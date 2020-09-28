@@ -15,6 +15,7 @@ buildscript {
 
 allprojects {
     apply plugin: 'nebula.release'
+	apply plugin: 'nebula.maven-publish'
     group = 'objectify'
 }
 

@@ -11,12 +11,14 @@ services:
     entrypoint: ["echo", "zookeeper service is disabled"]
 
   rabbitmq:
-    image: rabbitmq:3.7
+    image: rabbitmq:3.7-management
     container_name: dataflow-rabbitmq
     expose:
       - '5672'
+      - '15672'
     ports:
-      - 15672:5672
+      - 5672:5672
+      - 15672:15672
 
   dataflow-server:
     environment:

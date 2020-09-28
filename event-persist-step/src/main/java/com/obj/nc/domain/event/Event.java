@@ -3,14 +3,15 @@ package com.obj.nc.domain.event;
 import java.io.IOException;
 
 import org.json.JSONObject;
+import org.springframework.data.annotation.Id;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Event {
-
+	
 	Header header = new Header();
 	Body body = new Body();
-
+	
 	public static Event createWithSimpleMessage(String configurationName, String message) {
 		Event event = new Event();
 		event.header.setConfigurationName(configurationName);
