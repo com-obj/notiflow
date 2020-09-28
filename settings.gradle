@@ -1,4 +1,6 @@
 rootProject.name = 'notif-center'
 
-include 'rest-event-persister'
+include 'event-generator-test'
+include 'event-setting-step'
+
 
