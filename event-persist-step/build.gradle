@@ -43,3 +43,10 @@ dependencyManagement {
 test {
 	useJUnitPlatform()
 }
+
+task copyDistToStagingFolder(type: Copy) {
+	from bootJar // shortcut for bootJar.outputs.files
+	into "./../docker-k7s/dist"
+}
+
+build.dependsOn copyDistToStagingFolder
