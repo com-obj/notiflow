@@ -1,3 +1,4 @@
+
 buildscript {
     repositories {
         jcenter()
@@ -19,6 +20,8 @@ allprojects {
     group = 'objectify'
 }
 
+
+
 subprojects {
     repositories {
         jcenter()
@@ -31,6 +34,7 @@ subprojects {
         }
     }
 }
+
 
 task resolveDependencies(group: "build setup", description: "Resolve and prefetch dependencies") {
     doLast {
