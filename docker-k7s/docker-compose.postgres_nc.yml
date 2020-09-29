@@ -3,7 +3,7 @@ version: '3'
 
 services:
 
-  postgres:
+  nc-postgres:
     image: postgres:10
     container_name: nc-postgres
     restart: always
