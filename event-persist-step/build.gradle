@@ -46,7 +46,7 @@ test {
 
 task copyDistToStagingFolder(type: Copy) {
 	from bootJar // shortcut for bootJar.outputs.files
-	into "./../docker-k7s/dist"
+	into "./../docker-k7s/all-components/dist"
 }
 
 build.dependsOn copyDistToStagingFolder

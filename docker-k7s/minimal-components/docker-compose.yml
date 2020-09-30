@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:10
+    container_name: dataflow-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: dataflow
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: rootpw
+    expose:
+      - 5432
+    ports:
+      - 15432:5432
+
+  nc-postgres:
+    image: postgres:10
+    container_name: nc-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: nc
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: rootpw
+    expose:
+      - 5432
+    ports:
+      - 25432:5432
+      
+  rabbitmq:
+    image: rabbitmq:3.7-management
+    container_name: dataflow-rabbitmq
+    expose:
+      - '5672'
+      - '15672'
+    ports:
+      - 5672:5672
+      - 15672:15672
