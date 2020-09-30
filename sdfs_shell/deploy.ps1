@@ -1,7 +1,1 @@
-app register --uri file://root/scdf/event-generator-test-0.0.1-SNAPSHOT.jar --type source --name nc-event-generator
-app register --uri file://root/scdf/event-settings-step-0.0.1-SNAPSHOT.jar --type processor --name nc-event-settings-step
-app register --uri file://root/scdf/event-persist-step-0.0.1-SNAPSHOT.jar --type sink --name nc-event-persist-step
-
-stream create --definition "nc-event-generator | nc-event-settings-step | nc-event-persist-step" --name notif-center
-stream deploy --name notif-center
-
+java -jar spring-cloud-dataflow-shell-2.6.2.jar --spring.shell.commandFile=register-apps-deploy-stream.shell
