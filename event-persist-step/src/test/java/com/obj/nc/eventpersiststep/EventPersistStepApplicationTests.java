@@ -54,7 +54,7 @@ public class EventPersistStepApplicationTests {
 			.input()
 			.send(message);
 		
-		verify(this.persistEventSink).process(captor.capture());
+		verify(this.persistEventSink).logEvent().accept(captor.capture());
 	}
 
 	@EnableAutoConfiguration
