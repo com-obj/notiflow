@@ -16,10 +16,12 @@ public class EventGenerator {
 	@Bean
     @Scheduled(fixedDelay = 1000)
     public Supplier<Event> generateEvent() {
-		return () ->  {
-			Event event = Event.createWithSimpleMessage("test-config", "Hi there!!");
-			return event;
-		};
+		return EventGenerator::generateConstantEvent;
+	}
+	
+	public static Event generateConstantEvent() {
+		Event event = Event.createWithSimpleMessage("test-config", "Hi there!!");
+		return event;
 	}
 
 }

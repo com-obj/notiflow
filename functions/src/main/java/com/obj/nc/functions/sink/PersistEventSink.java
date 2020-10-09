@@ -16,7 +16,11 @@ public class PersistEventSink {
 	
 	@Bean
 	public Consumer<Event> logEvent() {
-		return event -> logger.info(event.toString());
+		return PersistEventSink::persisteEvent;
+	}
+	
+	public static void persisteEvent(Event event) {
+		logger.info(event.toString());
 	}
 
 }
