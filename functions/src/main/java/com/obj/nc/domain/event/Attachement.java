@@ -10,6 +10,7 @@ import lombok.Data;
 public class Attachement {
 
 	String name;
+	
 	@JsonProperty("file-URI")
     URI fileURI;
 	

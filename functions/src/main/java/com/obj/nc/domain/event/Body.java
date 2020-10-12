@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 public class Body extends BaseJSONObject{
 
 	Message message = new Message();
+	
 	List<Attachement> attachments = new ArrayList<Attachement>();
 
 }

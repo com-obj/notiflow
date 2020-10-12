@@ -75,7 +75,6 @@ public class EventGenerator {
 			
 			String eventJSONStr = readFileContent(eventFile);	
 			Event event = Event.fromJSON(eventJSONStr);
-			event.getHeader().generateAndSetID();//TODO: move to different step
 	
 			return event;
 		} catch (IOException e) {

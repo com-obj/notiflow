@@ -24,7 +24,9 @@ public class Event extends BaseJSONObject{
 	@NotNull
 	@Include
 	UUID id;
+	
 	Header header = new Header();
+	
 	Body body = new Body();
 
 	public static Event createWithSimpleMessage(String configurationName, String message) {
@@ -35,17 +37,12 @@ public class Event extends BaseJSONObject{
 		return event;
 	}
 	
-	
-	
 	private void generateAndSetID() {
 		id = generateUUID();
 	}
 	
-	public Event cloneWithNewID() {
-		Event newDeepClone = fromJSON(toJSONString());
-		newDeepClone.generateAndSetID();
-		
-		return newDeepClone;
+	public void regenerateAndSetID() {
+		id = generateUUID();
 	}
 
 	public static Event fromJSON(JSONObject jo) {

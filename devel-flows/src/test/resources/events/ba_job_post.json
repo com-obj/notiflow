@@ -5,6 +5,9 @@
    "body":{
       "message":{
          "text":"New position on koderia.sk"
-      }
+      },
+      
+      "technologies": ["Java","JEE","JPA"],
+      "experiance": ["Medior","Senior"]
    }
 }

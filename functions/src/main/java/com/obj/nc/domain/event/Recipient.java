@@ -20,6 +20,7 @@ public class Recipient {
 
 	@NotNull
 	String name;
+	
 	DeliveryOptions deliveryOptions = new DeliveryOptions();
 
 }

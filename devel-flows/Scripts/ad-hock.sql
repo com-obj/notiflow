@@ -1,0 +1,1 @@
+select * from nc_event ne ;

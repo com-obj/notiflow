@@ -1,4 +1,4 @@
-package com.obj.nc.functions.processors;
+package com.obj.nc.functions.sink;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -16,20 +16,20 @@ import lombok.extern.log4j.Log4j2;
 @Configuration
 @Log4j2
 @AllArgsConstructor
-public class PersistEvent {
+public class PersistEventConsumer {
 	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
 
 	@Bean
-	public Consumer<Event> persistEvent2() {
+	public Consumer<Event> persistEvent() {
 		return (event) -> {
-			persistEventImpl(event);
+			persistEvent(event);
 		};
 	}
 
-	public void persistEventImpl(Event event) {
+	public void persistEvent(Event event) {
 		log.info("Persisting event {}",event);
 		
 		String inserEventSQL = "INSERT INTO nc_event (id, processing_id, event_json) VALUES (?, ?, to_json(?::json))";

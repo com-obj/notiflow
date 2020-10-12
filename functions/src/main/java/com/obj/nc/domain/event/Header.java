@@ -22,17 +22,21 @@ public class Header extends BaseJSONObject {
 
 	@JsonProperty("configuration-name")
 	String configurationName;
+	
 	@NotNull
 	@Include
 	UUID processingID;
+	
 	List<Recipient> recipients = new ArrayList<Recipient>();
+	
+	DeliveryOptions deliveryOptions = new DeliveryOptions();
 
 	public Header addRecipient(Recipient r) {
 		this.recipients.add(r);
 		return this;
 	}
 
-	public void generateAndSetID() {
+	public void generateAndSetProcessingID() {
 		processingID = generateUUID();
 	}
 

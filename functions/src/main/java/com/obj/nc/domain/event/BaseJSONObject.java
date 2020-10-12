@@ -11,10 +11,10 @@ import lombok.Data;
 @Data
 public class BaseJSONObject {
 
-	private Map<String, String> attributes = new HashMap<String, String>();
+	private Map<String, Object> attributes = new HashMap<String, Object>();
 
 	@JsonAnySetter
-	public void pubAttributeValue(String key, String value) {
+	public void pubAttributeValue(String key, Object value) {
 		attributes.put(key, value);
 	}
 
