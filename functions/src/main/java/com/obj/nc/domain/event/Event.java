@@ -1,6 +1,7 @@
 package com.obj.nc.domain.event;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
@@ -22,7 +23,7 @@ public class Event extends BaseJSONObject{
 
 	@NotNull
 	@Include
-	String id;
+	UUID id;
 	Header header = new Header();
 	Body body = new Body();
 
@@ -33,6 +34,8 @@ public class Event extends BaseJSONObject{
 		event.body.message.setText(message);
 		return event;
 	}
+	
+	
 	
 	private void generateAndSetID() {
 		id = generateUUID();

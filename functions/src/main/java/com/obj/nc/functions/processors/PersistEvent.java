@@ -1,5 +1,6 @@
 package com.obj.nc.functions.processors;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class PersistEvent {
 	public void persistEventImpl(Event event) {
 		log.info("Persisting event {}",event);
 		
-		String inserEventSQL = "INSERT INTO nc_event (id, processing_id, event_json) VALUES (?, ?, ?)";
+		String inserEventSQL = "INSERT INTO nc_event (id, processing_id, event_json) VALUES (?, ?, to_json(?::json))";
 		
 		jdbcTemplate.update(inserEventSQL,
 				event.getId(),

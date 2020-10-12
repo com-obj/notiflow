@@ -2,6 +2,7 @@ package com.obj.nc.domain.event;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
@@ -23,7 +24,7 @@ public class Header extends BaseJSONObject {
 	String configurationName;
 	@NotNull
 	@Include
-	String processingID;
+	UUID processingID;
 	List<Recipient> recipients = new ArrayList<Recipient>();
 
 	public Header addRecipient(Recipient r) {
