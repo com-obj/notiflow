@@ -1,7 +1,15 @@
 package com.obj.nc.domain.event;
 
+import javax.validation.constraints.NotNull;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper=true)
 public class EmailRecipient extends Recipient {
 
+	@NotNull
 	String email;
 	
 	public static EmailRecipient create(String name, String emailAddress) {
@@ -11,13 +19,6 @@ public class EmailRecipient extends Recipient {
 		return r;
 	}
 
-	public String getEmail() {
-		return email;
-	}
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
 	
 }

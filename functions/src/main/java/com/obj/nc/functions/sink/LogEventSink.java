@@ -10,16 +10,16 @@ import org.springframework.context.annotation.Configuration;
 import com.obj.nc.domain.event.Event;
 
 @Configuration
-public class PersistEventSink {
+public class LogEventSink {
 	
-	private static final Logger logger = LoggerFactory.getLogger(PersistEventSink.class);
+	private static final Logger logger = LoggerFactory.getLogger(LogEventSink.class);
 	
 	@Bean
 	public Consumer<Event> logEvent() {
-		return PersistEventSink::persisteEvent;
+		return LogEventSink::logEvent;
 	}
 	
-	public static void persisteEvent(Event event) {
+	public static void logEvent(Event event) {
 		logger.info(event.toString());
 	}
 

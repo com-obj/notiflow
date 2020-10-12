@@ -5,7 +5,7 @@ plugins {
 	id 'maven-publish'
 }
 
-group = 'com.obj.nc.event-generator-test'
+group = 'com.obj.nc.flows'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '8'
 
@@ -18,13 +18,14 @@ ext {
 }
 
 dependencies {
-	implementation project(':functions')
+//	implementation project(':functions')
 	
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	implementation 'org.springframework.cloud:spring-cloud-stream'
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
+	implementation 'org.postgresql:postgresql'
 	implementation 'org.json:json:20200518'
 	
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {

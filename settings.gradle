@@ -1,4 +1,4 @@
 rootProject.name = 'notif-center'
 
-include 'functions'
 include 'devel-flows'
+

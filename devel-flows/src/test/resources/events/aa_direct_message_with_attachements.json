@@ -1,0 +1,16 @@
+{
+   "header":{
+      "configuration-name":"static-routing-pipeline"
+   },
+   "body":{
+      "message":{
+         "text":"Hallo world"
+      },
+      "attachments":[
+         {
+            "name":"name.extension",
+            "file-URI":"http://domain/location/name.extension"
+         }
+      ]
+   }
+}

@@ -1,0 +1,10 @@
+{
+   "header":{
+      "configuration-name":"static-routing-pipeline"
+   },
+   "body":{
+      "message":{
+         "text":"New position on koderia.sk"
+      }
+   }
+}

@@ -1,4 +1,4 @@
-package com.obj.nc.functions.processors;
+package com.obj.nc.functions.processors.koderia;
 
 import java.util.function.Function;
 
@@ -13,11 +13,11 @@ import lombok.extern.log4j.Log4j2;
 
 @Configuration
 @Log4j2
-public class EnrichEventSettingsProcessor {
+public class FindRecepientsUsingKoderiaSubsription {
 
 	@Bean
 	public Function<Event, Event> enrichEvent() {
-		return EnrichEventSettingsProcessor::enrichEvent;
+		return FindRecepientsUsingKoderiaSubsription::enrichEvent;
 	}
 
 	public static Event enrichEvent(Event event) {

@@ -1,5 +1,8 @@
 package com.obj.nc.domain.event;
 
+import lombok.Data;
+
+@Data
 public class DeliveryOptions {
 	
 	public enum AGGREGATION_TYPE {
@@ -8,14 +11,5 @@ public class DeliveryOptions {
 	
 	AGGREGATION_TYPE aggregationType;
 
-	public AGGREGATION_TYPE getAggregationType() {
-		return aggregationType;
-	}
-
-	public void setAggregationType(AGGREGATION_TYPE aggregationType) {
-		this.aggregationType = aggregationType;
-	}
-	
-	
 
 }
