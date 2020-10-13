@@ -20,8 +20,11 @@ public class GenerateProcessingIdProcessor {
 
 	public static Event generateProcessingId(Event event) {
 		log.info("Generating processingID for {}",  event);
+		event.stepStart("GenerateProcessingIdProcessor");
 		
-		event.getHeader().generateAndSetProcessingID();
+		event.getHeader().generateAndSetEventID();
+		
+		event.stepFinish();
 		return event;
 	}
 }

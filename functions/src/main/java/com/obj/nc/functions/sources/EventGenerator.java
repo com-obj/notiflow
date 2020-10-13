@@ -49,6 +49,8 @@ public class EventGenerator {
 	
 	public static Event generateConstantEvent() {
 		Event event = Event.createWithSimpleMessage("test-config", "Hi there!!");
+		event.stepStart("EventGenerator");
+		
 		return event;
 	}
 
@@ -75,6 +77,7 @@ public class EventGenerator {
 			
 			String eventJSONStr = readFileContent(eventFile);	
 			Event event = Event.fromJSON(eventJSONStr);
+			event.stepStart("EventGenerator");
 	
 			return event;
 		} catch (IOException e) {

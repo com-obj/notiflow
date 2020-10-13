@@ -19,25 +19,25 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class Header extends BaseJSONObject {
-
-	@JsonProperty("configuration-name")
-	String configurationName;
 	
+	@JsonProperty("configuration-name")
+	private String configurationName;
+		
 	@NotNull
 	@Include
-	UUID processingID;
+	private UUID eventId;
 	
-	List<Recipient> recipients = new ArrayList<Recipient>();
+	private List<Recipient> recipients = new ArrayList<Recipient>();
 	
-	DeliveryOptions deliveryOptions = new DeliveryOptions();
+	private DeliveryOptions deliveryOptions = new DeliveryOptions();	
 
 	public Header addRecipient(Recipient r) {
 		this.recipients.add(r);
 		return this;
 	}
 
-	public void generateAndSetProcessingID() {
-		processingID = generateUUID();
+	public void generateAndSetEventID() {
+		eventId = generateUUID();
 	}
 
 }

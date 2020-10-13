@@ -16,14 +16,15 @@ import lombok.extern.log4j.Log4j2;
 @Configuration
 @Log4j2
 public class FindRecepientsUsingKoderiaSubsription {
-
+	
 	@Bean
 	public Function<Event, Event> resolveRecipients() {
 		return FindRecepientsUsingKoderiaSubsription::resolveRecipients;
 	}
 
 	public static Event resolveRecipients(Event event) {
-		event.regenerateAndSetID();
+		event.stepStart("FindRecepientsUsingKoderiaSubsription");
+		
 		log.info("enrichEvent triggered");
 		
 		@SuppressWarnings("unchecked")
@@ -40,6 +41,7 @@ public class FindRecepientsUsingKoderiaSubsription {
 
 		event.getHeader().addRecipient(recipient1).addRecipient(recipient2);
 
+		event.stepFinish();
 		return event;
 	}
 }
