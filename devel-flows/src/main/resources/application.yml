@@ -1,0 +1,46 @@
+
+spring.cloud:
+   function:
+      definition: generateEvent;generateProcessingId;persistEvent;persistEvent2;resolveRecipients;logEvent
+   
+   stream:
+      bindings:
+         generateEvent-out-0:
+            destination: ext_event
+            producer.requiredGroups: ext_event-processing-group
+            
+         generateProcessingId-in-0:
+            destination: ext_event
+            group: ext_event-processing-group
+         generateProcessingId-out-0:
+            destination: event
+            producer.requiredGroups: event-processing-group
+            
+         persistEvent-in-0:
+            destination: event
+            
+         resolveRecipients-in-0:
+            destination: event
+            group: event-processing-group
+         resolveRecipients-out-0:
+            destination: event-with-settings
+            producer.requiredGroups: event-settings-consumer
+            
+         persistEvent2-in-0:
+            destination: event-with-settings
+            
+         logEvent-in-0:
+            destination: event-with-settings
+            group: event-settings-consumer
+            
+      poller.fixedDelay: "1000"
+
+spring.datasource:
+   platform: postgres
+   url: jdbc:postgresql://localhost:25432/nc
+   username: root
+   password: rootpw
+   
+management.endpoints.web.exposure.include: '*'
+functions.event-generator.sourceDir: src/test/resources/events
+

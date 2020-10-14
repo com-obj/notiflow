@@ -1,4 +1,4 @@
-package com.obj.nc.functions.processors.koderia;
+package com.obj.nc.functions.processors;
 
 import java.util.function.Function;
 
