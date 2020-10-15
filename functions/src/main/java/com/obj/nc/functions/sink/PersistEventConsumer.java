@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.event.Event;
-import com.obj.nc.domain.event.ProcessingInfo;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -38,7 +38,7 @@ public class PersistEventConsumer {
 	}
 
 	public void persistEvent(Event event) {
-		log.info("Persisting event {}",event);
+		log.debug("Persisting event {}",event);
 		
 		ProcessingInfo processingInfo = event.getProcessingInfo();
 		
@@ -48,7 +48,7 @@ public class PersistEventConsumer {
 		Timestamp processingTimeStampFinish = new Timestamp(processingInfo.getTimeStampFinish().toEpochMilli());
 		
 		jdbcTemplate.update(inserEventSQL,
-				event.getHeader().getEventId(),
+				event.getHeader().getId(),
 				processingInfo.getProcessingId(),
 				processingInfo.getPrevProcessingId(),
 				processingInfo.getStepName(),

@@ -1,10 +1,10 @@
-package com.obj.nc.domain.event;
+package com.obj.nc.domain;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
+
+import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -25,19 +25,14 @@ public class Header extends BaseJSONObject {
 		
 	@NotNull
 	@Include
-	private UUID eventId;
-	
-	private List<Recipient> recipients = new ArrayList<Recipient>();
-	
-	private DeliveryOptions deliveryOptions = new DeliveryOptions();	
+	private UUID id;
 
-	public Header addRecipient(Recipient r) {
-		this.recipients.add(r);
-		return this;
+	public void generateAndSetID() {
+		id = generateUUID();
 	}
 
-	public void generateAndSetEventID() {
-		eventId = generateUUID();
+	public void copyHeaderFrom(Header header) {
+		BeanUtils.copyProperties(header, this);
 	}
 
 }

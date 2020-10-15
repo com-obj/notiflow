@@ -1,11 +1,19 @@
 package com.obj.nc.domain.message;
 
+import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.Body;
+import com.obj.nc.domain.Header;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 @Data
-@NoArgsConstructor
-public class Message {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class Message extends BasePayload {
 	
-	private String text;
+	private Header header = new Header();
+	private Body body = new Body();
+
+	
+
 }

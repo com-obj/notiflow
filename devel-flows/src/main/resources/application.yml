@@ -1,7 +1,7 @@
 
 spring.cloud:
    function:
-      definition: generateEvent;generateProcessingId;persistEvent;persistEvent2;resolveRecipients;logEvent
+      definition: generateEvent;generateProcessingId;persistEvent;persistEvent2;resolveRecipients;generateMessagesFromEvent;logEvent
    
    stream:
       bindings:
@@ -14,24 +14,33 @@ spring.cloud:
             group: ext_event-processing-group
          generateProcessingId-out-0:
             destination: event
-            producer.requiredGroups: event-processing-group
+            producer.requiredGroups: event-processing-group,event-persisting-group
             
          persistEvent-in-0:
             destination: event
+            group: event-persisting-group
             
          resolveRecipients-in-0:
             destination: event
             group: event-processing-group
          resolveRecipients-out-0:
             destination: event-with-settings
-            producer.requiredGroups: event-settings-consumer
+            producer.requiredGroups: event-settings-consumer,event-persisting-group2
             
          persistEvent2-in-0:
             destination: event-with-settings
+            group: event-persisting-group2
             
-         logEvent-in-0:
+         generateMessagesFromEvent-in-0:
             destination: event-with-settings
             group: event-settings-consumer
+         generateMessagesFromEvent-out-0:
+            destination: message
+            producer.requiredGroups: message-consumer
+            
+         logEvent-in-0:
+            destination: message
+            group: message-consumer
             
       poller.fixedDelay: "1000"
 

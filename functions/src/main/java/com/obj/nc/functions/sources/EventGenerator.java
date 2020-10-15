@@ -22,11 +22,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.message.Message;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.EmitterProcessor;
+import reactor.core.publisher.Flux;
 
 @EnableScheduling
 @Configuration
@@ -38,21 +41,31 @@ public class EventGenerator {
 	@NotNull
 	private EventSourceConfig eventSourceConfig; 
 	
+	private final EmitterProcessor<Event> streamSource = EmitterProcessor.create();
+
+//IMERATIVE START
+//	@Bean
+//	@Scheduled(fixedDelay = 1000)
+//	public Supplier<Event> generateEvent() {
+//		return () -> {
+//			return readEventsFromFile();
+//		};
+//	}
+//IMERATIVE END
+	
+//REACTIVE START
 	@Bean
-    @Scheduled(fixedDelay = 1000)
-    public Supplier<Event> generateEvent() {
-//		return EventGenerator::generateConstantEvent;
-		return () -> {
-			return readEventsFromFile();
-		};
+    public Supplier<Flux<Event>> generateEvent() {
+		return () -> streamSource;
 	}
 	
-	public static Event generateConstantEvent() {
-		Event event = Event.createWithSimpleMessage("test-config", "Hi there!!");
-		event.stepStart("EventGenerator");
+    @Scheduled(fixedDelay = 1000)
+	public void generateEventAndAddToFlux() {
+    	Event event =  readEventsFromFile(); 
 		
-		return event;
+    	streamSource.onNext(event);
 	}
+//REACTIVE END
 
 	private int eventFileIndex = 0;
 	

@@ -1,4 +1,4 @@
-package com.obj.nc.domain.event;
+package com.obj.nc.domain;
 
 import javax.validation.constraints.NotNull;
 
@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 public class Recipient {
 
 	@NotNull
-	String name;
+	private String name;
 	
-	DeliveryOptions deliveryOptions = new DeliveryOptions();
+	private DeliveryOptions deliveryOptions;
 
 }

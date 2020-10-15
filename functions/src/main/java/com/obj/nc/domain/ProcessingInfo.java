@@ -1,4 +1,4 @@
-package com.obj.nc.domain.event;
+package com.obj.nc.domain;
 
 import java.time.Instant;
 import java.util.LinkedList;
@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.obj.nc.domain.event.Event;
 import com.obj.nc.utils.DiffMatchPatch;
 import com.obj.nc.utils.DiffMatchPatch.Diff;
 
@@ -39,7 +40,7 @@ public class ProcessingInfo {
 	private String diffJson;
 
 	
-	public void stepStart(String processingStepName, Event event) {
+	public void stepStart(String processingStepName, BasePayload event) {
 		this.eventJson = event.toJSONString();
 		
 		ProcessingInfo prevProcessingInfo = event.getProcessingInfo();
@@ -55,7 +56,7 @@ public class ProcessingInfo {
 		timeStampFinish = now;
 	}
 	
-	public void stepFinish(Event event) {
+	public void stepFinish(BasePayload event) {
 		timeStampFinish = Instant.now();
 		modifiedEventJson = event.toJSONString();
 		

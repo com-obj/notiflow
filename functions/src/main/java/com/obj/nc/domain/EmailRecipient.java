@@ -1,4 +1,4 @@
-package com.obj.nc.domain.event;
+package com.obj.nc.domain;
 
 import javax.validation.constraints.NotNull;
 
