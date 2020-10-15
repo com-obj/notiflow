@@ -1,8 +1,9 @@
-CREATE TABLE nc_event_processing
+CREATE TABLE nc_processing_info
 (
-  event_id UUID NOT null, 
   processing_id UUID NOT NULL PRIMARY KEY, 
   prev_processing_id UUID,
+  payload_id UUID NOT null, 
+  payload_type varchar(20),
   step_name varchar(100),
   step_index smallint,
   time_processing_start timestamp with time ZONE,

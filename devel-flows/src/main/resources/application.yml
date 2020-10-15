@@ -1,7 +1,7 @@
 
 spring.cloud:
    function:
-      definition: generateEvent;generateProcessingId;persistEvent;persistEvent2;resolveRecipients;generateMessagesFromEvent;logEvent
+      definition: generateEvent;generateProcessingId;persistPI;persistPI2;persistPI3;resolveRecipients;generateMessagesFromEvent;logEvent
    
    stream:
       bindings:
@@ -16,7 +16,7 @@ spring.cloud:
             destination: event
             producer.requiredGroups: event-processing-group,event-persisting-group
             
-         persistEvent-in-0:
+         persistPI-in-0:
             destination: event
             group: event-persisting-group
             
@@ -27,7 +27,7 @@ spring.cloud:
             destination: event-with-settings
             producer.requiredGroups: event-settings-consumer,event-persisting-group2
             
-         persistEvent2-in-0:
+         persistPI2-in-0:
             destination: event-with-settings
             group: event-persisting-group2
             
@@ -36,7 +36,11 @@ spring.cloud:
             group: event-settings-consumer
          generateMessagesFromEvent-out-0:
             destination: message
-            producer.requiredGroups: message-consumer
+            producer.requiredGroups: message-consumer,event-persisting-group3
+            
+         persistPI3-in-0:
+            destination: message
+            group: event-persisting-group3
             
          logEvent-in-0:
             destination: message

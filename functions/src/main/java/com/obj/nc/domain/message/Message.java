@@ -6,13 +6,19 @@ import com.obj.nc.domain.Header;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 public class Message extends BasePayload {
 	
-	private Header header = new Header();
-	private Body body = new Body();
+	public static final String JSON_TYPE_IDENTIFIER = "MESSAGE";
+
+	@Override
+	public String getPayloadTypeName() {
+		return JSON_TYPE_IDENTIFIER;
+	}
+
 
 	
 

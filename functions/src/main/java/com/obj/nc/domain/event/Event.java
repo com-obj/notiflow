@@ -1,19 +1,6 @@
 package com.obj.nc.domain.event;
 
-import java.io.IOException;
-import java.util.LinkedList;
-
-import org.json.JSONObject;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.Body;
-import com.obj.nc.domain.Header;
-import com.obj.nc.domain.ProcessingInfo;
-import com.obj.nc.utils.DiffMatchPatch;
-import com.obj.nc.utils.DiffMatchPatch.Diff;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -23,11 +10,10 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 public class Event extends BasePayload {
-
-	private Header header = new Header();
-	private Body body = new Body();
+	
+	public static final String JSON_TYPE_IDENTIFIER = "EVENT";
 
 	
 	public Event() {
@@ -39,6 +25,11 @@ public class Event extends BasePayload {
 		event.body.getMessage().setText(message);
 		
 		return event;
+	}
+
+	@Override
+	public String getPayloadTypeName() {
+		return JSON_TYPE_IDENTIFIER;
 	}
 	
 

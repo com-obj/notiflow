@@ -14,30 +14,27 @@ import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
 
 import lombok.extern.log4j.Log4j2;
+import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 
 @Configuration
 @Log4j2
 public class CreateMessagesFromEvent {
-
+	
 	@Bean
-	public Function<Event, Flux<Message>> generateMessagesFromEvent() {
-		return CreateMessagesFromEvent::generateMessagesFromEventAsFlux;
+	public Function<Flux<Event>, Flux<Message>> generateMessagesFromEvent() {
+		return eventFlux -> eventFlux
+				.flatMap(event-> Flux.fromIterable(generateMessagesFromEvent(event)));
 	}
 
-	public static Flux<Message> generateMessagesFromEventAsFlux(Event event) {
-		List<Message> messages = generateMessagesFromEvent(event);
-
-		return Flux.fromIterable(messages);
-	}
-
-	private static List<Message> generateMessagesFromEvent(Event event) {
+	private List<Message> generateMessagesFromEvent(Event event) {
 		log.debug("Create messages for {}",  event);
 		
 		List<Message> messages = new ArrayList<Message>();
 		for (Recipient recipient: event.getBody().getRecipients()) {
 			
 			Message msg = new Message();
+			msg.setProcessingInfo(event.getProcessingInfo());
 			msg.stepStart("CreateMessagesFromEvent");
 			
 			Header msgHeader = msg.getHeader();

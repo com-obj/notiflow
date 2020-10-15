@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.event.Event;
 
@@ -17,45 +18,53 @@ import lombok.extern.log4j.Log4j2;
 @Configuration
 @Log4j2
 @AllArgsConstructor
-public class PersistEventConsumer {
+public class PersistProcessingInfo {
 	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
 
 	@Bean
-	public Consumer<Event> persistEvent() {
+	public Consumer<BasePayload> persistPI() {
 		return (event) -> {
-			persistEvent(event);
+			persistPI(event);
 		};
 	}
 	
 	@Bean
-	public Consumer<Event> persistEvent2() {
+	public Consumer<BasePayload> persistPI2() {
 		return (event) -> {
-			persistEvent(event);
+			persistPI(event);
+		};
+	}
+	
+	@Bean
+	public Consumer<BasePayload> persistPI3() {
+		return (event) -> {
+			persistPI(event);
 		};
 	}
 
-	public void persistEvent(Event event) {
-		log.debug("Persisting event {}",event);
+	public void persistPI(BasePayload payload) {
+		log.debug("Persisting processing info {}",payload);
 		
-		ProcessingInfo processingInfo = event.getProcessingInfo();
+		ProcessingInfo processingInfo = payload.getProcessingInfo();
 		
-		String inserEventSQL = "INSERT INTO nc_event_processing (event_id, processing_id, prev_processing_id, step_name, step_index, time_processing_start, time_processing_end, event_json, event_json_diff) VALUES (?, ?, ?, ?, ?, ?,?, to_json(?::json), to_json(?::json))";
+		String inserEventSQL = "INSERT INTO nc_processing_info (payload_id, payload_type, processing_id, prev_processing_id, step_name, step_index, time_processing_start, time_processing_end, event_json, event_json_diff) VALUES (?, ?, ?, ?, ?, ?, ?,?, to_json(?::json), to_json(?::json))";
 		
 		Timestamp processingTimeStampStart = new Timestamp(processingInfo.getTimeStampStart().toEpochMilli());
 		Timestamp processingTimeStampFinish = new Timestamp(processingInfo.getTimeStampFinish().toEpochMilli());
 		
 		jdbcTemplate.update(inserEventSQL,
-				event.getHeader().getId(),
+				payload.getHeader().getId(),
+				payload.getPayloadTypeName(),
 				processingInfo.getProcessingId(),
 				processingInfo.getPrevProcessingId(),
 				processingInfo.getStepName(),
 				processingInfo.getStepIndex(),
 				processingTimeStampStart,
 				processingTimeStampFinish,
-				event.toJSONString(),
+				payload.toJSONString(),
 				processingInfo.getDiffJson());
 	}
 }

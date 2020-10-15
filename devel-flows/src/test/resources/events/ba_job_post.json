@@ -1,4 +1,5 @@
 {
+   "type":"EVENT",
    "header":{
       "configuration-name":"static-routing-pipeline"
    },
