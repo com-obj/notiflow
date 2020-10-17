@@ -50,7 +50,18 @@ public class PersistProcessingInfo {
 		
 		ProcessingInfo processingInfo = payload.getProcessingInfo();
 		
-		String inserEventSQL = "INSERT INTO nc_processing_info (payload_id, payload_type, processing_id, prev_processing_id, step_name, step_index, time_processing_start, time_processing_end, event_json, event_json_diff) VALUES (?, ?, ?, ?, ?, ?, ?,?, to_json(?::json), to_json(?::json))";
+		String inserEventSQL = "INSERT INTO nc_processing_info "
+				+ "(payload_id, "
+				+ "payload_type, "
+				+ "processing_id, "
+				+ "prev_processing_id, "
+				+ "step_name, "
+				+ "step_index, "
+				+ "time_processing_start, "
+				+ "time_processing_end, "
+				+ "event_json, "
+				+ "event_json_diff) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?,?, to_json(?::json), to_json(?::json))";
 		
 		Timestamp processingTimeStampStart = new Timestamp(processingInfo.getTimeStampStart().toEpochMilli());
 		Timestamp processingTimeStampFinish = new Timestamp(processingInfo.getTimeStampFinish().toEpochMilli());

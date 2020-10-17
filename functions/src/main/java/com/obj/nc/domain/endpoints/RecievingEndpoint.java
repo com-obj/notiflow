@@ -1,6 +1,6 @@
-package com.obj.nc.domain;
+package com.obj.nc.domain.endpoints;
 
-import javax.validation.constraints.NotNull;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
@@ -11,15 +11,12 @@ import lombok.NoArgsConstructor;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ 
-	@Type(value = EmailRecipient.class, name = "EMAIL"), 
-	@Type(value = Recipient.class, name = "RECIPIENT") 
+	@Type(value = EmailEndpoint.class, name = "EMAIL"), 
+	@Type(value = EmailEndpoint.class, name = "MAIL_CHIMP")
 })
 @Data
 @NoArgsConstructor
-public class Recipient {
-
-	@NotNull
-	private String name;
+public abstract class RecievingEndpoint {
 	
 	private DeliveryOptions deliveryOptions;
 

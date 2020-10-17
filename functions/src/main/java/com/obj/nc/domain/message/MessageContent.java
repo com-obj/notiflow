@@ -1,5 +1,6 @@
-package com.obj.nc.domain;
+package com.obj.nc.domain.message;
 
+import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.domain.event.Event;
 
 import lombok.Data;

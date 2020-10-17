@@ -7,9 +7,11 @@ import java.util.function.Function;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.obj.nc.domain.EmailRecipient;
-import com.obj.nc.domain.DeliveryOptions;
-import com.obj.nc.domain.DeliveryOptions.AGGREGATION_TYPE;
+import com.obj.nc.domain.endpoints.DeliveryOptions;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.Group;
+import com.obj.nc.domain.endpoints.Person;
+import com.obj.nc.domain.endpoints.DeliveryOptions.AGGREGATION_TYPE;
 import com.obj.nc.domain.event.Event;
 
 import lombok.extern.log4j.Log4j2;
@@ -44,14 +46,20 @@ public class FindRecepientsUsingKoderiaSubsription {
 		}
 		
 		//find recipients based on technologies
-		EmailRecipient recipient1 = EmailRecipient.create("John Doe", "john.doe@objectify.sk");
-		EmailRecipient recipient2 = EmailRecipient.create("John Dudly", "john.dudly@objectify.sk");
+		Person person1 = new Person("John Doe");
+		Person person2 = new Person("John Dudly");
+		Person person3 = new Person("Jonson and johnson");
+		Group allObjectifyGroup = Group.createWithMembers("All Objectify", person1, person2, person3);
+		
+		EmailEndpoint recipient1 = EmailEndpoint.createForPerson(person1, "john.doe@objectify.sk");
+		EmailEndpoint recipient2 = EmailEndpoint.createForPerson(person2, "john.dudly@objectify.sk");
+		EmailEndpoint recipient3 = EmailEndpoint.createForGroup(allObjectifyGroup, "all@objectify.sk");
 		
 		DeliveryOptions deliveryOptions = new DeliveryOptions();
 		deliveryOptions.setAggregationType(AGGREGATION_TYPE.ONCE_A_WEEK);
 		recipient2.setDeliveryOptions(deliveryOptions);
 
-		event.getBody().addRecipient(recipient1).addRecipient(recipient2);
+		event.getBody().addAllRecipient(recipient1,recipient2,recipient3);
 
 		event.stepFinish();
 		return event;

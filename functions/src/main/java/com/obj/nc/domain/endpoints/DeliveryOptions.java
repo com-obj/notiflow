@@ -1,4 +1,4 @@
-package com.obj.nc.domain;
+package com.obj.nc.domain.endpoints;
 
 import lombok.Data;
 

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.obj.nc.domain.Body;
 import com.obj.nc.domain.Header;
-import com.obj.nc.domain.Recipient;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
 
@@ -31,7 +31,7 @@ public class CreateMessagesFromEvent {
 		log.debug("Create messages for {}",  event);
 		
 		List<Message> messages = new ArrayList<Message>();
-		for (Recipient recipient: event.getBody().getRecipients()) {
+		for (RecievingEndpoint recipient: event.getBody().getRecipients()) {
 			
 			Message msg = new Message();
 			msg.setProcessingInfo(event.getProcessingInfo());
