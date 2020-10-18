@@ -1,15 +1,20 @@
 package com.obj.nc.functions.sink;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.ProcessingInfo;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 
 import lombok.AllArgsConstructor;
@@ -25,23 +30,26 @@ public class ProcessingInfoPersister {
 	
 
 	@Bean
-	public Consumer<BasePayload> persistPI() {
+	public Consumer<BasePayload> persistPIForEvent() {
 		return (event) -> {
 			persistPI(event);
 		};
 	}
 	
 	@Bean
-	public Consumer<BasePayload> persistPI2() {
+	public Consumer<BasePayload> persistPIForEventWithRecipients() {
 		return (event) -> {
 			persistPI(event);
+			
+			List<RecievingEndpoint> recipients = event.getBody().getRecipients();
+			persistEnpointIfNotExists(recipients);
 		};
 	}
 	
 	@Bean
-	public Consumer<BasePayload> persistPI3() {
-		return (event) -> {
-			persistPI(event);
+	public Consumer<BasePayload> persistPIForMessage() {
+		return (message) -> {
+			persistPI(message);
 		};
 	}
 
@@ -77,5 +85,31 @@ public class ProcessingInfoPersister {
 				processingTimeStampFinish,
 				payload.toJSONString(),
 				processingInfo.getDiffJson());
+	}
+	
+	public void persistEnpointIfNotExists(List<RecievingEndpoint> ednpoints) {
+		
+		String inserEndpointIfNotExistsSQL = "insert into nc_endpoint "
+				+ "(endpoint_name, endpoint_type) "
+				+ "values "
+				+ "(?, ?) "
+				+ "ON CONFLICT ON CONSTRAINT con_pk_endpoint_name DO NOTHING";
+		
+		jdbcTemplate.batchUpdate(
+				inserEndpointIfNotExistsSQL,
+				new BatchPreparedStatementSetter() {
+
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						RecievingEndpoint endpoint = ednpoints.get(i);
+						ps.setString(2, endpoint.getName());
+						ps.setString(3, endpoint.getEndpointTypeName());
+					}
+
+					public int getBatchSize() {
+						return ednpoints.size();
+					}
+
+				});
+		
 	}
 }

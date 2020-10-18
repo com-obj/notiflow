@@ -8,11 +8,11 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class EmailEndpoint extends RecievingEndpoint {
+	
+	public static final String JSON_TYPE_IDENTIFIER = "EMAIL";
 
 	@NotNull
 	private String email;
-	
-	private Recipient recipient;
 	
 	public static EmailEndpoint createForPerson(Person person, String emailAddress) {
 		EmailEndpoint r = new EmailEndpoint();
@@ -28,6 +28,14 @@ public class EmailEndpoint extends RecievingEndpoint {
 		return r;
 	}
 
+	@Override
+	public String getName() {
+		return email;
+	}
 
+	@Override
+	public String getEndpointTypeName() {
+		return JSON_TYPE_IDENTIFIER;
+	}
 	
 }
