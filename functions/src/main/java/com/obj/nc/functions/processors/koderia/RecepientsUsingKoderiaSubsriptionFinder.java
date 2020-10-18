@@ -19,7 +19,7 @@ import reactor.core.publisher.Flux;
 
 @Configuration
 @Log4j2
-public class FindRecepientsUsingKoderiaSubsription {
+public class RecepientsUsingKoderiaSubsriptionFinder {
 	
 	//IMERATIVE start
 //	@Bean

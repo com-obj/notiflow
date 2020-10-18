@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 
 @Configuration
 @Log4j2
-public class GenerateProcessingIdProcessor {
+public class ProcessingIdGenerator {
 
 //IMERATIVE START
 //	@Bean

@@ -9,14 +9,14 @@ import org.springframework.context.annotation.Configuration;
 
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.CreateMessagesFromEvent;
+import com.obj.nc.functions.processors.MessagesFromEventBuilder;
 
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;
 
 @Configuration
 @Log4j2
-public class LogPayloadSink {
+public class PayloadLoggerSink {
 		
 	@Bean
 	public Consumer<Flux<Message>> logEvent() {

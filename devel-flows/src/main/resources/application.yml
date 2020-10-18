@@ -1,7 +1,7 @@
 
 spring.cloud:
    function:
-      definition: generateEvent;generateProcessingId;persistPI;persistPI2;persistPI3;resolveRecipients;generateMessagesFromEvent;logEvent
+      definition: generateEvent;generateProcessingId;persistPI;resolveRecipients;persistPI2;generateMessagesFromEvent;persistPI3;logEvent
    
    stream:
       bindings:

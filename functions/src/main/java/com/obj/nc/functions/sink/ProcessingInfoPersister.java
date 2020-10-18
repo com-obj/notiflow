@@ -18,7 +18,7 @@ import lombok.extern.log4j.Log4j2;
 @Configuration
 @Log4j2
 @AllArgsConstructor
-public class PersistProcessingInfo {
+public class ProcessingInfoPersister {
 	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;

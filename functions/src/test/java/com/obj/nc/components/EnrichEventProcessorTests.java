@@ -12,11 +12,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.obj.nc.domain.event.Event;
-import com.obj.nc.functions.processors.koderia.FindRecepientsUsingKoderiaSubsription;
+import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubsriptionFinder;
 
 @RunWith(SpringRunner.class)
 @JdbcTest
-@ContextConfiguration(classes = FindRecepientsUsingKoderiaSubsription.class)
+@ContextConfiguration(classes = RecepientsUsingKoderiaSubsriptionFinder.class)
 class EnrichEventProcessorTests {
 
 	@Autowired

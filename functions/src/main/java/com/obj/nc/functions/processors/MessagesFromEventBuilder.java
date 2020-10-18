@@ -19,7 +19,7 @@ import reactor.core.publisher.Flux;
 
 @Configuration
 @Log4j2
-public class CreateMessagesFromEvent {
+public class MessagesFromEventBuilder {
 	
 	@Bean
 	public Function<Flux<Event>, Flux<Message>> generateMessagesFromEvent() {
