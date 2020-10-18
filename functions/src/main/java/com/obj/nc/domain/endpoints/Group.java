@@ -7,17 +7,29 @@ import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
-public class Group implements Recipient{
+@EqualsAndHashCode(callSuper=false)
+@NoArgsConstructor
+public class Group extends Recipient{
+	
+	public static final String JSON_TYPE_IDENTIFIER = "GROUP";
 	
 	@NotNull
-	private final String name;
+	private String name;
 	
 	private List<Recipient> members = new ArrayList<>();
 	
 	private boolean wasRsolved = false;
+	
+	public Group(String name) {
+		this.name = name;
+	}
 	
 	public static Group createWithMembers(String name, Recipient ... members ) {
 		Group group = new Group(name);
@@ -27,8 +39,8 @@ public class Group implements Recipient{
 	}
 
 	@Override
-	public List<Person> getFinalRecipientsAsPersons() {
-		return members.stream().flatMap(rec -> rec.getFinalRecipientsAsPersons().stream()).collect(Collectors.toList());
+	public List<Person> findFinalRecipientsAsPersons() {
+		return members.stream().flatMap(rec -> rec.findFinalRecipientsAsPersons().stream()).collect(Collectors.toList());
 	}
 
 }

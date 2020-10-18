@@ -8,6 +8,7 @@ import com.obj.nc.domain.message.Message;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
@@ -15,6 +16,7 @@ import lombok.Setter;
 @JsonSubTypes({ 
 	@Type(value = Event.class, name = Event.JSON_TYPE_IDENTIFIER),
 	@Type(value = Message.class, name = Message.JSON_TYPE_IDENTIFIER) })
+@ToString(callSuper = true)
 public abstract class BasePayload extends BaseJSONObject {
 
 	protected Header header = new Header();

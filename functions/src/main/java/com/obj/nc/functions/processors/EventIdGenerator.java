@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 
 @Configuration
 @Log4j2
-public class ProcessingIdGenerator {
+public class EventIdGenerator {
 
 //IMERATIVE START
 //	@Bean
@@ -23,17 +23,18 @@ public class ProcessingIdGenerator {
 	
 //REACTIVE START
 		@Bean
-	    public Function<Flux<Event>, Flux<Event>> generateProcessingId() {
-			return eventFlux -> eventFlux.map(event -> generateProcessingId(event));
+	    public Function<Flux<Event>, Flux<Event>> validateAndGenerateEventId() {
+			return eventFlux -> eventFlux.map(event -> validateAndGenerateEventId(event));
 		}
 //REACTIVE END
 
-	public Event generateProcessingId(Event event) {
-		log.debug("Generating processingID for {}",  event);
+	public Event validateAndGenerateEventId(Event event) {
+		log.debug("Validating {}",  event);
 		
-		event.stepStart("GenerateProcessingIdProcessor");
+		event.stepStart("ValidateAndGenerateEventId");
 		
 		event.getHeader().generateAndSetID();
+		event.getHeader().setEventId(event.getHeader().getId());
 		
 		event.stepFinish();
 		return event;

@@ -31,7 +31,7 @@ public class MessagesFromEventBuilder {
 		log.debug("Create messages for {}",  event);
 		
 		List<Message> messages = new ArrayList<Message>();
-		for (RecievingEndpoint recipient: event.getBody().getRecipients()) {
+		for (RecievingEndpoint recievingEndpoint: event.getBody().getRecievingEndpoints()) {
 			
 			Message msg = new Message();
 			msg.setProcessingInfo(event.getProcessingInfo());
@@ -43,10 +43,10 @@ public class MessagesFromEventBuilder {
 			
 			Body msgBody = msg.getBody();
 			Body eventBody = event.getBody();
-			msgBody.addRecipient(recipient);
+			msgBody.addRecievingEndpoints(recievingEndpoint);
 			
-			if (recipient.getDeliveryOptions()!=null) {
-				msgBody.setDeliveryOptions(recipient.getDeliveryOptions());
+			if (recievingEndpoint.getDeliveryOptions()!=null) {
+				msgBody.setDeliveryOptions(recievingEndpoint.getDeliveryOptions());
 			} else {
 				msgBody.setDeliveryOptions(eventBody.getDeliveryOptions());
 			}

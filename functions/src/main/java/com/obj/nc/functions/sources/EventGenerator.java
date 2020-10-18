@@ -28,6 +28,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 
@@ -35,6 +36,7 @@ import reactor.core.publisher.Flux;
 @Configuration
 @RequiredArgsConstructor
 @Getter
+@Log4j2
 public class EventGenerator {
 	
 	@Autowired
@@ -62,6 +64,9 @@ public class EventGenerator {
     @Scheduled(fixedDelay = 1000)
 	public void generateEventAndAddToFlux() {
     	Event event =  readEventsFromFile(); 
+    	if (event == null) {
+    		return;
+    	}
 		
     	streamSource.onNext(event);
 	}
@@ -78,6 +83,10 @@ public class EventGenerator {
 						.filter(path -> path.toString().endsWith(".json"))
 						.collect(Collectors.toList());
 				
+				if (eventFiles.size()==0) {
+					return null;
+				}
+				
 				eventFiles.sort(Comparator.comparing(eventFilePath -> eventFilePath.toAbsolutePath().toString()));
 				
 				eventFile = eventFiles.get(eventFileIndex++);
@@ -86,11 +95,17 @@ public class EventGenerator {
 				}
 			} else {
 				eventFile = Paths.get(eventSourceConfig.getSourceDir(), eventSourceConfig.getFileName());
+				if (!Files.exists(eventFile)) {
+					log.error("Configuration is referencing file, which doesn't exists {}", eventFile);
+					return null;
+				}
 			}
 			
 			String eventJSONStr = readFileContent(eventFile);	
 			Event event = Event.fromJSON(eventJSONStr);
-			event.stepStart("EventGenerator");
+//			event.stepStart("EventGenerator");
+			
+			Files.delete(eventFile);
 	
 			return event;
 		} catch (IOException e) {

@@ -19,17 +19,17 @@ public class Body extends BaseJSONObject{
 	
 	private List<Attachement> attachments = new ArrayList<Attachement>();
 	
-	private List<RecievingEndpoint> recipients = new ArrayList<RecievingEndpoint>();
+	private List<RecievingEndpoint> recievingEndpoints = new ArrayList<RecievingEndpoint>();
 	
 	private DeliveryOptions deliveryOptions = new DeliveryOptions();	
 
-	public Body addRecipient(RecievingEndpoint r) {
-		this.recipients.add(r);
+	public Body addRecievingEndpoints(RecievingEndpoint r) {
+		this.recievingEndpoints.add(r);
 		return this;
 	}
 	
-	public Body addAllRecipient(RecievingEndpoint ... r) {
-		this.recipients.addAll(Arrays.asList(r));
+	public Body addAllRecievingEndpoints(RecievingEndpoint ... r) {
+		this.recievingEndpoints.addAll(Arrays.asList(r));
 		return this;
 	}
 

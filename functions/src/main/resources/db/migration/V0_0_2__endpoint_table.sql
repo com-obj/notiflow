@@ -10,7 +10,8 @@ CREATE TABLE nc_endpoint
 
 CREATE TABLE nc_endpoint_processing
 (
-	endpoint_id UUID,
+	endpoint_id varchar(100),
 	processing_id UUID
 );
 
+CREATE INDEX ndx_endpoint_processing on nc_endpoint_processing (endpoint_id, processing_id);

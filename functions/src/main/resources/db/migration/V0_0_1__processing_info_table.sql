@@ -2,6 +2,7 @@ CREATE TABLE nc_processing_info
 (
   processing_id UUID NOT NULL PRIMARY KEY, 
   prev_processing_id UUID,
+  event_id UUID NOT null, 
   payload_id UUID NOT null, 
   payload_type varchar(20),
   step_name varchar(100),

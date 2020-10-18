@@ -60,20 +60,20 @@ public class ProcessingInfo {
 		timeStampFinish = Instant.now();
 		modifiedEventJson = event.toJSONString();
 		
-		calculateDiffToPreviosVersion();
+//		calculateDiffToPreviosVersion();
 	}
 	
-	private void calculateDiffToPreviosVersion() {
-		try {	
-			DiffMatchPatch diff = new DiffMatchPatch();
-			LinkedList<Diff> diffs = diff.diff_main(eventJson, modifiedEventJson);
-			
-			ObjectMapper objectMapper = new ObjectMapper();
-			diffJson = objectMapper.writeValueAsString(diffs.toArray());
-			
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
-	}
+//	private void calculateDiffToPreviosVersion() {
+//		try {	
+//			DiffMatchPatch diff = new DiffMatchPatch();
+//			LinkedList<Diff> diffs = diff.diff_main(eventJson, modifiedEventJson);
+//			
+//			ObjectMapper objectMapper = new ObjectMapper();
+//			diffJson = objectMapper.writeValueAsString(diffs.toArray());
+//			
+//		} catch (JsonProcessingException e) {
+//			throw new RuntimeException(e);
+//		}
+//	}
 	
 }

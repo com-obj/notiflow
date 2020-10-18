@@ -10,6 +10,7 @@ import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
+@ToString(callSuper = false)
 public class Message extends BasePayload {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "MESSAGE";

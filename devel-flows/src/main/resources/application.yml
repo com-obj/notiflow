@@ -1,7 +1,7 @@
 
 spring.cloud:
    function:
-      definition: generateEvent;generateProcessingId;persistPIForEvent;resolveRecipients;persistPIForEventWithRecipients;generateMessagesFromEvent;persistPIForMessage;logEvent
+      definition: generateEvent;validateAndGenerateEventId;persistPIForEvent;resolveRecipients;persistPIForEventWithRecipients;generateMessagesFromEvent;persistPIForMessage;logEvent
    
    stream:
       bindings:
@@ -9,10 +9,10 @@ spring.cloud:
             destination: ext_event
             producer.requiredGroups: ext_event-processing-group
             
-         generateProcessingId-in-0:
+         validateAndGenerateEventId-in-0:
             destination: ext_event
             group: ext_event-processing-group
-         generateProcessingId-out-0:
+         validateAndGenerateEventId-out-0:
             destination: event
             producer.requiredGroups: event-processing-group,event-persisting-group
             
@@ -31,16 +31,16 @@ spring.cloud:
             destination: event-with-settings
             group: event-persisting-group2
             
-         persistPIForMessage-in-0:
+         generateMessagesFromEvent-in-0:
             destination: event-with-settings
             group: event-settings-consumer
          generateMessagesFromEvent-out-0:
             destination: message
-            producer.requiredGroups: message-consumer,event-persisting-group3
+            producer.requiredGroups: message-consumer,message-persisting-group
             
-         persistPIWithMessages-in-0:
+         persistPIForMessage-in-0:
             destination: message
-            group: event-persisting-group3
+            group: message-persisting-group
             
          logEvent-in-0:
             destination: message
@@ -55,5 +55,6 @@ spring.datasource:
    password: rootpw
    
 management.endpoints.web.exposure.include: '*'
-functions.event-generator.sourceDir: src/test/resources/events
+
+functions.event-generator.sourceDir: src/test/resources/eventsQueue
 

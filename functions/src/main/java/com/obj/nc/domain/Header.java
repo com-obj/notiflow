@@ -26,6 +26,10 @@ public class Header extends BaseJSONObject {
 	@NotNull
 	@Include
 	private UUID id;
+	
+	@NotNull
+	@Include
+	private UUID eventId;
 
 	public void generateAndSetID() {
 		id = generateUUID();

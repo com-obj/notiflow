@@ -18,13 +18,12 @@ import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;
 
 @Configuration
-@Log4j2
 public class RecepientsUsingKoderiaSubsriptionFinder {
 	
 	//IMERATIVE start
 //	@Bean
 //	public Function<Event, Event> resolveRecipients() {
-//		return FindRecepientsUsingKoderiaSubsription::resolveRecipients;
+//		return event -> resolveRecipients(event);
 //	}
 	//IMERATIVE END
 	
@@ -51,15 +50,15 @@ public class RecepientsUsingKoderiaSubsriptionFinder {
 		Person person3 = new Person("Jonson and johnson");
 		Group allObjectifyGroup = Group.createWithMembers("All Objectify", person1, person2, person3);
 		
-		EmailEndpoint recipient1 = EmailEndpoint.createForPerson(person1, "john.doe@objectify.sk");
-		EmailEndpoint recipient2 = EmailEndpoint.createForPerson(person2, "john.dudly@objectify.sk");
-		EmailEndpoint recipient3 = EmailEndpoint.createForGroup(allObjectifyGroup, "all@objectify.sk");
+		EmailEndpoint endpoint1 = EmailEndpoint.createForPerson(person1, "john.doe@objectify.sk");
+		EmailEndpoint endpoint2 = EmailEndpoint.createForPerson(person2, "john.dudly@objectify.sk");
+		EmailEndpoint endpoint3 = EmailEndpoint.createForGroup(allObjectifyGroup, "all@objectify.sk");
 		
 		DeliveryOptions deliveryOptions = new DeliveryOptions();
 		deliveryOptions.setAggregationType(AGGREGATION_TYPE.ONCE_A_WEEK);
-		recipient2.setDeliveryOptions(deliveryOptions);
+		endpoint2.setDeliveryOptions(deliveryOptions);
 
-		event.getBody().addAllRecipient(recipient1,recipient2,recipient3);
+		event.getBody().addAllRecievingEndpoints(endpoint1,endpoint2,endpoint3);
 
 		event.stepFinish();
 		return event;

@@ -4,9 +4,11 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
+@NoArgsConstructor
 public class EmailEndpoint extends RecievingEndpoint {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "EMAIL";

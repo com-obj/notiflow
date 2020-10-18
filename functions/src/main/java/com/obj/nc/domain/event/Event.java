@@ -9,7 +9,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = false)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 public class Event extends BasePayload {
 	
