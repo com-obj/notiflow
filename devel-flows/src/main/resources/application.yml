@@ -1,7 +1,7 @@
 
 spring.cloud:
    function:
-      definition: generateEvent;validateAndGenerateEventId;persistPIForEvent;resolveRecipients;persistPIForEventWithRecipients;generateMessagesFromEvent;persistPIForMessage;logEvent
+      definition: generateEvent;validateAndGenerateEventId;persistPIForEvent;resolveRecipients;persistPIForEventWithRecipients;generateMessagesFromEvent;persistPIForMessage;sendMessage;logEvent
    
    stream:
       bindings:
@@ -36,11 +36,15 @@ spring.cloud:
             group: event-settings-consumer
          generateMessagesFromEvent-out-0:
             destination: message
-            producer.requiredGroups: message-consumer,message-persisting-group
+            producer.requiredGroups: message-consumer,message-persisting-group,message-sender
             
          persistPIForMessage-in-0:
             destination: message
             group: message-persisting-group
+            
+         sendMessage-in-0:
+            destination: message
+            group: message-sender
             
          logEvent-in-0:
             destination: message
@@ -53,6 +57,16 @@ spring.datasource:
    url: jdbc:postgresql://localhost:25432/nc
    username: root
    password: rootpw
+   
+spring.mail:
+   host: smtp.office365.com
+   port: 587
+   username: <login user to smtp server>
+   password: <login password to smtp server>
+   properties.mail.smtp:
+      auth: true
+      starttls.enable: true
+
    
 management.endpoints.web.exposure.include: '*'
 

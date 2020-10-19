@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 public class MessageContent extends BaseJSONObject {
 	
 	private String text;
+	private String subject;
 		
 
 }
