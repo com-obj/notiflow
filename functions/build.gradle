@@ -42,6 +42,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	
+	implementation 'com.icegreen:greenmail:1.6.0'
+	testImplementation 'com.icegreen:greenmail-junit4:1.6.0'
+	
+	
 	implementation 'org.springframework.cloud:spring-cloud-function-context'
 
 	implementation 'org.json:json:20200518'

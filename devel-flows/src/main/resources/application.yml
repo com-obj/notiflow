@@ -61,11 +61,11 @@ spring.datasource:
 spring.mail:
    host: smtp.office365.com
    port: 587
-   username: <login user to smtp server>
+   username:  no-reply@objectify.sk
    password: <login password to smtp server>
    properties.mail.smtp:
       auth: true
-      starttls.enable: true
+      starttls.enable: true   
 
    
 management.endpoints.web.exposure.include: '*'

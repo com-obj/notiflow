@@ -5,6 +5,7 @@
    },
    "body":{
       "message":{
+         "subject":"New position",
          "text":"New position on koderia.sk"
       },
       
