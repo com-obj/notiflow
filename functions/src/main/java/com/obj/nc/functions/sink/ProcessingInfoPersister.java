@@ -17,6 +17,7 @@ import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
+import com.obj.nc.exceptions.ProcessingException;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -61,6 +62,9 @@ public class ProcessingInfoPersister {
 		log.debug("Persisting processing info {}",payload);
 		
 		ProcessingInfo processingInfo = payload.getProcessingInfo();
+		if (processingInfo== null) {
+			throw new ProcessingException("Could not persist ProcessingIngo because the payload didn't contain it. Payload: " + payload);
+		}
 		
 		String inserEventSQL = "INSERT INTO nc_processing_info "
 				+ "(event_id, "
