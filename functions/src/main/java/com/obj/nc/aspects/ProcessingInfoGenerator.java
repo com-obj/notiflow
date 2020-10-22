@@ -11,8 +11,11 @@ import org.springframework.stereotype.Component;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.exceptions.ProcessingException;
 
+import lombok.extern.log4j.Log4j2;
+
 @Aspect
 @Component
+@Log4j2
 public class ProcessingInfoGenerator {
 
 	@Around("@annotation(DocumentProcessingInfo)")
@@ -25,6 +28,7 @@ public class ProcessingInfoGenerator {
 	    Method method = signature.getMethod();
 
 	    DocumentProcessingInfo myAnnotation = method.getAnnotation(DocumentProcessingInfo.class);
+		log.info("Generating processing info for step {}", myAnnotation.value());
 		
 		BasePayload payload = (BasePayload)joinPoint.getArgs()[0];
 		payload.stepStart(myAnnotation.value());

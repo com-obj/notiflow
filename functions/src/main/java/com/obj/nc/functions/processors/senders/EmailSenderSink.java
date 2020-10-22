@@ -2,7 +2,6 @@ package com.obj.nc.functions.processors.senders;
 
 import java.io.File;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.mail.MessagingException;
@@ -22,10 +21,9 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessageContent;
-import com.obj.nc.exceptions.ProcessingException;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.exceptions.ProcessingException;
 
-import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;
 
 @Configuration
@@ -35,7 +33,7 @@ public class EmailSenderSink {
 	private SendMessage fn;
 
 	@Bean
-	public Consumer<Flux<Message>> sendMessage() {
+	public Function<Flux<Message>,Flux<Message>> sendMessage() {
 		return payloads -> payloads.doOnNext(payload -> fn.apply(payload));
 	}
 

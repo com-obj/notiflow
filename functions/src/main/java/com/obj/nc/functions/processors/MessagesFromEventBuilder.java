@@ -39,7 +39,9 @@ public class MessagesFromEventBuilder {
 		public List<Message> apply(Event event) {
 			log.debug("Create messages for {}",  event);
 			
+			
 			List<Message> messages = new ArrayList<Message>();
+			
 			for (RecievingEndpoint recievingEndpoint: event.getBody().getRecievingEndpoints()) {
 				
 				Message msg = new Message();

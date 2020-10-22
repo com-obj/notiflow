@@ -57,6 +57,13 @@ public class ProcessingInfoPersister {
 			persistPI(message);
 		};
 	}
+	
+	@Bean
+	public Consumer<BasePayload> persistPIForSendMessage() {
+		return (message) -> {
+			persistPI(message);
+		};
+	}
 
 	public void persistPI(BasePayload payload) {
 		log.debug("Persisting processing info {}",payload);
