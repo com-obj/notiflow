@@ -45,6 +45,8 @@ public class GreenMailManager  {
 		greenMail = new GreenMail(new ServerSetup(portNumber, null, ServerSetup.PROTOCOL_SMTP));
 		greenMail.setUser(senderUser, senderPasswd);
         greenMail.start();
+        
+        log.info("Greenmail server started on port {}", portNumber);
     }
 	
 	@EventListener
@@ -54,7 +56,7 @@ public class GreenMailManager  {
     }
 	
 	@Component
-	@Profile("dev")
+	@Profile({"dev","test"})
 	public class GreenMailMessageLogger {
 		
 		@Scheduled(fixedDelay = 5000)

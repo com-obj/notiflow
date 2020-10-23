@@ -39,14 +39,13 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	
 	implementation 'com.icegreen:greenmail:1.6.0'
 	testImplementation 'com.icegreen:greenmail-junit4:1.6.0'
 	
-	
+	//add reactive support
 	implementation 'org.springframework.cloud:spring-cloud-function-context'
 
 	implementation 'org.json:json:20200518'
@@ -58,6 +57,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+		exclude group: "com.vaadin.external.google", module:"android-json"
 	}
 
 	testImplementation 'org.testcontainers:junit-jupiter'

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.utils.JsonUtils;
 
 import lombok.Data;
 import lombok.Getter;
@@ -101,9 +102,7 @@ public class EventGenerator {
 				}
 			}
 			
-			String eventJSONStr = readFileContent(eventFile);	
-			Event event = Event.fromJSON(eventJSONStr);
-//			event.stepStart("EventGenerator");
+			Event event = JsonUtils.readObjectFromJSONFile(eventFile,Event.class);
 			
 			Files.delete(eventFile);
 	
@@ -127,15 +126,6 @@ public class EventGenerator {
 	
 	
 	
-	private static String readFileContent(Path filePath) throws IOException 
-    {
-        StringBuilder contentBuilder = new StringBuilder();
- 
-        try (Stream<String> stream = Files.lines( filePath, StandardCharsets.UTF_8))  {
-            stream.forEach(s -> contentBuilder.append(s).append("\n"));
-        }
-        
-        return contentBuilder.toString();
-    }
+
 
 }

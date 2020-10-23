@@ -33,7 +33,13 @@ public class ProcessingInfoGenerator {
 		BasePayload payload = (BasePayload)joinPoint.getArgs()[0];
 		payload.stepStart(myAnnotation.value());
 		
-		Object returnValue = joinPoint.proceed();
+		Object returnValue = null;
+		try {
+			returnValue = joinPoint.proceed();
+		} catch (Throwable e) {
+			log.error("Exception ocured in processing step " + myAnnotation.value(), e);
+			throw e;
+		}
 		
 		payload.stepFinish();
 

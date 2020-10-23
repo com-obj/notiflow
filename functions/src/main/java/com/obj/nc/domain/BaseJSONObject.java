@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.domain.event.Event;
+import com.obj.nc.utils.JsonUtils;
 
 import lombok.Data;
 import lombok.Getter;
@@ -34,25 +35,11 @@ public class BaseJSONObject {
 	}
 
 	public static Event fromJSON(String jsonString) {
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-
-			Event event = objectMapper.readValue(jsonString, Event.class);
-			return event;
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
+		return JsonUtils.readObjectFromJSONString(jsonString, Event.class);
 	}
 
 	public String toJSONString() {
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			String jsonString = objectMapper.writeValueAsString(this);
-
-			return jsonString;
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
+		return JsonUtils.writeObjectToJSONString(this);
 	}
 
 }
