@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -36,8 +37,8 @@ import reactor.core.publisher.Flux;
 @EnableScheduling
 @Configuration
 @RequiredArgsConstructor
-@Getter
 @Log4j2
+@Profile("dev")
 public class EventGenerator {
 	
 	@Autowired
@@ -45,16 +46,6 @@ public class EventGenerator {
 	private EventSourceConfig eventSourceConfig; 
 	
 	private final EmitterProcessor<Event> streamSource = EmitterProcessor.create();
-
-//IMERATIVE START
-//	@Bean
-//	@Scheduled(fixedDelay = 1000)
-//	public Supplier<Event> generateEvent() {
-//		return () -> {
-//			return readEventsFromFile();
-//		};
-//	}
-//IMERATIVE END
 	
 //REACTIVE START
 	@Bean
@@ -112,9 +103,8 @@ public class EventGenerator {
 		}
 	}
 	
-	@ConfigurationProperties(prefix = "functions.event-generator")
+	@ConfigurationProperties(prefix = "nc.functions.event-generator")
 	@Data
-	@NoArgsConstructor
 	@Component
 	public static class EventSourceConfig {
 		
@@ -123,9 +113,6 @@ public class EventGenerator {
 		String fileName;
 	
 	}
-	
-	
-	
 
 
 }

@@ -19,11 +19,13 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
+import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 
 @Component
 @Profile({"dev","test"})
 @Log4j2
+@Data
 public class GreenMailManager  {
 	
 	private GreenMail greenMail;

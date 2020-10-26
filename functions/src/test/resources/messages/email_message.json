@@ -1,0 +1,39 @@
+{
+   "type":"MESSAGE",
+    "header":{
+      "attributes":{
+         
+      },
+      "id":"2598a791-08d6-4795-8354-2f675f72b067",
+      "eventId":"0c3f159f-103e-49fd-8eb1-f4b6de481acb",
+      "configuration-name":"static-routing-pipeline"
+   },
+   "body":{
+      "message":{
+         "text":"Text",
+         "subject":"Subject"
+      },
+      "attachments":[
+         
+      ],
+      "recievingEndpoints":[
+         {
+            "type":"EMAIL",
+            "recipient":{
+               "type":"PERSON",
+               "name":"John Doe"
+            },
+            "email":"john.doe@objectify.sk",
+            "endpointId":"john.doe@objectify.sk"
+         }
+      ],
+      "deliveryOptions":{
+         "aggregationType":"NONE",
+         "schedulingType":"IMMEDIATE"
+      }
+   },
+   "processingInfo":{
+      "processingId":"eaef533b-a512-4734-8206-9ca236a7f427",
+      "stepIndex":3
+    }
+}

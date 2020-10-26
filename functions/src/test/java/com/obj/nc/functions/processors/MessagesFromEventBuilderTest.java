@@ -29,7 +29,7 @@ class MessagesFromEventBuilderTest {
 	@Test
 	void createMessagesFromEvent() {
 		//GIVEN
-		String INPUT_JSON_FILE = "allEvents/direct_message.json";
+		String INPUT_JSON_FILE = "events/direct_message.json";
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
 		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId();
@@ -76,7 +76,7 @@ class MessagesFromEventBuilderTest {
 	@Test
 	void createMessagesFromEventDeliveryOptions() {
 		//GIVEN
-		String INPUT_JSON_FILE = "allEvents/delivery_options.json";
+		String INPUT_JSON_FILE = "events/delivery_options.json";
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
 		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId();
@@ -114,7 +114,7 @@ class MessagesFromEventBuilderTest {
 	@Test
 	void createMessagesFromEventAttachements() {
 		//GIVEN
-		String INPUT_JSON_FILE = "allEvents/direct_message_attachements.json";
+		String INPUT_JSON_FILE = "events/direct_message_attachements.json";
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
 		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId();

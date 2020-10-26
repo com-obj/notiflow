@@ -42,7 +42,7 @@ public class IntegrationTests {
 			InputDestination source = ctx.getBean(InputDestination.class);
 			OutputDestination target = ctx.getBean(OutputDestination.class);
 			
-			String INPUT_JSON_FILE = "allEvents/ba_job_post.json";
+			String INPUT_JSON_FILE = "events/ba_job_post.json";
 			Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 			org.springframework.messaging.Message<Event> inputEvent = convertBeanToMessagePayload(ctx, event);
 
