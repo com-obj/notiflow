@@ -1,10 +1,12 @@
 package com.obj.nc;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.stream.binder.test.InputDestination;
@@ -15,12 +17,19 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
+import org.testcontainers.containers.DockerComposeContainer;
 
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.utils.JsonUtils;
 
 public class IntegrationTests {
+
+	private static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
+	
+	@ClassRule
+	public static DockerComposeContainer environment = new DockerComposeContainer(new File("../docker-k7s/minimal-components/docker-compose.yml"))
+		.withLocalCompose(true);
 
 	@Test
 	public void testEventEmited() throws Exception {
@@ -33,17 +42,23 @@ public class IntegrationTests {
 			InputDestination source = ctx.getBean(InputDestination.class);
 			OutputDestination target = ctx.getBean(OutputDestination.class);
 			
-			Event event = JsonUtils.readObjectFromClassPathResource("allEvents/ba_job_post.json", Event.class);
+			String INPUT_JSON_FILE = "allEvents/ba_job_post.json";
+			Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 			org.springframework.messaging.Message<Event> inputEvent = convertBeanToMessagePayload(ctx, event);
 
 			source.send(inputEvent);
 
-
-			org.springframework.messaging.Message<byte[]> payload = target.receive(10000,"send-message.destination");
-
-			Message message = convertMessagePayloadToBean(ctx, payload, Message.class);
+			org.springframework.messaging.Message<byte[]> payload1 = target.receive(3000,FINAL_STEP_QUEUE_NAME);
+			Message message1 = convertMessagePayloadToBean(ctx, payload1, Message.class);
+			org.springframework.messaging.Message<byte[]> payload2 = target.receive(3000,FINAL_STEP_QUEUE_NAME);
+			Message message2 = convertMessagePayloadToBean(ctx, payload2, Message.class);
+			org.springframework.messaging.Message<byte[]> payload3 = target.receive(3000,FINAL_STEP_QUEUE_NAME);
+			Message message3 = convertMessagePayloadToBean(ctx, payload3, Message.class);
 			
-            MatcherAssert.assertThat(message, CoreMatchers.notNullValue());
+			
+            MatcherAssert.assertThat(message1, CoreMatchers.notNullValue());
+            MatcherAssert.assertThat(message2, CoreMatchers.notNullValue());
+            MatcherAssert.assertThat(message3, CoreMatchers.notNullValue());
         }
 		
 	}

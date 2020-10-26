@@ -34,6 +34,7 @@ dependencies {
             classifier = "test-binder"
         }
     }
+	testCompile "org.testcontainers:testcontainers:1.15.0-rc2"
 }
 
 dependencyManagement {
