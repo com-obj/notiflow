@@ -1,5 +1,6 @@
 package com.obj.nc.domain.event;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
 
 import lombok.EqualsAndHashCode;
@@ -28,11 +29,9 @@ public class Event extends BasePayload {
 	}
 
 	@Override
+	@JsonIgnore
 	public String getPayloadTypeName() {
 		return JSON_TYPE_IDENTIFIER;
 	}
 	
-
-
-
 }

@@ -16,8 +16,10 @@ import com.obj.nc.utils.DiffMatchPatch.Diff;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode.Include;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ProcessingInfo {
 	@NotNull
 	@Include

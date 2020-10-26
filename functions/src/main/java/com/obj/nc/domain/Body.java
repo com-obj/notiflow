@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public class Body extends BaseJSONObject{
 
-	private MessageContent message;
+	private MessageContent message = new MessageContent();
 	
 	private List<Attachement> attachments = new ArrayList<Attachement>();
 	

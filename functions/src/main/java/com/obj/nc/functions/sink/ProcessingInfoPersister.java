@@ -122,7 +122,7 @@ public class ProcessingInfoPersister {
 
 					public void setValues(PreparedStatement ps, int i) throws SQLException {
 						RecievingEndpoint endpoint = ednpoints.get(i);
-						ps.setString(1, endpoint.getName());
+						ps.setString(1, endpoint.getEndpointId());
 						ps.setString(2, endpoint.getEndpointTypeName());
 					}
 
@@ -151,7 +151,7 @@ public class ProcessingInfoPersister {
 	
 						public void setValues(PreparedStatement ps, int i) throws SQLException {
 							RecievingEndpoint endpoint = ednpoints.get(i);
-							ps.setString(1, endpoint.getName());
+							ps.setString(1, endpoint.getEndpointId());
 							ps.setObject(2, processingId);
 						}
 	

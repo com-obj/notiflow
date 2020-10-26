@@ -19,7 +19,7 @@ public abstract class RecievingEndpoint {
 	private DeliveryOptions deliveryOptions;
 	private Recipient recipient;
 	
-	public abstract String getName();
+	public abstract String getEndpointId();
 	
 	public abstract String getEndpointTypeName();
 

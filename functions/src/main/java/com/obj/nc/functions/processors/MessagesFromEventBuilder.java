@@ -58,6 +58,7 @@ public class MessagesFromEventBuilder {
 				
 				if (recievingEndpoint.getDeliveryOptions()!=null) {
 					msgBody.setDeliveryOptions(recievingEndpoint.getDeliveryOptions());
+					recievingEndpoint.setDeliveryOptions(null);
 				} else {
 					msgBody.setDeliveryOptions(eventBody.getDeliveryOptions());
 				}
