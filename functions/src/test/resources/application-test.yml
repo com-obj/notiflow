@@ -4,3 +4,5 @@ spring.mail:
    username: no-reply@objectify.sk
    password: xxx
    
+
+nc.functions.send-email-message.from: 'no-reply@objectify.sk'

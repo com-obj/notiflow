@@ -8,6 +8,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -23,25 +24,30 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessageContent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.exceptions.ProcessingException;
+import com.obj.nc.functions.sources.EventGenerator;
 
+import lombok.Data;
 import reactor.core.publisher.Flux;
 
 @Configuration
 public class EmailSenderSink {
 
 	@Autowired
-	private SendMessage fn;
-
+	private SendEmailMessage fn;
+	
 	@Bean
 	public Function<Flux<Message>,Flux<Message>> sendMessage() {
 		return payloads -> payloads.doOnNext(payload -> fn.apply(payload));
 	}
 
 	@Component
-	public static class SendMessage implements Function<Message, Message> {
+	public static class SendEmailMessage implements Function<Message, Message> {
 		
 		@Autowired
 	    private JavaMailSender emailSender;
+		
+		@Autowired 
+		private SendEmailMessageConfig config;
 
 
 		@DocumentProcessingInfo("SendEmail")
@@ -63,7 +69,7 @@ public class EmailSenderSink {
 				MimeMessage message = emailSender.createMimeMessage();
 				MimeMessageHelper helper = new MimeMessageHelper(message, true);
 		
-				helper.setFrom("no-reply@objectify.sk");
+				helper.setFrom(config.getFrom());
 		
 				helper.setTo(toEmail.getEmail());
 				
@@ -83,6 +89,15 @@ public class EmailSenderSink {
 			}
 		}
 
+	}
+	
+	@ConfigurationProperties(prefix = "nc.functions.send-email-message")
+	@Data
+	@Component
+	public static class SendEmailMessageConfig {
+		
+		String from;
+	
 	}
 
 }

@@ -78,4 +78,5 @@ spring.mail:
 management.endpoints.web.exposure.include: '*'
 
 nc.functions.event-generator.sourceDir: src/test/resources/eventsQueue
+nc.functions.send-email-message.from: no-reply@objectify.sk
 

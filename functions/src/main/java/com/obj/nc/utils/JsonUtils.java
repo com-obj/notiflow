@@ -2,6 +2,7 @@ package com.obj.nc.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,7 +21,11 @@ public class JsonUtils {
 	
 	public static <T> T readObjectFromClassPathResource(String resourceName, Class<T> beanType) {
 		ClassLoader classLoader = JsonUtils.class.getClassLoader();
-		File file = new File(classLoader.getResource(resourceName).getFile());
+		URL fileURL = classLoader.getResource(resourceName);
+		if (fileURL == null) {
+			throw new IllegalArgumentException("File " +resourceName + " not found on classpath");
+		}
+		File file = new File(fileURL.getFile());
 
 		return readObjectFromJSONFile(file.toPath(),beanType);
 	}
