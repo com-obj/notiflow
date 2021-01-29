@@ -34,10 +34,13 @@ public class EmailSenderSink {
 
 	@Autowired
 	private SendEmailMessage fn;
+
+	@Autowired
+	private CheckPreConditions checkPreConditions;
 	
 	@Bean
 	public Function<Flux<Message>,Flux<Message>> sendMessage() {
-		return payloads -> payloads.doOnNext(payload -> fn.apply(payload));
+		return payloads -> payloads.doOnNext(payload -> checkPreConditions.andThen(fn).apply(payload));
 	}
 
 	@Component
@@ -53,9 +56,7 @@ public class EmailSenderSink {
 		@DocumentProcessingInfo("SendEmail")
 		@Override
 		public Message apply(Message payload) {
-			RecievingEndpoint endpoint = checkExecutionPreCondition(payload);
-			
-			EmailEndpoint toEmail = (EmailEndpoint)endpoint;
+			EmailEndpoint toEmail = (EmailEndpoint) payload.getBody().getRecievingEndpoints().get(0);
 			
 			MessageContent msg = payload.getBody().getMessage();
 	
@@ -82,9 +83,12 @@ public class EmailSenderSink {
 				throw new ProcessingException(EmailSenderSink.class, e);
 			}
 		}
+	}
 
-
-		public RecievingEndpoint checkExecutionPreCondition(Message payload) {
+	@Component
+	public static class CheckPreConditions implements Function<Message, Message> {
+		@Override
+		public Message apply(Message payload) {
 			List<RecievingEndpoint> to = payload.getBody().getRecievingEndpoints();
 			if (to.size()!=1) {
 				throw new PayloadValidationException("Email sender can send to only one recipient. Found more: " + to);
@@ -93,9 +97,8 @@ public class EmailSenderSink {
 			if (!(endpoint instanceof EmailEndpoint)) {
 				throw new PayloadValidationException("Email sender can send to Email endpoints only. Found " + endpoint);
 			}
-			return endpoint;
+			return payload;
 		}
-
 	}
 	
 	@ConfigurationProperties(prefix = "nc.functions.send-email-message")

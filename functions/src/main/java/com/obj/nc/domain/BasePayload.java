@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
@@ -35,7 +37,11 @@ public abstract class BasePayload extends BaseJSONObject {
 	public void stepFinish() {
 		this.processingInfo.stepFinish(this);
 	}
-	
+
+	public boolean containsBodyAttributes(List<String> attributes) {
+		return attributes.stream().allMatch(attr -> body.getAttributes().get(attr) != null);
+	}
+
 	public abstract String getPayloadTypeName();
 
 }

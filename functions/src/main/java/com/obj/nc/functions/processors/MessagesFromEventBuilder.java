@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import com.obj.nc.exceptions.PayloadValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,13 +23,15 @@ import reactor.core.publisher.Flux;
 @Configuration
 @Log4j2
 public class MessagesFromEventBuilder {
-	
+
 	private @Autowired GenerateMessagesFromEvent fn;
+
+	private @Autowired CheckPreConditions checkPreConditions;
 	
 	@Bean
 	public Function<Flux<Event>, Flux<Message>> generateMessagesFromEvent() {
 		return eventFlux -> eventFlux
-				.flatMap(event-> Flux.fromIterable(fn.apply(event)));
+				.flatMap(event-> Flux.fromIterable(checkPreConditions.andThen(fn).apply(event)));
 	}
 	
 	@Component
@@ -74,5 +77,17 @@ public class MessagesFromEventBuilder {
 			return messages;
 		}
 	
+	}
+
+	@Component
+	public static class CheckPreConditions implements Function<Event, Event> {
+		@Override
+		public Event apply(Event event) {
+			if (event.getBody().getRecievingEndpoints().isEmpty()) {
+				throw new PayloadValidationException(String.format("Event {} has no receiving endpoints defined.", event));
+			}
+
+			return event;
+		}
 	}
 }
