@@ -53,14 +53,8 @@ public class EmailSenderSink {
 		@DocumentProcessingInfo("SendEmail")
 		@Override
 		public Message apply(Message payload) {
-			List<RecievingEndpoint> to = payload.getBody().getRecievingEndpoints();
-			if (to.size()!=1) {
-				throw new PayloadValidationException("Email sender can send to only one recipient. Found more: " + to);
-			}
-			RecievingEndpoint endpoint = to.get(0);
-			if (!(endpoint instanceof EmailEndpoint)) {
-				throw new PayloadValidationException("Email sender can send to Email endpoints only. Found " + endpoint);
-			}
+			RecievingEndpoint endpoint = checkExecutionPreCondition(payload);
+			
 			EmailEndpoint toEmail = (EmailEndpoint)endpoint;
 			
 			MessageContent msg = payload.getBody().getMessage();
@@ -87,6 +81,19 @@ public class EmailSenderSink {
 			} catch (MessagingException e) {
 				throw new ProcessingException(EmailSenderSink.class, e);
 			}
+		}
+
+
+		public RecievingEndpoint checkExecutionPreCondition(Message payload) {
+			List<RecievingEndpoint> to = payload.getBody().getRecievingEndpoints();
+			if (to.size()!=1) {
+				throw new PayloadValidationException("Email sender can send to only one recipient. Found more: " + to);
+			}
+			RecievingEndpoint endpoint = to.get(0);
+			if (!(endpoint instanceof EmailEndpoint)) {
+				throw new PayloadValidationException("Email sender can send to Email endpoints only. Found " + endpoint);
+			}
+			return endpoint;
 		}
 
 	}
