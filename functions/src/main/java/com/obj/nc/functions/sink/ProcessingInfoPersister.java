@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,11 +17,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.event.Event;
 import com.obj.nc.exceptions.ProcessingException;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
 
 @Configuration
 @Log4j2
@@ -29,19 +30,21 @@ public class ProcessingInfoPersister {
 	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	
+
+	@Autowired
+	private CheckPreConditions checkPreConditions;
 
 	@Bean
 	public Consumer<BasePayload> persistPIForEvent() {
 		return (event) -> {
-			persistPI(event);
+			persistPI(checkPreConditions.apply(event));
 		};
 	}
 	
 	@Bean
 	public Consumer<BasePayload> persistPIForEventWithRecipients() {
 		return (event) -> {
-			persistPI(event);
+			persistPI(checkPreConditions.apply(event));
 			
 			List<RecievingEndpoint> recipients = event.getBody().getRecievingEndpoints();
 			UUID processingId = event.getProcessingInfo().getProcessingId();
@@ -54,24 +57,21 @@ public class ProcessingInfoPersister {
 	@Bean
 	public Consumer<BasePayload> persistPIForMessage() {
 		return (message) -> {
-			persistPI(message);
+			persistPI(checkPreConditions.apply(message));
 		};
 	}
 	
 	@Bean
 	public Consumer<BasePayload> persistPIForSendMessage() {
 		return (message) -> {
-			persistPI(message);
+			persistPI(checkPreConditions.apply(message));
 		};
 	}
 
 	public void persistPI(BasePayload payload) {
 		log.debug("Persisting processing info {}",payload);
-		
+
 		ProcessingInfo processingInfo = payload.getProcessingInfo();
-		if (processingInfo== null) {
-			throw new ProcessingException("Could not persist ProcessingIngo because the payload didn't contain it. Payload: " + payload);
-		}
 		
 		String inserEventSQL = "INSERT INTO nc_processing_info "
 				+ "(event_id, "
@@ -165,5 +165,19 @@ public class ProcessingInfoPersister {
 			throw e;
 		}
 		
+	}
+
+	@Component
+	public static class CheckPreConditions implements Function<BasePayload, BasePayload> {
+		@Override
+		public BasePayload apply(BasePayload payload) {
+			ProcessingInfo processingInfo = payload.getProcessingInfo();
+
+			if (processingInfo == null) {
+				throw new ProcessingException("Could not persist ProcessingIngo because the payload didn't contain it. Payload: " + payload);
+			}
+
+			return payload;
+		}
 	}
 }
