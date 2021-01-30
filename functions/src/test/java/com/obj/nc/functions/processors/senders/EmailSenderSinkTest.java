@@ -33,6 +33,9 @@ class EmailSenderSinkTest {
 	
 	@Autowired 
 	private SendEmailMessage functionSend;
+
+	@Autowired
+	private EmailSenderSink.CheckPreConditions checkPreConditions;
 	
 	@Autowired
 	private SendEmailMessageConfig emailFromSetting;
@@ -72,7 +75,7 @@ class EmailSenderSinkTest {
 		
 		//WHEN -THEN
 		Assertions.assertThatThrownBy(() -> {
-			functionSend.apply(message);
+			checkPreConditions.andThen(functionSend).apply(message);
 		})
 		.isInstanceOf(PayloadValidationException.class)
 		.hasMessageContaining("Email sender can send to only one recipient. Found more: ");
@@ -86,7 +89,7 @@ class EmailSenderSinkTest {
 		
 		//WHEN -THEN
 		Assertions.assertThatThrownBy(() -> {
-			functionSend.apply(message);
+			checkPreConditions.andThen(functionSend).apply(message);
 		})
 		.isInstanceOf(PayloadValidationException.class)
 		.hasMessageContaining("Email sender can send to Email endpoints only. Found ");

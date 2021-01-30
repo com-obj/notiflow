@@ -20,7 +20,7 @@ import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubsription
 class EnrichEventProcessorTests {
 
 	@Autowired
-	Function<Event, Event> enrichEvent;
+	RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients enrichEvent;
 
 	@Test
 	public void contextLoads() {
