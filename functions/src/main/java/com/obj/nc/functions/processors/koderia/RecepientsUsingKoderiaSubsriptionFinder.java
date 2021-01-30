@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.obj.nc.exceptions.PayloadValidationException;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,16 +27,28 @@ public class RecepientsUsingKoderiaSubsriptionFinder {
 	@Autowired
 	private ResolveRecipients fn;
 
-	@Autowired
-	private CheckPreConditions checkPreConditions;
-
 	@Bean
 	public Function<Flux<Event>, Flux<Event>> resolveRecipients() {
-		return eventFlux -> eventFlux.map(event -> checkPreConditions.andThen(fn).apply(event));
+		return eventFlux -> eventFlux.map(event -> fn.apply(event));
 	}
 
 	@Component
+	@AllArgsConstructor
 	public static class ResolveRecipients implements Function<Event, Event> {
+		@Autowired
+		private Execute execute;
+
+		@Autowired
+		private CheckPreConditions checkPreConditions;
+
+		@Override
+		public Event apply(Event event) {
+			return checkPreConditions.andThen(execute).apply(event);
+		}
+	}
+
+	@Component
+	public static class Execute implements Function<Event, Event> {
 
 		@DocumentProcessingInfo("FindRecepientsUsingKoderiaSubsription")
 		public Event apply(Event event) {

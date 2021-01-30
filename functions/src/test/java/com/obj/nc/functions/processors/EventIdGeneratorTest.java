@@ -17,7 +17,10 @@ class EventIdGeneratorTest {
 		Event inputEvent = Event.createWithSimpleMessage("test-config", "Hi there!!");
 
 		//WHEN
-		ValidateAndGenerateEventId function = new EventIdGenerator.ValidateAndGenerateEventId();
+		ValidateAndGenerateEventId function = new EventIdGenerator.ValidateAndGenerateEventId(
+				new EventIdGenerator.Execute(),
+				new EventIdGenerator.CheckPreConditions());
+
 		Event outputEvent = function.apply(inputEvent);
 
 		//THEN

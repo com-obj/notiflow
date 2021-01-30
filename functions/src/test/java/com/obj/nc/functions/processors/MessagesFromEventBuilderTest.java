@@ -32,11 +32,17 @@ class MessagesFromEventBuilderTest {
 		String INPUT_JSON_FILE = "events/direct_message.json";
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
-		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId();
+		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId(
+				new EventIdGenerator.Execute(),
+				new EventIdGenerator.CheckPreConditions());
+
 		event = funciton.apply(event);
 		
 		//WHEN
-		GenerateMessagesFromEvent function = new MessagesFromEventBuilder.GenerateMessagesFromEvent();
+		GenerateMessagesFromEvent function = new MessagesFromEventBuilder.GenerateMessagesFromEvent(
+				new MessagesFromEventBuilder.Execute(),
+				new MessagesFromEventBuilder.CheckPreConditions());
+
 		List<Message> result = function.apply(event);
 		
 		//THEN
@@ -79,11 +85,17 @@ class MessagesFromEventBuilderTest {
 		String INPUT_JSON_FILE = "events/delivery_options.json";
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
-		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId();
+		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId(
+				new EventIdGenerator.Execute(),
+				new EventIdGenerator.CheckPreConditions());
+
 		event = funciton.apply(event);
 		
 		//WHEN
-		GenerateMessagesFromEvent function = new MessagesFromEventBuilder.GenerateMessagesFromEvent();
+		GenerateMessagesFromEvent function = new MessagesFromEventBuilder.GenerateMessagesFromEvent(
+				new MessagesFromEventBuilder.Execute(),
+				new MessagesFromEventBuilder.CheckPreConditions());
+
 		List<Message> result = function.apply(event);
 		
 		//THEN
@@ -117,11 +129,17 @@ class MessagesFromEventBuilderTest {
 		String INPUT_JSON_FILE = "events/direct_message_attachements.json";
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
-		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId();
+		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId(
+				new EventIdGenerator.Execute(),
+				new EventIdGenerator.CheckPreConditions());
+
 		event = funciton.apply(event);
 		
 		//WHEN
-		GenerateMessagesFromEvent function = new MessagesFromEventBuilder.GenerateMessagesFromEvent();
+		GenerateMessagesFromEvent function = new MessagesFromEventBuilder.GenerateMessagesFromEvent(
+				new MessagesFromEventBuilder.Execute(),
+				new MessagesFromEventBuilder.CheckPreConditions());
+
 		List<Message> result = function.apply(event);
 		
 		//THEN

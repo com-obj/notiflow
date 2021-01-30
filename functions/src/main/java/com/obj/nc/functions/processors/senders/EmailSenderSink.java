@@ -7,6 +7,7 @@ import java.util.function.Function;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -34,17 +35,29 @@ public class EmailSenderSink {
 
 	@Autowired
 	private SendEmailMessage fn;
-
-	@Autowired
-	private CheckPreConditions checkPreConditions;
 	
 	@Bean
 	public Function<Flux<Message>,Flux<Message>> sendMessage() {
-		return payloads -> payloads.doOnNext(payload -> checkPreConditions.andThen(fn).apply(payload));
+		return payloads -> payloads.doOnNext(payload -> fn.apply(payload));
 	}
 
 	@Component
+	@AllArgsConstructor
 	public static class SendEmailMessage implements Function<Message, Message> {
+		@Autowired
+		private Execute execute;
+
+		@Autowired
+		private CheckPreConditions checkPreConditions;
+
+		@Override
+		public Message apply(Message payload) {
+			return checkPreConditions.andThen(execute).apply(payload);
+		}
+	}
+
+	@Component
+	public static class Execute implements Function<Message, Message> {
 		
 		@Autowired
 	    private JavaMailSender emailSender;

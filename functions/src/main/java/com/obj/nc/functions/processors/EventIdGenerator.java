@@ -3,6 +3,7 @@ package com.obj.nc.functions.processors;
 import java.util.function.Function;
 
 import com.obj.nc.exceptions.PayloadValidationException;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,15 +21,28 @@ public class EventIdGenerator {
 
 	private @Autowired ValidateAndGenerateEventId fn;
 
-	private @Autowired CheckPreConditions checkPreConditions;
-	
 	@Bean
 	public Function<Flux<Event>, Flux<Event>> validateAndGenerateEventId() {
-		return eventFlux -> eventFlux.map(event -> checkPreConditions.andThen(fn).apply(event));
+		return eventFlux -> eventFlux.map(event -> fn.apply(event));
+	}
+
+	@Component
+	@AllArgsConstructor
+	public static class ValidateAndGenerateEventId implements Function<Event, Event> {
+		@Autowired
+		private Execute execute;
+
+		@Autowired
+		private CheckPreConditions checkPreConditions;
+
+		@Override
+		public Event apply(Event event) {
+			return checkPreConditions.andThen(execute).apply(event);
+		}
 	}
 	
 	@Component
-	public static class ValidateAndGenerateEventId implements Function<Event, Event> {
+	public static class Execute implements Function<Event, Event> {
 
 		@DocumentProcessingInfo("ValidateAndGenerateEventId")
 		public Event apply(Event event) {
@@ -45,10 +59,6 @@ public class EventIdGenerator {
 	public static class CheckPreConditions implements Function<Event, Event> {
 		@Override
 		public Event apply(Event event) {
-			if (event.getHeader().getEventId() != null) {
-				throw new PayloadValidationException(String.format("Event {} already has EventId: {}", event, event.getHeader().getEventId()));
-			}
-
 			return event;
 		}
 	}

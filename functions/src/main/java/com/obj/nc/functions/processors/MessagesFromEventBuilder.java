@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.obj.nc.exceptions.PayloadValidationException;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,17 +26,30 @@ import reactor.core.publisher.Flux;
 public class MessagesFromEventBuilder {
 
 	private @Autowired GenerateMessagesFromEvent fn;
-
-	private @Autowired CheckPreConditions checkPreConditions;
 	
 	@Bean
 	public Function<Flux<Event>, Flux<Message>> generateMessagesFromEvent() {
 		return eventFlux -> eventFlux
-				.flatMap(event-> Flux.fromIterable(checkPreConditions.andThen(fn).apply(event)));
+				.flatMap(event-> Flux.fromIterable(fn.apply(event)));
+	}
+
+	@Component
+	@AllArgsConstructor
+	public static class GenerateMessagesFromEvent implements Function<Event, List<Message>> {
+		@Autowired
+		private Execute execute;
+
+		@Autowired
+		private CheckPreConditions checkPreConditions;
+
+		@Override
+		public List<Message> apply(Event event) {
+			return checkPreConditions.andThen(execute).apply(event);
+		}
 	}
 	
 	@Component
-	public static class GenerateMessagesFromEvent implements Function<Event, List<Message>> {
+	public static class Execute implements Function<Event, List<Message>> {
 
 		@DocumentProcessingInfo("GenerateMessagesFromEvent")
 		@Override

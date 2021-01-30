@@ -1,9 +1,5 @@
 package com.obj.nc.components;
 
-import java.util.function.Function;
-
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +7,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.obj.nc.domain.event.Event;
 import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubsriptionFinder;
+import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients;
 
 @RunWith(SpringRunner.class)
 @JdbcTest
@@ -20,7 +16,7 @@ import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubsription
 class EnrichEventProcessorTests {
 
 	@Autowired
-	RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients enrichEvent;
+	ResolveRecipients enrichEvent;
 
 	@Test
 	public void contextLoads() {
