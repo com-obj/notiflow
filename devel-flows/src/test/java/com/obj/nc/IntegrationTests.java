@@ -73,16 +73,19 @@ public class IntegrationTests {
 						.profiles("test")
 						.run()
 		) {
+			// given empty processing info table
 			JdbcTemplate jdbcTemplate = ctx.getBean(JdbcTemplate.class);
 			jdbcTemplate.execute("truncate table nc_processing_info");
 
 			InputDestination source = ctx.getBean(InputDestination.class);
 			OutputDestination target = ctx.getBean(OutputDestination.class);
 
+			// and event
 			String INPUT_JSON_FILE = "allEvents/ba_job_post.json";
 			Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 			org.springframework.messaging.Message<Event> inputEvent = convertBeanToMessagePayload(ctx, event);
 
+			// when event processed
 			source.send(inputEvent);
 
 			org.springframework.messaging.Message<byte[]> payload1 = target.receive(3000,FINAL_STEP_QUEUE_NAME);
@@ -92,7 +95,8 @@ public class IntegrationTests {
 			org.springframework.messaging.Message<byte[]> payload3 = target.receive(3000,FINAL_STEP_QUEUE_NAME);
 			Message message3 = convertMessagePayloadToBean(ctx, payload3, Message.class);
 
-			List<Map<String, Object>> journaledRows = jdbcTemplate.queryForList("select * from nc_processing_info");
+			// then process should be journaled in database
+			List<Map<String, Object>> journaledRows = jdbcTemplate.queryForList("select payload_type, payload_id, step_name from nc_processing_info");
 
 			Map<String, Object> step0 = journaledRows.get(0);
 			MatcherAssert.assertThat(step0.get("payload_type"), CoreMatchers.equalTo("EVENT"));
