@@ -37,7 +37,7 @@ public class RecepientsUsingKoderiaSubsriptionFinder {
 		public Event apply(Event event) {
 			@SuppressWarnings("unchecked")
 			Optional<List<String>> technologies = Optional
-					.of((List<String>) event.getBody().getAttributes().get("technologies"));
+					.ofNullable((List<String>) event.getBody().getAttributes().get("technologies"));
 
 			if (!technologies.isPresent()) {
 				return event;

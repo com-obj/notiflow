@@ -3,6 +3,11 @@ spring.mail:
    port: 3025
    username: no-reply@objectify.sk
    password: xxx
-   
+
+spring.datasource:
+   platform: postgres
+   url: jdbc:postgresql://localhost:35432/nc
+   username: root
+   password: rootpw
 
 nc.functions.send-email-message.from: 'no-reply@objectify.sk'
