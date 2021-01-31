@@ -183,7 +183,7 @@ public class IntegrationTests {
             event = validateAndGenerateEventId.apply(event);
             event = resolveRecipients.apply(event);
             List<Message> messages = generateMessagesFromEvent.apply(event);
-            messages.forEach(message -> functionSend.apply(message));
+            messages.forEach(message -> message = functionSend.apply(message));
 
             // when
             messages.forEach(message -> processingInfoPersister.persistPIForSendMessage().accept(message));
