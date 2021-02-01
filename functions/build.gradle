@@ -49,8 +49,8 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-function-context'
 
 	implementation 'org.json:json:20200518'
-	testImplementation 'com.h2database:h2'
-	
+	testImplementation 'org.postgresql:postgresql'
+
 	implementation 'org.flywaydb:flyway-core'
 	compileOnly 'org.projectlombok:lombok'
 //	developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -60,7 +60,12 @@ dependencies {
 		exclude group: "com.vaadin.external.google", module:"android-json"
 	}
 
-	testImplementation 'org.testcontainers:junit-jupiter'
+	def junitJupiterVersion = '5.4.2'
+	testImplementation "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion"
+	testImplementation "org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion"
+	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
+	testImplementation "org.testcontainers:testcontainers:1.15.1"
+	testImplementation "org.testcontainers:junit-jupiter:1.15.1"
 }
 
 dependencyManagement {
