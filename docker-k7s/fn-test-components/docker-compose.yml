@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  fn-postgres:
+    image: postgres:10
+    restart: always
+    environment:
+      POSTGRES_DB: nc
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: rootpw
+    expose:
+      - 5432
+    ports:
+      - 35432:5432
