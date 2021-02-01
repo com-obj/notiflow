@@ -39,6 +39,12 @@ import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
+/*
+* TODO: zmenit z @Nested tried s testami na samostatne triedy
+*  Dovod, preco su zatial @Nested: neocakavane sa ukoncoval stream z postgresu a restartoval sa container tesne predtym,
+*  ako mala zacat dalsia classa testov. Toto bola jedina moznost, ktora zarucuje, ze container bude UP pocas vsetkych
+*  SpringBootTestov
+ */
 @Testcontainers
 public class IntegrationTests {
     public static final String DOCKER_COMPOSE_PATH = "../docker-k7s/fn-test-components/docker-compose.yml";
