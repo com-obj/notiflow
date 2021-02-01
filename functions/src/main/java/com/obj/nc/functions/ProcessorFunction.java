@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import com.obj.nc.exceptions.PayloadValidationException;
 
-public abstract class ProcessingFunction<IN, OUT> implements Function<IN, OUT> {
+public abstract class ProcessorFunction<IN, OUT> implements Function<IN, OUT> {
 
 	@Override
 	public OUT apply(IN input) {

@@ -2,7 +2,7 @@ package com.obj.nc.functions.processors.eventGenerator;
 
 import java.util.function.Function;
 
-import com.obj.nc.functions.ProcessingMicroService;
+import com.obj.nc.functions.ProcessorMicroService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,7 @@ import reactor.core.publisher.Flux;
 
 @Configuration
 @Log4j2
-public class ValidateAndGenerateEventIdMicroService extends ProcessingMicroService<Event, Event, ValidateAndGenerateEventIdProcessingFunction>{
+public class ValidateAndGenerateEventIdMicroService extends ProcessorMicroService<Event, Event, ValidateAndGenerateEventIdProcessingFunction>{
 
 	@Autowired
 	private ValidateAndGenerateEventIdProcessingFunction fn;

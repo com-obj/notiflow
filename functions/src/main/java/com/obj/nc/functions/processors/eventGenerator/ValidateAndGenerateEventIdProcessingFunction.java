@@ -6,13 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.event.Event;
-import com.obj.nc.functions.ProcessingFunction;
+import com.obj.nc.functions.ProcessorFunction;
 
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class ValidateAndGenerateEventIdProcessingFunction extends ProcessingFunction<Event, Event> {
+public class ValidateAndGenerateEventIdProcessingFunction extends ProcessorFunction<Event, Event> {
 	@Autowired
 	private ValidateAndGenerateEventIdExecution execution;
 
