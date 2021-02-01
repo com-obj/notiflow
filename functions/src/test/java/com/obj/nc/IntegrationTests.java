@@ -122,7 +122,7 @@ public class IntegrationTests {
         @Test
         void testPersistPIForEventWithRecipients() {
             // given
-            String INPUT_JSON_FILE = "events/direct_message.json";
+            String INPUT_JSON_FILE = "events/ba_job_post.json";
             Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
             event = validateAndGenerateEventId.apply(event);
             event = resolveRecipients.apply(event);
@@ -144,7 +144,7 @@ public class IntegrationTests {
         @Test
         void testPersistPIForMessage() {
             // given
-            String INPUT_JSON_FILE = "events/direct_message.json";
+            String INPUT_JSON_FILE = "events/ba_job_post.json";
             Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
             event = validateAndGenerateEventId.apply(event);
             event = resolveRecipients.apply(event);
@@ -184,7 +184,7 @@ public class IntegrationTests {
         @Test
         void testPersistPIForSendMessage() {
             // given
-            String INPUT_JSON_FILE = "events/direct_message.json";
+            String INPUT_JSON_FILE = "events/ba_job_post.json";
             Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
             event = validateAndGenerateEventId.apply(event);
             event = resolveRecipients.apply(event);

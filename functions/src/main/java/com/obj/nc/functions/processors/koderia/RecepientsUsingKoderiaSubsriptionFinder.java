@@ -81,7 +81,7 @@ public class RecepientsUsingKoderiaSubsriptionFinder {
 			boolean eventHasRequiredAttributes = event.containsBodyAttributes(REQUIRED_ATTRIBUTES);
 
 			if (!eventHasRequiredAttributes) {
-				throw new PayloadValidationException(String.format("Event {} does not contain required attributes. Required attributes are: {}", event, REQUIRED_ATTRIBUTES));
+				throw new PayloadValidationException(String.format("Event %s does not contain required attributes. Required attributes are: %s", event.toString(), REQUIRED_ATTRIBUTES));
 			}
 
 			return event;
