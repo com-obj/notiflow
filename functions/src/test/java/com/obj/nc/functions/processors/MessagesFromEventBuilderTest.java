@@ -20,8 +20,10 @@ import com.obj.nc.domain.endpoints.DeliveryOptions.TIME_CONSTRAINT_TYPE;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.EventIdGenerator.ValidateAndGenerateEventId;
 import com.obj.nc.functions.processors.MessagesFromEventBuilder.GenerateMessagesFromEvent;
+import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdPreCondition;
+import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdMicroService;
+import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
 
 class MessagesFromEventBuilderTest {
@@ -32,9 +34,9 @@ class MessagesFromEventBuilderTest {
 		String INPUT_JSON_FILE = "events/direct_message.json";
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
-		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId(
-				new EventIdGenerator.Execute(),
-				new EventIdGenerator.CheckPreConditions());
+		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction(
+				new ValidateAndGenerateEventIdProcessingFunction.Execution(),
+				new ValidateAndGenerateEventIdPreCondition());
 
 		event = funciton.apply(event);
 		
@@ -85,9 +87,9 @@ class MessagesFromEventBuilderTest {
 		String INPUT_JSON_FILE = "events/delivery_options.json";
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
-		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId(
-				new EventIdGenerator.Execute(),
-				new EventIdGenerator.CheckPreConditions());
+		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction(
+				new ValidateAndGenerateEventIdProcessingFunction.Execution(),
+				new ValidateAndGenerateEventIdPreCondition());
 
 		event = funciton.apply(event);
 		
@@ -129,9 +131,9 @@ class MessagesFromEventBuilderTest {
 		String INPUT_JSON_FILE = "events/direct_message_attachements.json";
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
-		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId(
-				new EventIdGenerator.Execute(),
-				new EventIdGenerator.CheckPreConditions());
+		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction(
+				new ValidateAndGenerateEventIdProcessingFunction.Execution(),
+				new ValidateAndGenerateEventIdPreCondition());
 
 		event = funciton.apply(event);
 		

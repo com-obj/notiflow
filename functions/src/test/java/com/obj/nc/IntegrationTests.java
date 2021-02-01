@@ -7,8 +7,8 @@ import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.EventIdGenerator;
 import com.obj.nc.functions.processors.MessagesFromEventBuilder;
+import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubsriptionFinder;
 import com.obj.nc.functions.processors.senders.EmailSenderSink;
 import com.obj.nc.functions.sink.ProcessingInfoPersister;
@@ -62,7 +62,7 @@ public class IntegrationTests {
         private ProcessingInfoPersister processingInfoPersister;
 
         @Autowired
-        private EventIdGenerator.ValidateAndGenerateEventId validateAndGenerateEventId;
+        private ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId;
 
         @Autowired
         private RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients resolveRecipients;

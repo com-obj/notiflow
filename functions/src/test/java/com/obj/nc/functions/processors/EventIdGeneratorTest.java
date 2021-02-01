@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.Header;
 import com.obj.nc.domain.event.Event;
-import com.obj.nc.functions.processors.EventIdGenerator.ValidateAndGenerateEventId;
+import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdPreCondition;
+import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdMicroService;
+import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdProcessingFunction;
 
 class EventIdGeneratorTest {
 
@@ -17,9 +19,9 @@ class EventIdGeneratorTest {
 		Event inputEvent = Event.createWithSimpleMessage("test-config", "Hi there!!");
 
 		//WHEN
-		ValidateAndGenerateEventId function = new EventIdGenerator.ValidateAndGenerateEventId(
-				new EventIdGenerator.Execute(),
-				new EventIdGenerator.CheckPreConditions());
+		ValidateAndGenerateEventIdProcessingFunction function = new ValidateAndGenerateEventIdProcessingFunction(
+				new ValidateAndGenerateEventIdProcessingFunction.Execution(),
+				new ValidateAndGenerateEventIdPreCondition());
 
 		Event outputEvent = function.apply(inputEvent);
 
