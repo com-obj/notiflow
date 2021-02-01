@@ -15,9 +15,10 @@ import reactor.core.publisher.Flux;
 
 @Configuration
 @Log4j2
-public class ValidateAndGenerateEventIdMicroService extends ProcessingMicroService<Event, Event, ValidateAndGenerateEventIdPreCondition, ValidateAndGenerateEventIdProcessingFunction>{
+public class ValidateAndGenerateEventIdMicroService extends ProcessingMicroService<Event, Event, ValidateAndGenerateEventIdProcessingFunction>{
 
-	private @Autowired ValidateAndGenerateEventIdProcessingFunction fn;
+	@Autowired
+	private ValidateAndGenerateEventIdProcessingFunction fn;
 
 	@Bean
 	public Function<Flux<Event>, Flux<Event>> validateAndGenerateEventId() {

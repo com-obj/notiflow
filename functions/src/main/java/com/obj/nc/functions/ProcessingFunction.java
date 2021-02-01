@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import com.obj.nc.exceptions.PayloadValidationException;
 
-public abstract class ProcessingFunction<IN, OUT, COND extends PreCondition<IN>> implements Function<IN, OUT> {
+public abstract class ProcessingFunction<IN, OUT> implements Function<IN, OUT> {
 
 	@Override
 	public OUT apply(IN input) {
@@ -18,7 +18,7 @@ public abstract class ProcessingFunction<IN, OUT, COND extends PreCondition<IN>>
 		return execution().apply(input);
 	}
 	
-	public abstract COND preCondition();
+	public abstract PreCondition<IN> preCondition();
 	
 	public abstract Function<IN, OUT> execution();
 

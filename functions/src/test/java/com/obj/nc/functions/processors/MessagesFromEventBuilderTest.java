@@ -22,6 +22,7 @@ import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.MessagesFromEventBuilder.GenerateMessagesFromEvent;
 import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdPreCondition;
+import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdExecution;
 import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdMicroService;
 import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
@@ -35,7 +36,7 @@ class MessagesFromEventBuilderTest {
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
 		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction(
-				new ValidateAndGenerateEventIdProcessingFunction.Execution(),
+				new ValidateAndGenerateEventIdExecution(),
 				new ValidateAndGenerateEventIdPreCondition());
 
 		event = funciton.apply(event);
@@ -88,7 +89,7 @@ class MessagesFromEventBuilderTest {
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
 		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction(
-				new ValidateAndGenerateEventIdProcessingFunction.Execution(),
+				new ValidateAndGenerateEventIdExecution(),
 				new ValidateAndGenerateEventIdPreCondition());
 
 		event = funciton.apply(event);
@@ -132,7 +133,7 @@ class MessagesFromEventBuilderTest {
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
 		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction(
-				new ValidateAndGenerateEventIdProcessingFunction.Execution(),
+				new ValidateAndGenerateEventIdExecution(),
 				new ValidateAndGenerateEventIdPreCondition());
 
 		event = funciton.apply(event);

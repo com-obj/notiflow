@@ -5,18 +5,16 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.functions.ProcessingFunction;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 @Component
 @AllArgsConstructor
-public class ValidateAndGenerateEventIdProcessingFunction extends ProcessingFunction<Event, Event, ValidateAndGenerateEventIdPreCondition> {
+public class ValidateAndGenerateEventIdProcessingFunction extends ProcessingFunction<Event, Event> {
 	@Autowired
-	private Execution execution;
+	private ValidateAndGenerateEventIdExecution execution;
 
 	@Autowired
 	private ValidateAndGenerateEventIdPreCondition checkPreConditions;
@@ -30,20 +28,7 @@ public class ValidateAndGenerateEventIdProcessingFunction extends ProcessingFunc
 	public Function<Event, Event> execution() {
 		return execution;
 	}
-	
-	@Component
-	@Log4j2
-	public static class Execution implements Function<Event, Event> {
 
-		@DocumentProcessingInfo("ValidateAndGenerateEventId")
-		public Event apply(Event event) {
-			log.debug("Validating {}",  event);
-			
-			event.getHeader().generateAndSetID();
-			event.getHeader().setEventId(event.getHeader().getId());
-	
-			return event;
-		}
-	}
+
 
 }

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import com.obj.nc.domain.Header;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdPreCondition;
+import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdExecution;
 import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdMicroService;
 import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdProcessingFunction;
 
@@ -20,7 +21,7 @@ class EventIdGeneratorTest {
 
 		//WHEN
 		ValidateAndGenerateEventIdProcessingFunction function = new ValidateAndGenerateEventIdProcessingFunction(
-				new ValidateAndGenerateEventIdProcessingFunction.Execution(),
+				new ValidateAndGenerateEventIdExecution(),
 				new ValidateAndGenerateEventIdPreCondition());
 
 		Event outputEvent = function.apply(inputEvent);
