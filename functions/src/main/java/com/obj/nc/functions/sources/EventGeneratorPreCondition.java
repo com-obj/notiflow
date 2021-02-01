@@ -43,7 +43,8 @@ public class EventGeneratorPreCondition implements PreCondition<Event> {
             }
 
             if (eventFiles.size()==0) {
-                return Optional.of(new PayloadValidationException("No file found"));
+                return Optional.of(new PayloadValidationException(
+                        String.format("Configuration is referencing empty directory: %s", eventGeneratorConfig.getSourceDir())));
             }
 
             eventFiles.sort(Comparator.comparing(eventFilePath -> eventFilePath.toAbsolutePath().toString()));
