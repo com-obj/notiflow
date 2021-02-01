@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.event.Event;
-import com.obj.nc.functions.ProcessorFunction;
+import com.obj.nc.functions.processors.ProcessorFunction;
 
 import lombok.AllArgsConstructor;
 

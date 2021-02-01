@@ -7,7 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.assertj.core.api.Assertions;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventExecution;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventPreCondition;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
 import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.Attachement;
@@ -20,10 +22,8 @@ import com.obj.nc.domain.endpoints.DeliveryOptions.TIME_CONSTRAINT_TYPE;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.MessagesFromEventBuilder.GenerateMessagesFromEvent;
 import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdPreCondition;
 import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdExecution;
-import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdMicroService;
 import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
 
@@ -42,9 +42,9 @@ class MessagesFromEventBuilderTest {
 		event = funciton.apply(event);
 		
 		//WHEN
-		GenerateMessagesFromEvent function = new MessagesFromEventBuilder.GenerateMessagesFromEvent(
-				new MessagesFromEventBuilder.Execute(),
-				new MessagesFromEventBuilder.CheckPreConditions());
+		MessagesFromEventProcessingFunction function = new MessagesFromEventProcessingFunction(
+				new MessagesFromEventExecution(),
+				new MessagesFromEventPreCondition());
 
 		List<Message> result = function.apply(event);
 		
@@ -95,9 +95,9 @@ class MessagesFromEventBuilderTest {
 		event = funciton.apply(event);
 		
 		//WHEN
-		GenerateMessagesFromEvent function = new MessagesFromEventBuilder.GenerateMessagesFromEvent(
-				new MessagesFromEventBuilder.Execute(),
-				new MessagesFromEventBuilder.CheckPreConditions());
+		MessagesFromEventProcessingFunction function = new MessagesFromEventProcessingFunction(
+				new MessagesFromEventExecution(),
+				new MessagesFromEventPreCondition());
 
 		List<Message> result = function.apply(event);
 		
@@ -139,9 +139,9 @@ class MessagesFromEventBuilderTest {
 		event = funciton.apply(event);
 		
 		//WHEN
-		GenerateMessagesFromEvent function = new MessagesFromEventBuilder.GenerateMessagesFromEvent(
-				new MessagesFromEventBuilder.Execute(),
-				new MessagesFromEventBuilder.CheckPreConditions());
+		MessagesFromEventProcessingFunction function = new MessagesFromEventProcessingFunction(
+				new MessagesFromEventExecution(),
+				new MessagesFromEventPreCondition());
 
 		List<Message> result = function.apply(event);
 		

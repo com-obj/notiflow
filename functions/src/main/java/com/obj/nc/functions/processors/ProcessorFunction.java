@@ -1,9 +1,10 @@
-package com.obj.nc.functions;
+package com.obj.nc.functions.processors;
 
 import java.util.Optional;
 import java.util.function.Function;
 
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.PreCondition;
 
 public abstract class ProcessorFunction<IN, OUT> implements Function<IN, OUT> {
 
