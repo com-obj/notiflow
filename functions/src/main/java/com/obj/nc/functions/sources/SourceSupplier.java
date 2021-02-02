@@ -14,13 +14,15 @@ public abstract class SourceSupplier<OUT> implements Supplier<OUT> {
 
 	@Override
 	public OUT get() {
-		Optional<PayloadValidationException> error = preCondition().apply(null);
+		OUT toGet = execution().get();
+
+		Optional<PayloadValidationException> error = preCondition().apply(toGet);
 
 		if (error.isPresent()) {
 			throw error.get();
 		}
 
-		return execution().get();
+		return toGet;
 	}
 
 	public abstract PreCondition<OUT> preCondition();

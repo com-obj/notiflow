@@ -46,6 +46,10 @@ public class EventGeneratorExecution implements Supplier<Event> {
                         .filter(path -> path.toString().endsWith(".json"))
                         .collect(Collectors.toList());
 
+                if (eventFiles.size()==0) {
+                    return null;
+                }
+
                 eventFiles.sort(Comparator.comparing(eventFilePath -> eventFilePath.toAbsolutePath().toString()));
 
                 eventFile = eventFiles.get(eventFileIndex++);
@@ -54,6 +58,10 @@ public class EventGeneratorExecution implements Supplier<Event> {
                 }
             } else {
                 eventFile = Paths.get(eventGeneratorConfig.getSourceDir(), eventGeneratorConfig.getFileName());
+                if (!Files.exists(eventFile)) {
+                    log.error("Configuration is referencing file, which doesn't exists {}", eventFile);
+                    return null;
+                }
             }
 
             Event event = JsonUtils.readObjectFromJSONFile(eventFile,Event.class);

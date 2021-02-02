@@ -19,11 +19,6 @@ public abstract class SourceMicroService<OUT, S extends SourceSupplier<OUT>> {
 	@Scheduled(fixedDelay = 1000)
 	public void generateEventAndAddToFlux() {
 		OUT event = getSourceSupplier().get();
-
-		if (event == null) {
-			return;
-		}
-
 		streamSource.onNext(event);
 	}
 
