@@ -1,11 +1,18 @@
 package com.obj.nc.functions.sources;
 
 import com.obj.nc.domain.event.Event;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfig;
+import com.obj.nc.functions.sources.eventGenerator.EventGeneratorExecution;
+import com.obj.nc.functions.sources.eventGenerator.EventGeneratorPreCondition;
+import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,8 +28,10 @@ class EventGeneratorTest {
     private static final String FIRST_QUEUED_EVENT_FILE_NAME = "0_ba_job_post.json";
 
     @BeforeEach
-    void copyEventToQueue(TestInfo testInfo) throws IOException {
-        if(testInfo.getTags().contains("SkipCopyEventToQueue")) {
+    void createAndPopulateEventsQueueDir(TestInfo testInfo) throws IOException {
+        Files.createDirectory(Paths.get(EVENT_QUEUE_DIR));
+
+        if(testInfo.getTags().contains("EmptyQueue")) {
             return;
         }
 
@@ -32,18 +41,26 @@ class EventGeneratorTest {
                 StandardCopyOption.REPLACE_EXISTING);
     }
 
+    @AfterEach
+    void deleteEventsQueueDir() throws IOException {
+        FileSystemUtils.deleteRecursively(Paths.get(EVENT_QUEUE_DIR));
+    }
+
     @Test
     void readEventFromValidFile() {
         // given
-        EventGenerator.EventSourceConfig eventSourceConfig = new EventGenerator.EventSourceConfig();
+        EventGeneratorConfig eventSourceConfig = new EventGeneratorConfig();
         eventSourceConfig.setSourceDir(EVENT_QUEUE_DIR);
         eventSourceConfig.setFileName(EVENT_FILE_NAME);
 
-        EventGenerator eventGenerator = new EventGenerator();
+        EventGeneratorSourceSupplier eventGenerator = new EventGeneratorSourceSupplier(
+                new EventGeneratorExecution(),
+                new EventGeneratorPreCondition());
+
         eventGenerator.setEventSourceConfig(eventSourceConfig);
 
         // when
-        Event eventFromFile = eventGenerator.readEventsFromFile();
+        Event eventFromFile = eventGenerator.get();
 
         // then
         Assertions.assertThat(eventFromFile).isNotNull();
@@ -54,55 +71,62 @@ class EventGeneratorTest {
     }
 
     @Test
-    void readEventFromInvalidFileIsNull() {
+    void readEventFromInvalidFileFails() {
         // given
-        EventGenerator.EventSourceConfig eventSourceConfig = new EventGenerator.EventSourceConfig();
+        EventGeneratorConfig eventSourceConfig = new EventGeneratorConfig();
         eventSourceConfig.setSourceDir(EVENT_QUEUE_DIR);
         eventSourceConfig.setFileName(EVENT_FILE_NAME + ".JOF*&#H827hfobn");
 
-        EventGenerator eventGenerator = new EventGenerator();
+        EventGeneratorSourceSupplier eventGenerator = new EventGeneratorSourceSupplier(
+                new EventGeneratorExecution(),
+                new EventGeneratorPreCondition());
+
         eventGenerator.setEventSourceConfig(eventSourceConfig);
 
-        // when
-        Event eventFromFile = eventGenerator.readEventsFromFile();
-
-        // then
-        Assertions.assertThat(eventFromFile).isNull();
+        // when - then
+        Assertions.assertThatThrownBy(eventGenerator::get)
+                .isInstanceOf(PayloadValidationException.class)
+                .hasMessageContaining("Input Event must not be null");
     }
 
     @Test
     void readEventOnlyDirSpecified() {
         // given
-        EventGenerator.EventSourceConfig eventSourceConfig = new EventGenerator.EventSourceConfig();
+        EventGeneratorConfig eventSourceConfig = new EventGeneratorConfig();
         eventSourceConfig.setSourceDir(EVENT_QUEUE_DIR);
         eventSourceConfig.setFileName(null);
 
-        EventGenerator eventGenerator = new EventGenerator();
+        EventGeneratorSourceSupplier eventGenerator = new EventGeneratorSourceSupplier(
+                new EventGeneratorExecution(),
+                new EventGeneratorPreCondition());
+
         eventGenerator.setEventSourceConfig(eventSourceConfig);
 
         // when
-        Event eventFromFile = eventGenerator.readEventsFromFile();
+        Event eventFromFile = eventGenerator.get();
 
         // then
         Assertions.assertThat(eventFromFile).isNotNull();
     }
 
     @Test
-    @Tag("SkipCopyEventToQueue")
-    void readEventOnlyDirSpecifiedEmptyQueueIsNull() {
+    @Tag("EmptyQueue")
+    void readEventOnlyDirSpecifiedEmptyQueueFails() {
         // given
-        EventGenerator.EventSourceConfig eventSourceConfig = new EventGenerator.EventSourceConfig();
+        EventGeneratorConfig eventSourceConfig = new EventGeneratorConfig();
         eventSourceConfig.setSourceDir(EVENT_QUEUE_DIR);
         eventSourceConfig.setFileName(null);
 
-        EventGenerator eventGenerator = new EventGenerator();
+        EventGeneratorSourceSupplier eventGenerator = new EventGeneratorSourceSupplier(
+                new EventGeneratorExecution(),
+                new EventGeneratorPreCondition());
+
         eventGenerator.setEventSourceConfig(eventSourceConfig);
 
-        // when
-        Event eventFromFile = eventGenerator.readEventsFromFile();
-
-        // then
-        Assertions.assertThat(eventFromFile).isNull();
+        // when - then
+        Assertions.assertThatThrownBy(eventGenerator::get)
+                .isInstanceOf(PayloadValidationException.class)
+                .hasMessageContaining("Input Event must not be null");
     }
 
     @Test
@@ -113,15 +137,18 @@ class EventGeneratorTest {
                 StandardCopyOption.REPLACE_EXISTING);
 
         // given
-        EventGenerator.EventSourceConfig eventSourceConfig = new EventGenerator.EventSourceConfig();
+        EventGeneratorConfig eventSourceConfig = new EventGeneratorConfig();
         eventSourceConfig.setSourceDir(EVENT_QUEUE_DIR);
         eventSourceConfig.setFileName(null);
 
-        EventGenerator eventGenerator = new EventGenerator();
+        EventGeneratorSourceSupplier eventGenerator = new EventGeneratorSourceSupplier(
+                new EventGeneratorExecution(),
+                new EventGeneratorPreCondition());
+
         eventGenerator.setEventSourceConfig(eventSourceConfig);
 
         // when
-        Event eventFromFile = eventGenerator.readEventsFromFile();
+        Event eventFromFile = eventGenerator.get();
 
         // then
         Assertions.assertThat(eventFromFile.getBody().getMessage().getSubject()).isEqualTo("First event in queue");
@@ -130,17 +157,20 @@ class EventGeneratorTest {
     @Test
     void readEventRemovesFileAfterRead() {
         // given
-        EventGenerator.EventSourceConfig eventSourceConfig = new EventGenerator.EventSourceConfig();
+        EventGeneratorConfig eventSourceConfig = new EventGeneratorConfig();
         eventSourceConfig.setSourceDir(EVENT_QUEUE_DIR);
         eventSourceConfig.setFileName(EVENT_FILE_NAME);
 
-        EventGenerator eventGenerator = new EventGenerator();
+        EventGeneratorSourceSupplier eventGenerator = new EventGeneratorSourceSupplier(
+                new EventGeneratorExecution(),
+                new EventGeneratorPreCondition());
+
         eventGenerator.setEventSourceConfig(eventSourceConfig);
 
         // when - then
         Assertions.assertThat(Files.exists(Paths.get(EVENT_QUEUE_DIR + EVENT_FILE_NAME))).isTrue();
 
-        Event eventFromFile = eventGenerator.readEventsFromFile();
+        Event eventFromFile = eventGenerator.get();
 
         Assertions.assertThat(Files.exists(Paths.get(EVENT_QUEUE_DIR + EVENT_FILE_NAME))).isFalse();
     }

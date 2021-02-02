@@ -3,32 +3,40 @@ package com.obj.nc.functions.processors.koderia;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
-import com.obj.nc.functions.processors.EventIdGenerator;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdExecution;
+import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdPreCondition;
+import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 class RecepientsUsingKoderiaSubsriptionFinderTest {
+
+    private final ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId =
+            new ValidateAndGenerateEventIdProcessingFunction(
+                    new ValidateAndGenerateEventIdExecution(),
+                    new ValidateAndGenerateEventIdPreCondition());
+
+    private final RecepientsUsingKoderiaSubscriptionProcessingFunction resolveRecipients =
+            new RecepientsUsingKoderiaSubscriptionProcessingFunction(
+                    new RecepientsUsingKoderiaSubscriptionExecution(),
+                    new RecepientsUsingKoderiaSubscriptionPreCondition());
 
     @Test
     void testResolveRecipientsFailWithoutRequiredAttributes() {
         // given
         Event inputEvent = Event.createWithSimpleMessage("test-config", "Hi there!!");
-        EventIdGenerator.ValidateAndGenerateEventId function = new EventIdGenerator.ValidateAndGenerateEventId();
-        inputEvent = function.apply(inputEvent);
 
-        // when
-        RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients resolveRecipients = new RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients();
-        Event outputEvent = resolveRecipients.apply(inputEvent);
-
-        // then
-        List<String> outputEventEndpoints = outputEvent.getBody().getRecievingEndpoints().stream().map(ep -> ep.getRecipient().getName()).collect(Collectors.toList());
-        MatcherAssert.assertThat(outputEventEndpoints, Matchers.empty());
+        // when - then
+        Assertions.assertThatThrownBy(() -> resolveRecipients.apply(inputEvent))
+                .isInstanceOf(PayloadValidationException.class)
+                .hasMessageContaining("does not contain required attributes. Required attributes are:");
     }
 
     @Test
@@ -36,11 +44,9 @@ class RecepientsUsingKoderiaSubsriptionFinderTest {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post.json";
         Event inputEvent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
-        EventIdGenerator.ValidateAndGenerateEventId function = new EventIdGenerator.ValidateAndGenerateEventId();
-        inputEvent = function.apply(inputEvent);
+        inputEvent = validateAndGenerateEventId.apply(inputEvent);
 
         // when
-        RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients resolveRecipients = new RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients();
         Event outputEvent = resolveRecipients.apply(inputEvent);
 
         // then
@@ -52,11 +58,9 @@ class RecepientsUsingKoderiaSubsriptionFinderTest {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post.json";
         Event inputEvent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
-        EventIdGenerator.ValidateAndGenerateEventId function = new EventIdGenerator.ValidateAndGenerateEventId();
-        inputEvent = function.apply(inputEvent);
+        inputEvent = validateAndGenerateEventId.apply(inputEvent);
 
         // when
-        RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients resolveRecipients = new RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients();
         Event outputEvent = resolveRecipients.apply(inputEvent);
 
         // then
@@ -81,11 +85,9 @@ class RecepientsUsingKoderiaSubsriptionFinderTest {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post_recipients.json";
         Event inputEvent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
-        EventIdGenerator.ValidateAndGenerateEventId function = new EventIdGenerator.ValidateAndGenerateEventId();
-        inputEvent = function.apply(inputEvent);
+        inputEvent = validateAndGenerateEventId.apply(inputEvent);
 
         // when
-        RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients resolveRecipients = new RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients();
         Event outputEvent = resolveRecipients.apply(inputEvent);
 
         // then

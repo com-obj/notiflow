@@ -74,6 +74,9 @@ public class EventGeneratorExecution implements Supplier<Event> {
         }
     }
 
-
+    @Deprecated // FOR TESTS ONLY
+    public void setEventSourceConfig(EventGeneratorConfig eventGeneratorConfig) {
+        this.eventGeneratorConfig = eventGeneratorConfig;
+    }
 
 }
