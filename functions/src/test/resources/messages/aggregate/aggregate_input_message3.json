@@ -1,0 +1,49 @@
+{
+  "type" : "MESSAGE",
+  "attributes" : { },
+  "header" : {
+    "attributes" : { },
+    "id" : "ce784630-e2e4-4c1a-bf34-0f8e3c78fb42",
+    "eventId" : "23e201b5-d7fa-4231-a520-51190b5c50dd",
+    "configuration-name" : "static-routing-pipeline"
+  },
+  "body" : {
+    "attributes" : { },
+    "message" : {
+      "attributes" : { },
+      "text" : "New position on koderia.sk",
+      "subject" : "New position"
+    },
+    "attachments" : [ ],
+    "recievingEndpoints" : [ {
+      "type" : "EMAIL",
+      "deliveryOptions" : null,
+      "recipient" : {
+        "type" : "GROUP",
+        "name" : "All Objectify",
+        "members" : [ {
+          "type" : "PERSON",
+          "name" : "John Doe"
+        }, {
+          "type" : "PERSON",
+          "name" : "John Dudly"
+        }, {
+          "type" : "PERSON",
+          "name" : "Jonson and johnson"
+        } ],
+        "wasRsolved" : true
+      },
+      "email" : "all@objectify.sk"
+    } ],
+    "deliveryOptions" : {
+      "aggregationType" : "ONCE_A_WEEK",
+      "schedulingType" : "IMMEDIATE"
+    }
+  },
+  "processingInfo" : {
+    "processingId" : "56855cc5-fcac-48e2-a183-8e1e83f3aa61",
+    "prevProcessingId" : null,
+    "stepName" : "CreateMessagesFromEvent",
+    "stepIndex" : 0
+  }
+}

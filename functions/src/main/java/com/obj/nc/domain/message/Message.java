@@ -5,6 +5,7 @@ import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.Body;
 import com.obj.nc.domain.Header;
 
+import com.obj.nc.domain.endpoints.DeliveryOptions;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -22,7 +23,10 @@ public class Message extends BasePayload {
 		return JSON_TYPE_IDENTIFIER;
 	}
 
-
+	@JsonIgnore
+	public boolean isAggregateMessage() {
+		return this.getBody().getDeliveryOptions().getAggregationType() != DeliveryOptions.AGGREGATION_TYPE.NONE;
+	}
 	
 
 }
