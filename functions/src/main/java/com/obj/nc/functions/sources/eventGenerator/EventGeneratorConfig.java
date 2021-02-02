@@ -1,4 +1,4 @@
-package com.obj.nc.functions.sources;
+package com.obj.nc.functions.sources.eventGenerator;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

@@ -1,4 +1,4 @@
-package com.obj.nc.functions.sources;
+package com.obj.nc.functions.sources.eventGenerator;
 
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.utils.JsonUtils;

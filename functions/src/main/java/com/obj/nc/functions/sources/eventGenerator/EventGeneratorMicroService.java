@@ -1,6 +1,8 @@
-package com.obj.nc.functions.sources;
+package com.obj.nc.functions.sources.eventGenerator;
 
 import com.obj.nc.domain.event.Event;
+import com.obj.nc.functions.sources.SourceMicroService;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

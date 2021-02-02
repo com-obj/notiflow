@@ -1,7 +1,9 @@
-package com.obj.nc.functions.sources;
+package com.obj.nc.functions.sources.eventGenerator;
 
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.functions.PreCondition;
+import com.obj.nc.functions.sources.SourceSupplier;
+
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;

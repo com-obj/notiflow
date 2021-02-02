@@ -1,4 +1,4 @@
-package com.obj.nc.functions.processors.eventGenerator;
+package com.obj.nc.functions.processors.eventIdGenerator;
 
 import java.util.Optional;
 

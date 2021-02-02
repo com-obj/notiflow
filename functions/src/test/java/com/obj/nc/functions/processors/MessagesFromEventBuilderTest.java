@@ -7,6 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdExecution;
+import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdPreCondition;
+import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventExecution;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventPreCondition;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
@@ -22,9 +25,6 @@ import com.obj.nc.domain.endpoints.DeliveryOptions.TIME_CONSTRAINT_TYPE;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdPreCondition;
-import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdExecution;
-import com.obj.nc.functions.processors.eventGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
 
 class MessagesFromEventBuilderTest {
