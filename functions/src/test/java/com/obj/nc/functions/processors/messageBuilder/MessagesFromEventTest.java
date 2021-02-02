@@ -1,4 +1,4 @@
-package com.obj.nc.functions.processors;
+package com.obj.nc.functions.processors.messageBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -10,9 +10,6 @@ import java.util.stream.Collectors;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdExecution;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdPreCondition;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventExecution;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventPreCondition;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
 import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.Attachement;
@@ -27,7 +24,7 @@ import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.utils.JsonUtils;
 
-class MessagesFromEventBuilderTest {
+class MessagesFromEventTest {
 
 	@Test
 	void createMessagesFromEvent() {

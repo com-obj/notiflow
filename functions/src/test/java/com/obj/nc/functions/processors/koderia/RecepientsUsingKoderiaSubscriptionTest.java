@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 
-class RecepientsUsingKoderiaSubsriptionFinderTest {
+class RecepientsUsingKoderiaSubscriptionTest {
 
     private final ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId =
             new ValidateAndGenerateEventIdProcessingFunction(
