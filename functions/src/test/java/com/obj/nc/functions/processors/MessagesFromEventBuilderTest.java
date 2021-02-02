@@ -7,7 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.assertj.core.api.Assertions;
+import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdExecution;
+import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdPreCondition;
+import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventExecution;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventPreCondition;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
 import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.Attachement;
@@ -20,8 +25,6 @@ import com.obj.nc.domain.endpoints.DeliveryOptions.TIME_CONSTRAINT_TYPE;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.EventIdGenerator.ValidateAndGenerateEventId;
-import com.obj.nc.functions.processors.MessagesFromEventBuilder.GenerateMessagesFromEvent;
 import com.obj.nc.utils.JsonUtils;
 
 class MessagesFromEventBuilderTest {
@@ -32,11 +35,17 @@ class MessagesFromEventBuilderTest {
 		String INPUT_JSON_FILE = "events/direct_message.json";
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
-		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId();
+		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction(
+				new ValidateAndGenerateEventIdExecution(),
+				new ValidateAndGenerateEventIdPreCondition());
+
 		event = funciton.apply(event);
 		
 		//WHEN
-		GenerateMessagesFromEvent function = new MessagesFromEventBuilder.GenerateMessagesFromEvent();
+		MessagesFromEventProcessingFunction function = new MessagesFromEventProcessingFunction(
+				new MessagesFromEventExecution(),
+				new MessagesFromEventPreCondition());
+
 		List<Message> result = function.apply(event);
 		
 		//THEN
@@ -79,11 +88,17 @@ class MessagesFromEventBuilderTest {
 		String INPUT_JSON_FILE = "events/delivery_options.json";
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
-		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId();
+		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction(
+				new ValidateAndGenerateEventIdExecution(),
+				new ValidateAndGenerateEventIdPreCondition());
+
 		event = funciton.apply(event);
 		
 		//WHEN
-		GenerateMessagesFromEvent function = new MessagesFromEventBuilder.GenerateMessagesFromEvent();
+		MessagesFromEventProcessingFunction function = new MessagesFromEventProcessingFunction(
+				new MessagesFromEventExecution(),
+				new MessagesFromEventPreCondition());
+
 		List<Message> result = function.apply(event);
 		
 		//THEN
@@ -117,11 +132,17 @@ class MessagesFromEventBuilderTest {
 		String INPUT_JSON_FILE = "events/direct_message_attachements.json";
 		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
 
-		ValidateAndGenerateEventId funciton = new EventIdGenerator.ValidateAndGenerateEventId();
+		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction(
+				new ValidateAndGenerateEventIdExecution(),
+				new ValidateAndGenerateEventIdPreCondition());
+
 		event = funciton.apply(event);
 		
 		//WHEN
-		GenerateMessagesFromEvent function = new MessagesFromEventBuilder.GenerateMessagesFromEvent();
+		MessagesFromEventProcessingFunction function = new MessagesFromEventProcessingFunction(
+				new MessagesFromEventExecution(),
+				new MessagesFromEventPreCondition());
+
 		List<Message> result = function.apply(event);
 		
 		//THEN

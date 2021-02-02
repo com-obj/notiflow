@@ -7,11 +7,13 @@ import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.EventIdGenerator;
-import com.obj.nc.functions.processors.MessagesFromEventBuilder;
-import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubsriptionFinder;
-import com.obj.nc.functions.processors.senders.EmailSenderSink;
-import com.obj.nc.functions.sink.ProcessingInfoPersister;
+import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
+import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubscriptionProcessingFunction;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
+import com.obj.nc.functions.processors.senders.EmailSenderSinkExecution;
+import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
+import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
+import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.ProcessingInfoPersisterForEventWithRecipientsSinkConsumer;
 import com.obj.nc.utils.GreenMailManager;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
@@ -59,22 +61,25 @@ public class IntegrationTests {
     class ProcessingInfoPersisterTest {
 
         @Autowired
-        private ProcessingInfoPersister processingInfoPersister;
+        private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
 
         @Autowired
-        private EventIdGenerator.ValidateAndGenerateEventId validateAndGenerateEventId;
+        private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoPersisterForEventWithRecipients;
 
         @Autowired
-        private RecepientsUsingKoderiaSubsriptionFinder.ResolveRecipients resolveRecipients;
+        private ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId;
 
         @Autowired
-        private MessagesFromEventBuilder.GenerateMessagesFromEvent generateMessagesFromEvent;
+        private RecepientsUsingKoderiaSubscriptionProcessingFunction resolveRecipients;
 
         @Autowired
-        private EmailSenderSink.SendEmailMessage functionSend;
+        private MessagesFromEventProcessingFunction generateMessagesFromEvent;
 
         @Autowired
-        private EmailSenderSink.SendEmailMessageConfig emailFromSetting;
+        private EmailSenderSinkProcessingFunction functionSend;
+
+        @Autowired
+        private EmailSenderSinkExecution.SendEmailMessageConfig emailFromSetting;
 
         @Autowired
         private JdbcTemplate jdbcTemplate;
@@ -92,7 +97,7 @@ public class IntegrationTests {
             event = validateAndGenerateEventId.apply(event);
 
             // when
-            processingInfoPersister.persistPIForEvent().accept(event);
+            processingInfoPersister.accept(event);
 
             // then
             Map<String, Object> persistedPI = jdbcTemplate.queryForMap("select * from nc_processing_info where event_id = ?", event.getHeader().getEventId());
@@ -122,13 +127,13 @@ public class IntegrationTests {
         @Test
         void testPersistPIForEventWithRecipients() {
             // given
-            String INPUT_JSON_FILE = "events/direct_message.json";
+            String INPUT_JSON_FILE = "events/ba_job_post.json";
             Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
             event = validateAndGenerateEventId.apply(event);
             event = resolveRecipients.apply(event);
 
             // when
-            processingInfoPersister.persistPIForEventWithRecipients().accept(event);
+            processingInfoPersisterForEventWithRecipients.accept(event);
 
             // then
             List<Map<String, Object>> persistedEndpoints = jdbcTemplate.queryForList("select * from nc_endpoint");
@@ -144,14 +149,14 @@ public class IntegrationTests {
         @Test
         void testPersistPIForMessage() {
             // given
-            String INPUT_JSON_FILE = "events/direct_message.json";
+            String INPUT_JSON_FILE = "events/ba_job_post.json";
             Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
             event = validateAndGenerateEventId.apply(event);
             event = resolveRecipients.apply(event);
             List<Message> messages = generateMessagesFromEvent.apply(event);
 
             // when
-            messages.forEach(message -> processingInfoPersister.persistPIForMessage().accept(message));
+            messages.forEach(message -> processingInfoPersister.accept(message));
 
             // then
             List<Map<String, Object>> persistedPI = jdbcTemplate.queryForList("select * from nc_processing_info");
@@ -184,7 +189,7 @@ public class IntegrationTests {
         @Test
         void testPersistPIForSendMessage() {
             // given
-            String INPUT_JSON_FILE = "events/direct_message.json";
+            String INPUT_JSON_FILE = "events/ba_job_post.json";
             Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
             event = validateAndGenerateEventId.apply(event);
             event = resolveRecipients.apply(event);
@@ -192,7 +197,7 @@ public class IntegrationTests {
             messages.forEach(message -> message = functionSend.apply(message));
 
             // when
-            messages.forEach(message -> processingInfoPersister.persistPIForSendMessage().accept(message));
+            messages.forEach(message -> processingInfoPersister.accept(message));
 
             // then
             List<Map<String, Object>> persistedPI = jdbcTemplate.queryForList("select * from nc_processing_info");
@@ -232,10 +237,10 @@ public class IntegrationTests {
         private GreenMailManager greenMailManager;
 
         @Autowired
-        private EmailSenderSink.SendEmailMessage functionSend;
+        private EmailSenderSinkProcessingFunction functionSend;
 
         @Autowired
-        private EmailSenderSink.SendEmailMessageConfig emailFromSetting;
+        private EmailSenderSinkExecution.SendEmailMessageConfig emailFromSetting;
 
 
         @Test
