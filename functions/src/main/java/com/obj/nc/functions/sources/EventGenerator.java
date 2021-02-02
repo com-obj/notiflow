@@ -102,7 +102,12 @@ public class EventGenerator {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	@Deprecated(since = "FOR TESTS ONLY")
+	public void setEventSourceConfig(EventSourceConfig eventSourceConfig) {
+		this.eventSourceConfig = eventSourceConfig;
+	}
+
 	@ConfigurationProperties(prefix = "nc.functions.event-generator")
 	@Data
 	@Component
