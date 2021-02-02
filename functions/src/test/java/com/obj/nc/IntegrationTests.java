@@ -1,6 +1,8 @@
 package com.obj.nc;
 
+import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -24,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.DockerComposeContainer;
@@ -242,6 +245,10 @@ public class IntegrationTests {
         @Autowired
         private EmailSenderSinkExecution.SendEmailMessageConfig emailFromSetting;
 
+        @BeforeEach
+        void cleanGreenMailMailBoxes() throws FolderException {
+            greenMailManager.getGreenMail().purgeEmailFromAllMailboxes();
+        }
 
         @Test
         void sendSingleMail() throws MessagingException, IOException {
@@ -295,6 +302,31 @@ public class IntegrationTests {
             })
                     .isInstanceOf(PayloadValidationException.class)
                     .hasMessageContaining("Email sender can send to Email endpoints only. Found ");
+        }
+
+        @Test
+        void sendMailWithAttachments() {
+            //GIVEN
+            String INPUT_JSON_FILE = "messages/email_message_attachments.json";
+            Message inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+
+            inputMessage.getBody().getAttachments().forEach(attachement -> {
+                try {
+                    attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            //WHEN
+            Message outputMessage = functionSend.apply(inputMessage);
+
+            //THEN
+            GreenMail gm = greenMailManager.getGreenMail();
+            MimeMessage message = gm.getReceivedMessages()[0];
+            String body = GreenMailUtil.getBody(message);
+
+            Assertions.assertThat(body).contains("name=test1.txt", "attachment test1", "name=test2.txt", "attachment test2");
         }
     }
 }
