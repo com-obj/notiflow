@@ -7,7 +7,6 @@ import com.obj.nc.domain.Body;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessageContent;
 import lombok.extern.log4j.Log4j2;
-import one.util.streamex.StreamEx;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -60,24 +59,15 @@ public class MessageAggregatorExecution implements Function<List<Message>, Messa
 	}
 
 	private MessageContent aggregateBodyMessageContent(List<Message> messages) {
-		List<String> messageTexts = messages.stream()
+		List<Message> messagesReversed = new ArrayList<>(messages);
+		Collections.reverse(messagesReversed);
+
+		return messagesReversed.stream()
 				.map(BasePayload::getBody)
 				.map(Body::getMessage)
-				.map(MessageContent::getText)
-				.collect(Collectors.toList());
-
-		List<String> messageSubjects = messages.stream()
-				.map(BasePayload::getBody)
-				.map(Body::getMessage)
-				.map(MessageContent::getSubject)
-				.collect(Collectors.toList());
-
-		Optional<MessageContent> aggregateMessageContent = StreamEx.ofReversed(messageTexts)
-				.zipWith(StreamEx.ofReversed(messageSubjects), MessageContent::new)
 				// add child message to parent and return parent
-				.reduce((m1, m2) -> m2.setNextMessage(m1));
-
-		return aggregateMessageContent.orElseThrow(() -> new IllegalStateException("Failed to Aggregate message content"));
+				.reduce((m1, m2) -> m2.setNextMessage(m1))
+				.orElseThrow(() -> new IllegalStateException("Failed to Aggregate message content"));
 	}
 
 }
