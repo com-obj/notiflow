@@ -42,6 +42,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	implementation 'one.util:streamex:0.7.3'
 	
 	implementation 'com.icegreen:greenmail:1.6.0'
 	testImplementation 'com.icegreen:greenmail-junit4:1.6.0'

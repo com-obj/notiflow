@@ -12,32 +12,22 @@
     "message" : {
       "attributes" : { },
       "text" : "New position on koderia.sk",
-      "subject" : "New position"
+      "subject" : "New position 3"
     },
     "attachments" : [ ],
     "recievingEndpoints" : [ {
       "type" : "EMAIL",
       "deliveryOptions" : null,
       "recipient" : {
-        "type" : "GROUP",
-        "name" : "All Objectify",
-        "members" : [ {
-          "type" : "PERSON",
-          "name" : "John Doe"
-        }, {
-          "type" : "PERSON",
-          "name" : "John Dudly"
-        }, {
-          "type" : "PERSON",
-          "name" : "Jonson and johnson"
-        } ],
-        "wasRsolved" : true
+        "type" : "PERSON",
+        "name" : "John Doe"
       },
-      "email" : "all@objectify.sk"
+      "email" : "john.doe@objectify.sk"
     } ],
     "deliveryOptions" : {
       "aggregationType" : "ONCE_A_WEEK",
-      "schedulingType" : "IMMEDIATE"
+      "schedulingType" : "NOT_BEFORE",
+      "schedulingValue" : "18:00"
     }
   },
   "processingInfo" : {

@@ -12,7 +12,7 @@
     "message" : {
       "attributes" : { },
       "text" : "New position on koderia.sk",
-      "subject" : "New position"
+      "subject" : "New position 1"
     },
     "attachments" : [ ],
     "recievingEndpoints" : [ {
@@ -26,7 +26,8 @@
     } ],
     "deliveryOptions" : {
       "aggregationType" : "ONCE_A_WEEK",
-      "schedulingType" : "IMMEDIATE"
+      "schedulingType" : "NOT_BEFORE",
+      "schedulingValue" : "18:00"
     }
   },
   "processingInfo" : {

@@ -30,6 +30,9 @@ public class RecepientsUsingKoderiaSubscriptionExecution implements Function<Eve
 
 		DeliveryOptions deliveryOptions = new DeliveryOptions();
 		deliveryOptions.setAggregationType(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_WEEK);
+		deliveryOptions.setSchedulingType(DeliveryOptions.TIME_CONSTRAINT_TYPE.NOT_BEFORE);
+		deliveryOptions.setSchedulingValue("18:00");
+
 		endpoint2.setDeliveryOptions(deliveryOptions);
 
 		event.getBody().addAllRecievingEndpoints(endpoint1, endpoint2, endpoint3);

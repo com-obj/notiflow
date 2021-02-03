@@ -12,7 +12,18 @@
     "message" : {
       "attributes" : { },
       "text" : "New position on koderia.sk",
-      "subject" : "New position"
+      "subject" : "New position 1",
+      "message" : {
+        "attributes" : { },
+        "text" : "New position on koderia.sk",
+        "subject" : "New position 2",
+        "message" : {
+          "attributes" : { },
+          "text" : "New position on koderia.sk",
+          "subject" : "New position 3",
+          "message" : null
+        }
+      }
     },
     "attachments" : [ ],
     "recievingEndpoints" : [ {
@@ -23,37 +34,11 @@
         "name" : "John Doe"
       },
       "email" : "john.doe@objectify.sk"
-    }, {
-      "type" : "EMAIL",
-      "deliveryOptions" : null,
-      "recipient" : {
-        "type" : "PERSON",
-        "name" : "John Doe"
-      },
-      "email" : "john.doe@objectify.sk"
-    }, {
-      "type" : "EMAIL",
-      "deliveryOptions" : null,
-      "recipient" : {
-        "type" : "GROUP",
-        "name" : "All Objectify",
-        "members" : [ {
-          "type" : "PERSON",
-          "name" : "John Doe"
-        }, {
-          "type" : "PERSON",
-          "name" : "John Dudly"
-        }, {
-          "type" : "PERSON",
-          "name" : "Jonson and johnson"
-        } ],
-        "wasRsolved" : true
-      },
-      "email" : "all@objectify.sk"
     } ],
     "deliveryOptions" : {
       "aggregationType" : "ONCE_A_WEEK",
-      "schedulingType" : "IMMEDIATE"
+      "schedulingType" : "NOT_BEFORE",
+      "schedulingValue" : "18:00"
     }
   },
   "processingInfo" : {

@@ -12,7 +12,7 @@
     "message" : {
       "attributes" : { },
       "text" : "New position on koderia.sk",
-      "subject" : "New position"
+      "subject" : "New position 2"
     },
     "attachments" : [ ],
     "recievingEndpoints" : [ {
@@ -20,13 +20,14 @@
       "deliveryOptions" : null,
       "recipient" : {
         "type" : "PERSON",
-        "name" : "John Dudly"
+        "name" : "John Doe"
       },
-      "email" : "john.dudly@objectify.sk"
+      "email" : "john.doe@objectify.sk"
     } ],
     "deliveryOptions" : {
       "aggregationType" : "ONCE_A_WEEK",
-      "schedulingType" : "IMMEDIATE"
+      "schedulingType" : "NOT_BEFORE",
+      "schedulingValue" : "18:00"
     }
   },
   "processingInfo" : {

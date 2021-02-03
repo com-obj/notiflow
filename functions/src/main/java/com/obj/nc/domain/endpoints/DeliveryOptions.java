@@ -10,11 +10,12 @@ public class DeliveryOptions {
 	}
 	
 	public enum TIME_CONSTRAINT_TYPE {
-		IMMEDIATE, CRON, NOT_BEFOR
+		IMMEDIATE, CRON, NOT_BEFORE
 	}
 	
 	AGGREGATION_TYPE aggregationType = AGGREGATION_TYPE.NONE;
 	TIME_CONSTRAINT_TYPE  schedulingType = TIME_CONSTRAINT_TYPE.IMMEDIATE;
 
+	private String schedulingValue;
 
 }

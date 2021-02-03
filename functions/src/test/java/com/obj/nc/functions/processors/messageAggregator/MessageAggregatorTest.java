@@ -4,15 +4,19 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.util.Arrays;
 import java.util.List;
 
+@ActiveProfiles("junit-test")
+@SpringJUnitConfig(classes = MessageAggregatorTestConfig.class)
 class MessageAggregatorTest {
 
-    private final MessageAggregatorProcessingFunction aggregateMessages = new MessageAggregatorProcessingFunction(
-            new MessageAggregatorExecution(),
-            new MessageAggregatorPreCondition());
+    @Autowired
+    private MessageAggregatorProcessingFunction aggregateMessages;
 
     @Test
     void testAggregateMessages() {
@@ -29,7 +33,7 @@ class MessageAggregatorTest {
 
         // then
         Message expected = JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_output_message.json", Message.class);
-        Assertions.assertThat(outputMessage).isEqualTo(expected);
+        Assertions.assertThat(outputMessage.getBody()).isEqualTo(expected.getBody());
     }
 
 }
