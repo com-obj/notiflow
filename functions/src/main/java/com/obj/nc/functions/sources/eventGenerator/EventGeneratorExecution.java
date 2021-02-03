@@ -52,10 +52,11 @@ public class EventGeneratorExecution implements Supplier<Event> {
 
                 eventFiles.sort(Comparator.comparing(eventFilePath -> eventFilePath.toAbsolutePath().toString()));
 
-                eventFile = eventFiles.get(eventFileIndex++);
                 if (eventFileIndex>=eventFiles.size()) {
                     eventFileIndex = 0;
                 }
+                eventFile = eventFiles.get(eventFileIndex++);
+
             } else {
                 eventFile = Paths.get(eventGeneratorConfig.getSourceDir(), eventGeneratorConfig.getFileName());
                 if (!Files.exists(eventFile)) {
@@ -73,7 +74,5 @@ public class EventGeneratorExecution implements Supplier<Event> {
             throw new RuntimeException(e);
         }
     }
-
-
 
 }
