@@ -38,7 +38,7 @@ public class MessageAggregatorPreCondition implements PreCondition<List<Message>
 				.map(Body::getRecievingEndpoints);
 
 		if (!recievingEndpoints.allMatch(messages.get(0).getBody().getRecievingEndpoints()::equals)) {
-			return Optional.of(new PayloadValidationException("Messages do not share the same recieving endpoints"));
+			return Optional.of(new PayloadValidationException("Messages do not share the same receiving endpoints"));
 		}
 
 		return Optional.empty();
