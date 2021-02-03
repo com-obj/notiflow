@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -40,6 +41,11 @@ public class BaseJSONObject {
 
 	public String toJSONString() {
 		return JsonUtils.writeObjectToJSONString(this);
+	}
+
+	public BaseJSONObject merge(BaseJSONObject other) {
+		other.getAttributes().forEach((key, value) -> attributes.putIfAbsent(key, value));
+		return this;
 	}
 
 }

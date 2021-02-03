@@ -33,4 +33,19 @@ public class Body extends BaseJSONObject{
 		return this;
 	}
 
+	public Body merge(Body other) {
+		Body merged = (Body) super.merge(other);
+		merged.message.setNextMessage(other.getMessage());
+
+		other.attachments.stream()
+				.filter(attachement -> !attachments.contains(attachement))
+				.forEach(attachments::add);
+
+		other.recievingEndpoints.stream()
+				.filter(recievingEndpoint -> !recievingEndpoints.contains(recievingEndpoint))
+				.forEach(recievingEndpoints::add);
+
+		return merged;
+	}
+
 }

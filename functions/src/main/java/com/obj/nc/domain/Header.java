@@ -39,4 +39,10 @@ public class Header extends BaseJSONObject {
 		BeanUtils.copyProperties(header, this);
 	}
 
+	public Header merge(Header other) {
+		Header merged = (Header) super.merge(other);
+		merged.generateAndSetID();
+		return merged;
+	}
+
 }

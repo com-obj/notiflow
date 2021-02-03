@@ -33,4 +33,7 @@ public class MessageContent extends BaseJSONObject {
 		return this;
 	}
 
+	public void wrapWith(MessageContent messageContent) {
+		messageContent.setNextMessage(this);
+	}
 }

@@ -10,18 +10,23 @@
   "body" : {
     "attributes" : { },
     "message" : {
-      "attributes" : { },
-      "text" : "New position on koderia.sk",
-      "subject" : "New position 1",
-      "message" : {
-        "attributes" : { },
-        "text" : "New position on koderia.sk",
-        "subject" : "New position 2",
-        "message" : {
-          "attributes" : { },
-          "text" : "New position on koderia.sk",
-          "subject" : "New position 3",
-          "message" : null
+      "attributes": {},
+      "text": "Digest text",
+      "subject": "Digest subject",
+      "message": {
+        "attributes": {},
+        "text": "New position on koderia.sk",
+        "subject": "New position 1",
+        "message": {
+          "attributes": {},
+          "text": "New position on koderia.sk",
+          "subject": "New position 2",
+          "message": {
+            "attributes": {},
+            "text": "New position on koderia.sk",
+            "subject": "New position 3",
+            "message": null
+          }
         }
       }
     },
