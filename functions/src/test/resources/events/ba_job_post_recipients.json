@@ -1,0 +1,29 @@
+{
+   "type":"EVENT",
+   "header":{
+      "configuration-name":"static-routing-pipeline"
+   },
+   "body":{
+      "message":{
+         "subject":"New position",
+         "text":"New position on koderia.sk"
+      },
+      "recievingEndpoints":[
+         {
+            "type":"EMAIL",
+            "email":"john.doe@objectify.sk"
+         },
+         {
+            "type":"EMAIL",
+            "email":"john.dudly@objectify.sk"
+         },
+         {
+            "type":"EMAIL",
+            "email":"all@objectify.sk"
+         }
+      ],
+      
+      "technologies": ["Java","JEE","JPA"],
+      "experiance": ["Medior","Senior"]
+   }
+}

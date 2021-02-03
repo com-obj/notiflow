@@ -1,4 +1,4 @@
-package com.obj.nc.functions.processors;
+package com.obj.nc.functions.processors.eventIdGenerator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -7,12 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.Header;
 import com.obj.nc.domain.event.Event;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdExecution;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdMicroService;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdPreCondition;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 
-class EventIdGeneratorTest {
+class ValidateAndGenerateEventIdTest {
 
 	@Test
 	void test() {
