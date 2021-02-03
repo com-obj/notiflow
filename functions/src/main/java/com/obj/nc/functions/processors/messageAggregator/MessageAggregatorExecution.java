@@ -27,7 +27,7 @@ public class MessageAggregatorExecution implements Function<List<Message>, Messa
 		return messagesReversed.stream()
 				.reduce((message, other) -> other.merge(message))
 				.map(message -> message.wrapMessageContent(new MessageContent(AGGREGATE_MESSAGE_TEXT, AGGREGATE_MESSAGE_SUBJECT)))
-				.orElseThrow(() -> new IllegalStateException("Failed to Aggregate message content"));
+				.orElseThrow(() -> new IllegalStateException("Failed to Aggregate messages"));
 	}
 
 }
