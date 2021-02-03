@@ -32,9 +32,4 @@ public class EventGeneratorSourceSupplier extends SourceSupplier<Event> {
 		return execution;
 	}
 
-	@Deprecated // FOR TESTS ONLY
-	public void setEventSourceConfig(EventGeneratorConfig eventGeneratorConfig) {
-		execution.setEventSourceConfig(eventGeneratorConfig);
-	}
-
 }
