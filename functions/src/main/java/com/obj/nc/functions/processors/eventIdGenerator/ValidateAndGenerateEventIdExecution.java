@@ -18,7 +18,7 @@ public class ValidateAndGenerateEventIdExecution implements Function<Event, Even
 		log.debug("Validating {}",  event);
 		
 		event.getHeader().generateAndSetID();
-		event.getHeader().setEventId(event.getHeader().getId());
+		event.getHeader().addEventId(event.getHeader().getId());
 
 		return event;
 	}

@@ -27,14 +27,14 @@ public class Message extends BasePayload {
 	}
 
 	public Message merge(Message other) {
-		header.merge(other.header);
-		body.merge(other.body);
-		return this;
+		Message merged = new Message();
+		merged.header = header;
+		merged.body = body;
+		merged.processingInfo = this.processingInfo;
+
+		merged.header = merged.header.merge(other.header);
+		merged.body = merged.body.merge(other.body);
+		return merged;
 	}
 
-	public Message wrapMessageContent(MessageContent wrapperMessageContent) {
-		body.getMessage().wrapWith(wrapperMessageContent);
-		body.setMessage(wrapperMessageContent);
-		return this;
-	}
 }

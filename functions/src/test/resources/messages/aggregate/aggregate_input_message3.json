@@ -4,17 +4,22 @@
   "header" : {
     "attributes" : { },
     "id" : "ce784630-e2e4-4c1a-bf34-0f8e3c78fb42",
-    "eventId" : "23e201b5-d7fa-4231-a520-51190b5c50dd",
+    "eventIds" : [
+      "23e201b5-d7fa-4231-a520-51190b5c50dc"
+    ],
     "configuration-name" : "static-routing-pipeline"
   },
   "body" : {
     "attributes" : { },
     "message" : {
-      "attributes" : { },
-      "text" : "New position on koderia.sk",
-      "subject" : "New position 3"
+      "content" : {
+        "attributes": {},
+        "text": "New position on koderia.sk 3",
+        "subject": "New position 3",
+        "attachments" : [ ]
+      },
+      "aggregateContent" : [ ]
     },
-    "attachments" : [ ],
     "recievingEndpoints" : [ {
       "type" : "EMAIL",
       "deliveryOptions" : null,
@@ -29,11 +34,5 @@
       "schedulingType" : "NOT_BEFORE",
       "schedulingValue" : "18:00"
     }
-  },
-  "processingInfo" : {
-    "processingId" : "56855cc5-fcac-48e2-a183-8e1e83f3aa61",
-    "prevProcessingId" : null,
-    "stepName" : "CreateMessagesFromEvent",
-    "stepIndex" : 0
   }
 }

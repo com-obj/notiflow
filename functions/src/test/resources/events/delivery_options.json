@@ -6,9 +6,11 @@
       	"configuration-name":"static-routing-pipeline"
    },
    "body":{
-      "message":{
-         "text":"Text",
-         "subject":"Subject"
+      "message": {
+         "content" : {
+            "text":"Text",
+            "subject":"Subject"
+         }
       },
       "recievingEndpoints":[
          {

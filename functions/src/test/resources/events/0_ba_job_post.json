@@ -5,8 +5,10 @@
    },
    "body":{
       "message":{
-         "subject":"First event in queue",
-         "text":"New position on koderia.sk"
+         "content" : {
+            "subject":"First event in queue",
+            "text":"New position on koderia.sk"
+         }
       },
       
       "technologies": ["Java","JEE","JPA"],

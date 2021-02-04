@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.MessageContent;
 
+import com.obj.nc.domain.message.MessageContents;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,9 +15,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public class Body extends BaseJSONObject{
 
-	private MessageContent message = new MessageContent();
-	
-	private List<Attachement> attachments = new ArrayList<Attachement>();
+	private MessageContents message = new MessageContents();
 	
 	private List<RecievingEndpoint> recievingEndpoints = new ArrayList<RecievingEndpoint>();
 	
@@ -34,16 +32,15 @@ public class Body extends BaseJSONObject{
 	}
 
 	public Body merge(Body other) {
-		Body merged = (Body) super.merge(other);
-		merged.message.setNextMessage(other.getMessage());
+		Body merged = new Body();
+		merged.setAttributes(this.getAttributes());
+		other.getAttributes().forEach((key, value) -> merged.getAttributes().putIfAbsent(key, value));
 
-		other.attachments.stream()
-				.filter(attachement -> !attachments.contains(attachement))
-				.forEach(attachments::add);
+		merged.message = message;
+		merged.message = merged.message.merge(other.message);
 
-		other.recievingEndpoints.stream()
-				.filter(recievingEndpoint -> !recievingEndpoints.contains(recievingEndpoint))
-				.forEach(recievingEndpoints::add);
+		merged.recievingEndpoints = recievingEndpoints;
+		merged.deliveryOptions = deliveryOptions;
 
 		return merged;
 	}

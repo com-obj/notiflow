@@ -3,13 +3,10 @@ package com.obj.nc.functions.sink.processingInfoPersister;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.Message;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -35,7 +32,7 @@ public class ProcessingInfoPersisterExecution implements Consumer<BasePayload> {
         ProcessingInfo processingInfo = payload.getProcessingInfo();
 
         String inserEventSQL = "INSERT INTO nc_processing_info "
-                + "(event_id, "
+                + "(event_ids, "
                 + "payload_id, "
                 + "payload_type, "
                 + "processing_id, "
@@ -47,7 +44,7 @@ public class ProcessingInfoPersisterExecution implements Consumer<BasePayload> {
                 + "step_duration_ms, "
                 + "event_json, "
                 + "event_json_diff) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, to_json(?::json), to_json(?::json))";
+                + "VALUES (to_json(?::json), ?, ?, ?, ?, ?, ?, ?, ?, ?, to_json(?::json), to_json(?::json))";
 
         long stepStartMs = processingInfo.getTimeStampStart().toEpochMilli();
         long stepEndMs = processingInfo.getTimeStampFinish().toEpochMilli();
@@ -55,7 +52,7 @@ public class ProcessingInfoPersisterExecution implements Consumer<BasePayload> {
         long stepDurationMs = stepEndMs - stepStartMs;
 
         jdbcTemplate.update(inserEventSQL,
-                payload.getHeader().getEventId(),
+                payload.getHeader().eventIdsAsJSONString(),
                 payload.getHeader().getId(),
                 payload.getPayloadTypeName(),
                 processingInfo.getProcessingId(),

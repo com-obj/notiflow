@@ -43,9 +43,4 @@ public class BaseJSONObject {
 		return JsonUtils.writeObjectToJSONString(this);
 	}
 
-	public BaseJSONObject merge(BaseJSONObject other) {
-		other.getAttributes().forEach((key, value) -> attributes.putIfAbsent(key, value));
-		return this;
-	}
-
 }

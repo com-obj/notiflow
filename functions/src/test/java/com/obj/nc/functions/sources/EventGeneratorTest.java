@@ -71,8 +71,8 @@ class EventGeneratorTest {
 
         // then
         Assertions.assertThat(eventFromFile).isNotNull();
-        Assertions.assertThat(eventFromFile.getBody().getMessage().getText()).isEqualTo("New position on koderia.sk");
-        Assertions.assertThat(eventFromFile.getBody().getMessage().getSubject()).isEqualTo("New position");
+        Assertions.assertThat(eventFromFile.getBody().getMessage().getContent().getText()).isEqualTo("New position on koderia.sk");
+        Assertions.assertThat(eventFromFile.getBody().getMessage().getContent().getSubject()).isEqualTo("New position");
         Assertions.assertThat(eventFromFile.getBody().getAttributes()).hasSize(2);
         Assertions.assertThat(eventFromFile.getBody().getRecievingEndpoints()).isEmpty();
     }
@@ -130,7 +130,7 @@ class EventGeneratorTest {
         Event eventFromFile = generateEvent.get();
 
         // then
-        Assertions.assertThat(eventFromFile.getBody().getMessage().getSubject()).isEqualTo("First event in queue");
+        Assertions.assertThat(eventFromFile.getBody().getMessage().getContent().getSubject()).isEqualTo("First event in queue");
     }
 
     @Test

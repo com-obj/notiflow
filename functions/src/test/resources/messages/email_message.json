@@ -9,13 +9,15 @@
       "configuration-name":"static-routing-pipeline"
    },
    "body":{
-      "message":{
+     "message": {
+       "content" : {
          "text":"Text",
-         "subject":"Subject"
-      },
-      "attachments":[
-         
-      ],
+         "subject":"Subject",
+         "attachments":[
+
+         ]
+       }
+     },
       "recievingEndpoints":[
          {
             "type":"EMAIL",

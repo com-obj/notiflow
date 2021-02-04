@@ -5,13 +5,15 @@
    },
    "body":{
       "message":{
-         "text":"Hallo world"
-      },
-      "attachments":[
-         {
-            "name":"name.extension",
-            "file-URI":"http://domain/location/name.extension"
+         "content" : {
+            "text":"Hallo world",
+            "attachments":[
+               {
+                  "name":"name.extension",
+                  "file-URI":"http://domain/location/name.extension"
+               }
+            ]
          }
-      ]
+      }
    }
 }
