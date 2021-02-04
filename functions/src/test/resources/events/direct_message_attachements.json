@@ -8,9 +8,21 @@
         "custom-proerty2": "zz"
    },
    "body":{
-      "message":{
-         "text":"Text",
-         "subject":"Subject"
+      "message": {
+         "content" : {
+            "text":"Text",
+            "subject":"Subject",
+            "attachments":[
+               {
+                  "name":"name.extension",
+                  "file-URI":"http://domain/location/name.extension"
+               },
+               {
+                  "name":"name.extension",
+                  "file-URI":"http://domain/location/name.extension"
+               }
+            ]
+         }
       },
       "recievingEndpoints":[
          {
@@ -20,16 +32,6 @@
          {
             "type":"EMAIL",
             "email":"john.dudly@objectify.sk"
-         }
-      ],
-      "attachments":[
-         {
-            "name":"name.extension",
-            "file-URI":"http://domain/location/name.extension"
-         },
-         {
-            "name":"name.extension",
-            "file-URI":"http://domain/location/name.extension"
          }
       ]
    },

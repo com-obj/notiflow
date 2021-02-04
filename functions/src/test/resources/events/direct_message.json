@@ -8,9 +8,11 @@
         "custom-proerty2": "zz"
    },
    "body":{
-      "message":{
-         "text":"Text",
-         "subject":"Subject"
+      "message": {
+         "content" : {
+            "text":"Text",
+            "subject":"Subject"
+         }
       },
       "recievingEndpoints":[
          {

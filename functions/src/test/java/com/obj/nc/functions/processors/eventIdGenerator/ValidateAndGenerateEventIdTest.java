@@ -3,6 +3,7 @@ package com.obj.nc.functions.processors.eventIdGenerator;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.Header;
@@ -25,9 +26,10 @@ class ValidateAndGenerateEventIdTest {
 		//THEN
 		Header header = outputEvent.getHeader();
 		assertThat(header.getId(), CoreMatchers.notNullValue());
-		assertThat(header.getEventId(), CoreMatchers.notNullValue());
+		assertThat(header.getEventIds(), Matchers.hasSize(1));
+		assertThat(header.getEventIds().get(0), CoreMatchers.notNullValue());
 		//in first step id = eventId
-		assertThat(header.getEventId(), CoreMatchers.is(header.getId()));
+		assertThat(header.getEventIds().get(0), CoreMatchers.is(header.getId()));
 	}
 
 }

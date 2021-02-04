@@ -72,10 +72,10 @@ class MessagesFromEventTest {
 		assertThat(recipient).extracting("email").isIn("john.doe@objectify.sk", "john.dudly@objectify.sk", "all@objectify.sk");
 		
 		
-		assertThat(body.getMessage()).isEqualTo(event.getBody().getMessage());
-		assertThat(body.getMessage().getSubject()).isEqualTo("Subject");
-		assertThat(body.getMessage().getText()).isEqualTo("Text");
-		assertThat(body.getAttachments().size()).isEqualTo(0);
+		assertThat(body.getMessage().getContent()).isEqualTo(event.getBody().getMessage().getContent());
+		assertThat(body.getMessage().getContent().getSubject()).isEqualTo("Subject");
+		assertThat(body.getMessage().getContent().getText()).isEqualTo("Text");
+		assertThat(body.getMessage().getContent().getAttachments().size()).isEqualTo(0);
 
 	}
 	
@@ -145,7 +145,7 @@ class MessagesFromEventTest {
 		//THEN
 		Message deliveryNullMessage = findMessageWithEnpoint(result, "john.doe@objectify.sk");
 		
-		List<Attachement> attachements = deliveryNullMessage.getBody().getAttachments();
+		List<Attachement> attachements = deliveryNullMessage.getBody().getMessage().getContent().getAttachments();
 		assertThat(attachements).isNotNull();
 		assertThat(attachements.size()).isEqualTo(2);
 		assertThat(attachements).first().extracting("name").isEqualTo("name.extension");

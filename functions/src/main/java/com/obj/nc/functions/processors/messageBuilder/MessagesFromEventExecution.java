@@ -45,9 +45,7 @@ public class MessagesFromEventExecution implements Function<Event, List<Message>
 				msgBody.setDeliveryOptions(eventBody.getDeliveryOptions());
 			}
 
-			msgBody.setAttachments(eventBody.getAttachments());
-
-			msgBody.setMessage(eventBody.getMessage());
+			msgBody.getMessage().setContent(eventBody.getMessage().getContent());
 
 			msg.stepFinish();
 

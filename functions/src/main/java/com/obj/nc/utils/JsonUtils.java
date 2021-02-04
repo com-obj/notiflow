@@ -55,8 +55,19 @@ public class JsonUtils {
 		}
 		
 	}
-	
 
+	public static String writeObjectToJSONStringPretty(Object pojo) {
+
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			String jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(pojo);
+
+			return jsonString;
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+
+	}
 	
 	private static String readFileContent(Path filePath)
     {

@@ -9,20 +9,23 @@
       "configuration-name":"static-routing-pipeline"
    },
    "body":{
-      "message":{
+     "message": {
+       "content" : {
          "text":"Text",
-         "subject":"Subject"
-      },
-      "attachments":[
-        {
-          "name":"test1.txt",
-          "file-URI":"messages/attachments/test1.txt"
-        },
-        {
-          "name":"test2.txt",
-          "file-URI":"messages/attachments/test2.txt"
-        }
-      ],
+         "subject":"Subject",
+         "attachments":[
+           {
+             "name":"test1.txt",
+             "file-URI":"messages/attachments/test1.txt"
+           },
+           {
+             "name":"test2.txt",
+             "file-URI":"messages/attachments/test2.txt"
+           }
+         ]
+       }
+     },
+
       "recievingEndpoints":[
          {
             "type":"EMAIL",

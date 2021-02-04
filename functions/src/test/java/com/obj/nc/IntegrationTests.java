@@ -8,6 +8,7 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.MessageContent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubscriptionProcessingFunction;
@@ -103,11 +104,13 @@ public class IntegrationTests {
             processingInfoPersister.accept(event);
 
             // then
-            Map<String, Object> persistedPI = jdbcTemplate.queryForMap("select * from nc_processing_info where event_id = ?", event.getHeader().getEventId());
+            Map<String, Object> persistedPI = jdbcTemplate.queryForMap("select * from nc_processing_info where payload_id = ?", event.getHeader().getId());
             assertThat(persistedPI, CoreMatchers.notNullValue());
 
             assertThat(persistedPI.get("processing_id"), CoreMatchers.equalTo(event.getProcessingInfo().getProcessingId()));
             assertThat(persistedPI.get("prev_processing_id"), CoreMatchers.equalTo(event.getProcessingInfo().getPrevProcessingId()));
+
+            assertThat(((PGobject) persistedPI.get("event_ids")).getValue(), CoreMatchers.equalTo(event.getHeader().eventIdsAsJSONString()));
 
             assertThat(persistedPI.get("payload_id"), CoreMatchers.equalTo(event.getHeader().getId()));
             assertThat(persistedPI.get("payload_type"), CoreMatchers.equalTo(event.getPayloadTypeName()));
@@ -310,7 +313,7 @@ public class IntegrationTests {
             String INPUT_JSON_FILE = "messages/email_message_attachments.json";
             Message inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 
-            inputMessage.getBody().getAttachments().forEach(attachement -> {
+            inputMessage.getBody().getMessage().getContent().getAttachments().forEach(attachement -> {
                 try {
                     attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
                 } catch (IOException e) {
@@ -327,6 +330,30 @@ public class IntegrationTests {
             String body = GreenMailUtil.getBody(message);
 
             Assertions.assertThat(body).contains("name=test1.txt", "attachment test1", "name=test2.txt", "attachment test2");
+        }
+
+        @Test
+        void sendAggregateMessage() {
+            //GIVEN
+            String INPUT_JSON_FILE = "messages/aggregate/aggregate_output_message.json";
+            Message inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+
+            //WHEN
+            Message outputMessage = functionSend.apply(inputMessage);
+
+            //THEN
+            GreenMail gm = greenMailManager.getGreenMail();
+            MimeMessage message = gm.getReceivedMessages()[0];
+            String msg = GreenMailUtil.getWholeMessage(message);
+
+
+            outputMessage.getBody().getMessage().getAggregateContent()
+                    .forEach(messageContent -> {
+                        Assertions.assertThat(msg).contains(messageContent.getSubject());
+                        Assertions.assertThat(msg).contains(messageContent.getText());
+                        messageContent.getAttachments()
+                                .forEach(attachment -> Assertions.assertThat(msg).contains(attachment.getName()));
+                    });
         }
     }
 }

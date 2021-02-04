@@ -23,7 +23,7 @@ public class Event extends BasePayload {
 	public static Event createWithSimpleMessage(String configurationName, String message) {
 		Event event = new Event();
 		event.header.setConfigurationName(configurationName);
-		event.body.getMessage().setText(message);
+		event.body.getMessage().getContent().setText(message);
 		
 		return event;
 	}

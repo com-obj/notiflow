@@ -28,10 +28,6 @@ public class RecepientsUsingKoderiaSubscriptionExecution implements Function<Eve
 		EmailEndpoint endpoint2 = EmailEndpoint.createForPerson(person2, "john.dudly@objectify.sk");
 		EmailEndpoint endpoint3 = EmailEndpoint.createForGroup(allObjectifyGroup, "all@objectify.sk");
 
-		DeliveryOptions deliveryOptions = new DeliveryOptions();
-		deliveryOptions.setAggregationType(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_WEEK);
-		endpoint2.setDeliveryOptions(deliveryOptions);
-
 		event.getBody().addAllRecievingEndpoints(endpoint1, endpoint2, endpoint3);
 
 		return event;

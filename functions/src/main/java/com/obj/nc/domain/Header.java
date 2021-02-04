@@ -1,9 +1,12 @@
 package com.obj.nc.domain;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
+import com.obj.nc.utils.JsonUtils;
 import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,7 +32,7 @@ public class Header extends BaseJSONObject {
 	
 	@NotNull
 	@Include
-	private UUID eventId;
+	private List<UUID> eventIds = new ArrayList<>();
 
 	public void generateAndSetID() {
 		id = generateUUID();
@@ -37,6 +40,29 @@ public class Header extends BaseJSONObject {
 
 	public void copyHeaderFrom(Header header) {
 		BeanUtils.copyProperties(header, this);
+	}
+
+	public Header merge(Header other) {
+		Header merged = new Header();
+
+		merged.setAttributes(this.getAttributes());
+		other.getAttributes().forEach((key, value) -> merged.getAttributes().putIfAbsent(key, value));
+
+		merged.configurationName = configurationName;
+		merged.generateAndSetID();
+
+		merged.eventIds = eventIds;
+		merged.eventIds.addAll(other.getEventIds());
+
+		return merged;
+	}
+
+	public String eventIdsAsJSONString() {
+		return JsonUtils.writeObjectToJSONString(eventIds);
+	}
+
+	public void addEventId(UUID eventId) {
+		eventIds.add(eventId);
 	}
 
 }

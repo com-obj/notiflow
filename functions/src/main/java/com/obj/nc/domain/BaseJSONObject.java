@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;

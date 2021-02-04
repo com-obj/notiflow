@@ -1,0 +1,38 @@
+{
+  "type" : "MESSAGE",
+  "attributes" : { },
+  "header" : {
+    "attributes" : { },
+    "id" : "8b5904d9-486c-4892-ba38-3a02701f1b31",
+    "eventIds" : [
+      "23e201b5-d7fa-4231-a520-51190b5c50da"
+    ],
+    "configuration-name" : "static-routing-pipeline"
+  },
+  "body" : {
+    "attributes" : { },
+    "message" : {
+      "content" : {
+        "attributes": {},
+        "text": "New position on koderia.sk 1",
+        "subject": "New position 1",
+        "attachments" : [ ]
+      },
+      "aggregateContent" : [ ]
+    },
+    "recievingEndpoints" : [ {
+      "type" : "EMAIL",
+      "deliveryOptions" : null,
+      "recipient" : {
+        "type" : "PERSON",
+        "name" : "John Doe"
+      },
+      "email" : "john.doe@objectify.sk"
+    } ],
+    "deliveryOptions" : {
+      "aggregationType" : "ONCE_A_WEEK",
+      "schedulingType" : "NOT_BEFORE",
+      "schedulingValue" : "18:00"
+    }
+  }
+}
