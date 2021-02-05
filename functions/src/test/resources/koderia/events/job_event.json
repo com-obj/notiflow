@@ -1,0 +1,29 @@
+{
+   "type":"EVENT",
+   "header":{
+      "configuration-name":"koderia-pipeline"
+   },
+   "body": {
+      "message":{
+         "content" : {
+            "subject":"",
+            "text":""
+         }
+      },
+      "newsletter-type" : "Projekty",
+      "newsletter" : {
+         "id": "unwhX7OlJYq7Kd7GfoCd",
+         "description": "<p>We are looking for a <strong>Business Intelligence (BI) Developer</strong> to create &amp; optimize BI and analytics solutions that turn <strong>Compliance data</strong> into knowledge. In this role, you should have a background in data and business analysis. You should be analytical and a good communicator. If you also have business acumen and problem-solving aptitude, we’d like to have you on board. Ultimately, you will enhance our <strong>Compliance business intelligence system</strong> to help us make better decisions.</p><p></p><p><strong>Responsibilities:</strong></p><ul><li><p>Designing, developing, and maintaining <strong>business intelligence solutions</strong> (mostly in <strong>Microsoft Power BI</strong>)</p></li></ul><ul><li><p>Setting up &amp; improving our <strong>DevOps</strong> environment</p></li><li><p>Creation of comprehensive &amp; optimizing of existing data models</p></li><li><p>Presenting information through reports and visualization</p></li><li><p>Knowledge transfer to our Junior Developers</p></li><li><p><strong>Translate business needs</strong> to technical specifications</p></li></ul><ul><li><p>Design, build and deploy <strong>BI solutions </strong>(e.g. reporting tools)</p></li><li><p>Design, implement and document data architecture and data modeling solutions, which include the use of relational, dimensional, and NoSQL databases</p></li><li><p>Maintain and support data analytics platforms</p></li><li><p><strong>Create tools</strong> to store data (e.g. OLAP cubes)</p></li><li><p>Develop unit testing and troubleshooting process</p></li><li><p>Evaluate and improve existing <strong>BI systems</strong></p></li><li><p>Optimize database queries</p></li><li><p>Create visualizations and reports for requested projects</p></li><li><p>Develop and update technical documentation</p></li></ul><p></p><p><strong>Requirements:</strong></p><ul><li><p>Senior experience as a <strong>BI Developer or Data Scientist</strong></p></li></ul><ul><li><p>Hands-on relational, dimensional, and/or analytic experience (using RDBMS, dimensional, NoSQL data platform technologies, and ETL and data ingestion protocols)</p></li><li><p>Experience in the <strong>banking industry</strong> is preferred (esp. Banking Compliance)</p></li><li><p>Familiarity with BI technologies (foremost Microsoft Power BI, but also AWS QuickSight, Qlik Sense)</p></li><li><p>Knowledge of <strong>SQL queries</strong>, SQL Server Reporting Services (SSRS), and SQL Server Integration Services (SSIS)</p></li><li><p>Knowledge in streaming technologies is a plus (real-time data sourcing, eg: Apache Kafka, -Pulsar,..)</p></li><li><p>Analytical mind with a problem-solving aptitude</p></li></ul><p></p>",
+         "name": "Business Intelligence (BI) Developer",
+         "location": "Viedeň",
+         "rate": "500",
+         "technologies": ["Microsoft Power BI"],
+         "specialRate": "400 – 500 € / manday",
+         "labels": ["Home Office"],
+         "positionType": ["Senior"],
+         "duration": "1 rok s možnosťou predĺženia",
+         "type": "Analytik",
+         "dateOfStart": "ASAP"
+      }
+   }
+}

@@ -1,0 +1,16 @@
+{
+  "type":"EVENT",
+  "header":{
+    "configuration-name":"koderia-pipeline"
+  },
+  "body": {
+    "message":{
+      "content" : {
+        "subject":"",
+        "text":""
+      }
+    },
+    "newsletter-type" : "Novinky",
+    "newsletter" : {}
+  }
+}
