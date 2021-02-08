@@ -1,0 +1,11 @@
+[
+  {
+    "email": "john.doe@objectify.sk",
+    "firstName": "John",
+    "lastName": "Doe"
+  }, {
+    "email": "john.dudly@objectify.sk",
+    "firstName": "John",
+    "lastName": "Dudly"
+  }
+]
