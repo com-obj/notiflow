@@ -1,5 +1,5 @@
 {
-  "newsletter" : "Projekty",
-  "newsletterTechnologies" : ["Microsoft Power BI"],
-  "newsletterProfessions": ["Analytik"]
+  "type" : "Projekty",
+  "technologies" : ["Microsoft Power BI"],
+  "profession": "Analytik"
 }

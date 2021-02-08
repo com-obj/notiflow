@@ -6,8 +6,8 @@
   "body":{
     "message":{
       "content" : {
-        "subject":"",
-        "text":""
+        "subject":"Advanced Styling using CSS Pseudo Elements",
+        "text":"Articles on frontend development and poems written by Linda Ojo, Frontend Developer"
       }
     },
     "newsletter-type" : "Link",

@@ -6,8 +6,8 @@
    "body": {
       "message":{
          "content" : {
-            "subject":"",
-            "text":""
+            "subject":"NextStep Science",
+            "text":"Milí priatelia,\nkaždým dňom sledujeme vývoj situácie ohľadom korona vírusu..."
          }
       },
       "newsletter-type" : "Event",
