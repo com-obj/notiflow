@@ -1,0 +1,16 @@
+{
+   "type" : "JOB_POST",
+   "id": "unwhX7OlJYq7Kd7GfoCd",
+   "subject":"Business Intelligence (BI) Developer",
+   "text":"We are looking for a Business Intelligence (BI) Developer to create...",
+   "description": "xxx",
+   "location": "Viedeň",
+   "rate": "500",
+   "technologies": ["Microsoft Power BI"],
+   "specialRate": "400 – 500 € / manday",
+   "labels": ["Home Office"],
+   "positionType": ["Senior"],
+   "duration": "1 rok s možnosťou predĺženia",
+   "type": "Analytik",
+   "dateOfStart": "ASAP"
+}
