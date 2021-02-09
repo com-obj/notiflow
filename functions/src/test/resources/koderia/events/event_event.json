@@ -1,35 +1,21 @@
 {
-   "type":"EVENT",
-   "header":{
-      "configuration-name":"koderia-pipeline"
+   "type" : "EVENT",
+   "id": "lEUd8rGH5sCFvQCP0cMb",
+   "subject":"NextStep Science",
+   "text":"Milí priatelia,\nkaždým dňom sledujeme vývoj situácie ohľadom korona vírusu...",
+   "ticketUrl": "https://www.nextstep-science.sk/kupit-listky?fbclid=IwAR3T85v2kVl7yaRe_tJkoZVGSD6S6sSGzHp_jX23Xmc2q2EBOlGZsx9iFrM",
+   "startAt": "17. 3. 2021, 16:00:00",
+   "locationId": "Bratislavský kraj",
+   "endAt": "17. 3. 2021, 22:00:00",
+   "location": {
+      "googlePlaceId": "ChIJr7jDYumLbEcRbztTTT9OKLw",
+      "name": "Univerzitný vedecký park UK, Ilkovičova, Karlova Ves, Slovensko"
    },
-   "body": {
-      "message":{
-         "content" : {
-            "subject":"NextStep Science",
-            "text":"Milí priatelia,\nkaždým dňom sledujeme vývoj situácie ohľadom korona vírusu..."
-         }
-      },
-      "newsletter-type" : "Event",
-      "newsletter" : {
-         "id": "lEUd8rGH5sCFvQCP0cMb",
-         "ticketUrl": "https://www.nextstep-science.sk/kupit-listky?fbclid=IwAR3T85v2kVl7yaRe_tJkoZVGSD6S6sSGzHp_jX23Xmc2q2EBOlGZsx9iFrM",
-         "startAt": "17. 3. 2021, 16:00:00",
-         "description": "Milí priatelia,\nkaždým dňom sledujeme vývoj situácie ohľadom korona vírusu. Vzhľadom na aktuálnu situáciu a predikciu na najbližšie mesiace sme sa rozhodli NextStep Science pre tento akademický rok zrušiť.\nPeniaze za lístky vám budú v blízkych dňoch vrátené na účet. Budeme Vás včas informovať o organizácii a dátume podujatia v nasledujúcom roku. Nastala nečakaná situácia, ktorej musíme spoločne čeliť, no zároveň veríme, že ju všetci spoločne prekonáme a že sa opäť v budúcom roku spoločne stretneme na NextStep Science.\n\nUž teraz sa tešíme na budúci ročník NextStep Science a na vás všetkých. \n______________________________________________________\nZačal si už rozmýšľať, čo budeš robiť po škole, alebo ako sa vieš zapojiť do rôznych aktivít a stáži už počas vysokoškolského štúdia? Nenechaj si ujsť príležitosť, pretože po prvýkrát sa uskutoční podujatie NextStep Science! \n\nNextStep Science je podujatie plné nepoznaných príležitostí, kde zažiješ nielen nezabudnuteľnú zábavu vo forme rôznych inovatívnych vychytávok a “hračiek”, ale taktiež zistíš, aké možnosti sebarealizácie máš v rámci odboru a možno aj trochu mimo neho. Skrátka príležitosti, ktoré ti pomôžu spraviť prvý krok k vysnívanej kariére. Je to na tebe!\n\nAk študuješ prírodovedné, chemické, biofyzikálne odbory, farmáciu, alebo si nadšenec biológie a nových technológii, vykroč s nami a zober príležitosť do vlastných rúk. Získaš možnosť odlíšiť sa od ostatných, nájsť najlepšie pracovné ponuky, stáže alebo rôzne aktivity, vďaka ktorým si zvýšiš šance na trhu práce. \nOkrem toho ťa čaká bohatý program plný zaujímavých prednášok a diskusii, interaktívnych workshopov a inšpiratívnych osobností zo sveta vedy, startupov, neziskoviek a množstvo atrakcií počas celého podujatia. Nebude chýbať ani after party po podujatí.\n\nPoď s nami zažiť prvý NextStep Science v histórii! \n\nProgram:\n\n17:00 - 17:30 Registrácia & Stánky\n17:30 - 17:45 Opening ceremony\n17:45 - 18:15 Keynote prednáška Moja cesta k vede, Igor Lacík\n18:15 - 18:45 Prednáška Ako sa zrodí liečba - cesta od nápadu až po registráciu lieku, Katarína Kováčová\n\n19:00 - 20:00 Diskusia Udržateľnosť ako príležitosť pre inovácie, Radoslav Jonáš, Pavol Alexy, Andrea Basilová\n20:00 - 20:30 Predstavenie Biospher - Prinášame nové príležitosti pre oblasť biotechnológií, Matej Held \n\n21:30 - 22:30 Diskusia Vybudovanie vedeckej spoločnosti: Od vzniku nápadu až po založenie firmy, Robert Mistrík\n\n23:00 - After party \n\nWorkshopy:\n18:00 - 19:00 -Kreatívny workshop v dielni Fablab\n18:00 - 19:00 - Navrhni úspešný biznis model pre vedecký produkt\n19:20 - 20:20 - Ako na kariéru vo výskume – Krok 1.\n20:30 - 21:30 - Ako dobré poznáš svoje emisie?\n\nViac informácií budeme zverejňovať v evente a na sociálnych sieťach postupne.\n\n\nKontakt: simona@biospher.org",
-         "locationId": "Bratislavský kraj",
-         "endAt": "17. 3. 2021, 22:00:00",
-         "location": {
-            "googlePlaceId": "ChIJr7jDYumLbEcRbztTTT9OKLw",
-            "name": "Univerzitný vedecký park UK, Ilkovičova, Karlova Ves, Slovensko"
-         },
-         "organizator": {
-            "description": "Biospher je platforma, ktorej cieľom je popularizovať vedu na Slovensku a vytvoriť paralelnú komunitu vedcov a fanúšikov vedy.",
-            "url": "https://www.biospher.org/",
-            "imageUrl": "https://firebasestorage.googleapis.com/v0/b/koderikoderom-365dd.appspot.com/o/events%2FqF8vguFkft2D69nGSG91MW343xqirUEy5myJPazmihBtZTa8VyQXWrgpVFfl0k7T?alt=media&token=344a073a-4a94-44d2-88c5-554df4a6fb22",
-            "name": "Biospher"
-         },
-         "imageUrl": "https://firebasestorage.googleapis.com/v0/b/koderikoderom-365dd.appspot.com/o/events%2F6ubVOvL6RLiBsBHXG4lZZXWSWXcZXLwb1elmrAupo3sna4CGnY7FL2yfT8G6ynBR?alt=media&token=407c5ee1-ef5e-47ee-b384-d7ca1b07c25f",
-         "name": "NextStep Science"
-      }
-   }
+   "organizator": {
+      "description": "Biospher je platforma, ktorej cieľom je popularizovať vedu na Slovensku a vytvoriť paralelnú komunitu vedcov a fanúšikov vedy.",
+      "url": "https://www.biospher.org/",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/koderikoderom-365dd.appspot.com/o/events%2FqF8vguFkft2D69nGSG91MW343xqirUEy5myJPazmihBtZTa8VyQXWrgpVFfl0k7T?alt=media&token=344a073a-4a94-44d2-88c5-554df4a6fb22",
+      "name": "Biospher"
+   },
+   "imageUrl": "https://firebasestorage.googleapis.com/v0/b/koderikoderom-365dd.appspot.com/o/events%2F6ubVOvL6RLiBsBHXG4lZZXWSWXcZXLwb1elmrAupo3sna4CGnY7FL2yfT8G6ynBR?alt=media&token=407c5ee1-ef5e-47ee-b384-d7ca1b07c25f",
 }

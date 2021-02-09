@@ -1,16 +1,5 @@
 {
-  "type":"EVENT",
-  "header":{
-    "configuration-name":"koderia-pipeline"
-  },
-  "body": {
-    "message":{
-      "content" : {
-        "subject":"Nove features na Koderia.sk",
-        "text":"..."
-      }
-    },
-    "newsletter-type" : "Novinky",
-    "newsletter" : {}
-  }
+  "type" : "NEWS",
+  "subject" : "Nove features na Koderia.sk",
+  "text" : "..."
 }
