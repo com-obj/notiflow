@@ -19,7 +19,6 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
