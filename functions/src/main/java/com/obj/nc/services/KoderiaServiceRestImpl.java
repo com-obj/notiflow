@@ -37,7 +37,7 @@ public class KoderiaServiceRestImpl implements KoderiaService {
         }
 
         return Arrays.stream(responseBody)
-                .map(recipientMapper::recipientDtoToEmailEndpoint)
+                .map(recipientMapper::map)
                 .collect(Collectors.toList());
     }
 

@@ -2,8 +2,8 @@ package com.obj.nc.services;
 
 import com.obj.nc.config.KoderiaApiConfig;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.koderia.CategorizedRecipientsQueryDto;
 import com.obj.nc.domain.koderia.RecipientDto;
-import com.obj.nc.domain.koderia.RecipientsQueryDto;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +52,7 @@ class KoderiaServiceRestImplTest {
     void testFindReceivingEndpoints() throws URISyntaxException {
         // given
         String QUERY_JSON_PATH = "koderia/recipient_queries/job_recipients_query.json";
-        RecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, RecipientsQueryDto.class);
+        CategorizedRecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, CategorizedRecipientsQueryDto.class);
 
         String RECIPIENTS_JSON_PATH = "koderia/recipients.json";
         RecipientDto[] responseBody = JsonUtils.readObjectFromClassPathResource(RECIPIENTS_JSON_PATH, RecipientDto[].class);
@@ -84,7 +84,7 @@ class KoderiaServiceRestImplTest {
     void testFindReceivingEndpointsNullFail() throws URISyntaxException {
         // given
         String QUERY_JSON_PATH = "koderia/recipient_queries/job_recipients_query.json";
-        RecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, RecipientsQueryDto.class);
+        CategorizedRecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, CategorizedRecipientsQueryDto.class);
 
         RecipientDto[] responseBody = null;
 
@@ -106,7 +106,7 @@ class KoderiaServiceRestImplTest {
     void testFindReceivingEndpoints404HandleError() throws URISyntaxException {
         // given
         String QUERY_JSON_PATH = "koderia/recipient_queries/job_recipients_query.json";
-        RecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, RecipientsQueryDto.class);
+        CategorizedRecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, CategorizedRecipientsQueryDto.class);
 
         RecipientDto[] responseBody = null;
 
@@ -128,7 +128,7 @@ class KoderiaServiceRestImplTest {
     void testFindReceivingEndpoints500HandleError() throws URISyntaxException {
         // given
         String QUERY_JSON_PATH = "koderia/recipient_queries/job_recipients_query.json";
-        RecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, RecipientsQueryDto.class);
+        CategorizedRecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, CategorizedRecipientsQueryDto.class);
 
         RecipientDto[] responseBody = null;
 
