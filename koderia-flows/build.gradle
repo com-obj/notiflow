@@ -29,6 +29,13 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         exclude group: "com.vaadin.external.google", module:"android-json"
     }
+    testImplementation 'io.rest-assured:rest-assured:4.2.0'
+    testImplementation 'io.rest-assured:json-path:4.2.0'
+    testImplementation 'io.rest-assured:xml-path:4.2.0'
+    testImplementation 'io.rest-assured:rest-assured-common:4.2.0'
+    testImplementation 'io.rest-assured:spring-mock-mvc:4.2.0'
+    testImplementation 'io.rest-assured:json-schema-validator:4.1.2'
+    testImplementation 'org.json:json:20201115'
 }
 
 dependencyManagement {
