@@ -1,0 +1,200 @@
+{
+   "$schema": "http://json-schema.org/draft-04/schema#",
+   "type": "object",
+   "properties": {
+      "type": {
+         "type": "string"
+      },
+      "attributes": {
+         "type": "object"
+      },
+      "header": {
+         "type": "object",
+         "properties": {
+            "attributes": {
+               "type": "object"
+            },
+            "id": {
+               "type": "null"
+            },
+            "eventIds": {
+               "type": "array",
+               "items": {}
+            },
+            "configuration-name": {
+               "type": "string"
+            }
+         },
+         "required": [
+            "attributes",
+            "id",
+            "eventIds",
+            "configuration-name"
+         ]
+      },
+      "body": {
+         "type": "object",
+         "properties": {
+            "attributes": {
+               "type": "object",
+               "properties": {
+                  "type": {
+                     "type": "string"
+                  },
+                  "subject": {
+                     "type": "string"
+                  },
+                  "text": {
+                     "type": "string"
+                  },
+                  "id": {
+                     "type": "string"
+                  },
+                  "ticketUrl": {
+                     "type": "string"
+                  },
+                  "startAt": {
+                     "type": "string"
+                  },
+                  "locationId": {
+                     "type": "string"
+                  },
+                  "endAt": {
+                     "type": "string"
+                  },
+                  "location": {
+                     "type": "object",
+                     "properties": {
+                        "googlePlaceId": {
+                           "type": "string"
+                        },
+                        "name": {
+                           "type": "string"
+                        }
+                     },
+                     "required": [
+                        "googlePlaceId",
+                        "name"
+                     ]
+                  },
+                  "organizer": {
+                     "type": "object",
+                     "properties": {
+                        "description": {
+                           "type": "string"
+                        },
+                        "url": {
+                           "type": "string"
+                        },
+                        "imageUrl": {
+                           "type": "string"
+                        },
+                        "name": {
+                           "type": "string"
+                        }
+                     },
+                     "required": [
+                        "description",
+                        "url",
+                        "imageUrl",
+                        "name"
+                     ]
+                  },
+                  "imageUrl": {
+                     "type": "string"
+                  }
+               },
+               "required": [
+                  "type",
+                  "subject",
+                  "text",
+                  "id",
+                  "ticketUrl",
+                  "startAt",
+                  "locationId",
+                  "endAt",
+                  "location",
+                  "organizer",
+                  "imageUrl"
+               ]
+            },
+            "message": {
+               "type": "object",
+               "properties": {
+                  "content": {
+                     "type": "object",
+                     "properties": {
+                        "attributes": {
+                           "type": "object"
+                        },
+                        "text": {
+                           "type": "string"
+                        },
+                        "subject": {
+                           "type": "string"
+                        },
+                        "attachments": {
+                           "type": "array",
+                           "items": {}
+                        }
+                     },
+                     "required": [
+                        "attributes",
+                        "text",
+                        "subject",
+                        "attachments"
+                     ]
+                  },
+                  "aggregateContent": {
+                     "type": "array",
+                     "items": {}
+                  }
+               },
+               "required": [
+                  "content",
+                  "aggregateContent"
+               ]
+            },
+            "recievingEndpoints": {
+               "type": "array",
+               "items": {}
+            },
+            "deliveryOptions": {
+               "type": "object",
+               "properties": {
+                  "aggregationType": {
+                     "type": "string"
+                  },
+                  "schedulingType": {
+                     "type": "string"
+                  },
+                  "schedulingValue": {
+                     "type": "null"
+                  }
+               },
+               "required": [
+                  "aggregationType",
+                  "schedulingType",
+                  "schedulingValue"
+               ]
+            }
+         },
+         "required": [
+            "attributes",
+            "message",
+            "recievingEndpoints",
+            "deliveryOptions"
+         ]
+      },
+      "processingInfo": {
+         "type": "null"
+      }
+   },
+   "required": [
+      "type",
+      "attributes",
+      "header",
+      "body",
+      "processingInfo"
+   ]
+}

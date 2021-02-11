@@ -7,14 +7,4 @@ public interface EventService {
 
     Event createEvent(CreateDto createDto);
 
-//    Event createJobPost(CreateJobPostDto createJobPostDto);
-//
-//    Event createBlog(CreateBlogDto createBlogDto);
-//
-//    Event createEvent(CreateEventDto createEventDto);
-//
-//    Event createLink(CreateLinkDto createLinkDto);
-//
-//    Event createNews(CreateNewsDto createNewsDto);
-
 }

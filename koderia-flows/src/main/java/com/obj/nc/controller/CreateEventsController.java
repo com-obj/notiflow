@@ -14,7 +14,7 @@ public class CreateEventsController {
     @Autowired
     private EventService eventService;
 
-    @PostMapping(path = "/jobPost", consumes = "application/json;charset=utf8")
+    @PostMapping(path = "/jobPost")
     @ResponseStatus(HttpStatus.CREATED)
     public Event createJobPost(@RequestBody CreateJobPostDto createJobPostDto) {
         return eventService.createEvent(createJobPostDto);

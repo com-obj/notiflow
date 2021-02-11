@@ -21,7 +21,7 @@ import java.util.Map;
         @JsonSubTypes.Type(value = CreateLinkDto.class, name = "LINK"),
         @JsonSubTypes.Type(value = CreateNewsDto.class, name = "NEWS")
 })
-public class CreateDto {
+public abstract class CreateDto {
 
     private Type type;
 
