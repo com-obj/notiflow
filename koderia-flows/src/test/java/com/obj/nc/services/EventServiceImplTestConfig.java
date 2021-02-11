@@ -1,7 +1,6 @@
-package com.obj.nc.controller;
+package com.obj.nc.services;
 
 import com.obj.nc.mapper.EventMapperImpl;
-import com.obj.nc.services.EventServiceImpl;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 
@@ -10,5 +9,5 @@ import org.springframework.context.annotation.Import;
         EventServiceImpl.class,
         EventMapperImpl.class
 })
-public class CreateEventsControllerTestConfig {
+public class EventServiceImplTestConfig {
 }

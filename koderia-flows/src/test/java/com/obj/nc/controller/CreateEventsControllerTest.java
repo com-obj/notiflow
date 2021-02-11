@@ -58,7 +58,7 @@ class CreateEventsControllerTest {
     }
 
     @Test
-    void testCreateBlogEventMatchesEventSchema() {
+    void testCreateBlogEvent() {
         CreateBlogDto createBlogDto = JsonUtils.readObjectFromClassPathResource("koderia/create_request/blog_body.json", CreateBlogDto.class);
 
         Event responseEvent = RestAssuredMockMvc
@@ -82,7 +82,7 @@ class CreateEventsControllerTest {
     }
 
     @Test
-    void testCreateEventEventMatchesEventSchema() {
+    void testCreateEventEvent() {
         CreateEventDto createEventDto = JsonUtils.readObjectFromClassPathResource("koderia/create_request/event_body.json", CreateEventDto.class);
 
         Event responseEvent = RestAssuredMockMvc
@@ -106,7 +106,7 @@ class CreateEventsControllerTest {
     }
 
     @Test
-    void testCreateLinkEventMatchesEventSchema() {
+    void testCreateLinkEvent() {
         CreateLinkDto createLinkDto = JsonUtils.readObjectFromClassPathResource("koderia/create_request/link_body.json", CreateLinkDto.class);
 
         Event responseEvent = RestAssuredMockMvc
@@ -130,7 +130,7 @@ class CreateEventsControllerTest {
     }
 
     @Test
-    void testCreateNewsEventMatchesEventSchema() {
+    void testCreateNewsEvent() {
         CreateNewsDto createNewsDto = JsonUtils.readObjectFromClassPathResource("koderia/create_request/news_body.json", CreateNewsDto.class);
 
         Event responseEvent = RestAssuredMockMvc
@@ -151,6 +151,23 @@ class CreateEventsControllerTest {
         MatcherAssert.assertThat(responseEvent.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(createNewsDto.getSubject()));
         MatcherAssert.assertThat(responseEvent.getBody().getMessage().getContent().getText(), Matchers.equalTo(createNewsDto.getText()));
         MatcherAssert.assertThat(responseEvent.getBody().getAttributes(), Matchers.equalTo(createNewsDto.asMap()));
+    }
+
+    @Test
+    void testInvalidCreateJobPostEventFail() {
+        Object createJobPostDto = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body_no_text.json", Object.class);
+
+        RestAssuredMockMvc
+                .given()
+                    .config(RestAssuredMockMvcConfig.config().encoderConfig(EncoderConfig.encoderConfig().defaultContentCharset("UTF-8")))
+                    .contentType(ContentType.JSON)
+                    .body(createJobPostDto)
+                .when()
+                    .post("/events/create/jobPost")
+                .then()
+                    .log().ifValidationFails()
+                    .assertThat()
+                    .status(HttpStatus.BAD_REQUEST);
     }
 
 }

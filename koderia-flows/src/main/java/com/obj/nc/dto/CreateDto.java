@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 @Data
@@ -25,8 +26,10 @@ public abstract class CreateDto {
 
     private Type type;
 
+    @NotNull
     private String subject;
 
+    @NotNull
     private String text;
 
     @JsonIgnore
