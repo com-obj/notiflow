@@ -1,0 +1,87 @@
+spring.cloud:
+   function:
+      definition: emitKoderiaEvent;convertKoderiaEvent;validateAndGenerateEventId;persistPIForEvent;resolveRecipients;persistPIForEventWithRecipients;generateMessagesFromEvent;persistPIForMessage;sendMessage;persistPIForSendMessage;logEvent
+
+   stream:
+      bindings:
+         emitKoderiaEvent-out-0:
+            destination: ext_event
+            producer.requiredGroups: ext_event-processing-group
+
+         convertKoderiaEvent-in-0:
+            destination: ext_event
+            group: ext_event-processing-group
+         convertKoderiaEvent-out-0:
+            destination: convert_event
+            producer.requiredGroups: convert_event-processing-group
+
+         validateAndGenerateEventId-in-0:
+            destination: convert_event
+            group: convert_event-processing-group
+         validateAndGenerateEventId-out-0:
+            destination: event
+            producer.requiredGroups: event-processing-group,event-persisting-group
+
+         persistPIForEvent-in-0:
+            destination: event
+            group: event-persisting-group
+
+         resolveRecipients-in-0:
+            destination: event
+            group: event-processing-group
+         resolveRecipients-out-0:
+            destination: event-with-settings
+            producer.requiredGroups: event-settings-consumer,event-persisting-group2
+
+         persistPIForEventWithRecipients-in-0:
+            destination: event-with-settings
+            group: event-persisting-group2
+
+         generateMessagesFromEvent-in-0:
+            destination: event-with-settings
+            group: event-settings-consumer
+         generateMessagesFromEvent-out-0:
+            destination: message
+            producer.requiredGroups: message-persisting-group,message-sender
+
+         persistPIForMessage-in-0:
+            destination: message
+            group: message-persisting-group
+
+         sendMessage-in-0:
+            destination: message
+            group: message-sender
+         sendMessage-out-0:
+            destination: send-message
+            producer.requiredGroups: send-message-persisting-group,message-logger
+
+         persistPIForSendMessage-in-0:
+            destination: send-message
+            group: send-message-persisting-group
+
+         logEvent-in-0:
+            destination: send-message
+            group: message-logger
+
+      poller.fixedDelay: "1000"
+
+spring.datasource:
+   platform: postgres
+   url: jdbc:postgresql://localhost:25432/nc
+   username: root
+   password: rootpw
+
+spring.mail:
+   host: smtp.office365.com
+   port: 587
+   username:  no-reply@objectify.sk
+   password: <login password to smtp server>
+   properties.mail.smtp:
+      auth: true
+      starttls.enable: true
+
+
+management.endpoints.web.exposure.include: '*'
+
+nc.functions.event-generator.sourceDir: src/test/resources/eventsQueue
+nc.functions.send-email-message.from: no-reply@objectify.sk

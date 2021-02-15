@@ -5,6 +5,6 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CreateNewsDto extends CreateDto {
+public class EmitNewsEventDto extends EmitEventDto {
 
 }

@@ -16,14 +16,15 @@ import java.util.Map;
         visible = true
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = CreateJobPostDto.class, name = "JOB_POST"),
-        @JsonSubTypes.Type(value = CreateBlogDto.class, name = "BLOG"),
-        @JsonSubTypes.Type(value = CreateEventDto.class, name = "EVENT"),
-        @JsonSubTypes.Type(value = CreateLinkDto.class, name = "LINK"),
-        @JsonSubTypes.Type(value = CreateNewsDto.class, name = "NEWS")
+        @JsonSubTypes.Type(value = EmitJobPostEventDto.class, name = "JOB_POST"),
+        @JsonSubTypes.Type(value = EmitBlogEventDto.class, name = "BLOG"),
+        @JsonSubTypes.Type(value = EmitEventEventDto.class, name = "EVENT"),
+        @JsonSubTypes.Type(value = EmitLinkEventDto.class, name = "LINK"),
+        @JsonSubTypes.Type(value = EmitNewsEventDto.class, name = "NEWS")
 })
-public abstract class CreateDto {
+public abstract class EmitEventDto {
 
+    @NotNull
     private Type type;
 
     @NotNull
