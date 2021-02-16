@@ -13,4 +13,8 @@ public abstract class AsyncSourceMicroService<OUT> {
 		return () -> streamSource;
 	}
 
+	public void onNext(OUT output) {
+		streamSource.onNext(output);
+	}
+
 }
