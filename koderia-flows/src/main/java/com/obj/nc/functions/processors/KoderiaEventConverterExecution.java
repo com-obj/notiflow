@@ -5,11 +5,14 @@ import com.obj.nc.dto.EmitEventDto;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.function.Function;
 
 @Component
 @Log4j2
 public class KoderiaEventConverterExecution implements Function<EmitEventDto, Event> {
+
+	public static final String ORIGINAL_EVENT_FIELD = "originalEvent";
 
 	@Override
 	public Event apply(EmitEventDto emitEventDto) {
@@ -19,7 +22,7 @@ public class KoderiaEventConverterExecution implements Function<EmitEventDto, Ev
 		event.getBody().getMessage().getContent().setSubject(emitEventDto.getSubject());
 		event.getBody().getMessage().getContent().setText(emitEventDto.getText());
 
-		event.getBody().setAttributes(emitEventDto.asMap());
+		event.getBody().putAttributeValue(ORIGINAL_EVENT_FIELD, emitEventDto.asMap());
 		return event;
 	}
 

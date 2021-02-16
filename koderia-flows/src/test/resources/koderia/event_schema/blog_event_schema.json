@@ -38,89 +38,97 @@
             "attributes": {
                "type": "object",
                "properties": {
-                  "type": {
-                     "type": "string"
-                  },
-                  "subject": {
-                     "type": "string"
-                  },
-                  "text": {
-                     "type": "string"
-                  },
-                  "id": {
-                     "type": "string"
-                  },
-                  "link": {
-                     "type": "string"
-                  },
-                  "featuredImage": {
-                     "type": "array",
-                     "items": [
-                        {
-                           "type": "string"
-                        }
-                     ]
-                  },
-                  "category": {
+                  "originalEvent": {
                      "type": "object",
                      "properties": {
+                        "type": {
+                           "type": "string"
+                        },
+                        "subject": {
+                           "type": "string"
+                        },
+                        "text": {
+                           "type": "string"
+                        },
                         "id": {
                            "type": "string"
                         },
-                        "slug": {
+                        "link": {
                            "type": "string"
                         },
-                        "name": {
-                           "type": "string"
+                        "featuredImage": {
+                           "type": "array",
+                           "items": [
+                              {
+                                 "type": "string"
+                              }
+                           ]
                         },
-                        "color_a": {
-                           "type": "string"
+                        "category": {
+                           "type": "object",
+                           "properties": {
+                              "id": {
+                                 "type": "string"
+                              },
+                              "slug": {
+                                 "type": "string"
+                              },
+                              "name": {
+                                 "type": "string"
+                              },
+                              "color_a": {
+                                 "type": "string"
+                              },
+                              "color_b": {
+                                 "type": "string"
+                              }
+                           },
+                           "required": [
+                              "id",
+                              "slug",
+                              "name",
+                              "color_a",
+                              "color_b"
+                           ]
                         },
-                        "color_b": {
-                           "type": "string"
+                        "author": {
+                           "type": "object",
+                           "properties": {
+                              "id": {
+                                 "type": "string"
+                              },
+                              "name": {
+                                 "type": "string"
+                              },
+                              "description": {
+                                 "type": "string"
+                              },
+                              "avatar": {
+                                 "type": "string"
+                              }
+                           },
+                           "required": [
+                              "id",
+                              "name",
+                              "description",
+                              "avatar"
+                           ]
                         }
                      },
                      "required": [
+                        "type",
+                        "subject",
+                        "text",
                         "id",
-                        "slug",
-                        "name",
-                        "color_a",
-                        "color_b"
-                     ]
-                  },
-                  "author": {
-                     "type": "object",
-                     "properties": {
-                        "id": {
-                           "type": "string"
-                        },
-                        "name": {
-                           "type": "string"
-                        },
-                        "description": {
-                           "type": "string"
-                        },
-                        "avatar": {
-                           "type": "string"
-                        }
-                     },
-                     "required": [
-                        "id",
-                        "name",
-                        "description",
-                        "avatar"
+                        "link",
+                        "featuredImage",
+                        "category",
+                        "author"
                      ]
                   }
                },
                "required": [
-                  "type",
-                  "subject",
-                  "text",
-                  "id",
-                  "link",
-                  "featuredImage",
-                  "category",
-                  "author"
+                  "originalEvent"
                ]
             },
             "message": {

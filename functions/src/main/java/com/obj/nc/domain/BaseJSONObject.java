@@ -2,6 +2,7 @@ package com.obj.nc.domain;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,7 +24,7 @@ public class BaseJSONObject {
 	private Map<String, Object> attributes = new HashMap<String, Object>();
 
 	@JsonAnySetter
-	public void pubAttributeValue(String key, Object value) {
+	public void putAttributeValue(String key, Object value) {
 		attributes.put(key, value);
 	}
 
@@ -41,6 +42,20 @@ public class BaseJSONObject {
 
 	public String toJSONString() {
 		return JsonUtils.writeObjectToJSONString(this);
+	}
+
+	public boolean containsAttributes(List<String> attributes) {
+		return attributes.stream().allMatch(attr -> this.attributes.get(attr) != null);
+	}
+
+	public boolean containsNestedAttributes(String field, List<String> attributes) {
+		Object fieldObject = this.attributes.get(field);
+
+		if (fieldObject instanceof Map) {
+			return attributes.stream().allMatch(attr -> ((Map<?, ?>) fieldObject).get(attr) != null);
+		}
+
+		return false;
 	}
 
 }

@@ -21,6 +21,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.File;
 
+import static com.obj.nc.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+
 @Testcontainers
 public class KoderiaFlowTests {
 
@@ -61,17 +63,17 @@ public class KoderiaFlowTests {
 			MatcherAssert.assertThat(message1, CoreMatchers.notNullValue());
 			MatcherAssert.assertThat(message1.getBody().getMessage().getContent().getText(), Matchers.equalTo(emitEventDto.getText()));
 			MatcherAssert.assertThat(message1.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(emitEventDto.getSubject()));
-			MatcherAssert.assertThat(message1.getBody().getMessage().getContent().getAttributes(), Matchers.equalTo(emitEventDto.asMap()));
+			MatcherAssert.assertThat(message1.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(emitEventDto.asMap()));
 
 			MatcherAssert.assertThat(message2, CoreMatchers.notNullValue());
 			MatcherAssert.assertThat(message2.getBody().getMessage().getContent().getText(), Matchers.equalTo(emitEventDto.getText()));
 			MatcherAssert.assertThat(message2.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(emitEventDto.getSubject()));
-			MatcherAssert.assertThat(message2.getBody().getMessage().getContent().getAttributes(), Matchers.equalTo(emitEventDto.asMap()));
+			MatcherAssert.assertThat(message2.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(emitEventDto.asMap()));
 
 			MatcherAssert.assertThat(message3, CoreMatchers.notNullValue());
 			MatcherAssert.assertThat(message3.getBody().getMessage().getContent().getText(), Matchers.equalTo(emitEventDto.getText()));
 			MatcherAssert.assertThat(message3.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(emitEventDto.getSubject()));
-			MatcherAssert.assertThat(message3.getBody().getMessage().getContent().getAttributes(), Matchers.equalTo(emitEventDto.asMap()));
+			MatcherAssert.assertThat(message3.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(emitEventDto.asMap()));
 		}
 	}
 

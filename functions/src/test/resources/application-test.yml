@@ -6,7 +6,7 @@ spring.mail:
 
 spring.datasource:
    platform: postgres
-   url: jdbc:postgresql://localhost:35432/nc
+   url: jdbc:postgresql://localhost:25432/nc
    username: root
    password: rootpw
 

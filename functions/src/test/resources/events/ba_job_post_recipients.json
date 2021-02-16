@@ -24,8 +24,11 @@
             "email":"all@objectify.sk"
          }
       ],
-      
-      "technologies": ["Java","JEE","JPA"],
-      "experiance": ["Medior","Senior"]
+      "attributes" : {
+         "originalEvent" : {
+            "technologies": ["Java","JEE","JPA"],
+            "experiance": ["Medior","Senior"]
+         }
+      }
    }
 }

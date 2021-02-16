@@ -38,75 +38,83 @@
             "attributes": {
                "type": "object",
                "properties": {
-                  "type": {
-                     "type": "string"
-                  },
-                  "id": {
-                     "type": "string"
-                  },
-                  "subject": {
-                     "type": "string"
-                  },
-                  "text": {
-                     "type": "string"
-                  },
-                  "location": {
-                     "type": "string"
-                  },
-                  "rate": {
-                     "type": "string"
-                  },
-                  "technologies": {
-                     "type": "array",
-                     "items": [
-                        {
+                  "originalEvent": {
+                     "type": "object",
+                     "properties": {
+                        "type": {
+                           "type": "string"
+                        },
+                        "subject": {
+                           "type": "string"
+                        },
+                        "text": {
+                           "type": "string"
+                        },
+                        "id": {
+                           "type": "string"
+                        },
+                        "location": {
+                           "type": "string"
+                        },
+                        "rate": {
+                           "type": "string"
+                        },
+                        "technologies": {
+                           "type": "array",
+                           "items": [
+                              {
+                                 "type": "string"
+                              }
+                           ]
+                        },
+                        "specialRate": {
+                           "type": "string"
+                        },
+                        "labels": {
+                           "type": "array",
+                           "items": [
+                              {
+                                 "type": "string"
+                              }
+                           ]
+                        },
+                        "positionType": {
+                           "type": "array",
+                           "items": [
+                              {
+                                 "type": "string"
+                              }
+                           ]
+                        },
+                        "duration": {
+                           "type": "string"
+                        },
+                        "jobType": {
+                           "type": "string"
+                        },
+                        "dateOfStart": {
                            "type": "string"
                         }
+                     },
+                     "required": [
+                        "type",
+                        "subject",
+                        "text",
+                        "id",
+                        "location",
+                        "rate",
+                        "technologies",
+                        "specialRate",
+                        "labels",
+                        "positionType",
+                        "duration",
+                        "jobType",
+                        "dateOfStart"
                      ]
-                  },
-                  "specialRate": {
-                     "type": "string"
-                  },
-                  "labels": {
-                     "type": "array",
-                     "items": [
-                        {
-                           "type": "string"
-                        }
-                     ]
-                  },
-                  "positionType": {
-                     "type": "array",
-                     "items": [
-                        {
-                           "type": "string"
-                        }
-                     ]
-                  },
-                  "duration": {
-                     "type": "string"
-                  },
-                  "jobType": {
-                     "type": "string"
-                  },
-                  "dateOfStart": {
-                     "type": "string"
                   }
                },
                "required": [
-                  "type",
-                  "id",
-                  "subject",
-                  "text",
-                  "location",
-                  "rate",
-                  "technologies",
-                  "specialRate",
-                  "labels",
-                  "positionType",
-                  "duration",
-                  "jobType",
-                  "dateOfStart"
+                  "originalEvent"
                ]
             },
             "message": {

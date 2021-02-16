@@ -38,84 +38,92 @@
             "attributes": {
                "type": "object",
                "properties": {
-                  "type": {
-                     "type": "string"
-                  },
-                  "subject": {
-                     "type": "string"
-                  },
-                  "text": {
-                     "type": "string"
-                  },
-                  "id": {
-                     "type": "string"
-                  },
-                  "ticketUrl": {
-                     "type": "string"
-                  },
-                  "startAt": {
-                     "type": "string"
-                  },
-                  "locationId": {
-                     "type": "string"
-                  },
-                  "endAt": {
-                     "type": "string"
-                  },
-                  "location": {
+                  "originalEvent": {
                      "type": "object",
                      "properties": {
-                        "googlePlaceId": {
+                        "type": {
                            "type": "string"
                         },
-                        "name": {
-                           "type": "string"
-                        }
-                     },
-                     "required": [
-                        "googlePlaceId",
-                        "name"
-                     ]
-                  },
-                  "organizer": {
-                     "type": "object",
-                     "properties": {
-                        "description": {
+                        "subject": {
                            "type": "string"
                         },
-                        "url": {
+                        "text": {
                            "type": "string"
+                        },
+                        "id": {
+                           "type": "string"
+                        },
+                        "ticketUrl": {
+                           "type": "string"
+                        },
+                        "startAt": {
+                           "type": "string"
+                        },
+                        "locationId": {
+                           "type": "string"
+                        },
+                        "endAt": {
+                           "type": "string"
+                        },
+                        "location": {
+                           "type": "object",
+                           "properties": {
+                              "googlePlaceId": {
+                                 "type": "string"
+                              },
+                              "name": {
+                                 "type": "string"
+                              }
+                           },
+                           "required": [
+                              "googlePlaceId",
+                              "name"
+                           ]
+                        },
+                        "organizer": {
+                           "type": "object",
+                           "properties": {
+                              "description": {
+                                 "type": "string"
+                              },
+                              "url": {
+                                 "type": "string"
+                              },
+                              "imageUrl": {
+                                 "type": "string"
+                              },
+                              "name": {
+                                 "type": "string"
+                              }
+                           },
+                           "required": [
+                              "description",
+                              "url",
+                              "imageUrl",
+                              "name"
+                           ]
                         },
                         "imageUrl": {
                            "type": "string"
-                        },
-                        "name": {
-                           "type": "string"
                         }
                      },
                      "required": [
-                        "description",
-                        "url",
-                        "imageUrl",
-                        "name"
+                        "type",
+                        "subject",
+                        "text",
+                        "id",
+                        "ticketUrl",
+                        "startAt",
+                        "locationId",
+                        "endAt",
+                        "location",
+                        "organizer",
+                        "imageUrl"
                      ]
-                  },
-                  "imageUrl": {
-                     "type": "string"
                   }
                },
                "required": [
-                  "type",
-                  "subject",
-                  "text",
-                  "id",
-                  "ticketUrl",
-                  "startAt",
-                  "locationId",
-                  "endAt",
-                  "location",
-                  "organizer",
-                  "imageUrl"
+                  "originalEvent"
                ]
             },
             "message": {

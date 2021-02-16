@@ -38,20 +38,28 @@
             "attributes": {
                "type": "object",
                "properties": {
-                  "type": {
-                     "type": "string"
-                  },
-                  "subject": {
-                     "type": "string"
-                  },
-                  "text": {
-                     "type": "string"
+                  "originalEvent": {
+                     "type": "object",
+                     "properties": {
+                        "type": {
+                           "type": "string"
+                        },
+                        "subject": {
+                           "type": "string"
+                        },
+                        "text": {
+                           "type": "string"
+                        }
+                     },
+                     "required": [
+                        "type",
+                        "subject",
+                        "text"
+                     ]
                   }
                },
                "required": [
-                  "type",
-                  "subject",
-                  "text"
+                  "originalEvent"
                ]
             },
             "message": {
