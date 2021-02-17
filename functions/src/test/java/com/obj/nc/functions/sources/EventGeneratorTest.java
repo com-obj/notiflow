@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 
 
 @ActiveProfiles("junit-test")
@@ -73,7 +74,7 @@ class EventGeneratorTest {
         Assertions.assertThat(eventFromFile).isNotNull();
         Assertions.assertThat(eventFromFile.getBody().getMessage().getContent().getText()).isEqualTo("New position on koderia.sk");
         Assertions.assertThat(eventFromFile.getBody().getMessage().getContent().getSubject()).isEqualTo("New position");
-        Assertions.assertThat(eventFromFile.getBody().getAttributes()).hasSize(2);
+        Assertions.assertThat(((Map<?, ?>) eventFromFile.getBody().getAttributes().get("originalEvent"))).hasSize(2);
         Assertions.assertThat(eventFromFile.getBody().getRecievingEndpoints()).isEmpty();
     }
 

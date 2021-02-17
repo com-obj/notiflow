@@ -1,9 +1,9 @@
 package com.obj.nc.services;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.koderia.RecipientDto;
-import com.obj.nc.domain.koderia.RecipientsQueryDto;
-import com.obj.nc.domain.mapper.RecipientMapper;
+import com.obj.nc.dto.RecipientDto;
+import com.obj.nc.dto.RecipientsQueryDto;
+import com.obj.nc.mapper.RecipientMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

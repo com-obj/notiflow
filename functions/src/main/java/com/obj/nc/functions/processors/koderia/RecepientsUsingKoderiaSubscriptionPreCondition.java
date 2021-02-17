@@ -16,7 +16,7 @@ public class RecepientsUsingKoderiaSubscriptionPreCondition implements PreCondit
 
 	@Override
 	public Optional<PayloadValidationException> apply(Event event) {
-		boolean eventHasRequiredAttributes = event.containsBodyAttributes(REQUIRED_ATTRIBUTES);
+		boolean eventHasRequiredAttributes = event.getBody().containsNestedAttributes("originalEvent", REQUIRED_ATTRIBUTES);
 
 		if (!eventHasRequiredAttributes) {
 			return Optional.of(new PayloadValidationException(String.format("Event %s does not contain required attributes." +

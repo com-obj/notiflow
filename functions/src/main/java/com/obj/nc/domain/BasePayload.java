@@ -6,11 +6,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
 
+import com.sun.imageio.plugins.tiff.TIFFRenderedImage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -38,9 +40,7 @@ public abstract class BasePayload extends BaseJSONObject {
 		this.processingInfo.stepFinish(this);
 	}
 
-	public boolean containsBodyAttributes(List<String> attributes) {
-		return attributes.stream().allMatch(attr -> body.getAttributes().get(attr) != null);
-	}
+
 
 	public abstract String getPayloadTypeName();
 

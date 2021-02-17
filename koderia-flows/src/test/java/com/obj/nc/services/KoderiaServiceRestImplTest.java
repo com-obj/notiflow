@@ -2,8 +2,8 @@ package com.obj.nc.services;
 
 import com.obj.nc.config.KoderiaApiConfig;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.koderia.CategorizedRecipientsQueryDto;
-import com.obj.nc.domain.koderia.RecipientDto;
+import com.obj.nc.dto.CategorizedRecipientsQueryDto;
+import com.obj.nc.dto.RecipientDto;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

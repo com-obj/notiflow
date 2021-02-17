@@ -53,7 +53,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @Testcontainers
 public class IntegrationTests {
-    public static final String DOCKER_COMPOSE_PATH = "../docker-k7s/fn-test-components/docker-compose.yml";
+    public static final String DOCKER_COMPOSE_PATH = "../docker-k7s/minimal-components/docker-compose.yml";
 
     @Container
     public static DockerComposeContainer<?> environment = new DockerComposeContainer<>(new File(DOCKER_COMPOSE_PATH))
