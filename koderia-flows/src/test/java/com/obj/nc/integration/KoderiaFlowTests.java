@@ -20,6 +20,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.File;
+import java.util.Map;
 
 import static com.obj.nc.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
 
@@ -41,8 +42,9 @@ public class KoderiaFlowTests {
 						.profiles("test")
 						.run()
 		) {
-			String INPUT_JSON_FILE = "koderia/create_request/job_body.json";
+			String INPUT_JSON_FILE = "koderia/create_request/blog_body.json";
 			EmitEventDto emitEventDto = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmitEventDto.class);
+			Map<String, Object> operand = emitEventDto.asMap();
 
 			InputDestination source = ctx.getBean(InputDestination.class);
 			OutputDestination target = ctx.getBean(OutputDestination.class);
@@ -63,17 +65,17 @@ public class KoderiaFlowTests {
 			MatcherAssert.assertThat(message1, CoreMatchers.notNullValue());
 			MatcherAssert.assertThat(message1.getBody().getMessage().getContent().getText(), Matchers.equalTo(emitEventDto.getText()));
 			MatcherAssert.assertThat(message1.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(emitEventDto.getSubject()));
-			MatcherAssert.assertThat(message1.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(emitEventDto.asMap()));
+			MatcherAssert.assertThat(message1.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(operand));
 
 			MatcherAssert.assertThat(message2, CoreMatchers.notNullValue());
 			MatcherAssert.assertThat(message2.getBody().getMessage().getContent().getText(), Matchers.equalTo(emitEventDto.getText()));
 			MatcherAssert.assertThat(message2.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(emitEventDto.getSubject()));
-			MatcherAssert.assertThat(message2.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(emitEventDto.asMap()));
+			MatcherAssert.assertThat(message2.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(operand));
 
 			MatcherAssert.assertThat(message3, CoreMatchers.notNullValue());
 			MatcherAssert.assertThat(message3.getBody().getMessage().getContent().getText(), Matchers.equalTo(emitEventDto.getText()));
 			MatcherAssert.assertThat(message3.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(emitEventDto.getSubject()));
-			MatcherAssert.assertThat(message3.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(emitEventDto.asMap()));
+			MatcherAssert.assertThat(message3.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(operand));
 		}
 	}
 

@@ -16,16 +16,22 @@ import java.io.IOException;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "koderia.api")
-public class KoderiaApiConfig {
+@ConfigurationProperties(prefix = "mailchimp.api")
+public class MailchimpApiConfig {
 
     private String uri;
+
+    private String key;
+
+    private String fromName;
+
+    private String fromEmail;
 
     @Autowired
     private ResponseErrorHandler responseErrorHandler;
 
-    @Bean("koderiaRestTemplate")
-    public RestTemplate koderiaRestTemplate() {
+    @Bean("mailchimpRestTemplate")
+    public RestTemplate mailchimpRestTemplate() {
         return new RestTemplateBuilder()
                 .rootUri(uri)
                 .errorHandler(responseErrorHandler)

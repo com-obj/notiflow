@@ -6,6 +6,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +42,12 @@ public class JsonUtils {
 			throw new RuntimeException(ex);
 		}
 		
+	}
+
+	public static <T> T readClassFromObject(Object object, Class<T> clazz) {
+			ObjectMapper objectMapper = new ObjectMapper();
+			T pojo = objectMapper.convertValue(object, clazz);
+			return pojo;
 	}
 	
 	public static String writeObjectToJSONString(Object pojo) {

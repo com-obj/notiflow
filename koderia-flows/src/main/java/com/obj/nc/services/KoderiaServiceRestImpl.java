@@ -6,6 +6,7 @@ import com.obj.nc.dto.RecipientsQueryDto;
 import com.obj.nc.mapper.RecipientMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -22,6 +23,7 @@ public class KoderiaServiceRestImpl implements KoderiaService {
     public static final String RECIPIENTS_PATH = "/recipients";
 
     @Autowired
+    @Qualifier("koderiaRestTemplate")
     private RestTemplate restTemplate;
 
     @Autowired

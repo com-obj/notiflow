@@ -9,6 +9,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,6 +36,7 @@ class KoderiaServiceRestImplTest {
     private KoderiaServiceRestImpl koderiaService;
 
     @Autowired
+    @Qualifier("koderiaRestTemplate")
     private RestTemplate koderiaRestTemplate;
 
     @Autowired
