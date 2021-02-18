@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.obj.nc.config.KoderiaApiConfig.KODERIA_REST_TEMPLATE;
+
 @Service
 @Log4j2
 public class KoderiaServiceRestImpl implements KoderiaService {
@@ -23,7 +25,7 @@ public class KoderiaServiceRestImpl implements KoderiaService {
     public static final String RECIPIENTS_PATH = "/recipients";
 
     @Autowired
-    @Qualifier("koderiaRestTemplate")
+    @Qualifier(KODERIA_REST_TEMPLATE)
     private RestTemplate restTemplate;
 
     @Autowired

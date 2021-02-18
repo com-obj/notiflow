@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import static com.obj.nc.config.KoderiaApiConfig.KODERIA_REST_TEMPLATE;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -36,7 +37,7 @@ class KoderiaServiceRestImplTest {
     private KoderiaServiceRestImpl koderiaService;
 
     @Autowired
-    @Qualifier("koderiaRestTemplate")
+    @Qualifier(KODERIA_REST_TEMPLATE)
     private RestTemplate koderiaRestTemplate;
 
     @Autowired

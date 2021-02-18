@@ -1,25 +1,20 @@
 package com.obj.nc.dto.mailchimp;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.obj.nc.dto.mailchimp.RecipientDto;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Data
 public class MessageDto {
 
-    @NotNull
+    @NotBlank
     private String subject;
 
-    private String html;
-    private String text;
+//    private String html;
+//    private String text;
 
     @NotBlank
     private String from_email;
