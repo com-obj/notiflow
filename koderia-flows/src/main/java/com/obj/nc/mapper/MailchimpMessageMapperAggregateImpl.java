@@ -6,8 +6,7 @@ import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.dto.mailchimp.*;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.obj.nc.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
@@ -19,32 +18,31 @@ public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperI
     public static final String COMPONENT_NAME = "mailchimpAggregateMessageMapper";
 
     @Override
-    protected MessageDto mapMessage(Message message) {
-        MessageDto messageDto = new MessageDto();
-        messageDto.setSubject(mailchimpApiConfig.getTemplate().getAggregateSubject());
-        messageDto.setFrom_email(mailchimpApiConfig.getApi().getFromEmail());
-        messageDto.setFrom_name(mailchimpApiConfig.getApi().getFromName());
+    protected String mapSubject(Message message) {
+        return mailchimpApiConfig.getTemplate().getAggregateSubject();
+    }
 
-        List<RecipientDto> recipients = Collections.singletonList(this.mapRecipient(message.getBody().getRecievingEndpoints().get(0)));
-        messageDto.setTo(recipients);
-
+    @Override
+    protected List<MergeVarDto> mapGlobalMergeVars(Message message) {
         List<MessageContent> aggregateContent = message.getBody().getMessage().getAggregateContent();
 
-        List<MergeVarDto> globalMergeVars = aggregateContent.stream()
-                .flatMap(messageContent -> {
-                    EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
-                    return originalEvent.asMap().entrySet().stream().map(this::mapFieldValue);
-                })
-                .collect(Collectors.toList());
+        Map<String, List<Object>> globalMergeCategoryValues = new HashMap<>();
+        Arrays.stream(EmitEventDto.Type.values())
+                .forEach(type -> globalMergeCategoryValues.put(type.name(), new ArrayList<>()));
 
-        messageDto.setGlobal_merge_vars(globalMergeVars);
+        aggregateContent.stream()
+                .map(messageContent -> messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class))
+                .forEach(originalEvent -> globalMergeCategoryValues.get(originalEvent.getType().name()).add(originalEvent.asMap()));
 
-        List<AttachmentDto> attachments = aggregateContent.stream()
+        return globalMergeCategoryValues.entrySet().stream().map(this::mapMergeVar).collect(Collectors.toList());
+    }
+
+    @Override
+    protected List<AttachmentDto> mapAttachments(Message message) {
+        List<MessageContent> aggregateContent = message.getBody().getMessage().getAggregateContent();
+        return aggregateContent.stream()
                 .flatMap(messageContent -> messageContent.getAttachments().stream().map(this::mapAttachment))
                 .collect(Collectors.toList());
-
-        messageDto.setAttachments(attachments);
-        return messageDto;
     }
 
     @Override

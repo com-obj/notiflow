@@ -58,10 +58,10 @@ public class MailchimpApiConfig {
     @Setter
     public static class MailchimpTemplateProperties {
         @NotBlank
-        private String aggregateName;
+        private String aggregateSubject;
 
         @NotBlank
-        private String aggregateSubject;
+        private String aggregateName;
 
         @NotBlank
         private String jobPostName;

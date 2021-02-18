@@ -45,52 +45,47 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     protected MessageDto mapMessage(Message message) {
         MessageDto messageDto = new MessageDto();
 
-        MessageContent messageContent = message.getBody().getMessage().getContent();
-        messageDto.setSubject(messageContent.getSubject());
-
+        messageDto.setSubject(mapSubject(message));
         messageDto.setFrom_email(mailchimpApiConfig.getApi().getFromEmail());
         messageDto.setFrom_name(mailchimpApiConfig.getApi().getFromName());
 
         List<RecipientDto> recipients = Collections.singletonList(this.mapRecipient(message.getBody().getRecievingEndpoints().get(0)));
         messageDto.setTo(recipients);
 
-        EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
-        List<MergeVarDto> globalMergeVars = originalEvent.asMap().entrySet().stream()
-                .map(this::mapFieldValue)
-                .collect(Collectors.toList());
-
+        List<MergeVarDto> globalMergeVars = mapGlobalMergeVars(message);
         messageDto.setGlobal_merge_vars(globalMergeVars);
 
-        List<AttachmentDto> attachments = messageContent.getAttachments().stream()
-                .map(this::mapAttachment)
-                .collect(Collectors.toList());
-
+        List<AttachmentDto> attachments = mapAttachments(message);
         messageDto.setAttachments(attachments);
+
         return messageDto;
     }
 
-    protected String getTemplateName(Message message) {
+    protected String mapSubject(Message message) {
+        MessageContent messageContent = message.getBody().getMessage().getContent();
+        return messageContent.getSubject();
+    }
+
+    protected List<MergeVarDto> mapGlobalMergeVars(Message message) {
         MessageContent messageContent = message.getBody().getMessage().getContent();
         EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
-        return mailchimpApiConfig.getTemplateNameFromMessageType(originalEvent.getType());
+        return originalEvent.asMap().entrySet().stream()
+                .map(this::mapMergeVar)
+                .collect(Collectors.toList());
     }
 
-    protected RecipientDto mapRecipient(RecievingEndpoint endpoint) {
-        if (!EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointTypeName())) {
-            throw new UnsupportedOperationException("Mapper can only map Email endpoint");
-        }
-
-        RecipientDto dto = new RecipientDto();
-        dto.setName(endpoint.getRecipient().getName());
-        dto.setEmail(((EmailEndpoint) endpoint).getEmail());
-        return dto;
-    }
-
-    protected MergeVarDto mapFieldValue(Map.Entry<String, Object> fieldValue) {
+    protected <T> MergeVarDto mapMergeVar(Map.Entry<String, T> entry) {
         MergeVarDto dto = new MergeVarDto();
-        dto.setName(fieldValue.getKey());
-        dto.setContent(fieldValue.getValue());
+        dto.setName(entry.getKey());
+        dto.setContent(entry.getValue());
         return dto;
+    }
+
+    protected List<AttachmentDto> mapAttachments(Message message) {
+        MessageContent messageContent = message.getBody().getMessage().getContent();
+        return messageContent.getAttachments().stream()
+                .map(this::mapAttachment)
+                .collect(Collectors.toList());
     }
 
     protected AttachmentDto mapAttachment(Attachement attachement) {
@@ -112,6 +107,23 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
         String base64StringAttachment = Base64.getEncoder().encodeToString(attachmentBytes);
         dto.setContent(base64StringAttachment);
 
+        return dto;
+    }
+
+    protected String getTemplateName(Message message) {
+        MessageContent messageContent = message.getBody().getMessage().getContent();
+        EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
+        return mailchimpApiConfig.getTemplateNameFromMessageType(originalEvent.getType());
+    }
+
+    protected RecipientDto mapRecipient(RecievingEndpoint endpoint) {
+        if (!EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointTypeName())) {
+            throw new UnsupportedOperationException("Mapper can only map Email endpoint");
+        }
+
+        RecipientDto dto = new RecipientDto();
+        dto.setName(endpoint.getRecipient().getName());
+        dto.setEmail(((EmailEndpoint) endpoint).getEmail());
         return dto;
     }
 
