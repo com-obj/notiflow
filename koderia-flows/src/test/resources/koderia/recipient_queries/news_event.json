@@ -1,0 +1,21 @@
+{
+   "type":"EVENT",
+   "header":{
+      "configuration-name":"static-routing-pipeline"
+   },
+   "body":{
+      "message":{
+         "content" : {
+            "subject":"Nove features na Koderia.sk",
+            "text":"..."
+         }
+      },
+      "attributes" : {
+         "originalEvent" : {
+            "type" : "NEWS",
+            "subject" : "Nove features na Koderia.sk",
+            "text" : "..."
+         }
+      }
+   }
+}

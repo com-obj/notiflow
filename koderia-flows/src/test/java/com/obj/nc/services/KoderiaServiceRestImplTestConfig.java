@@ -8,8 +8,7 @@ import org.springframework.context.annotation.Import;
 
 @TestConfiguration
 @Import({
-        KoderiaServiceRestImpl.class,
-        RecipientMapperImpl.class
+        RecipientMapperImpl.class,
 })
 @EnableConfigurationProperties(KoderiaApiConfig.class)
 public class KoderiaServiceRestImplTestConfig {

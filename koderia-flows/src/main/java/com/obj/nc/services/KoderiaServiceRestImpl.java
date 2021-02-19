@@ -1,13 +1,16 @@
 package com.obj.nc.services;
 
+import com.obj.nc.config.KoderiaApiConfig;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.dto.RecipientDto;
 import com.obj.nc.dto.RecipientsQueryDto;
 import com.obj.nc.mapper.RecipientMapper;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,14 +24,21 @@ public class KoderiaServiceRestImpl implements KoderiaService {
 
     public static final String RECIPIENTS_PATH = "/recipients";
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RecipientMapper recipientMapper;
 
-    @Autowired
-    private RecipientMapper recipientMapper;
+    private final RestTemplate restTemplate;
+
+    public KoderiaServiceRestImpl(ResponseErrorHandler responseErrorHandler, RecipientMapper recipientMapper,
+                                  KoderiaApiConfig koderiaApiConfig, RestTemplateBuilder restTemplateBuilder) {
+        this.recipientMapper = recipientMapper;
+        this.restTemplate = restTemplateBuilder
+                .rootUri(koderiaApiConfig.getUri())
+                .errorHandler(responseErrorHandler)
+                .build();
+    }
 
     @Override
-    public List<EmailEndpoint> findEmailEndpoints(RecipientsQueryDto query) {
+    public List<RecievingEndpoint> findReceivingEndpoints(RecipientsQueryDto query) {
         ResponseEntity<RecipientDto[]> responseEntity = restTemplate.postForEntity(RECIPIENTS_PATH, query, RecipientDto[].class);
         RecipientDto[] responseBody = responseEntity.getBody();
 
@@ -39,6 +49,11 @@ public class KoderiaServiceRestImpl implements KoderiaService {
         return Arrays.stream(responseBody)
                 .map(recipientMapper::map)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public RestTemplate getRestTemplate() {
+        return restTemplate;
     }
 
 }
