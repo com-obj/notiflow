@@ -1,5 +1,6 @@
 package com.obj.nc.dto.mailchimp;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -9,8 +10,10 @@ public class MessageResponseDto {
 
     private String status;
 
-    private String reject_reason;
+    @JsonProperty("reject_reason")
+    private String rejectReason;
 
-    private String _id;
+    @JsonProperty("_id")
+    private String id;
 
 }

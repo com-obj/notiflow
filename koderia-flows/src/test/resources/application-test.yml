@@ -4,6 +4,8 @@ spring.mail:
   username: no-reply@objectify.sk
   password: xxx
 
+koderia.api.uri: https://www.koderia.sk/api/v1
+
 mailchimp:
   api:
     uri: http://mandrillapp.com/api/1.0

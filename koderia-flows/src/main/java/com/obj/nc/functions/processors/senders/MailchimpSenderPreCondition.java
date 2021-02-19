@@ -23,19 +23,40 @@ public class MailchimpSenderPreCondition implements PreCondition<Message> {
 			return Optional.of(new PayloadValidationException("Message must not be null"));
 		}
 
-		MessageContent messageContent = message.getBody().getMessage().getContent();
+		if (message.isAggregateMessage()) {
+			for (MessageContent messageContent : message.getBody().getMessage().getAggregateContent()) {
+				Optional<PayloadValidationException> exception = checkMessageContent(messageContent);
+				if (exception.isPresent()) {
+					return exception;
+				}
+			}
+		} else {
+			Optional<PayloadValidationException> exception = checkMessageContent(message.getBody().getMessage().getContent());
+			if (exception.isPresent()) {
+				return exception;
+			}
+		}
+
+		return checkReceivingEndpoints(message);
+	}
+
+	private Optional<PayloadValidationException> checkMessageContent(MessageContent messageContent) {
 		if (!messageContent.containsAttributes(Collections.singletonList(ORIGINAL_EVENT_FIELD))) {
-			return Optional.of(new PayloadValidationException(String.format("Message %s must contain attribute: %s", message, ORIGINAL_EVENT_FIELD)));
+			return Optional.of(new PayloadValidationException(String.format("Message must contain attribute: %s", ORIGINAL_EVENT_FIELD)));
 		}
 
 		if (!messageContent.containsNestedAttributes(ORIGINAL_EVENT_FIELD, Collections.singletonList("type"))) {
-			return Optional.of(new PayloadValidationException(String.format("Message %s must contain attribute: %s.type", message, ORIGINAL_EVENT_FIELD)));
+			return Optional.of(new PayloadValidationException(String.format("Message must contain attribute: %s.type", ORIGINAL_EVENT_FIELD)));
 		}
 
 		if (!StringUtils.hasText(messageContent.getSubject())) {
-			return Optional.of(new PayloadValidationException(String.format("Message %s must contain Subject with at least 1 non-whitespace character", message)));
+			return Optional.of(new PayloadValidationException("Message must contain Subject with at least 1 non-whitespace character"));
 		}
 
+		return Optional.empty();
+	}
+
+	private Optional<PayloadValidationException> checkReceivingEndpoints(Message message) {
 		boolean hasNoneOrTooMuchEndpoints = message.getBody().getRecievingEndpoints().size() != 1;
 		boolean containsNonEmailEndpoint = message.getBody().getRecievingEndpoints().stream()
 				.anyMatch(endpoint -> !EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointTypeName()));

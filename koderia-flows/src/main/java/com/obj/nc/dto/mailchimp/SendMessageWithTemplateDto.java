@@ -1,5 +1,6 @@
 package com.obj.nc.dto.mailchimp;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,8 +13,10 @@ import java.util.List;
 public class SendMessageWithTemplateDto extends SendMessageDto {
 
     @NotBlank
-    private String template_name;
+    @JsonProperty("template_name")
+    private String templateName;
 
-    private List<TemplateContentDto> template_content = new ArrayList<>();
+    @JsonProperty("template_content")
+    private List<TemplateContentDto> templateContent = new ArrayList<>();
 
 }

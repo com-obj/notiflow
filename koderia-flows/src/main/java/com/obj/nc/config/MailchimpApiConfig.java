@@ -4,14 +4,9 @@ import com.obj.nc.dto.EmitEventDto;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.client.ResponseErrorHandler;
-import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotBlank;
 
@@ -21,22 +16,9 @@ import javax.validation.constraints.NotBlank;
 @ConfigurationProperties(prefix = "mailchimp")
 public class MailchimpApiConfig {
 
-    public static final String MAILCHIMP_REST_TEMPLATE = "mailchimpRestTemplate";
-
     private MailchimpApiProperties api;
 
     private MailchimpTemplateProperties template;
-
-    @Autowired
-    private ResponseErrorHandler responseErrorHandler;
-
-    @Bean(MAILCHIMP_REST_TEMPLATE)
-    public RestTemplate mailchimpRestTemplate() {
-        return new RestTemplateBuilder()
-                .rootUri(api.uri)
-                .errorHandler(responseErrorHandler)
-                .build();
-    }
 
     @Getter
     @Setter

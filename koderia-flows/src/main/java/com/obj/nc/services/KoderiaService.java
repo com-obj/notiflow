@@ -5,7 +5,7 @@ import com.obj.nc.dto.RecipientsQueryDto;
 
 import java.util.List;
 
-public interface KoderiaService {
+public interface KoderiaService extends RestClient {
 
     List<EmailEndpoint> findEmailEndpoints(RecipientsQueryDto query);
 

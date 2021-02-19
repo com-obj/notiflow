@@ -3,15 +3,13 @@ package com.obj.nc.integration;
 import com.obj.nc.config.MailchimpApiConfig;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.dto.mailchimp.MessageResponseDto;
-import com.obj.nc.services.MailchimpServiceRestImpl;
 import com.obj.nc.utils.JsonUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.binder.test.InputDestination;
 import org.springframework.cloud.stream.binder.test.OutputDestination;
@@ -21,10 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.client.support.RestGatewaySupport;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -47,6 +42,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 		TestChannelBinderConfiguration.class,
 		KoderiaFlowTestsConfig.class
 })
+@AutoConfigureMockRestServiceServer
 public class KoderiaFlowTests {
 
 	public static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
@@ -77,9 +73,9 @@ public class KoderiaFlowTests {
 		String mailchimpSendMessageUri = mailchimpApiConfig.getApi().getUri() + SEND_TEMPLATE_PATH;
 
 		MessageResponseDto responseDto = new MessageResponseDto();
-		responseDto.set_id("string");
+		responseDto.setId("string");
 		responseDto.setEmail("user@example.com");
-		responseDto.setReject_reason("hard_bounce");
+		responseDto.setRejectReason("hard_bounce");
 		responseDto.setStatus("sent");
 
 		List<MessageResponseDto> responseDtos = Collections.singletonList(responseDto);

@@ -19,19 +19,6 @@ import java.io.IOException;
 @ConfigurationProperties(prefix = "koderia.api")
 public class KoderiaApiConfig {
 
-    public static final String KODERIA_REST_TEMPLATE = "koderiaRestTemplate";
-
     private String uri;
-
-    @Autowired
-    private ResponseErrorHandler responseErrorHandler;
-
-    @Bean(KODERIA_REST_TEMPLATE)
-    public RestTemplate koderiaRestTemplate() {
-        return new RestTemplateBuilder()
-                .rootUri(uri)
-                .errorHandler(responseErrorHandler)
-                .build();
-    }
 
 }

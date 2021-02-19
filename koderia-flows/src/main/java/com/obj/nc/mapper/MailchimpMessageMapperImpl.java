@@ -9,6 +9,7 @@ import com.obj.nc.domain.message.MessageContent;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.dto.mailchimp.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -16,7 +17,6 @@ import java.io.IOException;
 import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,6 +27,7 @@ import static com.obj.nc.mapper.MailchimpMessageMapperImpl.COMPONENT_NAME;
 public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
 
     public static final String COMPONENT_NAME = "mailchimpMessageMapper";
+    public static final String EVENT_FIELD = "event";
 
     @Autowired
     protected MailchimpApiConfig mailchimpApiConfig;
@@ -38,7 +39,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
         dto.setMessage(mapMessage(message));
 
         String messageTypeName = getTemplateName(message);
-        dto.setTemplate_name(messageTypeName);
+        dto.setTemplateName(messageTypeName);
         return dto;
     }
 
@@ -46,14 +47,14 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
         MessageDto messageDto = new MessageDto();
 
         messageDto.setSubject(mapSubject(message));
-        messageDto.setFrom_email(mailchimpApiConfig.getApi().getFromEmail());
-        messageDto.setFrom_name(mailchimpApiConfig.getApi().getFromName());
+        messageDto.setFromEmail(mailchimpApiConfig.getApi().getFromEmail());
+        messageDto.setFromName(mailchimpApiConfig.getApi().getFromName());
 
         List<RecipientDto> recipients = Collections.singletonList(this.mapRecipient(message.getBody().getRecievingEndpoints().get(0)));
         messageDto.setTo(recipients);
 
         List<MergeVarDto> globalMergeVars = mapGlobalMergeVars(message);
-        messageDto.setGlobal_merge_vars(globalMergeVars);
+        messageDto.setGlobalMergeVars(globalMergeVars);
 
         List<AttachmentDto> attachments = mapAttachments(message);
         messageDto.setAttachments(attachments);
@@ -69,9 +70,10 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     protected List<MergeVarDto> mapGlobalMergeVars(Message message) {
         MessageContent messageContent = message.getBody().getMessage().getContent();
         EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
-        return originalEvent.asMap().entrySet().stream()
-                .map(this::mapMergeVar)
-                .collect(Collectors.toList());
+
+        Map<String, Object> mergeVars = new HashMap<>();
+        mergeVars.put(EVENT_FIELD, originalEvent.asMap());
+        return mergeVars.entrySet().stream().map(this::mapMergeVar).collect(Collectors.toList());
     }
 
     protected <T> MergeVarDto mapMergeVar(Map.Entry<String, T> entry) {
@@ -92,14 +94,14 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
         AttachmentDto dto = new AttachmentDto();
         dto.setName(attachement.getName());
 
-        File file = new File(attachement.getFileURI());
+        FileSystemResource file = new FileSystemResource(new File(attachement.getFileURI()));
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
-        String mimeType = fileNameMap.getContentTypeFor(file.getName());
+        String mimeType = fileNameMap.getContentTypeFor(file.getFilename());
         dto.setType(mimeType);
 
         byte[] attachmentBytes = new byte[0];
         try {
-            attachmentBytes = Files.readAllBytes(Paths.get(attachement.getFileURI()));
+            attachmentBytes = Files.readAllBytes(file.getFile().toPath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
