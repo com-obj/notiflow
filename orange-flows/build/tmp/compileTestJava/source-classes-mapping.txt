@@ -1,0 +1,2 @@
+com/obj/nc/binder/FileMessageBinderTests.java
+ com.obj.nc.binder.FileMessageBinderTests

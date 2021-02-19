@@ -1,0 +1,10 @@
+spring.mail:
+   host: localhost
+   port: 3025
+   username: no-reply@objectify.sk
+   password: xxx
+   
+   
+logging.level:
+   org.springframework.aop: TRACE
+

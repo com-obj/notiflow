@@ -1,4 +1,3 @@
-
 spring.cloud:
    function:
       definition: generateEvent;validateAndGenerateEventId;persistPIForEvent;resolveRecipients;persistPIForEventWithRecipients;generateMessagesFromEvent;persistPIForMessage;sendMessage;persistPIForSendMessage;logEvent
@@ -15,48 +14,48 @@ spring.cloud:
          validateAndGenerateEventId-out-0:
             destination: event
             producer.requiredGroups: event-processing-group,event-persisting-group
-            
+
          persistPIForEvent-in-0:
             destination: event
             group: event-persisting-group
-            
+
          resolveRecipients-in-0:
             destination: event
             group: event-processing-group
          resolveRecipients-out-0:
             destination: event-with-settings
             producer.requiredGroups: event-settings-consumer,event-persisting-group2
-            
+
          persistPIForEventWithRecipients-in-0:
             destination: event-with-settings
             group: event-persisting-group2
-            
+
          generateMessagesFromEvent-in-0:
             destination: event-with-settings
             group: event-settings-consumer
          generateMessagesFromEvent-out-0:
             destination: message
             producer.requiredGroups: message-persisting-group,message-sender
-            
+
          persistPIForMessage-in-0:
             destination: message
             group: message-persisting-group
-            
+
          sendMessage-in-0:
             destination: message
             group: message-sender
          sendMessage-out-0:
             destination: send-message
             producer.requiredGroups: send-message-persisting-group,message-logger
-            
+
          persistPIForSendMessage-in-0:
             destination: send-message
             group: send-message-persisting-group
-            
+
          logEvent-in-0:
             destination: send-message
             group: message-logger
-            
+
       poller.fixedDelay: "1000"
 
 spring.datasource:
@@ -72,7 +71,7 @@ spring.mail:
    password: <login password to smtp server>
    properties.mail.smtp:
       auth: true
-      starttls.enable: true   
+      starttls.enable: true
 
    
 management.endpoints.web.exposure.include: '*'

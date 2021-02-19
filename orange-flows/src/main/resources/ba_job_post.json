@@ -1,0 +1,20 @@
+{
+   "type":"EVENT",
+   "header":{
+      "configuration-name":"static-routing-pipeline"
+   },
+   "body":{
+      "message":{
+         "content" : {
+            "subject":"New position",
+            "text":"New position on koderia.sk"
+         }
+      },
+      "attributes" : {
+         "originalEvent" : {
+            "technologies": ["Java","JEE","JPA"],
+            "experiance": ["Medior","Senior"]
+         }
+      }
+   }
+}
