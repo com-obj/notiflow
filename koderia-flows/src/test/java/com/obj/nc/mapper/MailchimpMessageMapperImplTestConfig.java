@@ -1,17 +1,16 @@
-package com.obj.nc.services;
+package com.obj.nc.mapper;
 
 import com.obj.nc.config.RestClientConfig;
-import com.obj.nc.config.KoderiaApiConfigProperties;
-import com.obj.nc.mapper.RecipientMapperImpl;
+import com.obj.nc.config.MailchimpApiConfig;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 
 @TestConfiguration
 @Import({
-        RecipientMapperImpl.class,
+        MailchimpMessageMapperImpl.class,
         RestClientConfig.class
 })
-@EnableConfigurationProperties(KoderiaApiConfigProperties.class)
-public class KoderiaServiceRestImplTestConfig {
+@EnableConfigurationProperties(MailchimpApiConfig.class)
+class MailchimpMessageMapperImplTestConfig {
 }

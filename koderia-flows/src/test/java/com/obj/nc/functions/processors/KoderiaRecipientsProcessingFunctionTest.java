@@ -5,7 +5,7 @@ import com.obj.nc.domain.event.Event;
 import com.obj.nc.dto.RecipientDto;
 import com.obj.nc.dto.RecipientsQueryDto;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.services.KoderiaServiceRestImpl;
+import com.obj.nc.services.KoderiaRestClientImpl;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.obj.nc.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
-import static com.obj.nc.services.KoderiaServiceRestImpl.RECIPIENTS_PATH;
+import static com.obj.nc.services.KoderiaRestClientImpl.RECIPIENTS_PATH;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.test.web.client.ExpectedCount.once;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
@@ -33,7 +33,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ActiveProfiles("test")
-@RestClientTest(KoderiaServiceRestImpl.class)
+@RestClientTest(KoderiaRestClientImpl.class)
 @Import(KoderiaRecipientsProcessingFunctionTestConfig.class)
 class KoderiaRecipientsProcessingFunctionTest {
 

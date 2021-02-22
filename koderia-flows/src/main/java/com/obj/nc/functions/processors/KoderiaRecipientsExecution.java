@@ -5,7 +5,7 @@ import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.dto.RecipientsQueryDto;
-import com.obj.nc.services.KoderiaService;
+import com.obj.nc.services.KoderiaClient;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,14 +23,14 @@ public class KoderiaRecipientsExecution implements Function<Event, Event> {
 	private ObjectMapper objectMapper;
 
 	@Autowired
-	private KoderiaService koderiaService;
+	private KoderiaClient koderiaClient;
 
 	@DocumentProcessingInfo("FindKoderiaRecipients")
 	@Override
 	public Event apply(Event event) {
 		Object originalEvent = event.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD);
 		RecipientsQueryDto recipientsQueryDto = objectMapper.convertValue(originalEvent, RecipientsQueryDto.class);
-		List<RecievingEndpoint> emailEndpoints = koderiaService.findReceivingEndpoints(recipientsQueryDto);
+		List<RecievingEndpoint> emailEndpoints = koderiaClient.findReceivingEndpoints(recipientsQueryDto);
 		event.getBody().setRecievingEndpoints(emailEndpoints);
 		return event;
 	}

@@ -1,6 +1,6 @@
 package com.obj.nc.services;
 
-import com.obj.nc.config.KoderiaApiConfig;
+import com.obj.nc.config.KoderiaApiConfigProperties;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.dto.RecipientDto;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Log4j2
-public class KoderiaServiceRestImpl implements KoderiaService {
+public class KoderiaRestClientImpl implements KoderiaClient {
 
     public static final String RECIPIENTS_PATH = "/recipients";
 
@@ -28,11 +28,11 @@ public class KoderiaServiceRestImpl implements KoderiaService {
 
     private final RestTemplate restTemplate;
 
-    public KoderiaServiceRestImpl(ResponseErrorHandler responseErrorHandler, RecipientMapper recipientMapper,
-                                  KoderiaApiConfig koderiaApiConfig, RestTemplateBuilder restTemplateBuilder) {
+    public KoderiaRestClientImpl(ResponseErrorHandler responseErrorHandler, RecipientMapper recipientMapper,
+                                 KoderiaApiConfigProperties koderiaApiConfigProperties, RestTemplateBuilder restTemplateBuilder) {
         this.recipientMapper = recipientMapper;
         this.restTemplate = restTemplateBuilder
-                .rootUri(koderiaApiConfig.getUri())
+                .rootUri(koderiaApiConfigProperties.getUri())
                 .errorHandler(responseErrorHandler)
                 .build();
     }

@@ -1,6 +1,6 @@
 spring.cloud:
    function:
-      definition: emitKoderiaEvent;convertKoderiaEvent;validateAndGenerateEventId;persistPIForEvent;resolveRecipients;persistPIForEventWithRecipients;generateMessagesFromEvent;persistPIForMessage;sendMessage;persistPIForSendMessage;logEvent
+      definition: emitKoderiaEvent;convertKoderiaEvent;validateAndGenerateEventId;persistPIForEvent;resolveRecipients;persistPIForEventWithRecipients;generateMessagesFromEvent;persistPIForMessage;sendMailchimpMessage;persistPIForSendMessage;logEvent
 
    stream:
       bindings:
@@ -48,10 +48,10 @@ spring.cloud:
             destination: message
             group: message-persisting-group
 
-         sendMessage-in-0:
+         sendMailchimpMessage-in-0:
             destination: message
             group: message-sender
-         sendMessage-out-0:
+         sendMailchimpMessage-out-0:
             destination: send-message
             producer.requiredGroups: send-message-persisting-group,message-logger
 
@@ -82,6 +82,3 @@ spring.mail:
 
 
 management.endpoints.web.exposure.include: '*'
-
-nc.functions.event-generator.sourceDir: src/test/resources/eventsQueue
-nc.functions.send-email-message.from: no-reply@objectify.sk
