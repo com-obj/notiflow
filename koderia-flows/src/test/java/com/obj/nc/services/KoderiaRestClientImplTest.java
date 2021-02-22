@@ -2,7 +2,6 @@ package com.obj.nc.services;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.dto.JobPostRecipientsQueryDto;
 import com.obj.nc.dto.RecipientDto;
 import com.obj.nc.dto.RecipientsQueryDto;
 import com.obj.nc.utils.JsonUtils;
@@ -29,7 +28,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @ActiveProfiles("test")
 @RestClientTest(KoderiaRestClientImpl.class)
-@Import(KoderiaServiceRestImplTestConfig.class)
+@Import(KoderiaRestClientImplTestConfig.class)
 class KoderiaRestClientImplTest {
 
     @Autowired

@@ -13,5 +13,5 @@ import org.springframework.context.annotation.Import;
         RestClientConfig.class
 })
 @EnableConfigurationProperties(KoderiaApiConfigProperties.class)
-public class KoderiaServiceRestImplTestConfig {
+public class KoderiaRestClientImplTestConfig {
 }
