@@ -7,7 +7,7 @@ import com.obj.nc.dto.mailchimp.SendMessageWithTemplateDto;
 import com.obj.nc.mapper.MailchimpMessageMapper;
 import com.obj.nc.mapper.MailchimpMessageMapperAggregateImpl;
 import com.obj.nc.mapper.MailchimpMessageMapperImpl;
-import com.obj.nc.services.MailchimpService;
+import com.obj.nc.services.MailchimpClient;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,7 +23,7 @@ public class MailchimpSenderExecution implements Function<Message, Message> {
 	public static final String MAILCHIMP_RESPONSE_FIELD = "mailchimpResponse";
 
 	@Autowired
-	private MailchimpService mailchimpService;
+	private MailchimpClient mailchimpClient;
 
 	@Autowired
 	@Qualifier(MailchimpMessageMapperImpl.COMPONENT_NAME)
@@ -40,7 +40,7 @@ public class MailchimpSenderExecution implements Function<Message, Message> {
 				? mailchimpAggregateMessageMapper.mapWithTemplate(message)
 				: mailchimpMessageMapper.mapWithTemplate(message);
 
-		List<MessageResponseDto> messageResponseDtos = mailchimpService.sendMessageWithTemplate(sendMessageDto);
+		List<MessageResponseDto> messageResponseDtos = mailchimpClient.sendMessageWithTemplate(sendMessageDto);
 		message.getBody().putAttributeValue(MAILCHIMP_RESPONSE_FIELD, messageResponseDtos);
 
 		return message;

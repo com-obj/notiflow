@@ -17,7 +17,7 @@ import java.io.IOException;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "koderia.api")
-public class KoderiaApiConfig {
+public class KoderiaApiConfigProperties {
 
     private String uri;
 

@@ -27,7 +27,7 @@ import java.util.Map;
 
 import static com.obj.nc.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.functions.processors.senders.MailchimpSenderExecution.MAILCHIMP_RESPONSE_FIELD;
-import static com.obj.nc.services.MailchimpServiceRestImpl.SEND_TEMPLATE_PATH;
+import static com.obj.nc.services.MailchimpRestClientImpl.SEND_TEMPLATE_PATH;
 import static org.springframework.test.web.client.ExpectedCount.once;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;

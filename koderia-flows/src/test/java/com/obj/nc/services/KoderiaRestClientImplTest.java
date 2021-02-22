@@ -26,12 +26,12 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @ActiveProfiles("test")
-@RestClientTest(KoderiaServiceRestImpl.class)
+@RestClientTest(KoderiaRestClientImpl.class)
 @Import(KoderiaServiceRestImplTestConfig.class)
-class KoderiaServiceRestImplTest {
+class KoderiaRestClientImplTest {
 
     @Autowired
-    private KoderiaServiceRestImpl koderiaService;
+    private KoderiaRestClientImpl koderiaService;
 
     @Autowired
     private MockRestServiceServer mockServer;
@@ -46,7 +46,7 @@ class KoderiaServiceRestImplTest {
         RecipientDto[] responseBody = JsonUtils.readObjectFromClassPathResource(RECIPIENTS_JSON_PATH, RecipientDto[].class);
 
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI(KoderiaServiceRestImpl.RECIPIENTS_PATH)))
+                requestTo(new URI(KoderiaRestClientImpl.RECIPIENTS_PATH)))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -77,7 +77,7 @@ class KoderiaServiceRestImplTest {
         RecipientDto[] responseBody = null;
 
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI(KoderiaServiceRestImpl.RECIPIENTS_PATH)))
+                requestTo(new URI(KoderiaRestClientImpl.RECIPIENTS_PATH)))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -99,7 +99,7 @@ class KoderiaServiceRestImplTest {
         RecipientDto[] responseBody = null;
 
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI( KoderiaServiceRestImpl.RECIPIENTS_PATH)))
+                requestTo(new URI( KoderiaRestClientImpl.RECIPIENTS_PATH)))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.NOT_FOUND)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -121,7 +121,7 @@ class KoderiaServiceRestImplTest {
         RecipientDto[] responseBody = null;
 
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI(KoderiaServiceRestImpl.RECIPIENTS_PATH)))
+                requestTo(new URI(KoderiaRestClientImpl.RECIPIENTS_PATH)))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                         .contentType(MediaType.APPLICATION_JSON)

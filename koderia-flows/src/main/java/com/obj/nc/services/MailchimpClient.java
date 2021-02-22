@@ -5,7 +5,7 @@ import com.obj.nc.dto.mailchimp.SendMessageWithTemplateDto;
 
 import java.util.List;
 
-public interface MailchimpService extends RestClient {
+public interface MailchimpClient extends RestClient {
 
     List<MessageResponseDto> sendMessageWithTemplate(SendMessageWithTemplateDto sendMessageDto);
 

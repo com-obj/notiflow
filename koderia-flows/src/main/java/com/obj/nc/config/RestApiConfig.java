@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClientException;
 import java.io.IOException;
 
 @Configuration
-public class BaseApiConfig {
+public class RestApiConfig {
 
     @Bean
     public ResponseErrorHandler responseErrorHandler() {

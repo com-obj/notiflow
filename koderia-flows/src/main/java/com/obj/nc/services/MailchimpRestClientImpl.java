@@ -17,14 +17,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Log4j2
-public class MailchimpServiceRestImpl implements MailchimpService {
+public class MailchimpRestClientImpl implements MailchimpClient {
 
     public static final String SEND_TEMPLATE_PATH = "/messages/send-template";
 
     private final RestTemplate restTemplate;
 
-    public MailchimpServiceRestImpl(ResponseErrorHandler responseErrorHandler, MailchimpApiConfig mailchimpApiConfig,
-                                    RestTemplateBuilder restTemplateBuilder) {
+    public MailchimpRestClientImpl(ResponseErrorHandler responseErrorHandler, MailchimpApiConfig mailchimpApiConfig,
+                                   RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder
                 .rootUri(mailchimpApiConfig.getApi().getUri())
                 .errorHandler(responseErrorHandler)

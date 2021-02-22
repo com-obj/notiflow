@@ -1,8 +1,8 @@
 package com.obj.nc.integration;
 
-import com.obj.nc.config.BaseApiConfig;
+import com.obj.nc.config.RestApiConfig;
 import com.obj.nc.config.MailchimpApiConfig;
-import com.obj.nc.services.MailchimpServiceRestImpl;
+import com.obj.nc.services.MailchimpRestClientImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 @TestConfiguration
-@Import(BaseApiConfig.class)
+@Import(RestApiConfig.class)
 @EnableConfigurationProperties(MailchimpApiConfig.class)
 public class KoderiaFlowTestsConfig {
 
@@ -21,7 +21,7 @@ public class KoderiaFlowTestsConfig {
 	private MockServerRestTemplateCustomizer customizer;
 
 	@Autowired
-	private MailchimpServiceRestImpl mailchimpServiceRest;
+	private MailchimpRestClientImpl mailchimpServiceRest;
 
 	@Primary
 	@Bean
