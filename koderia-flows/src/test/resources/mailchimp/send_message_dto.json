@@ -1,0 +1,43 @@
+{
+  "key" : "ASDF",
+  "message" : {
+    "subject" : "Business Intelligence (BI) Developer",
+    "from_email" : "sender@koderia.sk",
+    "from_name" : "Koderia sender",
+    "to" : [ {
+      "email" : "john.doe@objectify.sk",
+      "name" : "John Doe",
+      "type" : "to"
+    } ],
+    "merge_language" : "handlebars",
+    "global_merge_vars" : [ {
+      "name" : "event",
+      "content" : {
+        "type" : "JOB_POST",
+        "id": "unwhX7OlJYq7Kd7GfoCd",
+        "subject":"Business Intelligence (BI) Developer",
+        "text":"We are looking for a Business Intelligence (BI) Developer to create...",
+        "location": "Viedeň",
+        "rate": "500",
+        "technologies": ["Microsoft Power BI"],
+        "specialRate": "400 – 500 € / manday",
+        "labels": ["Home Office"],
+        "positionType": ["Senior"],
+        "duration": "1 rok s možnosťou predĺženia",
+        "jobType": "Analytik",
+        "dateOfStart": "ASAP"
+      }
+    } ],
+    "attachments" : [ {
+      "type" : "text/plain",
+      "name" : "test1.txt",
+      "content" : "YXR0YWNobWVudCB0ZXN0MQ=="
+    }, {
+      "type" : "text/plain",
+      "name" : "test2.txt",
+      "content" : "YXR0YWNobWVudCB0ZXN0Mg=="
+    } ]
+  },
+  "template_name" : "job-post-template",
+  "template_content" : [ ]
+}

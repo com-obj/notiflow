@@ -1,22 +1,17 @@
 package com.obj.nc.domain;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class BaseJSONObject {
@@ -49,13 +44,17 @@ public class BaseJSONObject {
 	}
 
 	public boolean containsNestedAttributes(String field, List<String> attributes) {
-		Object fieldObject = this.attributes.get(field);
+		Map<String, Object> fieldValue = getAttributeValueAs(field, Map.class);
 
-		if (fieldObject instanceof Map) {
-			return attributes.stream().allMatch(attr -> ((Map<?, ?>) fieldObject).get(attr) != null);
+		if (fieldValue == null) {
+			return false;
 		}
 
-		return false;
+		return attributes.stream().allMatch(attr -> fieldValue.get(attr) != null);
+	}
+
+	public <T> T getAttributeValueAs(String attributeName, Class<T> clazz) {
+		return JsonUtils.readClassFromObject(attributes.get(attributeName), clazz);
 	}
 
 }

@@ -1,23 +1,21 @@
 package com.obj.nc.services;
 
-import com.obj.nc.config.KoderiaApiConfig;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.dto.CategorizedRecipientsQueryDto;
 import com.obj.nc.dto.RecipientDto;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,25 +25,16 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
-@SpringJUnitConfig(classes = KoderiaServiceRestImplTestConfig.class)
-@TestPropertySource(locations = "classpath:application-junit-test.yml")
-class KoderiaServiceRestImplTest {
+@ActiveProfiles("test")
+@RestClientTest(KoderiaRestClientImpl.class)
+@Import(KoderiaServiceRestImplTestConfig.class)
+class KoderiaRestClientImplTest {
 
     @Autowired
-    private KoderiaServiceRestImpl koderiaService;
+    private KoderiaRestClientImpl koderiaService;
 
     @Autowired
-    private RestTemplate koderiaRestTemplate;
-
-    @Autowired
-    private KoderiaApiConfig koderiaApiConfig;
-
     private MockRestServiceServer mockServer;
-
-    @BeforeEach
-    void initMockRestServiceServer() {
-        mockServer = MockRestServiceServer.createServer(koderiaRestTemplate);
-    }
 
     @Test
     void testFindReceivingEndpoints() throws URISyntaxException {
@@ -57,7 +46,7 @@ class KoderiaServiceRestImplTest {
         RecipientDto[] responseBody = JsonUtils.readObjectFromClassPathResource(RECIPIENTS_JSON_PATH, RecipientDto[].class);
 
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI( koderiaApiConfig.getUri() + KoderiaServiceRestImpl.RECIPIENTS_PATH)))
+                requestTo(new URI(KoderiaRestClientImpl.RECIPIENTS_PATH)))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -88,7 +77,7 @@ class KoderiaServiceRestImplTest {
         RecipientDto[] responseBody = null;
 
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI( koderiaApiConfig.getUri() + KoderiaServiceRestImpl.RECIPIENTS_PATH)))
+                requestTo(new URI(KoderiaRestClientImpl.RECIPIENTS_PATH)))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -110,7 +99,7 @@ class KoderiaServiceRestImplTest {
         RecipientDto[] responseBody = null;
 
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI( koderiaApiConfig.getUri() + KoderiaServiceRestImpl.RECIPIENTS_PATH)))
+                requestTo(new URI( KoderiaRestClientImpl.RECIPIENTS_PATH)))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.NOT_FOUND)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -132,7 +121,7 @@ class KoderiaServiceRestImplTest {
         RecipientDto[] responseBody = null;
 
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI( koderiaApiConfig.getUri() + KoderiaServiceRestImpl.RECIPIENTS_PATH)))
+                requestTo(new URI(KoderiaRestClientImpl.RECIPIENTS_PATH)))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                         .contentType(MediaType.APPLICATION_JSON)
