@@ -2,6 +2,7 @@ package com.obj.nc.services;
 
 import com.obj.nc.config.KoderiaApiConfigProperties;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.dto.RecipientDto;
 import com.obj.nc.dto.RecipientsQueryDto;
 import com.obj.nc.mapper.RecipientMapper;
@@ -37,7 +38,7 @@ public class KoderiaRestClientImpl implements KoderiaClient {
     }
 
     @Override
-    public List<EmailEndpoint> findEmailEndpoints(RecipientsQueryDto query) {
+    public List<RecievingEndpoint> findReceivingEndpoints(RecipientsQueryDto query) {
         ResponseEntity<RecipientDto[]> responseEntity = restTemplate.postForEntity(RECIPIENTS_PATH, query, RecipientDto[].class);
         RecipientDto[] responseBody = responseEntity.getBody();
 

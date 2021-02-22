@@ -1,0 +1,108 @@
+package com.obj.nc.functions.processors;
+
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.event.Event;
+import com.obj.nc.dto.RecipientDto;
+import com.obj.nc.dto.RecipientsQueryDto;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.services.KoderiaRestClientImpl;
+import com.obj.nc.utils.JsonUtils;
+import org.assertj.core.api.Assertions;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.client.MockRestServiceServer;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.obj.nc.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.services.KoderiaRestClientImpl.RECIPIENTS_PATH;
+import static java.util.stream.Collectors.toList;
+import static org.springframework.test.web.client.ExpectedCount.once;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+@ActiveProfiles("test")
+@RestClientTest(KoderiaRestClientImpl.class)
+@Import(KoderiaRecipientsProcessingFunctionTestConfig.class)
+class KoderiaRecipientsProcessingFunctionTest {
+
+    public static final String TEST_FILES_DIR_PATH = "koderia/recipient_queries/";
+
+    @Autowired
+    private KoderiaRecipientsProcessingFunction getKoderiaRecipients;
+
+    @Autowired
+    private MockRestServiceServer server;
+
+    @ParameterizedTest
+    @CsvSource({
+            "job_event.json,job_recipients_query.json,job_recipients_response.json",
+            "blog_event.json,blog_recipients_query.json,blog_recipients_response.json",
+            "event_event.json,event_recipients_query.json,event_recipients_response.json",
+            "link_event.json,link_recipients_query.json,link_recipients_response.json",
+            "news_event.json,news_recipients_query.json,news_recipients_response.json"
+    })
+    void testFindEventRecipients(String inputEventFile, String expectedQueryPath, String expectedRecipientsPath) {
+        // WITH MOCK SERVER
+        RecipientsQueryDto queryDto = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + expectedQueryPath, RecipientsQueryDto.class);
+        String queryDtoJsonString = JsonUtils.writeObjectToJSONString(queryDto);
+
+        RecipientDto[] responseDto = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + expectedRecipientsPath, RecipientDto[].class);
+        String responseDtoJsonString = JsonUtils.writeObjectToJSONString(responseDto);
+
+        server.expect(once(), requestTo(RECIPIENTS_PATH))
+                .andExpect(content().json(queryDtoJsonString))
+                .andRespond(withSuccess(responseDtoJsonString, MediaType.APPLICATION_JSON));
+
+        // GIVEN
+        Event inputEvent = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + inputEventFile, Event.class);
+
+        // WHEN
+        Event outputEvent = getKoderiaRecipients.apply(inputEvent);
+
+        // THEN
+        List<String> recipientEmails = outputEvent.getBody().getRecievingEndpoints().stream().map(endpoint -> ((EmailEndpoint) endpoint).getEmail()).collect(toList());
+        for (int i = 0; i < recipientEmails.size(); i++) {
+            MatcherAssert.assertThat(recipientEmails.get(i), Matchers.equalTo(responseDto[i].getEmail()));
+        }
+    }
+
+    @Test
+    void testEventWithNoOriginalEvent() {
+        // GIVEN
+        Event inputEvent = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + "job_event.json", Event.class);
+        inputEvent.getBody().getAttributes().remove(ORIGINAL_EVENT_FIELD);
+
+        // WHEN - THEN
+        Assertions.assertThatThrownBy(() -> getKoderiaRecipients.apply(inputEvent))
+                .isInstanceOf(PayloadValidationException.class)
+                .hasMessageContaining("does not contain required attributes.")
+                .hasMessageContaining(ORIGINAL_EVENT_FIELD);
+    }
+
+    @Test
+    void testInconvertibleEvent() {
+        // GIVEN
+        Event inputEvent = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + "job_event.json", Event.class);
+        Map<String, Object> map = new HashMap<>();
+        map.put("bad_field", "bad_value");
+        inputEvent.getBody().getAttributes().put(ORIGINAL_EVENT_FIELD, map);
+
+        // WHEN - THEN
+        Assertions.assertThatThrownBy(() -> getKoderiaRecipients.apply(inputEvent))
+                .isInstanceOf(PayloadValidationException.class)
+                .hasMessageContaining("missing type id property 'type'");
+    }
+
+}

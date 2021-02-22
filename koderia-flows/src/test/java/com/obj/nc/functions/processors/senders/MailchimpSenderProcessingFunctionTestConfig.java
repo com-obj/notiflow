@@ -1,6 +1,6 @@
 package com.obj.nc.functions.processors.senders;
 
-import com.obj.nc.config.RestApiConfig;
+import com.obj.nc.config.RestClientConfig;
 import com.obj.nc.config.MailchimpApiConfig;
 import com.obj.nc.mapper.MailchimpMessageMapperAggregateImpl;
 import com.obj.nc.mapper.MailchimpMessageMapperImpl;
@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Import;
         MailchimpMessageMapperImpl.class,
         MailchimpMessageMapperAggregateImpl.class,
         MailchimpRestClientImpl.class,
-        RestApiConfig.class
+        RestClientConfig.class
 })
 @EnableConfigurationProperties(MailchimpApiConfig.class)
 public class MailchimpSenderProcessingFunctionTestConfig {

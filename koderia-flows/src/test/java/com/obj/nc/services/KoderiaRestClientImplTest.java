@@ -1,8 +1,10 @@
 package com.obj.nc.services;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.dto.CategorizedRecipientsQueryDto;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.dto.JobPostRecipientsQueryDto;
 import com.obj.nc.dto.RecipientDto;
+import com.obj.nc.dto.RecipientsQueryDto;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -40,9 +42,9 @@ class KoderiaRestClientImplTest {
     void testFindReceivingEndpoints() throws URISyntaxException {
         // given
         String QUERY_JSON_PATH = "koderia/recipient_queries/job_recipients_query.json";
-        CategorizedRecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, CategorizedRecipientsQueryDto.class);
+        RecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, RecipientsQueryDto.class);
 
-        String RECIPIENTS_JSON_PATH = "koderia/recipients.json";
+        String RECIPIENTS_JSON_PATH = "koderia/recipient_queries/job_recipients_response.json";
         RecipientDto[] responseBody = JsonUtils.readObjectFromClassPathResource(RECIPIENTS_JSON_PATH, RecipientDto[].class);
 
         mockServer.expect(ExpectedCount.once(),
@@ -54,25 +56,28 @@ class KoderiaRestClientImplTest {
                 );
 
         // when
-        List<EmailEndpoint> outputRecipients = koderiaService.findEmailEndpoints(recipientsQueryDto);
+        List<RecievingEndpoint> outputRecipients = koderiaService.findReceivingEndpoints(recipientsQueryDto);
 
         // then
         mockServer.verify();
         Assertions.assertThat(outputRecipients).isNotNull();
-        Assertions.assertThat(outputRecipients).hasSize(2);
+        Assertions.assertThat(outputRecipients).hasSize(3);
 
-        Assertions.assertThat(outputRecipients.get(0).getEmail()).isEqualTo(responseBody[0].getEmail());
+        Assertions.assertThat(((EmailEndpoint) outputRecipients.get(0)).getEmail()).isEqualTo(responseBody[0].getEmail());
         Assertions.assertThat(outputRecipients.get(0).getRecipient().getName()).isEqualTo(responseBody[0].getFirstName() + " " + responseBody[0].getLastName());
 
-        Assertions.assertThat(outputRecipients.get(1).getEmail()).isEqualTo(responseBody[1].getEmail());
+        Assertions.assertThat(((EmailEndpoint) outputRecipients.get(1)).getEmail()).isEqualTo(responseBody[1].getEmail());
         Assertions.assertThat(outputRecipients.get(1).getRecipient().getName()).isEqualTo(responseBody[1].getFirstName() + " " + responseBody[1].getLastName());
+
+        Assertions.assertThat(((EmailEndpoint) outputRecipients.get(2)).getEmail()).isEqualTo(responseBody[2].getEmail());
+        Assertions.assertThat(outputRecipients.get(2).getRecipient().getName()).isEqualTo(responseBody[2].getFirstName() + " " + responseBody[2].getLastName());
     }
 
     @Test
     void testFindReceivingEndpointsNullFail() throws URISyntaxException {
         // given
         String QUERY_JSON_PATH = "koderia/recipient_queries/job_recipients_query.json";
-        CategorizedRecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, CategorizedRecipientsQueryDto.class);
+        RecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, RecipientsQueryDto.class);
 
         RecipientDto[] responseBody = null;
 
@@ -85,7 +90,7 @@ class KoderiaRestClientImplTest {
                 );
 
         // when - then
-        Assertions.assertThatThrownBy(() -> koderiaService.findEmailEndpoints(recipientsQueryDto))
+        Assertions.assertThatThrownBy(() -> koderiaService.findReceivingEndpoints(recipientsQueryDto))
                 .isInstanceOf(RestClientException.class)
                 .hasMessageContaining("Response body is null");
     }
@@ -94,7 +99,7 @@ class KoderiaRestClientImplTest {
     void testFindReceivingEndpoints404HandleError() throws URISyntaxException {
         // given
         String QUERY_JSON_PATH = "koderia/recipient_queries/job_recipients_query.json";
-        CategorizedRecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, CategorizedRecipientsQueryDto.class);
+        RecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, RecipientsQueryDto.class);
 
         RecipientDto[] responseBody = null;
 
@@ -107,7 +112,7 @@ class KoderiaRestClientImplTest {
                 );
 
         // when - then
-        Assertions.assertThatThrownBy(() -> koderiaService.findEmailEndpoints(recipientsQueryDto))
+        Assertions.assertThatThrownBy(() -> koderiaService.findReceivingEndpoints(recipientsQueryDto))
                 .isInstanceOf(RestClientException.class)
                 .hasMessageContaining("404 NOT_FOUND");
     }
@@ -116,7 +121,7 @@ class KoderiaRestClientImplTest {
     void testFindReceivingEndpoints500HandleError() throws URISyntaxException {
         // given
         String QUERY_JSON_PATH = "koderia/recipient_queries/job_recipients_query.json";
-        CategorizedRecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, CategorizedRecipientsQueryDto.class);
+        RecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, RecipientsQueryDto.class);
 
         RecipientDto[] responseBody = null;
 
@@ -129,7 +134,7 @@ class KoderiaRestClientImplTest {
                 );
 
         // when - then
-        Assertions.assertThatThrownBy(() -> koderiaService.findEmailEndpoints(recipientsQueryDto))
+        Assertions.assertThatThrownBy(() -> koderiaService.findReceivingEndpoints(recipientsQueryDto))
                 .isInstanceOf(RestClientException.class)
                 .hasMessageContaining("500 INTERNAL_SERVER_ERROR");
     }

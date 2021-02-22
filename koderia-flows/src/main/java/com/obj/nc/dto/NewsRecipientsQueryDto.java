@@ -3,14 +3,11 @@ package com.obj.nc.dto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CategorizedRecipientsQueryDto extends RecipientsQueryDto {
-
-    private List<String> technologies;
-
-    private String profession;
-
+public class NewsRecipientsQueryDto extends RecipientsQueryDto {
 }
