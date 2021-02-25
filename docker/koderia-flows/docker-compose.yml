@@ -1,0 +1,43 @@
+version: '3'
+
+networks:
+  koderia-flows:
+    driver: bridge
+
+services:
+  nc-postgres:
+    image: postgres:10
+    restart: always
+    environment:
+      POSTGRES_DB: nc
+      POSTGRES_USER: nc
+      POSTGRES_PASSWORD: ZMss4o9mdBLV
+    expose:
+      - 5432
+    ports:
+      - 25432:5432
+    networks:
+      - koderia-flows
+
+  rabbitmq:
+    image: rabbitmq:3.7-management
+    expose:
+      - '5672'
+      - '15672'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - koderia-flows
+
+  nc-koderia-flows:
+    image: koderia-flows:latest
+    environment:
+      - ACTIVE_PROFILES=docker
+    depends_on:
+      - nc-postgres
+      - rabbitmq
+    networks:
+      - koderia-flows
+    ports:
+      - 8080:8080

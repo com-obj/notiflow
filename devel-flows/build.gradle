@@ -5,6 +5,10 @@ plugins {
 	id 'maven-publish'
 }
 
+bootJar {
+	archiveFileName = 'devel-flows.jar'
+}
+
 group = 'com.obj.nc.flows'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '8'
@@ -14,7 +18,9 @@ repositories {
 }
 
 ext {
+	set('testcontainersVersion', "1.15.1")
 	set('springCloudVersion', "Hoxton.SR8")
+	set('junitJupiterVersion', '5.4.2')
 }
 
 dependencies {
@@ -35,12 +41,23 @@ dependencies {
             classifier = "test-binder"
         }
     }
-	testCompile "org.testcontainers:testcontainers:1.15.0-rc2"
+
+	testCompile 'org.junit.jupiter:junit-jupiter-api'
+	testRuntime 'org.junit.jupiter:junit-jupiter-engine'
+	testCompile 'org.junit.jupiter:junit-jupiter-params'
+	testCompile 'org.junit.platform:junit-platform-launcher'
+	testCompile 'org.junit.platform:junit-platform-runner'
+
+	testImplementation "org.testcontainers:testcontainers"
+	testImplementation "org.testcontainers:junit-jupiter"
+	testImplementation(testFixtures(project(":functions")))
 }
 
 dependencyManagement {
 	imports {
+		mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		mavenBom "org.junit:junit-bom:${junitJupiterVersion}"
 	}
 }
 
@@ -51,7 +68,7 @@ test {
 
 task copyDistToStagingFolder(type: Copy) {
 	from bootJar // shortcut for bootJar.outputs.files
-	into "./../docker-k7s/all-components/dist"
+	into "./../docker/devel-flows/dist"
 }
 
 build.dependsOn copyDistToStagingFolder

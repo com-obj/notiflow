@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.3.4.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 	id 'java'
+	id 'java-test-fixtures'
 }
 
 group = 'com.obj.nc.functions'
@@ -65,10 +66,10 @@ dependencies {
     testRuntime 'org.junit.jupiter:junit-jupiter-engine' 
     testCompile 'org.junit.jupiter:junit-jupiter-params' 
     testCompile 'org.junit.platform:junit-platform-launcher' 
-    testCompile 'org.junit.platform:junit-platform-runner' 
-	
-	testImplementation "org.testcontainers:testcontainers"
-	testImplementation "org.testcontainers:junit-jupiter"
+    testCompile 'org.junit.platform:junit-platform-runner'
+
+	testFixturesImplementation "org.testcontainers:testcontainers"
+	testFixturesImplementation "org.testcontainers:junit-jupiter"
 }
 
 dependencyManagement {

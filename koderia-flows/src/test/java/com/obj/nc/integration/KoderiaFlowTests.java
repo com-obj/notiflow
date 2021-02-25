@@ -1,5 +1,6 @@
 package com.obj.nc.integration;
 
+import com.obj.nc.KoderiaFlowsLocalIntegrationTest;
 import com.obj.nc.config.MailchimpApiConfig;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.dto.mailchimp.MessageResponseDto;
@@ -20,11 +21,7 @@ import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.testcontainers.containers.DockerComposeContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,21 +33,15 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ActiveProfiles("test")
-@Testcontainers
 @SpringBootTest
 @Import({
 		TestChannelBinderConfiguration.class,
 		KoderiaFlowTestsConfig.class
 })
 @AutoConfigureMockRestServiceServer
-public class KoderiaFlowTests {
+public class KoderiaFlowTests extends KoderiaFlowsLocalIntegrationTest {
 
 	public static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
-	public static final String DOCKER_COMPOSE_PATH = "../docker-k7s/minimal-components/docker-compose.yml";
-
-	@Container
-	public static DockerComposeContainer<?> environment = new DockerComposeContainer<>(new File(DOCKER_COMPOSE_PATH))
-			.withLocalCompose(true);
 
 	@Autowired
 	private MailchimpApiConfig mailchimpApiConfig;

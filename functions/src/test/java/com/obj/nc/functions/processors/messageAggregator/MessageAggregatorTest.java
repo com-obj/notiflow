@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@ActiveProfiles("junit-test")
+@ActiveProfiles("test")
 @SpringJUnitConfig(classes = MessageAggregatorTestConfig.class)
 class MessageAggregatorTest {
 

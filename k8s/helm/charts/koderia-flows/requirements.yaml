@@ -1,0 +1,9 @@
+dependencies:
+  - name: postgresql
+    version: 10.3.6
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: rabbitmq
+    version: 8.10.2
+    repository: https://charts.bitnami.com/bitnami
+    condition: rabbitmq.enabled

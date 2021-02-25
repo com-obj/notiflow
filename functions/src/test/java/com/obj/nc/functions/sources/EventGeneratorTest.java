@@ -25,7 +25,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
 
-@ActiveProfiles("junit-test")
+@ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
 @EnableConfigurationProperties(value = EventGeneratorConfig.class)
 @ContextConfiguration(classes = EventGeneratorTestConfig.class)

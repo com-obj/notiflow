@@ -3,4 +3,8 @@ spring.mail:
    port: 3025
    username: no-reply@objectify.sk
    password: xxx
-   
+
+spring.datasource:
+   url: jdbc:postgresql://localhost:35432/nc
+
+testContainers: local

@@ -1,11 +1,8 @@
-spring.mail:
-  host: localhost
-  port: 3025
-  username: no-reply@objectify.sk
-  password: xxx
-
 spring.datasource:
-  url: jdbc:postgresql://localhost:25432/nc
+  platform: postgres
+  url: jdbc:postgresql://nc-postgres:5432/nc
+  username: nc
+  password: ZMss4o9mdBLV
 
 koderia.api.uri: https://www.koderia.sk/api/v1
 
@@ -23,5 +20,3 @@ mailchimp:
     event-name: event-template
     link-name: link-template
     news-name: news-template
-
-testContainers: local

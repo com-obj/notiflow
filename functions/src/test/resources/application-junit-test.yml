@@ -1,3 +1,0 @@
-nc.functions.event-generator:
-   soruce-dir: eventsQueue
-   file-name: ba_job_post.json

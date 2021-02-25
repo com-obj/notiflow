@@ -9,8 +9,8 @@ services:
     restart: always
     environment:
       POSTGRES_DB: nc
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: rootpw
+      POSTGRES_USER: nc
+      POSTGRES_PASSWORD: ZMss4o9mdBLV
     expose:
       - 5432
     ports:

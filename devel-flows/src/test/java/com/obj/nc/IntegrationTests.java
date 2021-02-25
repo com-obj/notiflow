@@ -1,14 +1,13 @@
 package com.obj.nc;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.stream.binder.test.InputDestination;
 import org.springframework.cloud.stream.binder.test.OutputDestination;
@@ -19,19 +18,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
-import org.testcontainers.containers.DockerComposeContainer;
 
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.utils.JsonUtils;
 
-public class IntegrationTests {
+public class IntegrationTests extends DevelFlowsIntegrationTest {
 
 	private static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
-
-	@ClassRule
-	public static DockerComposeContainer environment = new DockerComposeContainer(new File("../docker-k7s/minimal-components/docker-compose.yml"))
-		.withLocalCompose(true);
 
 	@Test
 	public void testEventEmited() throws Exception {

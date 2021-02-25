@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "koderia-flows.fullname" . }}-test-connection"
+  labels:
+{{ include "koderia-flows.labels" . | indent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args:  ['{{ include "koderia-flows.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
