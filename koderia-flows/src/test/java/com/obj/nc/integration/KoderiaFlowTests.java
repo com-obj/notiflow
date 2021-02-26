@@ -1,10 +1,11 @@
 package com.obj.nc.integration;
 
-import com.obj.nc.KoderiaFlowsLocalIntegrationTest;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.config.MailchimpApiConfig;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.dto.mailchimp.MessageResponseDto;
 import com.obj.nc.utils.JsonUtils;
+import org.flywaydb.core.Flyway;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -32,14 +33,14 @@ import static org.springframework.test.web.client.ExpectedCount.times;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@ActiveProfiles("test")
+@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest
 @Import({
 		TestChannelBinderConfiguration.class,
 		KoderiaFlowTestsConfig.class
 })
 @AutoConfigureMockRestServiceServer
-public class KoderiaFlowTests extends KoderiaFlowsLocalIntegrationTest {
+public class KoderiaFlowTests {
 
 	public static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
 

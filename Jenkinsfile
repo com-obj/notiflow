@@ -8,7 +8,10 @@ try {
                 stage('Compile & Test') {
                     try {
                         container('gradle') {
-                            sh script: 'gradle test --info --stacktrace', label: 'Compile & Test'
+                            sh script: 'gradle test \
+                             -Dspring.profiles.active=test,jenkins_test \
+                             --info --stacktrace',
+                             label: 'Compile & Test'
                         }
                     }
                     catch(exception) {

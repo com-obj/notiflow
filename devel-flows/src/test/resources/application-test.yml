@@ -5,6 +5,6 @@ spring.mail:
    password: xxx
 
 spring.datasource:
-   url: jdbc:postgresql://localhost:35432/nc
+   url: jdbc:postgresql://localhost:25432/nc
 
 testContainers: local

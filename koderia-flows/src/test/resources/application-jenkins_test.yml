@@ -1,1 +1,12 @@
 testContainers: jenkins
+
+spring.datasource:
+  url: jdbc:postgresql://localhost:5432/nc
+
+postgres:
+  dockerImage: "postgres:10"
+  user: nc
+  password: ZMss4o9mdBLV
+  databaseName: nc
+
+spring.flyway.enabled: false

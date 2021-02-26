@@ -5,7 +5,7 @@ spring.mail:
   password: xxx
 
 spring.datasource:
-  url: jdbc:postgresql://localhost:25432/nc
+  url: jdbc:postgresql://localhost:35432/nc
 
 koderia.api.uri: https://www.koderia.sk/api/v1
 

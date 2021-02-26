@@ -29,6 +29,7 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-stream'
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
 	implementation 'org.postgresql:postgresql'
+	implementation 'org.flywaydb:flyway-core'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
@@ -62,6 +63,7 @@ dependencyManagement {
 }
 
 test {
+	systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
 	useJUnitPlatform()
 }
 

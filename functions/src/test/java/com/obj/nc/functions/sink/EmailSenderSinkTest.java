@@ -3,7 +3,8 @@ package com.obj.nc.functions.sink;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
-import com.obj.nc.FunctionsIntegrationTest;
+import com.obj.nc.LocalTestContainers;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -24,9 +25,9 @@ import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.UUID;
 
-@ActiveProfiles("test")
+@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class EmailSenderSinkTest extends FunctionsIntegrationTest {
+class EmailSenderSinkTest extends LocalTestContainers {
 
     @Autowired
     private GreenMailManager greenMailManager;

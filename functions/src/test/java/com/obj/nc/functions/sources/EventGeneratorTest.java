@@ -1,5 +1,6 @@
 package com.obj.nc.functions.sources;
 
+import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfig;
@@ -25,7 +26,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
 
-@ActiveProfiles("test")
+@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @ExtendWith(SpringExtension.class)
 @EnableConfigurationProperties(value = EventGeneratorConfig.class)
 @ContextConfiguration(classes = EventGeneratorTestConfig.class)
