@@ -6,7 +6,7 @@ networks:
 
 services:
   nc-postgres:
-    image: postgres:10
+    image: postgres:11.9
     restart: always
     environment:
       POSTGRES_DB: nc
@@ -20,7 +20,7 @@ services:
       - koderia-flows
 
   rabbitmq:
-    image: rabbitmq:3.7-management
+    image: rabbitmq:3.8.5
     expose:
       - '5672'
       - '15672'

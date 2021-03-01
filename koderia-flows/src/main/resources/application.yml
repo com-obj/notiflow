@@ -1,3 +1,5 @@
+release.name: koderia-flows
+
 spring.cloud:
    function:
       definition: emitKoderiaEvent;convertKoderiaEvent;validateAndGenerateEventId;persistPIForEvent;resolveRecipients;persistPIForEventWithRecipients;generateMessagesFromEvent;persistPIForMessage;sendMailchimpMessage;persistPIForSendMessage;logEvent
@@ -72,13 +74,26 @@ spring.datasource:
    password: ZMss4o9mdBLV
 
 spring.mail:
-   host: smtp.office365.com
-   port: 587
-   username:  no-reply@objectify.sk
-   password: Bos16428
-   properties.mail.smtp:
-      auth: true
-      starttls.enable: true
-
+   host: localhost
+   port: 3025
+   username: no-reply@objectify.sk
+   password: xxx
 
 management.endpoints.web.exposure.include: '*'
+
+koderia.api.uri: https://www.koderia.sk/api/v1
+
+mailchimp:
+   api:
+      key: MOCKkey
+      uri: http://mandrillapp.com/api/1.0
+      from-name: Koderia sender
+      from-email: sender@koderia.sk
+   template:
+      aggregate-subject: Koderia digest
+      aggregate-name: aggregate-template
+      job-post-name: job-post-template
+      blog-name: blog-template
+      event-name: event-template
+      link-name: link-template
+      news-name: news-template

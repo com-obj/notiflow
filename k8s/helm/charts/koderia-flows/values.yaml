@@ -5,9 +5,9 @@
 replicaCount: 1
 
 image:
-  repository: koderia-flows
-  tag: 0.1.0
-  pullPolicy: IfNotPresent
+  repository: eu.gcr.io/objectify-infra/koderia-flows
+  tag: latest
+  pullPolicy: Always
 
 imagePullSecrets: []
 nameOverride: ""
@@ -61,4 +61,6 @@ postgresql:
 
 rabbitmq:
   enabled: false
-
+  auth:
+    username: nc
+    password: NoyHPHmdq2AW

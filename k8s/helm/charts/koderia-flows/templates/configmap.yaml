@@ -3,9 +3,9 @@ kind: ConfigMap
 metadata:
   name: {{ include "koderia-flows.fullname" . }}
   labels:
-  {{ include "koderia-flows.labels" . | indent 4 }}
+{{ include "koderia-flows.labels" . | indent 4 }}
 data:
   application-override.yaml: |
-    {{- with .Values.overrideProperties }}
-      {{ toYaml . | nindent 4 }}
-    {{- end }}
+  {{- with .Values.overrideProperties }}
+    {{ toYaml . | nindent 4 }}
+  {{- end }}

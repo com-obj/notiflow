@@ -1,6 +1,5 @@
 package com.obj.nc.functions.sink;
 
-import com.obj.nc.LocalTestContainers;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -31,7 +30,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class ProcessingInfoPersisterTest extends LocalTestContainers {
+class ProcessingInfoPersisterTest {
 
     @Autowired
     private ProcessingInfoPersisterSinkConsumer processingInfoPersister;

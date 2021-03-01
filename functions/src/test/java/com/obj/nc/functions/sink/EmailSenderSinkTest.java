@@ -3,7 +3,6 @@ package com.obj.nc.functions.sink;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
-import com.obj.nc.LocalTestContainers;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.message.Message;
@@ -27,7 +26,7 @@ import java.util.UUID;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class EmailSenderSinkTest extends LocalTestContainers {
+class EmailSenderSinkTest {
 
     @Autowired
     private GreenMailManager greenMailManager;

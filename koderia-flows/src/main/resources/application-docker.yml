@@ -1,22 +1,2 @@
 spring.datasource:
-  platform: postgres
-  url: jdbc:postgresql://nc-postgres:5432/nc
-  username: nc
-  password: ZMss4o9mdBLV
-
-koderia.api.uri: https://www.koderia.sk/api/v1
-
-mailchimp:
-  api:
-    uri: http://mandrillapp.com/api/1.0
-    key: ASDF
-    from-name: Koderia sender
-    from-email: sender@koderia.sk
-  template:
-    aggregate-subject: Koderia digest
-    aggregate-name: aggregate-template
-    job-post-name: job-post-template
-    blog-name: blog-template
-    event-name: event-template
-    link-name: link-template
-    news-name: news-template
+  url: jdbc:postgresql://nc-postgres:25432/nc

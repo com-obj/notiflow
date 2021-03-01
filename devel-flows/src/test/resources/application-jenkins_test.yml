@@ -4,10 +4,9 @@ spring.datasource:
   url: jdbc:postgresql://localhost:5432/nc
 
 postgres:
-  dockerImage: "postgres:10"
+  dockerImage: postgres:11.9
   user: nc
   password: ZMss4o9mdBLV
   databaseName: nc
-  hostPort: 25432
 
 spring.flyway.enabled: false

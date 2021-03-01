@@ -1,24 +1,6 @@
 activeProfiles:
-  - dev
-  - extra
-
-overrideProperties:
-  koderia.api:
-    uri: https://www.koderia.sk/api/v1
-  mailchimp:
-    api:
-      uri: http://mandrillapp.com/api/1.0
-      key: ASDF
-      from-name: Koderia sender
-      from-email: sender@koderia.sk
-    template:
-      aggregate-subject: Koderia digest
-      aggregate-name: aggregate-template
-      job-post-name: job-post-template
-      blog-name: blog-template
-      event-name: event-template
-      link-name: link-template
-      news-name: news-template
+  - gke
+  - override
 
 postgresql:
   enabled: true
