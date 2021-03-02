@@ -1,0 +1,9 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--tag=eu.gcr.io/$PROJECT_ID/koderia-flows'
+      - '.'
+
+images:
+  - 'eu.gcr.io/$PROJECT_ID/koderia-flows'

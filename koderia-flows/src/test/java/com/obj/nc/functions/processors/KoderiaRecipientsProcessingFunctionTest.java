@@ -1,5 +1,6 @@
 package com.obj.nc.functions.processors;
 
+import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.dto.RecipientDto;
@@ -32,7 +33,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@ActiveProfiles("test")
+@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest(KoderiaRestClientImpl.class)
 @Import(KoderiaRecipientsProcessingFunctionTestConfig.class)
 class KoderiaRecipientsProcessingFunctionTest {

@@ -1,5 +1,6 @@
 package com.obj.nc.mapper;
 
+import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.dto.mailchimp.SendMessageWithTemplateDto;
 import com.obj.nc.utils.JsonUtils;
@@ -15,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 
-@ActiveProfiles("test")
+@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @JsonTest
 @Import(MailchimpMessageMapperAggregateImplTestConfig.class)
 class MailchimpMessageMapperAggregateImplTest {

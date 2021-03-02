@@ -1,0 +1,9 @@
+activeProfiles:
+  - gke
+  - override
+
+postgresql:
+  enabled: true
+
+rabbitmq:
+  enabled: true

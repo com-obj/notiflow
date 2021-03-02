@@ -6,8 +6,14 @@ spring.mail:
 
 spring.datasource:
    platform: postgres
-   url: jdbc:postgresql://localhost:25432/nc
-   username: root
-   password: rootpw
+   url: jdbc:postgresql://localhost:15432/nc
+   username: nc
+   password: ZMss4o9mdBLV
 
 nc.functions.send-email-message.from: 'no-reply@objectify.sk'
+
+testContainers: local
+
+nc.functions.event-generator:
+   soruce-dir: eventsQueue
+   file-name: ba_job_post.json

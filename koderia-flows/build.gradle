@@ -5,6 +5,10 @@ plugins {
     id 'maven-publish'
 }
 
+bootJar {
+    archiveFileName = 'koderia-flows.jar'
+}
+
 group = 'com.obj.nc.flows'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
@@ -32,6 +36,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-stream'
     implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
     implementation 'org.postgresql:postgresql'
+    implementation 'org.flywaydb:flyway-core'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
@@ -60,6 +65,7 @@ dependencies {
 
     testImplementation "org.testcontainers:testcontainers"
     testImplementation "org.testcontainers:junit-jupiter"
+    testImplementation(testFixtures(project(":functions")))
 }
 
 dependencyManagement {
@@ -71,12 +77,13 @@ dependencyManagement {
 }
 
 test {
+    systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
     useJUnitPlatform()
 }
 
 task copyDistToStagingFolder(type: Copy) {
     from bootJar // shortcut for bootJar.outputs.files
-    into "./../docker-k7s/all-components/dist"
+    into "./../docker/koderia-flows/dist"
 }
 
 build.dependsOn copyDistToStagingFolder

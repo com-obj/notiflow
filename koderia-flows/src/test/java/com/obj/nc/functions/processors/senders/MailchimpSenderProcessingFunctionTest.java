@@ -1,5 +1,6 @@
 package com.obj.nc.functions.processors.senders;
 
+import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.dto.mailchimp.MessageResponseDto;
@@ -32,7 +33,7 @@ import static org.springframework.test.web.client.ExpectedCount.once;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@ActiveProfiles("test")
+@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest
 @Import(MailchimpSenderProcessingFunctionTestConfig.class)
 class MailchimpSenderProcessingFunctionTest {

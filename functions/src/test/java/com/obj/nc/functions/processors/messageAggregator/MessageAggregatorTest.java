@@ -1,5 +1,6 @@
 package com.obj.nc.functions.processors.messageAggregator;
 
+import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.utils.JsonUtils;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@ActiveProfiles("junit-test")
+@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringJUnitConfig(classes = MessageAggregatorTestConfig.class)
 class MessageAggregatorTest {
 

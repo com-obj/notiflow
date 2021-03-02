@@ -62,8 +62,8 @@ spring.cloud:
 spring.datasource:
    platform: postgres
    url: jdbc:postgresql://localhost:25432/nc
-   username: root
-   password: rootpw
+   username: nc
+   password: ZMss4o9mdBLV
    
 spring.mail:
    host: smtp.office365.com
