@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "nc.functions.event-generator")
 @Data
 @Component
-public class EventGeneratorConfig {
+public class EventGeneratorConfigProperties {
 
     String sourceDir;
     //if null, reader rotates in directory

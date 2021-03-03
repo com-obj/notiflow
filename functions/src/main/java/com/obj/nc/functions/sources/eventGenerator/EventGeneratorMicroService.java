@@ -14,7 +14,6 @@ import java.util.function.Supplier;
 
 @Configuration
 @Log4j2
-@Profile("dev")
 public class EventGeneratorMicroService extends SourceMicroService<Event, EventGeneratorSourceSupplier> {
 
     @Autowired

@@ -5,7 +5,6 @@ import com.obj.nc.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +22,11 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 @Log4j2
-@Profile("dev")
 public class EventGeneratorExecution implements Supplier<Event> {
 
     @Autowired
     @NotNull
-    private EventGeneratorConfig eventGeneratorConfig;
+    private EventGeneratorConfigProperties eventGeneratorConfigProperties;
 
     @Override
     public Event get() {
@@ -41,8 +39,8 @@ public class EventGeneratorExecution implements Supplier<Event> {
         try {
             Path eventFile = null;
 
-            if (eventGeneratorConfig.getFileName()==null) {
-                List<Path> eventFiles = Files.list(Paths.get(eventGeneratorConfig.getSourceDir()))
+            if (eventGeneratorConfigProperties.getFileName()==null) {
+                List<Path> eventFiles = Files.list(Paths.get(eventGeneratorConfigProperties.getSourceDir()))
                         .filter(path -> path.toString().endsWith(".json"))
                         .collect(Collectors.toList());
 
@@ -58,7 +56,7 @@ public class EventGeneratorExecution implements Supplier<Event> {
                 eventFile = eventFiles.get(eventFileIndex++);
 
             } else {
-                eventFile = Paths.get(eventGeneratorConfig.getSourceDir(), eventGeneratorConfig.getFileName());
+                eventFile = Paths.get(eventGeneratorConfigProperties.getSourceDir(), eventGeneratorConfigProperties.getFileName());
                 if (!Files.exists(eventFile)) {
                     log.error("Configuration is referencing file, which doesn't exists {}", eventFile);
                     return null;
