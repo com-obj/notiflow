@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Component
 @Log4j2
+@Profile({"dev", "test"})
 public class EventGeneratorPreCondition implements PreCondition<Event> {
 
     @Override
