@@ -5,36 +5,43 @@
       "type": {
          "type": "string"
       },
-      "attributes": {
-         "type": "object"
-      },
       "header": {
          "type": "object",
          "properties": {
-            "attributes": {
-               "type": "object"
-            },
-            "id": {
-               "type": "null"
-            },
-            "eventIds": {
-               "type": "array",
-               "items": {}
-            },
             "configuration-name": {
                "type": "string"
             }
          },
          "required": [
-            "attributes",
-            "id",
-            "eventIds",
             "configuration-name"
          ]
       },
       "body": {
          "type": "object",
          "properties": {
+            "message": {
+               "type": "object",
+               "properties": {
+                  "content": {
+                     "type": "object",
+                     "properties": {
+                        "subject": {
+                           "type": "string"
+                        },
+                        "text": {
+                           "type": "string"
+                        }
+                     },
+                     "required": [
+                        "subject",
+                        "text"
+                     ]
+                  }
+               },
+               "required": [
+                  "content"
+               ]
+            },
             "attributes": {
                "type": "object",
                "properties": {
@@ -44,165 +51,106 @@
                         "type": {
                            "type": "string"
                         },
-                        "subject": {
-                           "type": "string"
-                        },
-                        "text": {
-                           "type": "string"
-                        },
-                        "id": {
-                           "type": "string"
-                        },
-                        "ticketUrl": {
-                           "type": "string"
-                        },
-                        "startAt": {
-                           "type": "string"
-                        },
-                        "locationId": {
-                           "type": "string"
-                        },
-                        "endAt": {
-                           "type": "string"
-                        },
-                        "location": {
+                        "data": {
                            "type": "object",
                            "properties": {
-                              "googlePlaceId": {
+                              "id": {
                                  "type": "string"
                               },
                               "name": {
                                  "type": "string"
-                              }
-                           },
-                           "required": [
-                              "googlePlaceId",
-                              "name"
-                           ]
-                        },
-                        "organizer": {
-                           "type": "object",
-                           "properties": {
+                              },
                               "description": {
                                  "type": "string"
                               },
-                              "url": {
+                              "ticketUrl": {
                                  "type": "string"
+                              },
+                              "startAt": {
+                                 "type": "string"
+                              },
+                              "locationId": {
+                                 "type": "string"
+                              },
+                              "endAt": {
+                                 "type": "string"
+                              },
+                              "location": {
+                                 "type": "object",
+                                 "properties": {
+                                    "googlePlaceId": {
+                                       "type": "string"
+                                    },
+                                    "name": {
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "googlePlaceId",
+                                    "name"
+                                 ]
+                              },
+                              "organizer": {
+                                 "type": "object",
+                                 "properties": {
+                                    "description": {
+                                       "type": "string"
+                                    },
+                                    "url": {
+                                       "type": "string"
+                                    },
+                                    "imageUrl": {
+                                       "type": "string"
+                                    },
+                                    "name": {
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "description",
+                                    "url",
+                                    "imageUrl",
+                                    "name"
+                                 ]
                               },
                               "imageUrl": {
-                                 "type": "string"
-                              },
-                              "name": {
                                  "type": "string"
                               }
                            },
                            "required": [
+                              "id",
+                              "name",
                               "description",
-                              "url",
-                              "imageUrl",
-                              "name"
+                              "ticketUrl",
+                              "startAt",
+                              "locationId",
+                              "endAt",
+                              "location",
+                              "organizer",
+                              "imageUrl"
                            ]
-                        },
-                        "imageUrl": {
-                           "type": "string"
                         }
                      },
                      "required": [
                         "type",
-                        "subject",
-                        "text",
-                        "id",
-                        "ticketUrl",
-                        "startAt",
-                        "locationId",
-                        "endAt",
-                        "location",
-                        "organizer",
-                        "imageUrl"
+                        "data"
                      ]
                   }
                },
                "required": [
                   "originalEvent"
                ]
-            },
-            "message": {
-               "type": "object",
-               "properties": {
-                  "content": {
-                     "type": "object",
-                     "properties": {
-                        "attributes": {
-                           "type": "object"
-                        },
-                        "text": {
-                           "type": "string"
-                        },
-                        "subject": {
-                           "type": "string"
-                        },
-                        "attachments": {
-                           "type": "array",
-                           "items": {}
-                        }
-                     },
-                     "required": [
-                        "attributes",
-                        "text",
-                        "subject",
-                        "attachments"
-                     ]
-                  },
-                  "aggregateContent": {
-                     "type": "array",
-                     "items": {}
-                  }
-               },
-               "required": [
-                  "content",
-                  "aggregateContent"
-               ]
-            },
-            "recievingEndpoints": {
-               "type": "array",
-               "items": {}
-            },
-            "deliveryOptions": {
-               "type": "object",
-               "properties": {
-                  "aggregationType": {
-                     "type": "string"
-                  },
-                  "schedulingType": {
-                     "type": "string"
-                  },
-                  "schedulingValue": {
-                     "type": "null"
-                  }
-               },
-               "required": [
-                  "aggregationType",
-                  "schedulingType",
-                  "schedulingValue"
-               ]
             }
          },
          "required": [
-            "attributes",
             "message",
-            "recievingEndpoints",
-            "deliveryOptions"
+            "attributes"
          ]
-      },
-      "processingInfo": {
-         "type": "null"
       }
    },
    "required": [
       "type",
-      "attributes",
       "header",
-      "body",
-      "processingInfo"
+      "body"
    ]
 }

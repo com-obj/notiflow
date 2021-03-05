@@ -5,36 +5,43 @@
       "type": {
          "type": "string"
       },
-      "attributes": {
-         "type": "object"
-      },
       "header": {
          "type": "object",
          "properties": {
-            "attributes": {
-               "type": "object"
-            },
-            "id": {
-               "type": "null"
-            },
-            "eventIds": {
-               "type": "array",
-               "items": {}
-            },
             "configuration-name": {
                "type": "string"
             }
          },
          "required": [
-            "attributes",
-            "id",
-            "eventIds",
             "configuration-name"
          ]
       },
       "body": {
          "type": "object",
          "properties": {
+            "message": {
+               "type": "object",
+               "properties": {
+                  "content": {
+                     "type": "object",
+                     "properties": {
+                        "subject": {
+                           "type": "string"
+                        },
+                        "text": {
+                           "type": "string"
+                        }
+                     },
+                     "required": [
+                        "subject",
+                        "text"
+                     ]
+                  }
+               },
+               "required": [
+                  "content"
+               ]
+            },
             "attributes": {
                "type": "object",
                "properties": {
@@ -44,170 +51,111 @@
                         "type": {
                            "type": "string"
                         },
-                        "subject": {
-                           "type": "string"
-                        },
-                        "text": {
-                           "type": "string"
-                        },
-                        "id": {
-                           "type": "string"
-                        },
-                        "link": {
-                           "type": "string"
-                        },
-                        "featuredImage": {
-                           "type": "array",
-                           "items": [
-                              {
-                                 "type": "string"
-                              }
-                           ]
-                        },
-                        "category": {
+                        "data": {
                            "type": "object",
                            "properties": {
                               "id": {
                                  "type": "string"
                               },
-                              "slug": {
+                              "title": {
                                  "type": "string"
                               },
-                              "name": {
+                              "content": {
                                  "type": "string"
                               },
-                              "color_a": {
+                              "link": {
                                  "type": "string"
                               },
-                              "color_b": {
-                                 "type": "string"
+                              "featuredImage": {
+                                 "type": "array",
+                                 "items": [
+                                    {
+                                       "type": "string"
+                                    }
+                                 ]
+                              },
+                              "category": {
+                                 "type": "object",
+                                 "properties": {
+                                    "id": {
+                                       "type": "string"
+                                    },
+                                    "slug": {
+                                       "type": "string"
+                                    },
+                                    "name": {
+                                       "type": "string"
+                                    },
+                                    "color_b": {
+                                       "type": "string"
+                                    },
+                                    "color_a": {
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "id",
+                                    "slug",
+                                    "name",
+                                    "color_b",
+                                    "color_a"
+                                 ]
+                              },
+                              "author": {
+                                 "type": "object",
+                                 "properties": {
+                                    "avatar": {
+                                       "type": "string"
+                                    },
+                                    "description": {
+                                       "type": "string"
+                                    },
+                                    "name": {
+                                       "type": "string"
+                                    },
+                                    "id": {
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "avatar",
+                                    "description",
+                                    "name",
+                                    "id"
+                                 ]
                               }
                            },
                            "required": [
                               "id",
-                              "slug",
-                              "name",
-                              "color_a",
-                              "color_b"
-                           ]
-                        },
-                        "author": {
-                           "type": "object",
-                           "properties": {
-                              "id": {
-                                 "type": "string"
-                              },
-                              "name": {
-                                 "type": "string"
-                              },
-                              "description": {
-                                 "type": "string"
-                              },
-                              "avatar": {
-                                 "type": "string"
-                              }
-                           },
-                           "required": [
-                              "id",
-                              "name",
-                              "description",
-                              "avatar"
+                              "title",
+                              "content",
+                              "link",
+                              "featuredImage",
+                              "category",
+                              "author"
                            ]
                         }
                      },
                      "required": [
                         "type",
-                        "subject",
-                        "text",
-                        "id",
-                        "link",
-                        "featuredImage",
-                        "category",
-                        "author"
+                        "data"
                      ]
                   }
                },
                "required": [
                   "originalEvent"
                ]
-            },
-            "message": {
-               "type": "object",
-               "properties": {
-                  "content": {
-                     "type": "object",
-                     "properties": {
-                        "attributes": {
-                           "type": "object"
-                        },
-                        "text": {
-                           "type": "string"
-                        },
-                        "subject": {
-                           "type": "string"
-                        },
-                        "attachments": {
-                           "type": "array",
-                           "items": {}
-                        }
-                     },
-                     "required": [
-                        "attributes",
-                        "text",
-                        "subject",
-                        "attachments"
-                     ]
-                  },
-                  "aggregateContent": {
-                     "type": "array",
-                     "items": {}
-                  }
-               },
-               "required": [
-                  "content",
-                  "aggregateContent"
-               ]
-            },
-            "recievingEndpoints": {
-               "type": "array",
-               "items": {}
-            },
-            "deliveryOptions": {
-               "type": "object",
-               "properties": {
-                  "aggregationType": {
-                     "type": "string"
-                  },
-                  "schedulingType": {
-                     "type": "string"
-                  },
-                  "schedulingValue": {
-                     "type": "null"
-                  }
-               },
-               "required": [
-                  "aggregationType",
-                  "schedulingType",
-                  "schedulingValue"
-               ]
             }
          },
          "required": [
-            "attributes",
             "message",
-            "recievingEndpoints",
-            "deliveryOptions"
+            "attributes"
          ]
-      },
-      "processingInfo": {
-         "type": "null"
       }
    },
    "required": [
       "type",
-      "attributes",
       "header",
-      "body",
-      "processingInfo"
+      "body"
    ]
 }

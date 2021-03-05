@@ -13,8 +13,10 @@
       "attributes" : {
          "originalEvent" : {
             "type" : "NEWS",
-            "subject" : "Nove features na Koderia.sk",
-            "text" : "..."
+            "data" : {
+               "subject" : "Nove features na Koderia.sk",
+               "text" : "..."
+            }
          }
       }
    }

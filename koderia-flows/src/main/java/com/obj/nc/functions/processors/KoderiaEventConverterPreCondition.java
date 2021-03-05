@@ -16,11 +16,11 @@ public class KoderiaEventConverterPreCondition implements PreCondition<EmitEvent
 			return Optional.of(new PayloadValidationException("Koderia event must not be null"));
 		}
 
-		if (emitEventDto.getSubject() == null) {
+		if (emitEventDto.getData().getMessageSubject() == null) {
 			return Optional.of(new PayloadValidationException("Subject of Koderia event must not be null"));
 		}
 
-		if (emitEventDto.getText() == null) {
+		if (emitEventDto.getData().getMessageText() == null) {
 			return Optional.of(new PayloadValidationException("Text of Koderia event must not be null"));
 		}
 

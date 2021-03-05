@@ -1,14 +1,16 @@
 {
    "type" : "JOB_POST",
-   "id": "unwhX7OlJYq7Kd7GfoCd",
-   "subject":"Business Intelligence (BI) Developer",
-   "location": "Viedeň",
-   "rate": "500",
-   "technologies": ["Microsoft Power BI"],
-   "specialRate": "400 – 500 € / manday",
-   "labels": ["Home Office"],
-   "positionType": ["Senior"],
-   "duration": "1 rok s možnosťou predĺženia",
-   "jobType": "Analytik",
-   "dateOfStart": "ASAP"
+   "data" : {
+      "id": "unwhX7OlJYq7Kd7GfoCd",
+      "name":"Business Intelligence (BI) Developer",
+      "location": "Viedeň",
+      "rate": "500",
+      "technologies": ["Microsoft Power BI"],
+      "specialRate": "400 – 500 € / manday",
+      "labels": ["Home Office"],
+      "positionType": ["Senior"],
+      "duration": "1 rok s možnosťou predĺženia",
+      "jobType": "Analytik",
+      "dateOfStart": "ASAP"
+   }
 }

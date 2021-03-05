@@ -73,8 +73,8 @@ class EventGeneratorTest {
 
         // then
         Assertions.assertThat(eventFromFile).isNotNull();
-        Assertions.assertThat(eventFromFile.getBody().getMessage().getContent().getText()).isEqualTo("New position on koderia.sk");
-        Assertions.assertThat(eventFromFile.getBody().getMessage().getContent().getSubject()).isEqualTo("New position");
+        Assertions.assertThat(eventFromFile.getBody().getMessage().getContent().getText()).isEqualTo("We are looking for a Business Intelligence (BI) Developer to create...");
+        Assertions.assertThat(eventFromFile.getBody().getMessage().getContent().getSubject()).isEqualTo("Business Intelligence (BI) Developer");
         Assertions.assertThat(((Map<?, ?>) eventFromFile.getBody().getAttributes().get("originalEvent"))).hasSize(2);
         Assertions.assertThat(eventFromFile.getBody().getRecievingEndpoints()).isEmpty();
     }
