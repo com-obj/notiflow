@@ -8,6 +8,7 @@ import com.obj.nc.domain.message.MessageContent;
 import com.obj.nc.domain.message.MessageContents;
 import com.obj.nc.exceptions.ProcessingException;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -24,13 +25,12 @@ import java.util.function.Function;
 
 @Component
 @Log4j2
+@RequiredArgsConstructor
 public class EmailSenderSinkExecution implements Function<Message, Message> {
 
-	@Autowired
-	private JavaMailSender emailSender;
+	private final JavaMailSender emailSender;
 
-	@Autowired
-	private SendEmailMessageConfig config;
+	private final SendEmailMessageConfig config;
 
 	@DocumentProcessingInfo("SendEmail")
 	@Override

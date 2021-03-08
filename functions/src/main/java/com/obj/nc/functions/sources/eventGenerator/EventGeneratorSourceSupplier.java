@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 @Component
 @AllArgsConstructor
-@Profile("dev")
+@Profile({"dev", "testmode"})
 public class EventGeneratorSourceSupplier extends SourceSupplier<Event> {
 
 	@Autowired

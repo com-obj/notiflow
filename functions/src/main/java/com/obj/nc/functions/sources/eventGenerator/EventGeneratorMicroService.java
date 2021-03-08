@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 
 @Configuration
 @Log4j2
-@Profile("dev")
+@Profile({"dev", "testmode"})
 public class EventGeneratorMicroService extends SourceMicroService<Event, EventGeneratorSourceSupplier> {
 
     @Autowired

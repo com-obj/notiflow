@@ -12,7 +12,6 @@ import java.util.function.Function;
 @Log4j2
 public class MessageAggregatorExecution implements Function<List<Message>, Message> {
 
-	@DocumentProcessingInfo("AggregateMessages")
 	@Override
 	public Message apply(List<Message> messages) {
 		Message outputMessage = new Message();

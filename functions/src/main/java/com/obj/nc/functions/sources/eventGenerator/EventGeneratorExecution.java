@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 @Log4j2
-@Profile("dev")
+@Profile({"dev", "testmode"})
 public class EventGeneratorExecution implements Supplier<Event> {
 
     @Autowired
