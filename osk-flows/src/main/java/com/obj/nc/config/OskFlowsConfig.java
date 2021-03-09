@@ -1,53 +1,76 @@
 package com.obj.nc.config;
 
-import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.event.Event;
-import com.obj.nc.domain.message.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.PollerSpec;
 import org.springframework.integration.dsl.Pollers;
-import reactor.core.publisher.Flux;
+import org.springframework.scheduling.Trigger;
+import org.springframework.scheduling.support.PeriodicTrigger;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
+import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubscriptionProcessingFunction;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
+import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
+import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
+import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
+import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.ProcessingInfoPersisterForEventWithRecipientsMicroService;
+import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.ProcessingInfoPersisterForEventWithRecipientsSinkConsumer;
+import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
 
 @Configuration
 public class OskFlowsConfig {
 
-    @Autowired
-    private Supplier<Flux<Event>> generateEvent;
+	@Autowired
+	private EventGeneratorSourceSupplier eventSupplier;
 
-    @Autowired
-    private Function<Flux<Event>, Flux<Event>> resolveRecipients;
+	@Autowired
+	private ValidateAndGenerateEventIdProcessingFunction generateEventId;
 
-    @Autowired
-    private Function<Flux<Event>, Flux<Message>> generateMessagesFromEvent;
+	@Autowired
+	private RecepientsUsingKoderiaSubscriptionProcessingFunction resolveRecipients;
 
-    @Autowired
-    private Function<Flux<Message>, Flux<Message>> sendMessage;
+	@Autowired
+	private MessagesFromEventProcessingFunction generateMessagesFromEvent;
 
-    @Autowired
-    private Consumer<Flux<BasePayload>> persistPIForEvent;
+	@Autowired
+	private EmailSenderSinkProcessingFunction sendMessage;
 
-    @Autowired
-    private Consumer<Flux<Message>> logEvent;
+	@Autowired
+	private PaylaodLoggerSinkConsumer logConsumer;
+	
+	@Autowired
+	private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
+	
+	@Autowired
+	private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoWithRecipientsPersister;
 
-    @Bean
-    public IntegrationFlow sendMessageFlow() {
-        return IntegrationFlows
-                .from(generateEvent, configurer -> configurer.poller(Pollers.fixedDelay(1000)))
-                .transform(resolveRecipients)
-                .transform(generateMessagesFromEvent)
-                .transform(sendMessage)
-//                .publishSubscribeChannel(pubSub -> pubSub
-//                        .subscribe(flow -> flow.handle(persistPIForEvent))
-//                        .subscribe(flow -> flow.handle(logEvent)))
-                .handle(logEvent)
-                .get();
-    }
+	@Bean
+	public IntegrationFlow sendMessageFlow() {
+		return IntegrationFlows.from(
+					eventSupplier, 
+					configurer -> configurer.poller(sourcePoller()).id("eventSupplier"))
+				.transform(generateEventId)
+				 	.wireTap(flow -> flow.handle(processingInfoPersister))
+				.transform(resolveRecipients)
+					.wireTap(flow -> flow.handle(processingInfoPersister))
+				.transform(generateMessagesFromEvent)
+				.split()
+				 	.wireTap(flow -> flow.handle(processingInfoPersister))
+				.transform(sendMessage)
+					.wireTap(flow -> flow.handle(processingInfoWithRecipientsPersister))
+				.handle(logConsumer).get();
+	}
 
+	@Bean
+	public Trigger sourceTrigger() {
+		return new PeriodicTrigger(1000);
+	}
+
+	@Bean
+	public PollerSpec sourcePoller() {
+		return Pollers.trigger(sourceTrigger());
+	}
 }

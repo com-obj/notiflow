@@ -9,7 +9,7 @@ public abstract class SourceMicroService<OUT, S extends SourceSupplier<OUT>> {
 
 	private final EmitterProcessor<OUT> streamSource = EmitterProcessor.create();
 
-	public Supplier<Flux<OUT>> executeSourceService() {
+	protected Supplier<Flux<OUT>> executeSourceService() {
 		return () -> streamSource;
 	}
 

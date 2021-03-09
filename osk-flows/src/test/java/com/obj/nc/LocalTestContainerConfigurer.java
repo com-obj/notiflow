@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
-@ConditionalOnProperty(value = "testContainers", havingValue = "local", matchIfMissing = true)
+@ConditionalOnProperty(value = "testContainers", havingValue = "local", matchIfMissing = false)
 public class LocalTestContainerConfigurer {
 
     public static final String DOCKER_COMPOSE_PATH = "../docker/osk-flows/test-components/docker-compose.yml";

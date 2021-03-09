@@ -1,4 +1,4 @@
-testContainers: local
+testContainers: no
 
 spring.datasource:
   url: jdbc:postgresql://localhost:45432/nc
