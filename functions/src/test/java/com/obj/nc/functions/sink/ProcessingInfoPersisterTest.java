@@ -6,7 +6,7 @@ import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubscriptionProcessingFunction;
+import com.obj.nc.functions.processors.koderia.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
 import com.obj.nc.functions.processors.senders.EmailSenderSinkExecution;
 import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
@@ -42,7 +42,7 @@ class ProcessingInfoPersisterTest {
     private ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId;
 
     @Autowired
-    private RecepientsUsingKoderiaSubscriptionProcessingFunction resolveRecipients;
+    private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
 
     @Autowired
     private MessagesFromEventProcessingFunction generateMessagesFromEvent;

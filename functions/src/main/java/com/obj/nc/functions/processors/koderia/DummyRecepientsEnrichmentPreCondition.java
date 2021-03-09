@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class RecepientsUsingKoderiaSubscriptionPreCondition implements PreCondition<Event> {
+public class DummyRecepientsEnrichmentPreCondition implements PreCondition<Event> {
 
 	public static final List<String> REQUIRED_ATTRIBUTES = Arrays.asList("technologies");
 

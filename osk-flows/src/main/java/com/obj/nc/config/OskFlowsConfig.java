@@ -11,7 +11,7 @@ import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubscriptionProcessingFunction;
+import com.obj.nc.functions.processors.koderia.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
 import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
@@ -30,7 +30,7 @@ public class OskFlowsConfig {
 	private ValidateAndGenerateEventIdProcessingFunction generateEventId;
 
 	@Autowired
-	private RecepientsUsingKoderiaSubscriptionProcessingFunction resolveRecipients;
+	private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
 
 	@Autowired
 	private MessagesFromEventProcessingFunction generateMessagesFromEvent;
