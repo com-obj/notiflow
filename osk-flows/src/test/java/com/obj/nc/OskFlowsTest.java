@@ -75,27 +75,8 @@ public class OskFlowsTest {
         Assertions.assertThat( messages.length ).isEqualTo(3);
         
         // THEN
-        List<ProcessingInfo> persistedPIs = jdbcTemplate.query(
-        		"select * from nc_processing_info "
-        		+ "where "
-        			+ "event_ids ? '" +inputEvent.getHeader().getId()+ "' "
-        			+ "and step_name='SendEmail'",
-        		(rs, rowNum) ->
-        			new ProcessingInfo(
-        					UUID.fromString(rs.getString("processing_id")),
-        					UUID.fromString(rs.getString("prev_processing_id")),
-        					rs.getString("step_name"),
-        					rs.getInt("step_index"),
-        					rs.getTimestamp("time_processing_start").toInstant(),
-        					rs.getTimestamp("time_processing_end").toInstant(),
-        					rs.getLong("step_duration_ms"),
-        					rs.getString("event_json"),
-        					rs.getString("event_json_diff"),null
-        					)
-        		);
+        List<ProcessingInfo> persistedPIs = ProcessingInfo.findProcessingInfo(inputEvent.getHeader().getId(), "SendEmail");
         Assertions.assertThat(persistedPIs.size()).isEqualTo(3);
-
-
     }
     
     @org.springframework.boot.test.context.TestConfiguration

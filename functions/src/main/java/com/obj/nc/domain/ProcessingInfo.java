@@ -49,7 +49,7 @@ public class ProcessingInfo {
 	@JsonIgnore
 	private String diffJson;
 	
-	public static List<ProcessingInfo> findProcessingInfo(String forEventId, String forStep) {
+	public static List<ProcessingInfo> findProcessingInfo(UUID forEventId, String forStep) {
         List<ProcessingInfo> persistedPIs = Get.getJdbc().query(
         		"select * from nc_processing_info "
         		+ "where "
