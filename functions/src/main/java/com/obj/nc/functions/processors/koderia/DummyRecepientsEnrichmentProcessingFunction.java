@@ -11,13 +11,13 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class RecepientsUsingKoderiaSubscriptionProcessingFunction extends ProcessorFunction<Event, Event> {
+public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunction<Event, Event> {
 
 	@Autowired
-	private RecepientsUsingKoderiaSubscriptionExecution execution;
+	private DummyRecepientsEnrichmentExecution execution;
 
 	@Autowired
-	private RecepientsUsingKoderiaSubscriptionPreCondition preCondition;
+	private DummyRecepientsEnrichmentPreCondition preCondition;
 
 	@Override
 	public PreCondition<Event> preCondition() {

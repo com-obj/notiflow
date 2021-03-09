@@ -12,10 +12,10 @@ import java.util.function.Function;
 
 @Configuration
 @Log4j2
-public class RecepientsUsingKoderiaSubscriptionMicroService extends ProcessorMicroService<Event, Event, RecepientsUsingKoderiaSubscriptionProcessingFunction>{
+public class DummyRecepientsEnrichmentMicroService extends ProcessorMicroService<Event, Event, DummyRecepientsEnrichmentProcessingFunction>{
 
 	@Autowired
-	private RecepientsUsingKoderiaSubscriptionProcessingFunction fn;
+	private DummyRecepientsEnrichmentProcessingFunction fn;
 
 	@Bean
 	public Function<Flux<Event>, Flux<Event>> resolveRecipients() {
@@ -23,7 +23,7 @@ public class RecepientsUsingKoderiaSubscriptionMicroService extends ProcessorMic
 	}
 
 	@Override
-	public RecepientsUsingKoderiaSubscriptionProcessingFunction getProccessingFuction() {
+	public DummyRecepientsEnrichmentProcessingFunction getProccessingFuction() {
 		return fn;
 	}
 

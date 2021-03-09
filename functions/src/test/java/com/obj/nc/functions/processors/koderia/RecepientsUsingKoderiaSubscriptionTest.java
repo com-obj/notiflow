@@ -23,10 +23,10 @@ class RecepientsUsingKoderiaSubscriptionTest {
                     new ValidateAndGenerateEventIdExecution(),
                     new ValidateAndGenerateEventIdPreCondition());
 
-    private final RecepientsUsingKoderiaSubscriptionProcessingFunction resolveRecipients =
-            new RecepientsUsingKoderiaSubscriptionProcessingFunction(
-                    new RecepientsUsingKoderiaSubscriptionExecution(),
-                    new RecepientsUsingKoderiaSubscriptionPreCondition());
+    private final DummyRecepientsEnrichmentProcessingFunction resolveRecipients =
+            new DummyRecepientsEnrichmentProcessingFunction(
+                    new DummyRecepientsEnrichmentExecution(),
+                    new DummyRecepientsEnrichmentPreCondition());
 
     @Test
     void testResolveRecipientsFailWithoutRequiredAttributes() {

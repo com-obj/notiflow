@@ -1,7 +1,6 @@
 package com.obj.nc.functions.processors.koderia;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.Group;
 import com.obj.nc.domain.endpoints.Person;
@@ -13,7 +12,7 @@ import java.util.function.Function;
 
 @Component
 @Log4j2
-public class RecepientsUsingKoderiaSubscriptionExecution implements Function<Event, Event> {
+public class DummyRecepientsEnrichmentExecution implements Function<Event, Event> {
 
 	@DocumentProcessingInfo("FindRecepientsUsingKoderiaSubsription")
 	@Override

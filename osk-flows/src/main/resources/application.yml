@@ -1,0 +1,16 @@
+spring.datasource:
+   platform: postgres
+   url: jdbc:postgresql://localhost:25432/nc
+   username: nc
+   password: ZMss4o9mdBLV
+
+spring.mail:
+   host: localhost
+   port: 3025
+   username: no-reply@objectify.sk
+   password: xxx
+
+nc.functions.event-generator:
+   source-dir: ${user.home}/eventsQueue
+
+nc.functions.send-email-message.from: no-reply@objectify.sk
