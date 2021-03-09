@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ActiveProfilesResolver;
 import org.springframework.test.context.support.DefaultActiveProfilesResolver;
+import org.springframework.util.StringUtils;
 
 //Spring by default neumoznuje overidnut @ActiveProfiles annotaciu pomocou -D parametra,.. toto je trik ako sa to da:
 //https://blog.inspeerity.com/spring/setting-default-spring-profile-for-tests-with-override-option/
@@ -20,7 +21,7 @@ public class SystemPropertyActiveProfileResolver implements ActiveProfilesResolv
         final String springProfileKey = "spring.profiles.active";
 
 
-        return System.getProperties().containsKey(springProfileKey)
+        return System.getProperties().containsKey(springProfileKey) && StringUtils.hasText(System.getProperty(springProfileKey))
                 ? System.getProperty(springProfileKey).split("\\s*,\\s*")
                 : defaultActiveProfilesResolver.resolve(testClass);
     }

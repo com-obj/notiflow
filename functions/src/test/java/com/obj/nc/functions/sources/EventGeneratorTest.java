@@ -3,7 +3,7 @@ package com.obj.nc.functions.sources;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfig;
+import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfigProperties;
 import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,7 @@ import java.util.Map;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @ExtendWith(SpringExtension.class)
-@EnableConfigurationProperties(value = EventGeneratorConfig.class)
+@EnableConfigurationProperties(value = EventGeneratorConfigProperties.class)
 @ContextConfiguration(classes = EventGeneratorTestConfig.class)
 class EventGeneratorTest {
 
@@ -41,7 +41,7 @@ class EventGeneratorTest {
     private EventGeneratorSourceSupplier generateEvent;
 
     @Autowired
-    private EventGeneratorConfig config;
+    private EventGeneratorConfigProperties config;
 
     @BeforeEach
     void createAndPopulateEventsQueueDir(TestInfo testInfo) throws IOException {

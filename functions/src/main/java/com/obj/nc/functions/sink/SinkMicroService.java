@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 public abstract class SinkMicroService<IN, C extends SinkConsumer<IN>> {
 	
-	public Consumer<Flux<IN>> executeSinkService() {
+	protected Consumer<Flux<IN>> executeSinkService() {
 		return payloads -> payloads.doOnNext(payload -> getSinkConsumer().accept(payload)).subscribe();
 	}
 	
