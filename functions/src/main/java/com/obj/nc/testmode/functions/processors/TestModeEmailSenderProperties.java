@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "testmode.smtp")
-@ConditionalOnProperty(value = "testmode.enabled", havingValue = "true")
 public class TestModeEmailSenderProperties {
 
     private String host;
@@ -20,5 +19,7 @@ public class TestModeEmailSenderProperties {
     private String password;
 
     private String recipient;
+
+    private int periodMinutes;
 
 }

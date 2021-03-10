@@ -10,9 +10,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-@Component
 @Log4j2
-@ConditionalOnProperty(value = "testmode.enabled", havingValue = "true")
+@Component
 public class GreenMailReceiverPreCondition implements PreCondition<List<Message>> {
 
     @Override

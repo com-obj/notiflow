@@ -1,5 +1,6 @@
 package com.obj.nc.functions.sink;
 
+import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -18,7 +19,6 @@ import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -29,8 +29,7 @@ import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class ProcessingInfoPersisterTest {
+class ProcessingInfoPersisterTest extends BaseIntegrationTest {
 
     @Autowired
     private ProcessingInfoPersisterSinkConsumer processingInfoPersister;

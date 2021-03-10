@@ -45,10 +45,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
-	implementation 'com.icegreen:greenmail:1.6.0'
+	implementation 'com.icegreen:greenmail-spring:1.6.0'
 	implementation 'org.apache.commons:commons-email:1.5'
-	testImplementation 'com.icegreen:greenmail-junit4:1.6.0'
-	
+
 	//add reactive support
 	implementation 'org.springframework.cloud:spring-cloud-function-context'
 	implementation 'org.springframework.boot:spring-boot-starter-integration'
@@ -78,9 +77,9 @@ dependencies {
 	}
 	testFixturesImplementation "org.testcontainers:testcontainers"
 	testFixturesImplementation "org.testcontainers:junit-jupiter"
-	testFixturesImplementation 'org.testcontainers:postgresql:1.12.4'
+	testFixturesImplementation 'org.testcontainers:postgresql'
 	testFixturesImplementation 'org.flywaydb:flyway-core'
-
+	testFixturesCompileOnly 'org.projectlombok:lombok'
 }
 
 dependencyManagement {

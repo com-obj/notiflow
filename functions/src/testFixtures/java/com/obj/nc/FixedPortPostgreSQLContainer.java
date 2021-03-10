@@ -3,47 +3,23 @@ package com.obj.nc;
 import org.rnorth.ducttape.TimeoutException;
 import org.rnorth.ducttape.unreliables.Unreliables;
 import org.testcontainers.containers.ContainerLaunchException;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 
-/**
- * We are expecting that postgresql container already will be created by an external system.
- * Also this class is able to wait for 60 seconds until postgresql container starts.
- */
-public class PostgreSQLPreMadeContainer extends PostgreSQLContainer {
+public class FixedPortPostgreSQLContainer<SELF extends FixedPortPostgreSQLContainer<SELF>> extends PostgreSQLContainer<SELF> {
 
     private final String dockerImageName;
 
-    public PostgreSQLPreMadeContainer(String dockerImage) {
+    private final int fixedHostPort;
+
+    public FixedPortPostgreSQLContainer(String dockerImage, int hostPort) {
         super(dockerImage);
         this.dockerImageName = dockerImage;
-    }
-
-    public PostgreSQLPreMadeContainer withPostgreSQLInitScript(String initScriptPath) {
-        super.withInitScript(initScriptPath);
-        return this;
-    }
-
-    public PostgreSQLPreMadeContainer withPostgreSQLUsername(String username) {
-        super.withUsername(username);
-        return this;
-    }
-
-    public PostgreSQLPreMadeContainer withPostgreSQLPassword(String password) {
-        super.withPassword(password);
-        return this;
-    }
-
-    public PostgreSQLPreMadeContainer withPostgreSQLDatabaseName(String databaseName) {
-        super.withDatabaseName(databaseName);
-        return this;
-    }
-
-    public PostgreSQLPreMadeContainer waitForContainer() {
+        this.fixedHostPort = hostPort;
+        super.addFixedExposedPort(fixedHostPort, POSTGRESQL_PORT);
         super.setWaitStrategy(new org.testcontainers.containers.wait.strategy.AbstractWaitStrategy() {
             @Override
             protected void waitUntilReady() {
@@ -51,9 +27,9 @@ public class PostgreSQLPreMadeContainer extends PostgreSQLContainer {
                     Unreliables.retryUntilTrue((int) startupTimeout.getSeconds(), TimeUnit.SECONDS,
                             () -> getRateLimiter().getWhenReady(() -> {
                                 try {
-                                    new Socket("localhost", POSTGRESQL_PORT).close();
+                                    new Socket("localhost", fixedHostPort).close();
                                 } catch (IOException e) {
-                                    throw new IllegalStateException("Socket not listening yet: " + POSTGRESQL_PORT);
+                                    throw new IllegalStateException("Socket not listening yet: " + fixedHostPort);
                                 }
                                 return true;
                             }));
@@ -62,13 +38,35 @@ public class PostgreSQLPreMadeContainer extends PostgreSQLContainer {
                     throw new ContainerLaunchException("Timed out waiting for container port to open (" +
                             "localhost" +
                             " ports: " +
-                            POSTGRESQL_PORT +
+                            fixedHostPort +
                             " should be listening)");
                 }
             }
         });
-        super.waitUntilContainerStarted();
+    }
+
+    public FixedPortPostgreSQLContainer<SELF> withPostgreSQLInitScript(String initScriptPath) {
+        super.withInitScript(initScriptPath);
         return this;
+    }
+
+    public FixedPortPostgreSQLContainer<SELF> withPostgreSQLUsername(String username) {
+        super.withUsername(username);
+        return this;
+    }
+
+    public FixedPortPostgreSQLContainer<SELF> withPostgreSQLPassword(String password) {
+        super.withPassword(password);
+        return this;
+    }
+
+    public FixedPortPostgreSQLContainer<SELF> withPostgreSQLDatabaseName(String databaseName) {
+        super.withDatabaseName(databaseName);
+        return this;
+    }
+
+    public void waitForContainer() {
+        super.waitUntilContainerStarted();
     }
 
     public void initialize() {
@@ -77,6 +75,11 @@ public class PostgreSQLPreMadeContainer extends PostgreSQLContainer {
 
     @Override
     public boolean isRunning() {
+        try {
+            new Socket("localhost", fixedHostPort).close();
+        } catch (IOException e) {
+            return false;
+        }
         return true;
     }
 
@@ -93,7 +96,8 @@ public class PostgreSQLPreMadeContainer extends PostgreSQLContainer {
     @Override
     public String getJdbcUrl() {
         // Disable Postgres driver use of java.util.logging to reduce noise at startup time
-        return "jdbc:postgresql://" + "localhost" + ":" + POSTGRESQL_PORT + "/" + getDatabaseName() + "?loggerLevel=OFF";
+        return "jdbc:postgresql://" + "localhost" + ":" + fixedHostPort + "/" + getDatabaseName() + "?loggerLevel=OFF";
     }
+
 }
 

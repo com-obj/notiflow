@@ -8,7 +8,6 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.binder.test.InputDestination;
 import org.springframework.cloud.stream.binder.test.OutputDestination;
 import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
@@ -23,9 +22,8 @@ import com.obj.nc.utils.JsonUtils;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest
 @Import(TestChannelBinderConfiguration.class)
-public class IntegrationTests {
+public class IntegrationTests extends BaseIntegrationTest {
 
 	private static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
 

@@ -6,7 +6,7 @@ import org.springframework.integration.config.EnableIntegration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
-//@EnableTransactionManagement
+@EnableTransactionManagement
 public class FunctionsTestApplication {
 
     public static void main(String[] args) {

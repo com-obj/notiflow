@@ -9,9 +9,9 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessageContent;
 import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
 import com.obj.nc.utils.GreenMailManager;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import javax.mail.*;
@@ -20,8 +20,8 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+@Log4j2
 @Component
-@ConditionalOnProperty(value = "testmode.enabled", havingValue = "true")
 public class GreenMailReceiverExecution implements Supplier<List<Message>> {
 
     @Autowired
@@ -39,7 +39,7 @@ public class GreenMailReceiverExecution implements Supplier<List<Message>> {
             Collection<MailFolder> mailboxes = store.listMailboxes("*");
 
             for (MailFolder folder : mailboxes) {
-                List<Message> folderMessages = folder.getMessages().stream().map(
+                List<Message> folderMessages = folder.getNonDeletedMessages().stream().map(
                         message -> {
                             MimeMessage mimeMessage = message.getMimeMessage();
                             Message result = new Message();

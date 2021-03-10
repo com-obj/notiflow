@@ -3,6 +3,7 @@ package com.obj.nc.functions.sink;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.message.Message;
@@ -15,7 +16,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -25,8 +25,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class EmailSenderSinkTest {
+class EmailSenderSinkTest extends BaseIntegrationTest {
 
     @Autowired
     private GreenMailManager greenMailManager;

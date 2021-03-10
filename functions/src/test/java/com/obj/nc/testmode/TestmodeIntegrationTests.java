@@ -1,6 +1,7 @@
 package com.obj.nc.testmode;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
@@ -11,7 +12,6 @@ import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.core.MessageSource;
@@ -26,10 +26,9 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.List;
 
-@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest
+@ActiveProfiles(value = { "test", "testmode" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = "greenMailSource")
-public class TestmodeIntegrationTests {
+public class TestmodeIntegrationTests extends BaseIntegrationTest {
 
     @Autowired
     private GreenMailManager greenMailManager;

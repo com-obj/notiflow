@@ -12,9 +12,8 @@ import reactor.core.publisher.Flux;
 import java.util.List;
 import java.util.function.Supplier;
 
-@Configuration
 @Log4j2
-@ConditionalOnProperty(value = "testmode.enabled", havingValue = "true")
+@Configuration
 public class GreenMailReceiverMicroService extends SourceMicroService<List<Message>, GreenMailReceiverSourceSupplier> {
 
     @Autowired

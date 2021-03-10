@@ -3,6 +3,7 @@ package com.obj.nc.testmode.config;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregatorProcessingFunction;
 import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
+import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
 import com.obj.nc.testmode.functions.sources.GreenMailReceiverSourceSupplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,6 +22,9 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @ConditionalOnProperty(value = "testmode.enabled", havingValue = "true")
 public class TestModeConfig {
+
+    @Autowired
+    private TestModeEmailSenderProperties properties;
 
     @Autowired
     private GreenMailReceiverSourceSupplier greenMailMessageSource;
@@ -46,7 +50,7 @@ public class TestModeConfig {
 
     @Bean
     public Trigger sourceTrigger() {
-        return new PeriodicTrigger(5, TimeUnit.MINUTES);
+        return new PeriodicTrigger(properties.getPeriodMinutes(), TimeUnit.MINUTES);
     }
 
     @Bean

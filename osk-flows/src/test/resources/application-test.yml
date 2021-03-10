@@ -1,9 +1,6 @@
-spring.main.allow-bean-definition-overriding: true
+testEnv: local
 
-testContainers: local
-
-spring.datasource:
-  url: jdbc:postgresql://localhost:45432/nc
+spring.flyway.enabled: false
 
 nc.functions.event-generator:
   source-dir: src/test/resources/eventsQueue
