@@ -35,7 +35,7 @@ import com.obj.nc.utils.GreenMailManager;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest({"spring.main.allow-bean-definition-overriding=true"})
+@SpringBootTest
 @SpringIntegrationTest(noAutoStartup = {"eventSupplier"})
 public class OskFlowsTest {
 		

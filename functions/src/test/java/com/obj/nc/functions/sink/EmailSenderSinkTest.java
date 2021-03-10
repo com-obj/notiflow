@@ -35,7 +35,7 @@ class EmailSenderSinkTest {
     private EmailSenderSinkProcessingFunction functionSend;
 
     @Autowired
-    private EmailSenderSinkExecution.SendEmailMessageConfig emailFromSetting;
+    private EmailSenderSinkExecution.EmailSenderSinkProperties emailFromSetting;
 
     @BeforeEach
     void cleanGreenMailMailBoxes() throws FolderException {

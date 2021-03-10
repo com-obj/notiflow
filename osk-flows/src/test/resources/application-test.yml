@@ -1,9 +1,9 @@
-testContainers: no
+spring.main.allow-bean-definition-overriding: true
+
+testContainers: local
 
 spring.datasource:
   url: jdbc:postgresql://localhost:45432/nc
 
 nc.functions.event-generator:
   source-dir: src/test/resources/eventsQueue
-
-app.scheduling.enabled: false

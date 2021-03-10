@@ -6,11 +6,14 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import com.icegreen.greenmail.util.ServerSetupTest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -27,27 +30,27 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @Data
 public class GreenMailManager  {
-	
-	private GreenMail greenMail;
-	
+
+    private GreenMail greenMail;
+
 	@Value("${spring.mail.port}")
 	private Integer portNumber;
-	
+
 	@Value("${spring.mail.username}")
 	private String senderUser;
-	
+
 	@Value("${spring.mail.password}")
 	private String senderPasswd;
-	
+
 	@EventListener
     public void onApplicationEvent(ContextRefreshedEvent event) {
 		if (greenMail!=null) {
 			return;
 		}
-		greenMail = new GreenMail(new ServerSetup(portNumber, null, ServerSetup.PROTOCOL_SMTP));
-		greenMail.setUser(senderUser, senderPasswd);
+        greenMail = new GreenMail(ServerSetupTest.ALL);
+        greenMail.setUser(senderUser, senderPasswd);
         greenMail.start();
-        
+
         log.info("Greenmail server started on port {}", portNumber);
     }
 	

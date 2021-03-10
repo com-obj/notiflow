@@ -3,12 +3,12 @@ package com.obj.nc.testmode.functions.sources;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.store.InMemoryStore;
 import com.icegreen.greenmail.store.MailFolder;
-import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessageContent;
 import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
+import com.obj.nc.utils.GreenMailManager;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -25,21 +25,21 @@ import java.util.stream.Collectors;
 public class GreenMailReceiverExecution implements Supplier<List<Message>> {
 
     @Autowired
-    private GreenMailReceiverConfig config;
+    private GreenMailManager greenMailManager;
 
     @Autowired
     private TestModeEmailSenderProperties properties;
 
     @Override
     public List<Message> get() {
-        List<Message> resultMessages = new ArrayList<>();
+        List<Message> allMessages = new ArrayList<>();
 
         try {
-            InMemoryStore store = (InMemoryStore) config.getGreenMail().getManagers().getImapHostManager().getStore();
+            InMemoryStore store = (InMemoryStore) greenMailManager.getGreenMail().getManagers().getImapHostManager().getStore();
             Collection<MailFolder> mailboxes = store.listMailboxes("*");
 
             for (MailFolder folder : mailboxes) {
-                List<Message> newMessages = folder.getNonDeletedMessages().stream().map(
+                List<Message> folderMessages = folder.getMessages().stream().map(
                         message -> {
                             MimeMessage mimeMessage = message.getMimeMessage();
                             Message result = new Message();
@@ -48,8 +48,6 @@ public class GreenMailReceiverExecution implements Supplier<List<Message>> {
                                 content.setSubject(mimeMessage.getSubject());
 
                                 MimeMessageParser parser = new MimeMessageParser(mimeMessage).parse();
-
-//                                String body = GreenMailUtil.getBody(mimeMessage);
                                 content.setText(parser.hasHtmlContent() ? parser.getHtmlContent() : parser.getPlainContent());
 
                                 List<MessageContent> aggregateContent = new ArrayList<>();
@@ -73,8 +71,7 @@ public class GreenMailReceiverExecution implements Supplier<List<Message>> {
                         }
                 ).collect(Collectors.toList());
 
-                resultMessages.addAll(newMessages);
-
+                allMessages.addAll(folderMessages);
                 folder.expunge();
             }
 
@@ -82,7 +79,7 @@ public class GreenMailReceiverExecution implements Supplier<List<Message>> {
             throw new RuntimeException(e);
         }
 
-        return resultMessages;
+        return allMessages;
     }
 
 }

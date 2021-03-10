@@ -7,11 +7,12 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessageContent;
 import com.obj.nc.domain.message.MessageContents;
 import com.obj.nc.exceptions.ProcessingException;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -23,14 +24,15 @@ import java.io.File;
 import java.util.Optional;
 import java.util.function.Function;
 
+@Primary
 @Component
 @Log4j2
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class EmailSenderSinkExecution implements Function<Message, Message> {
 
-	private final JavaMailSender emailSender;
+	private final JavaMailSender javaMailSender;
 
-	private final SendEmailMessageConfig config;
+	private final EmailSenderSinkProperties properties;
 
 	@DocumentProcessingInfo("SendEmail")
 	@Override
@@ -57,10 +59,10 @@ public class EmailSenderSinkExecution implements Function<Message, Message> {
 
 	private void doSendMessage(EmailEndpoint toEmail, MessageContent messageContent) {
 		try {
-			MimeMessage message = emailSender.createMimeMessage();
+			MimeMessage message = javaMailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-			helper.setFrom(config.getFrom());
+			helper.setFrom(properties.getFrom());
 
 			helper.setTo(toEmail.getEmail());
 
@@ -72,7 +74,7 @@ public class EmailSenderSinkExecution implements Function<Message, Message> {
 				helper.addAttachment(attachement.getName(), file);
 			}
 
-			emailSender.send(message);
+			javaMailSender.send(message);
 		} catch (MessagingException e) {
 			throw new ProcessingException(EmailSenderSinkProcessingFunction.class, e);
 		}
@@ -81,7 +83,7 @@ public class EmailSenderSinkExecution implements Function<Message, Message> {
 	@ConfigurationProperties(prefix = "nc.functions.send-email-message")
 	@Data
 	@Component
-	public static class SendEmailMessageConfig {
+	public static class EmailSenderSinkProperties {
 
 		String from;
 

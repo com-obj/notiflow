@@ -1,9 +1,9 @@
 package com.obj.nc.testmode.config;
 
-import com.obj.nc.functions.processors.messageAggregator.MessageAggregatorMicroService;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkMicroService;
-import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerMicroService;
-import com.obj.nc.testmode.functions.sources.GreenMailReceiverMicroService;
+import com.obj.nc.functions.processors.messageAggregator.MessageAggregatorProcessingFunction;
+import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
+import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
+import com.obj.nc.testmode.functions.sources.GreenMailReceiverSourceSupplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -11,37 +11,47 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.PollerSpec;
 import org.springframework.integration.dsl.Pollers;
+import org.springframework.scheduling.Trigger;
+import org.springframework.scheduling.support.PeriodicTrigger;
 
 import java.util.concurrent.TimeUnit;
-
-import static com.obj.nc.testmode.functions.processors.TestModeEmailSenderConfig.TEST_MODE_EMAIL_SENDER_MICRO_SERVICE;
 
 @Configuration
 @ConditionalOnProperty(value = "testmode.enabled", havingValue = "true")
 public class TestModeConfig {
 
     @Autowired
-    private GreenMailReceiverMicroService greenMailSource;
+    private GreenMailReceiverSourceSupplier greenMailMessageSource;
 
     @Autowired
-    private MessageAggregatorMicroService aggregator;
+    private MessageAggregatorProcessingFunction messageAggregator;
 
     @Autowired
-    @Qualifier(TEST_MODE_EMAIL_SENDER_MICRO_SERVICE)
-    private EmailSenderSinkMicroService testmodeSendEmail;
+    @Qualifier("testModeEmailSenderSinkProcessingFunction")
+    private EmailSenderSinkProcessingFunction testModeSendEmailProcessingFunction;
 
     @Autowired
-    private PaylaodLoggerMicroService logger;
+	private PaylaodLoggerSinkConsumer logConsumer;
 
     @Bean
     public IntegrationFlow testModeSendMessage() {
-        return IntegrationFlows
-                .from(greenMailSource, config -> config.poller(Pollers.fixedDelay(10000)))
-                .transform(aggregator)
-                .transform(testmodeSendEmail)
-                .handle(logger)
-                .get();
+        return IntegrationFlows.from(greenMailMessageSource,
+                        config -> config.poller(sourcePoller()).id("greenMailSource"))
+                .transform(messageAggregator)
+                .transform(testModeSendEmailProcessingFunction)
+                .handle(logConsumer).get();
+    }
+
+    @Bean
+    public Trigger sourceTrigger() {
+        return new PeriodicTrigger(5, TimeUnit.MINUTES);
+    }
+
+    @Bean
+    public PollerSpec sourcePoller() {
+        return Pollers.trigger(sourceTrigger());
     }
 
 }

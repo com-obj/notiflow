@@ -11,17 +11,16 @@ import reactor.core.publisher.Flux;
 
 import java.util.function.Consumer;
 
-@Service
+@Configuration
 @Log4j2
-public class PaylaodLoggerMicroService extends SinkMicroService<Message, PaylaodLoggerSinkConsumer>
-		implements Consumer<Flux<Message>> {
+public class PaylaodLoggerMicroService extends SinkMicroService<Message, PaylaodLoggerSinkConsumer> {
 
 	@Autowired
 	private PaylaodLoggerSinkConsumer fn;
 
-	@Override
-	public void accept(Flux<Message> messageFlux) {
-		super.executeSinkService().accept(messageFlux);
+	@Bean
+	public Consumer<Flux<Message>> logEvent() {
+		return super.executeSinkService();
 	}
 
 	@Override
