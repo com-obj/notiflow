@@ -76,7 +76,7 @@ spring.datasource:
 spring.mail:
    host: localhost
    port: 3025
-   username: no-reply@localhost
+   username: no-reply@objectify.sk
    password: xxx
 
 management.endpoints.web.exposure.include: '*'

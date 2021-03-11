@@ -5,7 +5,7 @@ spring.flyway.enabled: false
 spring.mail:
   host: localhost
   port: 3025
-  username: no-reply@localhost
+  username: no-reply@objectify.sk
   password: xxx
 
 koderia.api.uri: https://www.koderia.sk/api/v1

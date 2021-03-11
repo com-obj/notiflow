@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 @Configuration
 @Log4j2
-public class MessageAggregatorMicroService extends ProcessorMicroService<List<Message>, Message, MessageAggregatorProcessingFunction> {
+public class MessageAggregatorMicroService extends ProcessorMicroService<List<Message>, Message, MessageAggregatorProcessingFunction>{
 
 	@Autowired
 	private MessageAggregatorProcessingFunction fn;
@@ -27,5 +27,6 @@ public class MessageAggregatorMicroService extends ProcessorMicroService<List<Me
 	public MessageAggregatorProcessingFunction getProccessingFuction() {
 		return fn;
 	}
+
 
 }

@@ -48,7 +48,9 @@ public class GreenMailReceiverExecution implements Supplier<List<Message>> {
                                 content.setSubject(mimeMessage.getSubject());
 
                                 MimeMessageParser parser = new MimeMessageParser(mimeMessage).parse();
-                                content.setText(parser.hasHtmlContent() ? parser.getHtmlContent() : parser.getPlainContent());
+                                String originalRecipients = parser.getTo().stream().map(Address::toString).collect(Collectors.joining(","));
+                                String mimeMessageContent = parser.hasHtmlContent() ? parser.getHtmlContent() : parser.getPlainContent();
+                                content.setText(originalRecipients + "\n" + mimeMessageContent);
 
                                 List<MessageContent> aggregateContent = new ArrayList<>();
                                 aggregateContent.add(content);

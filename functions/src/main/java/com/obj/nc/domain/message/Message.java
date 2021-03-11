@@ -1,7 +1,6 @@
 package com.obj.nc.domain.message;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.BasePayload;
 
 import com.obj.nc.domain.endpoints.DeliveryOptions;

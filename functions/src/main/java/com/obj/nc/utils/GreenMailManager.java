@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PreDestroy;
 
 @Component
-@Profile({"dev","test","testmode"})
+@Profile({"dev","test"})
 @Log4j2
 @Data
 public class GreenMailManager {
@@ -19,7 +19,7 @@ public class GreenMailManager {
 
 	static {
 		GREEN_MAIL = new GreenMail(ServerSetupTest.SMTP_IMAP);
-		GREEN_MAIL.setUser("no-reply", "xxx");
+		GREEN_MAIL.setUser("no-reply@objectify.sk", "xxx");
 		GREEN_MAIL.start();
 	}
 

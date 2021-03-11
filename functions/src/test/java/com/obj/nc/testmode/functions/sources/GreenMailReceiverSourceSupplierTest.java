@@ -4,6 +4,7 @@ import com.icegreen.greenmail.store.FolderException;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
 import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
@@ -62,17 +63,20 @@ class GreenMailReceiverSourceSupplierTest {
         Assertions.assertThat(messages.get(0).getBody().getMessage().getAggregateContent().get(0).getSubject()).contains(
                 message1.getBody().getMessage().getAggregateContent().get(0).getSubject());
         Assertions.assertThat(messages.get(0).getBody().getMessage().getAggregateContent().get(0).getText()).contains(
-                message1.getBody().getMessage().getAggregateContent().get(0).getText());
+                message1.getBody().getMessage().getAggregateContent().get(0).getText(),
+                ((EmailEndpoint) message1.getBody().getRecievingEndpoints().get(0)).getEmail());
 
         Assertions.assertThat(messages.get(1).getBody().getMessage().getAggregateContent().get(0).getSubject()).contains(
                 message2.getBody().getMessage().getAggregateContent().get(0).getSubject());
         Assertions.assertThat(messages.get(1).getBody().getMessage().getAggregateContent().get(0).getText()).contains(
-                message2.getBody().getMessage().getAggregateContent().get(0).getText());
+                message2.getBody().getMessage().getAggregateContent().get(0).getText(),
+                ((EmailEndpoint) message2.getBody().getRecievingEndpoints().get(0)).getEmail());
 
         Assertions.assertThat(messages.get(2).getBody().getMessage().getAggregateContent().get(0).getSubject()).contains(
                 message3.getBody().getMessage().getAggregateContent().get(0).getSubject());
         Assertions.assertThat(messages.get(2).getBody().getMessage().getAggregateContent().get(0).getText()).contains(
-                message3.getBody().getMessage().getAggregateContent().get(0).getText());
+                message3.getBody().getMessage().getAggregateContent().get(0).getText(),
+                ((EmailEndpoint) message3.getBody().getRecievingEndpoints().get(0)).getEmail());
 
         Assertions.assertThat(messages.get(2).getBody().getRecievingEndpoints()).hasSize(1);
         Assertions.assertThat(((EmailEndpoint) messages.get(2).getBody().getRecievingEndpoints().get(0)).getEmail()).isEqualTo(properties.getRecipient());

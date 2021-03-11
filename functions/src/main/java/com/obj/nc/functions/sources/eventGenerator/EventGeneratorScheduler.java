@@ -12,14 +12,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("!test")
+@Profile({"dev"})
 @EnableScheduling
 public class EventGeneratorScheduler {
 
     @Autowired
     private EventGeneratorMicroService sourceMicroService;
 
-    @Scheduled(fixedDelay = 5000, initialDelay = 5000)
+    @Scheduled(fixedDelay = 1000, initialDelay = 1000)
     public void generateEventAndAddToFlux() {
         Event event = sourceMicroService.getSourceSupplier().get();
         sourceMicroService.onNext(event);

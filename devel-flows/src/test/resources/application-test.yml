@@ -5,5 +5,5 @@ spring.flyway.enabled: false
 spring.mail:
    host: localhost
    port: 3025
-   username: no-reply
+   username: no-reply@objectify.sk
    password: xxx

@@ -5,7 +5,7 @@ spring.flyway.enabled: false
 spring.mail:
    host: localhost
    port: 3025
-   username: no-reply
+   username: no-reply@objectify.sk
    password: xxx
 
 spring.datasource:
@@ -14,7 +14,7 @@ spring.datasource:
    username: nc
    password: ZMss4o9mdBLV
 
-nc.functions.send-email-message.from: no-reply
+nc.functions.send-email-message.from: no-reply@objectify.sk
 
 nc.functions.event-generator:
    soruce-dir: eventsQueue
@@ -25,7 +25,7 @@ testmode:
    smtp:
       host: localhost
       port: 3025
-      username: no-reply
+      username: no-reply@objectify.sk
       password: xxx
       recipient: testmode_recipient@objectify.sk
-      periodMinutes: 1
+      periodMinutes: 5
