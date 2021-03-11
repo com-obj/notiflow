@@ -33,7 +33,8 @@ public class LocalTestContainersConfig {
                         BaseIntegrationTest.POSTGRESQL_CONTAINER.getJdbcUrl(),
                         BaseIntegrationTest.POSTGRESQL_CONTAINER.getUsername(),
                         BaseIntegrationTest.POSTGRESQL_CONTAINER.getPassword())
-                .locations("classpath:db/migration").load();
+                .locations("classpath:db/migration")
+                .connectRetries(10).load();
 
         flyway.migrate();
     }
