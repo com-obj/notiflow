@@ -1,0 +1,8 @@
+{
+  "address" : [ "+420047013370" ],
+  "clientCorrelator" : "test3",
+  "message" : "test sms",
+  "notifyURL" : "http://localhost:9472/test",
+  "senderAddress" : "3333",
+  "billCode" : "WZ00"
+}

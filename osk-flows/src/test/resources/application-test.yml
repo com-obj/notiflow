@@ -16,7 +16,7 @@ nc.functions:
   send-email-message:
     from: no-reply@objectify.sk
 
-smsApi:
+smsapi:
   uri: http://localhost:6090/API/smsmessaging/v1
 
 osk.sia.functions.impact-notif-converter:

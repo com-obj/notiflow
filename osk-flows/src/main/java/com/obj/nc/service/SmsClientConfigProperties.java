@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "smsApi")
+@ConfigurationProperties(prefix = "smsapi")
 public class SmsClientConfigProperties {
 
     private String uri;
