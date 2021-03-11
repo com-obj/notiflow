@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "nc.functions.event-generator")
 @Data
 @Component
-@Profile({"dev", "test"})
 public class EventGeneratorConfigProperties {
 
     String sourceDir;

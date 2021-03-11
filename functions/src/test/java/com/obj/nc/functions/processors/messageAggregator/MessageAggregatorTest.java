@@ -1,6 +1,7 @@
 package com.obj.nc.functions.processors.messageAggregator;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.utils.JsonUtils;
@@ -30,8 +31,11 @@ class MessageAggregatorTest {
                 JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message3.json", Message.class)
         );
 
+        Messages inputMessagesWrapped = new Messages();
+        inputMessagesWrapped.setMessages(inputMessages);
+
         // when
-        Message outputMessage = aggregateMessages.apply(inputMessages);
+        Message outputMessage = aggregateMessages.apply(inputMessagesWrapped);
 
         // then
         Message expected = JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_output_message.json", Message.class);
@@ -43,8 +47,11 @@ class MessageAggregatorTest {
         // given
         List<Message> inputMessages = new ArrayList<>();
 
+        Messages inputMessagesWrapped = new Messages();
+        inputMessagesWrapped.setMessages(inputMessages);
+
         // when - then
-        Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessages))
+        Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessagesWrapped))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("There are no input messages to process");
     }
@@ -57,8 +64,11 @@ class MessageAggregatorTest {
                 JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1_none.json", Message.class)
         );
 
+        Messages inputMessagesWrapped = new Messages();
+        inputMessagesWrapped.setMessages(inputMessages);
+
         // when - then
-        Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessages))
+        Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessagesWrapped))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("Input message is not intended to be aggregated");
     }
@@ -71,8 +81,11 @@ class MessageAggregatorTest {
                 JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1_delivery_options.json", Message.class)
         );
 
+        Messages inputMessagesWrapped = new Messages();
+        inputMessagesWrapped.setMessages(inputMessages);
+
         // when - then
-        Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessages))
+        Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessagesWrapped))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("Messages do not share the same delivery options");
     }
@@ -85,8 +98,11 @@ class MessageAggregatorTest {
                 JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1_receiving_endpoints.json", Message.class)
         );
 
+        Messages inputMessagesWrapped = new Messages();
+        inputMessagesWrapped.setMessages(inputMessages);
+
         // when - then
-        Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessages))
+        Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessagesWrapped))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("Messages do not share the same receiving endpoints");
     }

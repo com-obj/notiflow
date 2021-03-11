@@ -1,21 +1,15 @@
 package com.obj.nc;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import javax.mail.internet.MimeMessage;
 
+import com.obj.nc.utils.GreenMailManager;
 import org.assertj.core.api.Assertions;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.test.context.MockIntegrationContext;
@@ -31,13 +25,11 @@ import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.event.Event;
-import com.obj.nc.utils.GreenMailManager;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest({"spring.main.allow-bean-definition-overriding=true"})
 @SpringIntegrationTest(noAutoStartup = {"eventSupplier"})
-public class OskFlowsTest {
+public class OskFlowsTest extends BaseIntegrationTest {
 		
 	@Autowired
 	private MockIntegrationContext mockIntegrationContext;

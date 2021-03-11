@@ -9,8 +9,8 @@ try {
                     try {
                         container('gradle') {
                             sh script: 'gradle test \
-                             -Dspring.profiles.active=test,jenkins_test \
-                             --info --stacktrace',
+                             -Dspring.profiles.active=jenkins_test \
+                              --info --stacktrace',
                              label: 'Compile & Test'
                         }
                     }

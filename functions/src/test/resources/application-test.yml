@@ -1,19 +1,31 @@
+testEnv: local
+
+spring.flyway.enabled: false
+
 spring.mail:
    host: localhost
    port: 3025
-   username: no-reply@objectify.sk
+   username: no-reply@objectify.sk # this has to be different to testmode.smtp.username, for more info see TestmodeIntegrationTests
    password: xxx
 
 spring.datasource:
    platform: postgres
-   url: jdbc:postgresql://localhost:15432/nc
+   url: jdbc:postgresql://localhost:25432/nc
    username: nc
    password: ZMss4o9mdBLV
 
-nc.functions.send-email-message.from: 'no-reply@objectify.sk'
-
-testContainers: local
+nc.functions.send-email-message.from: no-reply@objectify.sk
 
 nc.functions.event-generator:
    soruce-dir: eventsQueue
    file-name: ba_job_post.json
+
+testmode:
+   enabled: false
+   smtp:
+      host: localhost
+      port: 3025
+      username: testmode_no-reply@objectify.sk # this has to be different to spring.mail.username, for more info see TestmodeIntegrationTests
+      password: xxx
+      recipient: testmode_recipient@objectify.sk
+      periodMinutes: 5

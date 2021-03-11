@@ -19,11 +19,9 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-@EnableScheduling
 @Component
 @RequiredArgsConstructor
 @Log4j2
-@Profile({"dev", "test"})
 public class EventGeneratorExecution implements Supplier<Event> {
 
     @Autowired

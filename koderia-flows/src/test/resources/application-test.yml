@@ -1,11 +1,12 @@
+testEnv: local
+
+spring.flyway.enabled: false
+
 spring.mail:
   host: localhost
   port: 3025
   username: no-reply@objectify.sk
   password: xxx
-
-spring.datasource:
-  url: jdbc:postgresql://localhost:35432/nc
 
 koderia.api.uri: https://www.koderia.sk/api/v1
 
@@ -23,5 +24,3 @@ mailchimp:
     event-name: event-template
     link-name: link-template
     news-name: news-template
-
-testContainers: local
