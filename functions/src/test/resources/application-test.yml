@@ -5,7 +5,7 @@ spring.flyway.enabled: false
 spring.mail:
    host: localhost
    port: 3025
-   username: no-reply@objectify.sk
+   username: no-reply@objectify.sk # this has to be different to testmode.smtp.username, for more info see TestmodeIntegrationTests
    password: xxx
 
 spring.datasource:
@@ -25,7 +25,7 @@ testmode:
    smtp:
       host: localhost
       port: 3025
-      username: no-reply@objectify.sk
+      username: testmode_no-reply@objectify.sk # this has to be different to spring.mail.username, for more info see TestmodeIntegrationTests
       password: xxx
       recipient: testmode_recipient@objectify.sk
       periodMinutes: 5

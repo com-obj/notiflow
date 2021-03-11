@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.mail.MessagingException;
@@ -28,13 +29,13 @@ import java.util.UUID;
 class EmailSenderSinkTest extends BaseIntegrationTest {
 
     @Autowired
+    private JavaMailSenderImpl defaultJavaMailSender;
+
+    @Autowired
     private GreenMailManager greenMailManager;
 
     @Autowired
     private EmailSenderSinkProcessingFunction functionSend;
-
-    @Autowired
-    private EmailSenderSinkExecution.EmailSenderSinkProperties emailFromSetting;
 
     @BeforeEach
     void cleanGreenMailMailBoxes() throws FolderException {
@@ -56,7 +57,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         MimeMessage[] messages = gm.getReceivedMessages();
         Assertions.assertThat( messages.length ).isEqualTo(1);
         Assertions.assertThat( messages[0].getSubject() ).isEqualTo("Subject");
-        Assertions.assertThat( messages[0].getFrom()[0] ).extracting("address").isEqualTo(emailFromSetting.getFrom());
+        Assertions.assertThat( messages[0].getFrom()[0] ).extracting("address").isEqualTo(defaultJavaMailSender.getUsername());
 
         //THEN check processing info
 

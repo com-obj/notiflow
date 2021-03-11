@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @ConditionalOnProperty(value = "testmode.enabled", havingValue = "true")
-public class TestModeConfig {
+public class TestModeFlowConfig {
 
     @Autowired
     private TestModeEmailSenderProperties properties;
@@ -42,20 +42,20 @@ public class TestModeConfig {
     @Bean
     public IntegrationFlow testModeSendMessage() {
         return IntegrationFlows.from(greenMailMessageSource,
-                        config -> config.poller(sourcePoller()).id("greenMailSource"))
+                        config -> config.poller(testModeSourcePoller()).id("greenMailSource"))
                 .transform(messageAggregator)
                 .transform(testModeSendEmailProcessingFunction)
                 .handle(logConsumer).get();
     }
 
     @Bean
-    public Trigger sourceTrigger() {
+    public Trigger testModeSourceTrigger() {
         return new PeriodicTrigger(properties.getPeriodMinutes(), TimeUnit.MINUTES);
     }
 
     @Bean
-    public PollerSpec sourcePoller() {
-        return Pollers.trigger(sourceTrigger());
+    public PollerSpec testModeSourcePoller() {
+        return Pollers.trigger(testModeSourceTrigger());
     }
 
 }

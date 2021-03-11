@@ -3,6 +3,7 @@ package com.obj.nc.testmode.functions.sources;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.store.InMemoryStore;
 import com.icegreen.greenmail.store.MailFolder;
+import com.icegreen.greenmail.store.StoredMessage;
 import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -41,36 +42,10 @@ public class GreenMailReceiverExecution implements Supplier<Messages> {
 
             for (MailFolder folder : mailboxes) {
                 List<Message> folderMessages = folder.getNonDeletedMessages().stream().map(
-                        message -> {
-                            MimeMessage mimeMessage = message.getMimeMessage();
-                            Message result = new Message();
-                            try {
-                                MessageContent content = result.getBody().getMessage().getContent();
-                                content.setSubject(mimeMessage.getSubject());
-
-                                MimeMessageParser parser = new MimeMessageParser(mimeMessage).parse();
-                                String originalRecipients = parser.getTo().stream().map(Address::toString).collect(Collectors.joining(","));
-                                String mimeMessageContent = parser.hasHtmlContent() ? parser.getHtmlContent() : parser.getPlainContent();
-                                content.setText(originalRecipients + "\n" + mimeMessageContent);
-
-                                List<MessageContent> aggregateContent = new ArrayList<>();
-                                aggregateContent.add(content);
-                                result.getBody().getMessage().setAggregateContent(aggregateContent);
-
-                                EmailEndpoint emailEndpoint = new EmailEndpoint();
-                                emailEndpoint.setEmail(properties.getRecipient());
-                                result.getBody().setRecievingEndpoints(Collections.singletonList(emailEndpoint));
-
-                                DeliveryOptions deliveryOptions = new DeliveryOptions();
-                                deliveryOptions.setAggregationType(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
-                                result.getBody().setDeliveryOptions(deliveryOptions);
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-
-                            message.setFlag(Flags.Flag.DELETED, true);
-
-                            return result;
+                        greenMailMessage -> {
+                            Message message = convertGreenMailMessageToMessage(greenMailMessage);
+                            greenMailMessage.setFlag(Flags.Flag.DELETED, true);
+                            return message;
                         }
                 ).collect(Collectors.toList());
 
@@ -85,6 +60,37 @@ public class GreenMailReceiverExecution implements Supplier<Messages> {
         Messages allMessagesWrapped = new Messages();
         allMessagesWrapped.setMessages(allMessages);
         return allMessagesWrapped;
+    }
+
+    private Message convertGreenMailMessageToMessage(StoredMessage message) {
+        Message result = new Message();
+
+        try {
+            MimeMessage mimeMessage = message.getMimeMessage();
+            MessageContent content = result.getBody().getMessage().getContent();
+            content.setSubject(mimeMessage.getSubject());
+
+            MimeMessageParser parser = new MimeMessageParser(mimeMessage).parse();
+            String originalRecipients = parser.getTo().stream().map(Address::toString).collect(Collectors.joining(","));
+            String mimeMessageContent = parser.hasHtmlContent() ? parser.getHtmlContent() : parser.getPlainContent();
+            content.setText(originalRecipients + "\n" + mimeMessageContent);
+
+            List<MessageContent> aggregateContent = new ArrayList<>();
+            aggregateContent.add(content);
+            result.getBody().getMessage().setAggregateContent(aggregateContent);
+
+            EmailEndpoint emailEndpoint = new EmailEndpoint();
+            emailEndpoint.setEmail(properties.getRecipient());
+            result.getBody().setRecievingEndpoints(Collections.singletonList(emailEndpoint));
+
+            DeliveryOptions deliveryOptions = new DeliveryOptions();
+            deliveryOptions.setAggregationType(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
+            result.getBody().setDeliveryOptions(deliveryOptions);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return result;
     }
 
 }

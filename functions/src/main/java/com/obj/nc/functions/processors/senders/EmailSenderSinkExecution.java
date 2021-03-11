@@ -15,6 +15,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
@@ -30,9 +31,7 @@ import java.util.function.Function;
 @AllArgsConstructor
 public class EmailSenderSinkExecution implements Function<Message, Message> {
 
-	private final JavaMailSender javaMailSender;
-
-	private final EmailSenderSinkProperties properties;
+	private final JavaMailSenderImpl javaMailSender;
 
 	@DocumentProcessingInfo("SendEmail")
 	@Override
@@ -62,7 +61,7 @@ public class EmailSenderSinkExecution implements Function<Message, Message> {
 			MimeMessage message = javaMailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-			helper.setFrom(properties.getFrom());
+			helper.setFrom(javaMailSender.getUsername());
 
 			helper.setTo(toEmail.getEmail());
 
@@ -78,15 +77,6 @@ public class EmailSenderSinkExecution implements Function<Message, Message> {
 		} catch (MessagingException e) {
 			throw new ProcessingException(EmailSenderSinkProcessingFunction.class, e);
 		}
-	}
-
-	@ConfigurationProperties(prefix = "nc.functions.send-email-message")
-	@Data
-	@Component
-	public static class EmailSenderSinkProperties {
-
-		String from;
-
 	}
 
 }

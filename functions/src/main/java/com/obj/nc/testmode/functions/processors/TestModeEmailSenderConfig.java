@@ -21,7 +21,7 @@ public class TestModeEmailSenderConfig {
 
     @Primary
     @Bean
-    public JavaMailSender defaultMailSender(Environment environment) {
+    public JavaMailSenderImpl defaultMailSender(Environment environment) {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(environment.getProperty("spring.mail.host"));
         mailSender.setPort(Integer.parseInt(Objects.requireNonNull(environment.getProperty("spring.mail.port"))));
@@ -37,7 +37,7 @@ public class TestModeEmailSenderConfig {
     }
 
     @Bean
-    public JavaMailSender testModeJavaMailSender(
+    public JavaMailSenderImpl testModeJavaMailSender(
             TestModeEmailSenderProperties properties
     ) {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -57,10 +57,9 @@ public class TestModeEmailSenderConfig {
 
     @Bean
     public EmailSenderSinkExecution testModeSendEmailExecution(
-            @Qualifier("testModeJavaMailSender") JavaMailSender javaMailSender,
-            EmailSenderSinkExecution.EmailSenderSinkProperties properties
+            @Qualifier("testModeJavaMailSender") JavaMailSenderImpl javaMailSender
     ) {
-        return new EmailSenderSinkExecution(javaMailSender, properties);
+        return new EmailSenderSinkExecution(javaMailSender);
     }
 
     @Bean

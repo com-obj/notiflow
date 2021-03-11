@@ -20,6 +20,7 @@ public class GreenMailManager {
 	static {
 		GREEN_MAIL = new GreenMail(ServerSetupTest.SMTP_IMAP);
 		GREEN_MAIL.setUser("no-reply@objectify.sk", "xxx");
+		GREEN_MAIL.setUser("testmode_no-reply@objectify.sk", "xxx");
 		GREEN_MAIL.start();
 	}
 
