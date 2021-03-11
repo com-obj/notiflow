@@ -1,5 +1,6 @@
 package com.obj.nc.testmode.functions.sources;
 
+import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.sources.SourceMicroService;
 import lombok.extern.log4j.Log4j2;
@@ -14,13 +15,13 @@ import java.util.function.Supplier;
 
 @Log4j2
 @Configuration
-public class GreenMailReceiverMicroService extends SourceMicroService<List<Message>, GreenMailReceiverSourceSupplier> {
+public class GreenMailReceiverMicroService extends SourceMicroService<Messages, GreenMailReceiverSourceSupplier> {
 
     @Autowired
     private GreenMailReceiverSourceSupplier supplier;
 
     @Bean
-    public Supplier<Flux<List<Message>>> receiveGreenMailMessages() {
+    public Supplier<Flux<Messages>> receiveGreenMailMessages() {
         return super.executeSourceService();
     }
 

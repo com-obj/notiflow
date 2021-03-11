@@ -2,6 +2,7 @@ package com.obj.nc.testmode.functions.sources;
 
 import com.icegreen.greenmail.store.FolderException;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -57,9 +58,11 @@ class GreenMailReceiverSourceSupplierTest {
         Assertions.assertThat( mimeMessages.length ).isEqualTo(3);
 
         // WHEN
-        List<Message> messages = greenMailReceiverSourceSupplier.get();
+        Messages messagesWrapped = greenMailReceiverSourceSupplier.get();
 
         // THEN
+        List<Message> messages = messagesWrapped.getMessages();
+
         Assertions.assertThat(messages.get(0).getBody().getMessage().getAggregateContent().get(0).getSubject()).contains(
                 message1.getBody().getMessage().getAggregateContent().get(0).getSubject());
         Assertions.assertThat(messages.get(0).getBody().getMessage().getAggregateContent().get(0).getText()).contains(

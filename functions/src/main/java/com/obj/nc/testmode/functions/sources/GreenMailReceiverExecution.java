@@ -3,6 +3,7 @@ package com.obj.nc.testmode.functions.sources;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.store.InMemoryStore;
 import com.icegreen.greenmail.store.MailFolder;
+import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Log4j2
 @Component
-public class GreenMailReceiverExecution implements Supplier<List<Message>> {
+public class GreenMailReceiverExecution implements Supplier<Messages> {
 
     @Autowired
     private GreenMailManager greenMailManager;
@@ -31,7 +32,7 @@ public class GreenMailReceiverExecution implements Supplier<List<Message>> {
     private TestModeEmailSenderProperties properties;
 
     @Override
-    public List<Message> get() {
+    public Messages get() {
         List<Message> allMessages = new ArrayList<>();
 
         try {
@@ -81,7 +82,9 @@ public class GreenMailReceiverExecution implements Supplier<List<Message>> {
             throw new RuntimeException(e);
         }
 
-        return allMessages;
+        Messages allMessagesWrapped = new Messages();
+        allMessagesWrapped.setMessages(allMessages);
+        return allMessagesWrapped;
     }
 
 }

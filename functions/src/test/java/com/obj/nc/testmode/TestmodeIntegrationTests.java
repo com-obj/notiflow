@@ -3,6 +3,7 @@ package com.obj.nc.testmode;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
 import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
@@ -56,10 +57,11 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         emailSenderSinkProcessingFunction.apply(message3);
 
         greenMailManager.getGreenMail().waitForIncomingEmail(3);
-        List<Message> messages = greenMailReceiverSourceSupplier.get();
+        Messages messagesWrapped = greenMailReceiverSourceSupplier.get();
+        List<Message> messages = messagesWrapped.getMessages();
 
         // WHEN
-        MessageSource<List<Message>> messageSource = () -> new GenericMessage<>(messages);
+        MessageSource<Messages> messageSource = () -> new GenericMessage<>(messagesWrapped);
         mockIntegrationContext.substituteMessageSourceFor("greenMailSource", messageSource);
 
         // THEN

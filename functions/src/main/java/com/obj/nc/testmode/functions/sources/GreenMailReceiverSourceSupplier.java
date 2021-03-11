@@ -1,5 +1,6 @@
 package com.obj.nc.testmode.functions.sources;
 
+import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.PreCondition;
 import com.obj.nc.functions.sources.SourceSupplier;
@@ -13,7 +14,7 @@ import java.util.function.Supplier;
 
 @Component
 @AllArgsConstructor
-public class GreenMailReceiverSourceSupplier extends SourceSupplier<List<Message>> {
+public class GreenMailReceiverSourceSupplier extends SourceSupplier<Messages> {
 
 	@Autowired
 	private GreenMailReceiverExecution execution;
@@ -22,12 +23,12 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplier<List<Message
 	private GreenMailReceiverPreCondition preCondition;
 
 	@Override
-	public PreCondition<List<Message>> preCondition() {
+	public PreCondition<Messages> preCondition() {
 		return preCondition;
 	}
 
 	@Override
-	public Supplier<List<Message>> execution() {
+	public Supplier<Messages> execution() {
 		return execution;
 	}
 

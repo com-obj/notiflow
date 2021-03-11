@@ -1,5 +1,6 @@
 package com.obj.nc.testmode.functions.sources;
 
+import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
@@ -12,11 +13,11 @@ import java.util.Optional;
 
 @Log4j2
 @Component
-public class GreenMailReceiverPreCondition implements PreCondition<List<Message>> {
+public class GreenMailReceiverPreCondition implements PreCondition<Messages> {
 
     @Override
-    public Optional<PayloadValidationException> apply(List<Message> messages) {
-        if (messages.isEmpty()) {
+    public Optional<PayloadValidationException> apply(Messages messages) {
+        if (messages.getMessages().isEmpty()) {
             return Optional.of(new PayloadValidationException("There are no messages to supply"));
         }
 
