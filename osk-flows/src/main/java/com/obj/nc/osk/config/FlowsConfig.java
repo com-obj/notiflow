@@ -1,30 +1,32 @@
-package com.obj.nc.config;
+package com.obj.nc.osk.config;
+
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.PollerSpec;
-import org.springframework.integration.dsl.Pollers;
-import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.support.PeriodicTrigger;
+import org.springframework.integration.http.HttpHeaders;
+import org.springframework.integration.http.dsl.Http;
 
+import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.koderia.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
 import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
-import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.ProcessingInfoPersisterForEventWithRecipientsMicroService;
 import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.ProcessingInfoPersisterForEventWithRecipientsSinkConsumer;
-import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
+import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction;
+import com.obj.nc.osk.sia.dto.IncidentTicketNotificationEventDto;
 
 @Configuration
-public class OskFlowsConfig {
-
+public class FlowsConfig {
+	
 	@Autowired
-	private EventGeneratorSourceSupplier eventSupplier;
+	private NotificationEventConverterProcessingFunction  siaNotifEventConverter;
 
 	@Autowired
 	private ValidateAndGenerateEventIdProcessingFunction generateEventId;
@@ -48,10 +50,24 @@ public class OskFlowsConfig {
 	private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoWithRecipientsPersister;
 
 	@Bean
-	public IntegrationFlow sendMessageFlow() {
-		return IntegrationFlows.from(
-					eventSupplier, 
-					configurer -> configurer.poller(sourcePoller()).id("eventSupplier"))
+	public IntegrationFlow sendNotificationsOnSIAEventFlow() {
+		return IntegrationFlows
+				.from(
+						Http
+						.inboundGateway(SIAInboundGatewayConfig.NOTIFICATION_EVENT_REST_ENDPOINT_URL)
+						.requestMapping(m -> m.methods(HttpMethod.POST))
+						.requestPayloadType(IncidentTicketNotificationEventDto.class)
+				)
+				.publishSubscribeChannel(
+					publishSubscribeSpec -> publishSubscribeSpec
+					.id(SIAInboundGatewayConfig.NOTIFICATION_EVENT_INPUT_CHANNEL_NAME)
+					.subscribe(
+						flow -> flow
+						.transform((payload) -> "OK")
+						.enrichHeaders(Collections.singletonMap(HttpHeaders.STATUS_CODE, HttpStatus.ACCEPTED))
+						)
+					)
+				.transform(siaNotifEventConverter)
 				.transform(generateEventId)
 				 	.wireTap(flow -> flow.handle(processingInfoPersister))
 				.transform(resolveRecipients)
@@ -64,13 +80,4 @@ public class OskFlowsConfig {
 				.handle(logConsumer).get();
 	}
 
-	@Bean
-	public Trigger sourceTrigger() {
-		return new PeriodicTrigger(1000);
-	}
-
-	@Bean
-	public PollerSpec sourcePoller() {
-		return Pollers.trigger(sourceTrigger());
-	}
 }

@@ -21,7 +21,7 @@ public class ProcessingInfoGenerator {
 	@Around("@annotation(DocumentProcessingInfo)")
 	public Object updateProcessingInfoOnPayload(ProceedingJoinPoint joinPoint) throws Throwable {
 		if (joinPoint.getArgs().length != 1 || !(joinPoint.getArgs()[0] instanceof BasePayload)) {
-			throw new ProcessingException("@DocumentProcessingInfo can be used onlu on methods with single parameter which is of type BasePayload or its subtypes. Called on " + joinPoint.getSignature());
+			throw new ProcessingException("@DocumentProcessingInfo can be used only on methods with single parameter which is of type BasePayload or its subtypes. Called on " + joinPoint.getSignature());
 		}
 		
 		MethodSignature signature = (MethodSignature) joinPoint.getSignature();

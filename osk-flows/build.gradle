@@ -28,6 +28,7 @@ dependencies {
     implementation project(':functions')
 
     implementation 'org.springframework.boot:spring-boot-starter-integration'
+    implementation "org.springframework.integration:spring-integration-http"
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -38,6 +39,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     testImplementation 'org.springframework.integration:spring-integration-test'
+
 
     testImplementation 'org.json:json:20201115'
 

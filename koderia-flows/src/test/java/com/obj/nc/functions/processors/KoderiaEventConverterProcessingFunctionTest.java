@@ -38,7 +38,7 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(mappedEvent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/job_post_event_schema.json"));
 
         // and
-        MatcherAssert.assertThat(mappedEvent.getHeader().getConfigurationName(), Matchers.equalTo("static-routing-pipeline"));
+        MatcherAssert.assertThat(mappedEvent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
         MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(emitJobPostEventDto.getSubject()));
         MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getText(), Matchers.equalTo(emitJobPostEventDto.getText()));
 
@@ -98,7 +98,7 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(mappedEvent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/blog_event_schema.json"));
 
         // and
-        MatcherAssert.assertThat(mappedEvent.getHeader().getConfigurationName(), Matchers.equalTo("static-routing-pipeline"));
+        MatcherAssert.assertThat(mappedEvent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
         MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(emitJobPostEventDto.getSubject()));
         MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getText(), Matchers.equalTo(emitJobPostEventDto.getText()));
 
@@ -132,7 +132,7 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(mappedEvent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/event_event_schema.json"));
 
         // and
-        MatcherAssert.assertThat(mappedEvent.getHeader().getConfigurationName(), Matchers.equalTo("static-routing-pipeline"));
+        MatcherAssert.assertThat(mappedEvent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
         MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(emitJobPostEventDto.getSubject()));
         MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getText(), Matchers.equalTo(emitJobPostEventDto.getText()));
 
@@ -167,7 +167,7 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(mappedEvent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/link_event_schema.json"));
 
         // and
-        MatcherAssert.assertThat(mappedEvent.getHeader().getConfigurationName(), Matchers.equalTo("static-routing-pipeline"));
+        MatcherAssert.assertThat(mappedEvent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
         MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(emitJobPostEventDto.getSubject()));
         MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getText(), Matchers.equalTo(emitJobPostEventDto.getText()));
 
@@ -193,7 +193,7 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(mappedEvent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/news_event_schema.json"));
 
         // and
-        MatcherAssert.assertThat(mappedEvent.getHeader().getConfigurationName(), Matchers.equalTo("static-routing-pipeline"));
+        MatcherAssert.assertThat(mappedEvent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
         MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(emitJobPostEventDto.getSubject()));
         MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getText(), Matchers.equalTo(emitJobPostEventDto.getText()));
     }

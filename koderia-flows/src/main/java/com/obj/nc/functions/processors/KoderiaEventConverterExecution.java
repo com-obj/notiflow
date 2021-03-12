@@ -17,7 +17,7 @@ public class KoderiaEventConverterExecution implements Function<EmitEventDto, Ev
 	@Override
 	public Event apply(EmitEventDto emitEventDto) {
 		Event event = new Event();
-		event.getHeader().setConfigurationName("static-routing-pipeline");
+		event.getHeader().setFlowId("static-routing-pipeline");
 
 		event.getBody().getMessage().getContent().setSubject(emitEventDto.getSubject());
 		event.getBody().getMessage().getContent().setText(emitEventDto.getText());

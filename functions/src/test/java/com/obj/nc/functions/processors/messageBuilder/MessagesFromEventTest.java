@@ -56,7 +56,7 @@ class MessagesFromEventTest {
 		assertThat(processingInfo.getTimeStampStart()).isBeforeOrEqualTo(processingInfo.getTimeStampFinish());
 		
 		Header header = message.getHeader();
-		assertThat(header.getConfigurationName()).isEqualTo(event.getHeader().getConfigurationName());
+		assertThat(header.getFlowId()).isEqualTo(event.getHeader().getFlowId());
 		assertThat(header.getAttributes())
 			.contains(
 					entry("custom-proerty1", Arrays.asList("xx","yy")), 

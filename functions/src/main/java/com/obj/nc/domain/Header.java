@@ -23,8 +23,8 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class Header extends BaseJSONObject {
 	
-	@JsonProperty("configuration-name")
-	private String configurationName;
+	@JsonProperty("flow-id")
+	private String flowId;
 		
 	@NotNull
 	@Include
@@ -48,7 +48,7 @@ public class Header extends BaseJSONObject {
 		merged.setAttributes(this.getAttributes());
 		other.getAttributes().forEach((key, value) -> merged.getAttributes().putIfAbsent(key, value));
 
-		merged.configurationName = configurationName;
+		merged.flowId = flowId;
 		merged.generateAndSetID();
 
 		merged.eventIds = eventIds;
