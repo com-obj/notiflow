@@ -27,14 +27,6 @@ public class BaseJSONObject {
 		return UUID.randomUUID();
 	}
 
-	public static Event fromJSON(JSONObject jo) {
-		return fromJSON(jo.toString());
-	}
-
-	public static Event fromJSON(String jsonString) {
-		return JsonUtils.readObjectFromJSONString(jsonString, Event.class);
-	}
-
 	public String toJSONString() {
 		return JsonUtils.writeObjectToJSONString(this);
 	}

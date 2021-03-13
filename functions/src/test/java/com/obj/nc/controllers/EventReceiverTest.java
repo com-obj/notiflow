@@ -3,6 +3,9 @@ package com.obj.nc.controllers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
+
+import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,8 +18,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import com.jayway.jsonpath.JsonPath;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
 import com.obj.nc.utils.JsonUtils;
 
@@ -25,11 +31,8 @@ import com.obj.nc.utils.JsonUtils;
 class EventReceiverTest extends BaseIntegrationTest {
 
     @Autowired
-    private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
- 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-    
+    private GenericEventPersisterConsumer genericEventPersister;
+
     @Autowired
     protected MockMvc mockMvc;
 
@@ -43,6 +46,7 @@ class EventReceiverTest extends BaseIntegrationTest {
         String INPUT_JSON_FILE = "events/generic_event.json";
         String eventJson = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
         
+        //when
         ResultActions resp = mockMvc
         		.perform(MockMvcRequestBuilders.post("/events")
         		.contentType(APPLICATION_JSON_UTF8)
@@ -50,10 +54,15 @@ class EventReceiverTest extends BaseIntegrationTest {
                 .accept(APPLICATION_JSON_UTF8))
                 .andDo(MockMvcResultHandlers.print());
         
+        //then
         resp
         	.andExpect(status().is2xxSuccessful())
 			.andExpect(jsonPath("$.ncEventId").value(CoreMatchers.notNullValue()));
         
+        String eventId = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.ncEventId");
+        GenericEvent genericEvent = genericEventPersister.findByPayloadId(UUID.fromString(eventId));
+        
+        Assertions.assertThat(genericEvent).isNotNull();
     }
 
  

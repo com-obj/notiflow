@@ -1,32 +1,24 @@
 package com.obj.nc.controllers;
 
-import java.nio.charset.Charset;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.EventRecieverResponce;
-import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.eventFactory.EventFactoryProcessingFunction;
-import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
+import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.extern.log4j.Log4j2;
@@ -38,10 +30,7 @@ import lombok.extern.log4j.Log4j2;
 public class EventReceiverRestController {
 	
 	@Autowired
-	private EventFactoryProcessingFunction eventFactory;
-	
-	@Autowired
-	private ProcessingInfoPersisterSinkConsumer persister;
+	private GenericEventPersisterConsumer persister;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
     public EventRecieverResponce emitJobPostEvent(
@@ -53,11 +42,11 @@ public class EventReceiverRestController {
     	
     	GenericEvent event = GenericEvent.from(json);
     	event.setFlowIdIfNotPresent(flowId);
-
-    	Event ncEvent = eventFactory.apply(event);
-    	persister.accept(ncEvent);
+    	event.setExternalIdIfNotPresent(externalId);
     	
-    	return EventRecieverResponce.from(ncEvent.getHeader().getId());
+    	persister.accept(event);
+
+    	return EventRecieverResponce.from(event.getPayloadId());
     }
 
 	private JsonNode checkIfJsonValidAndReturn(String eventJson) {
@@ -68,8 +57,6 @@ public class EventReceiverRestController {
     	
     	return JsonUtils.readObjectFromJSONString(eventJson);
 	}
-
-
 
     @ExceptionHandler({PayloadValidationException.class})
     ResponseEntity<String> handleMethodArgumentNotValidException(PayloadValidationException e) {
