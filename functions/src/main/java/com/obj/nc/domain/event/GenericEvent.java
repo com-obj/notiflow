@@ -1,33 +1,52 @@
 package com.obj.nc.domain.event;
 
+import java.time.Instant;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Table;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.utils.JsonUtils;
+
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = "payloadId")
-public class GenericEvent {
+@EqualsAndHashCode(of = "id")
+@AllArgsConstructor
+@NoArgsConstructor
+@Table("nc_input")
+public class GenericEvent implements Persistable<UUID> {
 	
-	private JsonNode state;
+	@Id
+	private UUID id;
+	
+	private JsonNode payloadJson;
 	
 	private String flowId;
 	private String externalId;
 	
-	private UUID payloadId;
+	@CreatedDate
+	private Instant timeCreated;
+	//processing started, only if timeConsumed = null processing will be started
+	private Instant timeConsumed;
 	
 	public static GenericEvent from(JsonNode state) {
 		GenericEvent event = new GenericEvent();
-		event.setState(state);
+		event.setPayloadJson(state);
 		event.flowId = state.get("flowId")!=null?state.get("flowId").textValue():null;
 		event.externalId = state.get("externalId")!=null?state.get("externalId").textValue():null;
-		event.payloadId = UUID.randomUUID();
+		event.id = UUID.randomUUID();
 		return event;
 	}
 
@@ -45,5 +64,11 @@ public class GenericEvent {
     		this.externalId = externalId;
     	} 
 	}
+
+	@Override
+	public boolean isNew() {
+		return timeCreated == null;
+	}
+
 	
 }

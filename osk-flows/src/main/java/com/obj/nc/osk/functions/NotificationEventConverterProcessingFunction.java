@@ -18,9 +18,9 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.MessageContent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import com.obj.nc.osk.sia.dto.IncidentTicketNotificationContactDto;
-import com.obj.nc.osk.sia.dto.IncidentTicketNotificationEventDto;
-import com.obj.nc.osk.sia.dto.IncidentTicketServiceOutageForCustomerDto;
+import com.obj.nc.osk.dto.IncidentTicketNotificationContactDto;
+import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
+import com.obj.nc.osk.dto.IncidentTicketServiceOutageForCustomerDto;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
@@ -35,7 +35,7 @@ public class NotificationEventConverterProcessingFunction extends ProcessorFunct
 			return Optional.of(new PayloadValidationException("GenericEvent must not be null"));
 		}
 		
-		if (payload.getState()==null) {
+		if (payload.getPayloadJson()==null) {
 			return Optional.of(new PayloadValidationException("GenericEvent doesn't contain original message"));
 		}
 
@@ -47,7 +47,7 @@ public class NotificationEventConverterProcessingFunction extends ProcessorFunct
 	protected List<Event> execute(GenericEvent payload) {
 		List<Event> events = new ArrayList<>();
 		
-		IncidentTicketNotificationEventDto siaNotification = JsonUtils.readObjectFromJSON(payload.getState(), IncidentTicketNotificationEventDto.class);
+		IncidentTicketNotificationEventDto siaNotification = JsonUtils.readObjectFromJSON(payload.getPayloadJson(), IncidentTicketNotificationEventDto.class);
 		
 		List<Event> customerEvents = createCustomersEvents(siaNotification);
 		

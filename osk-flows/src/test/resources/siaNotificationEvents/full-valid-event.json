@@ -2,7 +2,7 @@
    "id":111,
    "name":"Outage MME",
    "description":"MME is down, bad things will happen",
-   "outageStart": 2021-01-01T20:00:00.000Z,
+   "outageStart": "2021-01-01T20:00:00.000Z",
    "outageEnd": null,
    "messages": [
    		{

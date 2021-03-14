@@ -46,7 +46,7 @@ public class EventReceiverRestController {
     	
     	persister.accept(event);
 
-    	return EventRecieverResponce.from(event.getPayloadId());
+    	return EventRecieverResponce.from(event.getId());
     }
 
 	private JsonNode checkIfJsonValidAndReturn(String eventJson) {

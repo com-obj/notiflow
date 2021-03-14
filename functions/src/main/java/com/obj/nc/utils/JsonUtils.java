@@ -113,6 +113,13 @@ public class JsonUtils {
 		}
 		
 	}
+	
+	public static JsonNode writeObjectToJSONNode(Object pojo) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		JsonNode jsonNode = objectMapper.valueToTree(pojo);
+
+		return jsonNode;
+	}
 
 	public static String writeObjectToJSONStringPretty(Object pojo) {
 

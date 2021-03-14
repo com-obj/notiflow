@@ -3,15 +3,12 @@ package com.obj.nc.controllers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.UUID;
-
 import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -23,15 +20,18 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
-import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
+import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
 class EventReceiverTest extends BaseIntegrationTest {
 
+//    @Autowired
+//    private GenericEventPersisterConsumer genericEventPersister;
+    
     @Autowired
-    private GenericEventPersisterConsumer genericEventPersister;
+    private GenericEventRepository genericEventRepository;
 
     @Autowired
     protected MockMvc mockMvc;
@@ -60,7 +60,7 @@ class EventReceiverTest extends BaseIntegrationTest {
 			.andExpect(jsonPath("$.ncEventId").value(CoreMatchers.notNullValue()));
         
         String eventId = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.ncEventId");
-        GenericEvent genericEvent = genericEventPersister.findByPayloadId(UUID.fromString(eventId));
+        GenericEvent genericEvent = genericEventRepository.findById(eventId).get();
         
         Assertions.assertThat(genericEvent).isNotNull();
     }

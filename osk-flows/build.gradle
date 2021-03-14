@@ -28,7 +28,8 @@ dependencies {
     implementation project(':functions')
 
     implementation 'org.springframework.boot:spring-boot-starter-integration'
-    implementation "org.springframework.integration:spring-integration-http"
+  //  implementation "org.springframework.integration:spring-integration-http"
+    implementation "org.springframework.integration:spring-integration-jdbc"
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
