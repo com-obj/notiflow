@@ -9,7 +9,7 @@ public class IncidentTicketNotificationEventDto {
 	String description;
 	Date outageStart;
 	Date outageEnd;
-	List<IncidentTicketNotificationMessageDto> messages;
+	List<IncidentTicketServiceOutageForCustomerDto> messages;
 
 	public Date getOutageStart() {
 		return outageStart;
@@ -35,11 +35,11 @@ public class IncidentTicketNotificationEventDto {
 		this.id = id;
 	}
 
-	public List<IncidentTicketNotificationMessageDto> getMessages() {
+	public List<IncidentTicketServiceOutageForCustomerDto> getMessages() {
 		return messages;
 	}
 
-	public void setMessages(List<IncidentTicketNotificationMessageDto> messages) {
+	public void setMessages(List<IncidentTicketServiceOutageForCustomerDto> messages) {
 		this.messages = messages;
 	}
 

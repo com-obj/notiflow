@@ -36,8 +36,6 @@ public abstract class BasePayload extends BaseJSONObject {
 		this.processingInfo.stepFinish(this);
 	}
 
-
-
 	public abstract String getPayloadTypeName();
 
 }

@@ -7,7 +7,7 @@ import java.util.List;
  * @author ja
  *
  */
-public class IncidentTicketNotificationMessageDto {
+public class IncidentTicketServiceOutageForCustomerDto {
 	public enum CustomerSegment {
 		SME, LA
 	}

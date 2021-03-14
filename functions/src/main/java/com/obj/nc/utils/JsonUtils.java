@@ -69,6 +69,18 @@ public class JsonUtils {
 		}
 		
 	}
+	
+	public static <T> T readObjectFromJSON(JsonNode json, Class<T> beanType) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+
+			T pojo = objectMapper.treeToValue(json, beanType);
+			return pojo;
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+		
+	}
 
 	public static <T> T readClassFromObject(Object object, Class<T> clazz) {
 			ObjectMapper objectMapper = new ObjectMapper();
