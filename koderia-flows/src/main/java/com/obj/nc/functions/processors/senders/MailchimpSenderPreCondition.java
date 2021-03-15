@@ -45,7 +45,7 @@ public class MailchimpSenderPreCondition implements PreCondition<Message> {
 			return Optional.of(new PayloadValidationException(String.format("Message must contain attribute: %s", ORIGINAL_EVENT_FIELD)));
 		}
 
-		if (!messageContent.containsNestedAttributes(ORIGINAL_EVENT_FIELD, Collections.singletonList("type"))) {
+		if (!messageContent.containsNestedAttributes(Collections.singletonList("type"), ORIGINAL_EVENT_FIELD)) {
 			return Optional.of(new PayloadValidationException(String.format("Message must contain attribute: %s.type", ORIGINAL_EVENT_FIELD)));
 		}
 

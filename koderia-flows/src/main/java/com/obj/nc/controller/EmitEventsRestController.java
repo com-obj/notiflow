@@ -14,36 +14,16 @@ import javax.validation.Valid;
 
 @Validated
 @RestController
-@RequestMapping("/events/emit")
+@RequestMapping("/events")
 @Log4j2
 public class EmitEventsRestController {
 
     @Autowired
     private KoderiaRestMicroService koderiaRestMicroService;
 
-    @PostMapping(path = "/jobPost")
-    public void emitJobPostEvent(@Valid @RequestBody EmitJobPostEventDto emitJobPostEventDto) {
+    @PostMapping(path = "/emit")
+    public void emitEvent(@Valid @RequestBody EmitEventDto emitJobPostEventDto) {
         koderiaRestMicroService.onNext(emitJobPostEventDto);
-    }
-
-    @PostMapping(path = "/blog")
-    public void emitBlogEvent(@Valid @RequestBody EmitBlogEventDto emitBlogEventDto) {
-        koderiaRestMicroService.onNext(emitBlogEventDto);
-    }
-
-    @PostMapping(path = "/event")
-    public void emitEventEvent(@Valid @RequestBody EmitEventEventDto emitEventEventDto) {
-        koderiaRestMicroService.onNext(emitEventEventDto);
-    }
-
-    @PostMapping(path = "/link")
-    public void emitLinkEvent(@Valid @RequestBody EmitLinkEventDto emitLinkEventDto) {
-        koderiaRestMicroService.onNext(emitLinkEventDto);
-    }
-
-    @PostMapping(path = "/news")
-    public void emitNewsEvent(@Valid @RequestBody EmitNewsEventDto emitNewsEventDto) {
-        koderiaRestMicroService.onNext(emitNewsEventDto);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

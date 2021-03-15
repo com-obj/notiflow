@@ -1,3 +1,4 @@
 {
-  "type" : "EVENT"
+  "type" : "EVENT",
+  "data" : {}
 }

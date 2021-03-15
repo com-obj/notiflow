@@ -96,14 +96,12 @@ class KoderiaRecipientsProcessingFunctionTest {
     void testInconvertibleEvent() {
         // GIVEN
         Event inputEvent = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + "job_event.json", Event.class);
-        Map<String, Object> map = new HashMap<>();
-        map.put("bad_field", "bad_value");
-        inputEvent.getBody().getAttributes().put(ORIGINAL_EVENT_FIELD, map);
+        ((Map<String, Object>) inputEvent.getBody().getAttributes().get("originalEvent")).put("type", "INVALID");
 
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> getKoderiaRecipients.apply(inputEvent))
                 .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("missing type id property 'type'");
+                .hasMessageContaining("Cannot deserialize value of");
     }
 
 }

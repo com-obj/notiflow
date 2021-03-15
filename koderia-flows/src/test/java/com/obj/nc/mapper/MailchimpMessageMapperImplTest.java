@@ -4,6 +4,7 @@ import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.dto.mailchimp.SendMessageWithTemplateDto;
 import com.obj.nc.utils.JsonUtils;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class MailchimpMessageMapperImplTest {
         SendMessageWithTemplateDto sendMessageDto = mapper.mapWithTemplate(inputMessage);
 
         // THEN
-        MatcherAssert.assertThat(sendMessageDto, Matchers.equalToObject(expectedSendMessageDto));
+        MatcherAssert.assertThat(sendMessageDto, Matchers.equalTo(expectedSendMessageDto));
     }
 
 }

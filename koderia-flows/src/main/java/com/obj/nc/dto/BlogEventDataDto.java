@@ -1,5 +1,6 @@
 package com.obj.nc.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,10 +11,16 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class EmitBlogEventDto extends EmitEventDto {
+public class BlogEventDataDto extends EventDataDto {
 
     @NotBlank
     private String id;
+
+    @NotBlank
+    private String title;
+
+    @NotBlank
+    private String content;
 
     @NotBlank
     private String link;
@@ -26,5 +33,15 @@ public class EmitBlogEventDto extends EmitEventDto {
 
     @NotNull
     private BlogAuthorDto author;
+
+    @Override
+    public String getMessageSubject() {
+        return title;
+    }
+
+    @Override
+    public String getMessageText() {
+        return content;
+    }
 
 }

@@ -5,36 +5,43 @@
       "type": {
          "type": "string"
       },
-      "attributes": {
-         "type": "object"
-      },
       "header": {
          "type": "object",
          "properties": {
-            "attributes": {
-               "type": "object"
-            },
-            "id": {
-               "type": "null"
-            },
-            "eventIds": {
-               "type": "array",
-               "items": {}
-            },
             "configuration-name": {
                "type": "string"
             }
          },
          "required": [
-            "attributes",
-            "id",
-            "eventIds",
             "configuration-name"
          ]
       },
       "body": {
          "type": "object",
          "properties": {
+            "message": {
+               "type": "object",
+               "properties": {
+                  "content": {
+                     "type": "object",
+                     "properties": {
+                        "subject": {
+                           "type": "string"
+                        },
+                        "text": {
+                           "type": "string"
+                        }
+                     },
+                     "required": [
+                        "subject",
+                        "text"
+                     ]
+                  }
+               },
+               "required": [
+                  "content"
+               ]
+            },
             "attributes": {
                "type": "object",
                "properties": {
@@ -44,140 +51,81 @@
                         "type": {
                            "type": "string"
                         },
-                        "subject": {
-                           "type": "string"
-                        },
-                        "text": {
-                           "type": "string"
-                        },
-                        "id": {
-                           "type": "string"
-                        },
-                        "siteName": {
-                           "type": "string"
-                        },
-                        "images": {
-                           "type": "array",
-                           "items": [
-                              {
+                        "data": {
+                           "type": "object",
+                           "properties": {
+                              "id": {
                                  "type": "string"
+                              },
+                              "title": {
+                                 "type": "string"
+                              },
+                              "description": {
+                                 "type": "string"
+                              },
+                              "siteName": {
+                                 "type": "string"
+                              },
+                              "images": {
+                                 "type": "array",
+                                 "items": [
+                                    {
+                                       "type": "string"
+                                    }
+                                 ]
+                              },
+                              "url": {
+                                 "type": "string"
+                              },
+                              "favicons": {
+                                 "type": "array",
+                                 "items": [
+                                    {
+                                       "type": "string"
+                                    },
+                                    {
+                                       "type": "string"
+                                    },
+                                    {
+                                       "type": "string"
+                                    },
+                                    {
+                                       "type": "string"
+                                    }
+                                 ]
                               }
-                           ]
-                        },
-                        "url": {
-                           "type": "string"
-                        },
-                        "favicons": {
-                           "type": "array",
-                           "items": [
-                              {
-                                 "type": "string"
-                              },
-                              {
-                                 "type": "string"
-                              },
-                              {
-                                 "type": "string"
-                              },
-                              {
-                                 "type": "string"
-                              }
+                           },
+                           "required": [
+                              "id",
+                              "title",
+                              "description",
+                              "siteName",
+                              "images",
+                              "url",
+                              "favicons"
                            ]
                         }
                      },
                      "required": [
                         "type",
-                        "subject",
-                        "text",
-                        "id",
-                        "siteName",
-                        "images",
-                        "url",
-                        "favicons"
+                        "data"
                      ]
                   }
                },
                "required": [
                   "originalEvent"
                ]
-            },
-            "message": {
-               "type": "object",
-               "properties": {
-                  "content": {
-                     "type": "object",
-                     "properties": {
-                        "attributes": {
-                           "type": "object"
-                        },
-                        "text": {
-                           "type": "string"
-                        },
-                        "subject": {
-                           "type": "string"
-                        },
-                        "attachments": {
-                           "type": "array",
-                           "items": {}
-                        }
-                     },
-                     "required": [
-                        "attributes",
-                        "text",
-                        "subject",
-                        "attachments"
-                     ]
-                  },
-                  "aggregateContent": {
-                     "type": "array",
-                     "items": {}
-                  }
-               },
-               "required": [
-                  "content",
-                  "aggregateContent"
-               ]
-            },
-            "recievingEndpoints": {
-               "type": "array",
-               "items": {}
-            },
-            "deliveryOptions": {
-               "type": "object",
-               "properties": {
-                  "aggregationType": {
-                     "type": "string"
-                  },
-                  "schedulingType": {
-                     "type": "string"
-                  },
-                  "schedulingValue": {
-                     "type": "null"
-                  }
-               },
-               "required": [
-                  "aggregationType",
-                  "schedulingType",
-                  "schedulingValue"
-               ]
             }
          },
          "required": [
-            "attributes",
             "message",
-            "recievingEndpoints",
-            "deliveryOptions"
+            "attributes"
          ]
-      },
-      "processingInfo": {
-         "type": "null"
       }
    },
    "required": [
       "type",
-      "attributes",
       "header",
-      "body",
-      "processingInfo"
+      "body"
    ]
 }

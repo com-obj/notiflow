@@ -19,8 +19,8 @@ public class KoderiaEventConverterExecution implements Function<EmitEventDto, Ev
 		Event event = new Event();
 		event.getHeader().setConfigurationName("static-routing-pipeline");
 
-		event.getBody().getMessage().getContent().setSubject(emitEventDto.getSubject());
-		event.getBody().getMessage().getContent().setText(emitEventDto.getText());
+		event.getBody().getMessage().getContent().setSubject(emitEventDto.getData().getMessageSubject());
+		event.getBody().getMessage().getContent().setText(emitEventDto.getData().getMessageText());
 
 		event.getBody().putAttributeValue(ORIGINAL_EVENT_FIELD, emitEventDto.asMap());
 		return event;

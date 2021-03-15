@@ -49,7 +49,7 @@ class MailchimpMessageMapperAggregateImplTest {
         SendMessageWithTemplateDto sendMessageDto = mapper.mapWithTemplate(inputMessage);
 
         // THEN
-        MatcherAssert.assertThat(sendMessageDto, Matchers.equalToObject(expectedSendMessageDto));
+        MatcherAssert.assertThat(sendMessageDto, Matchers.equalTo(expectedSendMessageDto));
     }
 
 }
