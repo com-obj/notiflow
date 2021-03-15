@@ -61,8 +61,14 @@
          "sellerContacts" : [ {
          		"id": 999,
          		"name": "Adrian Slavkovsky",
-         		"emails": ["sales@orange.sk", "slavkovsky@orange.sk"],
+         		"emails": ["slavkovsky@orange.sk"],
          		"phones": ["09050123467"]
+         	},
+         	{
+         		"id": 888,
+         		"name": "Vlado Hahn",
+         		"emails": ["sales@orange.sk", "hahn@orange.sk"],
+         		"phones": ["09050123478"]
          	}
          ]
       }

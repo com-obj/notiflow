@@ -4,6 +4,7 @@ import static com.obj.nc.osk.config.FlowsConfig.OUTAGE_START_FLOW_ID;
 import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -21,6 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.OskFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
@@ -66,12 +68,29 @@ public class OskFlowsTest extends BaseIntegrationTest {
     	
     	//THEN
         GreenMail gm = greenMailManager.getGreenMail();
-        boolean success = gm.waitForIncomingEmail(3);
+        boolean success = gm.waitForIncomingEmail(6);
         
         Assertions.assertThat(success).isTrue();
+        
+        MimeMessage[] msgs = gm.getReceivedMessages();
+        assertMessagesContains(msgs, MailMessageForAssertions.as("cuzy@objectify.sk", "Vase sluzby mozu byt nedostupne"));
+        assertMessagesContains(msgs, MailMessageForAssertions.as("jancuzy@gmail.com", "Vase sluzby mozu byt nedostupne"));
+        assertMessagesContains(msgs, MailMessageForAssertions.as("dysko@objectify.sk", "Vase sluzby mozu byt nedostupne"));
+        
+        assertMessagesContains(msgs, MailMessageForAssertions.as("slavkovsky@orange.sk", "Tvoji zakaznici maju problem"));
+        assertMessagesContains(msgs, MailMessageForAssertions.as("sales@orange.sk", "Tvoji zakaznici maju problem"));
+        assertMessagesContains(msgs, MailMessageForAssertions.as("hahn@orange.sk", "Tvoji zakaznici maju problem"));
+        
+        assertMessageCount(msgs, "cuzy@objectify.sk", 1);
+        assertMessageCount(msgs, "jancuzy@gmail.com", 1);
+        assertMessageCount(msgs, "dysko@objectify.sk", 1);
+        
+        assertMessageCount(msgs, "slavkovsky@orange.sk", 1);
+        assertMessageCount(msgs, "sales@orange.sk", 1);
+        assertMessageCount(msgs, "hahn@orange.sk", 1);
     }
-    
-    @Test
+
+	@Test
     void testLAsNotConfiguredAreNotNotified() throws MessagingException {
         // GIVEN
     	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-for-LA.json", IncidentTicketNotificationEventDto.class);

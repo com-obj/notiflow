@@ -1,5 +1,6 @@
 package com.obj.nc.osk.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class IncidentTicketServiceOutageForCustomerDto {
 	String sn;
 	String installationAddress;
 
-	List<IncidentTicketNotificationContactDto> customerContacts;
-	List<IncidentTicketNotificationContactDto> sellerContacts;
+	List<IncidentTicketNotificationContactDto> customerContacts = new ArrayList<>();
+	List<IncidentTicketNotificationContactDto> sellerContacts = new ArrayList<>();
 
 }
