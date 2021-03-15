@@ -57,7 +57,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
     @Test
     void testProcessEventFromFile() {
         // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/full-event.json", IncidentTicketNotificationEventDto.class);
+    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketNotificationEventDto.class);
     	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
     	event.setFlowId(OUTAGE_START_FLOW_ID);
 
