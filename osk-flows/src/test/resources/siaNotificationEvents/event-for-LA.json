@@ -1,0 +1,51 @@
+{
+   "id":111,
+   "name":"Outage MME",
+   "description":"MME is down, bad things will happen",
+   "outageStart": "2021-01-01T20:00:00.000Z",
+   "outageEnd": null,
+   "messages": [
+   		{
+         "customerSegment" : "LA",
+         "resourceId": 222,
+         "resource": "MME-ba-02",
+         "billingAccountId": 333,
+         "billingAccount": "Objectify",
+         "subscriptionId": 444,
+         "subscription": "Objectify subscription",
+         "serviceId": 555,
+         "service": "VPS",
+         "b2bLogin": "b2b_to_include",
+         "sn": "0918186997",
+         "installationAddress": "Mocidla 249, Myto pod Dumbierom",
+         "customerContacts" : [ {
+         		"id": 666,
+         		"name": "Jan Cuzy",
+         		"emails": ["cuzy@objectify.sk"],
+         		"phones": ["0918186997"]
+         	}
+         ]
+      },
+      {
+         "customerSegment" : "LA",
+         "resourceId": 222,
+         "resource": "MME-ba-02",
+         "billingAccountId": 333,
+         "billingAccount": "Objectify",
+         "subscriptionId": 444,
+         "subscription": "Objectify subscription",
+         "serviceId": 556,
+         "service": "VPS sifrovana",
+         "b2bLogin": "b2b_to_exclude",
+         "sn": "0918186997",
+         "installationAddress": "Mocidla 249, Myto pod Dumbierom",
+         "customerContacts" : [ 
+         	{
+         		"id": 777,
+         		"name": "Igor Dysko",
+         		"emails": ["dysko@objectify.sk"]
+         	}
+         ]
+      }
+   ]
+}

@@ -5,6 +5,10 @@ import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 
 import java.io.IOException;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,10 +55,9 @@ public class OskFlowsTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DirtiesContext
     void testProcessEventFromFile() {
         // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/full-valid-event.json", IncidentTicketNotificationEventDto.class);
+    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/full-event.json", IncidentTicketNotificationEventDto.class);
     	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
     	event.setFlowId(OUTAGE_START_FLOW_ID);
 
@@ -66,6 +69,27 @@ public class OskFlowsTest extends BaseIntegrationTest {
         boolean success = gm.waitForIncomingEmail(3);
         
         Assertions.assertThat(success).isTrue();
+    }
+    
+    @Test
+    void testLAsNotConfiguredAreNotNotified() throws MessagingException {
+        // GIVEN
+    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-for-LA.json", IncidentTicketNotificationEventDto.class);
+    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
+    	event.setFlowId(OUTAGE_START_FLOW_ID);
+
+    	//WHEN
+    	genEventRepo.save(event);
+    	
+    	//THEN
+        GreenMail gm = greenMailManager.getGreenMail();
+        boolean success = gm.waitForIncomingEmail(1);
+        
+        Assertions.assertThat(success).isTrue();
+        
+        MimeMessage[] messages = gm.getReceivedMessages();
+        Assertions.assertThat( messages.length ).isEqualTo(1);
+        Assertions.assertThat( ((InternetAddress) messages[0].getAllRecipients()[0]).getAddress() ).isEqualTo("cuzy@objectify.sk");
     }
 
 

@@ -184,7 +184,6 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(eventAttributes.get("images"), Matchers.equalTo(linkEventData.getImages()));
         MatcherAssert.assertThat(eventAttributes.get("url"), Matchers.equalTo(linkEventData.getUrl()));
         MatcherAssert.assertThat(eventAttributes.get("favicons"), Matchers.equalTo(linkEventData.getFavicons()));
-
     }
 
     @Test

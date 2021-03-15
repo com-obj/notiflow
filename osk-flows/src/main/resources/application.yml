@@ -14,3 +14,12 @@ nc.functions.event-generator:
    source-dir: ${user.home}/eventsQueue
 
 nc.functions.send-email-message.from: no-reply@objectify.sk
+
+osk.sia.impact-notif:
+#   ico-of-la-custumers-to-be-notified:
+#      - 00686930 #Tatrabanka a.s.
+#      - 00151866 #Ministerstvo vnútra SR
+   b2b-login-of-la-custumers-to-be-notified:
+      - Tatrabanka
+      - MVSR
+   
