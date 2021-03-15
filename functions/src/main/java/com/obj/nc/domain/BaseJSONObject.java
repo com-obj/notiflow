@@ -35,14 +35,25 @@ public class BaseJSONObject {
 		return attributes.stream().allMatch(attr -> this.attributes.get(attr) != null);
 	}
 
-	public boolean containsNestedAttributes(String field, List<String> attributes) {
-		Map<String, Object> fieldValue = getAttributeValueAs(field, Map.class);
+	public boolean containsNestedAttributes(List<String> attributes, String... attributePath) {
+		if (attributePath.length == 0) {
+			return attributes.stream().allMatch(attr -> this.attributes.get(attr) != null);
+		}
 
+		Map<String, Object> fieldValue = getAttributeValueAs(attributePath[0], Map.class);
 		if (fieldValue == null) {
 			return false;
 		}
 
-		return attributes.stream().allMatch(attr -> fieldValue.get(attr) != null);
+		for (int i = 1; i < attributePath.length; i++) {
+			fieldValue = JsonUtils.readClassFromObject(fieldValue.get(attributePath[i]), Map.class);
+			if (fieldValue == null) {
+				return false;
+			}
+		}
+
+		final Map<String, Object> finalFieldValue = fieldValue;
+		return attributes.stream().allMatch(attr -> finalFieldValue.get(attr) != null);
 	}
 
 	public <T> T getAttributeValueAs(String attributeName, Class<T> clazz) {

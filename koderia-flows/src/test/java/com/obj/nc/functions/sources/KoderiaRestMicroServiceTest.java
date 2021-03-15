@@ -38,7 +38,7 @@ class KoderiaRestMicroServiceTest {
                 .contentType(ContentType.JSON)
                 .body(emitJobPostDto)
                 .when()
-                .post("/events/emit/jobPost")
+                .post("/events/emit")
                 .then()
                 .log().ifValidationFails()
                 .assertThat()
@@ -55,7 +55,7 @@ class KoderiaRestMicroServiceTest {
                 .contentType(ContentType.JSON)
                 .body(emitBlogDto)
                 .when()
-                .post("/events/emit/blog")
+                .post("/events/emit")
                 .then()
                 .log().ifValidationFails()
                 .assertThat()
@@ -72,7 +72,7 @@ class KoderiaRestMicroServiceTest {
                 .contentType(ContentType.JSON)
                 .body(emitEventEventDto)
                 .when()
-                .post("/events/emit/event")
+                .post("/events/emit")
                 .then()
                 .log().ifValidationFails()
                 .assertThat()
@@ -89,7 +89,7 @@ class KoderiaRestMicroServiceTest {
                 .contentType(ContentType.JSON)
                 .body(emitLinkDto)
                 .when()
-                .post("/events/emit/link")
+                .post("/events/emit")
                 .then()
                 .log().ifValidationFails()
                 .assertThat()
@@ -106,7 +106,7 @@ class KoderiaRestMicroServiceTest {
                 .contentType(ContentType.JSON)
                 .body(emitNewsDto)
                 .when()
-                .post("/events/emit/news")
+                .post("/events/emit")
                 .then()
                 .log().ifValidationFails()
                 .assertThat()
@@ -123,7 +123,7 @@ class KoderiaRestMicroServiceTest {
                 .contentType(ContentType.JSON)
                 .body(invalidEmitJobPostDto)
                 .when()
-                .post("/events/emit/jobPost")
+                .post("/events/emit")
                 .then()
                 .log().ifValidationFails()
                 .assertThat()
@@ -133,6 +133,7 @@ class KoderiaRestMicroServiceTest {
     @Test
     void testEmitJobPostAsBlog() {
         EmitEventDto blogBody = JsonUtils.readObjectFromClassPathResource("koderia/create_request/blog_body.json", EmitEventDto.class);
+        blogBody.setType(EmitEventDto.Type.JOB_POST);
 
         RestAssuredMockMvc
                 .given()
@@ -140,7 +141,7 @@ class KoderiaRestMicroServiceTest {
                 .contentType(ContentType.JSON)
                 .body(blogBody)
                 .when()
-                .post("/events/emit/jobPost")
+                .post("/events/emit")
                 .then()
                 .log().ifValidationFails()
                 .assertThat()
