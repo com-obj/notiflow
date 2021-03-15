@@ -22,6 +22,9 @@ import lombok.AllArgsConstructor;
 public class NotificationEventConverterProcessingFunction extends ProcessorFunctionAdapter<GenericEvent, List<Event>> {
 	
 	private StaticRoutingOptions config;
+	
+	public static String OUTAGE_START_ATTR_NAME = "outageStart";
+	public static String OUTAGE_INFOS_ATTR_NAME = "outageInfos";
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(GenericEvent payload) {

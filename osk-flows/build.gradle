@@ -40,7 +40,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     testImplementation 'org.springframework.integration:spring-integration-test'
-
+    
+	testImplementation 'commons-jxpath:commons-jxpath:1.3'
 
     testImplementation 'org.json:json:20201115'
 

@@ -1,5 +1,8 @@
 package com.obj.nc.osk.dto;
 
+import static com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction.OUTAGE_INFOS_ATTR_NAME;
+import static com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction.OUTAGE_START_ATTR_NAME;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,6 +19,7 @@ import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.MessageContent;
 import com.obj.nc.osk.config.StaticRoutingOptions;
 import com.obj.nc.osk.dto.IncidentTicketServiceOutageForCustomerDto.CustomerSegment;
+import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -46,12 +50,12 @@ public class IncidentTicketNotificationEventDto {
 	
 	private Event createCustomerEvent(IncidentTicketNotificationContactDto customer, List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
 		MessageContent customerMessageContent = new MessageContent();
-		customerMessageContent.putAttributeValue("outageStart", getOutageStart());
+		customerMessageContent.putAttributeValue(OUTAGE_START_ATTR_NAME, getOutageStart());
 		customerMessageContent.setSubject("Vase sluzby mozu byt nedostupne");
 		customerMessageContent.setText("Vážený zákazník, o xx:xx hod. sme zaznamenali výpadok..."); 
 		
 		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutagesForCustomer);
-		customerMessageContent.putAttributeValue("outageInfos", outageInfos);
+		customerMessageContent.putAttributeValue(OUTAGE_INFOS_ATTR_NAME, outageInfos);
 
 		Set<EmailEndpoint> customerEmails = customer.asEmailEnpoints();
 		

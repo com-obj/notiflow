@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class ServiceOutageInfo {
 
+	private String customerName;
 	private String productName;
 	private String b2bLogin;
 	private String sn;
@@ -20,6 +21,7 @@ public class ServiceOutageInfo {
 		newInfo.setProductName(serviceOutage.getService());
 		newInfo.setSn(serviceOutage.getSn());
 		newInfo.setInstallationAddress(serviceOutage.getInstallationAddress());
+		newInfo.setCustomerName(serviceOutage.getBillingAccount());
 		
 		return newInfo;
 	}
