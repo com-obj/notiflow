@@ -17,7 +17,6 @@ import org.springframework.test.context.ContextConfiguration;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.OskFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.endpoints.Person;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
