@@ -5,19 +5,20 @@ import com.obj.nc.functions.PreCondition;
 import com.obj.nc.functions.processors.ProcessorFunction;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
+@Primary
 @Component
 @AllArgsConstructor
 public class EmailSenderSinkProcessingFunction extends ProcessorFunction<Message, Message> {
 
-	@Autowired
-	private EmailSenderSinkExecution execution;
+	private final EmailSenderSinkExecution execution;
 
-	@Autowired
-	private EmailSenderSinkPreCondition preCondition;
+	private final EmailSenderSinkPreCondition preCondition;
 
 	@Override
 	public PreCondition<Message> preCondition() {

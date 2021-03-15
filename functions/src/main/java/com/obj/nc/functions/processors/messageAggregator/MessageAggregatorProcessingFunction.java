@@ -1,5 +1,6 @@
 package com.obj.nc.functions.processors.messageAggregator;
 
+import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.ProcessorFunction;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class MessageAggregatorProcessingFunction extends ProcessorFunction<List<Message>, Message> {
+public class MessageAggregatorProcessingFunction extends ProcessorFunction<Messages, Message> {
 	@Autowired
 	private MessageAggregatorExecution execution;
 
@@ -24,7 +25,7 @@ public class MessageAggregatorProcessingFunction extends ProcessorFunction<List<
 	}
 
 	@Override
-	public Function<List<Message>, Message> execution() {
+	public Function<Messages, Message> execution() {
 		return execution;
 	}
 

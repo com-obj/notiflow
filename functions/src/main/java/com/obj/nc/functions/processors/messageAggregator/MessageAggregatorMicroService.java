@@ -1,5 +1,6 @@
 package com.obj.nc.functions.processors.messageAggregator;
 
+import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.ProcessorMicroService;
 import lombok.extern.log4j.Log4j2;
@@ -13,13 +14,13 @@ import java.util.function.Function;
 
 @Configuration
 @Log4j2
-public class MessageAggregatorMicroService extends ProcessorMicroService<List<Message>, Message, MessageAggregatorProcessingFunction>{
+public class MessageAggregatorMicroService extends ProcessorMicroService<Messages, Message, MessageAggregatorProcessingFunction>{
 
 	@Autowired
 	private MessageAggregatorProcessingFunction fn;
 
 	@Bean
-	public Function<Flux<List<Message>>, Flux<Message>> aggregateMessages() {
+	public Function<Flux<Messages>, Flux<Message>> aggregateMessages() {
 		return super.executeProccessingService();
 	}
 
@@ -27,6 +28,6 @@ public class MessageAggregatorMicroService extends ProcessorMicroService<List<Me
 	public MessageAggregatorProcessingFunction getProccessingFuction() {
 		return fn;
 	}
-	
+
 
 }

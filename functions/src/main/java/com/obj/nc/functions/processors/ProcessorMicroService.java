@@ -6,7 +6,7 @@ import reactor.core.publisher.Flux;
 
 public abstract class ProcessorMicroService<IN, OUT, F extends ProcessorFunction<IN,OUT>> {
 	
-	public Function<Flux<IN>, Flux<OUT>> executeProccessingService() {
+	protected Function<Flux<IN>, Flux<OUT>> executeProccessingService() {
 		return inputFlux -> inputFlux.map(input -> getProccessingFuction().apply(input));
 	}
 	

@@ -3,6 +3,7 @@ package com.obj.nc.functions.sink;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.message.Message;
@@ -15,8 +16,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.mail.MessagingException;
@@ -25,17 +26,16 @@ import java.io.IOException;
 import java.util.UUID;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class EmailSenderSinkTest {
+class EmailSenderSinkTest extends BaseIntegrationTest {
+
+    @Autowired
+    private JavaMailSenderImpl defaultJavaMailSender;
 
     @Autowired
     private GreenMailManager greenMailManager;
 
     @Autowired
     private EmailSenderSinkProcessingFunction functionSend;
-
-    @Autowired
-    private EmailSenderSinkExecution.SendEmailMessageConfig emailFromSetting;
 
     @BeforeEach
     void cleanGreenMailMailBoxes() throws FolderException {
@@ -57,7 +57,7 @@ class EmailSenderSinkTest {
         MimeMessage[] messages = gm.getReceivedMessages();
         Assertions.assertThat( messages.length ).isEqualTo(1);
         Assertions.assertThat( messages[0].getSubject() ).isEqualTo("Subject");
-        Assertions.assertThat( messages[0].getFrom()[0] ).extracting("address").isEqualTo(emailFromSetting.getFrom());
+        Assertions.assertThat( messages[0].getFrom()[0] ).extracting("address").isEqualTo(defaultJavaMailSender.getUsername());
 
         //THEN check processing info
 

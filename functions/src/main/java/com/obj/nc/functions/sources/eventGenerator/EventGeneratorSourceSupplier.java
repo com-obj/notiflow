@@ -13,7 +13,6 @@ import java.util.function.Supplier;
 
 @Component
 @AllArgsConstructor
-@Profile("dev")
 public class EventGeneratorSourceSupplier extends SourceSupplier<Event> {
 
 	@Autowired

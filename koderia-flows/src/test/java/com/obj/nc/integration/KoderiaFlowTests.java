@@ -1,5 +1,6 @@
 package com.obj.nc.integration;
 
+import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.config.MailchimpApiConfig;
 import com.obj.nc.dto.EmitEventDto;
@@ -13,7 +14,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.binder.test.InputDestination;
 import org.springframework.cloud.stream.binder.test.OutputDestination;
 import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
@@ -35,13 +35,12 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest
 @Import({
 		TestChannelBinderConfiguration.class,
 		KoderiaFlowTestsConfig.class
 })
 @AutoConfigureMockRestServiceServer
-public class KoderiaFlowTests {
+public class KoderiaFlowTests extends BaseIntegrationTest {
 
 	public static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
 

@@ -1,12 +1,14 @@
 package com.obj.nc.functions.sink;
 
+import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.koderia.RecepientsUsingKoderiaSubscriptionProcessingFunction;
+import com.obj.nc.functions.processors.koderia.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
 import com.obj.nc.functions.processors.senders.EmailSenderSinkExecution;
 import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
@@ -16,21 +18,18 @@ import com.obj.nc.utils.JsonUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class ProcessingInfoPersisterTest {
+class ProcessingInfoPersisterTest extends BaseIntegrationTest {
 
     @Autowired
     private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
@@ -42,16 +41,13 @@ class ProcessingInfoPersisterTest {
     private ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId;
 
     @Autowired
-    private RecepientsUsingKoderiaSubscriptionProcessingFunction resolveRecipients;
+    private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
 
     @Autowired
     private MessagesFromEventProcessingFunction generateMessagesFromEvent;
 
     @Autowired
     private EmailSenderSinkProcessingFunction functionSend;
-
-    @Autowired
-    private EmailSenderSinkExecution.SendEmailMessageConfig emailFromSetting;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -72,30 +68,22 @@ class ProcessingInfoPersisterTest {
         processingInfoPersister.accept(event);
 
         // then
-        Map<String, Object> persistedPI = jdbcTemplate.queryForMap("select * from nc_processing_info where payload_id = ?", event.getHeader().getId());
-        assertThat(persistedPI, CoreMatchers.notNullValue());
+        UUID uuid = event.getHeader().getId();
+        final Event finalEvent = event;
 
-        assertThat(persistedPI.get("processing_id"), CoreMatchers.equalTo(event.getProcessingInfo().getProcessingId()));
-        assertThat(persistedPI.get("prev_processing_id"), CoreMatchers.equalTo(event.getProcessingInfo().getPrevProcessingId()));
-
-        assertThat(((PGobject) persistedPI.get("event_ids")).getValue(), CoreMatchers.equalTo(event.getHeader().eventIdsAsJSONString()));
-
-        assertThat(persistedPI.get("payload_id"), CoreMatchers.equalTo(event.getHeader().getId()));
-        assertThat(persistedPI.get("payload_type"), CoreMatchers.equalTo(event.getPayloadTypeName()));
-
-        assertThat(persistedPI.get("step_name"), CoreMatchers.equalTo(event.getProcessingInfo().getStepName()));
-        assertThat(persistedPI.get("step_index"), CoreMatchers.equalTo(event.getProcessingInfo().getStepIndex()));
-
-        long start = event.getProcessingInfo().getTimeStampStart().toEpochMilli();
-        long finish = event.getProcessingInfo().getTimeStampFinish().toEpochMilli();
-        long duration = finish - start;
-
-        assertThat(((Timestamp) persistedPI.get("time_processing_start")).toInstant().toEpochMilli(), CoreMatchers.equalTo(start));
-        assertThat(((Timestamp) persistedPI.get("time_processing_end")).toInstant().toEpochMilli(), CoreMatchers.equalTo(finish));
-        assertThat(persistedPI.get("step_duration_ms"), CoreMatchers.equalTo(duration));
-
-        assertThat(((PGobject) persistedPI.get("event_json")).getValue(), CoreMatchers.equalTo(event.toJSONString()));
-        assertThat(persistedPI.get("event_json_diff"), CoreMatchers.nullValue());
+        List<ProcessingInfo> persistedPIs = ProcessingInfo.findProcessingInfo(uuid, "GenerateMessagesFromEvent");
+        persistedPIs.forEach(persistedPI -> {
+            assertThat(persistedPI.getProcessingId(), CoreMatchers.equalTo(finalEvent.getProcessingInfo().getProcessingId()));
+            assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(finalEvent.getProcessingInfo().getPrevProcessingId()));
+            assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(finalEvent.getProcessingInfo().getPrevProcessingId()));
+            assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(finalEvent.getProcessingInfo().getPrevProcessingId()));
+            assertThat(persistedPI.getDiffJson(), CoreMatchers.equalTo(finalEvent.getProcessingInfo().getDiffJson()));
+            assertThat(persistedPI.getStepName(), CoreMatchers.equalTo(finalEvent.getProcessingInfo().getStepName()));
+            assertThat(persistedPI.getEventJson(), CoreMatchers.equalTo(finalEvent.getProcessingInfo().getEventJson()));
+            assertThat(persistedPI.getDurationInMs(), CoreMatchers.equalTo(finalEvent.getProcessingInfo().getDurationInMs()));
+            assertThat(persistedPI.getTimeStampStart(), CoreMatchers.equalTo(finalEvent.getProcessingInfo().getTimeStampStart()));
+            assertThat(persistedPI.getTimeStampFinish(), CoreMatchers.equalTo(finalEvent.getProcessingInfo().getTimeStampFinish()));
+        });
     }
 
     @Test
@@ -133,31 +121,22 @@ class ProcessingInfoPersisterTest {
         messages.forEach(message -> processingInfoPersister.accept(message));
 
         // then
-        List<Map<String, Object>> persistedPI = jdbcTemplate.queryForList("select * from nc_processing_info");
-        assertThat(persistedPI, CoreMatchers.notNullValue());
-        assertThat(persistedPI.size(), CoreMatchers.equalTo(messages.size()));
-
-        for (int i = 0; i < persistedPI.size(); i++) {
-            assertThat(persistedPI.get(i).get("processing_id"), CoreMatchers.equalTo(messages.get(i).getProcessingInfo().getProcessingId()));
-            assertThat(persistedPI.get(i).get("prev_processing_id"), CoreMatchers.equalTo(messages.get(i).getProcessingInfo().getPrevProcessingId()));
-
-            assertThat(persistedPI.get(i).get("payload_id"), CoreMatchers.equalTo(messages.get(i).getHeader().getId()));
-            assertThat(persistedPI.get(i).get("payload_type"), CoreMatchers.equalTo(messages.get(i).getPayloadTypeName()));
-
-            assertThat(persistedPI.get(i).get("step_name"), CoreMatchers.equalTo(messages.get(i).getProcessingInfo().getStepName()));
-            assertThat(persistedPI.get(i).get("step_index"), CoreMatchers.equalTo(messages.get(i).getProcessingInfo().getStepIndex()));
-
-            long start = messages.get(i).getProcessingInfo().getTimeStampStart().toEpochMilli();
-            long finish = messages.get(i).getProcessingInfo().getTimeStampFinish().toEpochMilli();
-            long duration = finish - start;
-
-            assertThat(((Timestamp) persistedPI.get(i).get("time_processing_start")).toInstant().toEpochMilli(), CoreMatchers.equalTo(start));
-            assertThat(((Timestamp) persistedPI.get(i).get("time_processing_end")).toInstant().toEpochMilli(), CoreMatchers.equalTo(finish));
-            assertThat(persistedPI.get(i).get("step_duration_ms"), CoreMatchers.equalTo(duration));
-
-            assertThat(((PGobject) persistedPI.get(i).get("event_json")).getValue(), CoreMatchers.equalTo(messages.get(i).toJSONString()));
-            assertThat(persistedPI.get(i).get("event_json_diff"), CoreMatchers.nullValue());
-        }
+        messages.forEach(message -> {
+            UUID uuid = message.getHeader().getId();
+            List<ProcessingInfo> persistedPIs = ProcessingInfo.findProcessingInfo(uuid, "GenerateMessagesFromEvent");
+            persistedPIs.forEach(persistedPI -> {
+                assertThat(persistedPI.getProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getProcessingId()));
+                assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getPrevProcessingId()));
+                assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getPrevProcessingId()));
+                assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getPrevProcessingId()));
+                assertThat(persistedPI.getDiffJson(), CoreMatchers.equalTo(message.getProcessingInfo().getDiffJson()));
+                assertThat(persistedPI.getStepName(), CoreMatchers.equalTo(message.getProcessingInfo().getStepName()));
+                assertThat(persistedPI.getEventJson(), CoreMatchers.equalTo(message.getProcessingInfo().getEventJson()));
+                assertThat(persistedPI.getDurationInMs(), CoreMatchers.equalTo(message.getProcessingInfo().getDurationInMs()));
+                assertThat(persistedPI.getTimeStampStart(), CoreMatchers.equalTo(message.getProcessingInfo().getTimeStampStart()));
+                assertThat(persistedPI.getTimeStampFinish(), CoreMatchers.equalTo(message.getProcessingInfo().getTimeStampFinish()));
+            });
+        });
     }
 
     @Test
@@ -174,30 +153,21 @@ class ProcessingInfoPersisterTest {
         messages.forEach(message -> processingInfoPersister.accept(message));
 
         // then
-        List<Map<String, Object>> persistedPI = jdbcTemplate.queryForList("select * from nc_processing_info");
-        assertThat(persistedPI, CoreMatchers.notNullValue());
-        assertThat(persistedPI.size(), CoreMatchers.equalTo(messages.size()));
-
-        for (int i = 0; i < persistedPI.size(); i++) {
-            assertThat(persistedPI.get(i).get("processing_id"), CoreMatchers.equalTo(messages.get(i).getProcessingInfo().getProcessingId()));
-            assertThat(persistedPI.get(i).get("prev_processing_id"), CoreMatchers.equalTo(messages.get(i).getProcessingInfo().getPrevProcessingId()));
-
-            assertThat(persistedPI.get(i).get("payload_id"), CoreMatchers.equalTo(messages.get(i).getHeader().getId()));
-            assertThat(persistedPI.get(i).get("payload_type"), CoreMatchers.equalTo(messages.get(i).getPayloadTypeName()));
-
-            assertThat(persistedPI.get(i).get("step_name"), CoreMatchers.equalTo(messages.get(i).getProcessingInfo().getStepName()));
-            assertThat(persistedPI.get(i).get("step_index"), CoreMatchers.equalTo(messages.get(i).getProcessingInfo().getStepIndex()));
-
-            long start = messages.get(i).getProcessingInfo().getTimeStampStart().toEpochMilli();
-            long finish = messages.get(i).getProcessingInfo().getTimeStampFinish().toEpochMilli();
-            long duration = finish - start;
-
-            assertThat(((Timestamp) persistedPI.get(i).get("time_processing_start")).toInstant().toEpochMilli(), CoreMatchers.equalTo(start));
-            assertThat(((Timestamp) persistedPI.get(i).get("time_processing_end")).toInstant().toEpochMilli(), CoreMatchers.equalTo(finish));
-            assertThat(persistedPI.get(i).get("step_duration_ms"), CoreMatchers.equalTo(duration));
-
-            assertThat(((PGobject) persistedPI.get(i).get("event_json")).getValue(), CoreMatchers.equalTo(messages.get(i).toJSONString()));
-            assertThat(persistedPI.get(i).get("event_json_diff"), CoreMatchers.nullValue());
-        }
+        messages.forEach(message -> {
+            UUID uuid = message.getHeader().getId();
+            List<ProcessingInfo> persistedPIs = ProcessingInfo.findProcessingInfo(uuid, "SendEmail");
+            persistedPIs.forEach(persistedPI -> {
+                assertThat(persistedPI.getProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getProcessingId()));
+                assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getPrevProcessingId()));
+                assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getPrevProcessingId()));
+                assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getPrevProcessingId()));
+                assertThat(persistedPI.getDiffJson(), CoreMatchers.equalTo(message.getProcessingInfo().getDiffJson()));
+                assertThat(persistedPI.getStepName(), CoreMatchers.equalTo(message.getProcessingInfo().getStepName()));
+                assertThat(persistedPI.getEventJson(), CoreMatchers.equalTo(message.getProcessingInfo().getEventJson()));
+                assertThat(persistedPI.getDurationInMs(), CoreMatchers.equalTo(message.getProcessingInfo().getDurationInMs()));
+                assertThat(persistedPI.getTimeStampStart(), CoreMatchers.equalTo(message.getProcessingInfo().getTimeStampStart()));
+                assertThat(persistedPI.getTimeStampFinish(), CoreMatchers.equalTo(message.getProcessingInfo().getTimeStampFinish()));
+            });
+        });
     }
 }
