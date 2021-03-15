@@ -1,4 +1,4 @@
-package com.obj.nc.osk.functions;
+package com.obj.nc.osk.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

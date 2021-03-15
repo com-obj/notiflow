@@ -1,14 +1,11 @@
 package com.obj.nc.osk.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Pollers;
 
-import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
 import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
@@ -18,31 +15,19 @@ import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.Pro
 import com.obj.nc.functions.sources.genericEvents.GenericEventsForProcessingSupplier;
 import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction;
 
+import lombok.AllArgsConstructor;
+
 @Configuration
+@AllArgsConstructor
 public class FlowsConfig {
 	
-	@Autowired
 	private NotificationEventConverterProcessingFunction  siaNotifEventConverter;
-
-	@Autowired
 	private ValidateAndGenerateEventIdProcessingFunction generateEventId;
-
-	@Autowired
 	private MessagesFromEventProcessingFunction generateMessagesFromEvent;
-
-	@Autowired
 	private EmailSenderSinkProcessingFunction sendMessage;
-
-	@Autowired
 	private PaylaodLoggerSinkConsumer logConsumer;
-	
-	@Autowired
 	private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
-	
-	@Autowired
 	private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoWithRecipientsPersister;
-
-	@Autowired
 	private GenericEventsForProcessingSupplier genericEventSupplier;
 	
 	public static String OUTAGE_START_FLOW_ID = "OUTAGE_START_FLOW_ID";
@@ -52,6 +37,7 @@ public class FlowsConfig {
 		return IntegrationFlows
 				.from(genericEventSupplier, conf-> conf.poller(Pollers.fixedRate(1000)))
 				.transform(siaNotifEventConverter)
+				.split()
 				.transform(generateEventId)
 				 	.wireTap(flow -> flow.handle(processingInfoPersister))
 				.transform(generateMessagesFromEvent)

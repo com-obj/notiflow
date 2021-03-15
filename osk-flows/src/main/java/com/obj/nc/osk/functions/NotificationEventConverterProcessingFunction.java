@@ -21,6 +21,7 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.osk.dto.IncidentTicketNotificationContactDto;
 import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
 import com.obj.nc.osk.dto.IncidentTicketServiceOutageForCustomerDto;
+import com.obj.nc.osk.dto.ServiceOutageInfo;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
