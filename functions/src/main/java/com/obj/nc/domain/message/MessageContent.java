@@ -1,18 +1,16 @@
 package com.obj.nc.domain.message;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.BaseJSONObject;
-import com.obj.nc.domain.event.Event;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.NonNull;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
