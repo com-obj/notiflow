@@ -4,11 +4,9 @@
       "configuration-name":"static-routing-pipeline"
    },
    "body":{
-      "message":{
-         "content" : {
+      "message": {
             "subject":"First event in queue",
             "text":"We are looking for a Business Intelligence (BI) Developer to create..."
-         }
       },
       "attributes" : {
          "originalEvent" : {

@@ -21,7 +21,7 @@ public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, Me
 
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message message) {
-		MessageContent content = message.getBody().getMessage().getContent();
+		MessageContent content = message.getBody().getMessage();
 
 		if (content ==null ) {
 			return Optional.of(new PayloadValidationException("EmailTemplateFormatter cannot format message because its content is null"));
@@ -34,7 +34,7 @@ public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, Me
 	@DocumentProcessingInfo("EmailTemplateFormatter")
 	@Override
 	public Message execute(Message payload) {
-		MessageContent content = payload.getBody().getMessage().getContent();
+		MessageContent content = payload.getBody().getMessage();
 		
 		
 		return payload;

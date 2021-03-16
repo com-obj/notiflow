@@ -9,6 +9,7 @@ import com.obj.nc.domain.message.Message;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 
 @Getter
 @Setter
@@ -17,6 +18,7 @@ import lombok.ToString;
 	@Type(value = Event.class, name = Event.JSON_TYPE_IDENTIFIER),
 	@Type(value = Message.class, name = Message.JSON_TYPE_IDENTIFIER) })
 @ToString(callSuper = true)
+@Log4j2
 public abstract class BasePayload extends BaseJSONObject {
 
 	protected Header header = new Header();
@@ -25,6 +27,8 @@ public abstract class BasePayload extends BaseJSONObject {
 	protected ProcessingInfo processingInfo;
 
 	public ProcessingInfo stepStart(String processingStepName) {
+	    log.info("Generating processing info for step {}", processingStepName);
+	    
 		ProcessingInfo processingInfo = new ProcessingInfo();
 		processingInfo.stepStart(processingStepName, this);
 		this.processingInfo = processingInfo;
@@ -34,6 +38,8 @@ public abstract class BasePayload extends BaseJSONObject {
 
 	public void stepFinish() {
 		this.processingInfo.stepFinish(this);
+		
+		log.info("Processing finished for step {}. Took {} ms", getProcessingInfo().getStepName(), getProcessingInfo().getDurationInMs());
 	}
 
 	public abstract String getPayloadTypeName();

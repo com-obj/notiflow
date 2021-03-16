@@ -48,7 +48,7 @@ public class MessagesFromEventExecution implements Function<Event, List<Message>
 			msgBody.setAttributes(eventBody.getAttributes());
 			
 			msgBody.setMessage(eventBody.getMessage());
-			msgBody.getMessage().getContent().setAttributes(eventBody.getMessage().getContent().getAttributes());
+			msgBody.getMessage().setAttributes(eventBody.getMessage().getAttributes());
 
 			msg.stepFinish();
 

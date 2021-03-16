@@ -2,6 +2,7 @@ package com.obj.nc.mapper;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.MessageContentAggregated;
 import com.obj.nc.dto.mailchimp.SendMessageWithTemplateDto;
 import com.obj.nc.utils.JsonUtils;
 import org.hamcrest.MatcherAssert;
@@ -33,8 +34,9 @@ class MailchimpMessageMapperAggregateImplTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        inputMessage.getBody().getMessage().getAggregateContent().forEach(aggregateContent -> {
-            aggregateContent.getAttachments().forEach(attachement -> {
+        MessageContentAggregated aggregatedContent = inputMessage.getContentTyped();
+        aggregatedContent.getAggregateContent().forEach(part -> {
+        	part.getAttachments().forEach(attachement -> {
                 try {
                     attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
                 } catch (IOException e) {

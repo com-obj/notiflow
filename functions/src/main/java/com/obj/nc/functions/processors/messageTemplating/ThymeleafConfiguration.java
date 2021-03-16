@@ -66,7 +66,7 @@ public class ThymeleafConfiguration {
         final StringTemplateResolver templateResolver = new StringTemplateResolver();
         templateResolver.setOrder(Integer.valueOf(3));
         // No resolvable pattern, will simply process as a String template everything not previously matched
-        templateResolver.setTemplateMode("HTML5");
+        templateResolver.setTemplateMode("HTML");
         templateResolver.setCacheable(false);
         return templateResolver;
     }

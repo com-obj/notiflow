@@ -57,9 +57,7 @@ public class GreenMailReceiverExecution implements Supplier<Messages> {
             throw new RuntimeException(e);
         }
 
-        Messages allMessagesWrapped = new Messages();
-        allMessagesWrapped.setMessages(allMessages);
-        return allMessagesWrapped;
+        return new Messages(allMessages);
     }
 
     private Message convertGreenMailMessageToMessage(StoredMessage message) {
@@ -67,7 +65,7 @@ public class GreenMailReceiverExecution implements Supplier<Messages> {
 
         try {
             MimeMessage mimeMessage = message.getMimeMessage();
-            MessageContent content = result.getBody().getMessage().getContent();
+            MessageContent content = result.getBody().getMessage();
             content.setSubject(mimeMessage.getSubject());
 
             MimeMessageParser parser = new MimeMessageParser(mimeMessage).parse();
@@ -75,9 +73,7 @@ public class GreenMailReceiverExecution implements Supplier<Messages> {
             String mimeMessageContent = parser.hasHtmlContent() ? parser.getHtmlContent() : parser.getPlainContent();
             content.setText(originalRecipients + "\n" + mimeMessageContent);
 
-            List<MessageContent> aggregateContent = new ArrayList<>();
-            aggregateContent.add(content);
-            result.getBody().getMessage().setAggregateContent(aggregateContent);
+            result.getBody().setMessage(content);
 
             EmailEndpoint emailEndpoint = new EmailEndpoint();
             emailEndpoint.setEmail(properties.getRecipient());

@@ -9,10 +9,8 @@
    },
    "body":{
       "message": {
-         "content" : {
             "text":"Text",
             "subject":"Subject"
-         }
       },
       "recievingEndpoints":[
          {

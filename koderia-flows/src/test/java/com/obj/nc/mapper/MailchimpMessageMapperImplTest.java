@@ -34,7 +34,7 @@ class MailchimpMessageMapperImplTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        inputMessage.getBody().getMessage().getContent().getAttachments().forEach(attachement -> {
+        inputMessage.getBody().getMessage().getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {

@@ -7,6 +7,8 @@ import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.MessageContent;
+import com.obj.nc.domain.message.MessageContentAggregated;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
 import com.obj.nc.utils.GreenMailManager;
@@ -43,7 +45,7 @@ class GreenMailReceiverSourceSupplierTest {
     }
 
     @Test
-    void testGet() {
+    void testRecieveAndConvertMailsFromGreenMail() {
         // GIVEN
         Message message1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", Message.class);
         emailSenderSinkProcessingFunction.apply(message1);
@@ -63,22 +65,28 @@ class GreenMailReceiverSourceSupplierTest {
         // THEN
         List<Message> messages = messagesWrapped.getMessages();
 
-        Assertions.assertThat(messages.get(0).getBody().getMessage().getAggregateContent().get(0).getSubject()).contains(
-                message1.getBody().getMessage().getAggregateContent().get(0).getSubject());
-        Assertions.assertThat(messages.get(0).getBody().getMessage().getAggregateContent().get(0).getText()).contains(
-                message1.getBody().getMessage().getAggregateContent().get(0).getText(),
+        MessageContent aggregated = messages.get(0).getContentTyped();
+        MessageContentAggregated aggregatedExpected = message1.getContentTyped();
+        Assertions.assertThat(aggregated.getSubject()).contains(
+        		aggregatedExpected.getAggregateContent().get(0).getSubject());
+        Assertions.assertThat(aggregated.getText()).contains(
+        		aggregatedExpected.getAggregateContent().get(0).getText(),
                 ((EmailEndpoint) message1.getBody().getRecievingEndpoints().get(0)).getEmail());
 
-        Assertions.assertThat(messages.get(1).getBody().getMessage().getAggregateContent().get(0).getSubject()).contains(
-                message2.getBody().getMessage().getAggregateContent().get(0).getSubject());
-        Assertions.assertThat(messages.get(1).getBody().getMessage().getAggregateContent().get(0).getText()).contains(
-                message2.getBody().getMessage().getAggregateContent().get(0).getText(),
+        aggregated = messages.get(1).getContentTyped();
+        aggregatedExpected = message2.getContentTyped();
+        Assertions.assertThat(aggregated.getSubject()).contains(
+        		aggregatedExpected.getAggregateContent().get(0).getSubject());
+        Assertions.assertThat(aggregated.getText()).contains(
+        		aggregatedExpected.getAggregateContent().get(0).getText(),
                 ((EmailEndpoint) message2.getBody().getRecievingEndpoints().get(0)).getEmail());
 
-        Assertions.assertThat(messages.get(2).getBody().getMessage().getAggregateContent().get(0).getSubject()).contains(
-                message3.getBody().getMessage().getAggregateContent().get(0).getSubject());
-        Assertions.assertThat(messages.get(2).getBody().getMessage().getAggregateContent().get(0).getText()).contains(
-                message3.getBody().getMessage().getAggregateContent().get(0).getText(),
+        aggregated = messages.get(2).getContentTyped();
+        aggregatedExpected = message3.getContentTyped();
+        Assertions.assertThat(aggregated.getSubject()).contains(
+        		aggregatedExpected.getAggregateContent().get(0).getSubject());
+        Assertions.assertThat(aggregated.getText()).contains(
+        		aggregatedExpected.getAggregateContent().get(0).getText(),
                 ((EmailEndpoint) message3.getBody().getRecievingEndpoints().get(0)).getEmail());
 
         Assertions.assertThat(messages.get(2).getBody().getRecievingEndpoints()).hasSize(1);

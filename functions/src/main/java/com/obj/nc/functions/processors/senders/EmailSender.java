@@ -1,6 +1,8 @@
 package com.obj.nc.functions.processors.senders;
 
 import java.io.File;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,19 +21,20 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessageContent;
-import com.obj.nc.domain.message.MessageContents;
+import com.obj.nc.domain.message.MessageContentAggregated;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.exceptions.ProcessingException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Primary
 @Component
 @AllArgsConstructor
+@Log4j2
 public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	
-
 	private final JavaMailSenderImpl javaMailSender;
 	
 	@Override
@@ -54,23 +57,23 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	@DocumentProcessingInfo("SendEmail")
 	@Override
 	public Message execute(Message payload) {
+		payload.stepStart("SendEmail");
+		
 		EmailEndpoint toEmail = (EmailEndpoint) payload.getBody().getRecievingEndpoints().get(0);
 
-		MessageContents msg = payload.getBody().getMessage();
+		MessageContent msg = payload.getBody().getMessage();
 
-		Optional<MessageContent> messageContentOpt = Optional.empty();
-
-		if (payload.isAggregateMessage()) {
-			messageContentOpt = msg.getAggregateContent().stream()
-					.reduce(MessageContent::concat);
+		MessageContent messageContent = null;
+		if (msg instanceof MessageContentAggregated) {
+			//ak je stale v rezime aggregated tak mi nic ine nezostava ako spravit "dummy" aggregation. Na konci dna potrebujem jeden subject, jeden text
+			messageContent = ((MessageContentAggregated) msg).asSimpleContent();
 		} else {
-			messageContentOpt = Optional.of(msg.getContent());
+			messageContent = msg;
 		}
 
-		MessageContent messageContent = messageContentOpt
-				.orElseThrow(() -> new IllegalStateException("Failed to build message content"));
-
 		doSendMessage(toEmail, messageContent);
+		
+		payload.stepFinish();
 		return payload;
 	}
 
@@ -91,7 +94,12 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 				helper.addAttachment(attachement.getName(), file);
 			}
 
+			Instant sendStart = Instant.now();
+			
 			javaMailSender.send(message);
+			
+			log.info("Sending mail vie SMTP took {} ms", ChronoUnit.MILLIS.between(sendStart, Instant.now()));
+			
 		} catch (MessagingException e) {
 			throw new ProcessingException(EmailSender.class, e);
 		}

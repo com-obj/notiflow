@@ -6,6 +6,7 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.MessageContentAggregated;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
 import com.obj.nc.testmode.functions.sources.GreenMailReceiverSourceSupplier;
@@ -116,14 +117,17 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
                     }
                 });
 
+        MessageContentAggregated aggregated1 = message1.getContentTyped();
+        MessageContentAggregated aggregated2 = message2.getContentTyped();
+        MessageContentAggregated aggregated3 = message3.getContentTyped();
         Assertions.assertThat(outputMimeMessages[0].getSubject()).contains(
-                message1.getBody().getMessage().getAggregateContent().get(0).getSubject(),
-                message2.getBody().getMessage().getAggregateContent().get(0).getSubject(),
-                message3.getBody().getMessage().getAggregateContent().get(0).getSubject());
+        		aggregated1.getAggregateContent().get(0).getSubject(),
+        		aggregated2.getAggregateContent().get(0).getSubject(),
+        		aggregated3.getAggregateContent().get(0).getSubject());
         Assertions.assertThat(GreenMailUtil.getBody(outputMimeMessages[0])).contains(
-                message1.getBody().getMessage().getAggregateContent().get(0).getText(),
-                message2.getBody().getMessage().getAggregateContent().get(0).getText(),
-                message3.getBody().getMessage().getAggregateContent().get(0).getText());
+        		aggregated1.getAggregateContent().get(0).getText(),
+        		aggregated2.getAggregateContent().get(0).getText(),
+        		aggregated3.getAggregateContent().get(0).getText());
     }
 
     @TestConfiguration

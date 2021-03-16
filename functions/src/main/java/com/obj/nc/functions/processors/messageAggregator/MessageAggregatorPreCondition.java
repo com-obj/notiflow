@@ -21,8 +21,8 @@ public class MessageAggregatorPreCondition implements PreCondition<Messages> {
 		if (messages.getMessages().isEmpty()) {
 			return Optional.of(new PayloadValidationException("There are no input messages to process"));
 		}
-
-		if (!messages.getMessages().stream().allMatch(Message::isAggregateMessage)) {
+		
+		if (!messages.isAllDeliveryOptionAggregated()) {
 			return Optional.of(new PayloadValidationException("Input message is not intended to be aggregated"));
 		}
 

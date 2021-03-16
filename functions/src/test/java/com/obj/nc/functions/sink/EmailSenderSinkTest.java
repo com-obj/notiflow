@@ -21,6 +21,7 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.MessageContentAggregated;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.utils.GreenMailManager;
@@ -60,8 +61,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Assertions.assertThat( messages[0].getSubject() ).isEqualTo("Subject");
         Assertions.assertThat( messages[0].getFrom()[0] ).extracting("address").isEqualTo(defaultJavaMailSender.getUsername());
 
-        //THEN check processing info
-
+        //THEN check processing info --docasne zakomentovane kym nezimplementujeme HasProcessingInfo
         ProcessingInfo processingInfo = result.getProcessingInfo();
         Assertions.assertThat(processingInfo.getStepName()).isEqualTo("SendEmail");
         Assertions.assertThat(processingInfo.getStepIndex()).isEqualTo(4);
@@ -103,7 +103,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         String INPUT_JSON_FILE = "messages/email_message_attachments.json";
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 
-        inputMessage.getBody().getMessage().getContent().getAttachments().forEach(attachement -> {
+        inputMessage.getBody().getMessage().getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {
@@ -136,8 +136,8 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         MimeMessage message = gm.getReceivedMessages()[0];
         String msg = GreenMailUtil.getWholeMessage(message);
 
-
-        outputMessage.getBody().getMessage().getAggregateContent()
+        MessageContentAggregated aggregated = outputMessage.getContentTyped();
+        aggregated.getAggregateContent()
                 .forEach(messageContent -> {
                     Assertions.assertThat(msg).contains(messageContent.getSubject());
                     Assertions.assertThat(msg).contains(messageContent.getText());

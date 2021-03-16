@@ -31,8 +31,7 @@ class MessageAggregatorTest {
                 JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message3.json", Message.class)
         );
 
-        Messages inputMessagesWrapped = new Messages();
-        inputMessagesWrapped.setMessages(inputMessages);
+        Messages inputMessagesWrapped = new Messages(inputMessages);
 
         // when
         Message outputMessage = aggregateMessages.apply(inputMessagesWrapped);
@@ -47,8 +46,7 @@ class MessageAggregatorTest {
         // given
         List<Message> inputMessages = new ArrayList<>();
 
-        Messages inputMessagesWrapped = new Messages();
-        inputMessagesWrapped.setMessages(inputMessages);
+        Messages inputMessagesWrapped = new Messages(inputMessages);
 
         // when - then
         Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessagesWrapped))
@@ -64,8 +62,7 @@ class MessageAggregatorTest {
                 JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1_none.json", Message.class)
         );
 
-        Messages inputMessagesWrapped = new Messages();
-        inputMessagesWrapped.setMessages(inputMessages);
+        Messages inputMessagesWrapped = new Messages(inputMessages);
 
         // when - then
         Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessagesWrapped))
@@ -81,8 +78,7 @@ class MessageAggregatorTest {
                 JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1_delivery_options.json", Message.class)
         );
 
-        Messages inputMessagesWrapped = new Messages();
-        inputMessagesWrapped.setMessages(inputMessages);
+        Messages inputMessagesWrapped = new Messages(inputMessages);
 
         // when - then
         Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessagesWrapped))
@@ -98,8 +94,7 @@ class MessageAggregatorTest {
                 JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1_receiving_endpoints.json", Message.class)
         );
 
-        Messages inputMessagesWrapped = new Messages();
-        inputMessagesWrapped.setMessages(inputMessages);
+        Messages inputMessagesWrapped = new Messages(inputMessages);
 
         // when - then
         Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessagesWrapped))

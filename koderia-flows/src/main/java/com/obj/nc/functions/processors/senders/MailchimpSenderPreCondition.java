@@ -3,6 +3,7 @@ package com.obj.nc.functions.processors.senders;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessageContent;
+import com.obj.nc.domain.message.MessageContentAggregated;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
@@ -23,15 +24,18 @@ public class MailchimpSenderPreCondition implements PreCondition<Message> {
 			return Optional.of(new PayloadValidationException("Message must not be null"));
 		}
 
-		if (message.isAggregateMessage()) {
-			for (MessageContent messageContent : message.getBody().getMessage().getAggregateContent()) {
-				Optional<PayloadValidationException> exception = checkMessageContent(messageContent);
+		MessageContent messageContent = message.getBody().getMessage();
+		if (messageContent instanceof MessageContentAggregated) {
+			MessageContentAggregated aggregatedContent = (MessageContentAggregated)messageContent;
+			
+			for (MessageContent messageContentPart : aggregatedContent.getAggregateContent()) {
+				Optional<PayloadValidationException> exception = checkMessageContent(messageContentPart);
 				if (exception.isPresent()) {
 					return exception;
 				}
 			}
 		} else {
-			Optional<PayloadValidationException> exception = checkMessageContent(message.getBody().getMessage().getContent());
+			Optional<PayloadValidationException> exception = checkMessageContent(message.getBody().getMessage());
 			if (exception.isPresent()) {
 				return exception;
 			}
