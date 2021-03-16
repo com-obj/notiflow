@@ -14,7 +14,7 @@
   "body" : {
     "attributes" : { },
     "message" : {
-      "content" : {},
+      "type": "AGGREGATED_MESSAGE_CONTENT",
       "aggregateContent" : [ {
         "attributes": {},
         "text": "New position on koderia.sk 1",

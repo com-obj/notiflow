@@ -1,6 +1,7 @@
 package com.obj.nc.domain;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -90,6 +91,7 @@ public class ProcessingInfo {
 	
 	public void stepFinish(BasePayload event) {
 		timeStampFinish = Instant.now();
+		durationInMs = ChronoUnit.MILLIS.between(timeStampStart, timeStampFinish);
 		modifiedEventJson = event.toJSONString();
 		
 //		calculateDiffToPreviosVersion();

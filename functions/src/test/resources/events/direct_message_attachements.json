@@ -9,7 +9,6 @@
    },
    "body":{
       "message": {
-         "content" : {
             "text":"Text",
             "subject":"Subject",
             "attachments":[
@@ -22,7 +21,6 @@
                   "file-URI":"http://domain/location/name.extension"
                }
             ]
-         }
       },
       "recievingEndpoints":[
          {

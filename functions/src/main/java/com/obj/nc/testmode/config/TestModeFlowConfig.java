@@ -1,7 +1,7 @@
 package com.obj.nc.testmode.config;
 
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregatorProcessingFunction;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
+import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
 import com.obj.nc.testmode.functions.sources.GreenMailReceiverSourceSupplier;
@@ -34,7 +34,7 @@ public class TestModeFlowConfig {
 
     @Autowired
     @Qualifier("testModeEmailSenderSinkProcessingFunction")
-    private EmailSenderSinkProcessingFunction testModeSendEmailProcessingFunction;
+    private EmailSender testModeSendEmailProcessingFunction;
 
     @Autowired
 	private PaylaodLoggerSinkConsumer logConsumer;

@@ -1,5 +1,6 @@
 package com.obj.nc.functions.sources;
 
+import com.obj.nc.KoderiaFlowsApplication;
 import com.obj.nc.controller.EmitEventsRestController;
 import com.obj.nc.dto.*;
 import com.obj.nc.utils.JsonUtils;
@@ -12,12 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.context.WebApplicationContext;
 
 @WebMvcTest(controllers = {
         EmitEventsRestController.class,
         KoderiaRestMicroService.class
 })
+@ContextConfiguration(classes = KoderiaFlowsApplication.class)
 class KoderiaRestMicroServiceTest {
 
     @Autowired

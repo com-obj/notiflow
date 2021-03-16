@@ -23,18 +23,11 @@ public class Message extends BasePayload {
 
 	@JsonIgnore
 	public boolean isAggregateMessage() {
-		return this.getBody().getDeliveryOptions().getAggregationType() != DeliveryOptions.AGGREGATION_TYPE.NONE;
+		return this.getBody().getMessage() instanceof MessageContentAggregated;
 	}
-
-	public Message merge(Message other) {
-		Message merged = new Message();
-		merged.header = header;
-		merged.body = body;
-		merged.processingInfo = this.processingInfo;
-
-		merged.header = merged.header.merge(other.header);
-		merged.body = merged.body.merge(other.body);
-		return merged;
+	
+	public <T> T getContentTyped() {
+		return (T)getBody().getMessage();
 	}
 
 }

@@ -3,6 +3,7 @@ package com.obj.nc.functions.processors.senders;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.MessageContentAggregated;
 import com.obj.nc.dto.mailchimp.MessageResponseDto;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.utils.JsonUtils;
@@ -60,7 +61,7 @@ class MailchimpSenderProcessingFunctionTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        inputMessage.getBody().getMessage().getContent().getAttachments().forEach(attachement -> {
+        inputMessage.getBody().getMessage().getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {
@@ -90,8 +91,9 @@ class MailchimpSenderProcessingFunctionTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(AGGREGATE_MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        inputMessage.getBody().getMessage().getAggregateContent().forEach(aggregateContent -> {
-            aggregateContent.getAttachments().forEach(attachement -> {
+        MessageContentAggregated aggregateContent = inputMessage.getContentTyped();
+        aggregateContent.getAggregateContent().forEach(part -> {
+            part.getAttachments().forEach(attachement -> {
                 try {
                     attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
                 } catch (IOException e) {
@@ -140,8 +142,9 @@ class MailchimpSenderProcessingFunctionTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        inputMessage.getBody().getMessage().getAggregateContent().forEach(aggregateContent -> {
-            aggregateContent.getAttachments().forEach(attachement -> {
+        MessageContentAggregated aggregateContent = inputMessage.getContentTyped();
+        aggregateContent.getAggregateContent().forEach(part -> {
+            part.getAttachments().forEach(attachement -> {
                 try {
                     attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
                 } catch (IOException e) {
@@ -149,7 +152,7 @@ class MailchimpSenderProcessingFunctionTest {
                 }
             });
         });
-        inputMessage.getBody().getMessage().getContent().getAttributes().remove(ORIGINAL_EVENT_FIELD);
+        inputMessage.getBody().getMessage().getAttributes().remove(ORIGINAL_EVENT_FIELD);
 
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> sendMailchimpMessage.apply(inputMessage))
@@ -170,8 +173,9 @@ class MailchimpSenderProcessingFunctionTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        inputMessage.getBody().getMessage().getAggregateContent().forEach(aggregateContent -> {
-            aggregateContent.getAttachments().forEach(attachement -> {
+        MessageContentAggregated aggregateContent = inputMessage.getContentTyped();
+        aggregateContent.getAggregateContent().forEach(part -> {
+            part.getAttachments().forEach(attachement -> {
                 try {
                     attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
                 } catch (IOException e) {
@@ -179,7 +183,7 @@ class MailchimpSenderProcessingFunctionTest {
                 }
             });
         });
-        ((Map<?, ?>) inputMessage.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD)).remove("type");
+        ((Map<?, ?>) inputMessage.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD)).remove("type");
 
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> sendMailchimpMessage.apply(inputMessage))
@@ -200,8 +204,9 @@ class MailchimpSenderProcessingFunctionTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        inputMessage.getBody().getMessage().getAggregateContent().forEach(aggregateContent -> {
-            aggregateContent.getAttachments().forEach(attachement -> {
+        MessageContentAggregated aggregateContent = inputMessage.getContentTyped();
+        aggregateContent.getAggregateContent().forEach(part -> {
+            part.getAttachments().forEach(attachement -> {
                 try {
                     attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
                 } catch (IOException e) {
@@ -209,7 +214,7 @@ class MailchimpSenderProcessingFunctionTest {
                 }
             });
         });
-        inputMessage.getBody().getMessage().getContent().setSubject(param);
+        inputMessage.getBody().getMessage().setSubject(param);
 
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> sendMailchimpMessage.apply(inputMessage))
@@ -229,8 +234,10 @@ class MailchimpSenderProcessingFunctionTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        inputMessage.getBody().getMessage().getAggregateContent().forEach(aggregateContent -> {
-            aggregateContent.getAttachments().forEach(attachement -> {
+        
+        MessageContentAggregated aggregateContent = inputMessage.getContentTyped();
+        aggregateContent.getAggregateContent().forEach(part -> {
+            part.getAttachments().forEach(attachement -> {
                 try {
                     attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
                 } catch (IOException e) {
@@ -259,8 +266,10 @@ class MailchimpSenderProcessingFunctionTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        inputMessage.getBody().getMessage().getAggregateContent().forEach(aggregateContent -> {
-            aggregateContent.getAttachments().forEach(attachement -> {
+        
+        MessageContentAggregated aggregateContent = inputMessage.getContentTyped();
+        aggregateContent.getAggregateContent().forEach(part -> {
+            part.getAttachments().forEach(attachement -> {
                 try {
                     attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
                 } catch (IOException e) {

@@ -40,8 +40,8 @@ class KoderiaEventConverterProcessingFunctionTest {
 
         // and
         MatcherAssert.assertThat(mappedEvent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
-        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(jobPostEventData.getMessageSubject()));
-        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getText(), Matchers.equalTo(jobPostEventData.getMessageText()));
+        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getSubject(), Matchers.equalTo(jobPostEventData.getMessageSubject()));
+        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getText(), Matchers.equalTo(jobPostEventData.getMessageText()));
 
         // and
         Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedEvent.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
@@ -103,8 +103,8 @@ class KoderiaEventConverterProcessingFunctionTest {
 
         // and
         MatcherAssert.assertThat(mappedEvent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
-        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(blogEventData.getTitle()));
-        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getText(), Matchers.equalTo(blogEventData.getContent()));
+        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getSubject(), Matchers.equalTo(blogEventData.getTitle()));
+        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getText(), Matchers.equalTo(blogEventData.getContent()));
 
         // and
         Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedEvent.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
@@ -138,8 +138,8 @@ class KoderiaEventConverterProcessingFunctionTest {
 
         // and
         MatcherAssert.assertThat(mappedEvent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
-        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(eventEventData.getName()));
-        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getText(), Matchers.equalTo(eventEventData.getDescription()));
+        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getSubject(), Matchers.equalTo(eventEventData.getName()));
+        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getText(), Matchers.equalTo(eventEventData.getDescription()));
 
         // and
         Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedEvent.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
@@ -174,8 +174,8 @@ class KoderiaEventConverterProcessingFunctionTest {
 
         // and
         MatcherAssert.assertThat(mappedEvent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
-        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(linkEventData.getTitle()));
-        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getText(), Matchers.equalTo(linkEventData.getDescription()));
+        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getSubject(), Matchers.equalTo(linkEventData.getTitle()));
+        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getText(), Matchers.equalTo(linkEventData.getDescription()));
 
         // and
         Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedEvent.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
@@ -200,8 +200,8 @@ class KoderiaEventConverterProcessingFunctionTest {
 
         // and
         MatcherAssert.assertThat(mappedEvent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
-        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(newsEventData.getSubject()));
-        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getContent().getText(), Matchers.equalTo(newsEventData.getText()));
+        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getSubject(), Matchers.equalTo(newsEventData.getSubject()));
+        MatcherAssert.assertThat(mappedEvent.getBody().getMessage().getText(), Matchers.equalTo(newsEventData.getText()));
     }
 
 }

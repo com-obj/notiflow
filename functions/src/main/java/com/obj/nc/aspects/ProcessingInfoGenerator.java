@@ -28,8 +28,8 @@ public class ProcessingInfoGenerator {
 	    Method method = signature.getMethod();
 
 	    DocumentProcessingInfo myAnnotation = method.getAnnotation(DocumentProcessingInfo.class);
-		log.info("Generating processing info for step {}", myAnnotation.value());
 		
+	    log.info("Generating processing info for step {}", myAnnotation.value());
 		BasePayload payload = (BasePayload)joinPoint.getArgs()[0];
 		payload.stepStart(myAnnotation.value());
 		
@@ -40,8 +40,9 @@ public class ProcessingInfoGenerator {
 			log.error("Exception ocured in processing step " + myAnnotation.value(), e);
 			throw e;
 		}
-		
+
 		payload.stepFinish();
+		log.info("Processing finished for step {}. Took {} ms", myAnnotation.value(), payload.getProcessingInfo().getDurationInMs());
 
 		return returnValue;
 		

@@ -1,5 +1,6 @@
 package com.obj.nc.mapper;
 
+import com.obj.nc.KoderiaFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.dto.mailchimp.SendMessageWithTemplateDto;
@@ -14,12 +15,14 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.io.IOException;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @JsonTest
 @Import(MailchimpMessageMapperImplTestConfig.class)
+@ContextConfiguration(classes = KoderiaFlowsApplication.class)
 class MailchimpMessageMapperImplTest {
 
     public static final String MESSAGE_JSON_PATH = "mailchimp/message.json";
@@ -34,7 +37,7 @@ class MailchimpMessageMapperImplTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        inputMessage.getBody().getMessage().getContent().getAttachments().forEach(attachement -> {
+        inputMessage.getBody().getMessage().getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {

@@ -1,17 +1,11 @@
 package com.obj.nc.functions.sink;
 
-import com.icegreen.greenmail.store.FolderException;
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.GreenMailUtil;
-import com.obj.nc.BaseIntegrationTest;
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.ProcessingInfo;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkExecution;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
-import com.obj.nc.utils.GreenMailManager;
-import com.obj.nc.utils.JsonUtils;
+import java.io.IOException;
+import java.util.UUID;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,10 +14,18 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.IOException;
-import java.util.UUID;
+import com.icegreen.greenmail.store.FolderException;
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.obj.nc.BaseIntegrationTest;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.ProcessingInfo;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.MessageContentAggregated;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.senders.EmailSender;
+import com.obj.nc.utils.GreenMailManager;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 class EmailSenderSinkTest extends BaseIntegrationTest {
@@ -35,7 +37,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     private GreenMailManager greenMailManager;
 
     @Autowired
-    private EmailSenderSinkProcessingFunction functionSend;
+    private EmailSender functionSend;
 
     @BeforeEach
     void cleanGreenMailMailBoxes() throws FolderException {
@@ -59,8 +61,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Assertions.assertThat( messages[0].getSubject() ).isEqualTo("Subject");
         Assertions.assertThat( messages[0].getFrom()[0] ).extracting("address").isEqualTo(defaultJavaMailSender.getUsername());
 
-        //THEN check processing info
-
+        //THEN check processing info --docasne zakomentovane kym nezimplementujeme HasProcessingInfo
         ProcessingInfo processingInfo = result.getProcessingInfo();
         Assertions.assertThat(processingInfo.getStepName()).isEqualTo("SendEmail");
         Assertions.assertThat(processingInfo.getStepIndex()).isEqualTo(4);
@@ -102,7 +103,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         String INPUT_JSON_FILE = "messages/email_message_attachments.json";
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 
-        inputMessage.getBody().getMessage().getContent().getAttachments().forEach(attachement -> {
+        inputMessage.getBody().getMessage().getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {
@@ -135,8 +136,8 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         MimeMessage message = gm.getReceivedMessages()[0];
         String msg = GreenMailUtil.getWholeMessage(message);
 
-
-        outputMessage.getBody().getMessage().getAggregateContent()
+        MessageContentAggregated aggregated = outputMessage.getContentTyped();
+        aggregated.getAggregateContent()
                 .forEach(messageContent -> {
                     Assertions.assertThat(msg).contains(messageContent.getSubject());
                     Assertions.assertThat(msg).contains(messageContent.getText());

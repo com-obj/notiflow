@@ -15,9 +15,9 @@ import java.util.function.Function;
 @Configuration
 @Log4j2
 @AllArgsConstructor
-public class EmailSenderSinkMicroService extends ProcessorMicroService<Message, Message, EmailSenderSinkProcessingFunction> {
+public class EmailSenderReactive extends ProcessorMicroService<Message, Message, EmailSender> {
 
-	private final EmailSenderSinkProcessingFunction fn;
+	private final EmailSender fn;
 
 	@Bean
 	public Function<Flux<Message>, Flux<Message>> sendMessage() {
@@ -25,7 +25,7 @@ public class EmailSenderSinkMicroService extends ProcessorMicroService<Message, 
 	}
 
 	@Override
-	public EmailSenderSinkProcessingFunction getProccessingFuction() {
+	public EmailSender getProccessingFuction() {
 		return fn;
 	}
 

@@ -23,7 +23,7 @@ public class Event extends BasePayload {
 	public static Event createWithSimpleMessage(String flowId, String message) {
 		Event event = new Event();
 		event.header.setFlowId(flowId);
-		event.body.getMessage().getContent().setText(message);
+		event.body.getMessage().setText(message);
 		
 		return event;
 	}

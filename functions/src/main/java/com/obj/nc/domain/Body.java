@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-
-import com.obj.nc.domain.message.MessageContents;
+import com.obj.nc.domain.message.MessageContent;
+import com.obj.nc.domain.message.MessageContentAggregated;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public class Body extends BaseJSONObject{
 
-	private MessageContents message = new MessageContents();
+	private MessageContent message = new MessageContent();
 	
 	private List<RecievingEndpoint> recievingEndpoints = new ArrayList<RecievingEndpoint>();
 	
@@ -31,18 +31,18 @@ public class Body extends BaseJSONObject{
 		return this;
 	}
 
-	public Body merge(Body other) {
-		Body merged = new Body();
-		merged.setAttributes(this.getAttributes());
-		other.getAttributes().forEach((key, value) -> merged.getAttributes().putIfAbsent(key, value));
-
-		merged.message = message;
-		merged.message = merged.message.merge(other.message);
-
-		merged.recievingEndpoints = recievingEndpoints;
-		merged.deliveryOptions = deliveryOptions;
-
-		return merged;
-	}
+//	public Body merge(Body other) {
+//		Body merged = new Body();
+//		merged.setAttributes(this.getAttributes());
+//		other.getAttributes().forEach((key, value) -> merged.getAttributes().putIfAbsent(key, value));
+//
+//		merged.message = message;
+//		merged.message = merged.message.merge(other.message);
+//
+//		merged.recievingEndpoints = recievingEndpoints;
+//		merged.deliveryOptions = deliveryOptions;
+//
+//		return merged;
+//	}
 
 }

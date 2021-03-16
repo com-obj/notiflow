@@ -1,6 +1,7 @@
 package com.obj.nc.integration;
 
 import com.obj.nc.BaseIntegrationTest;
+import com.obj.nc.KoderiaFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.config.MailchimpApiConfig;
 import com.obj.nc.dto.EmitEventDto;
@@ -22,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import java.util.Collections;
@@ -40,6 +42,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 		KoderiaFlowTestsConfig.class
 })
 @AutoConfigureMockRestServiceServer
+@ContextConfiguration(classes = KoderiaFlowsApplication.class)
 public class KoderiaFlowTests extends BaseIntegrationTest {
 
 	public static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
@@ -97,21 +100,21 @@ public class KoderiaFlowTests extends BaseIntegrationTest {
 		mockMailchimpRestServer.verify();
 
 		MatcherAssert.assertThat(message1, CoreMatchers.notNullValue());
-		MatcherAssert.assertThat(message1.getBody().getMessage().getContent().getText(), Matchers.equalTo(jobPostData.getMessageText()));
-		MatcherAssert.assertThat(message1.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(jobPostData.getMessageSubject()));
-		MatcherAssert.assertThat(message1.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(emitEventDto.asMap()));
+		MatcherAssert.assertThat(message1.getBody().getMessage().getText(), Matchers.equalTo(jobPostData.getMessageText()));
+		MatcherAssert.assertThat(message1.getBody().getMessage().getSubject(), Matchers.equalTo(jobPostData.getMessageSubject()));
+		MatcherAssert.assertThat(message1.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(emitEventDto.asMap()));
 		MatcherAssert.assertThat(message1.getBody().getAttributes().get(MAILCHIMP_RESPONSE_FIELD), Matchers.notNullValue());
 
 		MatcherAssert.assertThat(message2, CoreMatchers.notNullValue());
-		MatcherAssert.assertThat(message2.getBody().getMessage().getContent().getText(), Matchers.equalTo(jobPostData.getMessageText()));
-		MatcherAssert.assertThat(message2.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(jobPostData.getMessageSubject()));
-		MatcherAssert.assertThat(message2.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(emitEventDto.asMap()));
+		MatcherAssert.assertThat(message2.getBody().getMessage().getText(), Matchers.equalTo(jobPostData.getMessageText()));
+		MatcherAssert.assertThat(message2.getBody().getMessage().getSubject(), Matchers.equalTo(jobPostData.getMessageSubject()));
+		MatcherAssert.assertThat(message2.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(emitEventDto.asMap()));
 		MatcherAssert.assertThat(message2.getBody().getAttributes().get(MAILCHIMP_RESPONSE_FIELD), Matchers.notNullValue());
 
 		MatcherAssert.assertThat(message3, CoreMatchers.notNullValue());
-		MatcherAssert.assertThat(message3.getBody().getMessage().getContent().getText(), Matchers.equalTo(jobPostData.getMessageText()));
-		MatcherAssert.assertThat(message3.getBody().getMessage().getContent().getSubject(), Matchers.equalTo(jobPostData.getMessageSubject()));
-		MatcherAssert.assertThat(message3.getBody().getMessage().getContent().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(emitEventDto.asMap()));
+		MatcherAssert.assertThat(message3.getBody().getMessage().getText(), Matchers.equalTo(jobPostData.getMessageText()));
+		MatcherAssert.assertThat(message3.getBody().getMessage().getSubject(), Matchers.equalTo(jobPostData.getMessageSubject()));
+		MatcherAssert.assertThat(message3.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD), Matchers.equalTo(emitEventDto.asMap()));
 		MatcherAssert.assertThat(message3.getBody().getAttributes().get(MAILCHIMP_RESPONSE_FIELD), Matchers.notNullValue());
 	}
 

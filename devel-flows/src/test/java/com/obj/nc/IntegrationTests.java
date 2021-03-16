@@ -15,14 +15,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.converter.CompositeMessageConverter;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.utils.JsonUtils;
-import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @Import(TestChannelBinderConfiguration.class)
+@ContextConfiguration(classes = EventGeneratorTestApplication.class)
 public class IntegrationTests extends BaseIntegrationTest {
 
 	private static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";

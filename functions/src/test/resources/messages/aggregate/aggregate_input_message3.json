@@ -12,13 +12,10 @@
   "body" : {
     "attributes" : { },
     "message" : {
-      "content" : {
         "attributes": {},
         "text": "New position on koderia.sk 3",
         "subject": "New position 3",
         "attachments" : [ ]
-      },
-      "aggregateContent" : [ ]
     },
     "recievingEndpoints" : [ {
       "type" : "EMAIL",

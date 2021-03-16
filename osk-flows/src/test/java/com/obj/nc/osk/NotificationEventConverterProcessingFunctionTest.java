@@ -59,7 +59,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Jan Cuzy");
     	
     	Event eventForCuzy = eventsForCuzy.iterator().next();
-    	MessageContent msgContent = eventForCuzy.getBody().getMessage().getContent();
+    	MessageContent msgContent = eventForCuzy.getBody().getMessage();
     	assertThat(
     			msgContent.getAttributeValueAs(OUTAGE_START_ATTR_NAME, Date.class)).isNotNull();
     	
@@ -98,7 +98,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	
     	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Vlado Hahn");
     	
-    	MessageContent msgContent = eventForHahn.getBody().getMessage().getContent();
+    	MessageContent msgContent = eventForHahn.getBody().getMessage();
     	assertThat(
     			msgContent.getAttributeValueAs(OUTAGE_START_ATTR_NAME, Date.class)).isNotNull();
     	

@@ -60,7 +60,7 @@ public class IncidentTicketNotificationEventDto {
 		Set<EmailEndpoint> customerEmails = customer.asEmailEnpoints();
 		
 		Body eventBody = new Body();
-		eventBody.getMessage().setContent(customerMessageContent);
+		eventBody.setMessage(customerMessageContent);
 		eventBody.getRecievingEndpoints().addAll(customerEmails);
 		
 		Event event = new Event();
@@ -133,7 +133,7 @@ public class IncidentTicketNotificationEventDto {
 		Set<EmailEndpoint> customerEmails = salesContact.asEmailEnpoints();
 		
 		Body eventBody = new Body();
-		eventBody.getMessage().setContent(customerMessageContent);
+		eventBody.setMessage(customerMessageContent);
 		eventBody.getRecievingEndpoints().addAll(customerEmails);
 		
 		Event event = new Event();

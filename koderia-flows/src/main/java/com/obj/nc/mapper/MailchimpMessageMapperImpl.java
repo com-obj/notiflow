@@ -63,12 +63,12 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     }
 
     protected String mapSubject(Message message) {
-        MessageContent messageContent = message.getBody().getMessage().getContent();
+        MessageContent messageContent = message.getBody().getMessage();
         return messageContent.getSubject();
     }
 
     protected List<MergeVarDto> mapGlobalMergeVars(Message message) {
-        MessageContent messageContent = message.getBody().getMessage().getContent();
+        MessageContent messageContent = message.getBody().getMessage();
         EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
 
         Map<String, Object> mergeVars = new HashMap<>();
@@ -84,7 +84,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     }
 
     protected List<AttachmentDto> mapAttachments(Message message) {
-        MessageContent messageContent = message.getBody().getMessage().getContent();
+        MessageContent messageContent = message.getBody().getMessage();
         return messageContent.getAttachments().stream()
                 .map(this::mapAttachment)
                 .collect(Collectors.toList());
@@ -113,7 +113,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     }
 
     protected String getTemplateName(Message message) {
-        MessageContent messageContent = message.getBody().getMessage().getContent();
+        MessageContent messageContent = message.getBody().getMessage();
         EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
         return mailchimpApiConfig.getTemplateNameFromMessageType(originalEvent.getType());
     }

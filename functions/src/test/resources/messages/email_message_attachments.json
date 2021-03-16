@@ -10,7 +10,6 @@
    },
    "body":{
      "message": {
-       "content" : {
          "text":"Text",
          "subject":"Subject",
          "attachments":[
@@ -23,7 +22,6 @@
              "file-URI":"messages/attachments/test2.txt"
            }
          ]
-       }
      },
 
       "recievingEndpoints":[

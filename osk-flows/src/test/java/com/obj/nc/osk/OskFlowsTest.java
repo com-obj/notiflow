@@ -68,7 +68,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
     	
     	//THEN
         GreenMail gm = greenMailManager.getGreenMail();
-        boolean success = gm.waitForIncomingEmail(6);
+        boolean success = gm.waitForIncomingEmail(10000, 6);
         
         Assertions.assertThat(success).isTrue();
         
@@ -102,7 +102,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
     	
     	//THEN
         GreenMail gm = greenMailManager.getGreenMail();
-        boolean success = gm.waitForIncomingEmail(1);
+        boolean success = gm.waitForIncomingEmail(10000, 1);
         
         Assertions.assertThat(success).isTrue();
         
