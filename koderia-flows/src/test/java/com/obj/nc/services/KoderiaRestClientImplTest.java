@@ -1,5 +1,6 @@
 package com.obj.nc.services;
 
+import com.obj.nc.KoderiaFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
@@ -30,6 +32,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest(KoderiaRestClientImpl.class)
 @Import(KoderiaRestClientImplTestConfig.class)
+@ContextConfiguration(classes = KoderiaFlowsApplication.class)
 class KoderiaRestClientImplTest {
 
     @Autowired

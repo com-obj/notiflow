@@ -1,5 +1,6 @@
 package com.obj.nc.mapper;
 
+import com.obj.nc.KoderiaFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessageContentAggregated;
@@ -14,12 +15,14 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.io.IOException;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @JsonTest
 @Import(MailchimpMessageMapperAggregateImplTestConfig.class)
+@ContextConfiguration(classes = KoderiaFlowsApplication.class)
 class MailchimpMessageMapperAggregateImplTest {
 
     public static final String MESSAGE_JSON_PATH = "mailchimp/aggregate_message.json";
