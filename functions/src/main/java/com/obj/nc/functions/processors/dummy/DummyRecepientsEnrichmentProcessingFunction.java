@@ -1,4 +1,4 @@
-package com.obj.nc.functions.processors.koderia;
+package com.obj.nc.functions.processors.dummy;
 
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.functions.PreCondition;

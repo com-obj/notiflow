@@ -1,5 +1,6 @@
 package com.obj.nc.testmode;
 
+import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
@@ -12,6 +13,7 @@ import com.obj.nc.utils.GreenMailManager;
 import com.obj.nc.utils.JsonUtils;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -51,6 +53,11 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
 
     @Autowired
     private MockIntegrationContext mockIntegrationContext;
+    
+    @BeforeEach
+    void cleanGreenMailMailBoxes() throws FolderException {
+        greenMailManager.getGreenMail().purgeEmailFromAllMailboxes();
+    }
 
     @Test
     void testTestmode() throws MessagingException {

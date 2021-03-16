@@ -4,3 +4,7 @@ spring.flyway.enabled: false
 
 nc.functions.event-generator:
   source-dir: src/test/resources/eventsQueue
+  
+osk.sia.impact-notif:
+   b2b-login-of-la-custumers-to-be-notified:
+      - b2b_to_include

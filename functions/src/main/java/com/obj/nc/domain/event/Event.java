@@ -20,9 +20,9 @@ public class Event extends BasePayload {
 	public Event() {
 	}
 	
-	public static Event createWithSimpleMessage(String configurationName, String message) {
+	public static Event createWithSimpleMessage(String flowId, String message) {
 		Event event = new Event();
-		event.header.setConfigurationName(configurationName);
+		event.header.setFlowId(flowId);
 		event.body.getMessage().getContent().setText(message);
 		
 		return event;

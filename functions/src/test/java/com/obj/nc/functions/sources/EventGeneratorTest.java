@@ -83,7 +83,7 @@ class EventGeneratorTest {
     void readEventFromInvalidFileFails() {
         // given
         config.setSourceDir(EVENT_QUEUE_DIR);
-        config.setFileName(EVENT_FILE_NAME + ".JOF*&#H827hfobn");
+        config.setFileName(EVENT_FILE_NAME + ".JOFH827hfobn");
 
         // when - then
         Assertions.assertThatThrownBy(generateEvent::get)

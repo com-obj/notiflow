@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper=false, of = "email")
 @NoArgsConstructor
 public class EmailEndpoint extends RecievingEndpoint {
 	
