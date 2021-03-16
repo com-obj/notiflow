@@ -1,5 +1,18 @@
 package com.obj.nc.functions.sink;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
+
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.ProcessingInfo;
@@ -10,23 +23,10 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkExecution;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
+import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
 import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.ProcessingInfoPersisterForEventWithRecipientsSinkConsumer;
 import com.obj.nc.utils.JsonUtils;
-import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import static org.hamcrest.MatcherAssert.assertThat;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 class ProcessingInfoPersisterTest extends BaseIntegrationTest {
@@ -47,7 +47,7 @@ class ProcessingInfoPersisterTest extends BaseIntegrationTest {
     private MessagesFromEventProcessingFunction generateMessagesFromEvent;
 
     @Autowired
-    private EmailSenderSinkProcessingFunction functionSend;
+    private EmailSender functionSend;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

@@ -8,7 +8,7 @@ import org.springframework.integration.dsl.Pollers;
 
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
+import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
 import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.ProcessingInfoPersisterForEventWithRecipientsSinkConsumer;
@@ -24,7 +24,7 @@ public class FlowsConfig {
 	private NotificationEventConverterProcessingFunction  siaNotifEventConverter;
 	private ValidateAndGenerateEventIdProcessingFunction generateEventId;
 	private MessagesFromEventProcessingFunction generateMessagesFromEvent;
-	private EmailSenderSinkProcessingFunction sendMessage;
+	private EmailSender sendMessage;
 	private PaylaodLoggerSinkConsumer logConsumer;
 	private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
 	private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoWithRecipientsPersister;

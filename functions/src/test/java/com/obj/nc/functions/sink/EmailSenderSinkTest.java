@@ -1,17 +1,11 @@
 package com.obj.nc.functions.sink;
 
-import com.icegreen.greenmail.store.FolderException;
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.GreenMailUtil;
-import com.obj.nc.BaseIntegrationTest;
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.ProcessingInfo;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkExecution;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
-import com.obj.nc.utils.GreenMailManager;
-import com.obj.nc.utils.JsonUtils;
+import java.io.IOException;
+import java.util.UUID;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,10 +14,17 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.IOException;
-import java.util.UUID;
+import com.icegreen.greenmail.store.FolderException;
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.obj.nc.BaseIntegrationTest;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.ProcessingInfo;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.senders.EmailSender;
+import com.obj.nc.utils.GreenMailManager;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 class EmailSenderSinkTest extends BaseIntegrationTest {
@@ -35,7 +36,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     private GreenMailManager greenMailManager;
 
     @Autowired
-    private EmailSenderSinkProcessingFunction functionSend;
+    private EmailSender functionSend;
 
     @BeforeEach
     void cleanGreenMailMailBoxes() throws FolderException {

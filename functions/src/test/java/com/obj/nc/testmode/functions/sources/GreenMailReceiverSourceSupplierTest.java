@@ -7,7 +7,7 @@ import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
+import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
 import com.obj.nc.utils.GreenMailManager;
 import com.obj.nc.utils.JsonUtils;
@@ -32,7 +32,7 @@ class GreenMailReceiverSourceSupplierTest {
     private TestModeEmailSenderProperties properties;
 
     @Autowired
-    private EmailSenderSinkProcessingFunction emailSenderSinkProcessingFunction;
+    private EmailSender emailSenderSinkProcessingFunction;
 
     @Autowired
     private GreenMailReceiverSourceSupplier greenMailReceiverSourceSupplier;

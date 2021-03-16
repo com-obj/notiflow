@@ -1,19 +1,17 @@
 package com.obj.nc.testmode.functions.processors;
 
-import com.obj.nc.functions.processors.senders.EmailSenderSinkExecution;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkPreCondition;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
+import java.util.Objects;
+import java.util.Properties;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import java.util.Objects;
-import java.util.Properties;
+import com.obj.nc.functions.processors.senders.EmailSender;
 
 @Configuration
 @ConditionalOnProperty(value = "testmode.enabled", havingValue = "true")
@@ -56,23 +54,8 @@ public class TestModeEmailSenderConfig {
     }
 
     @Bean
-    public EmailSenderSinkExecution testModeSendEmailExecution(
-            @Qualifier("testModeJavaMailSender") JavaMailSenderImpl javaMailSender
-    ) {
-        return new EmailSenderSinkExecution(javaMailSender);
-    }
-
-    @Bean
-    public EmailSenderSinkPreCondition testModeSendEmailPreCondition() {
-        return new EmailSenderSinkPreCondition();
-    }
-
-    @Bean
-    public EmailSenderSinkProcessingFunction testModeEmailSenderSinkProcessingFunction(
-            @Qualifier("testModeSendEmailExecution") EmailSenderSinkExecution execution,
-            @Qualifier("testModeSendEmailPreCondition") EmailSenderSinkPreCondition preCondition
-    ) {
-        return new EmailSenderSinkProcessingFunction(execution, preCondition);
+    public EmailSender testModeEmailSenderSinkProcessingFunction(@Qualifier("testModeJavaMailSender") JavaMailSenderImpl javaMailSender) {
+        return new EmailSender(javaMailSender);
     }
 
 }

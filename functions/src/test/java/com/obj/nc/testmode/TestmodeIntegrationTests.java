@@ -6,7 +6,7 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.senders.EmailSenderSinkProcessingFunction;
+import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
 import com.obj.nc.testmode.functions.sources.GreenMailReceiverSourceSupplier;
 import com.obj.nc.utils.GreenMailManager;
@@ -43,7 +43,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     private GreenMailManager greenMailManager;
 
     @Autowired
-    private EmailSenderSinkProcessingFunction emailSenderSinkProcessingFunction;
+    private EmailSender emailSenderSinkProcessingFunction;
 
     @Autowired
     private GreenMailReceiverSourceSupplier greenMailReceiverSourceSupplier;
