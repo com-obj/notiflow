@@ -1,13 +1,8 @@
 package com.obj.nc.functions.processors.messageTemplating;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -20,7 +15,6 @@ import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.domain.message.BaseEmailFromTemplate;
 import com.obj.nc.domain.message.Content;
 import com.obj.nc.domain.message.Email;
-import com.obj.nc.domain.message.EmailFromTemplate;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -30,6 +24,8 @@ import lombok.AllArgsConstructor;
 @Component
 @AllArgsConstructor
 public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, List<Message>> {
+	
+	public final static String LOCALE_ATTR_NAME = "@locale";
 	
 	private TemplateEngine templateEngine;
 	
@@ -75,6 +71,7 @@ public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, Li
 			final String htmlContent = this.templateEngine.process(emailFromTemplate.getTemplateFileName(), ctx);
 			
 			Message htmlMessage = Message.createAsEmail();
+			htmlMessage.setAttributeValue(LOCALE_ATTR_NAME,locale);
 			htmlMessage.getBody().setDeliveryOptions(payload.getBody().getDeliveryOptions());
 			htmlMessage.getBody().setRecievingEndpoints(payload.getBody().getRecievingEndpoints());
 			

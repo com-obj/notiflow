@@ -36,7 +36,7 @@ public class ThymeleafConfiguration {
 	@Value("${templates-root-dir:message-templates}")
 	private String templatesRootDir;
 	
-	@Value("${messages-root-dir:message-templates}")
+	@Value("${messages-dir-and-base-name:message-templates/messages}")
 	private String messagesRootDir;
 	
 	@Value("${locales:#{null}}")

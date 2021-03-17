@@ -41,7 +41,7 @@ public class MailchimpSenderExecution implements Function<Message, Message> {
 				: mailchimpMessageMapper.mapWithTemplate(message);
 
 		List<MessageResponseDto> messageResponseDtos = mailchimpClient.sendMessageWithTemplate(sendMessageDto);
-		message.getBody().putAttributeValue(MAILCHIMP_RESPONSE_FIELD, messageResponseDtos);
+		message.getBody().setAttributeValue(MAILCHIMP_RESPONSE_FIELD, messageResponseDtos);
 
 		return message;
 	}

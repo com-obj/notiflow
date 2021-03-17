@@ -34,7 +34,7 @@ public class EventFactoryProcessingFunction extends ProcessorFunctionAdapter<Gen
 		event.getHeader().generateAndSetID();
 		event.getHeader().addEventId(event.getHeader().getId());
 
-		event.getBody().putAttributeValue(ORIGINAL_EVENT_FIELD, JsonUtils.writeObjectToJSONString(genericEvent));
+		event.getBody().setAttributeValue(ORIGINAL_EVENT_FIELD, JsonUtils.writeObjectToJSONString(genericEvent));
 		
 		event.stepFinish();
 		

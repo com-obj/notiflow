@@ -20,7 +20,7 @@ nc.functions:
       file-name: ba_job_post.json
    email-templates:
       templates-root-dir: src/test/resources/message-templates
-      messagesRootDir: src/test/resources/message-templates
+      messages-dir-and-base-name: src/test/resources/message-templates/messages
    send-email-message:
       from: no-reply@objectify.sk
 
