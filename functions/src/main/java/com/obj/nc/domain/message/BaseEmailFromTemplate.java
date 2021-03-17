@@ -2,8 +2,12 @@ package com.obj.nc.domain.message;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.obj.nc.domain.Attachement;
+import com.obj.nc.domain.BaseJSONObject;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,12 +19,7 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class Email extends Content {
-	
-	public final static String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CONTENT";
-
-	public static final String TEXT_CONCAT_DELIMITER = "\n\n";
-	public static final String SUBJECT_CONCAT_DELIMITER = ", ";
+public abstract class BaseEmailFromTemplate<MODEL_TYPE> extends Content {
 
 	@NonNull
 	@EqualsAndHashCode.Include
@@ -28,18 +27,15 @@ public class Email extends Content {
 	
 	@NonNull
 	@EqualsAndHashCode.Include
-	private String text;
+	private String templateFileName;
+	
+	@NonNull
+	@EqualsAndHashCode.Include
+	private MODEL_TYPE model;
+	
+	private List<Locale> requiredLocales = new ArrayList<>();
 
 	@EqualsAndHashCode.Include
 	private List<Attachement> attachments = new ArrayList<Attachement>();
-
-	public Email concat(Email other) {
-		Email concated = new Email();
-		concated.text = text.concat(TEXT_CONCAT_DELIMITER).concat(other.text);
-		concated.subject = subject.concat(SUBJECT_CONCAT_DELIMITER).concat(other.subject);
-		concated.attachments.addAll(attachments);
-		concated.attachments.addAll(other.attachments);
-		return concated;
-	}
 
 }

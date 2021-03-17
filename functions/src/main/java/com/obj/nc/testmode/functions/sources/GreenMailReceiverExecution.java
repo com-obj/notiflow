@@ -74,8 +74,6 @@ public class GreenMailReceiverExecution implements Supplier<Messages> {
             String mimeMessageContent = parser.hasHtmlContent() ? parser.getHtmlContent() : parser.getPlainContent();
             content.setText(originalRecipients + "\n" + mimeMessageContent);
 
-            result.getBody().setMessage(content);
-
             EmailEndpoint emailEndpoint = new EmailEndpoint();
             emailEndpoint.setEmail(properties.getRecipient());
             result.getBody().setRecievingEndpoints(Collections.singletonList(emailEndpoint));

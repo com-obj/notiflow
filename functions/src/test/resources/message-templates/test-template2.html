@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title th:remove="all">Template for HTML email</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+    <body>
+    <p th:text="${name}">
+      Hello, Peter Static!
+    </p>
+    
+    <thead>
+        <tr>
+            <th> Field1 </th>
+            <th> Field2 </th>
+        </tr>
+    </thead>
+    <tbody>
+	<tr th:if="${parts.empty}">
+            <td colspan="2"> No parts available </td>
+        </tr>
+     <tr th:each="part : ${parts}">
+            <td><span th:text="${part.field1}"> Title </span></td>
+            <td><span th:text="${part.field2}"> Author </span></td>
+     </tr>
+    </tbody>
+  </body>
+</html>
