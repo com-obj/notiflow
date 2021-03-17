@@ -19,7 +19,7 @@ public class BaseJSONObject {
 	private Map<String, Object> attributes = new HashMap<String, Object>();
 
 	@JsonAnySetter
-	public void putAttributeValue(String key, Object value) {
+	public void setAttributeValue(String key, Object value) {
 		attributes.put(key, value);
 	}
 

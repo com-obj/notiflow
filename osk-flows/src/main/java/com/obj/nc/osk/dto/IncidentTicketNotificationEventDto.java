@@ -51,12 +51,12 @@ public class IncidentTicketNotificationEventDto {
 	
 	private Event createCustomerEvent(IncidentTicketNotificationContactDto customer, List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
 		Email customerMessageContent = new Email();
-		customerMessageContent.putAttributeValue(OUTAGE_START_ATTR_NAME, getOutageStart());
+		customerMessageContent.setAttributeValue(OUTAGE_START_ATTR_NAME, getOutageStart());
 		customerMessageContent.setSubject("Vase sluzby mozu byt nedostupne");
 		customerMessageContent.setText("Vážený zákazník, o xx:xx hod. sme zaznamenali výpadok..."); 
 		
 		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutagesForCustomer);
-		customerMessageContent.putAttributeValue(OUTAGE_INFOS_ATTR_NAME, outageInfos);
+		customerMessageContent.setAttributeValue(OUTAGE_INFOS_ATTR_NAME, outageInfos);
 
 		Set<EmailEndpoint> customerEmails = customer.asEmailEnpoints();
 		
@@ -124,12 +124,12 @@ public class IncidentTicketNotificationEventDto {
 	
 	private Event createSalesEvent(IncidentTicketNotificationContactDto salesContact, List<IncidentTicketServiceOutageForCustomerDto> serviceOutages) {
 		Email customerMessageContent = new Email();
-		customerMessageContent.putAttributeValue("outageStart", getOutageStart());
+		customerMessageContent.setAttributeValue("outageStart", getOutageStart());
 		customerMessageContent.setSubject("Tvoji zakaznici maju problem");
 		customerMessageContent.setText("Ahoj, zákazník //xxxx// ma pravdepodobne problém. Informovali sme ho o tom správou."); 
 		
 		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutages);
-		customerMessageContent.putAttributeValue("outageInfos", outageInfos);
+		customerMessageContent.setAttributeValue("outageInfos", outageInfos);
 
 		Set<EmailEndpoint> customerEmails = salesContact.asEmailEnpoints();
 		

@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 	@Type(value = Email.class, name = Email.JSON_TYPE_IDENTIFIER),
 	@Type(value = AggregatedEmail.class, name = AggregatedEmail.JSON_TYPE_IDENTIFIER),
 	@Type(value = SimpleText.class, name = SimpleText.JSON_TYPE_IDENTIFIER),
+	@Type(value = EmailFromTemplate.class, name = EmailFromTemplate.JSON_TYPE_IDENTIFIER),
 })
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)

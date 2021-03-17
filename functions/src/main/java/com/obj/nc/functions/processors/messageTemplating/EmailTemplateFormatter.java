@@ -1,23 +1,35 @@
 package com.obj.nc.functions.processors.messageTemplating;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.BaseJSONObject;
+import com.obj.nc.domain.message.BaseEmailFromTemplate;
 import com.obj.nc.domain.message.Content;
+import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import lombok.AllArgsConstructor;
 
-@Primary
 @Component
 @AllArgsConstructor
-public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, Message> {
+public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, List<Message>> {
 	
+	public final static String LOCALE_ATTR_NAME = "@locale";
+	
+	private TemplateEngine templateEngine;
+	
+	private ThymeleafConfiguration config;
 
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message message) {
@@ -26,6 +38,10 @@ public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, Me
 		if (content ==null ) {
 			return Optional.of(new PayloadValidationException("EmailTemplateFormatter cannot format message because its content is null"));
 		}
+		
+		if (!(content instanceof  BaseEmailFromTemplate)) {
+			return Optional.of(new PayloadValidationException("EmailTemplateFormatter cannot format message because its content is not of type EmailFromTemplate. Instead is " +  content.getClass().getSimpleName()));
+		}		
 
 		return Optional.empty();
 	}
@@ -33,11 +49,40 @@ public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, Me
 
 	@DocumentProcessingInfo("EmailTemplateFormatter")
 	@Override
-	public Message execute(Message payload) {
-		Content content = payload.getBody().getMessage();
+	public List<Message> execute(Message payload) {
+		List<Message> result = new ArrayList<>();
 		
+		BaseEmailFromTemplate<?> emailFromTemplate = payload.getContentTyped();
 		
-		return payload;
+		List<Locale> forLocales = CollectionUtils.isEmpty(emailFromTemplate.getRequiredLocales())?
+				config.getDefaultLocales()
+				:
+				emailFromTemplate.getRequiredLocales();
+		
+		for (Locale locale: forLocales) {
+			Context ctx = new Context(locale);
+			if (emailFromTemplate.getModel() instanceof BaseJSONObject) {
+				ctx.setVariables(((BaseJSONObject)emailFromTemplate.getModel()).getAttributes());
+			} else {
+				ctx.setVariable("model", emailFromTemplate.getModel());
+			}
+			
+			
+			final String htmlContent = this.templateEngine.process(emailFromTemplate.getTemplateFileName(), ctx);
+			
+			Message htmlMessage = Message.createAsEmail();
+			htmlMessage.setAttributeValue(LOCALE_ATTR_NAME,locale);
+			htmlMessage.getBody().setDeliveryOptions(payload.getBody().getDeliveryOptions());
+			htmlMessage.getBody().setRecievingEndpoints(payload.getBody().getRecievingEndpoints());
+			
+			Email email = htmlMessage.getContentTyped();
+			email.setSubject(emailFromTemplate.getSubject());
+			email.setText(htmlContent);
+			
+			result.add(htmlMessage);
+		}
+		
+		return result;
 	}
 
 
