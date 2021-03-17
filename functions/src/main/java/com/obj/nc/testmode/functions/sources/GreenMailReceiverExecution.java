@@ -8,7 +8,8 @@ import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessageContent;
+import com.obj.nc.domain.message.Content;
+import com.obj.nc.domain.message.Email;
 import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
 import com.obj.nc.utils.GreenMailManager;
 import lombok.extern.log4j.Log4j2;
@@ -61,11 +62,11 @@ public class GreenMailReceiverExecution implements Supplier<Messages> {
     }
 
     private Message convertGreenMailMessageToMessage(StoredMessage message) {
-        Message result = new Message();
+        Message result = Message.createAsEmail();
 
         try {
             MimeMessage mimeMessage = message.getMimeMessage();
-            MessageContent content = result.getBody().getMessage();
+            Email content = result.getContentTyped();
             content.setSubject(mimeMessage.getSubject());
 
             MimeMessageParser parser = new MimeMessageParser(mimeMessage).parse();

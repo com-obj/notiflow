@@ -21,7 +21,8 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessageContentAggregated;
+import com.obj.nc.domain.message.AggregatedEmail;
+import com.obj.nc.domain.message.Email;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.utils.GreenMailManager;
@@ -103,7 +104,8 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         String INPUT_JSON_FILE = "messages/email_message_attachments.json";
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 
-        inputMessage.getBody().getMessage().getAttachments().forEach(attachement -> {
+        Email email = inputMessage.getContentTyped();
+        email.getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {
@@ -136,7 +138,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         MimeMessage message = gm.getReceivedMessages()[0];
         String msg = GreenMailUtil.getWholeMessage(message);
 
-        MessageContentAggregated aggregated = outputMessage.getContentTyped();
+        AggregatedEmail aggregated = outputMessage.getContentTyped();
         aggregated.getAggregateContent()
                 .forEach(messageContent -> {
                     Assertions.assertThat(msg).contains(messageContent.getSubject());

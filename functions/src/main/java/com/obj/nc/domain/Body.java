@@ -6,8 +6,9 @@ import java.util.List;
 
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.MessageContent;
-import com.obj.nc.domain.message.MessageContentAggregated;
+import com.obj.nc.domain.message.Content;
+import com.obj.nc.domain.message.SimpleText;
+import com.obj.nc.domain.message.AggregatedEmail;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,7 +16,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public class Body extends BaseJSONObject{
 
-	private MessageContent message = new MessageContent();
+	private Content message = new SimpleText();
 	
 	private List<RecievingEndpoint> recievingEndpoints = new ArrayList<RecievingEndpoint>();
 	
@@ -30,19 +31,9 @@ public class Body extends BaseJSONObject{
 		this.recievingEndpoints.addAll(Arrays.asList(r));
 		return this;
 	}
-
-//	public Body merge(Body other) {
-//		Body merged = new Body();
-//		merged.setAttributes(this.getAttributes());
-//		other.getAttributes().forEach((key, value) -> merged.getAttributes().putIfAbsent(key, value));
-//
-//		merged.message = message;
-//		merged.message = merged.message.merge(other.message);
-//
-//		merged.recievingEndpoints = recievingEndpoints;
-//		merged.deliveryOptions = deliveryOptions;
-//
-//		return merged;
-//	}
+	
+	public <T extends Content> T getContentTyped() {
+		return (T) message;
+	}
 
 }

@@ -16,7 +16,8 @@ import com.obj.nc.domain.Body;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.Person;
 import com.obj.nc.domain.event.Event;
-import com.obj.nc.domain.message.MessageContent;
+import com.obj.nc.domain.message.Content;
+import com.obj.nc.domain.message.Email;
 import com.obj.nc.osk.config.StaticRoutingOptions;
 import com.obj.nc.osk.dto.IncidentTicketServiceOutageForCustomerDto.CustomerSegment;
 import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction;
@@ -49,7 +50,7 @@ public class IncidentTicketNotificationEventDto {
 	} 
 	
 	private Event createCustomerEvent(IncidentTicketNotificationContactDto customer, List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
-		MessageContent customerMessageContent = new MessageContent();
+		Email customerMessageContent = new Email();
 		customerMessageContent.putAttributeValue(OUTAGE_START_ATTR_NAME, getOutageStart());
 		customerMessageContent.setSubject("Vase sluzby mozu byt nedostupne");
 		customerMessageContent.setText("Vážený zákazník, o xx:xx hod. sme zaznamenali výpadok..."); 
@@ -122,7 +123,7 @@ public class IncidentTicketNotificationEventDto {
 	}
 	
 	private Event createSalesEvent(IncidentTicketNotificationContactDto salesContact, List<IncidentTicketServiceOutageForCustomerDto> serviceOutages) {
-		MessageContent customerMessageContent = new MessageContent();
+		Email customerMessageContent = new Email();
 		customerMessageContent.putAttributeValue("outageStart", getOutageStart());
 		customerMessageContent.setSubject("Tvoji zakaznici maju problem");
 		customerMessageContent.setText("Ahoj, zákazník //xxxx// ma pravdepodobne problém. Informovali sme ho o tom správou."); 

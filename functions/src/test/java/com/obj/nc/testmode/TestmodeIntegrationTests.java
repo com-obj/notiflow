@@ -6,7 +6,7 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessageContentAggregated;
+import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
 import com.obj.nc.testmode.functions.sources.GreenMailReceiverSourceSupplier;
@@ -117,9 +117,9 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
                     }
                 });
 
-        MessageContentAggregated aggregated1 = message1.getContentTyped();
-        MessageContentAggregated aggregated2 = message2.getContentTyped();
-        MessageContentAggregated aggregated3 = message3.getContentTyped();
+        AggregatedEmail aggregated1 = message1.getContentTyped();
+        AggregatedEmail aggregated2 = message2.getContentTyped();
+        AggregatedEmail aggregated3 = message3.getContentTyped();
         Assertions.assertThat(outputMimeMessages[0].getSubject()).contains(
         		aggregated1.getAggregateContent().get(0).getSubject(),
         		aggregated2.getAggregateContent().get(0).getSubject(),

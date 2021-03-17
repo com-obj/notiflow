@@ -12,7 +12,7 @@
   "body" : {
     "attributes" : { },
     "message" : {
-      "type": "AGGREGATED_MESSAGE_CONTENT",
+      "type": "AGGREGATED_EMAIL_MESSAGE_CONTENT",
       "aggregateContent" : [{
         "attributes": {},
         "text": "New position on koderia.sk 2",

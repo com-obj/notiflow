@@ -1,8 +1,8 @@
 package com.obj.nc.mapper;
 
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessageContent;
-import com.obj.nc.domain.message.MessageContentAggregated;
+import com.obj.nc.domain.message.Content;
+import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.dto.mailchimp.*;
 import org.springframework.stereotype.Component;
@@ -25,7 +25,7 @@ public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperI
 
     @Override
     protected List<MergeVarDto> mapGlobalMergeVars(Message message) {
-    	MessageContentAggregated aggregateContent = (MessageContentAggregated)message.getBody().getMessage();
+    	AggregatedEmail aggregateContent = (AggregatedEmail)message.getBody().getMessage();
 
         Map<String, List<Object>> globalMergeCategoryValues = new HashMap<>();
         Arrays.stream(EmitEventDto.Type.values())
@@ -40,7 +40,7 @@ public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperI
 
     @Override
     protected List<AttachmentDto> mapAttachments(Message message) {
-    	MessageContentAggregated aggregateContent = (MessageContentAggregated)message.getBody().getMessage();
+    	AggregatedEmail aggregateContent = (AggregatedEmail)message.getBody().getMessage();
     	
         return aggregateContent.getAggregateContent().stream()
                 .flatMap(messageContent -> messageContent.getAttachments().stream().map(this::mapAttachment))

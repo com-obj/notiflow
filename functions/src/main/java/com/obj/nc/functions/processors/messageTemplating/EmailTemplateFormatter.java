@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessageContent;
+import com.obj.nc.domain.message.Content;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
@@ -21,7 +21,7 @@ public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, Me
 
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message message) {
-		MessageContent content = message.getBody().getMessage();
+		Content content = message.getBody().getMessage();
 
 		if (content ==null ) {
 			return Optional.of(new PayloadValidationException("EmailTemplateFormatter cannot format message because its content is null"));
@@ -34,7 +34,7 @@ public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, Me
 	@DocumentProcessingInfo("EmailTemplateFormatter")
 	@Override
 	public Message execute(Message payload) {
-		MessageContent content = payload.getBody().getMessage();
+		Content content = payload.getBody().getMessage();
 		
 		
 		return payload;

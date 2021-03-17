@@ -20,8 +20,9 @@ import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessageContent;
-import com.obj.nc.domain.message.MessageContentAggregated;
+import com.obj.nc.domain.message.Content;
+import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.exceptions.ProcessingException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -39,6 +40,10 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message message) {
+		if (!(message.getBody().getMessage() instanceof Email)) {
+			return Optional.of(new PayloadValidationException("Email sender can process only Message with Email content. Was type " + message.getBody().getMessage().getClass().getSimpleName()));
+		}
+		
 		List<RecievingEndpoint> to = message.getBody().getRecievingEndpoints();
 
 		if (to.size() != 1) {
@@ -61,12 +66,12 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 		
 		EmailEndpoint toEmail = (EmailEndpoint) payload.getBody().getRecievingEndpoints().get(0);
 
-		MessageContent msg = payload.getBody().getMessage();
+		Email msg = payload.getContentTyped();
 
-		MessageContent messageContent = null;
-		if (msg instanceof MessageContentAggregated) {
+		Email messageContent = null;
+		if (msg instanceof AggregatedEmail) {
 			//ak je stale v rezime aggregated tak mi nic ine nezostava ako spravit "dummy" aggregation. Na konci dna potrebujem jeden subject, jeden text
-			messageContent = ((MessageContentAggregated) msg).asSimpleContent();
+			messageContent = ((AggregatedEmail) msg).asSimpleContent();
 		} else {
 			messageContent = msg;
 		}
@@ -77,7 +82,7 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 		return payload;
 	}
 
-	private void doSendMessage(EmailEndpoint toEmail, MessageContent messageContent) {
+	private void doSendMessage(EmailEndpoint toEmail, Email messageContent) {
 		try {
 			MimeMessage message = javaMailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, true);

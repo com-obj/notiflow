@@ -2,6 +2,7 @@ package com.obj.nc.domain.event;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.message.SimpleText;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -23,7 +24,7 @@ public class Event extends BasePayload {
 	public static Event createWithSimpleMessage(String flowId, String message) {
 		Event event = new Event();
 		event.header.setFlowId(flowId);
-		event.body.getMessage().setText(message);
+		event.body.setMessage(new SimpleText(message));
 		
 		return event;
 	}

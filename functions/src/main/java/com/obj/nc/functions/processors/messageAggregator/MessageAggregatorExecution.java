@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessageContentAggregated;
+import com.obj.nc.domain.message.AggregatedEmail;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -17,16 +17,15 @@ public class MessageAggregatorExecution implements Function<Messages, Message> {
 //	@DocumentProcessingInfo("AggregateMessages")
 	@Override
 	public Message apply(Messages messages) {
-		Message outputMessage = new Message();
+		Message outputMessage = Message.createAsAggregatedEmail();
 		outputMessage.getBody().setRecievingEndpoints(messages.getMessages().get(0).getBody().getRecievingEndpoints());
 		outputMessage.getBody().setDeliveryOptions(messages.getMessages().get(0).getBody().getDeliveryOptions());
 		
-		MessageContentAggregated aggregatedContent = new MessageContentAggregated();
+		AggregatedEmail aggregatedContent = outputMessage.getContentTyped();
 		for (Message msg: messages.getMessages()) {
-			aggregatedContent.add(msg.getBody().getMessage());
+			aggregatedContent.add(msg.getContentTyped());
 		}
 
-		outputMessage.getBody().setMessage(aggregatedContent);
 		return outputMessage;
 	}
 

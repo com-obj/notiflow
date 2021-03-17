@@ -2,8 +2,9 @@ package com.obj.nc.functions.processors.senders;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessageContent;
-import com.obj.nc.domain.message.MessageContentAggregated;
+import com.obj.nc.domain.message.Content;
+import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
@@ -24,18 +25,19 @@ public class MailchimpSenderPreCondition implements PreCondition<Message> {
 			return Optional.of(new PayloadValidationException("Message must not be null"));
 		}
 
-		MessageContent messageContent = message.getBody().getMessage();
-		if (messageContent instanceof MessageContentAggregated) {
-			MessageContentAggregated aggregatedContent = (MessageContentAggregated)messageContent;
+		Content messageContent = message.getBody().getMessage();
+		if (messageContent instanceof AggregatedEmail) {
+			AggregatedEmail aggregatedContent = (AggregatedEmail)messageContent;
 			
-			for (MessageContent messageContentPart : aggregatedContent.getAggregateContent()) {
+			for (Email messageContentPart : aggregatedContent.getAggregateContent()) {
+				
 				Optional<PayloadValidationException> exception = checkMessageContent(messageContentPart);
 				if (exception.isPresent()) {
 					return exception;
 				}
 			}
 		} else {
-			Optional<PayloadValidationException> exception = checkMessageContent(message.getBody().getMessage());
+			Optional<PayloadValidationException> exception = checkMessageContent(message.getContentTyped());
 			if (exception.isPresent()) {
 				return exception;
 			}
@@ -44,7 +46,7 @@ public class MailchimpSenderPreCondition implements PreCondition<Message> {
 		return checkReceivingEndpoints(message);
 	}
 
-	private Optional<PayloadValidationException> checkMessageContent(MessageContent messageContent) {
+	private Optional<PayloadValidationException> checkMessageContent(Email messageContent) {
 		if (!messageContent.containsAttributes(Collections.singletonList(ORIGINAL_EVENT_FIELD))) {
 			return Optional.of(new PayloadValidationException(String.format("Message must contain attribute: %s", ORIGINAL_EVENT_FIELD)));
 		}

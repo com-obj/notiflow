@@ -14,6 +14,18 @@ import lombok.ToString;
 public class Message extends BasePayload {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "MESSAGE";
+	
+	public static Message createAsEmail() {
+		Message msg = new Message();
+		msg.getBody().setMessage(new Email());
+		return msg;
+	}
+	
+	public static Message createAsAggregatedEmail() {
+		Message msg = new Message();
+		msg.getBody().setMessage(new AggregatedEmail());
+		return msg;
+	}
 
 	@Override
 	@JsonIgnore
@@ -23,11 +35,7 @@ public class Message extends BasePayload {
 
 	@JsonIgnore
 	public boolean isAggregateMessage() {
-		return this.getBody().getMessage() instanceof MessageContentAggregated;
-	}
-	
-	public <T> T getContentTyped() {
-		return (T)getBody().getMessage();
+		return this.getBody().getMessage() instanceof AggregatedEmail;
 	}
 
 }

@@ -43,5 +43,9 @@ public abstract class BasePayload extends BaseJSONObject {
 	}
 
 	public abstract String getPayloadTypeName();
+	
+	public <T> T getContentTyped() {
+		return (T)getBody().getMessage();
+	}
 
 }

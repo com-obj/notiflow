@@ -11,28 +11,28 @@ import java.util.Optional;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class MessageContentAggregated extends MessageContent {
+public class AggregatedEmail extends Email {
 	
-	public final static String JSON_TYPE_IDENTIFIER = "AGGREGATED_MESSAGE_CONTENT";
+	public final static String JSON_TYPE_IDENTIFIER = "AGGREGATED_EMAIL_MESSAGE_CONTENT";
 
 	//TODO: rename to parts
-    private List<MessageContent> aggregateContent = new ArrayList<>();
+    private List<Email> aggregateContent = new ArrayList<>();
 
-    public MessageContentAggregated from(MessageContent other) {
-        MessageContentAggregated aggregated = new MessageContentAggregated();
+    public AggregatedEmail from(Email other) {
+        AggregatedEmail aggregated = new AggregatedEmail();
         aggregated.setSubject(other.getSubject());
         aggregated.setText(other.getText());
         aggregated.setAttachments(other.getAttachments());
         return aggregated;
     }
     
-    public void add(MessageContent other) {
+    public void add(Email other) {
     	aggregateContent.add(other);
         getAttachments().addAll(other.getAttachments());
     }
     
-    public MessageContent asSimpleContent() {
-    	Optional<MessageContent> simpleContent = aggregateContent.stream().reduce(MessageContent::concat);
+    public Email asSimpleContent() {
+    	Optional<Email> simpleContent = aggregateContent.stream().reduce(Email::concat);
 		return simpleContent
 				.orElseThrow(() -> new IllegalStateException("Failed to build message content"));
     }

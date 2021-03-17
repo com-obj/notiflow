@@ -5,7 +5,8 @@ import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessageContent;
+import com.obj.nc.domain.message.Content;
+import com.obj.nc.domain.message.Email;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.dto.mailchimp.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,12 +64,12 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     }
 
     protected String mapSubject(Message message) {
-        MessageContent messageContent = message.getBody().getMessage();
+    	Email messageContent = message.getContentTyped();
         return messageContent.getSubject();
     }
 
     protected List<MergeVarDto> mapGlobalMergeVars(Message message) {
-        MessageContent messageContent = message.getBody().getMessage();
+        Content messageContent = message.getBody().getMessage();
         EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
 
         Map<String, Object> mergeVars = new HashMap<>();
@@ -84,7 +85,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     }
 
     protected List<AttachmentDto> mapAttachments(Message message) {
-        MessageContent messageContent = message.getBody().getMessage();
+        Email messageContent = message.getContentTyped();
         return messageContent.getAttachments().stream()
                 .map(this::mapAttachment)
                 .collect(Collectors.toList());
@@ -113,7 +114,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     }
 
     protected String getTemplateName(Message message) {
-        MessageContent messageContent = message.getBody().getMessage();
+        Content messageContent = message.getBody().getMessage();
         EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
         return mailchimpApiConfig.getTemplateNameFromMessageType(originalEvent.getType());
     }

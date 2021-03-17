@@ -17,35 +17,30 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", defaultImpl = MessageContent.class)
-@JsonSubTypes({ 
-	@Type(value = MessageContent.class, name = MessageContent.JSON_TYPE_IDENTIFIER), 
-	@Type(value = MessageContentAggregated.class, name = MessageContentAggregated.JSON_TYPE_IDENTIFIER)
-})
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class MessageContent extends BaseJSONObject {
+public class Email extends Content {
 	
-	public final static String JSON_TYPE_IDENTIFIER = "TEXT_MESSAGE_CONTENT";
+	public final static String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CONTENT";
 
 	public static final String TEXT_CONCAT_DELIMITER = "\n\n";
 	public static final String SUBJECT_CONCAT_DELIMITER = ", ";
 
 	@NonNull
 	@EqualsAndHashCode.Include
-	private String text;
-
+	private String subject;
+	
 	@NonNull
 	@EqualsAndHashCode.Include
-	private String subject;
+	private String text;
 
 	@EqualsAndHashCode.Include
 	private List<Attachement> attachments = new ArrayList<Attachement>();
 
-	public MessageContent concat(MessageContent other) {
-		MessageContent concated = new MessageContent();
+	public Email concat(Email other) {
+		Email concated = new Email();
 		concated.text = text.concat(TEXT_CONCAT_DELIMITER).concat(other.text);
 		concated.subject = subject.concat(SUBJECT_CONCAT_DELIMITER).concat(other.subject);
 		concated.attachments.addAll(attachments);

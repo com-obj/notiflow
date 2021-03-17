@@ -21,6 +21,7 @@ import com.obj.nc.domain.endpoints.DeliveryOptions.AGGREGATION_TYPE;
 import com.obj.nc.domain.endpoints.DeliveryOptions.TIME_CONSTRAINT_TYPE;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.message.Email;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.utils.JsonUtils;
 
@@ -71,11 +72,11 @@ class MessagesFromEventTest {
 		RecievingEndpoint recipient = recievingEndpoints.get(0);
 		assertThat(recipient).extracting("email").isIn("john.doe@objectify.sk", "john.dudly@objectify.sk", "all@objectify.sk");
 		
-		
+        Email email = body.getContentTyped();
 		assertThat(body.getMessage()).isEqualTo(event.getBody().getMessage());
-		assertThat(body.getMessage().getSubject()).isEqualTo("Subject");
-		assertThat(body.getMessage().getText()).isEqualTo("Text");
-		assertThat(body.getMessage().getAttachments().size()).isEqualTo(0);
+		assertThat(email.getSubject()).isEqualTo("Subject");
+		assertThat(email.getText()).isEqualTo("Text");
+		assertThat(email.getAttachments().size()).isEqualTo(0);
 
 	}
 	
@@ -145,7 +146,8 @@ class MessagesFromEventTest {
 		//THEN
 		Message deliveryNullMessage = findMessageWithEnpoint(result, "john.doe@objectify.sk");
 		
-		List<Attachement> attachements = deliveryNullMessage.getBody().getMessage().getAttachments();
+        Email email = deliveryNullMessage.getContentTyped();
+		List<Attachement> attachements = email.getAttachments();
 		assertThat(attachements).isNotNull();
 		assertThat(attachements.size()).isEqualTo(2);
 		assertThat(attachements).first().extracting("name").isEqualTo("name.extension");

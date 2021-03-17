@@ -7,8 +7,9 @@ import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessageContent;
-import com.obj.nc.domain.message.MessageContentAggregated;
+import com.obj.nc.domain.message.Content;
+import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
 import com.obj.nc.utils.GreenMailManager;
@@ -65,27 +66,27 @@ class GreenMailReceiverSourceSupplierTest {
         // THEN
         List<Message> messages = messagesWrapped.getMessages();
 
-        MessageContent aggregated = messages.get(0).getContentTyped();
-        MessageContentAggregated aggregatedExpected = message1.getContentTyped();
-        Assertions.assertThat(aggregated.getSubject()).contains(
+        Email original = messages.get(0).getContentTyped();
+        AggregatedEmail aggregatedExpected = message1.getContentTyped();
+        Assertions.assertThat(original.getSubject()).contains(
         		aggregatedExpected.getAggregateContent().get(0).getSubject());
-        Assertions.assertThat(aggregated.getText()).contains(
+        Assertions.assertThat(original.getText()).contains(
         		aggregatedExpected.getAggregateContent().get(0).getText(),
                 ((EmailEndpoint) message1.getBody().getRecievingEndpoints().get(0)).getEmail());
 
-        aggregated = messages.get(1).getContentTyped();
+        original = messages.get(1).getContentTyped();
         aggregatedExpected = message2.getContentTyped();
-        Assertions.assertThat(aggregated.getSubject()).contains(
+        Assertions.assertThat(original.getSubject()).contains(
         		aggregatedExpected.getAggregateContent().get(0).getSubject());
-        Assertions.assertThat(aggregated.getText()).contains(
+        Assertions.assertThat(original.getText()).contains(
         		aggregatedExpected.getAggregateContent().get(0).getText(),
                 ((EmailEndpoint) message2.getBody().getRecievingEndpoints().get(0)).getEmail());
 
-        aggregated = messages.get(2).getContentTyped();
+        original = messages.get(2).getContentTyped();
         aggregatedExpected = message3.getContentTyped();
-        Assertions.assertThat(aggregated.getSubject()).contains(
+        Assertions.assertThat(original.getSubject()).contains(
         		aggregatedExpected.getAggregateContent().get(0).getSubject());
-        Assertions.assertThat(aggregated.getText()).contains(
+        Assertions.assertThat(original.getText()).contains(
         		aggregatedExpected.getAggregateContent().get(0).getText(),
                 ((EmailEndpoint) message3.getBody().getRecievingEndpoints().get(0)).getEmail());
 

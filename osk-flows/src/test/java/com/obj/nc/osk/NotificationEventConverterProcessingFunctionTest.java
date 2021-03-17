@@ -20,7 +20,7 @@ import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.message.MessageContent;
+import com.obj.nc.domain.message.Content;
 import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
 import com.obj.nc.osk.dto.ServiceOutageInfo;
 import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction;
@@ -59,7 +59,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Jan Cuzy");
     	
     	Event eventForCuzy = eventsForCuzy.iterator().next();
-    	MessageContent msgContent = eventForCuzy.getBody().getMessage();
+    	Content msgContent = eventForCuzy.getBody().getMessage();
     	assertThat(
     			msgContent.getAttributeValueAs(OUTAGE_START_ATTR_NAME, Date.class)).isNotNull();
     	
@@ -98,7 +98,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	
     	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Vlado Hahn");
     	
-    	MessageContent msgContent = eventForHahn.getBody().getMessage();
+    	Content msgContent = eventForHahn.getBody().getMessage();
     	assertThat(
     			msgContent.getAttributeValueAs(OUTAGE_START_ATTR_NAME, Date.class)).isNotNull();
     	
