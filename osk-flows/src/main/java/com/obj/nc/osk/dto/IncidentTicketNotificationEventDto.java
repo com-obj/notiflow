@@ -4,23 +4,26 @@ import static com.obj.nc.osk.functions.NotificationEventConverterProcessingFunct
 import static com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction.OUTAGE_START_ATTR_NAME;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.obj.nc.domain.Body;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.Person;
 import com.obj.nc.domain.event.Event;
-import com.obj.nc.domain.message.Content;
 import com.obj.nc.domain.message.Email;
 import com.obj.nc.osk.config.StaticRoutingOptions;
 import com.obj.nc.osk.dto.IncidentTicketServiceOutageForCustomerDto.CustomerSegment;
-import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction;
+import com.obj.nc.osk.functions.CustEventStartEmailTemplate;
+import com.obj.nc.osk.functions.SalesEventStartEmailTemplate;
+import com.obj.nc.osk.functions.model.CustEventStartModel;
+import com.obj.nc.osk.functions.model.SalesEventStartModel;
+import com.obj.nc.osk.functions.model.ServiceOutageInfo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -49,14 +52,19 @@ public class IncidentTicketNotificationEventDto {
 		return customerEvents;
 	} 
 	
-	private Event createCustomerEvent(IncidentTicketNotificationContactDto customer, List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
-		Email customerMessageContent = new Email();
-		customerMessageContent.setAttributeValue(OUTAGE_START_ATTR_NAME, getOutageStart());
-		customerMessageContent.setSubject("Vase sluzby mozu byt nedostupne");
-		customerMessageContent.setText("Vážený zákazník, o xx:xx hod. sme zaznamenali výpadok..."); 
+	private Event createCustomerEvent(
+			IncidentTicketNotificationContactDto customer, 
+			List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
+		
+		CustEventStartEmailTemplate customerMessageContent = new CustEventStartEmailTemplate();
+		
+		customerMessageContent.setSubjectResourceKey("cust.start.subject");
+		customerMessageContent.setTemplateFileName("customer-notification-outage-start.html");
+		customerMessageContent.setRequiredLocales(Arrays.asList(new Locale("en"), new Locale("sk")));
 		
 		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutagesForCustomer);
-		customerMessageContent.setAttributeValue(OUTAGE_INFOS_ATTR_NAME, outageInfos);
+		String customerName = extractCustomerName(serviceOutagesForCustomer);
+		customerMessageContent.setModel(new CustEventStartModel(getOutageStart(), customerName, outageInfos));
 
 		Set<EmailEndpoint> customerEmails = customer.asEmailEnpoints();
 		
@@ -95,6 +103,10 @@ public class IncidentTicketNotificationEventDto {
 		
 		return outageInfos;
 	}
+	
+	private String extractCustomerName(List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
+		return serviceOutagesForCustomer.iterator().next().getCustomerName();
+	}
 
 	
 	public void filterOutLAsNotInConfig(StaticRoutingOptions config) {
@@ -122,19 +134,25 @@ public class IncidentTicketNotificationEventDto {
 		return salesEvents;
 	}
 	
-	private Event createSalesEvent(IncidentTicketNotificationContactDto salesContact, List<IncidentTicketServiceOutageForCustomerDto> serviceOutages) {
-		Email customerMessageContent = new Email();
-		customerMessageContent.setAttributeValue("outageStart", getOutageStart());
-		customerMessageContent.setSubject("Tvoji zakaznici maju problem");
-		customerMessageContent.setText("Ahoj, zákazník //xxxx// ma pravdepodobne problém. Informovali sme ho o tom správou."); 
+	private Event createSalesEvent(
+			IncidentTicketNotificationContactDto salesContact, 
+			List<IncidentTicketServiceOutageForCustomerDto> serviceOutages) {
+		
+		SalesEventStartEmailTemplate salesMessageContent = new SalesEventStartEmailTemplate();
+		
+		salesMessageContent.setSubjectResourceKey("sales.start.subject");
+		salesMessageContent.setTemplateFileName("sales-notification-outage-start.html");
+		salesMessageContent.setRequiredLocales(Arrays.asList(new Locale("sk")));
 		
 		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutages);
-		customerMessageContent.setAttributeValue("outageInfos", outageInfos);
+		Map<String, List<ServiceOutageInfo>> outageInfosPerCustomer = outageInfos.stream().collect(Collectors.groupingBy(ServiceOutageInfo::getCustomerName));
+		
+		salesMessageContent.setModel(new SalesEventStartModel(getOutageStart(), outageInfosPerCustomer));
 
 		Set<EmailEndpoint> customerEmails = salesContact.asEmailEnpoints();
 		
 		Body eventBody = new Body();
-		eventBody.setMessage(customerMessageContent);
+		eventBody.setMessage(salesMessageContent);
 		eventBody.getRecievingEndpoints().addAll(customerEmails);
 		
 		Event event = new Event();

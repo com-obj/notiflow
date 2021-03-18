@@ -21,7 +21,7 @@ public class KoderiaEventConverterExecution implements Function<EmitEventDto, Ev
 		Event event = new Event();
 		event.getHeader().setFlowId("static-routing-pipeline");
 		event.getBody().setMessage(
-				new Email(emitEventDto.getData().getMessageSubject(), emitEventDto.getData().getMessageText())
+				Email.createWithSubject(emitEventDto.getData().getMessageSubject(), emitEventDto.getData().getMessageText())
 		);
 
 		event.getBody().setAttributeValue(ORIGINAL_EVENT_FIELD, emitEventDto.asMap());

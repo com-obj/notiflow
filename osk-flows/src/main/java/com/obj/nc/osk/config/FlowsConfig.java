@@ -8,6 +8,7 @@ import org.springframework.integration.dsl.Pollers;
 
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
+import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
@@ -21,7 +22,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FlowsConfig {
 	
-	private NotificationEventConverterProcessingFunction  siaNotifEventConverter;
+	private NotificationEventConverterProcessingFunction siaNotifEventConverter;
 	private ValidateAndGenerateEventIdProcessingFunction generateEventId;
 	private MessagesFromEventProcessingFunction generateMessagesFromEvent;
 	private EmailSender sendMessage;
@@ -29,6 +30,7 @@ public class FlowsConfig {
 	private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
 	private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoWithRecipientsPersister;
 	private GenericEventsForProcessingSupplier genericEventSupplier;
+	private EmailTemplateFormatter emailFormatter;
 	
 	public static String OUTAGE_START_FLOW_ID = "OUTAGE_START_FLOW_ID";
 	
@@ -43,8 +45,9 @@ public class FlowsConfig {
 				.transform(generateMessagesFromEvent)
 				.split()
 				 	.wireTap(flow -> flow.handle(processingInfoPersister))
+				.transform(emailFormatter)
+				.split()
 				.transform(sendMessage)
-					.wireTap(flow -> flow.handle(processingInfoWithRecipientsPersister))
 				.handle(logConsumer).get();
 	}
 

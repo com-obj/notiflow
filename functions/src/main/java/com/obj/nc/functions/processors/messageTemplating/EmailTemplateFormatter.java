@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.thymeleaf.TemplateEngine;
@@ -76,7 +77,8 @@ public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, Li
 			htmlMessage.getBody().setRecievingEndpoints(payload.getBody().getRecievingEndpoints());
 			
 			Email email = htmlMessage.getContentTyped();
-			email.setSubject(emailFromTemplate.getSubject());
+			email.setContentType(MediaType.TEXT_HTML_VALUE);
+			email.setSubject(emailFromTemplate.getSubjectLocalised(locale));
 			email.setText(htmlContent);
 			
 			result.add(htmlMessage);

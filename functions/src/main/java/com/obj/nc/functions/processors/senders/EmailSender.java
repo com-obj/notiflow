@@ -11,6 +11,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -85,14 +86,15 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	private void doSendMessage(EmailEndpoint toEmail, Email messageContent) {
 		try {
 			MimeMessage message = javaMailSender.createMimeMessage();
-			MimeMessageHelper helper = new MimeMessageHelper(message, true);
+			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
 			helper.setFrom(javaMailSender.getUsername());
 
 			helper.setTo(toEmail.getEmail());
 
 			helper.setSubject(messageContent.getSubject());
-			helper.setText(messageContent.getText());
+			helper.setText(messageContent.getText(), MediaType.TEXT_HTML_VALUE.equals(messageContent.getContentType()) );
+			
 
 			for (Attachement attachement: messageContent.getAttachments()) {
 				FileSystemResource file = new FileSystemResource(new File(attachement.getFileURI()));

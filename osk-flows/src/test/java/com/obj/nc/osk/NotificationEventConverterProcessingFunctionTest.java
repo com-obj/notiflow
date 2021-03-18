@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.junit.jupiter.api.Test;
@@ -22,8 +23,10 @@ import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.Content;
 import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
-import com.obj.nc.osk.dto.ServiceOutageInfo;
+import com.obj.nc.osk.functions.CustEventStartEmailTemplate;
 import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction;
+import com.obj.nc.osk.functions.SalesEventStartEmailTemplate;
+import com.obj.nc.osk.functions.model.ServiceOutageInfo;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -44,7 +47,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	List<Event> result = function.apply(event);
     	
     	//THEN
-    	assertThat(result.size()).isEqualTo(4);
+    	assertThat(result.size()).isEqualTo(5);
     	
     	JXPathContext context = JXPathContext.newContext(result);
 
@@ -59,18 +62,17 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Jan Cuzy");
     	
     	Event eventForCuzy = eventsForCuzy.iterator().next();
-    	Content msgContent = eventForCuzy.getBody().getMessage();
-    	assertThat(
-    			msgContent.getAttributeValueAs(OUTAGE_START_ATTR_NAME, Date.class)).isNotNull();
+    	CustEventStartEmailTemplate msgContent = eventForCuzy.getContentTyped();
+    	assertThat(msgContent.getModel().getTimeStart()).isNotNull();
     	
-    	List<ServiceOutageInfo> outageInfos = msgContent.getAttributeValueAs(OUTAGE_INFOS_ATTR_NAME, List.class);
+    	List<ServiceOutageInfo> outageInfos = msgContent.getModel().getServices();
     	assertThat(outageInfos.size()).isEqualTo(2);
     	
     	context = JXPathContext.newContext(outageInfos);
     	assertThat(context.selectSingleNode(".[@productName='VPS']")).isNotNull();
      	assertThat(context.selectSingleNode(".[@productName='VPS sifrovana']")).isNotNull();
      	
-    	assertThat(context.selectSingleNode(".[@customerName='Objectify']")).isNotNull();
+    	assertThat(context.selectSingleNode(".[@customerName='Objectify, s.r.o.']")).isNotNull();
     	assertThat(context.selectSingleNode(".[@installationAddress='Mocidla 249, Myto pod Dumbierom']")).isNotNull();
     }
     
@@ -85,32 +87,33 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	List<Event> result = function.apply(event);
     	
     	//THEN
-    	assertThat(result.size()).isEqualTo(4);
+    	assertThat(result.size()).isEqualTo(5);
     	
     	JXPathContext context = JXPathContext.newContext(result);
-		List<Event> eventsForHahn = context.selectNodes("//recievingEndpoints[@endpointId='hahn@orange.sk']/../..");
-    	assertThat(eventsForHahn.size()).isEqualTo(1);
+		List<Event> eventsForSlavkovsky = context.selectNodes("//recievingEndpoints[@endpointId='slavkovsky@orange.sk']/../..");
+    	assertThat(eventsForSlavkovsky.size()).isEqualTo(1);
     	    	
-    	Event eventForHahn = eventsForHahn.iterator().next();
+    	Event eventForHahn = eventsForSlavkovsky.iterator().next();
     	context = JXPathContext.newContext(eventForHahn);
     	List<RecievingEndpoint> endpoints = context.selectNodes("//recievingEndpoints");
-    	assertThat(endpoints.size()).isEqualTo(2);
+    	assertThat(endpoints.size()).isEqualTo(1);
     	
-    	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Vlado Hahn");
+    	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Adrian Slavkovsky");
     	
-    	Content msgContent = eventForHahn.getBody().getMessage();
-    	assertThat(
-    			msgContent.getAttributeValueAs(OUTAGE_START_ATTR_NAME, Date.class)).isNotNull();
+    	SalesEventStartEmailTemplate msgContent = eventForHahn.getContentTyped();
+    	assertThat(msgContent.getModel().getTimeStart()).isNotNull();
     	
-    	List<ServiceOutageInfo> outageInfos = msgContent.getAttributeValueAs(OUTAGE_INFOS_ATTR_NAME, List.class);
-    	assertThat(outageInfos.size()).isEqualTo(2);
+    	Map<String, List<ServiceOutageInfo>> outageInfos = msgContent.getModel().getServicesPerCustomer();
+    	assertThat(outageInfos.keySet().size()).isEqualTo(2);
+    	assertThat(outageInfos.get("Objectify, s.r.o.").size()).isEqualTo(1);
+    	assertThat(outageInfos.get("Artin, s.r.o.").size()).isEqualTo(2);
     	
-    	context = JXPathContext.newContext(outageInfos);
-    	assertThat(context.selectSingleNode(".[@productName='VPS']")).isNotNull();
-     	assertThat(context.selectSingleNode(".[@productName='VPS sifrovana']")).isNotNull();
+    	context = JXPathContext.newContext(outageInfos.get("Artin, s.r.o."));
+    	assertThat(context.selectSingleNode(".[@productName='VPS sifrovana']")).isNotNull();
+     	assertThat(context.selectSingleNode(".[@productName='VPS sifrovana/nesifrovana']")).isNotNull();
      	
-    	assertThat(context.selectSingleNode(".[@customerName='Objectify']")).isNotNull();
-    	assertThat(context.selectSingleNode(".[@installationAddress='Mocidla 249, Myto pod Dumbierom']")).isNotNull();
+    	assertThat(context.selectSingleNode(".[@customerName='Artin, s.r.o.']")).isNotNull();
+    	assertThat(context.selectSingleNode(".[@installationAddress='Westend tower']")).isNotNull();
 
     }
 
