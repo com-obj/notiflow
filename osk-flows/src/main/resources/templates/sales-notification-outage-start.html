@@ -1,29 +1,28 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
-    <title th:text="#{sales.start.title}">Vypadok</title>
+    <title>Vypadok sluzby</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
     <body>
     	<p>
-    		<span th:text="#{sales.start.salution}">Vážený zákazník,</span>
+    		<span>Ahoj,</span>
     		<br>
+    		<span>dole uvedeny zakaznici maju pravdepodobne problem. Informovali sme ich o tom správou. Vypadok evidujeme od </span>
     		<span th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
-    		<span th:text="#{sales.start.outage}">sme zaznamenali výpadok</span>
     	</p>
     	
     	
     <table>
     	<tr th:each="services : ${model.servicesPerCustomer}">
         	<td th:text="${services.key}">Customer name</td>
-        	
 			    <table>		
 				    <thead>
 				        <tr>
-				        	<th th:text="#{sales.start.b2bLoginHeader}"> b2bLogin </th>
-				            <th th:text="#{sales.start.snHeader}"> SN </th>
-				            <th th:text="#{sales.start.serviceNameHeader}"> Služba </th>
-				            <th th:text="#{sales.start.customerLocationHeader}"> Odberna adresa </th>
+				        	<th>B2B Login</th>
+				            <th>SN</th>
+				            <th>Služba</th>
+				            <th>Odberna adresa</th>
 				        </tr>
 				    </thead>
 				    <tbody>
@@ -37,10 +36,6 @@
 			    </table>
 		</tr>
 	</table>
-			    
-    <p th:text="#{cust.start.footerLine1}"></p>
-    <p th:text="#{cust.start.footerLine2}"></p>
-    <p th:text="#{cust.start.signature}"></p>
     
     </body>
 </html>
