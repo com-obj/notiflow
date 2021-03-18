@@ -1,7 +1,9 @@
 package com.obj.nc;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import javax.mail.MessagingException;
@@ -46,8 +48,10 @@ public abstract class BaseIntegrationTest {
     	
     }
     
-    public static void assertMessageCount(MimeMessage[] receivedMessages, String emailAddress, int count) {
+    public static List<MimeMessage> assertMessageCount(MimeMessage[] receivedMessages, String emailAddress, int count) {
     	try { 
+    		List<MimeMessage> matched = new ArrayList<>();
+    		
 	    	int totalCount =0;
 	    	for (MimeMessage msg: receivedMessages) {
 	    		boolean has = Arrays.stream(msg.getAllRecipients())
@@ -56,25 +60,25 @@ public abstract class BaseIntegrationTest {
 	    			.findFirst().isPresent();
 	    		
 	    		if (has) {
+	    			matched.add(msg);
 	    			totalCount++;
 	    		}
 	    	}
 	    	
 	    	Assertions.assertThat(totalCount).isEqualTo(count);
+	    	
+	    	return matched;
     	} catch (MessagingException e) {
     		throw new RuntimeException(e);
     	}
     }
     
-    public static void assertMessagesContains(MimeMessage[] receivedMessages, MailMessageForAssertions msgToMatch) {
+    public static MimeMessage assertMessagesContains(MimeMessage[] receivedMessages, MailMessageForAssertions msgToMatch) {
 		 System.out.println("About to check message TO:" + msgToMatch.getTo() + " SUBJECT:" + msgToMatch.getSubjectPart() + " BODY:" + Arrays.toString(msgToMatch.textParts) );
 //		 System.out.println("BODY:" + GreenMailUtil.getBody(message) );
 		 
     	try { 
-	    	 for (MimeMessage message: receivedMessages) {
-	    		 
-
-	    		 
+	    	 for (MimeMessage message: receivedMessages) {	    		 
 		    	 boolean isMatching = true;
 	    		 
 	    		 if (msgToMatch.getTo().isPresent()) {
@@ -88,7 +92,7 @@ public abstract class BaseIntegrationTest {
 	    		 }
 	    		 
 	    		 if (msgToMatch.getSubjectPart().isPresent()) {
-	    			 
+	    			 	System.out.println("Checking subject '" + message.getSubject() + "' to contain '" + msgToMatch.getSubjectPart().get() + "'");
 						isMatching &= message.getSubject().contains(msgToMatch.getSubjectPart().get());
 		
 	    		 }
@@ -100,7 +104,7 @@ public abstract class BaseIntegrationTest {
 	    		 }
 	    		 
 	    		 if (isMatching) {
-	    			 return;
+	    			 return message;
 	    		 }
 	    	 }	
 	    	 
@@ -110,5 +114,7 @@ public abstract class BaseIntegrationTest {
     	} catch (MessagingException e) {
     		throw new RuntimeException(e);
     	}
+    	
+    	return null;
 	}
 }

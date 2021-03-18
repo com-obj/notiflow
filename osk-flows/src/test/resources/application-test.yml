@@ -2,8 +2,11 @@ testEnv: local
 
 spring.flyway.enabled: false
 
-nc.functions.event-generator:
-  source-dir: src/test/resources/eventsQueue
+nc.functions:
+   event-generator:
+     source-dir: src/test/resources/eventsQueue
+   send-email-message:
+      from: no-reply@objectify.sk  
   
 osk.sia.impact-notif:
    b2b-login-of-la-custumers-to-be-notified:

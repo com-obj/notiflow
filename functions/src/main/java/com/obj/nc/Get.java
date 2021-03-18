@@ -24,6 +24,10 @@ public class Get {
         return instance.applicationContext.getBean(clazz);
     }
     
+    public static <T> T getBean(String beanName, Class<T> clazz) {
+        return instance.applicationContext.getBean(beanName, clazz);
+    }
+    
     public static JdbcTemplate getJdbc() {
     	return getBean(JdbcTemplate.class);
     }

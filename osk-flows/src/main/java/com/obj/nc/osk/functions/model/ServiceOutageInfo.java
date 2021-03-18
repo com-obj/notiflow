@@ -1,4 +1,6 @@
-package com.obj.nc.osk.dto;
+package com.obj.nc.osk.functions.model;
+
+import com.obj.nc.osk.dto.IncidentTicketServiceOutageForCustomerDto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,7 +23,7 @@ public class ServiceOutageInfo {
 		newInfo.setProductName(serviceOutage.getService());
 		newInfo.setSn(serviceOutage.getSn());
 		newInfo.setInstallationAddress(serviceOutage.getInstallationAddress());
-		newInfo.setCustomerName(serviceOutage.getBillingAccount());
+		newInfo.setCustomerName(serviceOutage.getCustomerName());
 		
 		return newInfo;
 	}

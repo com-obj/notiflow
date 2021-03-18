@@ -10,16 +10,19 @@ spring.mail:
    username: no-reply@objectify.sk
    password: xxx
 
-nc.functions.event-generator:
-   source-dir: ${user.home}/eventsQueue
-
-nc.functions.send-email-message.from: no-reply@objectify.sk
+nc.functions:
+   event-generator:
+      source-dir: ${user.home}/eventsQueue    
+   send-email-message:
+      from: no-reply@objectify.sk  
+   email-templates:
+      templates-root-dir: src/main/resources/templates
+      messages-dir-and-base-name: src/main/resources/templates/messages
 
 osk.sia.impact-notif:
-#   ico-of-la-custumers-to-be-notified:
-#      - 00686930 #Tatrabanka a.s.
-#      - 00151866 #Ministerstvo vnútra SR
    b2b-login-of-la-custumers-to-be-notified:
       - Tatrabanka
       - MVSR
    
+#logging.level:
+#   org.springframework.beans: DEBUG

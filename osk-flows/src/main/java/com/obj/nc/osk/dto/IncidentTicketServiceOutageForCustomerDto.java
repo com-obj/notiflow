@@ -36,6 +36,7 @@ public class IncidentTicketServiceOutageForCustomerDto {
 	String service;
 
 	String b2bLogin;
+	String customerName;
 	String sn;
 	String installationAddress;
 

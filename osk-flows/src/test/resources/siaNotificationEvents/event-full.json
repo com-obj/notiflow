@@ -11,6 +11,7 @@
          "resource": "MME-ba-02",
          "billingAccountId": 333,
          "billingAccount": "Objectify",
+         "customerName": "Objectify, s.r.o.",
          "subscriptionId": 444,
          "subscription": "Objectify subscription",
          "serviceId": 555,
@@ -39,6 +40,7 @@
          "resource": "MME-ba-02",
          "billingAccountId": 333,
          "billingAccount": "Objectify",
+         "customerName": "Objectify, s.r.o.",
          "subscriptionId": 444,
          "subscription": "Objectify subscription",
          "serviceId": 556,
@@ -69,6 +71,64 @@
          		"name": "Vlado Hahn",
          		"emails": ["sales@orange.sk", "hahn@orange.sk"],
          		"phones": ["09050123478"]
+         	}
+         ]
+      },
+      {
+         "customerSegment" : "SME",
+         "resourceId": 222,
+         "resource": "MME-ba-02",
+         "billingAccountId": 3333,
+         "billingAccount": "Artin",
+         "customerName": "Artin, s.r.o.",
+         "subscriptionId": 4444,
+         "subscription": "Artin subscription",
+         "serviceId": 5566,
+         "service": "VPS sifrovana/nesifrovana",
+         "b2bLogin": "artin",
+         "sn": "0918186998",
+         "installationAddress": "Westend tower",
+         "customerContacts" : [ {
+         		"id": 6666,
+         		"name": "Marek Fukas",
+         		"emails": ["fukas@artin.sk"],
+         		"phones": ["0918186998"]
+         	}
+         ],
+         "sellerContacts" : [ {
+         		"id": 999,
+         		"name": "Adrian Slavkovsky",
+         		"emails": ["slavkovsky@orange.sk"],
+         		"phones": ["09050123467"]
+         	}
+         ]
+      },
+      {
+         "customerSegment" : "SME",
+         "resourceId": 222,
+         "resource": "MME-ba-02",
+         "billingAccountId": 3333,
+         "billingAccount": "Artin",
+         "customerName": "Artin, s.r.o.",
+         "subscriptionId": 4444,
+         "subscription": "Artin subscription",
+         "serviceId": 556,
+         "service": "VPS sifrovana",
+         "b2bLogin": "artin",
+         "sn": "0918186999",
+         "installationAddress": "Westend tower",
+         "customerContacts" : [ {
+         		"id": 6666,
+         		"name": "Marek Fukas",
+         		"emails": ["fukas@artin.sk"],
+         		"phones": ["0918186998"]
+         	}
+         ],
+         "sellerContacts" : [ {
+         		"id": 999,
+         		"name": "Adrian Slavkovsky",
+         		"emails": ["slavkovsky@orange.sk"],
+         		"phones": ["09050123467"]
          	}
          ]
       }
