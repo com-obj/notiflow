@@ -16,6 +16,7 @@ public class ServiceOutageInfo {
 	private String b2bLogin;
 	private String sn;
 	private String installationAddress;
+	private String customerAddress;
 	
 	public static ServiceOutageInfo from(IncidentTicketServiceOutageForCustomerDto serviceOutage) {
 		ServiceOutageInfo newInfo = new ServiceOutageInfo();
@@ -24,8 +25,12 @@ public class ServiceOutageInfo {
 		newInfo.setSn(serviceOutage.getSn());
 		newInfo.setInstallationAddress(serviceOutage.getInstallationAddress());
 		newInfo.setCustomerName(serviceOutage.getCustomerName());
+		newInfo.setCustomerAddress(serviceOutage.getCustomerAddress());
 		
 		return newInfo;
 	}
 	
+	public CustomerInfo getCustomer() {
+		return new CustomerInfo(customerName, customerAddress);
+	}
 }

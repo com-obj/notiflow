@@ -36,9 +36,10 @@ public class IncidentTicketServiceOutageForCustomerDto {
 
 	String b2bLogin;
 	String customerName;
+	String customerAddress;
+	
 	String sn;
 	String installationAddress;
-	String customerAddress;
 
 	List<IncidentTicketNotificationContactDto> customerContacts = new ArrayList<>();
 	List<IncidentTicketNotificationContactDto> sellerContacts = new ArrayList<>();

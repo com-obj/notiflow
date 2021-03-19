@@ -89,7 +89,6 @@ public abstract class BaseIntegrationTest {
     
     public static MimeMessage assertMessagesContains(MimeMessage[] receivedMessages, MailMessageForAssertions msgToMatch) {
 		 System.out.println("About to check message TO:" + msgToMatch.getTo() + " SUBJECT:" + msgToMatch.getSubjectPart() + " BODY:" + Arrays.toString(msgToMatch.textParts) );
-//		 System.out.println("BODY:" + GreenMailUtil.getBody(message) );
 		 
     	try { 
 	    	 for (MimeMessage message: receivedMessages) {	    		 

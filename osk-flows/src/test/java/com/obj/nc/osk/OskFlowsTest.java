@@ -2,6 +2,7 @@ package com.obj.nc.osk;
 
 import static com.obj.nc.osk.config.FlowsConfig.OUTAGE_START_FLOW_ID;
 import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -118,26 +119,31 @@ public class OskFlowsTest extends BaseIntegrationTest {
         assertMessageCount(msgs, "hahn@orange.sk", 1);
         
         msg = assertMessagesContains(msgs, MailMessageForAssertions.as("slavkovsky@orange.sk", "Tvoji zakaznici maju problem",
-        		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", "Mocidla 249, Myto pod Dumbierom",
-        		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", "Westend tower",
+        		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", 
+        		"Mocidla 249, Myto pod Dumbierom","Martinengova 4881/36 811 02 Bratislava",
+        		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", 
+        		"Westend tower","Dubravska cesta 2 841 04 Bratislava",
         		"0918186999"
         		)
         );
         System.out.println(GreenMailUtil.getWholeMessage(msg));
         assertMessagesContains(msgs, MailMessageForAssertions.as("sales@orange.sk", "Tvoji zakaznici maju problem"));
         assertMessagesContains(msgs, MailMessageForAssertions.as("hahn@orange.sk", "Tvoji zakaznici maju problem"));
-        
+
         //sales agent
         //only slovak
         lMsgs = assertMessageCount(msgs, "sales.agent@orange.sk", 1);
         System.out.println(GreenMailUtil.getWholeMessage(lMsgs.iterator().next()));
         
         msg = assertMessagesContains(msgs, MailMessageForAssertions.as("sales.agent@orange.sk", "Zakaznici maju problem",
-        		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", "Mocidla 249, Myto pod Dumbierom",
-        		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", "Westend tower",
+        		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", 
+        		"Mocidla 249, Myto pod Dumbierom", "Martinengova 4881/36 811 02 Bratislava",
+        		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", 
+        		"Westend tower","Dubravska cesta 2 841 04 Bratislava",
         		"0918186999"
         		)
         );
+
     }
 
 	@Test

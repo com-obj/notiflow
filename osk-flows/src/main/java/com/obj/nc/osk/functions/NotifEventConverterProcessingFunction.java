@@ -29,6 +29,7 @@ import com.obj.nc.osk.functions.content.CustEventStartEmailTemplate;
 import com.obj.nc.osk.functions.content.SalesAgentsEventStartEmailTemplate;
 import com.obj.nc.osk.functions.content.SalesEventStartEmailTemplate;
 import com.obj.nc.osk.functions.model.CustEventStartModel;
+import com.obj.nc.osk.functions.model.CustomerInfo;
 import com.obj.nc.osk.functions.model.SalesAgentEventStartModel;
 import com.obj.nc.osk.functions.model.SalesEventStartModel;
 import com.obj.nc.osk.functions.model.ServiceOutageInfo;
@@ -174,7 +175,9 @@ public class NotifEventConverterProcessingFunction extends ProcessorFunctionAdap
 		salesMessageContent.setRequiredLocales(Arrays.asList(new Locale("sk")));
 		
 		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutages);
-		Map<String, List<ServiceOutageInfo>> outageInfosPerCustomer = outageInfos.stream().collect(Collectors.groupingBy(ServiceOutageInfo::getCustomerName));
+		Map<CustomerInfo, List<ServiceOutageInfo>> outageInfosPerCustomer = outageInfos
+				.stream()
+				.collect(Collectors.groupingBy(ServiceOutageInfo::getCustomer));
 		
 		salesMessageContent.setModel(new SalesEventStartModel(outageStart, outageInfosPerCustomer));
 		return salesMessageContent;

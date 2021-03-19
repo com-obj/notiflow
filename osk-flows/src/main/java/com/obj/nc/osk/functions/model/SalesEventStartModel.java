@@ -19,5 +19,5 @@ public class SalesEventStartModel {
 	final private Date timeStart;
 	
 	@NotNull
-	final private Map<String, List<ServiceOutageInfo>> servicesPerCustomer;
+	final private Map<CustomerInfo, List<ServiceOutageInfo>> servicesPerCustomer;
 }

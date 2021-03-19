@@ -15,7 +15,7 @@
     	
     <table>
     	<tr th:each="services : ${model.servicesPerCustomer}">
-        	<td th:text="${services.key}">Customer name</td>
+        	<td th:text="${services.key.customerName + ' ' + services.key.customerAddress}">Customer name</td>
 			    <table>		
 				    <thead>
 				        <tr>
