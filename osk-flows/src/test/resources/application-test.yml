@@ -13,3 +13,5 @@ osk.sia.functions.impact-notif-converter:
       - b2b_to_include
    cs-agents-to-notify-email:
       - sales.agent@orange.sk
+      
+ 

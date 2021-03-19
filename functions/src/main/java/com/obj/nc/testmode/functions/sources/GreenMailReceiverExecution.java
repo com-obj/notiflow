@@ -7,6 +7,7 @@ import com.icegreen.greenmail.store.StoredMessage;
 import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.Content;
 import com.obj.nc.domain.message.Email;
@@ -74,8 +75,8 @@ public class GreenMailReceiverExecution implements Supplier<Messages> {
             String mimeMessageContent = parser.hasHtmlContent() ? parser.getHtmlContent() : parser.getPlainContent();
             content.setText(originalRecipients + "\n" + mimeMessageContent);
 
-            EmailEndpoint emailEndpoint = new EmailEndpoint(properties.getRecipient());
-            result.getBody().setRecievingEndpoints(Collections.singletonList(emailEndpoint));
+            List<RecievingEndpoint> emailEndpoints = properties.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
+            result.getBody().setRecievingEndpoints(emailEndpoints);
 
             DeliveryOptions deliveryOptions = new DeliveryOptions();
             deliveryOptions.setAggregationType(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);

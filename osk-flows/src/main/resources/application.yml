@@ -25,6 +25,28 @@ osk.sia.functions.impact-notif-converter:
       - MVSR
    cs-agents-to-notify-email:
       - sales.agent@orange.sk
+      
+      
+testmode:
+   enabled: false
+   smtp:
+      host: localhost
+      port: 3025
+      username: cuzy@objectify.sk
+      password: xxx
+      recipient: cuzy@objectify.sk
+      periodMinutes: 1
+      
+testmode:
+   enabled: false
+   smtp:
+      host: localhost
+      port: 3025
+      username: testmode_no-reply@objectify.sk # this has to be different to spring.mail.username, for more info see TestmodeIntegrationTests
+      password: xxx
+      recipients: 
+         - cuzy@objectify.sk
+      periodMinutes: 1
    
 #logging.level:
 #   org.springframework.beans: DEBUG

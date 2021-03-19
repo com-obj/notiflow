@@ -31,7 +31,8 @@ testmode:
       port: 3025
       username: testmode_no-reply@objectify.sk # this has to be different to spring.mail.username, for more info see TestmodeIntegrationTests
       password: xxx
-      recipient: testmode_recipient@objectify.sk
+      recipients: 
+         - testmode_recipient@objectify.sk
       periodMinutes: 5
       
 

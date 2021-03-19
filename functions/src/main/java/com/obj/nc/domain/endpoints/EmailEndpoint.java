@@ -1,23 +1,23 @@
 package com.obj.nc.domain.endpoints;
 
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Data
 @EqualsAndHashCode(callSuper=false, of = "email")
 @RequiredArgsConstructor
+@NoArgsConstructor
 public class EmailEndpoint extends RecievingEndpoint {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "EMAIL";
 
-	@NotNull
-	private final String email;
+	@NonNull
+	private String email;
 	
 	public static EmailEndpoint createForPerson(Person person, String emailAddress) {
 		EmailEndpoint r = new EmailEndpoint(emailAddress);

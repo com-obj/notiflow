@@ -91,7 +91,8 @@ class GreenMailReceiverSourceSupplierTest {
                 ((EmailEndpoint) message3.getBody().getRecievingEndpoints().get(0)).getEmail());
 
         Assertions.assertThat(messages.get(2).getBody().getRecievingEndpoints()).hasSize(1);
-        Assertions.assertThat(((EmailEndpoint) messages.get(2).getBody().getRecievingEndpoints().get(0)).getEmail()).isEqualTo(properties.getRecipient());
+        String recipient = properties.getRecipients().iterator().next();
+        Assertions.assertThat(((EmailEndpoint) messages.get(2).getBody().getRecievingEndpoints().get(0)).getEmail()).isEqualTo(recipient);
 
         Assertions.assertThat(messages.get(2).getBody().getDeliveryOptions()).isNotNull();
         Assertions.assertThat((messages.get(2).getBody().getDeliveryOptions().getAggregationType())).isEqualTo(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);

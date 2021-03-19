@@ -105,7 +105,8 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         MimeMessage[] outputMimeMessages = greenMailManager.getGreenMail().getReceivedMessages();
         Assertions.assertThat( outputMimeMessages.length ).isEqualTo(1);
 
-        outputMimeMessages = greenMailManager.getGreenMail().getReceivedMessagesForDomain(properties.getRecipient());
+        String recipient = properties.getRecipients().iterator().next();
+        outputMimeMessages = greenMailManager.getGreenMail().getReceivedMessagesForDomain(recipient);
         Assertions.assertThat( outputMimeMessages.length ).isEqualTo(1);
 
         Stream.of(outputMimeMessages)
