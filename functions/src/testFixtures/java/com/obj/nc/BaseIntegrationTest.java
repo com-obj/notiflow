@@ -11,11 +11,13 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
-import com.obj.nc.BaseIntegrationTest.MailMessageForAssertions;
+import com.obj.nc.utils.GreenMailManager;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +33,7 @@ public abstract class BaseIntegrationTest {
     static FixedPortPostgreSQLContainer<?> POSTGRESQL_CONTAINER;
     
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
-
+    
     @Data
     @AllArgsConstructor
     @ToString

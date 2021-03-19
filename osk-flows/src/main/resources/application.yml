@@ -26,17 +26,6 @@ osk.sia.functions.impact-notif-converter:
    cs-agents-to-notify-email:
       - sales.agent@orange.sk
       
-      
-testmode:
-   enabled: false
-   smtp:
-      host: localhost
-      port: 3025
-      username: cuzy@objectify.sk
-      password: xxx
-      recipient: cuzy@objectify.sk
-      periodMinutes: 1
-      
 testmode:
    enabled: false
    smtp:
