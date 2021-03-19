@@ -11,14 +11,11 @@
     		<span>dole uvedeny zakaznici maju pravdepodobne problem. Informovali sme ich o tom správou. Vypadok evidujeme od </span>
     		<span th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
     	</p>
-    	
-    	
-    <table>
-    	<tr th:each="services : ${model.servicesPerCustomer}">
-        	<td th:text="${services.key.customerName + ' ' + services.key.customerAddress}">Customer name</td>
 			    <table>		
 				    <thead>
 				        <tr>
+				        	<th>Zakaznik</th>
+				        	<th>Adresa zakaznika</th>
 				        	<th>B2B Login</th>
 				            <th>SN</th>
 				            <th>Služba</th>
@@ -26,7 +23,9 @@
 				        </tr>
 				    </thead>
 				    <tbody>
-				     	<tr th:each="service : ${services.value}">
+				     	<tr th:each="service : ${model.services}">
+				     		<td><span th:text="${service.customerName}"> mvsr.sk </span></td>
+				     		<td><span th:text="${service.customerAddress}"> mvsr.sk </span></td>
 				     		<td><span th:text="${service.b2bLogin}"> mvsr.sk </span></td>
 				            <td><span th:text="${service.sn}"> 0905132354 </span></td>
 				            <td><span th:text="${service.productName}"> VPS </span></td>
@@ -34,8 +33,5 @@
 				     	</tr>
 				    </tbody>
 			    </table>
-		</tr>
-	</table>
-    
     </body>
 </html>

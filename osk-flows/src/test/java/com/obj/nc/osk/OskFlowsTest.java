@@ -2,17 +2,20 @@ package com.obj.nc.osk;
 
 import static com.obj.nc.osk.config.FlowsConfig.OUTAGE_START_FLOW_ID;
 import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.jxpath.JXPathContext;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +35,7 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.OskFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
 import com.obj.nc.repositories.GenericEventRepository;
@@ -78,11 +82,12 @@ public class OskFlowsTest extends BaseIntegrationTest {
     	
     	//THEN
         GreenMail gm = greenMailManager.getGreenMail();
-        boolean success = gm.waitForIncomingEmail(10000, 11);
+        boolean success = gm.waitForIncomingEmail(10000, 12);
         
         Assertions.assertThat(success).isTrue();
         
         MimeMessage[] msgs = gm.getReceivedMessages();
+        Assertions.assertThat(msgs.length).isEqualTo(12); //4xcustomers(en/sk), 3xsales, 1xsales agent 
         System.out.println(GreenMailUtil.getWholeMessage(msgs[0]));
         
         //customers
@@ -114,14 +119,31 @@ public class OskFlowsTest extends BaseIntegrationTest {
         assertMessageCount(msgs, "hahn@orange.sk", 1);
         
         msg = assertMessagesContains(msgs, MailMessageForAssertions.as("slavkovsky@orange.sk", "Tvoji zakaznici maju problem",
-        		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", "Mocidla 249, Myto pod Dumbierom",
-        		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", "Westend tower",
+        		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", 
+        		"Mocidla 249, Myto pod Dumbierom","Martinengova 4881/36 811 02 Bratislava",
+        		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", 
+        		"Westend tower","Dubravska cesta 2 841 04 Bratislava",
         		"0918186999"
         		)
         );
         System.out.println(GreenMailUtil.getWholeMessage(msg));
         assertMessagesContains(msgs, MailMessageForAssertions.as("sales@orange.sk", "Tvoji zakaznici maju problem"));
         assertMessagesContains(msgs, MailMessageForAssertions.as("hahn@orange.sk", "Tvoji zakaznici maju problem"));
+
+        //sales agent
+        //only slovak
+        lMsgs = assertMessageCount(msgs, "sales.agent@orange.sk", 1);
+        System.out.println(GreenMailUtil.getWholeMessage(lMsgs.iterator().next()));
+        
+        msg = assertMessagesContains(msgs, MailMessageForAssertions.as("sales.agent@orange.sk", "Zakaznici maju problem",
+        		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", 
+        		"Mocidla 249, Myto pod Dumbierom", "Martinengova 4881/36 811 02 Bratislava",
+        		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", 
+        		"Westend tower","Dubravska cesta 2 841 04 Bratislava",
+        		"0918186999"
+        		)
+        );
+
     }
 
 	@Test
@@ -136,19 +158,19 @@ public class OskFlowsTest extends BaseIntegrationTest {
     	
     	//THEN
         GreenMail gm = greenMailManager.getGreenMail();
-        boolean success = gm.waitForIncomingEmail(10000, 2);
+        boolean success = gm.waitForIncomingEmail(10000, 3); //en+sk
         
         Assertions.assertThat(success).isTrue();
         
         MimeMessage[] messages = gm.getReceivedMessages();
+        Assertions.assertThat(messages.length).isEqualTo(3);
        
-        Assertions.assertThat( messages.length ).isEqualTo(2);
         System.out.println(GreenMailUtil.getWholeMessage(messages[0]));
         
-        Assertions.assertThat( ((InternetAddress) messages[0].getAllRecipients()[0]).getAddress() ).isEqualTo("cuzy@objectify.sk");
+        assertMessagesSendTo(messages,"dysko@objectify.sk", 0); //should get filter out
+        assertMessagesSendTo(messages,"cuzy@objectify.sk", 2);
+        assertMessagesSendTo(messages, "sales.agent@orange.sk", 1);
     }
-
-
     
 }
 

@@ -48,6 +48,20 @@ public abstract class BaseIntegrationTest {
     	
     }
     
+	public static void assertMessagesSendTo(MimeMessage[] messages, String emailAddress, int expectedCount) {
+		long count = Arrays.stream(messages)
+        	.flatMap(m-> {
+				try {
+					return Arrays.stream(m.getAllRecipients());
+				} catch (MessagingException e) {
+					throw new RuntimeException(e);
+				}
+			})
+        	.map(r -> (InternetAddress)r)
+        	.filter(ia -> ia.getAddress().equals(emailAddress)).count();
+    	 Assertions.assertThat( count ).isEqualTo(expectedCount);
+	}
+    
     public static List<MimeMessage> assertMessageCount(MimeMessage[] receivedMessages, String emailAddress, int count) {
     	try { 
     		List<MimeMessage> matched = new ArrayList<>();
@@ -75,15 +89,16 @@ public abstract class BaseIntegrationTest {
     
     public static MimeMessage assertMessagesContains(MimeMessage[] receivedMessages, MailMessageForAssertions msgToMatch) {
 		 System.out.println("About to check message TO:" + msgToMatch.getTo() + " SUBJECT:" + msgToMatch.getSubjectPart() + " BODY:" + Arrays.toString(msgToMatch.textParts) );
-//		 System.out.println("BODY:" + GreenMailUtil.getBody(message) );
 		 
     	try { 
 	    	 for (MimeMessage message: receivedMessages) {	    		 
-		    	 boolean isMatching = true;
+		    	 boolean isMatchingTo = true;
+		    	 boolean isMatchingSubject = true;
+		    	 boolean isMatchingContent = true;
 	    		 
 	    		 if (msgToMatch.getTo().isPresent()) {
 	    			 
-						isMatching &=
+	    			 isMatchingTo &=
 								 
 								 Arrays.stream( message.getAllRecipients())
 								 	.map(fromAddr -> ((InternetAddress)fromAddr).getAddress())
@@ -93,22 +108,20 @@ public abstract class BaseIntegrationTest {
 	    		 
 	    		 if (msgToMatch.getSubjectPart().isPresent()) {
 	    			 	System.out.println("Checking subject '" + message.getSubject() + "' to contain '" + msgToMatch.getSubjectPart().get() + "'");
-						isMatching &= message.getSubject().contains(msgToMatch.getSubjectPart().get());
+	    			 	isMatchingSubject &= message.getSubject().contains(msgToMatch.getSubjectPart().get());
 		
 	    		 }
 	    		 
 	    		 for (String bodyTextToMatch: msgToMatch.getTextParts()) {
 	    			 	
-						isMatching &= GreenMailUtil.getBody(message).contains(bodyTextToMatch);
-		
+	    			 isMatchingContent &= GreenMailUtil.getBody(message).contains(bodyTextToMatch);
+						
 	    		 }
 	    		 
-	    		 if (isMatching) {
+	    		 if (isMatchingTo && isMatchingSubject && isMatchingContent) {
 	    			 return message;
 	    		 }
 	    	 }	
-	    	 
-	    	 
 	    	 
 	    	 Assertions.assertThat(false).as("Greenmail didn't recieve mail which would match to " + msgToMatch.toString()).isTrue();
     	} catch (MessagingException e) {

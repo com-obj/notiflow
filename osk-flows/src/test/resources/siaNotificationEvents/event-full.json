@@ -19,6 +19,7 @@
          "b2bLogin": "obj",
          "sn": "0918186997",
          "installationAddress": "Mocidla 249, Myto pod Dumbierom",
+         "customerAddress": "Martinengova 4881/36 811 02 Bratislava",
          "customerContacts" : [ {
          		"id": 666,
          		"name": "Jan Cuzy",
@@ -48,6 +49,7 @@
          "b2bLogin": "obj",
          "sn": "0918186997",
          "installationAddress": "Mocidla 249, Myto pod Dumbierom",
+         "customerAddress": "Martinengova 4881/36 811 02 Bratislava",
          "customerContacts" : [ {
          		"id": 666,
          		"name": "Jan Cuzy",
@@ -88,6 +90,7 @@
          "b2bLogin": "artin",
          "sn": "0918186998",
          "installationAddress": "Westend tower",
+         "customerAddress": "Dubravska cesta 2 841 04 Bratislava",
          "customerContacts" : [ {
          		"id": 6666,
          		"name": "Marek Fukas",
@@ -117,6 +120,7 @@
          "b2bLogin": "artin",
          "sn": "0918186999",
          "installationAddress": "Westend tower",
+         "customerAddress": "Dubravska cesta 2 841 04 Bratislava",
          "customerContacts" : [ {
          		"id": 6666,
          		"name": "Marek Fukas",
