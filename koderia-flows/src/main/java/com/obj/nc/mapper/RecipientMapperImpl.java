@@ -15,8 +15,7 @@ public class RecipientMapperImpl implements RecipientMapper {
             return null;
         }
 
-        EmailEndpoint emailEndpoint = new EmailEndpoint();
-        emailEndpoint.setEmail(recipientDto.getEmail());
+        EmailEndpoint emailEndpoint = new EmailEndpoint(recipientDto.getEmail());
 
         Person person = new Person(recipientDto.getFirstName() + " " + recipientDto.getLastName());
         emailEndpoint.setRecipient(person);

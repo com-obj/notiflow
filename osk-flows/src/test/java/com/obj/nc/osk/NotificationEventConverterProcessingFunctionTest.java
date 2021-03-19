@@ -1,11 +1,8 @@
 package com.obj.nc.osk;
 
-import static com.obj.nc.osk.functions.NotifEventConverterProcessingFunction.OUTAGE_INFOS_ATTR_NAME;
-import static com.obj.nc.osk.functions.NotifEventConverterProcessingFunction.OUTAGE_START_ATTR_NAME;
 import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +18,6 @@ import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.message.Content;
 import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
 import com.obj.nc.osk.functions.NotifEventConverterProcessingFunction;
 import com.obj.nc.osk.functions.content.CustEventStartEmailTemplate;
@@ -47,10 +43,10 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	List<Event> result = function.apply(event);
     	
     	//THEN
-    	assertThat(result.size()).isEqualTo(5);
+    	assertThat(result.size()).isEqualTo(6); //3xcustomers, 2xsales, 1xsales agent 
     	
+    	//THEN check events for cuzy
     	JXPathContext context = JXPathContext.newContext(result);
-
 		List<Event> eventsForCuzy = context.selectNodes("//recievingEndpoints[@endpointId='cuzy@objectify.sk']/../..");
     	
     	assertThat(eventsForCuzy.size()).isEqualTo(1);
@@ -65,9 +61,10 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	CustEventStartEmailTemplate msgContent = eventForCuzy.getContentTyped();
     	assertThat(msgContent.getModel().getTimeStart()).isNotNull();
     	
+    	//THEN check outage infos
     	List<ServiceOutageInfo> outageInfos = msgContent.getModel().getServices();
     	assertThat(outageInfos.size()).isEqualTo(2);
-    	
+
     	context = JXPathContext.newContext(outageInfos);
     	assertThat(context.selectSingleNode(".[@productName='VPS']")).isNotNull();
      	assertThat(context.selectSingleNode(".[@productName='VPS sifrovana']")).isNotNull();
@@ -87,7 +84,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	List<Event> result = function.apply(event);
     	
     	//THEN
-    	assertThat(result.size()).isEqualTo(5);
+    	assertThat(result.size()).isEqualTo(6); //3xcustomers, 2xsales, 1xsales agent 
     	
     	JXPathContext context = JXPathContext.newContext(result);
 		List<Event> eventsForSlavkovsky = context.selectNodes("//recievingEndpoints[@endpointId='slavkovsky@orange.sk']/../..");

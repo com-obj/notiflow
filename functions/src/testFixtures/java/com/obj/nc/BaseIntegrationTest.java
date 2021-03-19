@@ -93,11 +93,13 @@ public abstract class BaseIntegrationTest {
 		 
     	try { 
 	    	 for (MimeMessage message: receivedMessages) {	    		 
-		    	 boolean isMatching = true;
+		    	 boolean isMatchingTo = true;
+		    	 boolean isMatchingSubject = true;
+		    	 boolean isMatchingContent = true;
 	    		 
 	    		 if (msgToMatch.getTo().isPresent()) {
 	    			 
-						isMatching &=
+	    			 isMatchingTo &=
 								 
 								 Arrays.stream( message.getAllRecipients())
 								 	.map(fromAddr -> ((InternetAddress)fromAddr).getAddress())
@@ -107,22 +109,20 @@ public abstract class BaseIntegrationTest {
 	    		 
 	    		 if (msgToMatch.getSubjectPart().isPresent()) {
 	    			 	System.out.println("Checking subject '" + message.getSubject() + "' to contain '" + msgToMatch.getSubjectPart().get() + "'");
-						isMatching &= message.getSubject().contains(msgToMatch.getSubjectPart().get());
+	    			 	isMatchingSubject &= message.getSubject().contains(msgToMatch.getSubjectPart().get());
 		
 	    		 }
 	    		 
 	    		 for (String bodyTextToMatch: msgToMatch.getTextParts()) {
 	    			 	
-						isMatching &= GreenMailUtil.getBody(message).contains(bodyTextToMatch);
-		
+	    			 isMatchingContent &= GreenMailUtil.getBody(message).contains(bodyTextToMatch);
+						
 	    		 }
 	    		 
-	    		 if (isMatching) {
+	    		 if (isMatchingTo && isMatchingSubject && isMatchingContent) {
 	    			 return message;
 	    		 }
 	    	 }	
-	    	 
-	    	 
 	    	 
 	    	 Assertions.assertThat(false).as("Greenmail didn't recieve mail which would match to " + msgToMatch.toString()).isTrue();
     	} catch (MessagingException e) {

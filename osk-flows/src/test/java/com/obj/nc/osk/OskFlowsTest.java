@@ -81,11 +81,12 @@ public class OskFlowsTest extends BaseIntegrationTest {
     	
     	//THEN
         GreenMail gm = greenMailManager.getGreenMail();
-        boolean success = gm.waitForIncomingEmail(10000, 11);
+        boolean success = gm.waitForIncomingEmail(10000, 12);
         
         Assertions.assertThat(success).isTrue();
         
         MimeMessage[] msgs = gm.getReceivedMessages();
+        Assertions.assertThat(msgs.length).isEqualTo(12); //4xcustomers(en/sk), 3xsales, 1xsales agent 
         System.out.println(GreenMailUtil.getWholeMessage(msgs[0]));
         
         //customers
@@ -125,6 +126,18 @@ public class OskFlowsTest extends BaseIntegrationTest {
         System.out.println(GreenMailUtil.getWholeMessage(msg));
         assertMessagesContains(msgs, MailMessageForAssertions.as("sales@orange.sk", "Tvoji zakaznici maju problem"));
         assertMessagesContains(msgs, MailMessageForAssertions.as("hahn@orange.sk", "Tvoji zakaznici maju problem"));
+        
+        //sales agent
+        //only slovak
+        lMsgs = assertMessageCount(msgs, "sales.agent@orange.sk", 1);
+        System.out.println(GreenMailUtil.getWholeMessage(lMsgs.iterator().next()));
+        
+        msg = assertMessagesContains(msgs, MailMessageForAssertions.as("sales.agent@orange.sk", "Zakaznici maju problem",
+        		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", "Mocidla 249, Myto pod Dumbierom",
+        		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", "Westend tower",
+        		"0918186999"
+        		)
+        );
     }
 
 	@Test
@@ -139,17 +152,18 @@ public class OskFlowsTest extends BaseIntegrationTest {
     	
     	//THEN
         GreenMail gm = greenMailManager.getGreenMail();
-        boolean success = gm.waitForIncomingEmail(10000, 2); //en+sk
+        boolean success = gm.waitForIncomingEmail(10000, 3); //en+sk
         
         Assertions.assertThat(success).isTrue();
         
         MimeMessage[] messages = gm.getReceivedMessages();
+        Assertions.assertThat(messages.length).isEqualTo(3);
        
-        Assertions.assertThat( messages.length ).isEqualTo(2);
         System.out.println(GreenMailUtil.getWholeMessage(messages[0]));
         
         assertMessagesSendTo(messages,"dysko@objectify.sk", 0); //should get filter out
         assertMessagesSendTo(messages,"cuzy@objectify.sk", 2);
+        assertMessagesSendTo(messages, "sales.agent@orange.sk", 1);
     }
     
 }
