@@ -1,7 +1,7 @@
 package com.obj.nc.osk;
 
-import static com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction.OUTAGE_INFOS_ATTR_NAME;
-import static com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction.OUTAGE_START_ATTR_NAME;
+import static com.obj.nc.osk.functions.NotifEventConverterProcessingFunction.OUTAGE_INFOS_ATTR_NAME;
+import static com.obj.nc.osk.functions.NotifEventConverterProcessingFunction.OUTAGE_START_ATTR_NAME;
 import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,9 +23,9 @@ import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.Content;
 import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
-import com.obj.nc.osk.functions.CustEventStartEmailTemplate;
-import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction;
-import com.obj.nc.osk.functions.SalesEventStartEmailTemplate;
+import com.obj.nc.osk.functions.NotifEventConverterProcessingFunction;
+import com.obj.nc.osk.functions.content.CustEventStartEmailTemplate;
+import com.obj.nc.osk.functions.content.SalesEventStartEmailTemplate;
 import com.obj.nc.osk.functions.model.ServiceOutageInfo;
 import com.obj.nc.utils.JsonUtils;
 
@@ -34,7 +34,7 @@ import com.obj.nc.utils.JsonUtils;
 public class NotificationEventConverterProcessingFunctionTest extends BaseIntegrationTest {
 	
 	@Autowired
-	private NotificationEventConverterProcessingFunction function;
+	private NotifEventConverterProcessingFunction function;
     
     @Test
 	@SuppressWarnings("unchecked")

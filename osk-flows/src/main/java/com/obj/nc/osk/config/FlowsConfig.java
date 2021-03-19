@@ -14,7 +14,7 @@ import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
 import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.ProcessingInfoPersisterForEventWithRecipientsSinkConsumer;
 import com.obj.nc.functions.sources.genericEvents.GenericEventsForProcessingSupplier;
-import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunction;
+import com.obj.nc.osk.functions.NotifEventConverterProcessingFunction;
 
 import lombok.AllArgsConstructor;
 
@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FlowsConfig {
 	
-	private NotificationEventConverterProcessingFunction siaNotifEventConverter;
+	private NotifEventConverterProcessingFunction siaNotifEventConverter;
 	private ValidateAndGenerateEventIdProcessingFunction generateEventId;
 	private MessagesFromEventProcessingFunction generateMessagesFromEvent;
 	private EmailSender sendMessage;

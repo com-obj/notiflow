@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Vypadok sluzby</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+    <body>
+    	<p>
+    		<span>Ahoj,</span>
+    		<br>
+    		<span>dole uvedeny zakaznici maju pravdepodobne problem. Informovali sme ich o tom správou. Vypadok evidujeme od </span>
+    		<span th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
+    	</p>
+    	
+    	
+
+			    <table>		
+				    <thead>
+				        <tr>
+				        	<th>Zakaznik</th>
+				        	<th>B2B Login</th>
+				            <th>SN</th>
+				            <th>Služba</th>
+				            <th>Odberna adresa</th>
+				        </tr>
+				    </thead>
+				    <tbody>
+				     	<tr th:each="service : ${services}">
+				     		<td><span th:text="${service.customerName}"> mvsr.sk </span></td>
+				     		<td><span th:text="${service.b2bLogin}"> mvsr.sk </span></td>
+				            <td><span th:text="${service.sn}"> 0905132354 </span></td>
+				            <td><span th:text="${service.productName}"> VPS </span></td>
+				            <td><span th:text="${service.installationAddress}"> Bratislava </span></td>
+				     	</tr>
+				    </tbody>
+			    </table>
+
+    
+    </body>
+</html>

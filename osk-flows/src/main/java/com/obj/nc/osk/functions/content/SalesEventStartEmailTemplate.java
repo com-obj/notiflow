@@ -1,4 +1,4 @@
-package com.obj.nc.osk.functions;
+package com.obj.nc.osk.functions.content;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.domain.message.BaseEmailFromTemplate;

@@ -1,4 +1,4 @@
-package com.obj.nc.osk.config;
+package com.obj.nc.osk.functions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import lombok.Data;
 @Configuration
 @ConfigurationProperties(prefix = "osk.sia.impact-notif")
 @Data
-public class StaticRoutingOptions {
+public class NotifEventConverterConfig {
 
 	private List<String> b2bLoginOfLACustumersToBeNotified = new ArrayList<>();
 }

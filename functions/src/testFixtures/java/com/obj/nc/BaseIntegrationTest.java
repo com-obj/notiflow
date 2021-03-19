@@ -48,6 +48,20 @@ public abstract class BaseIntegrationTest {
     	
     }
     
+	public static void assertMessagesSendTo(MimeMessage[] messages, String emailAddress, int expectedCount) {
+		long count = Arrays.stream(messages)
+        	.flatMap(m-> {
+				try {
+					return Arrays.stream(m.getAllRecipients());
+				} catch (MessagingException e) {
+					throw new RuntimeException(e);
+				}
+			})
+        	.map(r -> (InternetAddress)r)
+        	.filter(ia -> ia.getAddress().equals(emailAddress)).count();
+    	 Assertions.assertThat( count ).isEqualTo(expectedCount);
+	}
+    
     public static List<MimeMessage> assertMessageCount(MimeMessage[] receivedMessages, String emailAddress, int count) {
     	try { 
     		List<MimeMessage> matched = new ArrayList<>();

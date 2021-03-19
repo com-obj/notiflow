@@ -7,12 +7,14 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.jxpath.JXPathContext;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,7 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.OskFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
 import com.obj.nc.repositories.GenericEventRepository;
@@ -136,7 +139,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
     	
     	//THEN
         GreenMail gm = greenMailManager.getGreenMail();
-        boolean success = gm.waitForIncomingEmail(10000, 2);
+        boolean success = gm.waitForIncomingEmail(10000, 2); //en+sk
         
         Assertions.assertThat(success).isTrue();
         
@@ -145,10 +148,9 @@ public class OskFlowsTest extends BaseIntegrationTest {
         Assertions.assertThat( messages.length ).isEqualTo(2);
         System.out.println(GreenMailUtil.getWholeMessage(messages[0]));
         
-        Assertions.assertThat( ((InternetAddress) messages[0].getAllRecipients()[0]).getAddress() ).isEqualTo("cuzy@objectify.sk");
+        assertMessagesSendTo(messages,"dysko@objectify.sk", 0); //should get filter out
+        assertMessagesSendTo(messages,"cuzy@objectify.sk", 2);
     }
-
-
     
 }
 

@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
  *
  */
 @Data
-@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 public class IncidentTicketServiceOutageForCustomerDto {
 	public enum CustomerSegment {
@@ -39,6 +38,7 @@ public class IncidentTicketServiceOutageForCustomerDto {
 	String customerName;
 	String sn;
 	String installationAddress;
+	String customerAddress;
 
 	List<IncidentTicketNotificationContactDto> customerContacts = new ArrayList<>();
 	List<IncidentTicketNotificationContactDto> sellerContacts = new ArrayList<>();
