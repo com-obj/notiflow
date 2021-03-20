@@ -26,15 +26,10 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
 class EventReceiverTest extends BaseIntegrationTest {
-
-//    @Autowired
-//    private GenericEventPersisterConsumer genericEventPersister;
     
-    @Autowired
-    private GenericEventRepository genericEventRepository;
-
-    @Autowired
-    protected MockMvc mockMvc;
+    
+	@Autowired private GenericEventRepository genericEventRepository;
+	@Autowired protected MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {

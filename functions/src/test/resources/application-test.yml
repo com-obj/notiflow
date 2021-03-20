@@ -5,7 +5,7 @@ spring.flyway.enabled: false
 spring.mail:
    host: localhost
    port: 3025
-   username: no-reply@objectify.sk # this has to be different to testmode.smtp.username, for more info see TestmodeIntegrationTests
+   username: no-reply@objectify.sk
    password: xxx
 
 spring.datasource:
@@ -14,25 +14,18 @@ spring.datasource:
    username: nc
    password: ZMss4o9mdBLV
 
-nc.functions:
-   event-generator:
-      soruce-dir: eventsQueue
-      file-name: ba_job_post.json
-   email-templates:
-      templates-root-dir: src/test/resources/message-templates
-      messages-dir-and-base-name: src/test/resources/message-templates/messages
-   send-email-message:
-      from: no-reply@objectify.sk
+nc:
+   functions:
+      event-generator:
+         soruce-dir: eventsQueue
+         file-name: ba_job_post.json
+      email-templates:
+         templates-root-dir: src/test/resources/message-templates
+         messages-dir-and-base-name: src/test/resources/message-templates/messages
+      send-email-message:
+         from: no-reply@objectify.skk
+   flows:
+      test-mode.enabled: false
 
-testmode:
-   enabled: false
-   smtp:
-      host: localhost
-      port: 3025
-      username: testmode_no-reply@objectify.sk # this has to be different to spring.mail.username, for more info see TestmodeIntegrationTests
-      password: xxx
-      recipients: 
-         - testmode_recipient@objectify.sk
-      periodMinutes: 5
       
 

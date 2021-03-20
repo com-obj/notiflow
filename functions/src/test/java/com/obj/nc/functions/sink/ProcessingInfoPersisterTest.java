@@ -31,26 +31,13 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 class ProcessingInfoPersisterTest extends BaseIntegrationTest {
 
-    @Autowired
-    private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
-
-    @Autowired
-    private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoPersisterForEventWithRecipients;
-
-    @Autowired
-    private ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId;
-
-    @Autowired
-    private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
-
-    @Autowired
-    private MessagesFromEventProcessingFunction generateMessagesFromEvent;
-
-    @Autowired
-    private EmailSender functionSend;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+	@Autowired private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
+	@Autowired private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoPersisterForEventWithRecipients;
+	@Autowired private ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId;
+    @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
+    @Autowired private MessagesFromEventProcessingFunction generateMessagesFromEvent;
+    @Autowired private EmailSender functionSend;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     void setUp() {

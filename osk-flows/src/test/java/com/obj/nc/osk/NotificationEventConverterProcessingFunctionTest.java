@@ -27,7 +27,7 @@ import com.obj.nc.osk.functions.model.CustomerInfo;
 import com.obj.nc.osk.functions.model.ServiceOutageInfo;
 import com.obj.nc.utils.JsonUtils;
 
-@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@ActiveProfiles(resolver = SystemPropertyActiveProfileResolver.class)
 @ContextConfiguration(classes = OskFlowsApplication.class)
 public class NotificationEventConverterProcessingFunctionTest extends BaseIntegrationTest {
 	

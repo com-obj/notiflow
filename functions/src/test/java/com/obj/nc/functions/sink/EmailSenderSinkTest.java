@@ -20,29 +20,25 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.ProcessingInfo;
-import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.EmailSender;
-import com.obj.nc.utils.GreenMailManager;
 import com.obj.nc.utils.JsonUtils;
 
+import lombok.AllArgsConstructor;
+
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+
 class EmailSenderSinkTest extends BaseIntegrationTest {
 
-    @Autowired
-    private JavaMailSenderImpl defaultJavaMailSender;
-
-    @Autowired
-    private GreenMailManager greenMailManager;
-
-    @Autowired
-    private EmailSender functionSend;
+    @Autowired private JavaMailSenderImpl defaultJavaMailSender;
+    @Autowired private EmailSender functionSend;
 
     @BeforeEach
     void cleanGreenMailMailBoxes() throws FolderException {
-        greenMailManager.getGreenMail().purgeEmailFromAllMailboxes();
+    	greenMail.purgeEmailFromAllMailboxes();
     }
 
     @Test
@@ -56,8 +52,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Message result = functionSend.apply(message);
 
         //THEN
-        GreenMail gm = greenMailManager.getGreenMail();
-        MimeMessage[] messages = gm.getReceivedMessages();
+        MimeMessage[] messages = greenMail.getReceivedMessages();
         Assertions.assertThat( messages.length ).isEqualTo(1);
         Assertions.assertThat( messages[0].getSubject() ).isEqualTo("Subject");
         Assertions.assertThat( messages[0].getFrom()[0] ).extracting("address").isEqualTo(defaultJavaMailSender.getUsername());
@@ -117,8 +112,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Message outputMessage = functionSend.apply(inputMessage);
 
         //THEN
-        GreenMail gm = greenMailManager.getGreenMail();
-        MimeMessage message = gm.getReceivedMessages()[0];
+        MimeMessage message = greenMail.getReceivedMessages()[0];
         String body = GreenMailUtil.getBody(message);
 
         Assertions.assertThat(body).contains("name=test1.txt", "attachment test1", "name=test2.txt", "attachment test2");
@@ -134,8 +128,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Message outputMessage = functionSend.apply(inputMessage);
 
         //THEN
-        GreenMail gm = greenMailManager.getGreenMail();
-        MimeMessage message = gm.getReceivedMessages()[0];
+        MimeMessage message = greenMail.getReceivedMessages()[0];
         String msg = GreenMailUtil.getWholeMessage(message);
 
         AggregatedEmail aggregated = outputMessage.getContentTyped();

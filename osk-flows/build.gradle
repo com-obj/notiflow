@@ -2,7 +2,8 @@ plugins {
     id 'org.springframework.boot' version '2.3.4.RELEASE'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'java'
-    id 'maven-publish'
+    id 'maven-publish'    
+    id 'com.google.cloud.tools.appengine'
 }
 
 bootJar {
@@ -30,6 +31,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-integration'
   //  implementation "org.springframework.integration:spring-integration-http"
     implementation "org.springframework.integration:spring-integration-jdbc"
+    
+    //app-engine
+    implementation 'org.springframework.cloud:spring-cloud-gcp-starter'
+    implementation 'org.springframework.cloud:spring-cloud-gcp-starter-sql-postgresql'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

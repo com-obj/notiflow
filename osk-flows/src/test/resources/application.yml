@@ -1,0 +1,24 @@
+spring.profiles.active: test
+
+testEnv: test
+
+spring.flyway.enabled: false
+
+spring:
+   mail:
+      host: localhost
+      port: 3025
+      username: no-reply@objectify.sk
+      password: xxx
+      
+nc.functions:
+   event-generator:
+     source-dir: src/test/resources/eventsQueue
+   send-email-message:
+      from: no-reply@objectify.sk  
+  
+osk.sia.functions.impact-notif-converter:
+   b2b-login-of-la-custumers-to-be-notified:
+      - b2b_to_include
+   cs-agents-to-notify-email:
+      - sales.agent@orange.sk

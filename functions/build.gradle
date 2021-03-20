@@ -48,6 +48,7 @@ dependencies {
 	implementation 'org.springframework.data:spring-data-jdbc'
 
 	implementation 'com.icegreen:greenmail:1.6.0'
+	testImplementation 'com.icegreen:greenmail-junit5:1.6.0'
 	implementation 'org.apache.commons:commons-email:1.5'
 
 	//add reactive support

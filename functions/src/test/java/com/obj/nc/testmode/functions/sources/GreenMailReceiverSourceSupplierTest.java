@@ -1,69 +1,81 @@
 package com.obj.nc.testmode.functions.sources;
 
-import com.icegreen.greenmail.store.FolderException;
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.Messages;
-import com.obj.nc.domain.endpoints.DeliveryOptions;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.Content;
-import com.obj.nc.domain.message.Email;
-import com.obj.nc.domain.message.AggregatedEmail;
-import com.obj.nc.functions.processors.senders.EmailSender;
-import com.obj.nc.testmode.functions.processors.TestModeEmailSenderProperties;
-import com.obj.nc.utils.GreenMailManager;
-import com.obj.nc.utils.JsonUtils;
+import java.util.List;
+
+import javax.mail.internet.MimeMessage;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.mail.internet.MimeMessage;
-import java.util.List;
+import com.icegreen.greenmail.store.FolderException;
+import com.icegreen.greenmail.util.GreenMail;
+import com.obj.nc.BaseIntegrationTest;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.Messages;
+import com.obj.nc.domain.endpoints.DeliveryOptions;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.message.AggregatedEmail;
+import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.functions.processors.senders.EmailSender;
+import com.obj.nc.testmode.config.TestModeBeansConfig;
+import com.obj.nc.testmode.config.TestModeProperties;
+import com.obj.nc.utils.JsonUtils;
 
-@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest
-class GreenMailReceiverSourceSupplierTest {
+@ActiveProfiles(value = {"test"}, resolver = SystemPropertyActiveProfileResolver.class)
+@SpringBootTest(properties = {
+		"nc.flows.test-mode.enabled=true", 
+		"nc.flows.test-mode.recipients=cuzy@objectify.sk",
+		"nc.flows.test-mode.periodInSeconds=64000"}) //Don't poll, I'll make it by my self
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS) //Because of correct disposal of green mail used for test mode
+class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 
-    @Autowired
-    private GreenMailManager greenMailManager;
-
-    @Autowired
-    private TestModeEmailSenderProperties properties;
-
-    @Autowired
-    private EmailSender emailSenderSinkProcessingFunction;
-
-    @Autowired
-    private GreenMailReceiverSourceSupplier greenMailReceiverSourceSupplier;
+	@Qualifier(TestModeBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
+    @Autowired private GreenMail testModeEmailsReciver;
+	@Autowired private TestModeProperties properties;
+	@Autowired private EmailSender emailSenderSinkProcessingFunction;
+	@Autowired private GreenMailReceiverSourceSupplier greenMailReceiverSourceSupplier;
 
     @BeforeEach
     void setUp() throws FolderException {
-        greenMailManager.getGreenMail().purgeEmailFromAllMailboxes();
+    	testModeEmailsReciver.purgeEmailFromAllMailboxes();
     }
 
     @Test
     void testRecieveAndConvertMailsFromGreenMail() {
+    	//normaly, we would send all test mail to standrdTestGMServer. When testMode profile is activated, aditional testModeEmailsReciver
+    	//is created which is a different instannce. In this mode testModeEmailsReciver will catch all emails normaly send to standardTestGMServer
+    	//and thus in production will catch all emails send to standard SMTP server configured
+    	//PRE-CONDITION
+    	Assertions.assertThat(greenMail).isNotEqualTo(testModeEmailsReciver);
+    	Assertions.assertThat(greenMail.getSmtp().getPort()).isNotEqualTo(testModeEmailsReciver.getSmtp().getPort());
         // GIVEN
         Message message1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", Message.class);
-        emailSenderSinkProcessingFunction.apply(message1);
         Message message2 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message2.json", Message.class);
-        emailSenderSinkProcessingFunction.apply(message2);
         Message message3 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message3.json", Message.class);
+
+        //WHEN
+        emailSenderSinkProcessingFunction.apply(message1);
+        emailSenderSinkProcessingFunction.apply(message2);
         emailSenderSinkProcessingFunction.apply(message3);
 
-        boolean success = greenMailManager.getGreenMail().waitForIncomingEmail(3);
+        //THEN testModeEmailsReciver recieved the message, not the standard greenmail used for test. This proves it has been substituted
+        boolean success = testModeEmailsReciver.waitForIncomingEmail(3);
         Assertions.assertThat( success ).isEqualTo( true );
-        MimeMessage[] mimeMessages = greenMailManager.getGreenMail().getReceivedMessages();
+        MimeMessage[] mimeMessages = testModeEmailsReciver.getReceivedMessages();
         Assertions.assertThat( mimeMessages.length ).isEqualTo(3);
 
         // WHEN
         Messages messagesWrapped = greenMailReceiverSourceSupplier.get();
 
-        // THEN
+        // THEN mesages recieved from greenMailReceiverSourceSupplier and testModeEmailsReciver are as far as content the same
         List<Message> messages = messagesWrapped.getMessages();
 
         Email original = messages.get(0).getContentTyped();

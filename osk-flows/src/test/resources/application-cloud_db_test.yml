@@ -1,0 +1,10 @@
+testEnv: cloud
+
+spring.flyway.enabled: true
+
+spring:
+   mail:
+      host: localhost
+      port: 3025
+      username: no-reply@objectify.sk
+      password: xxx

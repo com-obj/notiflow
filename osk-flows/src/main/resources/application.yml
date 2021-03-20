@@ -1,14 +1,17 @@
-spring.datasource:
-   platform: postgres
-   url: jdbc:postgresql://localhost:25432/nc
-   username: nc
-   password: ZMss4o9mdBLV
-
-spring.mail:
-   host: localhost
-   port: 3025
-   username: no-reply@objectify.sk
-   password: xxx
+spring:
+   cloud.gcp:
+      sql.enabled: false
+      core.enabled: false
+   datasource:
+      platform: postgres
+      url: jdbc:postgresql://localhost:25432/nc
+      username: nc
+      password: ZMss4o9mdBLV
+   mail:
+      host: localhost
+      port: 3025
+      username: no-reply@objectify.sk
+      password: xxx
 
 nc.functions:
    event-generator:
@@ -25,17 +28,6 @@ osk.sia.functions.impact-notif-converter:
       - MVSR
    cs-agents-to-notify-email:
       - sales.agent@orange.sk
-      
-testmode:
-   enabled: false
-   smtp:
-      host: localhost
-      port: 3025
-      username: testmode_no-reply@objectify.sk # this has to be different to spring.mail.username, for more info see TestmodeIntegrationTests
-      password: xxx
-      recipients: 
-         - cuzy@objectify.sk
-      periodMinutes: 1
    
 #logging.level:
 #   org.springframework.beans: DEBUG

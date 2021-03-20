@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.BaseIntegrationTest;
@@ -17,10 +18,10 @@ import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@SpringBootTest
 class EmailFromTemplateTest extends BaseIntegrationTest {
 	
-	@Autowired
-	private EmailTemplateFormatter teamplte2Html;
+	@Autowired private EmailTemplateFormatter teamplte2Html;
 
 	@Test
 	void createSimpleHtmlEmailFromTemplate() {

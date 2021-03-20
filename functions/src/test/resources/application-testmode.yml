@@ -1,2 +1,5 @@
-testmode:
-   enabled: true
+nc:
+   flows:
+      test-mode:
+         enabled: true
+         periodInSeconds: 1
