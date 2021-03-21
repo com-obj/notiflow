@@ -1,25 +1,27 @@
-package com.obj.nc.osk;
+package com.obj.nc.osk.functions;
 
 import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.jxpath.JXPathContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 
+import com.icegreen.greenmail.store.FolderException;
 import com.obj.nc.BaseIntegrationTest;
-import com.obj.nc.OskFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
-import com.obj.nc.osk.functions.NotifEventConverterProcessingFunction;
 import com.obj.nc.osk.functions.content.CustEventStartEmailTemplate;
 import com.obj.nc.osk.functions.content.SalesAgentsEventStartEmailTemplate;
 import com.obj.nc.osk.functions.content.SalesEventStartEmailTemplate;
@@ -27,12 +29,25 @@ import com.obj.nc.osk.functions.model.CustomerInfo;
 import com.obj.nc.osk.functions.model.ServiceOutageInfo;
 import com.obj.nc.utils.JsonUtils;
 
-@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@ContextConfiguration(classes = OskFlowsApplication.class)
+@ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
+@SpringBootTest
 public class NotificationEventConverterProcessingFunctionTest extends BaseIntegrationTest {
 	
 	@Autowired
 	private NotifEventConverterProcessingFunction function;
+	
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    
+    @BeforeEach
+    void cleanGreenMailMailBoxes() throws FolderException, IOException {
+    	greenMail.purgeEmailFromAllMailboxes();
+    	
+        jdbcTemplate.batchUpdate("delete from nc_processing_info");
+        jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
+        jdbcTemplate.batchUpdate("delete from nc_endpoint");        
+        jdbcTemplate.batchUpdate("delete from nc_input");       
+    }
     
     @Test
 	@SuppressWarnings("unchecked")
@@ -133,7 +148,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	
     	//THEN check events for agent
     	JXPathContext context = JXPathContext.newContext(result);
-		List<Event> eventsForAgent = context.selectNodes("//recievingEndpoints[@endpointId='sales.agent@orange.sk']/../..");
+		List<Event> eventsForAgent = context.selectNodes("//recievingEndpoints[@endpointId='sales@objectify.sk']/../..");
     	
     	assertThat(eventsForAgent.size()).isEqualTo(1);
     	

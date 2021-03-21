@@ -94,7 +94,7 @@
          "customerContacts" : [ {
          		"id": 6666,
          		"name": "Marek Fukas",
-         		"emails": ["fukas@artin.sk"],
+         		"emails": ["nem_fukas@artin.sk"],
          		"phones": ["0918186998"]
          	}
          ],
@@ -124,7 +124,7 @@
          "customerContacts" : [ {
          		"id": 6666,
          		"name": "Marek Fukas",
-         		"emails": ["fukas@artin.sk"],
+         		"emails": ["nem_fukas@artin.sk"],
          		"phones": ["0918186998"]
          	}
          ],

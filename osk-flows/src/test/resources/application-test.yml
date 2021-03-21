@@ -1,6 +1,14 @@
 testEnv: local
 
-spring.flyway.enabled: false
+spring:
+   flyway.enabled: false
+   mail:
+      host: localhost
+      port: 3025
+      username: no-reply@objectify.sk
+      password: xxx
+      properties:
+         mail.debug: true
 
 nc.functions:
    event-generator:
@@ -12,6 +20,16 @@ osk.sia.functions.impact-notif-converter:
    b2b-login-of-la-custumers-to-be-notified:
       - b2b_to_include
    cs-agents-to-notify-email:
-      - sales.agent@orange.sk
+      - sales@objectify.sk
       
- 
+logging.level:
+#   org.springframework.beans: DEBUG
+   com.zaxxer.hikari.HikariConfig: DEBUG 
+#   com.zaxxer.hikari: TRACE
+      
+---
+spring.config.activate.on-profile: jenkins_test
+testEnv: jenkins
+spring.datasource:
+  url: jdbc:postgresql://localhost:5432/nc
+---

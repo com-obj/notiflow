@@ -37,7 +37,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	
-	private final JavaMailSenderImpl javaMailSender;
+	private final JavaMailSenderImpl mailSender;
 	
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message message) {
@@ -85,10 +85,10 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 
 	private void doSendMessage(EmailEndpoint toEmail, Email messageContent) {
 		try {
-			MimeMessage message = javaMailSender.createMimeMessage();
+			MimeMessage message = mailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-			helper.setFrom(javaMailSender.getUsername());
+			helper.setFrom(mailSender.getUsername());
 
 			helper.setTo(toEmail.getEmail());
 
@@ -103,7 +103,7 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 
 			Instant sendStart = Instant.now();
 			
-			javaMailSender.send(message);
+			mailSender.send(message);
 			
 			log.info("Sending mail vie SMTP took {} ms", ChronoUnit.MILLIS.between(sendStart, Instant.now()));
 			

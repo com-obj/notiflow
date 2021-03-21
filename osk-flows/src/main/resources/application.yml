@@ -1,14 +1,22 @@
-spring.datasource:
-   platform: postgres
-   url: jdbc:postgresql://localhost:25432/nc
-   username: nc
-   password: ZMss4o9mdBLV
-
-spring.mail:
-   host: localhost
-   port: 3025
-   username: no-reply@objectify.sk
-   password: xxx
+spring:
+   cloud.gcp:
+      sql.enabled: false
+      core.enabled: false
+   datasource:
+      platform: postgres
+      url: jdbc:postgresql://localhost:25432/nc
+      username: nc
+      password: ZMss4o9mdBLV
+   mail:
+      host: smtp.office365.com
+      port: 587
+      username: no-reply@objectify.sk
+      password: Bos16428
+      protocol: smtp
+      default-encoding: UTF-8
+      properties:
+         mail.smtp.auth: true
+         mail.smtp.starttls.enable: true
 
 nc.functions:
    event-generator:
@@ -24,18 +32,42 @@ osk.sia.functions.impact-notif-converter:
       - Tatrabanka
       - MVSR
    cs-agents-to-notify-email:
-      - sales.agent@orange.sk
-      
-testmode:
-   enabled: false
-   smtp:
-      host: localhost
-      port: 3025
-      username: testmode_no-reply@objectify.sk # this has to be different to spring.mail.username, for more info see TestmodeIntegrationTests
-      password: xxx
-      recipients: 
-         - cuzy@objectify.sk
-      periodMinutes: 1
+      - sales@objectify.sk
    
 #logging.level:
 #   org.springframework.beans: DEBUG
+
+
+#debug: true
+
+---
+spring.config.activate.on-profile: cloud_db
+spring.cloud.gcp:
+   project-id: test-osk-notifications
+   credentials.location: file:src/main/resources/test-osk-notifications-key.json
+   sql:
+      enabled: true
+      instance-connection-name: test-osk-notifications:europe-west1:test-osk-notif-db
+      database-name: nc
+   core:
+      enabled: true
+
+spring.datasource:
+   platform: postgres
+   username: postgres
+   password: A3r5dxRDv7edZXE6
+#   initialization-mode: always
+   url: jdbc:postgresql://google/${spring.cloud.gcp.sql.database-name}?cloudSqlInstance=${spring.cloud.gcp.sql.instance-connection-name}&socketFactory=com.google.cloud.sql.postgres.SocketFactory&user=${spring.datasource.username}&password=${spring.datasource.password}
+      
+nc:
+   flows:
+      test-mode:
+         enabled: true
+         recipients: 
+            - cuzy@objectify.sk
+   
+osk.sia.functions.impact-notif-converter:
+   cs-agents-to-notify-email:
+      - cuzy@objectify.sk
+      - lang@objectify.sk
+---

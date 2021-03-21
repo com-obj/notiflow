@@ -4,14 +4,13 @@ spring.mail:
    username: no-reply@objectify.sk
    password: xxx
 
-testmode:
-   enabled: true
-   smtp:
-      host: localhost
-      port: 3025
-      username: no-reply@objectify.sk
-      password: xxx
-      recipient: testmode_recipient@objectify.sk
-      periodMinutes: 5
-
 nc.functions.event-generator.sourceDir: ${user.home}/eventsQueue
+
+nc:
+   functions:
+      event-generator:
+         soruce-dir: ${user.home}/eventsQueue
+   flows:
+      test-mode:
+         enabled: true
+         periodInSeconds: 5
