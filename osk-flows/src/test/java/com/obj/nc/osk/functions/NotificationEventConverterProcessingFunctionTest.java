@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 
 import com.icegreen.greenmail.store.FolderException;
 import com.obj.nc.BaseIntegrationTest;
@@ -23,7 +22,6 @@ import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
-import com.obj.nc.osk.functions.NotifEventConverterProcessingFunction;
 import com.obj.nc.osk.functions.content.CustEventStartEmailTemplate;
 import com.obj.nc.osk.functions.content.SalesAgentsEventStartEmailTemplate;
 import com.obj.nc.osk.functions.content.SalesEventStartEmailTemplate;
@@ -43,6 +41,8 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     
     @BeforeEach
     void cleanGreenMailMailBoxes() throws FolderException, IOException {
+    	greenMail.purgeEmailFromAllMailboxes();
+    	
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
         jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
         jdbcTemplate.batchUpdate("delete from nc_endpoint");        
@@ -148,7 +148,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	
     	//THEN check events for agent
     	JXPathContext context = JXPathContext.newContext(result);
-		List<Event> eventsForAgent = context.selectNodes("//recievingEndpoints[@endpointId='sales.agent@orange.sk']/../..");
+		List<Event> eventsForAgent = context.selectNodes("//recievingEndpoints[@endpointId='sales@objectify.sk']/../..");
     	
     	assertThat(eventsForAgent.size()).isEqualTo(1);
     	

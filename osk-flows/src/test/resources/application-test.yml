@@ -7,6 +7,8 @@ spring:
       port: 3025
       username: no-reply@objectify.sk
       password: xxx
+      properties:
+         mail.debug: true
 
 nc.functions:
    event-generator:
@@ -18,17 +20,13 @@ osk.sia.functions.impact-notif-converter:
    b2b-login-of-la-custumers-to-be-notified:
       - b2b_to_include
    cs-agents-to-notify-email:
-      - sales.agent@orange.sk
+      - sales@objectify.sk
       
 logging.level:
 #   org.springframework.beans: DEBUG
    com.zaxxer.hikari.HikariConfig: DEBUG 
 #   com.zaxxer.hikari: TRACE
       
----
-spring.config.activate.on-profile: cloud_db_test
-testEnv: cloud
-
 ---
 spring.config.activate.on-profile: jenkins_test
 testEnv: jenkins

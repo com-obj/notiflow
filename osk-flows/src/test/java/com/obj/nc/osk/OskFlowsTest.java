@@ -13,7 +13,6 @@ import javax.mail.internet.MimeMessage;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +20,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
@@ -118,10 +116,10 @@ public class OskFlowsTest extends BaseIntegrationTest {
 
         //sales agent
         //only slovak
-        lMsgs = assertMessageCount(msgs, "sales.agent@orange.sk", 1);
+        lMsgs = assertMessageCount(msgs, "sales@objectify.sk", 1);
         System.out.println(GreenMailUtil.getWholeMessage(lMsgs.iterator().next()));
         
-        msg = assertMessagesContains(msgs, MailMessageForAssertions.as("sales.agent@orange.sk", "Zakaznici maju problem",
+        msg = assertMessagesContains(msgs, MailMessageForAssertions.as("sales@objectify.sk", "Zakaznici maju problem",
         		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", 
         		"Mocidla 249, Myto pod Dumbierom", "Martinengova 4881/36 811 02 Bratislava",
         		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", 
@@ -154,7 +152,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
         
         assertMessagesSendTo(messages,"dysko@objectify.sk", 0); //should get filter out
         assertMessagesSendTo(messages,"cuzy@objectify.sk", 2);
-        assertMessagesSendTo(messages, "sales.agent@orange.sk", 1);
+        assertMessagesSendTo(messages, "sales@objectify.sk", 1);
     }
     
 }

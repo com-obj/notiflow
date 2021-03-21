@@ -1,13 +1,15 @@
 package com.obj.nc.osk.config;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Properties;
+import java.util.stream.StreamSupport;
 
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.AbstractEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.MutablePropertySources;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.log4j.Log4j2;
@@ -18,29 +20,19 @@ public class ConfigPropertiesLogger {
 	
 	@EventListener
 	public void handleContextRefreshed(ContextRefreshedEvent event) {
-		printActiveProperties((ConfigurableEnvironment) event.getApplicationContext().getEnvironment());
+		printActiveProperties(event.getApplicationContext().getEnvironment());
 	}
 
-	private void printActiveProperties(ConfigurableEnvironment env) {
+	private void printActiveProperties(Environment env) {
 
 		log.info("************************* ACTIVE APP PROPERTIES ******************************");
-
-		List<MapPropertySource> propertySources = new ArrayList<>();
-
-		env.getPropertySources().forEach(it -> {
-			if (it instanceof MapPropertySource && it.getName().contains("applicationConfig")) {
-				propertySources.add((MapPropertySource) it);
-			}
-		});
-
-		propertySources.stream().map(propertySource -> propertySource.getSource().keySet()).flatMap(Collection::stream)
-				.distinct().sorted().forEach(key -> {
-					try {
-						log.info(key + "=" + env.getProperty(key));
-					} catch (Exception e) {
-						log.warn("{} -> {}", key, e.getMessage());
-					}
-				});
+		Properties props = new Properties();
+		MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
+		StreamSupport.stream(propSrcs.spliterator(), false)
+		        .filter(ps -> ps instanceof EnumerablePropertySource)
+		        .map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())
+		        .flatMap(Arrays::<String>stream)
+		        .forEach(propName -> props.setProperty(propName, env.getProperty(propName)));
 		log.info("******************************************************************************");
 	}
 }
