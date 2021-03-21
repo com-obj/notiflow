@@ -14,9 +14,9 @@ spring:
       password: Bos16428
       protocol: smtp
       default-encoding: UTF-8
-      smtp:
-        auth: true
-        starttls: truee
+      properties:
+         mail.smtp.auth: true
+         mail.smtp.starttls.enable: true
 
 nc.functions:
    event-generator:
@@ -59,8 +59,12 @@ spring.datasource:
 #   initialization-mode: always
    url: jdbc:postgresql://google/${spring.cloud.gcp.sql.database-name}?cloudSqlInstance=${spring.cloud.gcp.sql.instance-connection-name}&socketFactory=com.google.cloud.sql.postgres.SocketFactory&user=${spring.datasource.username}&password=${spring.datasource.password}
       
-testmode:
-   enabled: true
+nc:
+   flows:
+      test-mode:
+         enabled: true
+         recipients: 
+            - cuzy@objectify.sk
    
 osk.sia.functions.impact-notif-converter:
    cs-agents-to-notify-email:

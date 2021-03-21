@@ -3,6 +3,7 @@ package com.obj.nc.testmode.config;
 import java.util.Objects;
 import java.util.Properties;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +23,6 @@ import lombok.AllArgsConstructor;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-@AllArgsConstructor
 public class TestModeBeansConfig {
 	
     public static final String TEST_MODE_REAL_MAIL_SENDER_BEAN_NAME = "testModeJavaMailSenderReal";
@@ -32,7 +32,27 @@ public class TestModeBeansConfig {
     
     private TestModeGreenMailProperties properties;
 
-    /**
+    public TestModeBeansConfig(@Autowired TestModeGreenMailProperties properties) {
+		super();
+		this.properties = properties;
+		
+		printBanner();
+	}
+
+
+	private void printBanner() {
+		System.out.println(
+				  "████████╗███████╗███████╗████████╗    ███╗   ███╗ ██████╗ ██████╗ ███████╗     █████╗  ██████╗████████╗██╗██╗   ██╗███████╗\r\n"
+				+ "╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝    ████╗ ████║██╔═══██╗██╔══██╗██╔════╝    ██╔══██╗██╔════╝╚══██╔══╝██║██║   ██║██╔════╝\r\n"
+				+ "   ██║   █████╗  ███████╗   ██║       ██╔████╔██║██║   ██║██║  ██║█████╗      ███████║██║        ██║   ██║██║   ██║█████╗  \r\n"
+				+ "   ██║   ██╔══╝  ╚════██║   ██║       ██║╚██╔╝██║██║   ██║██║  ██║██╔══╝      ██╔══██║██║        ██║   ██║╚██╗ ██╔╝██╔══╝  \r\n"
+				+ "   ██║   ███████╗███████║   ██║       ██║ ╚═╝ ██║╚██████╔╝██████╔╝███████╗    ██║  ██║╚██████╗   ██║   ██║ ╚████╔╝ ███████╗\r\n"
+				+ "   ╚═╝   ╚══════╝╚══════╝   ╚═╝       ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝    ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝  ╚═══╝  ╚══════╝\r\n"
+				+ "                                                                                                                           ");
+	}
+
+
+	/**
      * This mail sender will be used to send the aggregated email composed of email received by the TEST_MODE_GREEN_MAIL_BEAN_NAME
      * @param environment
      * @return
