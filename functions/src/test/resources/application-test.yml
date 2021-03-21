@@ -27,5 +27,10 @@ nc:
    flows:
       test-mode.enabled: false
 
-      
+---
+spring.config.activate.on-profile: jenkins_test
+testEnv: jenkins
+spring.datasource:
+  url: jdbc:postgresql://localhost:5432/nc
+---
 
