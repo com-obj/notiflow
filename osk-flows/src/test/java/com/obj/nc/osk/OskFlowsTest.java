@@ -13,29 +13,28 @@ import javax.mail.internet.MimeMessage;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.icegreen.greenmail.store.FolderException;
-import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
-import com.obj.nc.OskFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
 import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.utils.GreenMailManager;
 import com.obj.nc.utils.JsonUtils;
 
-@ActiveProfiles(resolver = SystemPropertyActiveProfileResolver.class)
+@ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest
-@ContextConfiguration(classes = OskFlowsApplication.class)
+@SpringBootTest
 public class OskFlowsTest extends BaseIntegrationTest {
     
     @Autowired
@@ -43,9 +42,6 @@ public class OskFlowsTest extends BaseIntegrationTest {
     
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private GreenMailManager greenMailManager;
     
     @Autowired
     @Qualifier("nc.emailTemplateFormatter.messageSource")
@@ -53,8 +49,8 @@ public class OskFlowsTest extends BaseIntegrationTest {
     
     @BeforeEach
     void cleanGreenMailMailBoxes() throws FolderException, IOException {
-        greenMailManager.getGreenMail().purgeEmailFromAllMailboxes();
-        
+    	greenMail.purgeEmailFromAllMailboxes();
+    	
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
         jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
         jdbcTemplate.batchUpdate("delete from nc_endpoint");        
@@ -72,12 +68,11 @@ public class OskFlowsTest extends BaseIntegrationTest {
     	genEventRepo.save(event);
     	
     	//THEN
-        GreenMail gm = greenMailManager.getGreenMail();
-        boolean success = gm.waitForIncomingEmail(10000, 12);
+        boolean success = greenMail.waitForIncomingEmail(10000, 12);
         
         Assertions.assertThat(success).isTrue();
         
-        MimeMessage[] msgs = gm.getReceivedMessages();
+        MimeMessage[] msgs = greenMail.getReceivedMessages();
         Assertions.assertThat(msgs.length).isEqualTo(12); //4xcustomers(en/sk), 3xsales, 1xsales agent 
         System.out.println(GreenMailUtil.getWholeMessage(msgs[0]));
         
@@ -148,12 +143,11 @@ public class OskFlowsTest extends BaseIntegrationTest {
     	genEventRepo.save(event);
     	
     	//THEN
-        GreenMail gm = greenMailManager.getGreenMail();
-        boolean success = gm.waitForIncomingEmail(10000, 3); //en+sk
+        boolean success = greenMail.waitForIncomingEmail(10000, 3); //en+sk
         
         Assertions.assertThat(success).isTrue();
         
-        MimeMessage[] messages = gm.getReceivedMessages();
+        MimeMessage[] messages = greenMail.getReceivedMessages();
         Assertions.assertThat(messages.length).isEqualTo(3);
        
         System.out.println(GreenMailUtil.getWholeMessage(messages[0]));

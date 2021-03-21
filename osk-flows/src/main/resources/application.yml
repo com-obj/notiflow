@@ -31,3 +31,6 @@ osk.sia.functions.impact-notif-converter:
    
 #logging.level:
 #   org.springframework.beans: DEBUG
+
+
+#debug: true
