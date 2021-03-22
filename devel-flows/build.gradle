@@ -19,7 +19,7 @@ repositories {
 
 ext {
 	set('testcontainersVersion', "1.15.1")
-	set('springCloudVersion', "Hoxton.SR8")
+	set('springCloudVersion', "2020.0.0")
 	set('junitJupiterVersion', '5.4.2')
 }
 

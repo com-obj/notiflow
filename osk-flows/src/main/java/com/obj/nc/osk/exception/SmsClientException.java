@@ -1,4 +1,4 @@
-package com.obj.nc.exception;
+package com.obj.nc.osk.exception;
 
 public class SmsClientException extends RuntimeException {
 

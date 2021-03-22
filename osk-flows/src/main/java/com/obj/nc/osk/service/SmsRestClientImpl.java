@@ -1,9 +1,9 @@
-package com.obj.nc.service;
+package com.obj.nc.osk.service;
 
-import com.obj.nc.dto.ResourceReferenceDto;
-import com.obj.nc.dto.SendSmsRequestDto;
-import com.obj.nc.dto.SendSmsResponseDto;
-import com.obj.nc.exception.SmsClientException;
+import com.obj.nc.osk.dto.ResourceReferenceDto;
+import com.obj.nc.osk.dto.SendSmsRequestDto;
+import com.obj.nc.osk.dto.SendSmsResponseDto;
+import com.obj.nc.osk.exception.SmsClientException;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;

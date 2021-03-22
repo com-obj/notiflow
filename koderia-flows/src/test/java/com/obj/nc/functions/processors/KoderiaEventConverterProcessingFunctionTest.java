@@ -46,7 +46,7 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(email.getText(), Matchers.equalTo(jobPostEventData.getMessageText()));
 
         // and
-        Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedEvent.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
+        Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedEvent.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
         MatcherAssert.assertThat(eventAttributes.get("id"), Matchers.equalTo(jobPostEventData.getId()));
         MatcherAssert.assertThat(eventAttributes.get("location"), Matchers.equalTo(jobPostEventData.getLocation()));
         MatcherAssert.assertThat(eventAttributes.get("rate"), Matchers.equalTo(jobPostEventData.getRate()));
@@ -110,7 +110,7 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(email.getText(), Matchers.equalTo(blogEventData.getContent()));
 
         // and
-        Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedEvent.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
+        Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedEvent.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
         MatcherAssert.assertThat(eventAttributes.get("id"), Matchers.equalTo(blogEventData.getId()));
         MatcherAssert.assertThat(eventAttributes.get("link"), Matchers.equalTo(blogEventData.getLink()));
         MatcherAssert.assertThat(eventAttributes.get("featuredImage"), Matchers.equalTo(blogEventData.getFeaturedImage()));
@@ -146,7 +146,7 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(email.getText(), Matchers.equalTo(eventEventData.getDescription()));
 
         // and
-        Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedEvent.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
+        Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedEvent.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
         MatcherAssert.assertThat(eventAttributes.get("id"), Matchers.equalTo(eventEventData.getId()));
         MatcherAssert.assertThat(eventAttributes.get("ticketUrl"), Matchers.equalTo(eventEventData.getTicketUrl()));
         MatcherAssert.assertThat(eventAttributes.get("startAt"), Matchers.equalTo(eventEventData.getStartAt()));
@@ -183,7 +183,7 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(email.getText(), Matchers.equalTo(linkEventData.getDescription()));
 
         // and
-        Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedEvent.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
+        Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedEvent.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
         MatcherAssert.assertThat(eventAttributes.get("id"), Matchers.equalTo(linkEventData.getId()));
         MatcherAssert.assertThat(eventAttributes.get("siteName"), Matchers.equalTo(linkEventData.getSiteName()));
         MatcherAssert.assertThat(eventAttributes.get("images"), Matchers.equalTo(linkEventData.getImages()));

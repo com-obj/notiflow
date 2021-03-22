@@ -1,4 +1,4 @@
-package com.obj.nc.dto;
+package com.obj.nc.osk.dto;
 
 import lombok.Data;
 

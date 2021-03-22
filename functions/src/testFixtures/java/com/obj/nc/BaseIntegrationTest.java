@@ -46,10 +46,10 @@ public abstract class BaseIntegrationTest {
     @AllArgsConstructor
     @ToString
     public static class MailMessageForAssertions {
-    	Optional<String> from;
-    	Optional<String> to;
-    	Optional<String> subjectPart;
-    	String[] textParts;
+    	private Optional<String> from;
+		private Optional<String> to;
+		private Optional<String> subjectPart;
+		private String[] textParts;
 
     	public static MailMessageForAssertions as(String to,String subjectPart,String ... textParts ) {
     		MailMessageForAssertions msg = new MailMessageForAssertions(Optional.empty(),Optional.of(to),Optional.of(subjectPart), textParts);

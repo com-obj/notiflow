@@ -24,7 +24,7 @@ public class KoderiaEventConverterExecution implements Function<EmitEventDto, Ev
 				Email.createWithSubject(emitEventDto.getData().getMessageSubject(), emitEventDto.getData().getMessageText())
 		);
 
-		event.getBody().setAttributeValue(ORIGINAL_EVENT_FIELD, emitEventDto.asMap());
+		event.getBody().getMessage().setAttributeValue(ORIGINAL_EVENT_FIELD, emitEventDto.asMap());
 		return event;
 	}
 

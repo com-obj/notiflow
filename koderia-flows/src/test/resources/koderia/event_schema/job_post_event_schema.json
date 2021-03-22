@@ -5,43 +5,315 @@
       "type": {
          "type": "string"
       },
+      "attributes": {
+         "type": "object"
+      },
       "header": {
          "type": "object",
          "properties": {
-            "configuration-name": {
+            "attributes": {
+               "type": "object"
+            },
+            "id": {
+               "type": "null"
+            },
+            "eventIds": {
+               "type": "array",
+               "items": {}
+            },
+            "flow-id": {
                "type": "string"
             }
          },
          "required": [
-            "configuration-name"
+            "attributes",
+            "id",
+            "eventIds",
+            "flow-id"
          ]
       },
       "body": {
          "type": "object",
          "properties": {
+            "attributes": {
+               "type": "object"
+            },
             "message": {
                "type": "object",
                "properties": {
-                  "content": {
+                  "type": {
+                     "type": "string"
+                  },
+                  "attributes": {
                      "type": "object",
                      "properties": {
-                        "subject": {
-                           "type": "string"
-                        },
-                        "text": {
-                           "type": "string"
+                        "originalEvent": {
+                           "type": "object",
+                           "properties": {
+                              "type": {
+                                 "type": "string"
+                              },
+                              "data": {
+                                 "type": "object",
+                                 "properties": {
+                                    "id": {
+                                       "type": "string"
+                                    },
+                                    "name": {
+                                       "type": "string"
+                                    },
+                                    "description": {
+                                       "type": "string"
+                                    },
+                                    "location": {
+                                       "type": "string"
+                                    },
+                                    "rate": {
+                                       "type": "string"
+                                    },
+                                    "technologies": {
+                                       "type": "array",
+                                       "items": [
+                                          {
+                                             "type": "string"
+                                          }
+                                       ]
+                                    },
+                                    "specialRate": {
+                                       "type": "string"
+                                    },
+                                    "labels": {
+                                       "type": "array",
+                                       "items": [
+                                          {
+                                             "type": "string"
+                                          }
+                                       ]
+                                    },
+                                    "positionType": {
+                                       "type": "array",
+                                       "items": [
+                                          {
+                                             "type": "string"
+                                          }
+                                       ]
+                                    },
+                                    "duration": {
+                                       "type": "string"
+                                    },
+                                    "type": {
+                                       "type": "string"
+                                    },
+                                    "dateOfStart": {
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "id",
+                                    "name",
+                                    "description",
+                                    "location",
+                                    "rate",
+                                    "technologies",
+                                    "specialRate",
+                                    "labels",
+                                    "positionType",
+                                    "duration",
+                                    "type",
+                                    "dateOfStart"
+                                 ]
+                              }
+                           },
+                           "required": [
+                              "type",
+                              "data"
+                           ]
                         }
                      },
                      "required": [
-                        "subject",
-                        "text"
+                        "originalEvent"
                      ]
+                  },
+                  "subject": {
+                     "type": "string"
+                  },
+                  "text": {
+                     "type": "string"
+                  },
+                  "contentType": {
+                     "type": "string"
+                  },
+                  "attachments": {
+                     "type": "array",
+                     "items": {}
                   }
                },
                "required": [
-                  "content"
+                  "type",
+                  "attributes",
+                  "subject",
+                  "text",
+                  "contentType",
+                  "attachments"
                ]
             },
+            "recievingEndpoints": {
+               "type": "array",
+               "items": {}
+            },
+            "deliveryOptions": {
+               "type": "object",
+               "properties": {
+                  "aggregationType": {
+                     "type": "string"
+                  },
+                  "schedulingType": {
+                     "type": "string"
+                  },
+                  "schedulingValue": {
+                     "type": "null"
+                  }
+               },
+               "required": [
+                  "aggregationType",
+                  "schedulingType",
+                  "schedulingValue"
+               ]
+            },
+            "contentTyped": {
+               "type": "object",
+               "properties": {
+                  "type": {
+                     "type": "string"
+                  },
+                  "attributes": {
+                     "type": "object",
+                     "properties": {
+                        "originalEvent": {
+                           "type": "object",
+                           "properties": {
+                              "type": {
+                                 "type": "string"
+                              },
+                              "data": {
+                                 "type": "object",
+                                 "properties": {
+                                    "id": {
+                                       "type": "string"
+                                    },
+                                    "name": {
+                                       "type": "string"
+                                    },
+                                    "description": {
+                                       "type": "string"
+                                    },
+                                    "location": {
+                                       "type": "string"
+                                    },
+                                    "rate": {
+                                       "type": "string"
+                                    },
+                                    "technologies": {
+                                       "type": "array",
+                                       "items": [
+                                          {
+                                             "type": "string"
+                                          }
+                                       ]
+                                    },
+                                    "specialRate": {
+                                       "type": "string"
+                                    },
+                                    "labels": {
+                                       "type": "array",
+                                       "items": [
+                                          {
+                                             "type": "string"
+                                          }
+                                       ]
+                                    },
+                                    "positionType": {
+                                       "type": "array",
+                                       "items": [
+                                          {
+                                             "type": "string"
+                                          }
+                                       ]
+                                    },
+                                    "duration": {
+                                       "type": "string"
+                                    },
+                                    "type": {
+                                       "type": "string"
+                                    },
+                                    "dateOfStart": {
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "id",
+                                    "name",
+                                    "description",
+                                    "location",
+                                    "rate",
+                                    "technologies",
+                                    "specialRate",
+                                    "labels",
+                                    "positionType",
+                                    "duration",
+                                    "type",
+                                    "dateOfStart"
+                                 ]
+                              }
+                           },
+                           "required": [
+                              "type",
+                              "data"
+                           ]
+                        }
+                     },
+                     "required": [
+                        "originalEvent"
+                     ]
+                  },
+                  "subject": {
+                     "type": "string"
+                  },
+                  "text": {
+                     "type": "string"
+                  },
+                  "contentType": {
+                     "type": "string"
+                  },
+                  "attachments": {
+                     "type": "array",
+                     "items": {}
+                  }
+               },
+               "required": [
+                  "type",
+                  "attributes",
+                  "subject",
+                  "text",
+                  "contentType",
+                  "attachments"
+               ]
+            }
+         },
+         "required": [
+            "attributes",
+            "message",
+            "recievingEndpoints",
+            "deliveryOptions",
+            "contentTyped"
+         ]
+      },
+      "processingInfo": {
+         "type": "null"
+      },
+      "contentTyped": {
+         "type": "object",
+         "properties": {
             "attributes": {
                "type": "object",
                "properties": {
@@ -131,17 +403,36 @@
                "required": [
                   "originalEvent"
                ]
+            },
+            "subject": {
+               "type": "string"
+            },
+            "text": {
+               "type": "string"
+            },
+            "contentType": {
+               "type": "string"
+            },
+            "attachments": {
+               "type": "array",
+               "items": {}
             }
          },
          "required": [
-            "message",
-            "attributes"
+            "attributes",
+            "subject",
+            "text",
+            "contentType",
+            "attachments"
          ]
       }
    },
    "required": [
       "type",
+      "attributes",
       "header",
-      "body"
+      "body",
+      "processingInfo",
+      "contentTyped"
    ]
 }

@@ -1,7 +1,7 @@
-package com.obj.nc.service;
+package com.obj.nc.osk.service;
 
-import com.obj.nc.dto.SendSmsRequestDto;
-import com.obj.nc.dto.SendSmsResponseDto;
+import com.obj.nc.osk.dto.SendSmsRequestDto;
+import com.obj.nc.osk.dto.SendSmsResponseDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

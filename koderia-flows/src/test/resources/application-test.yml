@@ -1,12 +1,12 @@
 testEnv: local
 
-spring.flyway.enabled: false
-
-spring.mail:
-  host: localhost
-  port: 3025
-  username: no-reply@objectify.sk
-  password: xxx
+spring:
+  flyway.enabled: false
+  mail:
+    host: localhost
+    port: 3025
+    username: no-reply@objectify.sk
+    password: xxx
 
 koderia.api.uri: https://www.koderia.sk/api/v1
 
@@ -24,3 +24,10 @@ mailchimp:
     event-name: event-template
     link-name: link-template
     news-name: news-template
+
+---
+spring.config.activate.on-profile: jenkins_test
+testEnv: jenkins
+spring.datasource:
+  url: jdbc:postgresql://localhost:5432/nc
+---

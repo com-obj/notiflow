@@ -1,8 +1,8 @@
-package com.obj.nc.service;
+package com.obj.nc.osk.service;
 
-import com.obj.nc.dto.SendSmsRequestDto;
-import com.obj.nc.dto.SendSmsResponseDto;
-import com.obj.nc.exception.SmsClientException;
+import com.obj.nc.osk.dto.SendSmsRequestDto;
+import com.obj.nc.osk.dto.SendSmsResponseDto;
+import com.obj.nc.osk.exception.SmsClientException;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,6 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

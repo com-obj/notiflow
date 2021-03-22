@@ -1,4 +1,4 @@
-package com.obj.nc.service;
+package com.obj.nc.osk.service;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

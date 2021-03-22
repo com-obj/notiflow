@@ -1,4 +1,4 @@
-package com.obj.nc.service;
+package com.obj.nc.osk.service;
 
 public interface SmsRestClientConstants {
 
