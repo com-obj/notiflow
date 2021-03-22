@@ -1,5 +1,6 @@
 package com.obj.nc.osk.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
@@ -19,18 +20,17 @@ import com.obj.nc.osk.functions.NotifEventConverterProcessingFunction;
 import lombok.AllArgsConstructor;
 
 @Configuration
-@AllArgsConstructor
 public class FlowsConfig {
 	
-	private NotifEventConverterProcessingFunction siaNotifEventConverter;
-	private ValidateAndGenerateEventIdProcessingFunction generateEventId;
-	private MessagesFromEventProcessingFunction generateMessagesFromEvent;
-	private EmailSender sendMessage;
-	private PaylaodLoggerSinkConsumer logConsumer;
-	private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
-	private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoWithRecipientsPersister;
-	private GenericEventsForProcessingSupplier genericEventSupplier;
-	private EmailTemplateFormatter emailFormatter;
+	@Autowired private NotifEventConverterProcessingFunction siaNotifEventConverter;
+	@Autowired private ValidateAndGenerateEventIdProcessingFunction generateEventId;
+	@Autowired private MessagesFromEventProcessingFunction generateMessagesFromEvent;
+	@Autowired private EmailSender sendMessage;
+	@Autowired private PaylaodLoggerSinkConsumer logConsumer;
+	@Autowired private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
+	@Autowired private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoWithRecipientsPersister;
+	@Autowired private GenericEventsForProcessingSupplier genericEventSupplier;
+	@Autowired private EmailTemplateFormatter emailFormatter;
 	
 	public static String OUTAGE_START_FLOW_ID = "OUTAGE_START_FLOW_ID";
 	

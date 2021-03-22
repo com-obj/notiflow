@@ -32,7 +32,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-integration'
     implementation "org.springframework.integration:spring-integration-jdbc"
 
-    /* copy/paste from funcitons.. not sure how to pull it from there, this might help: https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_separation*/
+    /* copy/paste from functions.. not sure how to pull it from there, this might help: https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_separation*/
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
@@ -47,9 +47,11 @@ dependencies {
 	/* to here */
     
     //app-engine
-    implementation 'org.springframework.cloud:spring-cloud-gcp-starter'
+	/*    
+	implementation 'org.springframework.cloud:spring-cloud-gcp-starter'
     implementation 'org.springframework.cloud:spring-cloud-gcp-starter-sql-postgresql'
-
+ 	*/
+ 	
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 

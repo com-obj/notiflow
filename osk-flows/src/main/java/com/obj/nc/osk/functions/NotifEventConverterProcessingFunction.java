@@ -94,13 +94,13 @@ public class NotifEventConverterProcessingFunction extends ProcessorFunctionAdap
 					outageForCustomers.get(customer));
 
 			
-			Event event  = createNotificaitonIntent(customerMessageContent, customer.asEmailEnpoints());
+			Event event  = createNotificationIntent(customerMessageContent, customer.asEmailEnpoints());
 			customerEvents.add(event);
 		}
 		return customerEvents;
 	} 
 	
-	private Event createNotificaitonIntent(
+	private Event createNotificationIntent(
 			BaseEmailFromTemplate<?> messageContent,
 			Set<EmailEndpoint> emails) {
 		
@@ -139,7 +139,7 @@ public class NotifEventConverterProcessingFunction extends ProcessorFunctionAdap
 					notifEvent.getOutageStart(), 
 					incidentsForSellers.get(salesContact));
 			
-			Event event  = createNotificaitonIntent(
+			Event event  = createNotificationIntent(
 					salesMessageContent,
 					salesContact.asEmailEnpoints());
 			
@@ -160,7 +160,7 @@ public class NotifEventConverterProcessingFunction extends ProcessorFunctionAdap
 				notifEvent.getOutageStart(), 
 				notifEvent.getMessages());
 			
-		Event event  = createNotificaitonIntent(salesMessageContent, agentEmails);
+		Event event  = createNotificationIntent(salesMessageContent, agentEmails);
 		salesEvents.add(event);
 
 		return salesEvents;

@@ -41,23 +41,7 @@ osk.sia.functions.impact-notif-converter:
 #debug: true
 
 ---
-spring.config.activate.on-profile: cloud_db
-spring.cloud.gcp:
-   project-id: test-osk-notifications
-   credentials.location: file:src/main/resources/test-osk-notifications-key.json
-   sql:
-      enabled: true
-      instance-connection-name: test-osk-notifications:europe-west1:test-osk-notif-db
-      database-name: nc
-   core:
-      enabled: true
-
-spring.datasource:
-   platform: postgres
-   username: postgres
-   password: A3r5dxRDv7edZXE6
-#   initialization-mode: always
-   url: jdbc:postgresql://google/${spring.cloud.gcp.sql.database-name}?cloudSqlInstance=${spring.cloud.gcp.sql.instance-connection-name}&socketFactory=com.google.cloud.sql.postgres.SocketFactory&user=${spring.datasource.username}&password=${spring.datasource.password}
+spring.config.activate.on-profile: test_mode
       
 nc:
    flows:
@@ -65,9 +49,5 @@ nc:
          enabled: true
          recipients: 
             - cuzy@objectify.sk
-   
-osk.sia.functions.impact-notif-converter:
-   cs-agents-to-notify-email:
-      - cuzy@objectify.sk
-      - lang@objectify.sk
+
 ---
