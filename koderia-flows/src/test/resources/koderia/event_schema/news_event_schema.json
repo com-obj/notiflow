@@ -124,142 +124,17 @@
                   "schedulingType",
                   "schedulingValue"
                ]
-            },
-            "contentTyped": {
-               "type": "object",
-               "properties": {
-                  "type": {
-                     "type": "string"
-                  },
-                  "attributes": {
-                     "type": "object",
-                     "properties": {
-                        "originalEvent": {
-                           "type": "object",
-                           "properties": {
-                              "type": {
-                                 "type": "string"
-                              },
-                              "data": {
-                                 "type": "object",
-                                 "properties": {
-                                    "subject": {
-                                       "type": "string"
-                                    },
-                                    "text": {
-                                       "type": "string"
-                                    }
-                                 },
-                                 "required": [
-                                    "subject",
-                                    "text"
-                                 ]
-                              }
-                           },
-                           "required": [
-                              "type",
-                              "data"
-                           ]
-                        }
-                     },
-                     "required": [
-                        "originalEvent"
-                     ]
-                  },
-                  "subject": {
-                     "type": "string"
-                  },
-                  "text": {
-                     "type": "string"
-                  },
-                  "contentType": {
-                     "type": "string"
-                  },
-                  "attachments": {
-                     "type": "array",
-                     "items": {}
-                  }
-               },
-               "required": [
-                  "type",
-                  "attributes",
-                  "subject",
-                  "text",
-                  "contentType",
-                  "attachments"
-               ]
             }
          },
          "required": [
             "attributes",
             "message",
             "recievingEndpoints",
-            "deliveryOptions",
-            "contentTyped"
+            "deliveryOptions"
          ]
       },
       "processingInfo": {
          "type": "null"
-      },
-      "contentTyped": {
-         "type": "object",
-         "properties": {
-            "attributes": {
-               "type": "object",
-               "properties": {
-                  "originalEvent": {
-                     "type": "object",
-                     "properties": {
-                        "type": {
-                           "type": "string"
-                        },
-                        "data": {
-                           "type": "object",
-                           "properties": {
-                              "subject": {
-                                 "type": "string"
-                              },
-                              "text": {
-                                 "type": "string"
-                              }
-                           },
-                           "required": [
-                              "subject",
-                              "text"
-                           ]
-                        }
-                     },
-                     "required": [
-                        "type",
-                        "data"
-                     ]
-                  }
-               },
-               "required": [
-                  "originalEvent"
-               ]
-            },
-            "subject": {
-               "type": "string"
-            },
-            "text": {
-               "type": "string"
-            },
-            "contentType": {
-               "type": "string"
-            },
-            "attachments": {
-               "type": "array",
-               "items": {}
-            }
-         },
-         "required": [
-            "attributes",
-            "subject",
-            "text",
-            "contentType",
-            "attachments"
-         ]
       }
    },
    "required": [
@@ -267,7 +142,6 @@
       "attributes",
       "header",
       "body",
-      "processingInfo",
-      "contentTyped"
+      "processingInfo"
    ]
 }

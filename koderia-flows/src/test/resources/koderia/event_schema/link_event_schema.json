@@ -163,220 +163,17 @@
                   "schedulingType",
                   "schedulingValue"
                ]
-            },
-            "contentTyped": {
-               "type": "object",
-               "properties": {
-                  "type": {
-                     "type": "string"
-                  },
-                  "attributes": {
-                     "type": "object",
-                     "properties": {
-                        "originalEvent": {
-                           "type": "object",
-                           "properties": {
-                              "type": {
-                                 "type": "string"
-                              },
-                              "data": {
-                                 "type": "object",
-                                 "properties": {
-                                    "id": {
-                                       "type": "string"
-                                    },
-                                    "title": {
-                                       "type": "string"
-                                    },
-                                    "description": {
-                                       "type": "string"
-                                    },
-                                    "siteName": {
-                                       "type": "string"
-                                    },
-                                    "images": {
-                                       "type": "array",
-                                       "items": [
-                                          {
-                                             "type": "string"
-                                          }
-                                       ]
-                                    },
-                                    "url": {
-                                       "type": "string"
-                                    },
-                                    "favicons": {
-                                       "type": "array",
-                                       "items": [
-                                          {
-                                             "type": "string"
-                                          },
-                                          {
-                                             "type": "string"
-                                          },
-                                          {
-                                             "type": "string"
-                                          },
-                                          {
-                                             "type": "string"
-                                          }
-                                       ]
-                                    }
-                                 },
-                                 "required": [
-                                    "id",
-                                    "title",
-                                    "description",
-                                    "siteName",
-                                    "images",
-                                    "url",
-                                    "favicons"
-                                 ]
-                              }
-                           },
-                           "required": [
-                              "type",
-                              "data"
-                           ]
-                        }
-                     },
-                     "required": [
-                        "originalEvent"
-                     ]
-                  },
-                  "subject": {
-                     "type": "string"
-                  },
-                  "text": {
-                     "type": "string"
-                  },
-                  "contentType": {
-                     "type": "string"
-                  },
-                  "attachments": {
-                     "type": "array",
-                     "items": {}
-                  }
-               },
-               "required": [
-                  "type",
-                  "attributes",
-                  "subject",
-                  "text",
-                  "contentType",
-                  "attachments"
-               ]
             }
          },
          "required": [
             "attributes",
             "message",
             "recievingEndpoints",
-            "deliveryOptions",
-            "contentTyped"
+            "deliveryOptions"
          ]
       },
       "processingInfo": {
          "type": "null"
-      },
-      "contentTyped": {
-         "type": "object",
-         "properties": {
-            "attributes": {
-               "type": "object",
-               "properties": {
-                  "originalEvent": {
-                     "type": "object",
-                     "properties": {
-                        "type": {
-                           "type": "string"
-                        },
-                        "data": {
-                           "type": "object",
-                           "properties": {
-                              "id": {
-                                 "type": "string"
-                              },
-                              "title": {
-                                 "type": "string"
-                              },
-                              "description": {
-                                 "type": "string"
-                              },
-                              "siteName": {
-                                 "type": "string"
-                              },
-                              "images": {
-                                 "type": "array",
-                                 "items": [
-                                    {
-                                       "type": "string"
-                                    }
-                                 ]
-                              },
-                              "url": {
-                                 "type": "string"
-                              },
-                              "favicons": {
-                                 "type": "array",
-                                 "items": [
-                                    {
-                                       "type": "string"
-                                    },
-                                    {
-                                       "type": "string"
-                                    },
-                                    {
-                                       "type": "string"
-                                    },
-                                    {
-                                       "type": "string"
-                                    }
-                                 ]
-                              }
-                           },
-                           "required": [
-                              "id",
-                              "title",
-                              "description",
-                              "siteName",
-                              "images",
-                              "url",
-                              "favicons"
-                           ]
-                        }
-                     },
-                     "required": [
-                        "type",
-                        "data"
-                     ]
-                  }
-               },
-               "required": [
-                  "originalEvent"
-               ]
-            },
-            "subject": {
-               "type": "string"
-            },
-            "text": {
-               "type": "string"
-            },
-            "contentType": {
-               "type": "string"
-            },
-            "attachments": {
-               "type": "array",
-               "items": {}
-            }
-         },
-         "required": [
-            "attributes",
-            "subject",
-            "text",
-            "contentType",
-            "attachments"
-         ]
       }
    },
    "required": [
@@ -384,7 +181,6 @@
       "attributes",
       "header",
       "body",
-      "processingInfo",
-      "contentTyped"
+      "processingInfo"
    ]
 }
