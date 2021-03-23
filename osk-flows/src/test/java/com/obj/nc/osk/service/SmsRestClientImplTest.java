@@ -3,6 +3,7 @@ package com.obj.nc.osk.service;
 import com.obj.nc.osk.dto.SendSmsRequestDto;
 import com.obj.nc.osk.dto.SendSmsResponseDto;
 import com.obj.nc.osk.exception.SmsClientException;
+import com.obj.nc.osk.functions.senders.SmsSenderConfigProperties;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @RestClientTest(SmsRestClientImpl.class)
 @ImportAutoConfiguration(ValidationAutoConfiguration.class)
-@EnableConfigurationProperties(SmsClientConfigProperties.class)
+@EnableConfigurationProperties(SmsSenderConfigProperties.class)
 class SmsRestClientImplTest {
 
     @Autowired
@@ -40,8 +41,8 @@ class SmsRestClientImplTest {
     @Test
     void testSendSmsWithSuccessResponse() {
         // GIVEN
-        SendSmsRequestDto sendSmsRequest = JsonUtils.readObjectFromClassPathResource("sms/sms_request.json", SendSmsRequestDto.class);
-        SendSmsResponseDto sendSmsSuccessResponse = JsonUtils.readObjectFromClassPathResource("sms/sms_response_success.json", SendSmsResponseDto.class);
+        SendSmsRequestDto sendSmsRequest = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-request.json", SendSmsRequestDto.class);
+        SendSmsResponseDto sendSmsSuccessResponse = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-success.json", SendSmsResponseDto.class);
 
         // MOCK SERVER
         mockRestServiceServer.expect(ExpectedCount.once(),
@@ -63,27 +64,25 @@ class SmsRestClientImplTest {
     @Test
     void testSendSmsWithInvalidRequest() {
         // GIVEN
-        SendSmsRequestDto sendSmsRequest = JsonUtils.readObjectFromClassPathResource("sms/sms_request.json", SendSmsRequestDto.class);
-        sendSmsRequest.setAddress(new ArrayList<>());
+        SendSmsRequestDto sendSmsRequest = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-request.json", SendSmsRequestDto.class);
         sendSmsRequest.setSenderAddress(null);
 
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> smsRestClient.sendSms(sendSmsRequest))
                 .isInstanceOf(ConstraintViolationException.class)
-                .hasMessageContaining("empty")
-                .hasMessageContaining("blank");
+                .hasMessageContaining("must not be blank");
 
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> smsRestClient.sendSms(null))
                 .isInstanceOf(ConstraintViolationException.class)
-                .hasMessageContaining("null");
+                .hasMessageContaining("must not be null");
     }
 
     @Test
     void testSendSmsWithFailureResponse() {
         // GIVEN
-        SendSmsRequestDto sendSmsRequest = JsonUtils.readObjectFromClassPathResource("sms/sms_request.json", SendSmsRequestDto.class);
-        SendSmsResponseDto sendSmsFailureResponse = JsonUtils.readObjectFromClassPathResource("sms/sms_response_failure.json", SendSmsResponseDto.class);
+        SendSmsRequestDto sendSmsRequest = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-request.json", SendSmsRequestDto.class);
+        SendSmsResponseDto sendSmsFailureResponse = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-failure.json", SendSmsResponseDto.class);
 
         // MOCK SERVER
         mockRestServiceServer.expect(ExpectedCount.once(),
@@ -103,8 +102,8 @@ class SmsRestClientImplTest {
     @Test
     void testSendSmsWithInvalidResponse() {
         // GIVEN
-        SendSmsRequestDto sendSmsRequest = JsonUtils.readObjectFromClassPathResource("sms/sms_request.json", SendSmsRequestDto.class);
-        SendSmsResponseDto sendSmsInvalidResponse = JsonUtils.readObjectFromClassPathResource("sms/sms_response_invalid.json", SendSmsResponseDto.class);
+        SendSmsRequestDto sendSmsRequest = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-request.json", SendSmsRequestDto.class);
+        SendSmsResponseDto sendSmsInvalidResponse = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-invalid.json", SendSmsResponseDto.class);
 
         // MOCK SERVER
         mockRestServiceServer.expect(ExpectedCount.once(),
@@ -121,7 +120,7 @@ class SmsRestClientImplTest {
                 .hasMessageContaining("Unknown response status");
 
         // GIVEN
-        sendSmsInvalidResponse = JsonUtils.readObjectFromClassPathResource("sms/sms_response_invalid.json", SendSmsResponseDto.class);
+        sendSmsInvalidResponse = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-invalid.json", SendSmsResponseDto.class);
         sendSmsInvalidResponse.setResourceReference(null);
 
         // MOCK SERVER
@@ -140,7 +139,7 @@ class SmsRestClientImplTest {
                 .hasMessageContaining("Resource reference must not be null");
 
         // GIVEN
-        sendSmsInvalidResponse = JsonUtils.readObjectFromClassPathResource("sms/sms_response_invalid.json", SendSmsResponseDto.class);
+        sendSmsInvalidResponse = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-invalid.json", SendSmsResponseDto.class);
         sendSmsInvalidResponse.getResourceReference().setResourceURL(null);
 
         // MOCK SERVER

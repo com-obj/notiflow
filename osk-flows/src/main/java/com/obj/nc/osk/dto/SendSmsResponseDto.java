@@ -10,6 +10,6 @@ public class SendSmsResponseDto {
 
     @NotNull
     @Valid
-    private ResourceReferenceDto resourceReference;
+    private SendSmsResourceReferenceDto resourceReference;
 
 }

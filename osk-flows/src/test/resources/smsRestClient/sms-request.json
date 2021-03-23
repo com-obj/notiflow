@@ -1,5 +1,5 @@
 {
-  "address" : [ "+420047013370" ],
+  "address" : [ "0918368864" ],
   "clientCorrelator" : "test3",
   "message" : "test sms",
   "notifyURL" : "http://localhost:9472/test",

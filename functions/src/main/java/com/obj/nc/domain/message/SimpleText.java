@@ -16,7 +16,6 @@ public class SimpleText extends Content {
 	public final static String JSON_TYPE_IDENTIFIER = "TEXT_CONTENT";
 
 	public static final String TEXT_CONCAT_DELIMITER = "\n\n";
-	public static final String SUBJECT_CONCAT_DELIMITER = ", ";
 
 	@NonNull
 	@EqualsAndHashCode.Include
@@ -26,6 +25,11 @@ public class SimpleText extends Content {
 		SimpleText concated = new SimpleText();
 		concated.text = text.concat(TEXT_CONCAT_DELIMITER).concat(other.text);
 		return concated;
+	}
+
+	@Override
+	public String getContentTypeName() {
+		return JSON_TYPE_IDENTIFIER;
 	}
 
 }

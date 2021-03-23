@@ -1,9 +1,10 @@
 package com.obj.nc.osk.service;
 
-import com.obj.nc.osk.dto.ResourceReferenceDto;
+import com.obj.nc.osk.dto.SendSmsResourceReferenceDto;
 import com.obj.nc.osk.dto.SendSmsRequestDto;
 import com.obj.nc.osk.dto.SendSmsResponseDto;
 import com.obj.nc.osk.exception.SmsClientException;
+import com.obj.nc.osk.functions.senders.SmsSenderConfigProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -19,9 +20,9 @@ public class SmsRestClientImpl implements SmsClient {
 
     private final RestTemplate smsRestTemplate;
 
-    public SmsRestClientImpl(SmsClientConfigProperties properties,
+    public SmsRestClientImpl(SmsSenderConfigProperties properties,
                              RestTemplateBuilder restTemplateBuilder) {
-        this.smsRestTemplate = restTemplateBuilder.rootUri(properties.getUri()).build();
+        this.smsRestTemplate = restTemplateBuilder.rootUri(properties.getGapApiUrl()).build();
     }
 
     @Override
@@ -37,7 +38,7 @@ public class SmsRestClientImpl implements SmsClient {
             throw new RestClientException("Sms response body must not be null");
         }
 
-        ResourceReferenceDto resourceReference = responseBody.getResourceReference();
+        SendSmsResourceReferenceDto resourceReference = responseBody.getResourceReference();
 
         if (resourceReference == null) {
             throw new RestClientException("Resource reference must not be null");

@@ -5,7 +5,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 
 @Data
-public class ResourceReferenceDto {
+public class SendSmsResourceReferenceDto {
 
     @NotBlank
     private String resourceURL;

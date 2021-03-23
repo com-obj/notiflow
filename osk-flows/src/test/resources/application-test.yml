@@ -16,14 +16,18 @@ nc.functions:
   send-email-message:
     from: no-reply@objectify.sk
 
-smsapi:
-  uri: http://localhost:6090/API/smsmessaging/v1
-
-osk.sia.functions.impact-notif-converter:
-   b2b-login-of-la-custumers-to-be-notified:
+osk.sia.functions:
+  impact-notif-converter:
+    b2b-login-of-la-custumers-to-be-notified:
       - b2b_to_include
-   cs-agents-to-notify-email:
+    cs-agents-to-notify-email:
       - sales@objectify.sk
+  sms-sender:
+    gap-api-url: http://localhost:6090/API/smsmessaging/v1
+    client-correlator: nc
+    notify-url: http://localhost:8080/smssender
+    sender-address: 3333
+    bill-code: WZ00
 
 logging.level:
 #   org.springframework.beans: DEBUG

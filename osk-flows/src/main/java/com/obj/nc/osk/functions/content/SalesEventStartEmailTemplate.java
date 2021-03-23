@@ -8,4 +8,9 @@ import com.obj.nc.osk.functions.model.SalesEventStartModel;
 @JsonTypeName("SALES_EVENT_START")
 public class SalesEventStartEmailTemplate extends BaseEmailFromTemplate<SalesEventStartModel> {
 
+    @Override
+    public String getContentTypeName() {
+        return "SALES_EVENT_START";
+    }
+
 }

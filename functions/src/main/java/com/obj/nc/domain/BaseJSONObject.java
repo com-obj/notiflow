@@ -1,9 +1,6 @@
 package com.obj.nc.domain;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import org.json.JSONObject;
 
@@ -33,6 +30,10 @@ public class BaseJSONObject {
 
 	public boolean containsAttributes(List<String> attributes) {
 		return attributes.stream().allMatch(attr -> this.attributes.get(attr) != null);
+	}
+
+	public boolean containsAttribute(String attribute) {
+		return containsAttributes(Collections.singletonList(attribute));
 	}
 
 	public boolean containsNestedAttributes(List<String> attributes, String... attributePath) {
