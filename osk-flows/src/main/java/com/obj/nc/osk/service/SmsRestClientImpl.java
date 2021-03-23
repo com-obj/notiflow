@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.*;
 import javax.validation.constraints.NotNull;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @Validated
@@ -22,7 +23,8 @@ public class SmsRestClientImpl implements SmsClient {
 
     public SmsRestClientImpl(SmsSenderConfigProperties properties,
                              RestTemplateBuilder restTemplateBuilder) {
-        this.smsRestTemplate = restTemplateBuilder.rootUri(properties.getGapApiUrl()).build();
+        this.smsRestTemplate = restTemplateBuilder.rootUri(properties.getGapApiUrl())
+                .basicAuthentication(properties.getGapApiLogin(), properties.getGapApiPassword()).build();
     }
 
     @Override
@@ -31,8 +33,7 @@ public class SmsRestClientImpl implements SmsClient {
                 SmsRestClientConstants.SEND_PATH,
                 sendSmsRequestDto,
                 SendSmsResponseDto.class,
-                sendSmsRequestDto.getSenderAddress()
-        ).getBody();
+                sendSmsRequestDto.getSenderAddress()).getBody();
 
         if (responseBody == null) {
             throw new RestClientException("Sms response body must not be null");

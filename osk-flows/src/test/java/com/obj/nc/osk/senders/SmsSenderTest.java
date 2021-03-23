@@ -2,8 +2,6 @@ package com.obj.nc.osk.senders;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.Body;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SimpleText;
@@ -27,8 +25,7 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
@@ -59,11 +56,12 @@ class SmsSenderTest extends BaseIntegrationTest {
                 requestTo(UriComponentsBuilder.fromHttpUrl(properties.getGapApiUrl() + SmsRestClientConstants.SEND_PATH).build(properties.getSenderAddress()))
         )
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.OK)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header("Authorization", "Basic dGVzdGxvZ2luOnRlc3Rwdw=="))
+                .andRespond(withStatus(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(sendSmsResponseExpected))
                 );
-
 
         // WHEN
         Message sentMessage = function.apply(inputMessage);
@@ -80,7 +78,7 @@ class SmsSenderTest extends BaseIntegrationTest {
 
         SimpleText contentTyped = inputMessage.getBody().getContentTyped();
         Assertions.assertThat(sendSmsRequest.getMessage()).isEqualTo(contentTyped.getText());
-        Assertions.assertThat(sendSmsRequest.getClientCorrelator()).contains(properties.getClientCorrelator());
+        Assertions.assertThat(sendSmsRequest.getClientCorrelator()).contains(properties.getClientCorrelatorPrefix());
         Assertions.assertThat(sendSmsRequest.getNotifyURL()).isEqualTo(properties.getNotifyUrl());
 
         Assertions.assertThat(sentMessage.getBody().containsAttribute(SmsRestClientConstants.SEND_SMS_RESPONSE_ATTRIBUTE)).isTrue();

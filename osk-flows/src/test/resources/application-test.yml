@@ -24,7 +24,9 @@ osk.sia.functions:
       - sales@objectify.sk
   sms-sender:
     gap-api-url: http://localhost:6090/API/smsmessaging/v1
-    client-correlator: nc
+    gap-api-login: testlogin
+    gap-api-password: testpw
+    client-correlator-prefix: nc
     notify-url: http://localhost:8080/smssender
     sender-address: 3333
     bill-code: WZ00

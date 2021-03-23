@@ -1,5 +1,6 @@
 package com.obj.nc.osk.service;
 
+import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.osk.dto.SendSmsRequestDto;
 import com.obj.nc.osk.dto.SendSmsResponseDto;
 import com.obj.nc.osk.exception.SmsClientException;
@@ -9,12 +10,18 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
@@ -23,10 +30,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
+@ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest(SmsRestClientImpl.class)
 @ImportAutoConfiguration(ValidationAutoConfiguration.class)
 @EnableConfigurationProperties(SmsSenderConfigProperties.class)
@@ -48,7 +56,9 @@ class SmsRestClientImplTest {
         mockRestServiceServer.expect(ExpectedCount.once(),
                 requestTo(UriComponentsBuilder.fromPath(SmsRestClientConstants.SEND_PATH).build(sendSmsRequest.getSenderAddress())))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.OK)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header("Authorization", "Basic dGVzdGxvZ2luOnRlc3Rwdw=="))
+                .andRespond(withStatus(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(sendSmsSuccessResponse))
                 );
@@ -88,7 +98,9 @@ class SmsRestClientImplTest {
         mockRestServiceServer.expect(ExpectedCount.once(),
                 requestTo(UriComponentsBuilder.fromPath(SmsRestClientConstants.SEND_PATH).build(sendSmsRequest.getSenderAddress())))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.OK)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header("Authorization", "Basic dGVzdGxvZ2luOnRlc3Rwdw=="))
+                .andRespond(withStatus(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(sendSmsFailureResponse))
                 );
@@ -109,7 +121,9 @@ class SmsRestClientImplTest {
         mockRestServiceServer.expect(ExpectedCount.once(),
                 requestTo(UriComponentsBuilder.fromPath(SmsRestClientConstants.SEND_PATH).build(sendSmsRequest.getSenderAddress())))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.OK)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header("Authorization", "Basic dGVzdGxvZ2luOnRlc3Rwdw=="))
+                .andRespond(withStatus(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(sendSmsInvalidResponse))
                 );
@@ -128,7 +142,9 @@ class SmsRestClientImplTest {
         mockRestServiceServer.expect(ExpectedCount.once(),
                 requestTo(UriComponentsBuilder.fromPath(SmsRestClientConstants.SEND_PATH).build(sendSmsRequest.getSenderAddress())))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.OK)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header("Authorization", "Basic dGVzdGxvZ2luOnRlc3Rwdw=="))
+                .andRespond(withStatus(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(sendSmsInvalidResponse))
                 );
@@ -147,7 +163,9 @@ class SmsRestClientImplTest {
         mockRestServiceServer.expect(ExpectedCount.once(),
                 requestTo(UriComponentsBuilder.fromPath(SmsRestClientConstants.SEND_PATH).build(sendSmsRequest.getSenderAddress())))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.OK)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header("Authorization", "Basic dGVzdGxvZ2luOnRlc3Rwdw=="))
+                .andRespond(withStatus(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(sendSmsInvalidResponse))
                 );
@@ -157,5 +175,11 @@ class SmsRestClientImplTest {
                 .isInstanceOf(RestClientException.class)
                 .hasMessageContaining("Resource URL must not be null");
     }
+
+//    @TestConfiguration
+//    @EnableConfigurationProperties(SmsSenderConfigProperties.class)
+//    public static class SmsRestClientImplTestConfig {
+//
+//    }
 
 }

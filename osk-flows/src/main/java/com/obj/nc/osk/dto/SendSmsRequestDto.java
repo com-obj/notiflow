@@ -7,7 +7,6 @@ import com.obj.nc.osk.functions.senders.SmsSenderConfigProperties;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,7 +41,7 @@ public class SendSmsRequestDto {
                 .map(RecievingEndpoint::getEndpointId)
                 .collect(Collectors.toList());
 
-        result.clientCorrelator = properties.getClientCorrelator() + "-" + createTimestamp();
+        result.clientCorrelator = properties.getClientCorrelatorPrefix() + "-" + createTimestamp();
 
         SimpleText content = payload.getBody().getContentTyped();
         result.message = content.getText();

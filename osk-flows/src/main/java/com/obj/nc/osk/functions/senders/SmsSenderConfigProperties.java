@@ -16,7 +16,13 @@ public class SmsSenderConfigProperties {
     private String gapApiUrl;
 
     @NotBlank
-    private String clientCorrelator;
+    private String gapApiLogin;
+
+    @NotBlank
+    private String gapApiPassword;
+
+    @NotBlank
+    private String clientCorrelatorPrefix;
 
     @NotNull
     private String notifyUrl;
