@@ -15,6 +15,9 @@ nc.functions:
      source-dir: src/test/resources/eventsQueue
    send-email-message:
       from: no-reply@objectify.sk  
+      
+nc.flows:
+   input-evet-routing.enabled: true
   
 osk.sia.functions.impact-notif-converter:
    b2b-login-of-la-custumers-to-be-notified:

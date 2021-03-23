@@ -1,6 +1,6 @@
-package com.obj.nc.testmode;
+package com.obj.nc.flows.testmode;
 
-import static com.obj.nc.testmode.config.TestModeFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
+import static com.obj.nc.flows.testmode.config.TestModeFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -38,11 +38,11 @@ import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
+import com.obj.nc.flows.testmode.config.TestModeGreenMailProperties;
+import com.obj.nc.flows.testmode.config.TestModeProperties;
+import com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier;
 import com.obj.nc.functions.processors.senders.EmailSender;
-import com.obj.nc.testmode.config.TestModeBeansConfig;
-import com.obj.nc.testmode.config.TestModeGreenMailProperties;
-import com.obj.nc.testmode.config.TestModeProperties;
-import com.obj.nc.testmode.functions.sources.GreenMailReceiverSourceSupplier;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)

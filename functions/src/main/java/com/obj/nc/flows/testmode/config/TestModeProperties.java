@@ -1,4 +1,4 @@
-package com.obj.nc.testmode.config;
+package com.obj.nc.flows.testmode.config;
 
 import java.util.List;
 

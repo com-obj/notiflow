@@ -56,6 +56,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-integration'
 	
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	
+	testImplementation 'org.awaitility:awaitility'
 
 	implementation 'org.json:json:20200518'
 	implementation 'org.postgresql:postgresql'

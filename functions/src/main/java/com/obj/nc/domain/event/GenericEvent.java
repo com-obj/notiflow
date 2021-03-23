@@ -10,6 +10,7 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.domain.HasFlowId;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table("nc_input")
-public class GenericEvent implements Persistable<UUID> {
+public class GenericEvent implements Persistable<UUID>, HasFlowId {
 	
 	@Id
 	private UUID id;

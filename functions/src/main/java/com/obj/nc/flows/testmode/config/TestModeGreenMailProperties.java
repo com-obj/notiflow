@@ -1,4 +1,4 @@
-package com.obj.nc.testmode.config;
+package com.obj.nc.flows.testmode.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

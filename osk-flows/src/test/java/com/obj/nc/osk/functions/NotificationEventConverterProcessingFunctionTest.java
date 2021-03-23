@@ -21,6 +21,7 @@ import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.osk.config.FlowsConfig;
 import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
 import com.obj.nc.osk.functions.content.CustEventStartEmailTemplate;
 import com.obj.nc.osk.functions.content.SalesAgentsEventStartEmailTemplate;
@@ -52,9 +53,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     @Test
 	@SuppressWarnings("unchecked")
     void testCustomerEvent() {
-        // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketNotificationEventDto.class);
-    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
+        GenericEvent event = readFullTestEvent();
 
     	//WHEN
     	List<Event> result = function.apply(event);
@@ -94,9 +93,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     @Test
 	@SuppressWarnings("unchecked")
     void testSalesEvent() {
-        // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketNotificationEventDto.class);
-    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
+        GenericEvent event = readFullTestEvent();
 
     	//WHEN
     	List<Event> result = function.apply(event);
@@ -137,8 +134,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
 	@SuppressWarnings("unchecked")
     void testSalesAgentEvent() {
         // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketNotificationEventDto.class);
-    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
+    	GenericEvent event = readFullTestEvent();
 
     	//WHEN
     	List<Event> result = function.apply(event);
@@ -179,6 +175,14 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(context.selectSingleNode(".[@customerAddress='Dubravska cesta 2 841 04 Bratislava']")).isNotNull();
     	
     }
+
+	public static GenericEvent readFullTestEvent() {
+		IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketNotificationEventDto.class);
+    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
+    	event.setFlowId(FlowsConfig.OUTAGE_START_FLOW_ID);
+    	event.setExternalId(inputEvent.getId().toString());
+		return event;
+	}
 
 }
 

@@ -26,7 +26,9 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.osk.config.FlowsConfig;
 import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
+import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunctionTest;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
@@ -58,10 +60,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
     @Test
     void testNotifyCustomersAndSalesByEmail() {
         // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketNotificationEventDto.class);
-    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
-    	event.setFlowId(OUTAGE_START_FLOW_ID);
-    	event.setExternalId(inputEvent.getId().toString());
+    	GenericEvent event = NotificationEventConverterProcessingFunctionTest.readFullTestEvent();
 
     	//WHEN
     	genEventRepo.save(event);
@@ -134,9 +133,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
 	@Test
     void testLAsNotConfiguredAreNotNotified() throws MessagingException {
         // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-for-LA.json", IncidentTicketNotificationEventDto.class);
-    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
-    	event.setFlowId(OUTAGE_START_FLOW_ID);
+    	GenericEvent event = readTestEventForLA();
 
     	//WHEN
     	genEventRepo.save(event);
@@ -155,6 +152,14 @@ public class OskFlowsTest extends BaseIntegrationTest {
         assertMessagesSendTo(messages,"cuzy@objectify.sk", 2);
         assertMessagesSendTo(messages, "sales@objectify.sk", 1);
     }
+	
+	public static GenericEvent readTestEventForLA() {
+		IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-for-LA.json", IncidentTicketNotificationEventDto.class);
+    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
+    	event.setFlowId(FlowsConfig.OUTAGE_START_FLOW_ID);
+    	event.setExternalId(inputEvent.getId().toString());
+		return event;
+	}
     
 }
 

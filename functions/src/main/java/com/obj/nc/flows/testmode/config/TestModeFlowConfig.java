@@ -1,4 +1,4 @@
-package com.obj.nc.testmode.config;
+package com.obj.nc.flows.testmode.config;
 
 import java.util.concurrent.TimeUnit;
 
@@ -14,10 +14,10 @@ import org.springframework.integration.dsl.Pollers;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
+import com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregatorProcessingFunction;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
-import com.obj.nc.testmode.functions.sources.GreenMailReceiverSourceSupplier;
 
 import lombok.AllArgsConstructor;
 

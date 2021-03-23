@@ -11,12 +11,14 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
@@ -41,6 +43,11 @@ public abstract class BaseIntegrationTest {
       			GreenMailConfiguration.aConfig()
       			.withUser("no-reply@objectify.sk", "xxx"))
       	.withPerMethodLifecycle(false);
+    
+    @BeforeEach
+    void cleanGreenMailMailBoxes() throws FolderException {
+    	greenMail.purgeEmailFromAllMailboxes();
+    }
     
     @Data
     @AllArgsConstructor
