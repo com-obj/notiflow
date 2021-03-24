@@ -25,9 +25,9 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest
 @SpringBootTest(properties = {
-		"nc.flows.input-evet-routing.enabled=true"})
+		"nc.flows.input-evet-routing.type=FLOW_ID"})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //Because of correct disposal of green mail used for test mode
-public class InputEventRoutingIntegrationTests extends BaseIntegrationTest {
+public class FlowIDInputEventRoutingIntegrationTests extends BaseIntegrationTest {
 	
 	@Autowired private GenericEventPersisterConsumer persister;
 	@Qualifier("TEST_FLOW_INPUT")
@@ -35,7 +35,7 @@ public class InputEventRoutingIntegrationTests extends BaseIntegrationTest {
 	
     @Test
     void testGenericEventRouting() throws MessagingException {
-        GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode("events/generic_event.json"));
+        GenericEvent event = GenericEvent.from(JsonUtils.readJsonNodeFromClassPathResource("events/generic_event.json"));
         event.setFlowId("TEST_FLOW");
         
         persister.accept(event);

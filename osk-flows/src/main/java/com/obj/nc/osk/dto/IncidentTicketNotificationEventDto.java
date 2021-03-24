@@ -4,18 +4,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.osk.dto.IncidentTicketServiceOutageForCustomerDto.CustomerSegment;
 import com.obj.nc.osk.functions.NotifEventConverterConfig;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 @Data
-@EqualsAndHashCode(of = "id")
-@NoArgsConstructor
-public class IncidentTicketNotificationEventDto {
-	Long id;
+@EqualsAndHashCode(callSuper=true)
+@JsonTypeName("OUTAGE_START")
+public class IncidentTicketNotificationEventDto extends SiaOutageEvent {
+	
 	String name;
 	String description;
 	Date outageStart;

@@ -10,15 +10,11 @@ spring:
       properties:
          mail.debug: true
 
-nc.functions:
-   event-generator:
-     source-dir: src/test/resources/eventsQueue
-   send-email-message:
-      from: no-reply@objectify.sk  
-      
-nc.flows:
-   input-evet-routing.enabled: true
-  
+nc:
+   functions:
+      event-generator:
+        source-dir: src/test/resources/eventsQueue
+            
 osk.sia.functions.impact-notif-converter:
    b2b-login-of-la-custumers-to-be-notified:
       - b2b_to_include

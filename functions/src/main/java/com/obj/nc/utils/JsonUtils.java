@@ -6,16 +6,11 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obj.nc.domain.event.Event;
 import com.obj.nc.exceptions.PayloadValidationException;
 
 public class JsonUtils {
@@ -44,6 +39,12 @@ public class JsonUtils {
 		return readFileContent(file.toPath());
 	}
 	
+	public static JsonNode readJsonNodeFromClassPathResource(String resourceName) {
+		String jsonString = readJsonStringFromClassPathResource(resourceName);
+		
+		return readJsonNodeFromJSONString(jsonString);
+	}
+	
 	public static <T> T readObjectFromJSONString(String json, Class<T> beanType) {
 		
 		try {
@@ -57,7 +58,7 @@ public class JsonUtils {
 		
 	}
 	
-	public static JsonNode readObjectFromJSONString(String json) {
+	public static JsonNode readJsonNodeFromJSONString(String json) {
 		
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
@@ -165,6 +166,6 @@ public class JsonUtils {
     		throw new PayloadValidationException(jsonProblems.get());
     	}
     	
-    	return JsonUtils.readObjectFromJSONString(eventJson);
+    	return JsonUtils.readJsonNodeFromJSONString(eventJson);
 	}
 }

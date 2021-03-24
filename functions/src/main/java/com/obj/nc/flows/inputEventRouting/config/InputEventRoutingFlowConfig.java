@@ -4,22 +4,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.router.AbstractMessageRouter;
 
 import com.obj.nc.flows.inputEventRouting.FlowId2InputMessageRouter;
+import com.obj.nc.flows.inputEventRouting.SimpleTypeBasedMessageRouter;
 import com.obj.nc.functions.sources.genericEvents.GenericEventsForProcessingSupplier;
 
 @Configuration
-@ConditionalOnProperty(value = "nc.flows.input-evet-routing.enabled", havingValue = "true")
 public class InputEventRoutingFlowConfig {
 	
 	@Autowired private InputEventRoutingProperties routingProps;	
 	@Autowired private GenericEventsForProcessingSupplier genericEventSupplier;
     
     @Bean
+    @ConditionalOnProperty(value = "nc.flows.input-evet-routing.type", havingValue = "FLOW_ID")
     public IntegrationFlow flowIdBasedRoutingFlow() {
     	return IntegrationFlows
 			.from(genericEventSupplier, 
@@ -29,9 +31,26 @@ public class InputEventRoutingFlowConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(value = "nc.flows.input-evet-routing.type", havingValue = "FLOW_ID")
     public AbstractMessageRouter flowIdRouter() {
         return new FlowId2InputMessageRouter();
     }
     
+    @Bean
+    @ConditionalOnProperty(value = "nc.flows.input-evet-routing.type", havingValue = "PAYLOAD_TYPE")
+    public IntegrationFlow payloadTypeBasedRoutingFlow() {
+    	return IntegrationFlows
+			.from(genericEventSupplier, 
+					conf-> conf.poller(Pollers.fixedRate(routingProps.getPollPeriodInMiliSeconds())))
+			.channel(new DirectChannel())
+			.route(simplePayloadTypeBasedRouter())
+			.get();
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "nc.flows.input-evet-routing.type", havingValue = "PAYLOAD_TYPE")
+    public AbstractMessageRouter simplePayloadTypeBasedRouter() {
+        return new SimpleTypeBasedMessageRouter(); 
+    }
 
 }

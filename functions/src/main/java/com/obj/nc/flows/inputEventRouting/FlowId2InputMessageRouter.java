@@ -3,7 +3,6 @@ package com.obj.nc.flows.inputEventRouting;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.integration.router.AbstractMessageRouter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -12,6 +11,9 @@ import com.obj.nc.Get;
 import com.obj.nc.domain.HasFlowId;
 import com.obj.nc.exceptions.PayloadValidationException;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public class FlowId2InputMessageRouter extends AbstractMessageRouter {
 	@Override
 	protected Collection<MessageChannel> determineTargetChannels(Message<?> message) {
@@ -25,7 +27,10 @@ public class FlowId2InputMessageRouter extends AbstractMessageRouter {
 			MessageChannel inputChannel = Get.getBean(flowId + "_INPUT", MessageChannel.class);
 			return Arrays.asList(inputChannel);
 		} catch (Exception ex) {
-			throw new PayloadValidationException("No chanel with name " + flowId + "_INPUT found. Adjust the flow name to match you flow input chanel or consider turnin input event routing off by setting nc.flows.input-evet-routing.enabled=false");	
+			log.error(ex);
+			
+			throw new PayloadValidationException("No chanel with name " + flowId + "_INPUT found. "
+					+ "Adjust the flow name to match you flow input chanel or consider turning input event routing off by deleting nc.flows.input-evet-routing.type property");	
 		}
 	}
 }

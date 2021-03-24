@@ -18,14 +18,21 @@ spring:
          mail.smtp.auth: true
          mail.smtp.starttls.enable: true
 
-nc.functions:
-   event-generator:
-      source-dir: ${user.home}/eventsQueue    
-   send-email-message:
-      from: no-reply@objectify.sk  
-   email-templates:
-      templates-root-dir: src/main/resources/templates
-      messages-dir-and-base-name: src/main/resources/templates/messages
+nc:
+   functions:
+      event-generator:
+         source-dir: ${user.home}/eventsQueue    
+      send-email-message:
+         from: no-reply@objectify.sk  
+      email-templates:
+         templates-root-dir: src/main/resources/templates
+         messages-dir-and-base-name: src/main/resources/templates/messages
+   flows:    
+      input-evet-routing:
+         type: PAYLOAD_TYPE
+         type-channel-mapping:
+            OUTAGE_START: OUTAGE_START_INPUT
+            OUTAGE_END: OUTAGE_END_INPUT
 
 osk.sia.functions.impact-notif-converter:
    b2b-login-of-la-custumers-to-be-notified:
@@ -33,6 +40,8 @@ osk.sia.functions.impact-notif-converter:
       - MVSR
    cs-agents-to-notify-email:
       - sales@objectify.sk
+      
+
    
 #logging.level:
 #   org.springframework.beans: DEBUG

@@ -19,7 +19,7 @@ public class PgObjectToJsonNodeConverter implements Converter<PGobject, JsonNode
 			throw new IllegalArgumentException("Not a jsonb column");
 		}
 			
-		return JsonUtils.readObjectFromJSONString(json.getValue());
+		return JsonUtils.readJsonNodeFromJSONString(json.getValue());
 	}
 
 }
