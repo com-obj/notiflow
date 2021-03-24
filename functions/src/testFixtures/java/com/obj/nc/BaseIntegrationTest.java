@@ -45,7 +45,7 @@ public abstract class BaseIntegrationTest {
       	.withPerMethodLifecycle(false);
     
     @BeforeEach
-    void cleanGreenMailMailBoxes() throws FolderException {
+    protected void cleanGreenMailMailBoxes() throws FolderException {
     	greenMail.purgeEmailFromAllMailboxes();
     }
     

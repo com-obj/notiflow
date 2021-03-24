@@ -34,7 +34,7 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
 
     
     @BeforeEach
-    void cleanGreenMailMailBoxes() throws FolderException, IOException {
+    void purgeNotifTables() throws FolderException, IOException {
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
         jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
         jdbcTemplate.batchUpdate("delete from nc_endpoint");        

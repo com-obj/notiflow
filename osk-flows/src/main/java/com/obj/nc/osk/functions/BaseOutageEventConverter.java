@@ -22,9 +22,9 @@ import com.obj.nc.domain.message.BaseEmailFromTemplate;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.osk.dto.IncidentTicketNotificationContactDto;
-import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
+import com.obj.nc.osk.dto.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.dto.IncidentTicketServiceOutageForCustomerDto;
-import com.obj.nc.osk.dto.IncidentTicketServiceOutageForCustomerDto.CustomerSegment;
+import com.obj.nc.osk.functions.config.NotifEventConverterConfig;
 import com.obj.nc.osk.functions.content.CustEventStartEmailTemplate;
 import com.obj.nc.osk.functions.content.SalesAgentsEventStartEmailTemplate;
 import com.obj.nc.osk.functions.content.SalesEventStartEmailTemplate;
@@ -33,18 +33,29 @@ import com.obj.nc.osk.functions.model.CustomerInfo;
 import com.obj.nc.osk.functions.model.SalesAgentEventStartModel;
 import com.obj.nc.osk.functions.model.SalesEventStartModel;
 import com.obj.nc.osk.functions.model.ServiceOutageInfo;
-import com.obj.nc.utils.JsonUtils;
 
-import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Component
-@AllArgsConstructor
-public class NotifEventConverterProcessingFunction extends ProcessorFunctionAdapter<GenericEvent, List<Event>> {
+@Data
+@EqualsAndHashCode(callSuper=false)
+@RequiredArgsConstructor
+public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<GenericEvent, List<Event>> {
 	
+	@NonNull
 	private NotifEventConverterConfig config;
 	
-	public static String OUTAGE_START_ATTR_NAME = "outageStart";
-	public static String OUTAGE_INFOS_ATTR_NAME = "outageInfos";
+	protected String customerEmailSubjectKey;
+	protected String customerEmailTemplateName;
+
+	protected String salesEmailSubjectKey;
+	protected String salesEmailTemplateName;
+	
+	protected String salesAgentEmailSubjectKey;
+	protected String salesAgentEmailTemplateName;
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(GenericEvent payload) {
@@ -64,7 +75,7 @@ public class NotifEventConverterProcessingFunction extends ProcessorFunctionAdap
 	protected List<Event> execute(GenericEvent payload) {
 		List<Event> events = new ArrayList<>();
 		
-		IncidentTicketNotificationEventDto siaNotification = JsonUtils.readObjectFromJSON(payload.getPayloadJson(), IncidentTicketNotificationEventDto.class);
+		IncidentTicketOutageStartEventDto siaNotification = findIncidentTicketStartEvent(payload);
 		
 		//toto moze znamenat, ze sa o niektorych vypadkoch nedozvedia ani salesaci za danych zakanikov... je to ok?
 		siaNotification.filterOutLAsNotInConfig(config);
@@ -80,8 +91,55 @@ public class NotifEventConverterProcessingFunction extends ProcessorFunctionAdap
 		return events;
 	}
 
-	public List<Event> createCustomersEvents(
-			IncidentTicketNotificationEventDto notifEvent
+	protected abstract IncidentTicketOutageStartEventDto findIncidentTicketStartEvent(GenericEvent payload);
+	
+	protected CustEventStartEmailTemplate createCustomerEmailContent(Date outageStart,
+			List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
+		CustEventStartEmailTemplate customerMessageContent = new CustEventStartEmailTemplate();
+		
+		customerMessageContent.setSubjectResourceKey(customerEmailSubjectKey);
+		customerMessageContent.setTemplateFileName(customerEmailTemplateName);
+		customerMessageContent.setRequiredLocales(Arrays.asList(new Locale("en"), new Locale("sk")));
+		
+		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutagesForCustomer);
+		String customerName = extractCustomerName(serviceOutagesForCustomer);
+		customerMessageContent.setModel(new CustEventStartModel(outageStart, customerName, outageInfos));
+		return customerMessageContent;
+	}	
+	
+	
+	protected SalesEventStartEmailTemplate createSalesEmailContent(Date outageStart,
+			List<IncidentTicketServiceOutageForCustomerDto> serviceOutages) {
+		SalesEventStartEmailTemplate salesMessageContent = new SalesEventStartEmailTemplate();
+		
+		salesMessageContent.setSubjectResourceKey(salesEmailSubjectKey);
+		salesMessageContent.setTemplateFileName(salesEmailTemplateName);
+		salesMessageContent.setRequiredLocales(Arrays.asList(new Locale("sk")));
+		
+		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutages);
+		Map<CustomerInfo, List<ServiceOutageInfo>> outageInfosPerCustomer = outageInfos
+				.stream()
+				.collect(Collectors.groupingBy(ServiceOutageInfo::getCustomer));
+		
+		salesMessageContent.setModel(new SalesEventStartModel(outageStart, outageInfosPerCustomer));
+		return salesMessageContent;
+	}		
+	protected SalesAgentsEventStartEmailTemplate createSalesAgentsEmailContent(Date outageStart,
+			List<IncidentTicketServiceOutageForCustomerDto> serviceOutages) {
+		SalesAgentsEventStartEmailTemplate salesAgentMessageContent = new SalesAgentsEventStartEmailTemplate();
+		
+		salesAgentMessageContent.setSubjectResourceKey(salesAgentEmailSubjectKey);
+		salesAgentMessageContent.setTemplateFileName(salesAgentEmailTemplateName);
+		salesAgentMessageContent.setRequiredLocales(Arrays.asList(new Locale("sk")));
+		
+		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutages);
+		
+		salesAgentMessageContent.setModel(new SalesAgentEventStartModel(outageStart, outageInfos));
+		return salesAgentMessageContent;
+	}	
+
+	protected List<Event> createCustomersEvents(
+			IncidentTicketOutageStartEventDto notifEvent
 			) {
 		List<Event> customerEvents = new ArrayList<>();
 		
@@ -114,21 +172,8 @@ public class NotifEventConverterProcessingFunction extends ProcessorFunctionAdap
 		return event;
 	}
 
-	private CustEventStartEmailTemplate createCustomerEmailContent(Date outageStart,
-			List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
-		CustEventStartEmailTemplate customerMessageContent = new CustEventStartEmailTemplate();
-		
-		customerMessageContent.setSubjectResourceKey("cust.start.subject");
-		customerMessageContent.setTemplateFileName("customer-notification-outage-start.html");
-		customerMessageContent.setRequiredLocales(Arrays.asList(new Locale("en"), new Locale("sk")));
-		
-		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutagesForCustomer);
-		String customerName = extractCustomerName(serviceOutagesForCustomer);
-		customerMessageContent.setModel(new CustEventStartModel(outageStart, customerName, outageInfos));
-		return customerMessageContent;
-	}	
 	
-	public List<Event> createSalesEvents(IncidentTicketNotificationEventDto notifEvent) {
+	protected List<Event> createSalesEvents(IncidentTicketOutageStartEventDto notifEvent) {
 		List<Event> salesEvents = new ArrayList<>();
 		
 		Map<IncidentTicketNotificationContactDto, List<IncidentTicketServiceOutageForCustomerDto>> incidentsForSellers = groupBySalesPerson(notifEvent.getMessages());
@@ -148,7 +193,7 @@ public class NotifEventConverterProcessingFunction extends ProcessorFunctionAdap
 		return salesEvents;
 	}
 	
-	public List<Event> createSalesAgentsEvents(IncidentTicketNotificationEventDto notifEvent) {
+	protected List<Event> createSalesAgentsEvents(IncidentTicketOutageStartEventDto notifEvent) {
 		List<Event> salesEvents = new ArrayList<>();
 		
 		Set<EmailEndpoint> agentEmails = config.getCsAgentsToNotifyEmail().stream()
@@ -165,53 +210,22 @@ public class NotifEventConverterProcessingFunction extends ProcessorFunctionAdap
 
 		return salesEvents;
 	}
-
-	private SalesEventStartEmailTemplate createSalesEmailContent(Date outageStart,
-			List<IncidentTicketServiceOutageForCustomerDto> serviceOutages) {
-		SalesEventStartEmailTemplate salesMessageContent = new SalesEventStartEmailTemplate();
-		
-		salesMessageContent.setSubjectResourceKey("sales.start.subject");
-		salesMessageContent.setTemplateFileName("sales-notification-outage-start.html");
-		salesMessageContent.setRequiredLocales(Arrays.asList(new Locale("sk")));
-		
-		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutages);
-		Map<CustomerInfo, List<ServiceOutageInfo>> outageInfosPerCustomer = outageInfos
-				.stream()
-				.collect(Collectors.groupingBy(ServiceOutageInfo::getCustomer));
-		
-		salesMessageContent.setModel(new SalesEventStartModel(outageStart, outageInfosPerCustomer));
-		return salesMessageContent;
-	}	
 	
-	private SalesAgentsEventStartEmailTemplate createSalesAgentsEmailContent(Date outageStart,
-			List<IncidentTicketServiceOutageForCustomerDto> serviceOutages) {
-		SalesAgentsEventStartEmailTemplate salesAgentMessageContent = new SalesAgentsEventStartEmailTemplate();
-		
-		salesAgentMessageContent.setSubjectResourceKey("salesAgent.start.subject");
-		salesAgentMessageContent.setTemplateFileName("agent-notification-outage-start.html");
-		salesAgentMessageContent.setRequiredLocales(Arrays.asList(new Locale("sk")));
-		
-		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutages);
-		
-		salesAgentMessageContent.setModel(new SalesAgentEventStartModel(outageStart, outageInfos));
-		return salesAgentMessageContent;
-	}	
-	
-	private Set<IncidentTicketNotificationContactDto> extractDistinctSalesContacts(List<IncidentTicketServiceOutageForCustomerDto> messages) {
+	protected Set<IncidentTicketNotificationContactDto> extractDistinctSalesContacts(List<IncidentTicketServiceOutageForCustomerDto> messages) {
 		return messages.stream()
 					.map(outage -> outage.getSellerContacts())
 					.flatMap(contacts -> contacts.stream())
 					.collect(Collectors.toSet());
 	}
 	
-	private Set<IncidentTicketNotificationContactDto> extractDistinctCustomerContacts(List<IncidentTicketServiceOutageForCustomerDto> messages) {
+	protected Set<IncidentTicketNotificationContactDto> extractDistinctCustomerContacts(List<IncidentTicketServiceOutageForCustomerDto> messages) {
 		return messages.stream()
 					.map(outage -> outage.getCustomerContacts())
 					.flatMap(contacts -> contacts.stream())
 					.collect(Collectors.toSet());
 	}
 
-	private List<ServiceOutageInfo> convertToServiceOutages(List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
+	protected List<ServiceOutageInfo> convertToServiceOutages(List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
 		List<ServiceOutageInfo> outageInfos = new ArrayList<>();
 		
 		for (IncidentTicketServiceOutageForCustomerDto serviceOutage : serviceOutagesForCustomer) {
@@ -223,11 +237,11 @@ public class NotifEventConverterProcessingFunction extends ProcessorFunctionAdap
 		return outageInfos;
 	}
 	
-	private String extractCustomerName(List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
+	protected String extractCustomerName(List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
 		return serviceOutagesForCustomer.iterator().next().getCustomerName();
 	}
 	
-	private Map<IncidentTicketNotificationContactDto, List<IncidentTicketServiceOutageForCustomerDto>> groupBySalesPerson(
+	protected Map<IncidentTicketNotificationContactDto, List<IncidentTicketServiceOutageForCustomerDto>> groupBySalesPerson(
 				List<IncidentTicketServiceOutageForCustomerDto> messages
 			) {
 		Map<IncidentTicketNotificationContactDto, List<IncidentTicketServiceOutageForCustomerDto>> incidentsForSellers = new HashMap<>();
@@ -247,7 +261,7 @@ public class NotifEventConverterProcessingFunction extends ProcessorFunctionAdap
 	}
 	
 	//copy/paste groupBySalesPerson
-	private Map<IncidentTicketNotificationContactDto, List<IncidentTicketServiceOutageForCustomerDto>> groupByCustomerPerson(
+	protected Map<IncidentTicketNotificationContactDto, List<IncidentTicketServiceOutageForCustomerDto>> groupByCustomerPerson(
 			List<IncidentTicketServiceOutageForCustomerDto> messages
 			) {
 		Map<IncidentTicketNotificationContactDto, List<IncidentTicketServiceOutageForCustomerDto>> incidetnsForCustomerContact = new HashMap<>();

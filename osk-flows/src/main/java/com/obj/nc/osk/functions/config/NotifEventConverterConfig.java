@@ -1,4 +1,4 @@
-package com.obj.nc.osk.functions;
+package com.obj.nc.osk.functions.config;
 
 import java.util.ArrayList;
 import java.util.HashSet;

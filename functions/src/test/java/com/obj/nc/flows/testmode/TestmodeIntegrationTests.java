@@ -3,22 +3,17 @@ package com.obj.nc.flows.testmode;
 import static com.obj.nc.flows.testmode.config.TestModeFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.mail.util.MimeMessageParser;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.test.context.MockIntegrationContext;
 import org.springframework.integration.test.context.SpringIntegrationTest;
@@ -30,7 +25,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
@@ -62,11 +56,6 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
 	@Autowired private TestModeProperties props;
 	@Autowired private MockIntegrationContext mockIntegrationContext;
 	@Autowired private JavaMailSenderImpl mailSender;
-	
-    @BeforeEach
-    void cleanGreenMailMailBoxes() throws FolderException {
-    	testModeEmailsReciver.purgeEmailFromAllMailboxes();
-    }
 
     @Test
     void testTestmode() throws MessagingException {

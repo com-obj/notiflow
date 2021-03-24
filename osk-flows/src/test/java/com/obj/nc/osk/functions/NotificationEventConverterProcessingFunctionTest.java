@@ -22,7 +22,7 @@ import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.osk.config.FlowsConfig;
-import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
+import com.obj.nc.osk.dto.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.functions.content.CustEventStartEmailTemplate;
 import com.obj.nc.osk.functions.content.SalesAgentsEventStartEmailTemplate;
 import com.obj.nc.osk.functions.content.SalesEventStartEmailTemplate;
@@ -35,15 +35,13 @@ import com.obj.nc.utils.JsonUtils;
 public class NotificationEventConverterProcessingFunctionTest extends BaseIntegrationTest {
 	
 	@Autowired
-	private NotifEventConverterProcessingFunction function;
+	private StartOutageEventConverter function;
 	
     @Autowired
     private JdbcTemplate jdbcTemplate;
     
     @BeforeEach
-    void cleanGreenMailMailBoxes() throws FolderException, IOException {
-    	greenMail.purgeEmailFromAllMailboxes();
-    	
+    void purgeNotifTables() throws FolderException, IOException {
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
         jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
         jdbcTemplate.batchUpdate("delete from nc_endpoint");        
@@ -177,7 +175,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     }
 
 	public static GenericEvent readFullTestEvent() {
-		IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketNotificationEventDto.class);
+		IncidentTicketOutageStartEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketOutageStartEventDto.class);
     	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
     	event.setFlowId(FlowsConfig.OUTAGE_START_FLOW_ID);
     	event.setExternalId(inputEvent.getId().toString());
