@@ -6,6 +6,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -14,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.exceptions.PayloadValidationException;
 
 public class JsonUtils {
+	
+	public static DateFormat stdJsonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
 	public static <T> T readObjectFromJSONFile(Path filePath, Class<T> beanType) {
 		String JSONStr = readFileContent(filePath);	
@@ -167,5 +175,12 @@ public class JsonUtils {
     	}
     	
     	return JsonUtils.readJsonNodeFromJSONString(eventJson);
+	}
+	
+	public static Date convertJsonDateStringToDate(String date) {
+		TemporalAccessor ta = DateTimeFormatter.ISO_INSTANT.parse(date);
+	    Instant i = Instant.from(ta);
+	    Date d = Date.from(i);
+	    return d;
 	}
 }

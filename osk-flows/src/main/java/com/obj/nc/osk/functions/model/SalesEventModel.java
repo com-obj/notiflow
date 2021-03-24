@@ -2,6 +2,7 @@ package com.obj.nc.osk.functions.model;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
@@ -12,14 +13,14 @@ import lombok.RequiredArgsConstructor;
 @Data
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class CustEventStartModel {
+public class SalesEventModel {
 	
 	@NotNull
 	final private Date timeStart;
 	
 	@NotNull
-	final private String customerName;
+	final private Date timeEnd;
 	
 	@NotNull
-	final private List<ServiceOutageInfo> services;
+	final private Map<CustomerInfo, List<ServiceOutageInfo>> servicesPerCustomer;
 }

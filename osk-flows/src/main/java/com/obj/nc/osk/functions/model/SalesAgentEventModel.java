@@ -12,10 +12,13 @@ import lombok.RequiredArgsConstructor;
 @Data
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class SalesAgentEventStartModel {
+public class SalesAgentEventModel {
 	
 	@NotNull
 	final private Date timeStart;
+	
+	@NotNull
+	final private Date timeEnd;
 	
 	@NotNull
 	final private List<ServiceOutageInfo> services;

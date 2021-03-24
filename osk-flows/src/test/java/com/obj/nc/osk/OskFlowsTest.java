@@ -57,7 +57,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
     @Test
     void testNotifyCustomersAndSalesByEmail() {
         // GIVEN
-    	GenericEvent event = NotificationEventConverterProcessingFunctionTest.readFullTestEvent();
+    	GenericEvent event = NotificationEventConverterProcessingFunctionTest.readOutageStartEvent();
 
     	//WHEN
     	genEventRepo.save(event);
@@ -151,7 +151,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
     }
 	
 	public static GenericEvent readTestEventForLA() {
-		IncidentTicketOutageStartEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-for-LA.json", IncidentTicketOutageStartEventDto.class);
+		IncidentTicketOutageStartEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/outage-start-event-for-LA.json", IncidentTicketOutageStartEventDto.class);
     	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
     	event.setFlowId(FlowsConfig.OUTAGE_START_FLOW_ID);
     	event.setExternalId(inputEvent.getId().toString());

@@ -25,13 +25,13 @@ import com.obj.nc.osk.dto.IncidentTicketNotificationContactDto;
 import com.obj.nc.osk.dto.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.dto.IncidentTicketServiceOutageForCustomerDto;
 import com.obj.nc.osk.functions.config.NotifEventConverterConfig;
-import com.obj.nc.osk.functions.content.CustEventStartEmailTemplate;
-import com.obj.nc.osk.functions.content.SalesAgentsEventStartEmailTemplate;
-import com.obj.nc.osk.functions.content.SalesEventStartEmailTemplate;
-import com.obj.nc.osk.functions.model.CustEventStartModel;
+import com.obj.nc.osk.functions.content.CustEventEmailTemplate;
+import com.obj.nc.osk.functions.content.SalesAgentsEventEmailTemplate;
+import com.obj.nc.osk.functions.content.SalesEventEmailTemplate;
+import com.obj.nc.osk.functions.model.CustEventModel;
 import com.obj.nc.osk.functions.model.CustomerInfo;
-import com.obj.nc.osk.functions.model.SalesAgentEventStartModel;
-import com.obj.nc.osk.functions.model.SalesEventStartModel;
+import com.obj.nc.osk.functions.model.SalesAgentEventModel;
+import com.obj.nc.osk.functions.model.SalesEventModel;
 import com.obj.nc.osk.functions.model.ServiceOutageInfo;
 
 import lombok.Data;
@@ -93,9 +93,11 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 
 	protected abstract IncidentTicketOutageStartEventDto findIncidentTicketStartEvent(GenericEvent payload);
 	
-	protected CustEventStartEmailTemplate createCustomerEmailContent(Date outageStart,
-			List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
-		CustEventStartEmailTemplate customerMessageContent = new CustEventStartEmailTemplate();
+	protected CustEventEmailTemplate createCustomerEmailContent(
+			Date outageStart,Date outageEnd,
+			List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer
+			) {
+		CustEventEmailTemplate customerMessageContent = new CustEventEmailTemplate();
 		
 		customerMessageContent.setSubjectResourceKey(customerEmailSubjectKey);
 		customerMessageContent.setTemplateFileName(customerEmailTemplateName);
@@ -103,14 +105,16 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		
 		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutagesForCustomer);
 		String customerName = extractCustomerName(serviceOutagesForCustomer);
-		customerMessageContent.setModel(new CustEventStartModel(outageStart, customerName, outageInfos));
+		customerMessageContent.setModel(new CustEventModel(outageStart, outageEnd, customerName, outageInfos));
 		return customerMessageContent;
 	}	
 	
 	
-	protected SalesEventStartEmailTemplate createSalesEmailContent(Date outageStart,
-			List<IncidentTicketServiceOutageForCustomerDto> serviceOutages) {
-		SalesEventStartEmailTemplate salesMessageContent = new SalesEventStartEmailTemplate();
+	protected SalesEventEmailTemplate createSalesEmailContent(
+			Date outageStart, Date outageEnd,
+			List<IncidentTicketServiceOutageForCustomerDto> serviceOutages
+			) {
+		SalesEventEmailTemplate salesMessageContent = new SalesEventEmailTemplate();
 		
 		salesMessageContent.setSubjectResourceKey(salesEmailSubjectKey);
 		salesMessageContent.setTemplateFileName(salesEmailTemplateName);
@@ -121,12 +125,13 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 				.stream()
 				.collect(Collectors.groupingBy(ServiceOutageInfo::getCustomer));
 		
-		salesMessageContent.setModel(new SalesEventStartModel(outageStart, outageInfosPerCustomer));
+		salesMessageContent.setModel(new SalesEventModel(outageStart, outageEnd, outageInfosPerCustomer));
 		return salesMessageContent;
 	}		
-	protected SalesAgentsEventStartEmailTemplate createSalesAgentsEmailContent(Date outageStart,
+	protected SalesAgentsEventEmailTemplate createSalesAgentsEmailContent(
+			Date outageStart, Date outageEnd,
 			List<IncidentTicketServiceOutageForCustomerDto> serviceOutages) {
-		SalesAgentsEventStartEmailTemplate salesAgentMessageContent = new SalesAgentsEventStartEmailTemplate();
+		SalesAgentsEventEmailTemplate salesAgentMessageContent = new SalesAgentsEventEmailTemplate();
 		
 		salesAgentMessageContent.setSubjectResourceKey(salesAgentEmailSubjectKey);
 		salesAgentMessageContent.setTemplateFileName(salesAgentEmailTemplateName);
@@ -134,7 +139,7 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		
 		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutages);
 		
-		salesAgentMessageContent.setModel(new SalesAgentEventStartModel(outageStart, outageInfos));
+		salesAgentMessageContent.setModel(new SalesAgentEventModel(outageStart, outageEnd, outageInfos));
 		return salesAgentMessageContent;
 	}	
 
@@ -147,8 +152,9 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		
 		for (IncidentTicketNotificationContactDto customer: outageForCustomers.keySet()) {
 			
-			CustEventStartEmailTemplate customerMessageContent = createCustomerEmailContent(
+			CustEventEmailTemplate customerMessageContent = createCustomerEmailContent(
 					notifEvent.getOutageStart(), 
+					notifEvent.getOutageEnd(),
 					outageForCustomers.get(customer));
 
 			
@@ -180,8 +186,9 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		
 		for (IncidentTicketNotificationContactDto salesContact: incidentsForSellers.keySet()) {
 			
-			SalesEventStartEmailTemplate salesMessageContent = createSalesEmailContent(
+			SalesEventEmailTemplate salesMessageContent = createSalesEmailContent(
 					notifEvent.getOutageStart(), 
+					notifEvent.getOutageEnd(),
 					incidentsForSellers.get(salesContact));
 			
 			Event event  = createNotificationIntent(
@@ -201,11 +208,15 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 				.collect(Collectors.toSet());
 
 			
-		SalesAgentsEventStartEmailTemplate salesMessageContent = createSalesAgentsEmailContent(
+		SalesAgentsEventEmailTemplate salesMessageContent = createSalesAgentsEmailContent(
 				notifEvent.getOutageStart(), 
+				notifEvent.getOutageEnd(),
 				notifEvent.getMessages());
 			
-		Event event  = createNotificationIntent(salesMessageContent, agentEmails);
+		Event event  = createNotificationIntent(
+				salesMessageContent, 
+				agentEmails);
+		
 		salesEvents.add(event);
 
 		return salesEvents;

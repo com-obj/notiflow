@@ -45,7 +45,7 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
     @Test
     void testNotifyCustomersViaTestmodeEmail() {
         // GIVEN
-    	GenericEvent event = NotificationEventConverterProcessingFunctionTest.readFullTestEvent();
+    	GenericEvent event = NotificationEventConverterProcessingFunctionTest.readOutageStartEvent();
 
     	//WHEN
     	genEventRepo.save(event);
