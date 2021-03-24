@@ -7,7 +7,4 @@ public interface SmsRestClientConstants {
     String STATUS_SUCCESS = "SUCCESS";
     String STATUS_FAILURE = "FAILURE";
 
-    String SEND_SMS_REQUEST_ATTRIBUTE = "sendSmsRequest";
-    String SEND_SMS_RESPONSE_ATTRIBUTE = "sendSmsResponse";
-
 }

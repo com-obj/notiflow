@@ -6,7 +6,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class SendSmsResponseDto {
+public class OskSendSmsResponseDto {
 
     @NotNull
     @Valid

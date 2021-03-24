@@ -1,4 +1,4 @@
-package com.obj.nc.osk.functions.senders;
+package com.obj.nc.functions.processors.senders;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
@@ -6,23 +6,15 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SimpleText;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import com.obj.nc.osk.dto.SendSmsRequestDto;
-import com.obj.nc.osk.dto.SendSmsResponseDto;
-import com.obj.nc.osk.service.SmsClient;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
+import com.obj.nc.services.SmsClient;
+import com.obj.nc.services.Sms;
 
 import java.util.Optional;
 
-import static com.obj.nc.osk.service.SmsRestClientConstants.SEND_SMS_REQUEST_ATTRIBUTE;
-import static com.obj.nc.osk.service.SmsRestClientConstants.SEND_SMS_RESPONSE_ATTRIBUTE;
+public abstract class BaseSmsSender<SMS_T extends Sms, RESPONSE_T> extends ProcessorFunctionAdapter<Message, Message> {
 
-@Component
-@AllArgsConstructor
-public class SmsSender extends ProcessorFunctionAdapter<Message, Message> {
-
-    private final SmsSenderConfigProperties properties;
-    private final SmsClient smsClient;
+    public static final String SEND_SMS_REQUEST_ATTRIBUTE = "sendSmsRequest";
+    public static final String SEND_SMS_RESPONSE_ATTRIBUTE = "sendSmsResponse";
 
     @Override
     protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
@@ -44,13 +36,17 @@ public class SmsSender extends ProcessorFunctionAdapter<Message, Message> {
     @Override
     @DocumentProcessingInfo("SmsSender")
     protected Message execute(Message payload) {
-        SendSmsRequestDto sendSmsRequest = SendSmsRequestDto.from(payload, properties);
-        payload.getBody().setAttributeValue(SEND_SMS_REQUEST_ATTRIBUTE, sendSmsRequest);
+        SmsClient<SMS_T, RESPONSE_T> smsClient = getSmsClient();
 
-        SendSmsResponseDto sendSmsResponse = smsClient.sendSms(sendSmsRequest);
+        SMS_T smsMessage = smsClient.convertMessage(payload);
+        payload.getBody().setAttributeValue(SEND_SMS_REQUEST_ATTRIBUTE, smsMessage);
 
+        RESPONSE_T sendSmsResponse = smsClient.send(smsMessage);
         payload.getBody().setAttributeValue(SEND_SMS_RESPONSE_ATTRIBUTE, sendSmsResponse);
+
         return payload;
     }
+
+    protected abstract SmsClient<SMS_T, RESPONSE_T> getSmsClient();
 
 }

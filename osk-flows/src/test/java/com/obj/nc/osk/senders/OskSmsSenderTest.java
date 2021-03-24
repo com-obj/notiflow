@@ -5,10 +5,10 @@ import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SimpleText;
-import com.obj.nc.osk.dto.SendSmsRequestDto;
-import com.obj.nc.osk.dto.SendSmsResponseDto;
-import com.obj.nc.osk.functions.senders.SmsSender;
-import com.obj.nc.osk.functions.senders.SmsSenderConfigProperties;
+import com.obj.nc.osk.dto.OskSendSmsRequestDto;
+import com.obj.nc.osk.dto.OskSendSmsResponseDto;
+import com.obj.nc.osk.functions.senders.OskSmsSender;
+import com.obj.nc.osk.functions.senders.OskSmsSenderConfigProperties;
 import com.obj.nc.osk.service.SmsRestClientConstants;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
@@ -25,19 +25,21 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import static com.obj.nc.functions.processors.senders.BaseSmsSender.SEND_SMS_REQUEST_ATTRIBUTE;
+import static com.obj.nc.functions.processors.senders.BaseSmsSender.SEND_SMS_RESPONSE_ATTRIBUTE;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockRestServiceServer
 @ImportAutoConfiguration(ValidationAutoConfiguration.class)
-class SmsSenderTest extends BaseIntegrationTest {
+class OskSmsSenderTest extends BaseIntegrationTest {
 
     @Autowired
-    private SmsSender function;
+    private OskSmsSender function;
 
     @Autowired
-    private SmsSenderConfigProperties properties;
+    private OskSmsSenderConfigProperties properties;
 
     @Autowired
     private MockRestServiceServer mockRestServiceServer;
@@ -49,7 +51,7 @@ class SmsSenderTest extends BaseIntegrationTest {
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_PATH, Message.class);
 
         // MOCK SERVER
-        SendSmsResponseDto sendSmsResponseExpected = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-success.json", SendSmsResponseDto.class);
+        OskSendSmsResponseDto sendSmsResponseExpected = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-success.json", OskSendSmsResponseDto.class);
 
         mockRestServiceServer.expect(
                 ExpectedCount.once(),
@@ -69,8 +71,8 @@ class SmsSenderTest extends BaseIntegrationTest {
         // THEN
         mockRestServiceServer.verify();
 
-        Assertions.assertThat(sentMessage.getBody().containsAttribute(SmsRestClientConstants.SEND_SMS_REQUEST_ATTRIBUTE)).isTrue();
-        SendSmsRequestDto sendSmsRequest = sentMessage.getBody().getAttributeValueAs(SmsRestClientConstants.SEND_SMS_REQUEST_ATTRIBUTE, SendSmsRequestDto.class);
+        Assertions.assertThat(sentMessage.getBody().containsAttribute(SEND_SMS_REQUEST_ATTRIBUTE)).isTrue();
+        OskSendSmsRequestDto sendSmsRequest = sentMessage.getBody().getAttributeValueAs(SEND_SMS_REQUEST_ATTRIBUTE, OskSendSmsRequestDto.class);
         Assertions.assertThat(sendSmsRequest.getAddress()).hasSize(1);
         Assertions.assertThat(sendSmsRequest.getAddress().get(0)).isEqualTo(((SmsEndpoint) inputMessage.getBody().getRecievingEndpoints().get(0)).getPhone());
         Assertions.assertThat(sendSmsRequest.getSenderAddress()).isEqualTo(properties.getSenderAddress());
@@ -81,8 +83,8 @@ class SmsSenderTest extends BaseIntegrationTest {
         Assertions.assertThat(sendSmsRequest.getClientCorrelator()).contains(properties.getClientCorrelatorPrefix());
         Assertions.assertThat(sendSmsRequest.getNotifyURL()).isEqualTo(properties.getNotifyUrl());
 
-        Assertions.assertThat(sentMessage.getBody().containsAttribute(SmsRestClientConstants.SEND_SMS_RESPONSE_ATTRIBUTE)).isTrue();
-        SendSmsResponseDto sendSmsResponseActual = sentMessage.getBody().getAttributeValueAs(SmsRestClientConstants.SEND_SMS_RESPONSE_ATTRIBUTE, SendSmsResponseDto.class);
+        Assertions.assertThat(sentMessage.getBody().containsAttribute(SEND_SMS_RESPONSE_ATTRIBUTE)).isTrue();
+        OskSendSmsResponseDto sendSmsResponseActual = sentMessage.getBody().getAttributeValueAs(SEND_SMS_RESPONSE_ATTRIBUTE, OskSendSmsResponseDto.class);
         Assertions.assertThat(sendSmsResponseActual).isEqualTo(sendSmsResponseExpected);
     }
 

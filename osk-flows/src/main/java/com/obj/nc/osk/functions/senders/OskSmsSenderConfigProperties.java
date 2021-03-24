@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "osk.sia.functions.sms-sender")
-public class SmsSenderConfigProperties {
+public class OskSmsSenderConfigProperties {
 
     @NotBlank
     private String gapApiUrl;
