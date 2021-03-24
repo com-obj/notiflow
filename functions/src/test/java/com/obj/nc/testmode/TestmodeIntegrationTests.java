@@ -48,21 +48,21 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME)
 @SpringBootTest(properties = {
-		"nc.flows.test-mode.enabled=true",
+		"nc.flows.test-mode.enabled=true", 
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //Because of correct disposal of green mail used for test mode
 public class TestmodeIntegrationTests extends BaseIntegrationTest {
-
+	
 	@Qualifier(TestModeBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
 	@Autowired private GreenMail testModeEmailsReciver;
-
+	
 	@Autowired private EmailSender emailSenderSinkProcessingFunction;
 	@Autowired private GreenMailReceiverSourceSupplier greenMailReceiverSourceSupplier;
 	@Autowired private TestModeGreenMailProperties gmProps;
 	@Autowired private TestModeProperties props;
 	@Autowired private MockIntegrationContext mockIntegrationContext;
 	@Autowired private JavaMailSenderImpl mailSender;
-
+	
     @BeforeEach
     void cleanGreenMailMailBoxes() throws FolderException {
     	testModeEmailsReciver.purgeEmailFromAllMailboxes();
@@ -81,13 +81,13 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     	//Any injected JavaMailSenderImpl has to be configured to send email to testModeEmailReviver. Not to standard SMTP
     	Assertions.assertThat(mailSender.getHost()).isEqualTo("localhost");
     	Assertions.assertThat(mailSender.getPort()).isEqualTo(gmProps.getSmtpPort());
-
-
+    	
+    	
         // GIVEN
         Message message1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", Message.class);
         Message message2 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message2.json", Message.class);
         Message message3 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message3.json", Message.class);
-
+        
         //WHEN
         emailSenderSinkProcessingFunction.apply(message1);
         emailSenderSinkProcessingFunction.apply(message2);

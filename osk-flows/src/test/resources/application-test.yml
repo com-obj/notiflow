@@ -11,11 +11,11 @@ spring:
          mail.debug: true
 
 nc.functions:
-  event-generator:
-    source-dir: src/test/resources/eventsQueue
-  send-email-message:
-    from: no-reply@objectify.sk
-
+   event-generator:
+     source-dir: src/test/resources/eventsQueue
+   send-email-message:
+      from: no-reply@objectify.sk  
+  
 osk.sia.functions:
   impact-notif-converter:
     b2b-login-of-la-custumers-to-be-notified:
@@ -30,12 +30,12 @@ osk.sia.functions:
     notify-url: http://localhost:8080/smssender
     sender-address: 3333
     bill-code: WZ00
-
+      
 logging.level:
 #   org.springframework.beans: DEBUG
-   com.zaxxer.hikari.HikariConfig: DEBUG
+   com.zaxxer.hikari.HikariConfig: DEBUG 
 #   com.zaxxer.hikari: TRACE
-
+      
 ---
 spring.config.activate.on-profile: jenkins_test
 testEnv: jenkins

@@ -2,7 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.4.0'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
-    id 'maven-publish'
+    id 'maven-publish'    
     id 'com.google.cloud.tools.appengine'
 }
 
@@ -43,10 +43,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
-
+	
 	implementation 'org.springframework.data:spring-data-jdbc'
 	/* to here */
-
+    
     //app-engine
     implementation 'com.google.cloud:spring-cloud-gcp-starter'
     implementation 'com.google.cloud:spring-cloud-gcp-starter-sql-postgresql'
@@ -58,7 +58,7 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.integration:spring-integration-test'
-
+    
 	testImplementation 'commons-jxpath:commons-jxpath:1.3'
 
     testImplementation 'org.json:json:20201115'
@@ -93,8 +93,8 @@ task copyDistToStagingFolder(type: Copy) {
     into "./../docker/osk-flows/dist"
 }
 
-appengine {
-    deploy {
+appengine {  
+    deploy {   
         projectId = 'test-osk-notifications'
         version = 'GCLOUD_CONFIG'     // gcloud to generate a version
     }

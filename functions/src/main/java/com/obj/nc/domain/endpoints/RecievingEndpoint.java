@@ -20,7 +20,7 @@ public abstract class RecievingEndpoint {
 	
 	private DeliveryOptions deliveryOptions;
 	private Recipient recipient;
-
+	
 	@JsonIgnore
 	public abstract String getEndpointId();
 	

@@ -32,32 +32,32 @@ import lombok.ToString;
 public abstract class BaseIntegrationTest {
 
     static FixedPortPostgreSQLContainer<?> POSTGRESQL_CONTAINER;
-
+    
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
-
+    
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
       	.withConfiguration(
       			GreenMailConfiguration.aConfig()
       			.withUser("no-reply@objectify.sk", "xxx"))
       	.withPerMethodLifecycle(false);
-
+    
     @Data
     @AllArgsConstructor
     @ToString
     public static class MailMessageForAssertions {
-    	private Optional<String> from;
-		private Optional<String> to;
-		private Optional<String> subjectPart;
-		private String[] textParts;
-
+    	Optional<String> from;
+    	Optional<String> to;
+    	Optional<String> subjectPart;
+    	String[] textParts;
+    	
     	public static MailMessageForAssertions as(String to,String subjectPart,String ... textParts ) {
     		MailMessageForAssertions msg = new MailMessageForAssertions(Optional.empty(),Optional.of(to),Optional.of(subjectPart), textParts);
     		return msg;
     	}
-
+    	
     }
-
+    
 	public static void assertMessagesSendTo(MimeMessage[] messages, String emailAddress, int expectedCount) {
 		long count = Arrays.stream(messages)
         	.flatMap(m-> {
@@ -71,73 +71,73 @@ public abstract class BaseIntegrationTest {
         	.filter(ia -> ia.getAddress().equals(emailAddress)).count();
     	 Assertions.assertThat( count ).isEqualTo(expectedCount);
 	}
-
+    
     public static List<MimeMessage> assertMessageCount(MimeMessage[] receivedMessages, String emailAddress, int count) {
-    	try {
+    	try { 
     		List<MimeMessage> matched = new ArrayList<>();
-
+    		
 	    	int totalCount =0;
 	    	for (MimeMessage msg: receivedMessages) {
 	    		boolean has = Arrays.stream(msg.getAllRecipients())
 	    			.map(adr-> ((InternetAddress)adr).getAddress())
 	    			.filter(email -> emailAddress.equals(email))
 	    			.findFirst().isPresent();
-
+	    		
 	    		if (has) {
 	    			matched.add(msg);
 	    			totalCount++;
 	    		}
 	    	}
-
+	    	
 	    	Assertions.assertThat(totalCount).isEqualTo(count);
-
+	    	
 	    	return matched;
     	} catch (MessagingException e) {
     		throw new RuntimeException(e);
     	}
     }
-
+    
     public static MimeMessage assertMessagesContains(MimeMessage[] receivedMessages, MailMessageForAssertions msgToMatch) {
 		 System.out.println("About to check message TO:" + msgToMatch.getTo() + " SUBJECT:" + msgToMatch.getSubjectPart() + " BODY:" + Arrays.toString(msgToMatch.textParts) );
-
-    	try {
-	    	 for (MimeMessage message: receivedMessages) {
+		 
+    	try { 
+	    	 for (MimeMessage message: receivedMessages) {	    		 
 		    	 boolean isMatchingTo = true;
 		    	 boolean isMatchingSubject = true;
 		    	 boolean isMatchingContent = true;
-
+	    		 
 	    		 if (msgToMatch.getTo().isPresent()) {
-
+	    			 
 	    			 isMatchingTo &=
-
+								 
 								 Arrays.stream( message.getAllRecipients())
 								 	.map(fromAddr -> ((InternetAddress)fromAddr).getAddress())
 								 	.filter(fromAddr -> msgToMatch.getTo().get().equals(fromAddr) )
-								 	.findFirst().isPresent();
+								 	.findFirst().isPresent(); 
 	    		 }
-
+	    		 
 	    		 if (msgToMatch.getSubjectPart().isPresent()) {
 	    			 	System.out.println("Checking subject '" + message.getSubject() + "' to contain '" + msgToMatch.getSubjectPart().get() + "'");
 	    			 	isMatchingSubject &= message.getSubject().contains(msgToMatch.getSubjectPart().get());
-
+		
 	    		 }
-
+	    		 
 	    		 for (String bodyTextToMatch: msgToMatch.getTextParts()) {
-
+	    			 	
 	    			 isMatchingContent &= GreenMailUtil.getBody(message).contains(bodyTextToMatch);
-
+						
 	    		 }
-
+	    		 
 	    		 if (isMatchingTo && isMatchingSubject && isMatchingContent) {
 	    			 return message;
 	    		 }
-	    	 }
-
+	    	 }	
+	    	 
 	    	 Assertions.assertThat(false).as("Greenmail didn't recieve mail which would match to " + msgToMatch.toString()).isTrue();
     	} catch (MessagingException e) {
     		throw new RuntimeException(e);
     	}
-
+    	
     	return null;
 	}
 }

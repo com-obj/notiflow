@@ -44,7 +44,7 @@ public abstract class BasePayload extends BaseJSONObject {
 	}
 
 	public abstract String getPayloadTypeName();
-
+	
 	@JsonIgnore
 	public <T> T getContentTyped() {
 		return (T)getBody().getMessage();
