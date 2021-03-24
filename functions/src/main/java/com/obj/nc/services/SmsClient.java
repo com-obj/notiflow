@@ -5,10 +5,10 @@ import com.obj.nc.domain.message.Message;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-public interface SmsClient<SMS_T extends Sms, RESPONSE_T> {
+public interface SmsClient<REQUEST_T, RESPONSE_T> {
 
-    SMS_T convertMessage(Message message);
+    REQUEST_T convertMessageToRequest(Message message);
 
-    RESPONSE_T send(@Valid @NotNull SMS_T smsMessage);
+    RESPONSE_T sendRequest(@Valid @NotNull REQUEST_T smsMessage);
 
 }

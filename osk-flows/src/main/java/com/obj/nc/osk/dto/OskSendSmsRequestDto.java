@@ -1,17 +1,26 @@
 package com.obj.nc.osk.dto;
 
-import com.obj.nc.services.Sms;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class OskSendSmsRequestDto extends Sms {
+@NoArgsConstructor
+public class OskSendSmsRequestDto {
+
+    @NotNull
+    private String senderAddress;
+
+    @NotNull
+    private List<String> address;
+
+    @NotNull
+    private String message;
 
     @NotBlank
     private String clientCorrelator;
@@ -26,7 +35,7 @@ public class OskSendSmsRequestDto extends Sms {
         this.clientCorrelator = clientCorrelatorPrefix + "-" + createTimestamp();
     }
 
-    public static String createTimestamp() {
+    private String createTimestamp() {
         ZonedDateTime zdt = ZonedDateTime.now();
         // example format: 2014-09-02T08:05:23.653Z
         return DateTimeFormatter.ISO_INSTANT.format(zdt);

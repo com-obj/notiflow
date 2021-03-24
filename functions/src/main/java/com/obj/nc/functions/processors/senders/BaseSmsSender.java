@@ -7,13 +7,11 @@ import com.obj.nc.domain.message.SimpleText;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.services.SmsClient;
-import com.obj.nc.services.Sms;
 
 import java.util.Optional;
 
-public abstract class BaseSmsSender<SMS_T extends Sms, RESPONSE_T> extends ProcessorFunctionAdapter<Message, Message> {
+public abstract class BaseSmsSender<REQUEST_T, RESPONSE_T> extends ProcessorFunctionAdapter<Message, Message> {
 
-    public static final String SEND_SMS_REQUEST_ATTRIBUTE = "sendSmsRequest";
     public static final String SEND_SMS_RESPONSE_ATTRIBUTE = "sendSmsResponse";
 
     @Override
@@ -36,17 +34,13 @@ public abstract class BaseSmsSender<SMS_T extends Sms, RESPONSE_T> extends Proce
     @Override
     @DocumentProcessingInfo("SmsSender")
     protected Message execute(Message payload) {
-        SmsClient<SMS_T, RESPONSE_T> smsClient = getSmsClient();
-
-        SMS_T smsMessage = smsClient.convertMessage(payload);
-        payload.getBody().setAttributeValue(SEND_SMS_REQUEST_ATTRIBUTE, smsMessage);
-
-        RESPONSE_T sendSmsResponse = smsClient.send(smsMessage);
+        SmsClient<REQUEST_T, RESPONSE_T> smsClient = getSmsClient();
+        REQUEST_T sendSmsRequest = smsClient.convertMessageToRequest(payload);
+        RESPONSE_T sendSmsResponse = smsClient.sendRequest(sendSmsRequest);
         payload.getBody().setAttributeValue(SEND_SMS_RESPONSE_ATTRIBUTE, sendSmsResponse);
-
         return payload;
     }
 
-    protected abstract SmsClient<SMS_T, RESPONSE_T> getSmsClient();
+    protected abstract SmsClient<REQUEST_T, RESPONSE_T> getSmsClient();
 
 }

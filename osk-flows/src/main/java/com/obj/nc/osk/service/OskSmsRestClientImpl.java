@@ -23,18 +23,21 @@ import java.util.stream.Collectors;
 @Validated
 public class OskSmsRestClientImpl implements SmsClient<OskSendSmsRequestDto, OskSendSmsResponseDto> {
 
+    public static final String SEND_PATH = "/outbound/{senderAddress}/requests";
+    public static final String STATUS_SUCCESS = "SUCCESS";
+    public static final String STATUS_FAILURE = "FAILURE";
+
     private final OskSmsSenderConfigProperties properties;
     private final RestTemplate smsRestTemplate;
 
-    public OskSmsRestClientImpl(OskSmsSenderConfigProperties properties,
-                                RestTemplateBuilder restTemplateBuilder) {
+    public OskSmsRestClientImpl(OskSmsSenderConfigProperties properties, RestTemplateBuilder restTemplateBuilder) {
         this.properties = properties;
         this.smsRestTemplate = restTemplateBuilder.rootUri(properties.getGapApiUrl())
                 .basicAuthentication(properties.getGapApiLogin(), properties.getGapApiPassword()).build();
     }
 
     @Override
-    public OskSendSmsRequestDto convertMessage(Message message) {
+    public OskSendSmsRequestDto convertMessageToRequest(Message message) {
         OskSendSmsRequestDto result = new OskSendSmsRequestDto();
 
         result.setAddress(message.getBody().getRecievingEndpoints().stream()
@@ -54,9 +57,9 @@ public class OskSmsRestClientImpl implements SmsClient<OskSendSmsRequestDto, Osk
     }
 
     @Override
-    public OskSendSmsResponseDto send(@Valid @NotNull OskSendSmsRequestDto oskSendSmsRequestDto) {
+    public OskSendSmsResponseDto sendRequest(@Valid @NotNull OskSendSmsRequestDto oskSendSmsRequestDto) {
         OskSendSmsResponseDto responseBody = smsRestTemplate.postForEntity(
-                SmsRestClientConstants.SEND_PATH,
+                SEND_PATH,
                 oskSendSmsRequestDto,
                 OskSendSmsResponseDto.class,
                 oskSendSmsRequestDto.getSenderAddress()).getBody();
@@ -77,9 +80,9 @@ public class OskSmsRestClientImpl implements SmsClient<OskSendSmsRequestDto, Osk
             throw new RestClientException("Resource URL must not be null");
         }
 
-        if (resourceURL.contains(SmsRestClientConstants.STATUS_SUCCESS)) {
+        if (resourceURL.contains(STATUS_SUCCESS)) {
             return responseBody;
-        } else if (resourceURL.contains(SmsRestClientConstants.STATUS_FAILURE)) {
+        } else if (resourceURL.contains(STATUS_FAILURE)) {
             throw new SmsClientException(resourceURL);
         } else {
             throw new SmsClientException("Unknown response status");

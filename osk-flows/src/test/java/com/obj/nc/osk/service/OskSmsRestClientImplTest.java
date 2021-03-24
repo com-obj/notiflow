@@ -1,13 +1,15 @@
 package com.obj.nc.osk.service;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.endpoints.SmsEndpoint;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.SimpleText;
 import com.obj.nc.osk.dto.OskSendSmsRequestDto;
 import com.obj.nc.osk.dto.OskSendSmsResponseDto;
 import com.obj.nc.osk.exception.SmsClientException;
 import com.obj.nc.osk.functions.senders.OskSmsSenderConfigProperties;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -25,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.ConstraintViolationException;
 
+import static com.obj.nc.osk.service.OskSmsRestClientImpl.SEND_PATH;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -39,7 +42,29 @@ class OskSmsRestClientImplTest {
     private OskSmsRestClientImpl smsRestClient;
 
     @Autowired
+    private OskSmsSenderConfigProperties properties;
+
+    @Autowired
     private MockRestServiceServer mockRestServiceServer;
+
+    @Test
+    void testCreateRequest() {
+        // GIVEN
+        String MESSAGE_PATH = "smsNotificationMessages/message.json";
+        Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_PATH, Message.class);
+
+        OskSendSmsRequestDto oskSendSmsRequestDto = smsRestClient.convertMessageToRequest(inputMessage);
+
+        Assertions.assertThat(oskSendSmsRequestDto.getAddress()).hasSize(1);
+        Assertions.assertThat(oskSendSmsRequestDto.getAddress().get(0)).isEqualTo(((SmsEndpoint) inputMessage.getBody().getRecievingEndpoints().get(0)).getPhone());
+        Assertions.assertThat(oskSendSmsRequestDto.getSenderAddress()).isEqualTo(properties.getSenderAddress());
+        Assertions.assertThat(oskSendSmsRequestDto.getBillCode()).isEqualTo(properties.getBillCode());
+
+        SimpleText contentTyped = inputMessage.getBody().getContentTyped();
+        Assertions.assertThat(oskSendSmsRequestDto.getMessage()).isEqualTo(contentTyped.getText());
+        Assertions.assertThat(oskSendSmsRequestDto.getClientCorrelator()).contains(properties.getClientCorrelatorPrefix());
+        Assertions.assertThat(oskSendSmsRequestDto.getNotifyURL()).isEqualTo(properties.getNotifyUrl());
+    }
 
     @Test
     void testSendSmsWithSuccessResponse() {
@@ -51,7 +76,7 @@ class OskSmsRestClientImplTest {
         mockRestServerWithOneRequest(sendSmsRequest, sendSmsSuccessResponse);
 
         // WHEN
-        OskSendSmsResponseDto sendSmsResponse = smsRestClient.send(sendSmsRequest);
+        OskSendSmsResponseDto sendSmsResponse = smsRestClient.sendRequest(sendSmsRequest);
 
         // THEN
         mockRestServiceServer.verify();
@@ -59,7 +84,7 @@ class OskSmsRestClientImplTest {
     }
 
     @Test
-    void testSendSmsWithInvalidRequest() {
+    void testSendSmsWithInvalidRequestFailsOnValidation() {
         // GIVEN
         OskSendSmsRequestDto sendSmsRequest = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-request.json", OskSendSmsRequestDto.class);
         OskSendSmsResponseDto sendSmsSuccessResponse = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-success.json", OskSendSmsResponseDto.class);
@@ -69,13 +94,7 @@ class OskSmsRestClientImplTest {
         mockRestServerWithOneRequest(sendSmsRequest, sendSmsSuccessResponse);
 
         // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> smsRestClient.send(sendSmsRequest))
-                .isInstanceOf(ConstraintViolationException.class)
-                .hasMessageContaining("must not be blank");
-
-        mockRestServerWithOneRequest(sendSmsRequest, sendSmsSuccessResponse);
-        // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> smsRestClient.send(null))
+        Assertions.assertThatThrownBy(() -> smsRestClient.sendRequest(null))
                 .isInstanceOf(ConstraintViolationException.class)
                 .hasMessageContaining("must not be null");
     }
@@ -90,7 +109,7 @@ class OskSmsRestClientImplTest {
         mockRestServerWithOneRequest(sendSmsRequest, sendSmsFailureResponse);
 
         // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> smsRestClient.send(sendSmsRequest))
+        Assertions.assertThatThrownBy(() -> smsRestClient.sendRequest(sendSmsRequest))
                 .isInstanceOf(SmsClientException.class)
                 .hasMessageContaining(sendSmsFailureResponse.getResourceReference().getResourceURL());
     }
@@ -105,7 +124,7 @@ class OskSmsRestClientImplTest {
         mockRestServerWithOneRequest(sendSmsRequest, sendSmsInvalidResponse);
 
         // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> smsRestClient.send(sendSmsRequest))
+        Assertions.assertThatThrownBy(() -> smsRestClient.sendRequest(sendSmsRequest))
                 .isInstanceOf(SmsClientException.class)
                 .hasMessageContaining("Unknown response status");
 
@@ -117,7 +136,7 @@ class OskSmsRestClientImplTest {
         mockRestServerWithOneRequest(sendSmsRequest, sendSmsInvalidResponse);
 
         // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> smsRestClient.send(sendSmsRequest))
+        Assertions.assertThatThrownBy(() -> smsRestClient.sendRequest(sendSmsRequest))
                 .isInstanceOf(RestClientException.class)
                 .hasMessageContaining("Resource reference must not be null");
 
@@ -129,7 +148,7 @@ class OskSmsRestClientImplTest {
         mockRestServerWithOneRequest(sendSmsRequest, sendSmsInvalidResponse);
 
         // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> smsRestClient.send(sendSmsRequest))
+        Assertions.assertThatThrownBy(() -> smsRestClient.sendRequest(sendSmsRequest))
                 .isInstanceOf(RestClientException.class)
                 .hasMessageContaining("Resource URL must not be null");
     }
@@ -137,7 +156,7 @@ class OskSmsRestClientImplTest {
     private void mockRestServerWithOneRequest(OskSendSmsRequestDto sendSmsRequest, OskSendSmsResponseDto sendSmsSuccessResponse) {
         mockRestServiceServer.reset();
         mockRestServiceServer.expect(ExpectedCount.once(),
-                requestTo(UriComponentsBuilder.fromPath(SmsRestClientConstants.SEND_PATH).build(sendSmsRequest.getSenderAddress())))
+                requestTo(UriComponentsBuilder.fromPath(SEND_PATH).build(sendSmsRequest.getSenderAddress())))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(header("Authorization", "Basic dGVzdGxvZ2luOnRlc3Rwdw=="))
