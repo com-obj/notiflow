@@ -7,3 +7,10 @@ spring.mail:
    port: 3025
    username: no-reply@objectify.sk
    password: xxx
+
+---
+spring.config.activate.on-profile: jenkins_test
+testEnv: jenkins
+spring.datasource:
+   url: jdbc:postgresql://localhost:5432/nc
+---

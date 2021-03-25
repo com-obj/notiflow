@@ -6,5 +6,10 @@ import com.obj.nc.osk.functions.model.CustEventModel;
 
 @JsonTypeName("CUST_EVENT")
 public class CustEventEmailTemplate extends BaseEmailFromTemplate<CustEventModel> {
-
+    
+    @Override
+    public String getContentTypeName() {
+        return "CUST_EVENT";
+    }
+    
 }

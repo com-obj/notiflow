@@ -10,7 +10,7 @@
   },
   "body":{
     "message": {
-      "content" : {},
+      "type" : "AGGREGATED_EMAIL_MESSAGE_CONTENT",
       "aggregateContent" : [ {
         "attributes": {
           "originalEvent" : {

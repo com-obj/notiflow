@@ -32,7 +32,6 @@ public class EmailEndpoint extends RecievingEndpoint {
 	}
 
 	@Override
-	@JsonIgnore
 	public String getEndpointId() {
 		return email;
 	}

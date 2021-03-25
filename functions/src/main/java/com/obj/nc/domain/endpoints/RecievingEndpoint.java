@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ 
 	@Type(value = EmailEndpoint.class, name = EmailEndpoint.JSON_TYPE_IDENTIFIER), 
-	@Type(value = MailChimpEndpoint.class, name = MailChimpEndpoint.JSON_TYPE_IDENTIFIER)
+	@Type(value = MailChimpEndpoint.class, name = MailChimpEndpoint.JSON_TYPE_IDENTIFIER),
+	@Type(value = SmsEndpoint.class, name = SmsEndpoint.JSON_TYPE_IDENTIFIER)
 })
 @Data
 @NoArgsConstructor
@@ -20,6 +21,7 @@ public abstract class RecievingEndpoint {
 	private DeliveryOptions deliveryOptions;
 	private Recipient recipient;
 	
+	@JsonIgnore
 	public abstract String getEndpointId();
 	
 	@JsonIgnore

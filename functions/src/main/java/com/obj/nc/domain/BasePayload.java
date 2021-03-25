@@ -1,5 +1,6 @@
 package com.obj.nc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -44,6 +45,7 @@ public abstract class BasePayload extends BaseJSONObject {
 
 	public abstract String getPayloadTypeName();
 	
+	@JsonIgnore
 	public <T> T getContentTyped() {
 		return (T)getBody().getMessage();
 	}

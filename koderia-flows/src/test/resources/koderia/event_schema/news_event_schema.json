@@ -5,88 +5,143 @@
       "type": {
          "type": "string"
       },
+      "attributes": {
+         "type": "object"
+      },
       "header": {
          "type": "object",
          "properties": {
-            "configuration-name": {
+            "attributes": {
+               "type": "object"
+            },
+            "id": {
+               "type": "null"
+            },
+            "eventIds": {
+               "type": "array",
+               "items": {}
+            },
+            "flow-id": {
                "type": "string"
             }
          },
          "required": [
-            "configuration-name"
+            "attributes",
+            "id",
+            "eventIds",
+            "flow-id"
          ]
       },
       "body": {
          "type": "object",
          "properties": {
+            "attributes": {
+               "type": "object"
+            },
             "message": {
                "type": "object",
                "properties": {
-                  "content": {
+                  "type": {
+                     "type": "string"
+                  },
+                  "attributes": {
                      "type": "object",
                      "properties": {
-                        "subject": {
-                           "type": "string"
-                        },
-                        "text": {
-                           "type": "string"
-                        }
-                     },
-                     "required": [
-                        "subject",
-                        "text"
-                     ]
-                  }
-               },
-               "required": [
-                  "content"
-               ]
-            },
-            "attributes": {
-               "type": "object",
-               "properties": {
-                  "originalEvent": {
-                     "type": "object",
-                     "properties": {
-                        "type": {
-                           "type": "string"
-                        },
-                        "data": {
+                        "originalEvent": {
                            "type": "object",
                            "properties": {
-                              "subject": {
+                              "type": {
                                  "type": "string"
                               },
-                              "text": {
-                                 "type": "string"
+                              "data": {
+                                 "type": "object",
+                                 "properties": {
+                                    "subject": {
+                                       "type": "string"
+                                    },
+                                    "text": {
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "subject",
+                                    "text"
+                                 ]
                               }
                            },
                            "required": [
-                              "subject",
-                              "text"
+                              "type",
+                              "data"
                            ]
                         }
                      },
                      "required": [
-                        "type",
-                        "data"
+                        "originalEvent"
                      ]
+                  },
+                  "subject": {
+                     "type": "string"
+                  },
+                  "text": {
+                     "type": "string"
+                  },
+                  "contentType": {
+                     "type": "string"
+                  },
+                  "attachments": {
+                     "type": "array",
+                     "items": {}
                   }
                },
                "required": [
-                  "originalEvent"
+                  "type",
+                  "attributes",
+                  "subject",
+                  "text",
+                  "contentType",
+                  "attachments"
+               ]
+            },
+            "recievingEndpoints": {
+               "type": "array",
+               "items": {}
+            },
+            "deliveryOptions": {
+               "type": "object",
+               "properties": {
+                  "aggregationType": {
+                     "type": "string"
+                  },
+                  "schedulingType": {
+                     "type": "string"
+                  },
+                  "schedulingValue": {
+                     "type": "null"
+                  }
+               },
+               "required": [
+                  "aggregationType",
+                  "schedulingType",
+                  "schedulingValue"
                ]
             }
          },
          "required": [
+            "attributes",
             "message",
-            "attributes"
+            "recievingEndpoints",
+            "deliveryOptions"
          ]
+      },
+      "processingInfo": {
+         "type": "null"
       }
    },
    "required": [
       "type",
+      "attributes",
       "header",
-      "body"
+      "body",
+      "processingInfo"
    ]
 }

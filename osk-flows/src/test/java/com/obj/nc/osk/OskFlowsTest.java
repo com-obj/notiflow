@@ -63,7 +63,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
     	genEventRepo.save(event);
     	
     	//THEN
-        boolean success = greenMail.waitForIncomingEmail(10000, 12);
+        boolean success = greenMail.waitForIncomingEmail(20000L, 12);
         
         Assertions.assertThat(success).isTrue();
         

@@ -24,6 +24,9 @@ public class SystemPropertyActiveProfileResolver implements ActiveProfilesResolv
         final String springProfileKey = "spring.profiles.active";
 
         String[] resolvedProfiles = defaultActiveProfilesResolver.resolve(testClass);
+        if (resolvedProfiles.length == 0) {
+            resolvedProfiles = new String[] { "test" };
+        }
 
         if (System.getProperties().containsKey(springProfileKey) && StringUtils.hasText(System.getProperty(springProfileKey))) {
             resolvedProfiles = Stream.of(resolvedProfiles, System.getProperty(springProfileKey).split("\\s*,\\s*"))
