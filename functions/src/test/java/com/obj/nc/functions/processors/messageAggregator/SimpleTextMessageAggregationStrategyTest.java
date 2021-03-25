@@ -17,7 +17,7 @@ import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageAggregator.SimpleTextMessageAggregationStrategyTest.MessageAggregatorTestConfig;
-import com.obj.nc.functions.processors.messageAggregator.aggregations.SimpleTextMessageAggregationStrategy;
+import com.obj.nc.functions.processors.messageAggregator.aggregations.AggregatedInContentStrategy;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -25,7 +25,7 @@ import com.obj.nc.utils.JsonUtils;
 class SimpleTextMessageAggregationStrategyTest {
 
     @Autowired
-    private SimpleTextMessageAggregationStrategy aggregateMessages;
+    private AggregatedInContentStrategy aggregateMessages;
 
     @Test
     void testAggregateValidMessagesPass() {
@@ -111,8 +111,8 @@ class SimpleTextMessageAggregationStrategyTest {
     public static class MessageAggregatorTestConfig {
 
         @Bean
-        public SimpleTextMessageAggregationStrategy aggregateMessages() {
-            return new SimpleTextMessageAggregationStrategy();
+        public AggregatedInContentStrategy aggregateMessages() {
+            return new AggregatedInContentStrategy();
         }
     }
 

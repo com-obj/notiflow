@@ -19,7 +19,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Component
 @Log4j2
-public class SimpleTextMessageAggregationStrategy extends ProcessorFunctionAdapter<Messages, Message> implements MessageAggregationStrategy {
+public class AggregatedInContentStrategy extends ProcessorFunctionAdapter<Messages, Message> implements MessageAggregationStrategy {
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(Messages messages) {

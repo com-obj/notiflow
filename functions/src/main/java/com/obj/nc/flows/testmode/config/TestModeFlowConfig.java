@@ -57,7 +57,7 @@ public class TestModeFlowConfig {
         						)
 
         			)
-//                .transform(messageAggregator)
+//        		.transform(aggregated2SingleMail)
                 .transform(sendEmailRealSmtp)
                 .handle(logConsumer).get();
     }

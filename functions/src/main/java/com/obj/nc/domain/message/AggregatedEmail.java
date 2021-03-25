@@ -1,12 +1,12 @@
 package com.obj.nc.domain.message;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -17,14 +17,6 @@ public class AggregatedEmail extends Email {
 
 	//TODO: rename to parts
     private List<Email> aggregateContent = new ArrayList<>();
-
-    public AggregatedEmail from(Email other) {
-        AggregatedEmail aggregated = new AggregatedEmail();
-        aggregated.setSubject(other.getSubject());
-        aggregated.setText(other.getText());
-        aggregated.setAttachments(other.getAttachments());
-        return aggregated;
-    }
     
     public void add(Email other) {
     	aggregateContent.add(other);
