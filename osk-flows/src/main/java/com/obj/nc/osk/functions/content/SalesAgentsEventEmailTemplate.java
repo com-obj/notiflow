@@ -6,5 +6,10 @@ import com.obj.nc.osk.functions.model.SalesAgentEventModel;
 
 @JsonTypeName("SALES_AGENT_EVENT")
 public class SalesAgentsEventEmailTemplate extends BaseEmailFromTemplate<SalesAgentEventModel> {
-
+    
+    @Override
+    public String getContentTypeName() {
+        return "SALES_AGENT_EVENT";
+    }
+    
 }

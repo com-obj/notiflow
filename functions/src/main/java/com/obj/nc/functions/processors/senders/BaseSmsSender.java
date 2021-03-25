@@ -7,12 +7,16 @@ import com.obj.nc.domain.message.SimpleText;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.services.SmsClient;
+import lombok.AllArgsConstructor;
 
 import java.util.Optional;
 
+@AllArgsConstructor
 public abstract class BaseSmsSender<REQUEST_T, RESPONSE_T> extends ProcessorFunctionAdapter<Message, Message> {
 
     public static final String SEND_SMS_RESPONSE_ATTRIBUTE = "sendSmsResponse";
+    
+    private final SmsClient<REQUEST_T, RESPONSE_T> smsClient;
 
     @Override
     protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
@@ -20,11 +24,11 @@ public abstract class BaseSmsSender<REQUEST_T, RESPONSE_T> extends ProcessorFunc
             return Optional.of(new PayloadValidationException("Message must not be null"));
         }
 
-        if (payload.getBody().getRecievingEndpoints().stream().anyMatch(endpoint -> !SmsEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointTypeName()))) {
+        if (payload.getBody().getRecievingEndpoints().stream().anyMatch(endpoint -> !(endpoint instanceof SmsEndpoint))) {
             return Optional.of(new PayloadValidationException(String.format("Sms sender can only send message to endpoint of type %s", SmsEndpoint.JSON_TYPE_IDENTIFIER)));
         }
 
-        if (!SimpleText.JSON_TYPE_IDENTIFIER.equals(payload.getBody().getMessage().getContentTypeName())) {
+        if (!(payload.getBody().getMessage() instanceof SimpleText)) {
             return Optional.of(new PayloadValidationException(String.format("Sms sender can only send message with content of type %s", SimpleText.JSON_TYPE_IDENTIFIER)));
         }
 
@@ -34,13 +38,10 @@ public abstract class BaseSmsSender<REQUEST_T, RESPONSE_T> extends ProcessorFunc
     @Override
     @DocumentProcessingInfo("SmsSender")
     protected Message execute(Message payload) {
-        SmsClient<REQUEST_T, RESPONSE_T> smsClient = getSmsClient();
         REQUEST_T sendSmsRequest = smsClient.convertMessageToRequest(payload);
         RESPONSE_T sendSmsResponse = smsClient.sendRequest(sendSmsRequest);
         payload.getBody().setAttributeValue(SEND_SMS_RESPONSE_ATTRIBUTE, sendSmsResponse);
         return payload;
     }
-
-    protected abstract SmsClient<REQUEST_T, RESPONSE_T> getSmsClient();
 
 }
