@@ -29,7 +29,6 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
@@ -87,15 +86,15 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         MimeMessage[] inputMimeMessages = testModeEmailsReciver.getReceivedMessages();
         Assertions.assertThat(inputMimeMessages.length).isEqualTo(3);
 
-        Messages messagesWrapped = greenMailReceiverSourceSupplier.get();
-        List<Message> messages = messagesWrapped.getMessages();
+        List<Message> messages = greenMailReceiverSourceSupplier.get();
+//        List<Message> messages = messagesWrapped.getMessages();
 
         // WHEN
-        MessageSource<Messages> messageSource = () -> new GenericMessage<>(messagesWrapped);
+        MessageSource<?> messageSource = () -> new GenericMessage<>(messages);
         mockIntegrationContext.substituteMessageSourceFor(TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME, messageSource);
 
         // THEN agregeted mail recieved by standardn green mail used by test and thus in producton standard SMTP server
-        boolean success = greenMail.waitForIncomingEmail(1);
+        boolean success = greenMail.waitForIncomingEmail(5000,1);
         Assertions.assertThat( success ).isEqualTo( true );
 
         MimeMessage[] outputMimeMessages = greenMail.getReceivedMessages();

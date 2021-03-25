@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.json.JSONObject;
-
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.obj.nc.domain.event.Event;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.Data;
@@ -58,6 +55,10 @@ public class BaseJSONObject {
 
 	public <T> T getAttributeValueAs(String attributeName, Class<T> clazz) {
 		return JsonUtils.readClassFromObject(attributes.get(attributeName), clazz);
+	}
+	
+	public Object getAttributeValue(String attributeName) {
+		return attributes.get(attributeName);
 	}
 
 }

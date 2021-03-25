@@ -23,5 +23,13 @@ public class Messages extends BaseJSONObject {
     				.stream()
     				.allMatch(msg -> msg.getBody().getDeliveryOptions().getAggregationType() != AGGREGATION_TYPE.NONE);
     }
+    
+    public Message getFirst() {
+    	return messages.iterator().next();
+    }
+    
+    public boolean isEmpty() {
+    	return messages.isEmpty();
+    }
 
 }

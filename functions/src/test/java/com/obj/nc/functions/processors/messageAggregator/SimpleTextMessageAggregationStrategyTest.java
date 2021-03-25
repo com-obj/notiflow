@@ -1,26 +1,31 @@
 package com.obj.nc.functions.processors.messageAggregator;
 
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.Messages;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.utils.JsonUtils;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.Messages;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.messageAggregator.SimpleTextMessageAggregationStrategyTest.MessageAggregatorTestConfig;
+import com.obj.nc.functions.processors.messageAggregator.aggregations.SimpleTextMessageAggregationStrategy;
+import com.obj.nc.utils.JsonUtils;
+
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringJUnitConfig(classes = MessageAggregatorTestConfig.class)
-class MessageAggregatorTest {
+class SimpleTextMessageAggregationStrategyTest {
 
     @Autowired
-    private MessageAggregatorProcessingFunction aggregateMessages;
+    private SimpleTextMessageAggregationStrategy aggregateMessages;
 
     @Test
     void testAggregateValidMessagesPass() {
@@ -100,6 +105,15 @@ class MessageAggregatorTest {
         Assertions.assertThatThrownBy(() -> aggregateMessages.apply(inputMessagesWrapped))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("Messages do not share the same receiving endpoints");
+    }
+    
+    @TestConfiguration
+    public static class MessageAggregatorTestConfig {
+
+        @Bean
+        public SimpleTextMessageAggregationStrategy aggregateMessages() {
+            return new SimpleTextMessageAggregationStrategy();
+        }
     }
 
 }

@@ -18,7 +18,6 @@ import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.AggregatedEmail;
@@ -26,7 +25,6 @@ import com.obj.nc.domain.message.Email;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
 import com.obj.nc.flows.testmode.config.TestModeProperties;
-import com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.utils.JsonUtils;
 
@@ -74,10 +72,10 @@ class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
         Assertions.assertThat( mimeMessages.length ).isEqualTo(3);
 
         // WHEN
-        Messages messagesWrapped = greenMailReceiverSourceSupplier.get();
+        List<Message> messages = greenMailReceiverSourceSupplier.get();
 
         // THEN mesages recieved from greenMailReceiverSourceSupplier and testModeEmailsReciver are as far as content the same
-        List<Message> messages = messagesWrapped.getMessages();
+//        List<Message> messages = messagesWrapped.getMessages();
 
         Email original = messages.get(0).getContentTyped();
         AggregatedEmail aggregatedExpected = message1.getContentTyped();

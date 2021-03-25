@@ -23,6 +23,7 @@ import com.obj.nc.repositories.GenericEventRepository;
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(properties = {
 		"nc.flows.test-mode.enabled=true", 
+		"nc.flows.test-mode.period-in-seconds=1",
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
 public class OskFlowsTestModeTest extends BaseIntegrationTest {
     
@@ -51,7 +52,7 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
     	genEventRepo.save(event);
     	
     	//THEN
-        boolean success = greenMail.waitForIncomingEmail(10000, 1);
+        boolean success = greenMail.waitForIncomingEmail(20000, 1);
         
         Assertions.assertThat(success).isTrue();
         

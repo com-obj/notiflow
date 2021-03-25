@@ -18,12 +18,12 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.Attachement;
+import com.obj.nc.domain.Header;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.Content;
-import com.obj.nc.domain.message.Email;
 import com.obj.nc.domain.message.AggregatedEmail;
+import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.exceptions.ProcessingException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -38,6 +38,8 @@ import lombok.extern.log4j.Log4j2;
 public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	
 	private final JavaMailSenderImpl mailSender;
+	
+	public static String NOTIF_CENTER_EMAIL_HEANDER_PREFIX = "$NC_";
 	
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message message) {
@@ -77,15 +79,17 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 			messageContent = msg;
 		}
 
-		doSendMessage(toEmail, messageContent);
+		doSendMessage(toEmail, messageContent, payload.getHeader());
 		
 		payload.stepFinish();
 		return payload;
 	}
 
-	private void doSendMessage(EmailEndpoint toEmail, Email messageContent) {
+	private void doSendMessage(EmailEndpoint toEmail, Email messageContent, Header header) {
 		try {
-			MimeMessage message = mailSender.createMimeMessage();
+			MimeMessage message = mailSender.createMimeMessage();	
+			copyHeaderValues(header, message);
+			
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
 			helper.setFrom(mailSender.getUsername());
@@ -95,7 +99,6 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 			helper.setSubject(messageContent.getSubject());
 			helper.setText(messageContent.getText(), MediaType.TEXT_HTML_VALUE.equals(messageContent.getContentType()) );
 			
-
 			for (Attachement attachement: messageContent.getAttachments()) {
 				FileSystemResource file = new FileSystemResource(new File(attachement.getFileURI()));
 				helper.addAttachment(attachement.getName(), file);
@@ -109,6 +112,25 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 			
 		} catch (MessagingException e) {
 			throw new ProcessingException(EmailSender.class, e);
+		}
+	}
+
+
+	private void copyHeaderValues(Header header, MimeMessage message) {
+		header.getAttributes().entrySet().forEach(entry-> {
+			try {
+				message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + entry.getKey(), entry.getValue()+"");
+			} catch (MessagingException e) {
+				throw new RuntimeException(e);
+			}
+		});
+		
+		try {
+	//		message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "EVENT_ID", Arrays.toString(header.getEventIds()));
+			message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "FLOW_ID", header.getFlowId());
+			message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "MSG_ID", header.getId()+"");
+		} catch (MessagingException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

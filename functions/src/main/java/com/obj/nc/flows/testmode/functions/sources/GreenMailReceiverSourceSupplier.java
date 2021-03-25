@@ -21,7 +21,6 @@ import com.icegreen.greenmail.store.InMemoryStore;
 import com.icegreen.greenmail.store.MailFolder;
 import com.icegreen.greenmail.store.StoredMessage;
 import com.icegreen.greenmail.util.GreenMail;
-import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -34,7 +33,7 @@ import com.obj.nc.functions.sources.SourceSupplierAdapter;
 
 @Component
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<Messages> {
+public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<Message>> {
 
     @Qualifier(TestModeBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
     @Autowired private GreenMail gm;
@@ -42,7 +41,7 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<Messa
     @Autowired private TestModeProperties properties;
 
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(Messages payload) {
+	protected Optional<PayloadValidationException> checkPreCondition(List<Message> messages) {
 		//toto neni na stav, kedy by bolo treba hadzat vynimku.. ked je source prazdy, tak je prazdny. nic sa nedeje
 //        if (payload.getMessages().isEmpty()) {
 //            return Optional.of(new PayloadValidationException("There are no messages to supply"));
@@ -56,7 +55,7 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<Messa
 	}
 
 	@Override
-	protected Messages execute() {
+	protected List<Message> execute() {
         List<Message> allMessages = new ArrayList<>();
 
         try {
@@ -84,7 +83,7 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<Messa
         	return null; //terminates further flow processing
         }
 
-        return new Messages(allMessages);
+        return allMessages;
 	}
 	
     private Message convertGreenMailMessageToMessage(StoredMessage message) {
