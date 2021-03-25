@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class OskSendSmsRequestDto {
-
+    
     @NotNull
     private String senderAddress;
 
@@ -34,12 +34,12 @@ public class OskSendSmsRequestDto {
     public void setClientCorrelator(String clientCorrelatorPrefix) {
         this.clientCorrelator = clientCorrelatorPrefix + "-" + createTimestamp();
     }
-
+    
     private String createTimestamp() {
         ZonedDateTime zdt = ZonedDateTime.now();
         // example format: 2014-09-02T08:05:23.653Z
         return DateTimeFormatter.ISO_INSTANT.format(zdt);
     }
-
+    
 }
 

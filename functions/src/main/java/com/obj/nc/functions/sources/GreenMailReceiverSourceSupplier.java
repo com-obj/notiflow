@@ -1,4 +1,4 @@
-package com.obj.nc.flows.testmode.functions.sources;
+package com.obj.nc.functions.sources;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,9 +27,8 @@ import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Email;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
-import com.obj.nc.flows.testmode.config.TestModeProperties;
-import com.obj.nc.functions.sources.SourceSupplierAdapter;
+import com.obj.nc.flows.testmode.TestModeBeansConfig;
+import com.obj.nc.flows.testmode.TestModeProperties;
 
 @Component
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")

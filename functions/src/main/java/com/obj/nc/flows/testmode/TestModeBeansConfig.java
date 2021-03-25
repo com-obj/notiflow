@@ -1,4 +1,4 @@
-package com.obj.nc.flows.testmode.config;
+package com.obj.nc.flows.testmode;
 
 import java.util.Objects;
 import java.util.Properties;
@@ -9,17 +9,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.event.ContextStoppedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
-import com.obj.nc.Get;
 import com.obj.nc.functions.processors.senders.EmailSender;
-
-import lombok.AllArgsConstructor;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")

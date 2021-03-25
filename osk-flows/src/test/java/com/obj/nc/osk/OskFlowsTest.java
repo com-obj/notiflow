@@ -25,7 +25,7 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.osk.config.FlowsConfig;
+import com.obj.nc.osk.flows.siaFlows.FlowsConfig;
 import com.obj.nc.osk.dto.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunctionTest;
 import com.obj.nc.repositories.GenericEventRepository;
