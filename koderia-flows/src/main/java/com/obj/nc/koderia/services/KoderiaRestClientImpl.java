@@ -1,6 +1,7 @@
 package com.obj.nc.koderia.services;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.functions.processors.KoderiaRecipientsConfigProperties;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.koderia.config.KoderiaApiConfigProperties;
 import com.obj.nc.koderia.dto.RecipientDto;
@@ -9,6 +10,7 @@ import com.obj.nc.koderia.mapper.RecipientMapper;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResponseErrorHandler;
@@ -30,10 +32,16 @@ public class KoderiaRestClientImpl implements KoderiaClient {
     private final RestTemplate restTemplate;
 
     public KoderiaRestClientImpl(ResponseErrorHandler responseErrorHandler, RecipientMapper recipientMapper,
-                                 KoderiaApiConfigProperties koderiaApiConfigProperties, RestTemplateBuilder restTemplateBuilder) {
+                                 KoderiaRecipientsConfigProperties koderiaRecipientsConfigProperties, RestTemplateBuilder restTemplateBuilder) {
         this.recipientMapper = recipientMapper;
         this.restTemplate = restTemplateBuilder
-                .rootUri(koderiaApiConfigProperties.getUri())
+                .rootUri(koderiaRecipientsConfigProperties.getKoderiaApiUrl())
+                .additionalInterceptors(
+                        (httpRequest, bytes, clientHttpRequestExecution) -> {
+                            httpRequest.getHeaders().add(HttpHeaders.AUTHORIZATION,
+                                    "Bearer " + koderiaRecipientsConfigProperties.getKoderiaApiToken());
+                            return clientHttpRequestExecution.execute(httpRequest, bytes);
+                        })
                 .errorHandler(responseErrorHandler)
                 .build();
     }

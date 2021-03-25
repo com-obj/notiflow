@@ -81,19 +81,21 @@ spring.mail:
 
 management.endpoints.web.exposure.include: '*'
 
-koderia.api.uri: https://www.koderia.sk/api/v1
+koderia.functions:
+   recipients:
+      koderia-api-url: https://us-central1-koderia-develop.cloudfunctions.net/apiExternal
+      koderia-api-token: fbtYmk5vXY9hlCKX5abBfuDhKjcY5IFQXbomVA6Uxv6CUi8gXsaruWXCA4hWPgygIx49F6Dfgk6B0sE65AytH9YXvBzKKrw2Xm0WYaWr73ZpMpDhFlaBbo1ufM5c6a81WCqKUHyIjf6ez11GqEzHHFG8v7GRMKhBGJe9zjOYMFWZ1ZBD3eEuQPal9sgsP5cWVsTZV32ls0BrWU9EkYcwwsxFXEeD3PKAyFx6Bzp4rPNsgU5f8fYgTmjynyAPaZ6p
+   mailchimp-sender:
+      mailchimp-api:
+         url: http://mandrillapp.com/api/1.0
+         auth-key: MOCKkey
+         sender-name: Koderia sender
+         sender-email: sender@koderia.sk
+      mailchimp-template-names:
+         aggregate: aggregate-template
+         job-post: job-post-template
+         blog: blog-template
+         event: event-template
+         link: link-template
+         news: news-template
 
-mailchimp:
-   api:
-      key: MOCKkey
-      uri: http://mandrillapp.com/api/1.0
-      from-name: Koderia sender
-      from-email: sender@koderia.sk
-   template:
-      aggregate-subject: Koderia digest
-      aggregate-name: aggregate-template
-      job-post-name: job-post-template
-      blog-name: blog-template
-      event-name: event-template
-      link-name: link-template
-      news-name: news-template

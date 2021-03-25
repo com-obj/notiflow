@@ -13,6 +13,6 @@ import com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl;
         MailchimpMessageMapperImpl.class,
         RestClientConfig.class
 })
-@EnableConfigurationProperties(MailchimpApiConfig.class)
+@EnableConfigurationProperties(MailchimpSenderConfigProperties.class)
 class MailchimpMessageMapperImplTestConfig {
 }

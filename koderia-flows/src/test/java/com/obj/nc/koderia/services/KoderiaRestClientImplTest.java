@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,8 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -41,6 +41,9 @@ class KoderiaRestClientImplTest {
 
     @Autowired
     private MockRestServiceServer mockServer;
+    
+    @Autowired
+    private KoderiaRecipientsConfigProperties koderiaRecipientsConfigProperties;
 
     @Test
     void testFindReceivingEndpoints() throws URISyntaxException {
@@ -54,6 +57,7 @@ class KoderiaRestClientImplTest {
         mockServer.expect(ExpectedCount.once(),
                 requestTo(new URI(KoderiaRestClientImpl.RECIPIENTS_PATH)))
                 .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + koderiaRecipientsConfigProperties.getKoderiaApiToken()))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(responseBody))
@@ -88,6 +92,7 @@ class KoderiaRestClientImplTest {
         mockServer.expect(ExpectedCount.once(),
                 requestTo(new URI(KoderiaRestClientImpl.RECIPIENTS_PATH)))
                 .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + koderiaRecipientsConfigProperties.getKoderiaApiToken()))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(responseBody))
@@ -110,6 +115,7 @@ class KoderiaRestClientImplTest {
         mockServer.expect(ExpectedCount.once(),
                 requestTo(new URI( KoderiaRestClientImpl.RECIPIENTS_PATH)))
                 .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + koderiaRecipientsConfigProperties.getKoderiaApiToken()))
                 .andRespond(withStatus(HttpStatus.NOT_FOUND)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(responseBody))
@@ -132,6 +138,7 @@ class KoderiaRestClientImplTest {
         mockServer.expect(ExpectedCount.once(),
                 requestTo(new URI(KoderiaRestClientImpl.RECIPIENTS_PATH)))
                 .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + koderiaRecipientsConfigProperties.getKoderiaApiToken()))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(responseBody))

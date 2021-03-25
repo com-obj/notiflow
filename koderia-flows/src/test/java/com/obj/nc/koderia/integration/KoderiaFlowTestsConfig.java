@@ -1,5 +1,8 @@
 package com.obj.nc.koderia.integration;
 
+import com.obj.nc.config.RestClientConfig;
+import com.obj.nc.functions.processors.senders.MailchimpSenderConfigProperties;
+import com.obj.nc.services.MailchimpRestClientImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -15,7 +18,7 @@ import com.obj.nc.koderia.services.MailchimpRestClientImpl;
 
 @TestConfiguration
 @Import(RestClientConfig.class)
-@EnableConfigurationProperties(MailchimpApiConfig.class)
+@EnableConfigurationProperties(MailchimpSenderConfigProperties.class)
 public class KoderiaFlowTestsConfig {
 
 	@Autowired

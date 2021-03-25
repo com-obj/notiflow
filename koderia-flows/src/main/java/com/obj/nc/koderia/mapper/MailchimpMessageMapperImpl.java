@@ -1,5 +1,6 @@
 package com.obj.nc.koderia.mapper;
 
+import com.obj.nc.functions.processors.senders.MailchimpSenderConfigProperties;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.email.EmailContent;
@@ -32,12 +33,12 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     public static final String EVENT_FIELD = "event";
 
     @Autowired
-    protected MailchimpApiConfig mailchimpApiConfig;
+    protected MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 
     @Override
     public SendMessageWithTemplateDto mapWithTemplate(Message message) {
         SendMessageWithTemplateDto dto = new SendMessageWithTemplateDto();
-        dto.setKey(mailchimpApiConfig.getApi().getKey());
+        dto.setKey(mailchimpSenderConfigProperties.getMailchimpApi().getAuthKey());
         dto.setMessage(mapMessage(message));
 
         String messageTypeName = getTemplateName(message);
@@ -49,8 +50,8 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
         MessageDto messageDto = new MessageDto();
 
         messageDto.setSubject(mapSubject(message));
-        messageDto.setFromEmail(mailchimpApiConfig.getApi().getFromEmail());
-        messageDto.setFromName(mailchimpApiConfig.getApi().getFromName());
+        messageDto.setFromEmail(mailchimpSenderConfigProperties.getMailchimpApi().getSenderEmail());
+        messageDto.setFromName(mailchimpSenderConfigProperties.getMailchimpApi().getSenderName());
 
         List<RecipientDto> recipients = Collections.singletonList(this.mapRecipient(message.getBody().getRecievingEndpoints().get(0)));
         messageDto.setTo(recipients);
@@ -70,7 +71,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     }
 
     protected List<MergeVarDto> mapGlobalMergeVars(Message message) {
-        Content messageContent = message.getBody().getMessage();
+        Email messageContent = message.getContentTyped();
         EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
 
         Map<String, Object> mergeVars = new HashMap<>();
@@ -117,7 +118,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     protected String getTemplateName(Message message) {
         Content messageContent = message.getBody().getMessage();
         EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
-        return mailchimpApiConfig.getTemplateNameFromMessageType(originalEvent.getType());
+        return mailchimpSenderConfigProperties.getTemplateNameFromMessageType(originalEvent.getType());
     }
 
     protected RecipientDto mapRecipient(RecievingEndpoint endpoint) {

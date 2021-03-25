@@ -21,11 +21,11 @@ import org.springframework.cloud.stream.binder.test.InputDestination;
 import org.springframework.cloud.stream.binder.test.OutputDestination;
 import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import com.obj.nc.BaseIntegrationTest;
@@ -51,7 +51,7 @@ public class KoderiaFlowTests extends BaseIntegrationTest {
 	public static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
 
 	@Autowired
-	private MailchimpApiConfig mailchimpApiConfig;
+	private MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 
 	@Autowired
 	private InputDestination source;
@@ -68,7 +68,7 @@ public class KoderiaFlowTests extends BaseIntegrationTest {
 	@Test
 	public void testJobPostKoderiaEventEmited() throws Exception {
 		// WITH MOCK SERVER CONFIG
-		String mailchimpSendMessageUri = mailchimpApiConfig.getApi().getUri() + SEND_TEMPLATE_PATH;
+		String mailchimpSendMessageUri = mailchimpSenderConfigProperties.getMailchimpApi().getUrl() + SEND_TEMPLATE_PATH;
 
 		MessageResponseDto responseDto = new MessageResponseDto();
 		responseDto.setId("string");
@@ -79,6 +79,7 @@ public class KoderiaFlowTests extends BaseIntegrationTest {
 		List<MessageResponseDto> responseDtos = Collections.singletonList(responseDto);
 
 		mockMailchimpRestServer.expect(times(3), requestTo(mailchimpSendMessageUri))
+				.andExpect(method(HttpMethod.POST))
 				.andRespond(withSuccess(JsonUtils.writeObjectToJSONString(responseDtos), MediaType.APPLICATION_JSON));
 
 		// GIVEN

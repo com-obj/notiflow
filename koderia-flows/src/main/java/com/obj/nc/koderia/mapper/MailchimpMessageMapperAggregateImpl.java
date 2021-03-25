@@ -20,11 +20,6 @@ public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperI
     public static final String COMPONENT_NAME = "mailchimpAggregateMessageMapper";
 
     @Override
-    protected String mapSubject(Message message) {
-        return mailchimpApiConfig.getTemplate().getAggregateSubject();
-    }
-
-    @Override
     protected List<MergeVarDto> mapGlobalMergeVars(Message message) {
     	AggregatedEmailContent aggregateContent = (AggregatedEmailContent)message.getBody().getMessage();
 
@@ -50,7 +45,7 @@ public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperI
 
     @Override
     protected String getTemplateName(Message message) {
-        return mailchimpApiConfig.getTemplate().getAggregateName();
+        return mailchimpSenderConfigProperties.getMailchimpTemplateNames().getAggregate();
     }
 
 }

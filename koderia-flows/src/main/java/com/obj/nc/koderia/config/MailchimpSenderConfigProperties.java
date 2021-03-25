@@ -1,4 +1,4 @@
-package com.obj.nc.koderia.config;
+package com.obj.nc.functions.processors.senders;
 
 import lombok.Data;
 import lombok.Getter;
@@ -14,66 +14,63 @@ import javax.validation.constraints.NotBlank;
 @Validated
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "mailchimp")
-public class MailchimpApiConfig {
+@ConfigurationProperties(prefix = "koderia.functions.mailchimp-sender")
+public class MailchimpSenderConfigProperties {
 
-    private MailchimpApiProperties api;
+    private MailchimpApiProperties mailchimpApi;
 
-    private MailchimpTemplateProperties template;
+    private MailchimpTemplateProperties mailchimpTemplateNames;
 
     @Getter
     @Setter
     public static class MailchimpApiProperties {
         @NotBlank
-        private String uri;
+        private String url;
 
         @NotBlank
-        private String key;
+        private String authKey;
 
         @NotBlank
-        private String fromName;
+        private String senderName;
 
         @NotBlank
-        private String fromEmail;
+        private String senderEmail;
     }
 
     @Getter
     @Setter
     public static class MailchimpTemplateProperties {
         @NotBlank
-        private String aggregateSubject;
+        private String aggregate;
 
         @NotBlank
-        private String aggregateName;
+        private String jobPost;
 
         @NotBlank
-        private String jobPostName;
+        private String blog;
 
         @NotBlank
-        private String blogName;
+        private String event;
 
         @NotBlank
-        private String eventName;
+        private String link;
 
         @NotBlank
-        private String linkName;
-
-        @NotBlank
-        private String newsName;
+        private String news;
     }
 
     public String getTemplateNameFromMessageType(EmitEventDto.Type messageType) {
         switch (messageType) {
             case JOB_POST:
-                return template.jobPostName;
+                return mailchimpTemplateNames.jobPost;
             case BLOG:
-                return template.blogName;
+                return mailchimpTemplateNames.blog;
             case EVENT:
-                return template.eventName;
+                return mailchimpTemplateNames.event;
             case LINK:
-                return template.linkName;
+                return mailchimpTemplateNames.link;
             case NEWS:
-                return template.newsName;
+                return mailchimpTemplateNames.news;
             default:
                 throw new IllegalArgumentException("Unknown message type");
         }

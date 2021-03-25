@@ -24,10 +24,10 @@ public class MailchimpRestClientImpl implements MailchimpClient {
 
     private final RestTemplate restTemplate;
 
-    public MailchimpRestClientImpl(ResponseErrorHandler responseErrorHandler, MailchimpApiConfig mailchimpApiConfig,
+    public MailchimpRestClientImpl(ResponseErrorHandler responseErrorHandler, MailchimpSenderConfigProperties mailchimpSenderConfigProperties,
                                    RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder
-                .rootUri(mailchimpApiConfig.getApi().getUri())
+                .rootUri(mailchimpSenderConfigProperties.getMailchimpApi().getUrl())
                 .errorHandler(responseErrorHandler)
                 .build();
     }
