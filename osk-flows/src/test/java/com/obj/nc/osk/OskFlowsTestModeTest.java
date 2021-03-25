@@ -1,8 +1,5 @@
 package com.obj.nc.osk;
 
-import static com.obj.nc.osk.config.FlowsConfig.OUTAGE_START_FLOW_ID;
-import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
-
 import java.io.IOException;
 
 import javax.mail.internet.MimeMessage;
@@ -20,9 +17,8 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
+import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunctionTest;
 import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(properties = {
@@ -38,7 +34,7 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
 
     
     @BeforeEach
-    void cleanGreenMailMailBoxes() throws FolderException, IOException {
+    void purgeNotifTables() throws FolderException, IOException {
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
         jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
         jdbcTemplate.batchUpdate("delete from nc_endpoint");        
@@ -49,9 +45,7 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
     @Test
     void testNotifyCustomersViaTestmodeEmail() {
         // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketNotificationEventDto.class);
-    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
-    	event.setFlowId(OUTAGE_START_FLOW_ID);
+    	GenericEvent event = NotificationEventConverterProcessingFunctionTest.readOutageStartEvent();
 
     	//WHEN
     	genEventRepo.save(event);

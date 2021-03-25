@@ -55,7 +55,7 @@ public class EventReceiverRestController {
     		throw new PayloadValidationException(jsonProblems.get());
     	}
     	
-    	return JsonUtils.readObjectFromJSONString(eventJson);
+    	return JsonUtils.readJsonNodeFromJSONString(eventJson);
 	}
 
     @ExceptionHandler({PayloadValidationException.class})

@@ -4,8 +4,10 @@ import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,12 +23,15 @@ import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
-import com.obj.nc.osk.functions.content.CustEventStartEmailTemplate;
-import com.obj.nc.osk.functions.content.SalesAgentsEventStartEmailTemplate;
-import com.obj.nc.osk.functions.content.SalesEventStartEmailTemplate;
+import com.obj.nc.osk.dto.IncidentTicketOutageEndEventDto;
+import com.obj.nc.osk.dto.IncidentTicketOutageStartEventDto;
+import com.obj.nc.osk.functions.content.CustEventEmailTemplate;
+import com.obj.nc.osk.functions.content.SalesAgentsEventEmailTemplate;
+import com.obj.nc.osk.functions.content.SalesEventEmailTemplate;
+import com.obj.nc.osk.functions.model.CustEventModel;
 import com.obj.nc.osk.functions.model.CustomerInfo;
 import com.obj.nc.osk.functions.model.ServiceOutageInfo;
+import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
@@ -34,15 +39,19 @@ import com.obj.nc.utils.JsonUtils;
 public class NotificationEventConverterProcessingFunctionTest extends BaseIntegrationTest {
 	
 	@Autowired
-	private NotifEventConverterProcessingFunction function;
+	private StartOutageEventConverter startOutageConverter;
+	
+	@Autowired
+	private EndOutageEventConverter endOutageConverter;
+	
+	@Autowired
+	private GenericEventRepository eventRepo;
 	
     @Autowired
     private JdbcTemplate jdbcTemplate;
     
     @BeforeEach
-    void cleanGreenMailMailBoxes() throws FolderException, IOException {
-    	greenMail.purgeEmailFromAllMailboxes();
-    	
+    void purgeNotifTables() throws FolderException, IOException {
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
         jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
         jdbcTemplate.batchUpdate("delete from nc_endpoint");        
@@ -50,17 +59,39 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     }
     
     @Test
-	@SuppressWarnings("unchecked")
-    void testCustomerEvent() {
-        // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketNotificationEventDto.class);
-    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
-
-    	//WHEN
-    	List<Event> result = function.apply(event);
+    void testCustomerEvent() throws ParseException {
+    	//WHEN OUTAGE STARTs
+        GenericEvent event = readOutageStartEvent();
+        event = eventRepo.save(event);
+    	List<Event> result = startOutageConverter.apply(event);
     	
     	//THEN
-    	assertThat(result.size()).isEqualTo(6); //3xcustomers, 2xsales, 1xsales agent 
+    	assertCustomerEvents(result);
+
+    	//WHEN OUTAGE ENDs
+        event = readOutageEndEvent();
+    	result = endOutageConverter.apply(event);
+    	
+    	//THEN
+    	assertCustomerEvents(result);
+    	
+    	List<CustEventEmailTemplate> contents = result.stream()
+    		.filter(e-> e.getBody().getMessage() instanceof CustEventEmailTemplate)
+    		.map(e-> ((CustEventEmailTemplate)e.getBody().getMessage()))
+    		.filter(custE-> custE.getModel().getTimeStart() != null && custE.getModel().getTimeEnd() != null)
+    		.collect(Collectors.toList());
+    	
+    	//all contents have start and end date
+    	assertThat(contents.size()).isEqualTo(3);
+
+		CustEventModel anyModel = contents.iterator().next().getModel();
+       	assertThat(anyModel.getTimeStart()).isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T20:00:00.000Z"));
+       	assertThat(anyModel.getTimeEnd()).isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T22:00:00.000Z"));
+    }
+
+	@SuppressWarnings("unchecked")
+	private void assertCustomerEvents(List<Event> result) {
+		assertThat(result.size()).isEqualTo(6); //3xcustomers, 2xsales, 1xsales agent 
     	
     	//THEN check events for customer
     	JXPathContext context = JXPathContext.newContext(result);
@@ -75,7 +106,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Jan Cuzy");
     	
     	Event eventForCuzy = eventsForCuzy.iterator().next();
-    	CustEventStartEmailTemplate msgContent = eventForCuzy.getContentTyped();
+    	CustEventEmailTemplate msgContent = eventForCuzy.getContentTyped();
     	assertThat(msgContent.getModel().getTimeStart()).isNotNull();
     	
     	//THEN check outage infos
@@ -89,17 +120,15 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(context.selectSingleNode(".[@customerName='Objectify, s.r.o.']")).isNotNull();
     	assertThat(context.selectSingleNode(".[@installationAddress='Mocidla 249, Myto pod Dumbierom']")).isNotNull();
     	assertThat(context.selectSingleNode(".[@customerAddress='Martinengova 4881/36 811 02 Bratislava']")).isNotNull();
-    }
+	}
     
     @Test
 	@SuppressWarnings("unchecked")
     void testSalesEvent() {
-        // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketNotificationEventDto.class);
-    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
+        GenericEvent event = readOutageStartEvent();
 
     	//WHEN
-    	List<Event> result = function.apply(event);
+    	List<Event> result = startOutageConverter.apply(event);
     	
     	//THEN
     	assertThat(result.size()).isEqualTo(6); //3xcustomers, 2xsales, 1xsales agent 
@@ -115,7 +144,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	
     	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Adrian Slavkovsky");
     	
-    	SalesEventStartEmailTemplate msgContent = eventForHahn.getContentTyped();
+    	SalesEventEmailTemplate msgContent = eventForHahn.getContentTyped();
     	assertThat(msgContent.getModel().getTimeStart()).isNotNull();
     	
     	Map<CustomerInfo, List<ServiceOutageInfo>> outageInfos = msgContent.getModel().getServicesPerCustomer();
@@ -137,11 +166,10 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
 	@SuppressWarnings("unchecked")
     void testSalesAgentEvent() {
         // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketNotificationEventDto.class);
-    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
+    	GenericEvent event = readOutageStartEvent();
 
     	//WHEN
-    	List<Event> result = function.apply(event);
+    	List<Event> result = startOutageConverter.apply(event);
     	
     	//THEN
     	assertThat(result.size()).isEqualTo(6); //3xcustomers, 2xsales, 1xsales agent 
@@ -159,7 +187,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(endpoints.iterator().next().getRecipient()).isNull(); //Pre sales agentov nemam person
     	
     	Event eventForAgent = eventsForAgent.iterator().next();
-    	SalesAgentsEventStartEmailTemplate msgContent = eventForAgent.getContentTyped();
+    	SalesAgentsEventEmailTemplate msgContent = eventForAgent.getContentTyped();
     	assertThat(msgContent.getModel().getTimeStart()).isNotNull();
     	
     	//THEN check outage infos
@@ -179,6 +207,19 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(context.selectSingleNode(".[@customerAddress='Dubravska cesta 2 841 04 Bratislava']")).isNotNull();
     	
     }
+
+	public static GenericEvent readOutageStartEvent() {
+		IncidentTicketOutageStartEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/outage-start-event-full.json", IncidentTicketOutageStartEventDto.class);
+    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
+    	event.setExternalId(inputEvent.getId().toString());
+		return event;
+	}
+	
+	public static GenericEvent readOutageEndEvent() {
+		IncidentTicketOutageEndEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/outage-end-event.json", IncidentTicketOutageEndEventDto.class);
+    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
+		return event;
+	}
 
 }
 

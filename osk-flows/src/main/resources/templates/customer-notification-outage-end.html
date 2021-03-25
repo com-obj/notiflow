@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title th:text="#{cust.end.title}">Vase sluzby su opat dostupne</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+    <body>
+    	<p>
+    		<span th:text="#{cust.end.salution}">Vážený zákazník</span>
+    		<span th:text="${model.customerName}">Objectify</span>
+    		<br>
+    		<span th:text="#{cust.end.atTime}">o</span>
+    		<span th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
+    		<span th:text="#{cust.end.hour}">hodine</span>
+    		<span th:text="#{cust.end.outage}">sme odstranili vypadok v nasich sluzbach</span>
+    	</p>
+    <table>		
+	    <thead>
+	        <tr>
+	            <th th:text="#{cust.end.SNHeader}"> SN </th>
+	            <th th:text="#{cust.end.serviceNameHeader}"> Služba </th>
+	            <th th:text="#{cust.end.customerLocationHeader}"> Odberna adresa </th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	     	<tr th:each="service : ${model.services}">
+	            <td><span th:text="${service.sn}"> 0905132354 </span></td>
+	            <td><span th:text="${service.productName}"> VPS </span></td>
+	            <td><span th:text="${service.installationAddress}"> Bratislava </span></td>
+	     	</tr>
+	    </tbody>
+    </table>
+    	<p th:text="#{cust.end.footerLine1}">Za vzniknute problemi sa ospravedlnujeme</p>
+    	<p th:text="#{cust.end.footerLine2}"></p>
+    	<p th:text="#{cust.end.signature}"></p>
+    </body>
+</html>
