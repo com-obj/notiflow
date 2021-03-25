@@ -5,11 +5,13 @@ import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.domain.HasFlowId;
+import com.obj.nc.domain.HasJsonPayload;
+import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
@@ -26,7 +28,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table("nc_input")
-public class GenericEvent implements Persistable<UUID> {
+public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayload {
 	
 	@Id
 	private UUID id;
@@ -44,19 +46,18 @@ public class GenericEvent implements Persistable<UUID> {
 	public static GenericEvent from(JsonNode state) {
 		GenericEvent event = new GenericEvent();
 		event.setPayloadJson(state);
-		event.flowId = state.get("flowId")!=null?state.get("flowId").textValue():null;
+		event.flowId = state.get("flowId")!=null?state.get("flowId").textValue():"default-flow";
 		event.externalId = state.get("externalId")!=null?state.get("externalId").textValue():null;
 		event.id = UUID.randomUUID();
 		return event;
 	}
 
 	public void setFlowIdIfNotPresent(String flowId) {
-    	if (this.flowId == null) {
-    		this.flowId = flowId;
+    	if (flowId == null) {
+    		return;
     	} 
-    	if (this.flowId == null) {
-    		this.flowId = "default-flow";
-    	}
+    	
+    	this.flowId = flowId;
 	}
 	
 	public void setExternalIdIfNotPresent(String externalId) {
@@ -69,6 +70,9 @@ public class GenericEvent implements Persistable<UUID> {
 	public boolean isNew() {
 		return timeCreated == null;
 	}
-
+	
+	public <T extends IsTypedJson> T getPayloadAsPojo() {
+		return (T)JsonUtils.readObjectFromJSON(payloadJson, IsTypedJson.class);
+	}
 	
 }

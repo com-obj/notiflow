@@ -1,6 +1,5 @@
 package com.obj.nc.osk;
 
-import static com.obj.nc.osk.config.FlowsConfig.OUTAGE_START_FLOW_ID;
 import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 
 import java.io.IOException;
@@ -26,11 +25,13 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.osk.dto.IncidentTicketNotificationEventDto;
+import com.obj.nc.osk.config.FlowsConfig;
+import com.obj.nc.osk.dto.IncidentTicketOutageStartEventDto;
+import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunctionTest;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
-@ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
+@ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest
 @SpringBootTest
 public class OskFlowsTest extends BaseIntegrationTest {
@@ -46,9 +47,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
     private MessageSource emailMessageSource;
     
     @BeforeEach
-    void cleanGreenMailMailBoxes() throws FolderException, IOException {
-    	greenMail.purgeEmailFromAllMailboxes();
-    	
+    void purgeNotifTables() throws FolderException, IOException {
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
         jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
         jdbcTemplate.batchUpdate("delete from nc_endpoint");        
@@ -58,10 +57,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
     @Test
     void testNotifyCustomersAndSalesByEmail() {
         // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-full.json", IncidentTicketNotificationEventDto.class);
-    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
-    	event.setFlowId(OUTAGE_START_FLOW_ID);
-    	event.setExternalId(inputEvent.getId().toString());
+    	GenericEvent event = NotificationEventConverterProcessingFunctionTest.readOutageStartEvent();
 
     	//WHEN
     	genEventRepo.save(event);
@@ -134,9 +130,7 @@ public class OskFlowsTest extends BaseIntegrationTest {
 	@Test
     void testLAsNotConfiguredAreNotNotified() throws MessagingException {
         // GIVEN
-    	IncidentTicketNotificationEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/event-for-LA.json", IncidentTicketNotificationEventDto.class);
-    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
-    	event.setFlowId(OUTAGE_START_FLOW_ID);
+    	GenericEvent event = readTestEventForLA();
 
     	//WHEN
     	genEventRepo.save(event);
@@ -155,6 +149,14 @@ public class OskFlowsTest extends BaseIntegrationTest {
         assertMessagesSendTo(messages,"cuzy@objectify.sk", 2);
         assertMessagesSendTo(messages, "sales@objectify.sk", 1);
     }
+	
+	public static GenericEvent readTestEventForLA() {
+		IncidentTicketOutageStartEventDto inputEvent = readObjectFromClassPathResource("siaNotificationEvents/outage-start-event-for-LA.json", IncidentTicketOutageStartEventDto.class);
+    	GenericEvent event = GenericEvent.from(JsonUtils.writeObjectToJSONNode(inputEvent));
+    	event.setFlowId(FlowsConfig.OUTAGE_START_FLOW_ID);
+    	event.setExternalId(inputEvent.getId().toString());
+		return event;
+	}
     
 }
 

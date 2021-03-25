@@ -7,15 +7,12 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.icegreen.greenmail.store.FolderException;
-import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
@@ -27,19 +24,12 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.utils.JsonUtils;
 
-import lombok.AllArgsConstructor;
-
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 
 class EmailSenderSinkTest extends BaseIntegrationTest {
 
     @Autowired private JavaMailSenderImpl defaultJavaMailSender;
     @Autowired private EmailSender functionSend;
-
-    @BeforeEach
-    void cleanGreenMailMailBoxes() throws FolderException {
-    	greenMail.purgeEmailFromAllMailboxes();
-    }
 
     @Test
     void sendSingleMail() throws MessagingException, IOException {
