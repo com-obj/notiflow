@@ -22,7 +22,7 @@ import com.obj.nc.flows.testmode.functions.processors.AggregateToSingleEmailTran
 import com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.MessageAggregationStrategy;
-import com.obj.nc.functions.processors.messageAggregator.correlations.TestModeCorrelationStrategy;
+import com.obj.nc.functions.processors.messageAggregator.correlations.EventIdBasedCorrelationStrategy;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
@@ -55,7 +55,11 @@ public class TestModeFlowConfig {
         		.aggregate(
         			aggSpec-> aggSpec
         				.correlationStrategy( testModeCorrelationStrategy() )
-        				.releaseStrategy( testModeAggregatorReleaseStrategy() )
+        				.releaseStrategy( testModeReleaseStrategy() )
+        					.groupTimeout(2000) //wait max 2 sec for another message to arrive, if not, release
+        					.sendPartialResultOnExpiry(true)
+        					.expireGroupsUponCompletion(true)
+        					.expireGroupsUponTimeout(true)
         				.outputProcessor( testModeMessageAggregator() )
         			)
         		.transform(aggregateToSingleEmailTransformer())
@@ -66,7 +70,7 @@ public class TestModeFlowConfig {
     
     @Bean
     public CorrelationStrategy testModeCorrelationStrategy() {
-    	return new TestModeCorrelationStrategy(); //pull all in one group
+    	return new EventIdBasedCorrelationStrategy(); //pull all in one group
     }
     
     @Bean
@@ -75,9 +79,19 @@ public class TestModeFlowConfig {
     }
     
 	@Bean
-	public ReleaseStrategy testModeAggregatorReleaseStrategy() {
-	  	return new LoggingSimpleSequenceSizeReleaseStrategy();
+	public ReleaseStrategy testModeReleaseStrategy() {
+	  	return new NeverReleaseStrategy(); //based on timeout, not release strategy
 	} 
+	
+	public static class NeverReleaseStrategy implements ReleaseStrategy {
+
+		@Override
+		public boolean canRelease(MessageGroup group) {
+			return false;
+		}
+
+	}
+
 	
 	public static class LoggingSimpleSequenceSizeReleaseStrategy implements ReleaseStrategy {
 

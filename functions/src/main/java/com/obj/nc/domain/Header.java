@@ -6,10 +6,10 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
-import com.obj.nc.utils.JsonUtils;
 import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.obj.nc.utils.JsonUtils;
 
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;

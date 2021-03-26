@@ -63,9 +63,9 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
 
         //TODO: zatial neviem spolahlivo pockat na vsetky srpavy
         assertMessagesContains(msgs, MailMessageForAssertions.as("cuzy@objectify.sk", "Notifications digest while running test mode",
-        		"Processed with love by Notification Center by Objectify" //check if translations work
-//        		"Vase sluzby mozu byt nedostupne", "Your services could be affected", "Zakaznici maju problem", 
-//        		"cuzy@objectify.sk", "jancuzy@gmail.com"
+        		"Processed with love by Notification Center by Objectify", //check if translations work
+        		"Vase sluzby mozu byt nedostupne", "Your services could be affected", "Zakaznici maju problem", 
+        		"cuzy@objectify.sk", "jancuzy@gmail.com"
         		
         		)
         );
