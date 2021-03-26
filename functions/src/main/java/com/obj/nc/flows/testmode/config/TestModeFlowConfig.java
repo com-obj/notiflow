@@ -10,11 +10,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.aggregator.CorrelationStrategy;
 import org.springframework.integration.aggregator.ReleaseStrategy;
-import org.springframework.integration.aggregator.SimpleSequenceSizeReleaseStrategy;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.PollerSpec;
 import org.springframework.integration.dsl.Pollers;
+import org.springframework.integration.store.MessageGroup;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
@@ -76,8 +76,21 @@ public class TestModeFlowConfig {
     
 	@Bean
 	public ReleaseStrategy testModeAggregatorReleaseStrategy() {
-	  	return new SimpleSequenceSizeReleaseStrategy();
+	  	return new LoggingSimpleSequenceSizeReleaseStrategy();
 	} 
+	
+	public static class LoggingSimpleSequenceSizeReleaseStrategy implements ReleaseStrategy {
+
+		@Override
+		public boolean canRelease(MessageGroup group) {
+			boolean releasing = group.getSequenceSize() == group.size();
+			
+			log.info("Having {} sequence size, have {} group size, releasing: {}",group.getSequenceSize(),group.size(),releasing);
+			return releasing;
+		}
+
+	}
+
 
     @Bean
     public Trigger testModeSourceTrigger() {

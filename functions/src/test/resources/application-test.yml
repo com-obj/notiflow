@@ -20,9 +20,6 @@ nc:
          soruce-dir: eventsQueue
          file-name: ba_job_post.json
       email-templates:
-         templates-root-dir: 
-            - src/main/resources/message-templates
-            - src/test/resources/message-templates
          messages-dir-and-base-name: classpath:message-templates/messages
       send-email-message:
          from: no-reply@objectify.skk

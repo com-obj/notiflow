@@ -2,7 +2,5 @@
 nc:
    functions:
       email-templates:
-         templates-root-dir: 
-            - src/main/resources/message-templates
          messages-dir-and-base-name: classpath:message-templates/messages
 

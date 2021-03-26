@@ -17,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
@@ -47,21 +48,24 @@ public class ThymeleafConfiguration {
 	@PostConstruct
     public TemplateEngine configure() {
         // Resolver for TEXT emails
-		textTemplateResolver().forEach(res -> templateEngine.addTemplateResolver( res ));
-        // Resolver for HTML emails (except the editable one)
-		htmlTemplateResolver().forEach(res -> templateEngine.addTemplateResolver( res ));
+		int resloverIndex = 1;
+		textTemplateResolver(resloverIndex).forEach(res -> templateEngine.addTemplateResolver( res ));
+        // Resolver for HTML emails
+		htmlTemplateResolver(resloverIndex).forEach(res -> templateEngine.addTemplateResolver( res ));
+		// Resolver for internal HTML emails
+		templateEngine.addTemplateResolver(internalhtmlTemplateResolver());
         // Message source, internationalization specific to emails
         templateEngine.setTemplateEngineMessageSource(emailMessageSource());
         return templateEngine;
     }
     
-    private List<ITemplateResolver> textTemplateResolver() {
+    private List<ITemplateResolver> textTemplateResolver(int startIndex) {
     	List<ITemplateResolver> resolvers = new ArrayList<>();
     	for (String templateDir: config.getTemplatesRootDir()) {
 			log.info("Configuring Thymeleaf template resolver root path to be " + templateDir  + File.separator);
 			
 	        final FileTemplateResolver templateResolver = new FileTemplateResolver();
-	        templateResolver.setOrder(Integer.valueOf(1));
+	        templateResolver.setOrder(startIndex++);
 	        templateResolver.setPrefix(templateDir + File.separator);
 	        templateResolver.setSuffix(".txt");
 	        templateResolver.setTemplateMode(TemplateMode.TEXT);
@@ -74,13 +78,13 @@ public class ThymeleafConfiguration {
     	return resolvers;
     }
 
-    private List<ITemplateResolver> htmlTemplateResolver() {
+    private List<ITemplateResolver> htmlTemplateResolver(int startIndex) {
     	List<ITemplateResolver> resolvers = new ArrayList<>();
     	for (String templateDir: config.getTemplatesRootDir()) {
 			log.info("Configuring Thymeleaf template resolver root path to be " + templateDir  + File.separator);
 			
 	        final FileTemplateResolver templateResolver = new FileTemplateResolver();
-	        templateResolver.setOrder(Integer.valueOf(2));
+	        templateResolver.setOrder(startIndex);
 	        templateResolver.setPrefix(templateDir  + File.separator);
 	        templateResolver.setSuffix(".html");
 	        templateResolver.setTemplateMode(TemplateMode.HTML);
@@ -91,6 +95,21 @@ public class ThymeleafConfiguration {
 	        resolvers.add(templateResolver) ;
     	}
     	return resolvers;
+    }
+    
+    private ITemplateResolver internalhtmlTemplateResolver() {
+			log.info("Configuring Thymeleaf template resolver root path to be classpath:message-templates serving internal templates");
+			
+			ClassLoaderTemplateResolver internalTemplateResolver = new ClassLoaderTemplateResolver();
+			internalTemplateResolver.setOrder(Integer.valueOf(999));
+			internalTemplateResolver.setPrefix("message-templates/");
+			internalTemplateResolver.setSuffix(".html");
+			internalTemplateResolver.setTemplateMode(TemplateMode.HTML);
+			internalTemplateResolver.setCharacterEncoding(EMAIL_TEMPLATE_ENCODING);
+			internalTemplateResolver.setCacheable(true);
+			internalTemplateResolver.setCheckExistence(true);
+	        
+	        return internalTemplateResolver;
     }
     
     public List<Locale> getDefaultLocales() {
