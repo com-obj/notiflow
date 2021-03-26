@@ -12,10 +12,15 @@ import org.springframework.stereotype.Service;
 public class OskSmsRestReceiver extends BaseRestReceiver<OskSendSmsRequestDto, OskSendSmsResponseDto> {
     
     @Override
-    protected OskSendSmsResponseDto createDummyResponse() {
+    protected OskSendSmsResponseDto createResponse(OskSendSmsRequestDto request) {
         OskSendSmsResponseDto response = new OskSendSmsResponseDto();
         SendSmsResourceReferenceDto resourceReference = new SendSmsResourceReferenceDto();
-        resourceReference.setResourceURL("/3333/requests/+420047013370-SUCCESS-0000000000000000000000000000000000000478#");
+        String resourceUrl = "/"
+                .concat(request.getSenderAddress())
+                .concat("/requests/")
+                .concat(request.getAddress().get(0))
+                .concat("-SUCCESS-0000000000000000000000000000000000000478#");
+        resourceReference.setResourceURL(resourceUrl);
         response.setResourceReference(resourceReference);
         return response;
     }

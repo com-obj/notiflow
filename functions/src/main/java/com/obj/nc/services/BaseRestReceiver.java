@@ -11,10 +11,10 @@ public abstract class BaseRestReceiver<REQUEST_T, RESPONSE_T> {
     
     public RESPONSE_T receive(REQUEST_T request) {
         requests.add(request);
-        return createDummyResponse();
+        return createResponse(request);
     }
     
-    protected abstract RESPONSE_T createDummyResponse();
+    protected abstract RESPONSE_T createResponse(REQUEST_T request);
     
     public boolean waitForIncomingRequests(long timeout, int requestCount) {
         final CountDownLatch waitObject = createNewWaitObject(requestCount);
