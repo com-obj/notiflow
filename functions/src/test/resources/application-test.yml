@@ -19,8 +19,6 @@ nc:
       event-generator:
          soruce-dir: eventsQueue
          file-name: ba_job_post.json
-      email-templates:
-         messages-dir-and-base-name: classpath:message-templates/messages
       send-email-message:
          from: no-reply@objectify.skk
    flows:

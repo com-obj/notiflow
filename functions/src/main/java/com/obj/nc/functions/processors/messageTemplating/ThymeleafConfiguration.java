@@ -39,7 +39,12 @@ public class ThymeleafConfiguration {
 		log.info("Configuring i18n message source to be have basename (path end file name prefix) " + config.getMessagesDirAndBaseName());
 		
 		final ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-		messageSource.setBasename(config.getMessagesDirAndBaseName());
+		messageSource.addBasenames("classpath:message-templates/messages");
+		
+		if (config.getMessagesDirAndBaseName()!=null) {
+			messageSource.addBasenames(config.getMessagesDirAndBaseName());
+		}
+
 		messageSource.setDefaultEncoding("UTF-8");
 		return messageSource;
 	}
@@ -61,6 +66,11 @@ public class ThymeleafConfiguration {
     
     private List<ITemplateResolver> textTemplateResolver(int startIndex) {
     	List<ITemplateResolver> resolvers = new ArrayList<>();
+    	
+    	if (config.getTemplatesRootDir()== null) {
+    		return resolvers;
+    	}
+
     	for (String templateDir: config.getTemplatesRootDir()) {
 			log.info("Configuring Thymeleaf template resolver root path to be " + templateDir  + File.separator);
 			
@@ -80,6 +90,11 @@ public class ThymeleafConfiguration {
 
     private List<ITemplateResolver> htmlTemplateResolver(int startIndex) {
     	List<ITemplateResolver> resolvers = new ArrayList<>();
+    	
+    	if (config.getTemplatesRootDir()== null) {
+    		return resolvers;
+    	}
+    	
     	for (String templateDir: config.getTemplatesRootDir()) {
 			log.info("Configuring Thymeleaf template resolver root path to be " + templateDir  + File.separator);
 			

@@ -1,12 +1,12 @@
 package com.obj.nc.osk.functions.senders;
 
-import lombok.Data;
+import javax.validation.constraints.NotBlank;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 @Data
 @Validated
@@ -26,7 +26,6 @@ public class OskSmsSenderConfigProperties {
     @NotBlank
     private String clientCorrelatorPrefix;
 
-    @NotNull
     private String notifyUrl;
 
     @NotBlank

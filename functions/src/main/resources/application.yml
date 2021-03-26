@@ -1,6 +1,2 @@
 
-nc:
-   functions:
-      email-templates:
-         messages-dir-and-base-name: classpath:message-templates/messages
 
