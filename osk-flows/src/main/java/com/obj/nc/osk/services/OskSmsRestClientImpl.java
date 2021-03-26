@@ -1,4 +1,4 @@
-package com.obj.nc.osk.service;
+package com.obj.nc.osk.services;
 
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -17,6 +17,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,8 +45,9 @@ public class OskSmsRestClientImpl implements SmsClient<OskSendSmsRequestDto, Osk
         result.setAddress(message.getBody().getRecievingEndpoints().stream()
                 .map(RecievingEndpoint::getEndpointId)
                 .collect(Collectors.toList()));
-
-        result.setClientCorrelator(properties.getClientCorrelatorPrefix());
+    
+        ZonedDateTime zdt = ZonedDateTime.now();
+        result.setClientCorrelator(properties.getClientCorrelatorPrefix() + "-" +  DateTimeFormatter.ISO_INSTANT.format(zdt));
 
         SimpleText content = message.getBody().getContentTyped();
         result.setMessage(content.getText());

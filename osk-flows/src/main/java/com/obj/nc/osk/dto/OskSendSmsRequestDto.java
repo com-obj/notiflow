@@ -5,8 +5,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
@@ -31,15 +29,5 @@ public class OskSendSmsRequestDto {
     @NotBlank
     private String billCode;
 
-    public void setClientCorrelator(String clientCorrelatorPrefix) {
-        this.clientCorrelator = clientCorrelatorPrefix + "-" + createTimestamp();
-    }
-    
-    private String createTimestamp() {
-        ZonedDateTime zdt = ZonedDateTime.now();
-        // example format: 2014-09-02T08:05:23.653Z
-        return DateTimeFormatter.ISO_INSTANT.format(zdt);
-    }
-    
 }
 

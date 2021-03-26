@@ -39,6 +39,10 @@ public abstract class BaseRestReceiver<REQUEST_T, RESPONSE_T> {
         return allRequests;
     }
     
+    public List<REQUEST_T> getAllRequests() {
+        return requests;
+    }
+    
     public void reset() {
         requests = new ArrayList<>();
     }

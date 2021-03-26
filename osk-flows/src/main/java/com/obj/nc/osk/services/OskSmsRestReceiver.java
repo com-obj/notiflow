@@ -4,11 +4,9 @@ import com.obj.nc.osk.dto.OskSendSmsRequestDto;
 import com.obj.nc.osk.dto.OskSendSmsResponseDto;
 import com.obj.nc.osk.dto.SendSmsResourceReferenceDto;
 import com.obj.nc.services.BaseRestReceiver;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
 public class OskSmsRestReceiver extends BaseRestReceiver<OskSendSmsRequestDto, OskSendSmsResponseDto> {
     
     @Override

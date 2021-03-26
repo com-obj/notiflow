@@ -4,20 +4,22 @@ import com.obj.nc.osk.dto.OskSendSmsRequestDto;
 import com.obj.nc.osk.dto.OskSendSmsResponseDto;
 import com.obj.nc.osk.services.OskSmsRestReceiver;
 import lombok.AllArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
-@RestController("/testmode-receiver")
+import javax.validation.Valid;
+
+@Validated
+@RestController
+@RequestMapping("/API/smsmessaging/v1")
 @AllArgsConstructor
-@ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
 public class OskSmsRestReceiverController {
     
     private final OskSmsRestReceiver oskSmsRestReceiver;
     
-    @PostMapping(path = "/receive", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public OskSendSmsResponseDto receive(OskSendSmsRequestDto request) {
+    @PostMapping(value = "/outbound/{senderAddress}/requests", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public OskSendSmsResponseDto receive(@PathVariable String senderAddress, @RequestBody @Valid OskSendSmsRequestDto request) {
         return oskSmsRestReceiver.receive(request);
     }
     
