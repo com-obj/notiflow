@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title th:text="#{testMode.title}">Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+    <body>
+    	<p>
+    		<span th:text="#{testMode.headerMain}">O co ide</span>
+    	</p>
+    <table>		
+	    <thead>
+	        <tr>
+	            <th th:text="#{testMode.header1.type}"> Email/SMS </th>
+	            <th th:text="#{testMode.header1.recipient}"> Recipient </th>
+	            <th th:text="#{testMode.header1.subject}"> Subject </th>
+	            <th th:text="#{testMode.header1.message}"> Message </th>
+	            <th th:text="#{testMode.header1.attachements}"> Attachments </th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	     	<tr th:each="email : ${model.emails}">
+	            <td><span> EMAIL </span></td>
+	            <td><span> TODO </span></td>
+	            <td><span th:text="${email.subject}"> Subject1 </span></td>
+	            <td><span th:text="${email.text}"> Body1 </span></td>
+	            <td><span th:text="${email.attachments}"> Attachments </span></td>
+	     	</tr>
+	    </tbody>
+    </table>
+    	<p th:text="#{testMode.footerMain}"></p>
+    	<p th:text="#{testMode.signature}"></p>
+    </body>
+</html>

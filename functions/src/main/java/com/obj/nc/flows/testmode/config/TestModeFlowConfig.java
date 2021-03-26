@@ -18,10 +18,12 @@ import org.springframework.integration.dsl.Pollers;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
+import com.obj.nc.flows.testmode.functions.processors.AggregateToSingleEmailTransformer;
 import com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.MessageAggregationStrategy;
 import com.obj.nc.functions.processors.messageAggregator.correlations.TestModeCorrelationStrategy;
+import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 
@@ -34,12 +36,13 @@ public class TestModeFlowConfig {
 	
 	@Autowired private TestModeProperties testModeProps;
 	@Autowired private GreenMailReceiverSourceSupplier greenMailMessageSource;
-//	@Autowired private MessageAggregatorProcessingFunction messageAggregator;
     
     @Qualifier(TestModeBeansConfig.TEST_MODE_EMAIL_SENDER_FUNCTION_BEAN_NAME)
     @Autowired private EmailSender sendEmailRealSmtp;
     @Autowired private PaylaodLoggerSinkConsumer logConsumer;
     @Autowired private MessageAggregationStrategy aggregationStrategy;
+    @Autowired private EmailTemplateFormatter digestEmailFormatter;
+    
 	
 	public final static String TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME = "greenMailSource";
 
@@ -53,11 +56,10 @@ public class TestModeFlowConfig {
         			aggSpec-> aggSpec
         				.correlationStrategy( testModeCorrelationStrategy() )
         				.releaseStrategy( testModeAggregatorReleaseStrategy() )
-        				.outputProcessor( testModeMessageAggregator()
-        						)
-
+        				.outputProcessor( testModeMessageAggregator() )
         			)
-//        		.transform(aggregated2SingleMail)
+        		.transform(aggregateToSingleEmailTransformer())
+        		.transform(digestEmailFormatter)
                 .transform(sendEmailRealSmtp)
                 .handle(logConsumer).get();
     }
@@ -72,11 +74,6 @@ public class TestModeFlowConfig {
     	return new MessageAggregator(aggregationStrategy);
     }
     
-//    @Bean
-//    public ReleaseStrategy testModeAggregatorReleaseStrategy() {
-//    	return new TimeoutCountSequenceSizeReleaseStrategy(TimeoutCountSequenceSizeReleaseStrategy.DEFAULT_THRESHOLD, 1000l);
-//    }
-    
 	@Bean
 	public ReleaseStrategy testModeAggregatorReleaseStrategy() {
 	  	return new SimpleSequenceSizeReleaseStrategy();
@@ -90,6 +87,11 @@ public class TestModeFlowConfig {
     @Bean
     public PollerSpec testModeSourcePoller() {
         return Pollers.trigger(testModeSourceTrigger());
+    }
+    
+    @Bean
+    public AggregateToSingleEmailTransformer aggregateToSingleEmailTransformer() {
+    	return new AggregateToSingleEmailTransformer();
     }
 
 }

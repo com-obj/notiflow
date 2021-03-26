@@ -61,6 +61,8 @@ dependencies {
 
 	implementation 'org.json:json:20200518'
 	implementation 'org.postgresql:postgresql'
+	
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
 
 	implementation 'org.flywaydb:flyway-core'
 	compileOnly 'org.projectlombok:lombok'

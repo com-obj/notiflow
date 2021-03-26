@@ -25,8 +25,8 @@ nc:
       send-email-message:
          from: no-reply@objectify.sk  
       email-templates:
-         templates-root-dir: src/main/resources/templates
-         messages-dir-and-base-name: src/main/resources/templates/messages
+         templates-root-dir: src/main/resources/message-templates
+         messages-dir-and-base-name: src/main/resources/message-templates/messages
    flows:    
       input-evet-routing:
          type: PAYLOAD_TYPE
