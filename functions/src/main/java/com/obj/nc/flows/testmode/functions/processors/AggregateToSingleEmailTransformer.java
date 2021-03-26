@@ -42,6 +42,7 @@ public class AggregateToSingleEmailTransformer extends ProcessorFunctionAdapter<
 		resultMail.setSubject("Notifications digest while running test mode");
 		resultMail.setTemplateFileName("test-mode-digest.html");
 		resultMail.setRequiredLocales(Arrays.asList(new Locale("en")));
+		resultMail.setModel(digestModel);
 
 		aggregatedMessage.getBody().setMessage(resultMail);
 

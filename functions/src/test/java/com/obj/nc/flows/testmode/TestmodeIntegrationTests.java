@@ -83,13 +83,14 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
 
         testModeEmailsReciver.waitForIncomingEmail(3);
 
+        //THEN MeSSAGES RECIEVED to TESTMODE GREENMAIL
         MimeMessage[] inputMimeMessages = testModeEmailsReciver.getReceivedMessages();
         Assertions.assertThat(inputMimeMessages.length).isEqualTo(3);
 
         List<Message> messages = greenMailReceiverSourceSupplier.get();
 //        List<Message> messages = messagesWrapped.getMessages();
 
-        // WHEN
+        // WHEN Simulate further aggregation processing
         MessageSource<?> messageSource = () -> new GenericMessage<>(messages);
         mockIntegrationContext.substituteMessageSourceFor(TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME, messageSource);
 
@@ -102,19 +103,28 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
 
         String recipient = props.getRecipients().iterator().next();
         outputMimeMessages = greenMail.getReceivedMessagesForDomain(recipient);
-        Assertions.assertThat( outputMimeMessages.length ).isEqualTo(1);
 
+        MimeMessage msg = outputMimeMessages[0];
+        System.out.println(GreenMailUtil.getWholeMessage(msg));
+        
+        
         AggregatedEmail aggregated1 = message1.getContentTyped();
         AggregatedEmail aggregated2 = message2.getContentTyped();
         AggregatedEmail aggregated3 = message3.getContentTyped();
-        Assertions.assertThat(outputMimeMessages[0].getSubject()).contains(
+        Assertions.assertThat(msg.getSubject()).isEqualTo("Notifications digest while running test mode");
+        
+        Assertions.assertThat(GreenMailUtil.getBody(msg)).contains(
         		aggregated1.getAggregateContent().get(0).getSubject(),
         		aggregated2.getAggregateContent().get(0).getSubject(),
         		aggregated3.getAggregateContent().get(0).getSubject());
-        Assertions.assertThat(GreenMailUtil.getBody(outputMimeMessages[0])).contains(
+        
+        Assertions.assertThat(GreenMailUtil.getBody(msg)).contains(
         		aggregated1.getAggregateContent().get(0).getText(),
         		aggregated2.getAggregateContent().get(0).getText(),
         		aggregated3.getAggregateContent().get(0).getText());
+        
+        //Check tranlations
+        Assertions.assertThat(GreenMailUtil.getBody(msg)).contains("Recipient","Attachments");
     }
 
     @TestConfiguration

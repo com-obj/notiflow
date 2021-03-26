@@ -11,13 +11,13 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "nc.functions.email-templates")
 @Data
 @Component
-public class ThymeleadConfigProperties {
+public class ThymeleafConfigProperties {
 
 	@Value("${templates-root-dir:message-templates}")
-	private String templatesRootDir;
+	private List<String> templatesRootDir;
 	
 
-	@Value("${messages-dir-and-base-name:message-templates/messages}")
+	@Value("${messages-dir-and-base-name:classpath:messages}")
 	private String messagesDirAndBaseName;
 	
 	@Value("${default-locale-codes:#{null}}")
