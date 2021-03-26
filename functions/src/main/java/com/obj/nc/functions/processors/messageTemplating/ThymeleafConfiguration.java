@@ -39,7 +39,7 @@ public class ThymeleafConfiguration {
 		log.info("Configuring i18n message source to be have basename (path end file name prefix) " + config.getMessagesDirAndBaseName());
 		
 		final ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-		messageSource.addBasenames("classpath:message-templates/messages");
+		messageSource.addBasenames("classpath:nc-internal-resources/messages");
 		
 		if (config.getMessagesDirAndBaseName()!=null) {
 			messageSource.addBasenames(config.getMessagesDirAndBaseName());
@@ -113,11 +113,11 @@ public class ThymeleafConfiguration {
     }
     
     private ITemplateResolver internalhtmlTemplateResolver() {
-			log.info("Configuring Thymeleaf template resolver root path to be classpath:message-templates serving internal templates");
+			log.info("Configuring Thymeleaf template resolver root path to be classpath:nc-internal-resources/message-templates/ serving internal templates");
 			
 			ClassLoaderTemplateResolver internalTemplateResolver = new ClassLoaderTemplateResolver();
 			internalTemplateResolver.setOrder(Integer.valueOf(999));
-			internalTemplateResolver.setPrefix("message-templates/");
+			internalTemplateResolver.setPrefix("nc-internal-resources/message-templates/");
 			internalTemplateResolver.setSuffix(".html");
 			internalTemplateResolver.setTemplateMode(TemplateMode.HTML);
 			internalTemplateResolver.setCharacterEncoding(EMAIL_TEMPLATE_ENCODING);

@@ -58,8 +58,17 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
         
         MimeMessage[] msgs = greenMail.getReceivedMessages();
         Assertions.assertThat(msgs.length).isEqualTo(1);
+        
         System.out.println(GreenMailUtil.getWholeMessage(msgs[0]));
 
+        //TODO: zatial neviem spolahlivo pockat na vsetky srpavy
+        assertMessagesContains(msgs, MailMessageForAssertions.as("cuzy@objectify.sk", "Notifications digest while running test mode",
+        		"Processed with love by Notification Center by Objectify" //check if translations work
+//        		"Vase sluzby mozu byt nedostupne", "Your services could be affected", "Zakaznici maju problem", 
+//        		"cuzy@objectify.sk", "jancuzy@gmail.com"
+        		
+        		)
+        );
     }
     
 }
