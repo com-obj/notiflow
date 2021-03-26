@@ -16,7 +16,7 @@ import java.util.List;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext
+@DirtiesContext // SpringBootTest.WebEnvironment.DEFINED_PORT
 class OskSmsRestReceiverTest {
     
     @Autowired

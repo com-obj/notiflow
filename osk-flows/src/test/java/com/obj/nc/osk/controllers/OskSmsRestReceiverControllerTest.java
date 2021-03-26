@@ -25,7 +25,7 @@ import static com.obj.nc.osk.services.OskSmsRestClientImpl.SEND_PATH;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext
+@DirtiesContext // SpringBootTest.WebEnvironment.DEFINED_PORT
 class OskSmsRestReceiverControllerTest {
     
     @Autowired
@@ -40,9 +40,7 @@ class OskSmsRestReceiverControllerTest {
     @BeforeEach
     public void initialiseRestAssuredMockMvcWebApplicationContext() {
         RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
-        RestAssured.baseURI = "http://localhost";
-        String contextPath = webApplicationContext.getServletContext().getContextPath();
-        RestAssured.basePath = contextPath;
+        RestAssured.basePath = webApplicationContext.getServletContext().getContextPath();
     }
     
     @Test
