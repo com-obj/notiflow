@@ -14,6 +14,7 @@ import org.apache.commons.mail.util.MimeMessageParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import com.icegreen.greenmail.store.FolderException;
@@ -35,7 +36,9 @@ import com.obj.nc.functions.sources.SourceSupplierAdapter;
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
 public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<Message>> {
 
-    @Qualifier(TestModeBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
+    private static final String ORIGINAL_RECIPIENTS_ATTR_NAME = "ORIGINAL_RECIPIENTS";
+
+	@Qualifier(TestModeBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
     @Autowired private GreenMail gm;
 
     @Autowired private TestModeProperties properties;
@@ -93,11 +96,15 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
             MimeMessage mimeMessage = message.getMimeMessage();
             Email content = result.getContentTyped();
             content.setSubject(mimeMessage.getSubject());
-
+            
             MimeMessageParser parser = new MimeMessageParser(mimeMessage).parse();
             String originalRecipients = parser.getTo().stream().map(Address::toString).collect(Collectors.joining(","));
             String mimeMessageContent = parser.hasHtmlContent() ? parser.getHtmlContent() : parser.getPlainContent();
-            content.setText(originalRecipients + "\n" + mimeMessageContent);
+            String contentType = parser.hasHtmlContent()? MediaType.TEXT_HTML_VALUE : MediaType.TEXT_PLAIN_VALUE;
+       
+            content.setText(mimeMessageContent);
+            content.setAttributeValue(ORIGINAL_RECIPIENTS_ATTR_NAME, originalRecipients);
+            content.setContentType(contentType);
 
             List<RecievingEndpoint> emailEndpoints = properties.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
             result.getBody().setRecievingEndpoints(emailEndpoints);
