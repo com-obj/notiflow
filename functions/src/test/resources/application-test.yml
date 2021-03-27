@@ -19,14 +19,17 @@ nc:
       event-generator:
          soruce-dir: eventsQueue
          file-name: ba_job_post.json
-      email-templates:
-         templates-root-dir: src/test/resources/message-templates
-         messages-dir-and-base-name: src/test/resources/message-templates/messages
       send-email-message:
          from: no-reply@objectify.skk
+      email-templates:
+         templates-root-dir: 
+            - src/test/resources/message-templates
+         messages-dir-and-base-name: file:src/test/resources/message-templates/messages
    flows:
       test-mode.enabled: false
 
+logging.level:
+   org.springframework: DEBUG
 ---
 spring.config.activate.on-profile: jenkins_test
 testEnv: jenkins

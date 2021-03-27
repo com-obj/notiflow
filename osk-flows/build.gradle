@@ -21,9 +21,6 @@ repositories {
 
 ext {
     set('testcontainersVersion', "1.15.1")
-    set('springCloudVersion', "2020.0.0")
-    set('springCloudGcpVersion', "2.0.1")
-    set('springIntegrationVersion', "5.1.3.RELEASE")
     set('junitJupiterVersion', '5.4.2')
 }
 
@@ -76,9 +73,6 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-        mavenBom "com.google.cloud:spring-cloud-gcp-dependencies:${springCloudGcpVersion}"
-        mavenBom "org.springframework.integration:spring-integration-bom:${springIntegrationVersion}"
         mavenBom "org.junit:junit-bom:${junitJupiterVersion}"
     }
 }

@@ -23,6 +23,7 @@ import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Email;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
 
 class MessagesFromEventTest {

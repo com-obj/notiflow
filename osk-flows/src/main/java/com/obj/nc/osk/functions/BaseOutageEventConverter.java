@@ -88,6 +88,8 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		events.addAll(salesEvents);
 		events.addAll(salesAgentEvents);
 		
+		events.forEach(e-> e.getHeader().addEventId(payload.getId()));
+		
 		return events;
 	}
 

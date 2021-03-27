@@ -1,5 +1,7 @@
 package com.obj.nc.flows.testmode.config;
 
+import static org.springframework.integration.dsl.MessageChannels.executor;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -10,18 +12,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.aggregator.CorrelationStrategy;
 import org.springframework.integration.aggregator.ReleaseStrategy;
-import org.springframework.integration.aggregator.SimpleSequenceSizeReleaseStrategy;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.PollerSpec;
 import org.springframework.integration.dsl.Pollers;
+import org.springframework.integration.store.MessageGroup;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
+import com.obj.nc.flows.testmode.functions.processors.AggregateToSingleEmailTransformer;
 import com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.MessageAggregationStrategy;
-import com.obj.nc.functions.processors.messageAggregator.correlations.TestModeCorrelationStrategy;
+import com.obj.nc.functions.processors.messageAggregator.correlations.EventIdBasedCorrelationStrategy;
+import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 
@@ -34,37 +37,47 @@ public class TestModeFlowConfig {
 	
 	@Autowired private TestModeProperties testModeProps;
 	@Autowired private GreenMailReceiverSourceSupplier greenMailMessageSource;
-//	@Autowired private MessageAggregatorProcessingFunction messageAggregator;
     
     @Qualifier(TestModeBeansConfig.TEST_MODE_EMAIL_SENDER_FUNCTION_BEAN_NAME)
     @Autowired private EmailSender sendEmailRealSmtp;
     @Autowired private PaylaodLoggerSinkConsumer logConsumer;
     @Autowired private MessageAggregationStrategy aggregationStrategy;
+    @Autowired private EmailTemplateFormatter digestEmailFormatter;
+    
 	
-	public final static String TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME = "greenMailSource";
+	public final static String TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME = "tmGMSource";
+	public final static String TEST_MODE_SOURCE_TRIGGER_BEAN_NAME = "tmSourceTrigger";
+	public final static String TEST_MODE_AGGREGATOR_BEAN_NAME = "tmAggregator";
+	public final static String TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME = "tmExecutorChannel";
 
     @Bean
     public IntegrationFlow testModeSendMessage() {
-        return IntegrationFlows.from(greenMailMessageSource,
-                        config -> config.poller(testModeSourcePoller()).id(TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME))
+        return IntegrationFlows
+        		.fromSupplier(greenMailMessageSource,
+                      config -> config.poller(Pollers.trigger(testModeSourceTrigger()))
+                      .id(TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME))
         		.split()
-        		.channel(c -> c.executor(Executors.newCachedThreadPool()))
+        		.channel(executor(TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME, Executors.newSingleThreadExecutor()))
         		.aggregate(
         			aggSpec-> aggSpec
         				.correlationStrategy( testModeCorrelationStrategy() )
-        				.releaseStrategy( testModeAggregatorReleaseStrategy() )
-        				.outputProcessor( testModeMessageAggregator()
-        						)
-
+        				.releaseStrategy( testModeReleaseStrategy() )
+        					.groupTimeout((testModeProps.getPeriodInSeconds()*2*1000)+500) //wait min 2 polls interval
+        					.sendPartialResultOnExpiry(true)
+        					.expireGroupsUponCompletion(true)
+        					.expireGroupsUponTimeout(true)
+        				.outputProcessor( testModeMessageAggregator() )
+        				.id(TEST_MODE_AGGREGATOR_BEAN_NAME)
         			)
-//        		.transform(aggregated2SingleMail)
+        		.transform(aggregateToSingleEmailTransformer())
+        		.transform(digestEmailFormatter)
                 .transform(sendEmailRealSmtp)
                 .handle(logConsumer).get();
     }
     
     @Bean
     public CorrelationStrategy testModeCorrelationStrategy() {
-    	return new TestModeCorrelationStrategy(); //pull all in one group
+    	return new EventIdBasedCorrelationStrategy(); //pull all in one group
     }
     
     @Bean
@@ -72,24 +85,42 @@ public class TestModeFlowConfig {
     	return new MessageAggregator(aggregationStrategy);
     }
     
-//    @Bean
-//    public ReleaseStrategy testModeAggregatorReleaseStrategy() {
-//    	return new TimeoutCountSequenceSizeReleaseStrategy(TimeoutCountSequenceSizeReleaseStrategy.DEFAULT_THRESHOLD, 1000l);
-//    }
-    
 	@Bean
-	public ReleaseStrategy testModeAggregatorReleaseStrategy() {
-	  	return new SimpleSequenceSizeReleaseStrategy();
+	public ReleaseStrategy testModeReleaseStrategy() {
+	  	return new NeverReleaseStrategy(); //based on timeout, not release strategy
 	} 
+	
+	public static class NeverReleaseStrategy implements ReleaseStrategy {
 
-    @Bean
+		@Override
+		public boolean canRelease(MessageGroup group) {
+			return false;
+		}
+
+	}
+
+	
+	public static class LoggingSimpleSequenceSizeReleaseStrategy implements ReleaseStrategy {
+
+		@Override
+		public boolean canRelease(MessageGroup group) {
+			boolean releasing = group.getSequenceSize() == group.size();
+			
+			log.info("Having {} sequence size, have {} group size, releasing: {}",group.getSequenceSize(),group.size(),releasing);
+			return releasing;
+		}
+
+	}
+
+
+    @Bean(TEST_MODE_SOURCE_TRIGGER_BEAN_NAME)
     public Trigger testModeSourceTrigger() {
         return new PeriodicTrigger(testModeProps.getPeriodInSeconds(), TimeUnit.SECONDS);
     }
-
+    
     @Bean
-    public PollerSpec testModeSourcePoller() {
-        return Pollers.trigger(testModeSourceTrigger());
+    public AggregateToSingleEmailTransformer aggregateToSingleEmailTransformer() {
+    	return new AggregateToSingleEmailTransformer();
     }
 
 }

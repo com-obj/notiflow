@@ -25,8 +25,9 @@ nc:
       send-email-message:
          from: no-reply@objectify.sk  
       email-templates:
-         templates-root-dir: src/main/resources/templates
-         messages-dir-and-base-name: src/main/resources/templates/messages
+         templates-root-dir: 
+            - src/main/resources/message-templates
+         messages-dir-and-base-name: file:src/main/resources/message-templates/messages
    flows:    
       input-evet-routing:
          type: PAYLOAD_TYPE
@@ -34,13 +35,21 @@ nc:
             OUTAGE_START: OUTAGE_START_INPUT
             OUTAGE_END: OUTAGE_END_INPUT
 
-osk.sia.functions.impact-notif-converter:
-   b2b-login-of-la-custumers-to-be-notified:
-      - Tatrabanka
-      - MVSR
-   cs-agents-to-notify-email:
-      - sales@objectify.sk
-      
+osk.sia.functions:
+   impact-notif-converter:
+      b2b-login-of-la-custumers-to-be-notified:
+         - Tatrabanka
+         - MVSR
+      cs-agents-to-notify-email:
+         - sales@objectify.skk
+   sms-sender:
+      gap-api-url: http://localhost:6090/API/smsmessaging/v1
+      gap-api-login: testlogin
+      gap-api-password: testpw
+      client-correlator-prefix: nc
+#      notify-url: http://localhost:8080/smssender
+      sender-address: 3333
+      bill-code: WZ00
 
    
 #logging.level:

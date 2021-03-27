@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title th:text="#{testMode.title}">Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+    <body>
+    	<p>
+    		<span th:text="#{testMode.headerMain}">O co ide</span>
+    	</p>
+    	
+    	<h3>Emails</h3>
+		    <table>		
+			    <thead>
+			        <tr>
+			            <th th:text="#{testMode.header1.recipient}"> Rec </th>
+			            <th th:text="#{testMode.header1.subject}"> Subject </th>
+			            <th th:text="#{testMode.header1.message}"> Message </th>
+			            <th th:text="#{testMode.header1.attachements}"> Attach </th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			     	<tr th:each="email : ${model.emails}">
+			            <td><span th:text="${email.getAttributeValue('ORIGINAL_RECIPIENTS')}"> cuzy@objectify.sk </span></td>
+			            <td><span th:text="${email.subject}"> Subject1 </span></td>
+			            <td><span th:text="${email.text}"> Body1 </span></td>
+			            <td><span th:text="${email.attachments}"> Attachments </span></td>
+			     	</tr>
+			    </tbody>
+		    </table>
+		 <h3>SMSs</h3>
+	 
+	 
+	 	<p th:text="#{testMode.footerMain}"></p>
+    	<p th:text="#{testMode.signature}"></p>
+    </body>
+</html>
