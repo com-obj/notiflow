@@ -36,7 +36,7 @@ import com.obj.nc.functions.sources.SourceSupplierAdapter;
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
 public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<Message>> {
 
-    private static final String ORIGINAL_RECIPIENTS_ATTR_NAME = "ORIGINAL_RECIPIENTS";
+    public static final String ORIGINAL_RECIPIENTS_ATTR_NAME = "ORIGINAL_RECIPIENTS";
 
 	@Qualifier(TestModeBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
     @Autowired private GreenMail gm;

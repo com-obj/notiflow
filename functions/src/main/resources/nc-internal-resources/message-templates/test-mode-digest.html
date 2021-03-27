@@ -21,7 +21,7 @@
 			    </thead>
 			    <tbody>
 			     	<tr th:each="email : ${model.emails}">
-			            <td><span> TODO </span></td>
+			            <td><span th:text="${email.getAttributeValue('ORIGINAL_RECIPIENTS')}"> cuzy@objectify.sk </span></td>
 			            <td><span th:text="${email.subject}"> Subject1 </span></td>
 			            <td><span th:text="${email.text}"> Body1 </span></td>
 			            <td><span th:text="${email.attachments}"> Attachments </span></td>
