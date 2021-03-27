@@ -15,7 +15,7 @@ public class TestModeProperties {
     //This two should be here
     private List<String> recipients;
 
-    private int periodInSeconds=1;
+    private int periodInSeconds=5;
     
     private boolean enabled = false;
 

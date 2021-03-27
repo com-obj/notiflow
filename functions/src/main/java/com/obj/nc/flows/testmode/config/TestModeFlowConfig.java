@@ -62,11 +62,11 @@ public class TestModeFlowConfig {
         			aggSpec-> aggSpec
         				.correlationStrategy( testModeCorrelationStrategy() )
         				.releaseStrategy( testModeReleaseStrategy() )
-        					.groupTimeout(2000) //wait max 2 sec for another message to arrive, if not, release
+        					.groupTimeout((testModeProps.getPeriodInSeconds()*2*1000)+500) //wait min 2 polls interval
         					.sendPartialResultOnExpiry(true)
         					.expireGroupsUponCompletion(true)
         					.expireGroupsUponTimeout(true)
-        				.outputProcessor( testModeMessageAggregator())
+        				.outputProcessor( testModeMessageAggregator() )
         				.id(TEST_MODE_AGGREGATOR_BEAN_NAME)
         			)
         		.transform(aggregateToSingleEmailTransformer())
