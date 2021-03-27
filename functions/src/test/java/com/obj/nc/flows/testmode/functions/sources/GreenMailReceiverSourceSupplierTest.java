@@ -1,6 +1,10 @@
 package com.obj.nc.flows.testmode.functions.sources;
 
+import static com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier.ORIGINAL_RECIPIENTS_ATTR_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
+import java.util.UUID;
 
 import javax.mail.internet.MimeMessage;
 
@@ -18,6 +22,7 @@ import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.Body;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.AggregatedEmail;
@@ -56,14 +61,14 @@ class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
     	Assertions.assertThat(greenMail).isNotEqualTo(testModeEmailsReciver);
     	Assertions.assertThat(greenMail.getSmtp().getPort()).isNotEqualTo(testModeEmailsReciver.getSmtp().getPort());
         // GIVEN
-        Message message1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", Message.class);
-        Message message2 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message2.json", Message.class);
-        Message message3 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message3.json", Message.class);
+        Message origianlMsgForAggreagtion1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", Message.class);
+        Message origianlMsgForAggreagtion2 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message2.json", Message.class);
+        Message origianlMsgForAggreagtion3 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message3.json", Message.class);
 
         //WHEN
-        emailSenderSinkProcessingFunction.apply(message1);
-        emailSenderSinkProcessingFunction.apply(message2);
-        emailSenderSinkProcessingFunction.apply(message3);
+        emailSenderSinkProcessingFunction.apply(origianlMsgForAggreagtion1);
+        emailSenderSinkProcessingFunction.apply(origianlMsgForAggreagtion2);
+        emailSenderSinkProcessingFunction.apply(origianlMsgForAggreagtion3);
 
         //THEN testModeEmailsReciver recieved the message, not the standard greenmail used for test. This proves it has been substituted
         boolean success = testModeEmailsReciver.waitForIncomingEmail(3);
@@ -72,40 +77,37 @@ class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
         Assertions.assertThat( mimeMessages.length ).isEqualTo(3);
 
         // WHEN
-        List<Message> messages = greenMailReceiverSourceSupplier.get();
+        List<Message> msgsCauthByTestModeGM = greenMailReceiverSourceSupplier.get();
+        msgsCauthByTestModeGM.forEach(m-> assertThat(m.getHeader().getEventIds()).contains(UUID.fromString("23e201b5-d7fa-4231-a520-51190b5c50da")));
 
-        // THEN mesages recieved from greenMailReceiverSourceSupplier and testModeEmailsReciver are as far as content the same
-//        List<Message> messages = messagesWrapped.getMessages();
+        Email emailFromTMGM1 = msgsCauthByTestModeGM.get(0).getContentTyped();
+        checkRecievedMatchOriginal(origianlMsgForAggreagtion1, emailFromTMGM1);
 
-        Email original = messages.get(0).getContentTyped();
-        AggregatedEmail aggregatedExpected = message1.getContentTyped();
-        Assertions.assertThat(original.getSubject()).contains(
-        		aggregatedExpected.getAggregateContent().get(0).getSubject());
-        Assertions.assertThat(original.getText()).contains(
-        		aggregatedExpected.getAggregateContent().get(0).getText(),
-                ((EmailEndpoint) message1.getBody().getRecievingEndpoints().get(0)).getEmail());
+        Email emailFromTMGM2 = msgsCauthByTestModeGM.get(1).getContentTyped();
+        checkRecievedMatchOriginal(origianlMsgForAggreagtion2, emailFromTMGM2);
 
-        original = messages.get(1).getContentTyped();
-        aggregatedExpected = message2.getContentTyped();
-        Assertions.assertThat(original.getSubject()).contains(
-        		aggregatedExpected.getAggregateContent().get(0).getSubject());
-        Assertions.assertThat(original.getText()).contains(
-        		aggregatedExpected.getAggregateContent().get(0).getText(),
-                ((EmailEndpoint) message2.getBody().getRecievingEndpoints().get(0)).getEmail());
 
-        original = messages.get(2).getContentTyped();
-        aggregatedExpected = message3.getContentTyped();
-        Assertions.assertThat(original.getSubject()).contains(
-        		aggregatedExpected.getAggregateContent().get(0).getSubject());
-        Assertions.assertThat(original.getText()).contains(
-        		aggregatedExpected.getAggregateContent().get(0).getText(),
-                ((EmailEndpoint) message3.getBody().getRecievingEndpoints().get(0)).getEmail());
+        Email emailFromTMGM3 = msgsCauthByTestModeGM.get(2).getContentTyped();
+        checkRecievedMatchOriginal(origianlMsgForAggreagtion3, emailFromTMGM3);
 
-        Assertions.assertThat(messages.get(2).getBody().getRecievingEndpoints()).hasSize(1);
+        Body emailBodyFromTMGM2 = msgsCauthByTestModeGM.get(2).getBody();
+        
+        assertThat(emailBodyFromTMGM2.getRecievingEndpoints()).hasSize(1);
         String recipient = properties.getRecipients().iterator().next();
-        Assertions.assertThat(((EmailEndpoint) messages.get(2).getBody().getRecievingEndpoints().get(0)).getEmail()).isEqualTo(recipient);
+        assertThat(((EmailEndpoint) emailBodyFromTMGM2.getRecievingEndpoints().get(0)).getEmail()).isEqualTo(recipient);
 
-        Assertions.assertThat(messages.get(2).getBody().getDeliveryOptions()).isNotNull();
-        Assertions.assertThat((messages.get(2).getBody().getDeliveryOptions().getAggregationType())).isEqualTo(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
+        assertThat(emailBodyFromTMGM2.getDeliveryOptions()).isNotNull();
+        assertThat((emailBodyFromTMGM2.getDeliveryOptions().getAggregationType())).isEqualTo(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
     }
+
+	private void checkRecievedMatchOriginal(Message origianlMsgForAggreagtion, Email emailFromTMGM) {
+		Email originalContent1 = ((AggregatedEmail)origianlMsgForAggreagtion.getContentTyped()).getAggregateContent().get(0);
+        String originalReviever1 = ((EmailEndpoint) origianlMsgForAggreagtion.getBody().getRecievingEndpoints().get(0)).getEmail();
+        assertThat(emailFromTMGM.getSubject())
+        	.contains(originalContent1.getSubject());
+        assertThat(emailFromTMGM.getAttributeValue(ORIGINAL_RECIPIENTS_ATTR_NAME).toString())
+        	.contains(originalReviever1);
+        assertThat(emailFromTMGM.getText())
+        	.contains(originalContent1.getText());
+	}
 }

@@ -2,7 +2,6 @@ package com.obj.nc.flows.inpuEventRouting;
 
 import javax.mail.MessagingException;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,6 +10,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -46,14 +46,16 @@ public class TypeIDInputEventRoutingIntegrationTests extends BaseIntegrationTest
         persister.accept(event);
         
         //THEN
-	    Assertions.assertNotNull(flowInputChannel1.receive(5000));
+	    Message<?> springMessage = flowInputChannel1.receive(5000);
+	    FlowIDInputEventRoutingIntegrationTests.assertEventReadyForProcessing(springMessage);
 	    
     	//WHEN
         event = GenericEvent.from(JsonUtils.readJsonNodeFromClassPathResource("events/generic_event_with_type_info2.json"));
         persister.accept(event);
         
         //THEN
-	    Assertions.assertNotNull(flowInputChannel2.receive(5000));
+	    springMessage = flowInputChannel2.receive(5000);
+	    FlowIDInputEventRoutingIntegrationTests.assertEventReadyForProcessing(springMessage);
     }
 
     @TestConfiguration

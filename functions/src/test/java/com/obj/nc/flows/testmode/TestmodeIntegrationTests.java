@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.integration.config.EnableIntegrationManagement;
+import org.springframework.integration.config.EnableMessageHistory;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.test.context.MockIntegrationContext;
 import org.springframework.integration.test.context.SpringIntegrationTest;
@@ -32,6 +34,7 @@ import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
+import com.obj.nc.flows.testmode.config.TestModeFlowConfig;
 import com.obj.nc.flows.testmode.config.TestModeGreenMailProperties;
 import com.obj.nc.flows.testmode.config.TestModeProperties;
 import com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier;
@@ -41,6 +44,7 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME)
 @SpringBootTest(properties = {
+		"spring.main.allow-bean-definition-overriding=true",
 		"nc.flows.test-mode.enabled=true", 
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //Because of correct disposal of green mail used for test mode
@@ -95,7 +99,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         mockIntegrationContext.substituteMessageSourceFor(TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME, messageSource);
 
         // THEN agregeted mail recieved by standardn green mail used by test and thus in producton standard SMTP server
-        boolean success = greenMail.waitForIncomingEmail(5000,1);
+        boolean success = greenMail.waitForIncomingEmail(10000,1);
         Assertions.assertThat( success ).isEqualTo( true );
 
         MimeMessage[] outputMimeMessages = greenMail.getReceivedMessages();
@@ -128,10 +132,12 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     }
 
     @TestConfiguration
+    @EnableMessageHistory
+    @EnableIntegrationManagement
     public static class TestModeTestConfiguration {
 
-        @Bean
-        public Trigger sourceTrigger() {
+        @Bean(TestModeFlowConfig.TEST_MODE_SOURCE_TRIGGER_BEAN_NAME)
+        public Trigger testModeSourceTrigger() {
             return new OnlyOnceTrigger();
         }
 

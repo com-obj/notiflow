@@ -1,5 +1,7 @@
 package com.obj.nc.flows.testmode.config;
 
+import static org.springframework.integration.dsl.MessageChannels.executor;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -12,7 +14,6 @@ import org.springframework.integration.aggregator.CorrelationStrategy;
 import org.springframework.integration.aggregator.ReleaseStrategy;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.PollerSpec;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.store.MessageGroup;
 import org.springframework.scheduling.Trigger;
@@ -44,14 +45,19 @@ public class TestModeFlowConfig {
     @Autowired private EmailTemplateFormatter digestEmailFormatter;
     
 	
-	public final static String TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME = "greenMailSource";
+	public final static String TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME = "tmGMSource";
+	public final static String TEST_MODE_SOURCE_TRIGGER_BEAN_NAME = "tmSourceTrigger";
+	public final static String TEST_MODE_AGGREGATOR_BEAN_NAME = "tmAggregator";
+	public final static String TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME = "tmExecutorChannel";
 
     @Bean
     public IntegrationFlow testModeSendMessage() {
-        return IntegrationFlows.from(greenMailMessageSource,
-                        config -> config.poller(testModeSourcePoller()).id(TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME))
+        return IntegrationFlows
+        		.fromSupplier(greenMailMessageSource,
+                      config -> config.poller(Pollers.trigger(testModeSourceTrigger()))
+                      .id(TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME))
         		.split()
-        		.channel(c -> c.executor(Executors.newCachedThreadPool()))
+        		.channel(executor(TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME, Executors.newSingleThreadExecutor()))
         		.aggregate(
         			aggSpec-> aggSpec
         				.correlationStrategy( testModeCorrelationStrategy() )
@@ -60,7 +66,8 @@ public class TestModeFlowConfig {
         					.sendPartialResultOnExpiry(true)
         					.expireGroupsUponCompletion(true)
         					.expireGroupsUponTimeout(true)
-        				.outputProcessor( testModeMessageAggregator() )
+        				.outputProcessor( testModeMessageAggregator())
+        				.id(TEST_MODE_AGGREGATOR_BEAN_NAME)
         			)
         		.transform(aggregateToSingleEmailTransformer())
         		.transform(digestEmailFormatter)
@@ -106,14 +113,9 @@ public class TestModeFlowConfig {
 	}
 
 
-    @Bean
+    @Bean(TEST_MODE_SOURCE_TRIGGER_BEAN_NAME)
     public Trigger testModeSourceTrigger() {
         return new PeriodicTrigger(testModeProps.getPeriodInSeconds(), TimeUnit.SECONDS);
-    }
-
-    @Bean
-    public PollerSpec testModeSourcePoller() {
-        return Pollers.trigger(testModeSourceTrigger());
     }
     
     @Bean

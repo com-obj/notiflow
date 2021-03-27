@@ -27,6 +27,7 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.exceptions.ProcessingException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -126,9 +127,14 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 		});
 		
 		try {
-	//		message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "EVENT_ID", Arrays.toString(header.getEventIds()));
-			message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "FLOW_ID", header.getFlowId());
-			message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "MSG_ID", header.getId()+"");
+			message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "EVENT_ID", JsonUtils.writeObjectToJSONString(header.getEventIds()));
+			
+			if (header.getFlowId()!= null) {
+				message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "FLOW_ID", header.getFlowId());
+			}
+			if (header.getId()!= null) {
+				message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "MSG_ID", header.getId().toString());
+			}
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);
 		}
