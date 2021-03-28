@@ -6,7 +6,6 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.osk.dto.OskSendSmsResponseDto;
 import com.obj.nc.osk.functions.senders.OskSmsSender;
 import com.obj.nc.osk.functions.senders.OskSmsSenderConfigProperties;
-import com.obj.nc.osk.service.OskSmsRestClientImpl;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import static com.obj.nc.functions.processors.senders.BaseSmsSender.SEND_SMS_RESPONSE_ATTRIBUTE;
-import static com.obj.nc.osk.service.OskSmsRestClientImpl.SEND_PATH;
+import static com.obj.nc.osk.services.OskSmsRestClientImpl.SEND_PATH;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 

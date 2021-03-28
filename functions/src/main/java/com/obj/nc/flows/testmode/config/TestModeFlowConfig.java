@@ -19,8 +19,9 @@ import org.springframework.integration.store.MessageGroup;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
+import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.functions.processors.AggregateToSingleEmailTransformer;
-import com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier;
+import com.obj.nc.flows.testmode.functions.processors.GreenMailReceiverSourceSupplier;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.MessageAggregationStrategy;
 import com.obj.nc.functions.processors.messageAggregator.correlations.EventIdBasedCorrelationStrategy;
@@ -34,7 +35,7 @@ import lombok.extern.log4j.Log4j2;
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
 @Log4j2
 public class TestModeFlowConfig {
-	
+	 
 	@Autowired private TestModeProperties testModeProps;
 	@Autowired private GreenMailReceiverSourceSupplier greenMailMessageSource;
     

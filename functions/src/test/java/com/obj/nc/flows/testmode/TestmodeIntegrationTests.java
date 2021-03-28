@@ -35,9 +35,7 @@ import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
 import com.obj.nc.flows.testmode.config.TestModeFlowConfig;
-import com.obj.nc.flows.testmode.config.TestModeGreenMailProperties;
-import com.obj.nc.flows.testmode.config.TestModeProperties;
-import com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier;
+import com.obj.nc.flows.testmode.functions.processors.GreenMailReceiverSourceSupplier;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.utils.JsonUtils;
 

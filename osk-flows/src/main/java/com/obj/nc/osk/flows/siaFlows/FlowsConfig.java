@@ -1,4 +1,4 @@
-package com.obj.nc.osk.config;
+package com.obj.nc.osk.flows.siaFlows;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

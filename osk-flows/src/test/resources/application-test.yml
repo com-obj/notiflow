@@ -22,7 +22,7 @@ osk.sia.functions:
       cs-agents-to-notify-email:
          - sales@objectify.sk
    sms-sender:
-      gap-api-url: http://localhost:6090/API/smsmessaging/v1
+      gap-api-url: http://localhost:8080/API/smsmessaging/v1
       gap-api-login: testlogin
       gap-api-password: testpw
       client-correlator-prefix: nc

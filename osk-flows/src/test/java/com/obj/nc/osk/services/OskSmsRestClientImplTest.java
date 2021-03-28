@@ -1,4 +1,4 @@
-package com.obj.nc.osk.service;
+package com.obj.nc.osk.services;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
@@ -27,7 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.ConstraintViolationException;
 
-import static com.obj.nc.osk.service.OskSmsRestClientImpl.SEND_PATH;
+import static com.obj.nc.osk.services.OskSmsRestClientImpl.SEND_PATH;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;

@@ -1,6 +1,6 @@
 package com.obj.nc.flows.testmode.functions.sources;
 
-import static com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier.ORIGINAL_RECIPIENTS_ATTR_NAME;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -28,8 +28,9 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.domain.message.Email;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
-import com.obj.nc.flows.testmode.config.TestModeProperties;
+import com.obj.nc.flows.testmode.functions.processors.GreenMailReceiverSourceSupplier;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.utils.JsonUtils;
 
@@ -105,7 +106,7 @@ class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
         String originalReviever1 = ((EmailEndpoint) origianlMsgForAggreagtion.getBody().getRecievingEndpoints().get(0)).getEmail();
         assertThat(emailFromTMGM.getSubject())
         	.contains(originalContent1.getSubject());
-        assertThat(emailFromTMGM.getAttributeValue(ORIGINAL_RECIPIENTS_ATTR_NAME).toString())
+        assertThat(emailFromTMGM.getAttributeValue(GreenMailReceiverSourceSupplier.ORIGINAL_RECIPIENTS_ATTR_NAME).toString())
         	.contains(originalReviever1);
         assertThat(emailFromTMGM.getText())
         	.contains(originalContent1.getText());
