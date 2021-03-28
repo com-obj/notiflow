@@ -1,5 +1,12 @@
 package com.obj.nc.functions.processors.koderia;
 
+import java.util.List;
+
+import org.assertj.core.api.Assertions;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.Event;
@@ -11,12 +18,6 @@ import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEvent
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdPreCondition;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
-import org.assertj.core.api.Assertions;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 
 class RecepientsUsingKoderiaSubscriptionTest {

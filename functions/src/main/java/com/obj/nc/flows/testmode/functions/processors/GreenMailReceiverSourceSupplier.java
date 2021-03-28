@@ -1,19 +1,23 @@
-package com.obj.nc.functions.sources;
+package com.obj.nc.flows.testmode.functions.processors;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.mail.Address;
 import javax.mail.Flags;
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import com.icegreen.greenmail.store.FolderException;
@@ -21,20 +25,29 @@ import com.icegreen.greenmail.store.InMemoryStore;
 import com.icegreen.greenmail.store.MailFolder;
 import com.icegreen.greenmail.store.StoredMessage;
 import com.icegreen.greenmail.util.GreenMail;
+import com.obj.nc.domain.Header;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Email;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.flows.testmode.TestModeBeansConfig;
 import com.obj.nc.flows.testmode.TestModeProperties;
+import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
+import com.obj.nc.functions.processors.senders.EmailSender;
+import com.obj.nc.functions.sources.SourceSupplierAdapter;
+import com.obj.nc.utils.JsonUtils;
+
+import lombok.extern.log4j.Log4j2;
 
 @Component
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
+@Log4j2
 public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<Message>> {
 
-    @Qualifier(TestModeBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
+    public static final String ORIGINAL_RECIPIENTS_ATTR_NAME = "ORIGINAL_RECIPIENTS";
+
+	@Qualifier(TestModeBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
     @Autowired private GreenMail gm;
 
     @Autowired private TestModeProperties properties;
@@ -55,6 +68,8 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
 
 	@Override
 	protected List<Message> execute() {
+		log.info("Pulling messages from Test Mode GreenMail");
+		
         List<Message> allMessages = new ArrayList<>();
 
         try {
@@ -92,11 +107,15 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
             MimeMessage mimeMessage = message.getMimeMessage();
             Email content = result.getContentTyped();
             content.setSubject(mimeMessage.getSubject());
-
+            
             MimeMessageParser parser = new MimeMessageParser(mimeMessage).parse();
             String originalRecipients = parser.getTo().stream().map(Address::toString).collect(Collectors.joining(","));
             String mimeMessageContent = parser.hasHtmlContent() ? parser.getHtmlContent() : parser.getPlainContent();
-            content.setText(originalRecipients + "\n" + mimeMessageContent);
+            String contentType = parser.hasHtmlContent()? MediaType.TEXT_HTML_VALUE : MediaType.TEXT_PLAIN_VALUE;
+       
+            content.setText(mimeMessageContent);
+            content.setAttributeValue(ORIGINAL_RECIPIENTS_ATTR_NAME, originalRecipients);
+            content.setContentType(contentType);
 
             List<RecievingEndpoint> emailEndpoints = properties.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
             result.getBody().setRecievingEndpoints(emailEndpoints);
@@ -104,11 +123,32 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
             DeliveryOptions deliveryOptions = new DeliveryOptions();
             deliveryOptions.setAggregationType(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
             result.getBody().setDeliveryOptions(deliveryOptions);
+            
+            copyHeaderValues(mimeMessage, result.getHeader());
+            
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         return result;
     }
+    
+	private void copyHeaderValues(MimeMessage src, Header dest) throws MessagingException {
+		Enumeration<javax.mail.Header> headers = src.getAllHeaders();
+		while  (headers.hasMoreElements()) {
+			javax.mail.Header header =headers.nextElement();
+			
+			if (header.getName().equals(EmailSender.NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "EVENT_ID")) {
+				List<String> eventIDs = JsonUtils.readObjectFromJSONString(header.getValue(), List.class);
+				List<UUID> eventUUIDs = eventIDs.stream().map(eId-> UUID.fromString(eId)).collect(Collectors.toList());
+				dest.setEventIds(eventUUIDs);
+			} else if (header.getName().equals(EmailSender.NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "FLOW_ID")) {
+				dest.setFlowId(header.getValue());
+			} else if (header.getName().equals(EmailSender.NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "MSG_ID")) {
+				dest.setId(UUID.fromString(header.getValue()));
+			}
+			dest.setAttributeValue(header.getName(), header.getValue());
+		}
+	}
 
 }

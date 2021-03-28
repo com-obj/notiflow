@@ -14,7 +14,7 @@ import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class EventFactoryProcessingFunction extends ProcessorFunctionAdapter<GenericEvent, Event> {
+public class GenericEventToNotificaitonIntentConverter extends ProcessorFunctionAdapter<GenericEvent, Event> {
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(GenericEvent payload) {

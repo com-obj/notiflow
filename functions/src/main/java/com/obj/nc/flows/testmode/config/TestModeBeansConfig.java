@@ -1,4 +1,4 @@
-package com.obj.nc.flows.testmode;
+package com.obj.nc.flows.testmode.config;
 
 import java.util.Objects;
 import java.util.Properties;
@@ -14,6 +14,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
+import com.obj.nc.flows.testmode.TestModeGreenMailProperties;
 import com.obj.nc.functions.processors.senders.EmailSender;
 
 @Configuration

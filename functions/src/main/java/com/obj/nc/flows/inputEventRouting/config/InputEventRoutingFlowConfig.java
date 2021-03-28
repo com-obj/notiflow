@@ -24,7 +24,7 @@ public class InputEventRoutingFlowConfig {
     @ConditionalOnProperty(value = "nc.flows.input-evet-routing.type", havingValue = "FLOW_ID")
     public IntegrationFlow flowIdBasedRoutingFlow() {
     	return IntegrationFlows
-			.from(genericEventSupplier, 
+			.fromSupplier(genericEventSupplier, 
 					conf-> conf.poller(Pollers.fixedRate(routingProps.getPollPeriodInMiliSeconds())))
 			.route(flowIdRouter())
 			.get();
@@ -40,7 +40,7 @@ public class InputEventRoutingFlowConfig {
     @ConditionalOnProperty(value = "nc.flows.input-evet-routing.type", havingValue = "PAYLOAD_TYPE")
     public IntegrationFlow payloadTypeBasedRoutingFlow() {
     	return IntegrationFlows
-			.from(genericEventSupplier, 
+			.fromSupplier(genericEventSupplier, 
 					conf-> conf.poller(Pollers.fixedRate(routingProps.getPollPeriodInMiliSeconds())))
 			.channel(new DirectChannel())
 			.route(simplePayloadTypeBasedRouter())
