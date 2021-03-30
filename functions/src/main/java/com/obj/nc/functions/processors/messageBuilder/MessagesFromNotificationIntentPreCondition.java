@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class MessagesFromEventPreCondition implements PreCondition<NotificationIntent> {
+public class MessagesFromNotificationIntentPreCondition implements PreCondition<NotificationIntent> {
 
 	@Override
 	public Optional<PayloadValidationException> apply(NotificationIntent notificationIntent) {

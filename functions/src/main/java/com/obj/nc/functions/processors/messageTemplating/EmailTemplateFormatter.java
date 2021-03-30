@@ -13,7 +13,7 @@ import org.thymeleaf.context.Context;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.BaseJSONObject;
-import com.obj.nc.domain.message.BaseEmailFromTemplate;
+import com.obj.nc.domain.message.TemplateWithModelBasedContent;
 import com.obj.nc.domain.message.Content;
 import com.obj.nc.domain.message.Email;
 import com.obj.nc.domain.message.Message;
@@ -40,8 +40,8 @@ public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, Li
 			return Optional.of(new PayloadValidationException("EmailTemplateFormatter cannot format message because its content is null"));
 		}
 		
-		if (!(content instanceof  BaseEmailFromTemplate)) {
-			return Optional.of(new PayloadValidationException("EmailTemplateFormatter cannot format message because its content is not of type EmailFromTemplate. Instead is " +  content.getClass().getSimpleName()));
+		if (!(content instanceof  TemplateWithModelBasedContent)) {
+			return Optional.of(new PayloadValidationException("EmailTemplateFormatter cannot format message because its content is not of type EmailFromTemplateJsonModel. Instead is " +  content.getClass().getSimpleName()));
 		}		
 
 		return Optional.empty();
@@ -53,7 +53,7 @@ public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, Li
 	public List<Message> execute(Message payload) {
 		List<Message> result = new ArrayList<>();
 		
-		BaseEmailFromTemplate<?> emailFromTemplate = payload.getContentTyped();
+		TemplateWithModelBasedContent<?> emailFromTemplate = payload.getContentTyped();
 		
 		List<Locale> forLocales = CollectionUtils.isEmpty(emailFromTemplate.getRequiredLocales())?
 				config.getDefaultLocales()

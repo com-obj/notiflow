@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 @Component
 @Log4j2
-public class MessagesFromEventExecution implements Function<NotificationIntent, List<Message>> {
+public class MessagesFromNotificationIntentExecution implements Function<NotificationIntent, List<Message>> {
 
 	@DocumentProcessingInfo("GenerateMessagesFromEvent")
 	@Override

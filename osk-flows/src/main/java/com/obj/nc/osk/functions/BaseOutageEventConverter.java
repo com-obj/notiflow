@@ -16,8 +16,9 @@ import org.springframework.stereotype.Component;
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.Body;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.message.BaseEmailFromTemplate;
+import com.obj.nc.domain.message.TemplateWithModelBasedContent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -159,20 +160,19 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 					notifEvent.getOutageEnd(),
 					outageForCustomers.get(customer));
 
-			
-			NotificationIntent notificationIntent  = createNotificationIntent(customerMessageContent, customer.asEmailEnpoints());
+			NotificationIntent notificationIntent  = createNotificationIntent(customerMessageContent, customer.asEnpoints());
 			customerNotificationIntents.add(notificationIntent);
 		}
 		return customerNotificationIntents;
 	} 
 	
 	private NotificationIntent createNotificationIntent(
-			BaseEmailFromTemplate<?> messageContent,
-			Set<EmailEndpoint> emails) {
+			TemplateWithModelBasedContent<?> messageContent,
+			Set<? extends RecievingEndpoint> endpoints) {
 		
 		Body eventBody = new Body();
 		eventBody.setMessage(messageContent);
-		eventBody.getRecievingEndpoints().addAll(emails);
+		eventBody.getRecievingEndpoints().addAll(endpoints);
 		
 		NotificationIntent notificationIntent = new NotificationIntent();
 		notificationIntent.setBody(eventBody);

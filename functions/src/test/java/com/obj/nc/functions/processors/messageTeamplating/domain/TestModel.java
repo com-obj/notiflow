@@ -6,8 +6,8 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class Model {
+public class TestModel {
 	String name;
 	
-	List<ChilModel>	parts = new ArrayList<>();
+	List<TestChildModel> parts = new ArrayList<>();
 }

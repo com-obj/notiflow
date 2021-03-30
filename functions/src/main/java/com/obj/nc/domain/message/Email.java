@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.MediaType;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.domain.Attachement;
 
 import lombok.Data;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@JsonTypeName(Email.JSON_TYPE_IDENTIFIER)
 public class Email extends Content {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CONTENT";
@@ -51,8 +53,4 @@ public class Email extends Content {
 		return concated;
 	}
 
-	@Override
-	public String getContentTypeName() {
-		return JSON_TYPE_IDENTIFIER;
-	}
 }

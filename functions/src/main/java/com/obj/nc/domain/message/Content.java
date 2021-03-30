@@ -1,6 +1,5 @@
 package com.obj.nc.domain.message;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -14,13 +13,10 @@ import lombok.EqualsAndHashCode;
 	@Type(value = Email.class, name = Email.JSON_TYPE_IDENTIFIER),
 	@Type(value = AggregatedEmail.class, name = AggregatedEmail.JSON_TYPE_IDENTIFIER),
 	@Type(value = SimpleText.class, name = SimpleText.JSON_TYPE_IDENTIFIER),
-	@Type(value = EmailFromTemplate.class, name = EmailFromTemplate.JSON_TYPE_IDENTIFIER),
+	@Type(value = EmailFromTemplateJsonModel.class, name = EmailFromTemplateJsonModel.JSON_TYPE_IDENTIFIER),
 })
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public abstract class Content extends BaseJSONObject {
-
-	@JsonIgnore
-	public abstract String getContentTypeName();
 	
 }

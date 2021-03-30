@@ -13,13 +13,13 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class MessagesFromEventProcessingFunction extends ProcessorFunction<NotificationIntent, List<Message>> {
+public class MessagesFromNotificationIntentProcessingFunction extends ProcessorFunction<NotificationIntent, List<Message>> {
 
 	@Autowired
-	private MessagesFromEventExecution execution;
+	private MessagesFromNotificationIntentExecution execution;
 
 	@Autowired
-	private MessagesFromEventPreCondition preCondition;
+	private MessagesFromNotificationIntentPreCondition preCondition;
 
 	@Override
 	public PreCondition<NotificationIntent> preCondition() {

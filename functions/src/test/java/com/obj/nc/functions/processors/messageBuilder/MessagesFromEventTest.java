@@ -41,9 +41,9 @@ class MessagesFromEventTest {
 		notificationIntent = funciton.apply(notificationIntent);
 		
 		//WHEN
-		MessagesFromEventProcessingFunction function = new MessagesFromEventProcessingFunction(
-				new MessagesFromEventExecution(),
-				new MessagesFromEventPreCondition());
+		MessagesFromNotificationIntentProcessingFunction function = new MessagesFromNotificationIntentProcessingFunction(
+				new MessagesFromNotificationIntentExecution(),
+				new MessagesFromNotificationIntentPreCondition());
 
 		List<Message> result = function.apply(notificationIntent);
 		
@@ -94,9 +94,9 @@ class MessagesFromEventTest {
 		notificationIntent = funciton.apply(notificationIntent);
 		
 		//WHEN
-		MessagesFromEventProcessingFunction function = new MessagesFromEventProcessingFunction(
-				new MessagesFromEventExecution(),
-				new MessagesFromEventPreCondition());
+		MessagesFromNotificationIntentProcessingFunction function = new MessagesFromNotificationIntentProcessingFunction(
+				new MessagesFromNotificationIntentExecution(),
+				new MessagesFromNotificationIntentPreCondition());
 
 		List<Message> result = function.apply(notificationIntent);
 		
@@ -138,9 +138,9 @@ class MessagesFromEventTest {
 		notificationIntent = funciton.apply(notificationIntent);
 		
 		//WHEN
-		MessagesFromEventProcessingFunction function = new MessagesFromEventProcessingFunction(
-				new MessagesFromEventExecution(),
-				new MessagesFromEventPreCondition());
+		MessagesFromNotificationIntentProcessingFunction function = new MessagesFromNotificationIntentProcessingFunction(
+				new MessagesFromNotificationIntentExecution(),
+				new MessagesFromNotificationIntentPreCondition());
 
 		List<Message> result = function.apply(notificationIntent);
 		

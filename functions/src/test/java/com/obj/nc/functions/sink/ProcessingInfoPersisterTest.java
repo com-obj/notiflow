@@ -22,7 +22,7 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
 import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.ProcessingInfoPersisterForEventWithRecipientsSinkConsumer;
@@ -35,7 +35,7 @@ class ProcessingInfoPersisterTest extends BaseIntegrationTest {
 	@Autowired private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoPersisterForEventWithRecipients;
 	@Autowired private ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId;
     @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
-    @Autowired private MessagesFromEventProcessingFunction generateMessagesFromEvent;
+    @Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
     @Autowired private EmailSender functionSend;
     @Autowired private JdbcTemplate jdbcTemplate;
 

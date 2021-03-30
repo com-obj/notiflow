@@ -9,7 +9,7 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromEventProcessingFunction;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
@@ -23,7 +23,7 @@ public class FlowsConfig {
 	@Autowired private EndOutageEventConverter endOutageEventConverter;
 	
 	@Autowired private ValidateAndGenerateEventIdProcessingFunction generateEventId;
-	@Autowired private MessagesFromEventProcessingFunction generateMessagesFromEvent;
+	@Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
 	@Autowired private EmailSender sendMessage;
 	@Autowired private PaylaodLoggerSinkConsumer logConsumer;
 	@Autowired private EmailTemplateFormatter emailFormatter;

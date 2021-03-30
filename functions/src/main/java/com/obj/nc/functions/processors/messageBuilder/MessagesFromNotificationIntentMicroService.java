@@ -14,10 +14,10 @@ import java.util.function.Function;
 
 @Configuration
 @Log4j2
-public class MessagesFromEventMicroService extends ProcessorMicroService<NotificationIntent, List<Message>, MessagesFromEventProcessingFunction>{
+public class MessagesFromNotificationIntentMicroService extends ProcessorMicroService<NotificationIntent, List<Message>, MessagesFromNotificationIntentProcessingFunction>{
 
 	@Autowired
-	private MessagesFromEventProcessingFunction fn;
+	private MessagesFromNotificationIntentProcessingFunction fn;
 
 	@Bean
 	public Function<Flux<NotificationIntent>, Flux<Message>> generateMessagesFromNotificationIntent() {
@@ -25,7 +25,7 @@ public class MessagesFromEventMicroService extends ProcessorMicroService<Notific
 	}
 
 	@Override
-	public MessagesFromEventProcessingFunction getProccessingFuction() {
+	public MessagesFromNotificationIntentProcessingFunction getProccessingFuction() {
 		return fn;
 	}
 

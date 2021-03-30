@@ -2,7 +2,9 @@ package com.obj.nc.domain.message;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;import org.springframework.context.MessageSource;
+import java.util.Locale;
+
+import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 
 import com.obj.nc.Get;
@@ -20,7 +22,7 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Log4j2
-public abstract class BaseEmailFromTemplate<MODEL_TYPE> extends Content {
+public abstract class TemplateWithModelBasedContent<MODEL_TYPE> extends Content {
 
 	@NonNull
 	@EqualsAndHashCode.Include
