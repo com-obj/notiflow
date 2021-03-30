@@ -18,7 +18,7 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.content.AggregatedEmail;
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.EmailSender;
@@ -66,7 +66,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
             functionSend.apply(message);
         })
                 .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("Email sender can send to only one recipient. Found more: ");
+                .hasMessageContaining("EmailContent sender can send to only one recipient. Found more: ");
     }
 
     @Test
@@ -80,7 +80,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
             functionSend.apply(message);
         })
                 .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("Email sender can send to Email endpoints only. Found ");
+                .hasMessageContaining("EmailContent sender can send to EmailContent endpoints only. Found ");
     }
 
     @Test
@@ -89,8 +89,8 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         String INPUT_JSON_FILE = "messages/email_message_attachments.json";
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 
-        Email email = inputMessage.getContentTyped();
-        email.getAttachments().forEach(attachement -> {
+        EmailContent emailContent = inputMessage.getContentTyped();
+        emailContent.getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {

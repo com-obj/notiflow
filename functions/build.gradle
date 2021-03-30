@@ -61,6 +61,7 @@ dependencies {
 	implementation 'org.postgresql:postgresql'
 	
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
+	implementation 'org.apache.commons:commons-text:1.9'
 
 	implementation 'org.flywaydb:flyway-core'
 	compileOnly 'org.projectlombok:lombok'

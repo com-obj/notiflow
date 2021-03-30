@@ -3,7 +3,7 @@ package com.obj.nc.flows.testmode.functions.processors;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,6 +14,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TestModeDiggestModel {
 	
-	private List<Email> emails = new ArrayList<>();
+	private List<EmailContent> emailContents = new ArrayList<>();
 
 }

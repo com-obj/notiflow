@@ -5,6 +5,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
     <body>
+    	<style>
+	        .grow:hover {
+	            height: unset !important;
+	        }
+	    </style>
     	<p>
     		<span th:text="#{testMode.headerMain}">O co ide</span>
     	</p>
@@ -20,7 +25,7 @@
 			        </tr>
 			    </thead>
 			    <tbody>
-			     	<tr th:each="email : ${model.emails}">
+			     	<tr th:each="email : ${model.emailContents}">
 			            <td><span th:text="${email.getAttributeValue('ORIGINAL_RECIPIENTS')}"> cuzy@objectify.sk </span></td>
 			            <td><span th:text="${email.subject}"> Subject1 </span></td>
 			            <td><span th:text="${email.text}"> Body1 </span></td>

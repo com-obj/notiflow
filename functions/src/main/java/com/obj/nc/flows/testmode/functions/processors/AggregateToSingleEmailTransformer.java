@@ -28,7 +28,7 @@ public class AggregateToSingleEmailTransformer extends ProcessorFunctionAdapter<
 		
 		AggregatedEmail aggregate = ((AggregatedEmail)aggregatedMessage.getBody().getMessage());
 		aggregate.getAggregateContent().stream().forEach(e -> {
-			digestModel.getEmails().add(e);
+			digestModel.getEmailContents().add(e);
 			if (!e.getContentType().equals(MediaType.TEXT_HTML_VALUE)) {
 				return;
 			}

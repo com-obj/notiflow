@@ -24,7 +24,7 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.Body;
 import com.obj.nc.domain.content.AggregatedEmail;
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -80,15 +80,15 @@ class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
         List<Message> msgsCauthByTestModeGM = greenMailReceiverSourceSupplier.get();
         msgsCauthByTestModeGM.forEach(m-> assertThat(m.getHeader().getEventIds()).contains(UUID.fromString("23e201b5-d7fa-4231-a520-51190b5c50da")));
 
-        Email emailFromTMGM1 = msgsCauthByTestModeGM.get(0).getContentTyped();
-        checkRecievedMatchOriginal(origianlMsgForAggreagtion1, emailFromTMGM1);
+        EmailContent emailContentFromTMGM1 = msgsCauthByTestModeGM.get(0).getContentTyped();
+        checkRecievedMatchOriginal(origianlMsgForAggreagtion1, emailContentFromTMGM1);
 
-        Email emailFromTMGM2 = msgsCauthByTestModeGM.get(1).getContentTyped();
-        checkRecievedMatchOriginal(origianlMsgForAggreagtion2, emailFromTMGM2);
+        EmailContent emailContentFromTMGM2 = msgsCauthByTestModeGM.get(1).getContentTyped();
+        checkRecievedMatchOriginal(origianlMsgForAggreagtion2, emailContentFromTMGM2);
 
 
-        Email emailFromTMGM3 = msgsCauthByTestModeGM.get(2).getContentTyped();
-        checkRecievedMatchOriginal(origianlMsgForAggreagtion3, emailFromTMGM3);
+        EmailContent emailContentFromTMGM3 = msgsCauthByTestModeGM.get(2).getContentTyped();
+        checkRecievedMatchOriginal(origianlMsgForAggreagtion3, emailContentFromTMGM3);
 
         Body emailBodyFromTMGM2 = msgsCauthByTestModeGM.get(2).getBody();
         
@@ -100,14 +100,14 @@ class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
         assertThat((emailBodyFromTMGM2.getDeliveryOptions().getAggregationType())).isEqualTo(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
     }
 
-	private void checkRecievedMatchOriginal(Message origianlMsgForAggreagtion, Email emailFromTMGM) {
-		Email originalContent1 = ((AggregatedEmail)origianlMsgForAggreagtion.getContentTyped()).getAggregateContent().get(0);
+	private void checkRecievedMatchOriginal(Message origianlMsgForAggreagtion, EmailContent emailContentFromTMGM) {
+		EmailContent originalContent1 = ((AggregatedEmail)origianlMsgForAggreagtion.getContentTyped()).getAggregateContent().get(0);
         String originalReviever1 = ((EmailEndpoint) origianlMsgForAggreagtion.getBody().getRecievingEndpoints().get(0)).getEmail();
-        assertThat(emailFromTMGM.getSubject())
+        assertThat(emailContentFromTMGM.getSubject())
         	.contains(originalContent1.getSubject());
-        assertThat(emailFromTMGM.getAttributeValue(GreenMailReceiverSourceSupplier.ORIGINAL_RECIPIENTS_ATTR_NAME).toString())
+        assertThat(emailContentFromTMGM.getAttributeValue(GreenMailReceiverSourceSupplier.ORIGINAL_RECIPIENTS_ATTR_NAME).toString())
         	.contains(originalReviever1);
-        assertThat(emailFromTMGM.getText())
+        assertThat(emailContentFromTMGM.getText())
         	.contains(originalContent1.getText());
 	}
 }

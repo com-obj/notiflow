@@ -14,7 +14,7 @@ import org.thymeleaf.context.Context;
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.content.TemplateWithModelBasedContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -76,10 +76,10 @@ public class EmailTemplateFormatter extends ProcessorFunctionAdapter<Message, Li
 			htmlMessage.getBody().setDeliveryOptions(payload.getBody().getDeliveryOptions());
 			htmlMessage.getBody().setRecievingEndpoints(payload.getBody().getRecievingEndpoints());
 			
-			Email email = htmlMessage.getContentTyped();
-			email.setContentType(MediaType.TEXT_HTML_VALUE);
-			email.setSubject(emailFromTemplate.getSubjectLocalised(locale));
-			email.setText(htmlContent);
+			EmailContent emailContent = htmlMessage.getContentTyped();
+			emailContent.setContentType(MediaType.TEXT_HTML_VALUE);
+			emailContent.setSubject(emailFromTemplate.getSubjectLocalised(locale));
+			emailContent.setText(htmlContent);
 			
 			result.add(htmlMessage);
 		}

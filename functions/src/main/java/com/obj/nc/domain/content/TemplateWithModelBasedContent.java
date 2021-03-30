@@ -24,9 +24,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public abstract class TemplateWithModelBasedContent<MODEL_TYPE> extends Content {
 
-	@NonNull
-	@EqualsAndHashCode.Include
-	private String subject;
+
 	
 	@NonNull
 	@EqualsAndHashCode.Include
@@ -45,6 +43,10 @@ public abstract class TemplateWithModelBasedContent<MODEL_TYPE> extends Content 
 	private MODEL_TYPE model;
 	
 	private List<Locale> requiredLocales = new ArrayList<>();
+	
+	@NonNull
+	@EqualsAndHashCode.Include
+	private String subject;
 
 	@EqualsAndHashCode.Include
 	private List<Attachement> attachments = new ArrayList<Attachement>();

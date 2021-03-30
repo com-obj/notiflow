@@ -2,7 +2,7 @@ package com.obj.nc.mapper;
 
 import com.obj.nc.KoderiaFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.dto.mailchimp.SendMessageWithTemplateDto;
 import com.obj.nc.utils.JsonUtils;
@@ -38,8 +38,8 @@ class MailchimpMessageMapperImplTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        Email email = inputMessage.getContentTyped();
-        email.getAttachments().forEach(attachement -> {
+        EmailContent emailContent = inputMessage.getContentTyped();
+        emailContent.getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {

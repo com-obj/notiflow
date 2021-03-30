@@ -1,6 +1,6 @@
 package com.obj.nc.functions.processors;
 
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.dto.*;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -40,10 +40,10 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/job_post_event_schema.json"));
 
         // and
-        Email email = mappedNotificationIntent.getBody().getContentTyped();
+        EmailContent emailContent = mappedNotificationIntent.getBody().getContentTyped();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
-        MatcherAssert.assertThat(email.getSubject(), Matchers.equalTo(jobPostEventData.getMessageSubject()));
-        MatcherAssert.assertThat(email.getText(), Matchers.equalTo(jobPostEventData.getMessageText()));
+        MatcherAssert.assertThat(emailContent.getSubject(), Matchers.equalTo(jobPostEventData.getMessageSubject()));
+        MatcherAssert.assertThat(emailContent.getText(), Matchers.equalTo(jobPostEventData.getMessageText()));
 
         // and
         Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedNotificationIntent.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
@@ -104,10 +104,10 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/blog_event_schema.json"));
 
         // and
-        Email email = mappedNotificationIntent.getBody().getContentTyped();
+        EmailContent emailContent = mappedNotificationIntent.getBody().getContentTyped();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
-        MatcherAssert.assertThat(email.getSubject(), Matchers.equalTo(blogEventData.getTitle()));
-        MatcherAssert.assertThat(email.getText(), Matchers.equalTo(blogEventData.getContent()));
+        MatcherAssert.assertThat(emailContent.getSubject(), Matchers.equalTo(blogEventData.getTitle()));
+        MatcherAssert.assertThat(emailContent.getText(), Matchers.equalTo(blogEventData.getContent()));
 
         // and
         Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedNotificationIntent.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
@@ -140,10 +140,10 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/event_event_schema.json"));
 
         // and
-        Email email = mappedNotificationIntent.getBody().getContentTyped();
+        EmailContent emailContent = mappedNotificationIntent.getBody().getContentTyped();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
-        MatcherAssert.assertThat(email.getSubject(), Matchers.equalTo(eventEventData.getName()));
-        MatcherAssert.assertThat(email.getText(), Matchers.equalTo(eventEventData.getDescription()));
+        MatcherAssert.assertThat(emailContent.getSubject(), Matchers.equalTo(eventEventData.getName()));
+        MatcherAssert.assertThat(emailContent.getText(), Matchers.equalTo(eventEventData.getDescription()));
 
         // and
         Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedNotificationIntent.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
@@ -177,10 +177,10 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/link_event_schema.json"));
 
         // and
-        Email email = mappedNotificationIntent.getBody().getContentTyped();
+        EmailContent emailContent = mappedNotificationIntent.getBody().getContentTyped();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
-        MatcherAssert.assertThat(email.getSubject(), Matchers.equalTo(linkEventData.getTitle()));
-        MatcherAssert.assertThat(email.getText(), Matchers.equalTo(linkEventData.getDescription()));
+        MatcherAssert.assertThat(emailContent.getSubject(), Matchers.equalTo(linkEventData.getTitle()));
+        MatcherAssert.assertThat(emailContent.getText(), Matchers.equalTo(linkEventData.getDescription()));
 
         // and
         Map<String, Object> eventAttributes = (Map<String, Object>) ((Map<String, Object>) mappedNotificationIntent.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD)).get("data");
@@ -204,10 +204,10 @@ class KoderiaEventConverterProcessingFunctionTest {
         MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/news_event_schema.json"));
 
         // and
-        Email email = mappedNotificationIntent.getBody().getContentTyped();
+        EmailContent emailContent = mappedNotificationIntent.getBody().getContentTyped();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), Matchers.equalTo("static-routing-pipeline"));
-        MatcherAssert.assertThat(email.getSubject(), Matchers.equalTo(newsEventData.getSubject()));
-        MatcherAssert.assertThat(email.getText(), Matchers.equalTo(newsEventData.getText()));
+        MatcherAssert.assertThat(emailContent.getSubject(), Matchers.equalTo(newsEventData.getSubject()));
+        MatcherAssert.assertThat(emailContent.getText(), Matchers.equalTo(newsEventData.getText()));
     }
 
 }

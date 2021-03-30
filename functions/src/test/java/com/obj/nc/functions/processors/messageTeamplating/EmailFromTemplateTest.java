@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.utils.JsonUtils;
@@ -35,7 +35,7 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
 		
-		Email content = htmlMessages.iterator().next().getContentTyped();
+		EmailContent content = htmlMessages.iterator().next().getContentTyped();
 		
 		System.out.println(content.getText());
 		assertThat(content.getSubject()).isEqualTo("Subject");
@@ -54,7 +54,7 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
 		
-		Email content = htmlMessages.iterator().next().getContentTyped();
+		EmailContent content = htmlMessages.iterator().next().getContentTyped();
 		
 		System.out.println(content.getText());
 		assertThat(content.getSubject()).isEqualTo("Subject");
@@ -74,7 +74,7 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(2);
 		
-		Email deContent = htmlMessages
+		EmailContent deContent = htmlMessages
 				.stream()
 				.filter(m-> Locale.GERMAN.equals(m.getAttributes().get(EmailTemplateFormatter.LOCALE_ATTR_NAME)))
 				.findFirst()
@@ -85,7 +85,7 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 		assertThat(deContent.getText()).contains("Grues gott");
 		assertThat(deContent.getText()).contains("John Doe");
 		
-		Email enContent = htmlMessages
+		EmailContent enContent = htmlMessages
 				.stream()
 				.filter(m-> Locale.US.equals(m.getAttributes().get(EmailTemplateFormatter.LOCALE_ATTR_NAME)))
 				.findFirst()

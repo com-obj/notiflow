@@ -2,7 +2,7 @@ package com.obj.nc.functions.processors.senders;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.AggregatedEmail;
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.dto.mailchimp.MessageResponseDto;
@@ -62,8 +62,8 @@ class MailchimpSenderProcessingFunctionTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        Email email = inputMessage.getContentTyped();
-        email.getAttachments().forEach(attachement -> {
+        EmailContent emailContent = inputMessage.getContentTyped();
+        emailContent.getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {
@@ -144,8 +144,8 @@ class MailchimpSenderProcessingFunctionTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        Email emailContent = inputMessage.getContentTyped();
-        emailContent.getAttachments().forEach(attachement -> {
+        EmailContent emailContentContent = inputMessage.getContentTyped();
+        emailContentContent.getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {
@@ -173,8 +173,8 @@ class MailchimpSenderProcessingFunctionTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        Email emailContent = inputMessage.getContentTyped();
-        emailContent.getAttachments().forEach(attachement -> {
+        EmailContent emailContentContent = inputMessage.getContentTyped();
+        emailContentContent.getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {
@@ -202,15 +202,15 @@ class MailchimpSenderProcessingFunctionTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        Email emailContent = inputMessage.getContentTyped();
-        emailContent.getAttachments().forEach(attachement -> {
+        EmailContent emailContentContent = inputMessage.getContentTyped();
+        emailContentContent.getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
-        emailContent.setSubject(param);
+        emailContentContent.setSubject(param);
 
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> sendMailchimpMessage.apply(inputMessage))
@@ -231,8 +231,8 @@ class MailchimpSenderProcessingFunctionTest {
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
         
-        Email emailContent = inputMessage.getContentTyped();
-        emailContent.getAttachments().forEach(attachement -> {
+        EmailContent emailContentContent = inputMessage.getContentTyped();
+        emailContentContent.getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {
@@ -245,7 +245,7 @@ class MailchimpSenderProcessingFunctionTest {
         Assertions.assertThatThrownBy(() -> sendMailchimpMessage.apply(inputMessage))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("Mailchimp can only send message")
-                .hasMessageContaining("to 1 Email endpoint");
+                .hasMessageContaining("to 1 EmailContent endpoint");
     }
 
     @Test
@@ -261,8 +261,8 @@ class MailchimpSenderProcessingFunctionTest {
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
         
-        Email emailContent = inputMessage.getContentTyped();
-        emailContent.getAttachments().forEach(attachement -> {
+        EmailContent emailContentContent = inputMessage.getContentTyped();
+        emailContentContent.getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
             } catch (IOException e) {
@@ -287,7 +287,7 @@ class MailchimpSenderProcessingFunctionTest {
         Assertions.assertThatThrownBy(() -> sendMailchimpMessage.apply(inputMessage))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("Mailchimp can only send message")
-                .hasMessageContaining("to 1 Email endpoint");
+                .hasMessageContaining("to 1 EmailContent endpoint");
     }
 
 }

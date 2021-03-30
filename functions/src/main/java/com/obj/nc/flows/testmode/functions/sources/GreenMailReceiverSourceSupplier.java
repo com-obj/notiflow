@@ -14,6 +14,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.mail.util.MimeMessageParser;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,7 +27,7 @@ import com.icegreen.greenmail.store.MailFolder;
 import com.icegreen.greenmail.store.StoredMessage;
 import com.icegreen.greenmail.util.GreenMail;
 import com.obj.nc.domain.Header;
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -105,12 +106,14 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
 
         try {
             MimeMessage mimeMessage = message.getMimeMessage();
-            Email content = result.getContentTyped();
+            EmailContent content = result.getContentTyped();
             content.setSubject(mimeMessage.getSubject());
             
             MimeMessageParser parser = new MimeMessageParser(mimeMessage).parse();
             String originalRecipients = parser.getTo().stream().map(Address::toString).collect(Collectors.joining(","));
-            String mimeMessageContent = parser.hasHtmlContent() ? parser.getHtmlContent() : parser.getPlainContent();
+            String mimeMessageContent = parser.hasHtmlContent() 
+            		? StringEscapeUtils.unescapeHtml4( parser.getHtmlContent() )
+            		: parser.getPlainContent();
             String contentType = parser.hasHtmlContent()? MediaType.TEXT_HTML_VALUE : MediaType.TEXT_PLAIN_VALUE;
        
             content.setText(mimeMessageContent);

@@ -18,8 +18,8 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-@JsonTypeName(Email.JSON_TYPE_IDENTIFIER)
-public class Email extends Content {
+@JsonTypeName(EmailContent.JSON_TYPE_IDENTIFIER)
+public class EmailContent extends Content {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CONTENT";
 
@@ -38,14 +38,14 @@ public class Email extends Content {
 	@EqualsAndHashCode.Include
 	private List<Attachement> attachments = new ArrayList<Attachement>();
 	
-	public static Email createWithSubject(String subject, String text) {
-		Email email = new Email(text);
-		email.setSubject(subject);
-		return email;
+	public static EmailContent createWithSubject(String subject, String text) {
+		EmailContent emailContent = new EmailContent(text);
+		emailContent.setSubject(subject);
+		return emailContent;
 	}
 
-	public Email concat(Email other) {
-		Email concated = new Email();
+	public EmailContent concat(EmailContent other) {
+		EmailContent concated = new EmailContent();
 		concated.text = text.concat(TEXT_CONCAT_DELIMITER).concat(other.text);
 		concated.subject = subject.concat(SUBJECT_CONCAT_DELIMITER).concat(other.subject);
 		concated.attachments.addAll(attachments);

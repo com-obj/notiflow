@@ -20,7 +20,7 @@ import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.Header;
 import com.obj.nc.domain.content.AggregatedEmail;
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -44,19 +44,19 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message message) {
-		if (!(message.getBody().getMessage() instanceof Email)) {
-			return Optional.of(new PayloadValidationException("Email sender can process only Message with Email content. Was type " + message.getBody().getMessage().getClass().getSimpleName()));
+		if (!(message.getBody().getMessage() instanceof EmailContent)) {
+			return Optional.of(new PayloadValidationException("EmailContent sender can process only Message with EmailContent content. Was type " + message.getBody().getMessage().getClass().getSimpleName()));
 		}
 		
 		List<RecievingEndpoint> to = message.getBody().getRecievingEndpoints();
 
 		if (to.size() != 1) {
-			return Optional.of(new PayloadValidationException("Email sender can send to only one recipient. Found more: " + to));
+			return Optional.of(new PayloadValidationException("EmailContent sender can send to only one recipient. Found more: " + to));
 		}
 
 		RecievingEndpoint endpoint = to.get(0);
 		if (!(endpoint instanceof EmailEndpoint)) {
-			return Optional.of(new PayloadValidationException("Email sender can send to Email endpoints only. Found " + endpoint));
+			return Optional.of(new PayloadValidationException("EmailContent sender can send to EmailContent endpoints only. Found " + endpoint));
 		}
 
 		return Optional.empty();
@@ -70,9 +70,9 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 		
 		EmailEndpoint toEmail = (EmailEndpoint) payload.getBody().getRecievingEndpoints().get(0);
 
-		Email msg = payload.getContentTyped();
+		EmailContent msg = payload.getContentTyped();
 
-		Email messageContent = null;
+		EmailContent messageContent = null;
 		if (msg instanceof AggregatedEmail) {
 			//ak je stale v rezime aggregated tak mi nic ine nezostava ako spravit "dummy" aggregation. Na konci dna potrebujem jeden subject, jeden text
 			messageContent = ((AggregatedEmail) msg).asSimpleContent();
@@ -86,7 +86,7 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 		return payload;
 	}
 
-	private void doSendMessage(EmailEndpoint toEmail, Email messageContent, Header header) {
+	private void doSendMessage(EmailEndpoint toEmail, EmailContent messageContent, Header header) {
 		try {
 			MimeMessage message = mailSender.createMimeMessage();	
 			copyHeaderValues(header, message);

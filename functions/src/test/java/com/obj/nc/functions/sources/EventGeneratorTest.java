@@ -1,7 +1,7 @@
 package com.obj.nc.functions.sources;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfigProperties;
@@ -75,9 +75,9 @@ class EventGeneratorTest {
         // then
         Assertions.assertThat(notificationIntentFromFile).isNotNull();
         
-        Email email = notificationIntentFromFile.getContentTyped();
-        Assertions.assertThat(email.getText()).isEqualTo("We are looking for a Business Intelligence (BI) Developer to create...");
-        Assertions.assertThat(email.getSubject()).isEqualTo("Business Intelligence (BI) Developer");
+        EmailContent emailContent = notificationIntentFromFile.getContentTyped();
+        Assertions.assertThat(emailContent.getText()).isEqualTo("We are looking for a Business Intelligence (BI) Developer to create...");
+        Assertions.assertThat(emailContent.getSubject()).isEqualTo("Business Intelligence (BI) Developer");
         Assertions.assertThat(((Map<?, ?>) notificationIntentFromFile.getBody().getMessage().getAttributes().get("originalEvent"))).hasSize(2);
         Assertions.assertThat(notificationIntentFromFile.getBody().getRecievingEndpoints()).isEmpty();
     }
@@ -135,8 +135,8 @@ class EventGeneratorTest {
         NotificationIntent notificationIntentFromFile = generateEvent.get();
 
         // then
-        Email email = notificationIntentFromFile.getContentTyped();
-        Assertions.assertThat(email.getSubject()).isEqualTo("First event in queue");
+        EmailContent emailContent = notificationIntentFromFile.getContentTyped();
+        Assertions.assertThat(emailContent.getSubject()).isEqualTo("First event in queue");
     }
 
     @Test

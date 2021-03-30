@@ -3,7 +3,7 @@ package com.obj.nc.mapper;
 import com.obj.nc.config.MailchimpApiConfig;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -64,7 +64,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     }
 
     protected String mapSubject(Message message) {
-    	Email messageContent = message.getContentTyped();
+    	EmailContent messageContent = message.getContentTyped();
         return messageContent.getSubject();
     }
 
@@ -85,7 +85,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     }
 
     protected List<AttachmentDto> mapAttachments(Message message) {
-        Email messageContent = message.getContentTyped();
+        EmailContent messageContent = message.getContentTyped();
         return messageContent.getAttachments().stream()
                 .map(this::mapAttachment)
                 .collect(Collectors.toList());
@@ -121,7 +121,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
 
     protected RecipientDto mapRecipient(RecievingEndpoint endpoint) {
         if (!EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointTypeName())) {
-            throw new UnsupportedOperationException("Mapper can only map Email endpoint");
+            throw new UnsupportedOperationException("Mapper can only map EmailContent endpoint");
         }
 
         RecipientDto dto = new RecipientDto();

@@ -2,7 +2,7 @@ package com.obj.nc.functions.processors.senders;
 
 import com.obj.nc.domain.content.AggregatedEmail;
 import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.dto.EmitEventDto;
@@ -29,7 +29,7 @@ public class MailchimpSenderPreCondition implements PreCondition<Message> {
 		if (messageContent instanceof AggregatedEmail) {
 			AggregatedEmail aggregatedContent = (AggregatedEmail)messageContent;
 			
-			for (Email messageContentPart : aggregatedContent.getAggregateContent()) {
+			for (EmailContent messageContentPart : aggregatedContent.getAggregateContent()) {
 				
 				Optional<PayloadValidationException> exception = checkMessageContent(messageContentPart);
 				if (exception.isPresent()) {
@@ -46,7 +46,7 @@ public class MailchimpSenderPreCondition implements PreCondition<Message> {
 		return checkReceivingEndpoints(message);
 	}
 
-	private Optional<PayloadValidationException> checkMessageContent(Email messageContent) {
+	private Optional<PayloadValidationException> checkMessageContent(EmailContent messageContent) {
 		if (!messageContent.containsAttributes(Collections.singletonList(ORIGINAL_EVENT_FIELD))) {
 			return Optional.of(new PayloadValidationException(String.format("Message must contain attribute: %s", ORIGINAL_EVENT_FIELD)));
 		}
@@ -68,7 +68,7 @@ public class MailchimpSenderPreCondition implements PreCondition<Message> {
 				.anyMatch(endpoint -> !EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointTypeName()));
 
 		if (hasNoneOrTooMuchEndpoints || containsNonEmailEndpoint) {
-			return Optional.of(new PayloadValidationException(String.format("Mailchimp can only send message %s to 1 Email endpoint", message)));
+			return Optional.of(new PayloadValidationException(String.format("Mailchimp can only send message %s to 1 EmailContent endpoint", message)));
 		}
 
 		return Optional.empty();

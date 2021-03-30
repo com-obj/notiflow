@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 import org.springframework.stereotype.Component;
 
-import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.EmailContent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.dto.EmitEventDto;
 
@@ -21,7 +21,7 @@ public class KoderiaEventConverterExecution implements Function<EmitEventDto, No
 		NotificationIntent notificationIntent = new NotificationIntent();
 		notificationIntent.getHeader().setFlowId("static-routing-pipeline");
 		notificationIntent.getBody().setMessage(
-				Email.createWithSubject(emitEventDto.getData().getMessageSubject(), emitEventDto.getData().getMessageText())
+				EmailContent.createWithSubject(emitEventDto.getData().getMessageSubject(), emitEventDto.getData().getMessageText())
 		);
 
 		notificationIntent.getBody().getMessage().setAttributeValue(ORIGINAL_EVENT_FIELD, emitEventDto.asMap());
