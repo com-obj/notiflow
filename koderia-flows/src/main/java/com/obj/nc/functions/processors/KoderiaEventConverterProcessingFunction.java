@@ -1,6 +1,6 @@
 package com.obj.nc.functions.processors;
 
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.functions.PreCondition;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class KoderiaEventConverterProcessingFunction extends ProcessorFunction<EmitEventDto, Event> {
+public class KoderiaEventConverterProcessingFunction extends ProcessorFunction<EmitEventDto, NotificationIntent> {
 
 	@Autowired
 	private KoderiaEventConverterExecution execution;
@@ -25,7 +25,7 @@ public class KoderiaEventConverterProcessingFunction extends ProcessorFunction<E
 	}
 
 	@Override
-	public Function<EmitEventDto, Event> execution() {
+	public Function<EmitEventDto, NotificationIntent> execution() {
 		return execution;
 	}
 

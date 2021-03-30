@@ -2,7 +2,7 @@ package com.obj.nc.functions.processors;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.dto.RecipientDto;
 import com.obj.nc.dto.RecipientsQueryDto;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -67,13 +67,13 @@ class KoderiaRecipientsProcessingFunctionTest {
                 .andRespond(withSuccess(responseDtoJsonString, MediaType.APPLICATION_JSON));
 
         // GIVEN
-        Event inputEvent = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + inputEventFile, Event.class);
+        NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + inputEventFile, NotificationIntent.class);
 
         // WHEN
-        Event outputEvent = getKoderiaRecipients.apply(inputEvent);
+        NotificationIntent outputNotificationIntent = getKoderiaRecipients.apply(inputNotificationIntent);
 
         // THEN
-        List<String> recipientEmails = outputEvent.getBody().getRecievingEndpoints().stream().map(endpoint -> ((EmailEndpoint) endpoint).getEmail()).collect(toList());
+        List<String> recipientEmails = outputNotificationIntent.getBody().getRecievingEndpoints().stream().map(endpoint -> ((EmailEndpoint) endpoint).getEmail()).collect(toList());
         for (int i = 0; i < recipientEmails.size(); i++) {
             MatcherAssert.assertThat(recipientEmails.get(i), Matchers.equalTo(responseDto[i].getEmail()));
         }
@@ -82,11 +82,11 @@ class KoderiaRecipientsProcessingFunctionTest {
     @Test
     void testEventWithNoOriginalEvent() {
         // GIVEN
-        Event inputEvent = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + "job_event.json", Event.class);
-        inputEvent.getBody().getAttributes().remove(ORIGINAL_EVENT_FIELD);
+        NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + "job_event.json", NotificationIntent.class);
+        inputNotificationIntent.getBody().getAttributes().remove(ORIGINAL_EVENT_FIELD);
 
         // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> getKoderiaRecipients.apply(inputEvent))
+        Assertions.assertThatThrownBy(() -> getKoderiaRecipients.apply(inputNotificationIntent))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("does not contain required attributes.")
                 .hasMessageContaining(ORIGINAL_EVENT_FIELD);
@@ -95,11 +95,11 @@ class KoderiaRecipientsProcessingFunctionTest {
     @Test
     void testInconvertibleEvent() {
         // GIVEN
-        Event inputEvent = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + "job_event.json", Event.class);
-        ((Map<String, Object>) inputEvent.getBody().getAttributes().get("originalEvent")).put("type", "INVALID");
+        NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + "job_event.json", NotificationIntent.class);
+        ((Map<String, Object>) inputNotificationIntent.getBody().getAttributes().get("originalEvent")).put("type", "INVALID");
 
         // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> getKoderiaRecipients.apply(inputEvent))
+        Assertions.assertThatThrownBy(() -> getKoderiaRecipients.apply(inputNotificationIntent))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("Cannot deserialize value of");
     }

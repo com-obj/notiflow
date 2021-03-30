@@ -1,6 +1,6 @@
 package com.obj.nc.functions.processors.messageBuilder;
 
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
 import org.springframework.stereotype.Component;
@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class MessagesFromEventPreCondition implements PreCondition<Event> {
+public class MessagesFromEventPreCondition implements PreCondition<NotificationIntent> {
 
 	@Override
-	public Optional<PayloadValidationException> apply(Event event) {
-		if (event.getBody().getRecievingEndpoints().isEmpty()) {
-			return Optional.of(new PayloadValidationException(String.format("Event %s has no receiving endpoints defined.", event)));
+	public Optional<PayloadValidationException> apply(NotificationIntent notificationIntent) {
+		if (notificationIntent.getBody().getRecievingEndpoints().isEmpty()) {
+			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s has no receiving endpoints defined.", notificationIntent)));
 		}
 
 		return Optional.empty();

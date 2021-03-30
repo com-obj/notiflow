@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentExecution;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentPreCondition;
@@ -35,10 +35,10 @@ class RecepientsUsingKoderiaSubscriptionTest {
     @Test
     void testResolveRecipientsFailWithoutRequiredAttributes() {
         // given
-        Event inputEvent = Event.createWithSimpleMessage("test-config", "Hi there!!");
+        NotificationIntent inputNotificationIntent = NotificationIntent.createWithSimpleMessage("test-config", "Hi there!!");
 
         // when - then
-        Assertions.assertThatThrownBy(() -> resolveRecipients.apply(inputEvent))
+        Assertions.assertThatThrownBy(() -> resolveRecipients.apply(inputNotificationIntent))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("does not contain required attributes. Required attributes are:");
     }
@@ -47,30 +47,30 @@ class RecepientsUsingKoderiaSubscriptionTest {
     void testResolveRecipientsPassWithRequiredAttributes() {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post.json";
-        Event inputEvent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
-        inputEvent = validateAndGenerateEventId.apply(inputEvent);
+        NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        inputNotificationIntent = validateAndGenerateEventId.apply(inputNotificationIntent);
 
         // when
-        Event outputEvent = resolveRecipients.apply(inputEvent);
+        NotificationIntent outputNotificationIntent = resolveRecipients.apply(inputNotificationIntent);
 
         // then
-        MatcherAssert.assertThat(outputEvent, Matchers.notNullValue());
+        MatcherAssert.assertThat(outputNotificationIntent, Matchers.notNullValue());
     }
 
     @Test
     void testResolveRecipientsResolvesAll() {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post.json";
-        Event inputEvent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
-        inputEvent = validateAndGenerateEventId.apply(inputEvent);
+        NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        inputNotificationIntent = validateAndGenerateEventId.apply(inputNotificationIntent);
 
         // when
-        Event outputEvent = resolveRecipients.apply(inputEvent);
+        NotificationIntent outputNotificationIntent = resolveRecipients.apply(inputNotificationIntent);
 
         // then
-        MatcherAssert.assertThat(outputEvent, Matchers.notNullValue());
+        MatcherAssert.assertThat(outputNotificationIntent, Matchers.notNullValue());
 
-        List<RecievingEndpoint> outputEventEndpoints = outputEvent.getBody().getRecievingEndpoints();
+        List<RecievingEndpoint> outputEventEndpoints = outputNotificationIntent.getBody().getRecievingEndpoints();
         MatcherAssert.assertThat(outputEventEndpoints, Matchers.hasSize(3));
         MatcherAssert.assertThat(outputEventEndpoints, Matchers.everyItem(Matchers.instanceOf(EmailEndpoint.class)));
 
@@ -88,14 +88,14 @@ class RecepientsUsingKoderiaSubscriptionTest {
     void testResolveRecipientsMergeWithExisting() {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post_recipients.json";
-        Event inputEvent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
-        inputEvent = validateAndGenerateEventId.apply(inputEvent);
+        NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        inputNotificationIntent = validateAndGenerateEventId.apply(inputNotificationIntent);
 
         // when
-        Event outputEvent = resolveRecipients.apply(inputEvent);
+        NotificationIntent outputNotificationIntent = resolveRecipients.apply(inputNotificationIntent);
 
         // then
-        List<RecievingEndpoint> outputEventEndpoints = outputEvent.getBody().getRecievingEndpoints();
+        List<RecievingEndpoint> outputEventEndpoints = outputNotificationIntent.getBody().getRecievingEndpoints();
         MatcherAssert.assertThat(outputEventEndpoints, Matchers.hasSize(6));
         MatcherAssert.assertThat(outputEventEndpoints, Matchers.everyItem(Matchers.instanceOf(EmailEndpoint.class)));
     }

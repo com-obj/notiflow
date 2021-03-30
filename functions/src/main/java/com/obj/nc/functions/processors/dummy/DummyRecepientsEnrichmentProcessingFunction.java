@@ -1,6 +1,6 @@
 package com.obj.nc.functions.processors.dummy;
 
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.PreCondition;
 import com.obj.nc.functions.processors.ProcessorFunction;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunction<Event, Event> {
+public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunction<NotificationIntent, NotificationIntent> {
 
 	@Autowired
 	private DummyRecepientsEnrichmentExecution execution;
@@ -20,12 +20,12 @@ public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFuncti
 	private DummyRecepientsEnrichmentPreCondition preCondition;
 
 	@Override
-	public PreCondition<Event> preCondition() {
+	public PreCondition<NotificationIntent> preCondition() {
 		return preCondition;
 	}
 
 	@Override
-	public Function<Event, Event> execution() {
+	public Function<NotificationIntent, NotificationIntent> execution() {
 		return execution;
 	}
 

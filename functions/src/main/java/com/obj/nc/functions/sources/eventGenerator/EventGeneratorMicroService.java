@@ -1,6 +1,6 @@
 package com.obj.nc.functions.sources.eventGenerator;
 
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.sources.SourceMicroService;
 
 import lombok.extern.log4j.Log4j2;
@@ -14,13 +14,13 @@ import java.util.function.Supplier;
 
 @Configuration
 @Log4j2
-public class EventGeneratorMicroService extends SourceMicroService<Event, EventGeneratorSourceSupplier> {
+public class EventGeneratorMicroService extends SourceMicroService<NotificationIntent, EventGeneratorSourceSupplier> {
 
     @Autowired
     private EventGeneratorSourceSupplier supplier;
 
     @Bean
-    public Supplier<Flux<Event>> generateEvent() {
+    public Supplier<Flux<NotificationIntent>> generateNotificationIntent() {
         return super.executeSourceService();
     }
 

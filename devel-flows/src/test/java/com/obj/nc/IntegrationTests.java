@@ -18,8 +18,8 @@ import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -44,10 +44,10 @@ public class IntegrationTests extends BaseIntegrationTest {
 	@Test
 	public void testEventEmited() {
 		String INPUT_JSON_FILE = "allEvents/ba_job_post.json";
-		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
-		org.springframework.messaging.Message<Event> inputEvent = convertBeanToMessagePayload(event);
+		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		org.springframework.messaging.Message<NotificationIntent> inputNotificationIntent = convertBeanToMessagePayload(notificationIntent);
 
-		source.send(inputEvent);
+		source.send(inputNotificationIntent);
 
 		org.springframework.messaging.Message<byte[]> payload1 = target.receive(3000,FINAL_STEP_QUEUE_NAME);
 		Message message1 = (Message) messageConverter.fromMessage(payload1, Message.class);
@@ -69,11 +69,11 @@ public class IntegrationTests extends BaseIntegrationTest {
 
 		// and event
 		String INPUT_JSON_FILE = "allEvents/ba_job_post.json";
-		Event event = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Event.class);
-		org.springframework.messaging.Message<Event> inputEvent = convertBeanToMessagePayload(event);
+		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		org.springframework.messaging.Message<NotificationIntent> inputNotificationIntent = convertBeanToMessagePayload(notificationIntent);
 
 		// when event processed
-		source.send(inputEvent);
+		source.send(inputNotificationIntent);
 
 		org.springframework.messaging.Message<byte[]> payload1 = target.receive(3000,FINAL_STEP_QUEUE_NAME);
 		Message message1 = (Message) messageConverter.fromMessage(payload1, Message.class);

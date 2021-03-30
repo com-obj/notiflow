@@ -1,7 +1,7 @@
 package com.obj.nc.functions.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
@@ -16,21 +16,21 @@ import java.util.Optional;
 import static com.obj.nc.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
 
 @Component
-public class KoderiaRecipientsPreCondition implements PreCondition<Event> {
+public class KoderiaRecipientsPreCondition implements PreCondition<NotificationIntent> {
 
 	@Autowired
 	private ObjectMapper objectMapper;
 
 	@Override
-	public Optional<PayloadValidationException> apply(Event event) {
-		boolean eventContainsOriginalEvent = event.getBody().containsAttributes(Collections.singletonList(ORIGINAL_EVENT_FIELD));
+	public Optional<PayloadValidationException> apply(NotificationIntent notificationIntent) {
+		boolean eventContainsOriginalEvent = notificationIntent.getBody().containsAttributes(Collections.singletonList(ORIGINAL_EVENT_FIELD));
 
 		if (!eventContainsOriginalEvent) {
-			return Optional.of(new PayloadValidationException(String.format("Event %s does not contain required attributes." +
-					" Required attributes are: %s", event.toString(), Collections.singletonList(ORIGINAL_EVENT_FIELD))));
+			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s does not contain required attributes." +
+					" Required attributes are: %s", notificationIntent.toString(), Collections.singletonList(ORIGINAL_EVENT_FIELD))));
 		}
 
-		Object originalEvent = event.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD);
+		Object originalEvent = notificationIntent.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD);
 
 		try {
 			EmitEventDto originalEventAsDto = objectMapper.convertValue(originalEvent, EmitEventDto.class);

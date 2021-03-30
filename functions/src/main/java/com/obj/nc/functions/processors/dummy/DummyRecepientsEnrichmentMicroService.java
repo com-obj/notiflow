@@ -1,6 +1,6 @@
 package com.obj.nc.functions.processors.dummy;
 
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.ProcessorMicroService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +12,13 @@ import java.util.function.Function;
 
 @Configuration
 @Log4j2
-public class DummyRecepientsEnrichmentMicroService extends ProcessorMicroService<Event, Event, DummyRecepientsEnrichmentProcessingFunction>{
+public class DummyRecepientsEnrichmentMicroService extends ProcessorMicroService<NotificationIntent, NotificationIntent, DummyRecepientsEnrichmentProcessingFunction>{
 
 	@Autowired
 	private DummyRecepientsEnrichmentProcessingFunction fn;
 
 	@Bean
-	public Function<Flux<Event>, Flux<Event>> resolveRecipients() {
+	public Function<Flux<NotificationIntent>, Flux<NotificationIntent>> resolveRecipients() {
 		return super.executeProccessingService();
 	}
 

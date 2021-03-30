@@ -1,4 +1,4 @@
-package com.obj.nc.domain.event;
+package com.obj.nc.domain.notifIntent;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
@@ -13,20 +13,20 @@ import lombok.ToString;
 @Setter
 @ToString(callSuper = false)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
-public class Event extends BasePayload {
+public class NotificationIntent extends BasePayload {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "EVENT";
 
 	
-	public Event() {
+	public NotificationIntent() {
 	}
 	
-	public static Event createWithSimpleMessage(String flowId, String message) {
-		Event event = new Event();
-		event.header.setFlowId(flowId);
-		event.body.setMessage(new SimpleText(message));
+	public static NotificationIntent createWithSimpleMessage(String flowId, String message) {
+		NotificationIntent notificationIntent = new NotificationIntent();
+		notificationIntent.header.setFlowId(flowId);
+		notificationIntent.body.setMessage(new SimpleText(message));
 		
-		return event;
+		return notificationIntent;
 	}
 
 	@Override

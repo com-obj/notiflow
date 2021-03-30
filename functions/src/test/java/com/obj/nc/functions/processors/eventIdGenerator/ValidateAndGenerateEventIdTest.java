@@ -7,24 +7,24 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.Header;
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 
 class ValidateAndGenerateEventIdTest {
 
 	@Test
 	void test() {
 		//GIVEN
-		Event inputEvent = Event.createWithSimpleMessage("test-config", "Hi there!!");
+		NotificationIntent inputNotificationIntent = NotificationIntent.createWithSimpleMessage("test-config", "Hi there!!");
 
 		//WHEN
 		ValidateAndGenerateEventIdProcessingFunction function = new ValidateAndGenerateEventIdProcessingFunction(
 				new ValidateAndGenerateEventIdExecution(),
 				new ValidateAndGenerateEventIdPreCondition());
 
-		Event outputEvent = function.apply(inputEvent);
+		NotificationIntent outputNotificationIntent = function.apply(inputNotificationIntent);
 
 		//THEN
-		Header header = outputEvent.getHeader();
+		Header header = outputNotificationIntent.getHeader();
 		assertThat(header.getId(), CoreMatchers.notNullValue());
 		assertThat(header.getEventIds(), Matchers.hasSize(1));
 		assertThat(header.getEventIds().get(0), CoreMatchers.notNullValue());

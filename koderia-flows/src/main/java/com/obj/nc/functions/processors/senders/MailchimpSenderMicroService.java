@@ -1,7 +1,7 @@
 package com.obj.nc.functions.processors.senders;
 
-import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.functions.processors.ProcessorMicroService;
 import lombok.extern.log4j.Log4j2;

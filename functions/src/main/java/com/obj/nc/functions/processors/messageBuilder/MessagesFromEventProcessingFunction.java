@@ -1,7 +1,7 @@
 package com.obj.nc.functions.processors.messageBuilder;
 
-import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.PreCondition;
 import com.obj.nc.functions.processors.ProcessorFunction;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class MessagesFromEventProcessingFunction extends ProcessorFunction<Event, List<Message>> {
+public class MessagesFromEventProcessingFunction extends ProcessorFunction<NotificationIntent, List<Message>> {
 
 	@Autowired
 	private MessagesFromEventExecution execution;
@@ -22,12 +22,12 @@ public class MessagesFromEventProcessingFunction extends ProcessorFunction<Event
 	private MessagesFromEventPreCondition preCondition;
 
 	@Override
-	public PreCondition<Event> preCondition() {
+	public PreCondition<NotificationIntent> preCondition() {
 		return preCondition;
 	}
 
 	@Override
-	public Function<Event, List<Message>> execution() {
+	public Function<NotificationIntent, List<Message>> execution() {
 		return execution;
 	}
 

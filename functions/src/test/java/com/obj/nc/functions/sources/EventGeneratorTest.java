@@ -1,8 +1,8 @@
 package com.obj.nc.functions.sources;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfigProperties;
 import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
@@ -70,16 +70,16 @@ class EventGeneratorTest {
         config.setFileName(EVENT_FILE_NAME);
 
         // when
-        Event eventFromFile = generateEvent.get();
+        NotificationIntent notificationIntentFromFile = generateEvent.get();
 
         // then
-        Assertions.assertThat(eventFromFile).isNotNull();
+        Assertions.assertThat(notificationIntentFromFile).isNotNull();
         
-        Email email = eventFromFile.getContentTyped();
+        Email email = notificationIntentFromFile.getContentTyped();
         Assertions.assertThat(email.getText()).isEqualTo("We are looking for a Business Intelligence (BI) Developer to create...");
         Assertions.assertThat(email.getSubject()).isEqualTo("Business Intelligence (BI) Developer");
-        Assertions.assertThat(((Map<?, ?>) eventFromFile.getBody().getMessage().getAttributes().get("originalEvent"))).hasSize(2);
-        Assertions.assertThat(eventFromFile.getBody().getRecievingEndpoints()).isEmpty();
+        Assertions.assertThat(((Map<?, ?>) notificationIntentFromFile.getBody().getMessage().getAttributes().get("originalEvent"))).hasSize(2);
+        Assertions.assertThat(notificationIntentFromFile.getBody().getRecievingEndpoints()).isEmpty();
     }
 
     @Test
@@ -91,7 +91,7 @@ class EventGeneratorTest {
         // when - then
         Assertions.assertThatThrownBy(generateEvent::get)
                 .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("Input Event must not be null");
+                .hasMessageContaining("Input NotificationIntent must not be null");
     }
 
     @Test
@@ -101,10 +101,10 @@ class EventGeneratorTest {
         config.setFileName(null);
 
         // when
-        Event eventFromFile = generateEvent.get();
+        NotificationIntent notificationIntentFromFile = generateEvent.get();
 
         // then
-        Assertions.assertThat(eventFromFile).isNotNull();
+        Assertions.assertThat(notificationIntentFromFile).isNotNull();
     }
 
     @Test
@@ -117,7 +117,7 @@ class EventGeneratorTest {
         // when - then
         Assertions.assertThatThrownBy(generateEvent::get)
                 .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("Input Event must not be null");
+                .hasMessageContaining("Input NotificationIntent must not be null");
     }
 
     @Test
@@ -132,10 +132,10 @@ class EventGeneratorTest {
         config.setFileName(null);
 
         // when
-        Event eventFromFile = generateEvent.get();
+        NotificationIntent notificationIntentFromFile = generateEvent.get();
 
         // then
-        Email email = eventFromFile.getContentTyped();
+        Email email = notificationIntentFromFile.getContentTyped();
         Assertions.assertThat(email.getSubject()).isEqualTo("First event in queue");
     }
 
@@ -148,7 +148,7 @@ class EventGeneratorTest {
         // when - then
         Assertions.assertThat(Files.exists(Paths.get(EVENT_QUEUE_DIR + EVENT_FILE_NAME))).isTrue();
 
-        Event eventFromFile = generateEvent.get();
+        NotificationIntent notificationIntentFromFile = generateEvent.get();
 
         Assertions.assertThat(Files.exists(Paths.get(EVENT_QUEUE_DIR + EVENT_FILE_NAME))).isFalse();
     }

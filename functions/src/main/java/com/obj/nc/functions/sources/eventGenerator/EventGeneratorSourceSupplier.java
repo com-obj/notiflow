@@ -1,6 +1,6 @@
 package com.obj.nc.functions.sources.eventGenerator;
 
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.PreCondition;
 import com.obj.nc.functions.sources.SourceSupplier;
 
@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 @Component
 @AllArgsConstructor
-public class EventGeneratorSourceSupplier extends SourceSupplier<Event> {
+public class EventGeneratorSourceSupplier extends SourceSupplier<NotificationIntent> {
 
 	@Autowired
 	private EventGeneratorExecution execution;
@@ -22,12 +22,12 @@ public class EventGeneratorSourceSupplier extends SourceSupplier<Event> {
 	private EventGeneratorPreCondition preCondition;
 
 	@Override
-	public PreCondition<Event> preCondition() {
+	public PreCondition<NotificationIntent> preCondition() {
 		return preCondition;
 	}
 
 	@Override
-	public Supplier<Event> execution() {
+	public Supplier<NotificationIntent> execution() {
 		return execution;
 	}
 

@@ -4,7 +4,8 @@ import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.Group;
 import com.obj.nc.domain.endpoints.Person;
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
@@ -12,11 +13,11 @@ import java.util.function.Function;
 
 @Component
 @Log4j2
-public class DummyRecepientsEnrichmentExecution implements Function<Event, Event> {
+public class DummyRecepientsEnrichmentExecution implements Function<NotificationIntent, NotificationIntent> {
 
 	@DocumentProcessingInfo("FindRecepientsUsingKoderiaSubsription")
 	@Override
-	public Event apply(Event event) {
+	public NotificationIntent apply(NotificationIntent notificationIntent) {
 		// find recipients based on technologies
 		Person person1 = new Person("John Doe");
 		Person person2 = new Person("John Dudly");
@@ -27,9 +28,9 @@ public class DummyRecepientsEnrichmentExecution implements Function<Event, Event
 		EmailEndpoint endpoint2 = EmailEndpoint.createForPerson(person2, "john.dudly@objectify.sk");
 		EmailEndpoint endpoint3 = EmailEndpoint.createForGroup(allObjectifyGroup, "all@objectify.sk");
 
-		event.getBody().addAllRecievingEndpoints(endpoint1, endpoint2, endpoint3);
+		notificationIntent.getBody().addAllRecievingEndpoints(endpoint1, endpoint2, endpoint3);
 
-		return event;
+		return notificationIntent;
 	}
 
 }

@@ -1,6 +1,6 @@
 package com.obj.nc.functions.sources.eventGenerator;
 
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,20 +22,20 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 @Log4j2
-public class EventGeneratorExecution implements Supplier<Event> {
+public class EventGeneratorExecution implements Supplier<NotificationIntent> {
 
     @Autowired
     @NotNull
     private EventGeneratorConfigProperties eventGeneratorConfigProperties;
 
     @Override
-    public Event get() {
-        return readEventsFromFile();
+    public NotificationIntent get() {
+        return readNotificationIntentsFromFile();
     }
 
     private int eventFileIndex = 0;
 
-    public Event readEventsFromFile()  {
+    public NotificationIntent readNotificationIntentsFromFile()  {
         try {
             Path eventFile = null;
 
@@ -63,11 +63,11 @@ public class EventGeneratorExecution implements Supplier<Event> {
                 }
             }
 
-            Event event = JsonUtils.readObjectFromJSONFile(eventFile,Event.class);
+            NotificationIntent notificationIntent = JsonUtils.readObjectFromJSONFile(eventFile,NotificationIntent.class);
 
             Files.delete(eventFile);
 
-            return event;
+            return notificationIntent;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

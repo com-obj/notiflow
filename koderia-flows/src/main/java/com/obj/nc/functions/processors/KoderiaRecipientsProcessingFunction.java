@@ -1,6 +1,6 @@
 package com.obj.nc.functions.processors;
 
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.PreCondition;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
-public class KoderiaRecipientsProcessingFunction extends ProcessorFunction<Event, Event> {
+public class KoderiaRecipientsProcessingFunction extends ProcessorFunction<NotificationIntent, NotificationIntent> {
 
 	@Autowired
 	private KoderiaRecipientsExecution execution;
@@ -19,12 +19,12 @@ public class KoderiaRecipientsProcessingFunction extends ProcessorFunction<Event
 	private KoderiaRecipientsPreCondition preCondition;
 
 	@Override
-	public PreCondition<Event> preCondition() {
+	public PreCondition<NotificationIntent> preCondition() {
 		return preCondition;
 	}
 
 	@Override
-	public Function<Event, Event> execution() {
+	public Function<NotificationIntent, NotificationIntent> execution() {
 		return execution;
 	}
 

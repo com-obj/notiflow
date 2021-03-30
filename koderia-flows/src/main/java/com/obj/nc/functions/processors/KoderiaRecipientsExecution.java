@@ -3,7 +3,7 @@ package com.obj.nc.functions.processors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.dto.RecipientsQueryDto;
 import com.obj.nc.services.KoderiaClient;
 import lombok.extern.log4j.Log4j2;
@@ -17,7 +17,7 @@ import static com.obj.nc.functions.processors.KoderiaEventConverterExecution.ORI
 
 @Component
 @Log4j2
-public class KoderiaRecipientsExecution implements Function<Event, Event> {
+public class KoderiaRecipientsExecution implements Function<NotificationIntent, NotificationIntent> {
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -27,12 +27,12 @@ public class KoderiaRecipientsExecution implements Function<Event, Event> {
 
 	@DocumentProcessingInfo("FindKoderiaRecipients")
 	@Override
-	public Event apply(Event event) {
-		Object originalEvent = event.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD);
+	public NotificationIntent apply(NotificationIntent notificationIntent) {
+		Object originalEvent = notificationIntent.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD);
 		RecipientsQueryDto recipientsQueryDto = objectMapper.convertValue(originalEvent, RecipientsQueryDto.class);
 		List<RecievingEndpoint> emailEndpoints = koderiaClient.findReceivingEndpoints(recipientsQueryDto);
-		event.getBody().setRecievingEndpoints(emailEndpoints);
-		return event;
+		notificationIntent.getBody().setRecievingEndpoints(emailEndpoints);
+		return notificationIntent;
 	}
 
 }

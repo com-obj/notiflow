@@ -1,7 +1,7 @@
 package com.obj.nc.functions.processors.messageBuilder;
 
-import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.ProcessorMicroService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +14,13 @@ import java.util.function.Function;
 
 @Configuration
 @Log4j2
-public class MessagesFromEventMicroService extends ProcessorMicroService<Event, List<Message>, MessagesFromEventProcessingFunction>{
+public class MessagesFromEventMicroService extends ProcessorMicroService<NotificationIntent, List<Message>, MessagesFromEventProcessingFunction>{
 
 	@Autowired
 	private MessagesFromEventProcessingFunction fn;
 
 	@Bean
-	public Function<Flux<Event>, Flux<Message>> generateMessagesFromEvent() {
+	public Function<Flux<NotificationIntent>, Flux<Message>> generateMessagesFromNotificationIntent() {
 		return eventFlux -> super.executeProccessingService().apply(eventFlux).flatMap(Flux::fromIterable);
 	}
 

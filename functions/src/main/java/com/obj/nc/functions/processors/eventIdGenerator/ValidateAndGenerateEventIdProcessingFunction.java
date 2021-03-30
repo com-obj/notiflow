@@ -5,14 +5,14 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.obj.nc.domain.event.Event;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.ProcessorFunction;
 
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class ValidateAndGenerateEventIdProcessingFunction extends ProcessorFunction<Event, Event> {
+public class ValidateAndGenerateEventIdProcessingFunction extends ProcessorFunction<NotificationIntent, NotificationIntent> {
 	@Autowired
 	private ValidateAndGenerateEventIdExecution execution;
 
@@ -25,7 +25,7 @@ public class ValidateAndGenerateEventIdProcessingFunction extends ProcessorFunct
 	}
 
 	@Override
-	public Function<Event, Event> execution() {
+	public Function<NotificationIntent, NotificationIntent> execution() {
 		return execution;
 	}
 

@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.obj.nc.domain.event.Event;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.utils.JsonUtils;
@@ -14,7 +14,7 @@ import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class GenericEventToNotificaitonIntentConverter extends ProcessorFunctionAdapter<GenericEvent, Event> {
+public class GenericEventToNotificaitonIntentConverter extends ProcessorFunctionAdapter<GenericEvent, NotificationIntent> {
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(GenericEvent payload) {
@@ -26,19 +26,19 @@ public class GenericEventToNotificaitonIntentConverter extends ProcessorFunction
 	}
 
 	@Override
-	protected Event execute(GenericEvent genericEvent) {
-		Event event = new Event();
-		event.stepStart("EventFactory");
+	protected NotificationIntent execute(GenericEvent genericEvent) {
+		NotificationIntent notificationIntent = new NotificationIntent();
+		notificationIntent.stepStart("EventFactory");
 		
-		event.getHeader().setFlowId(genericEvent.getFlowId());
-		event.getHeader().generateAndSetID();
-		event.getHeader().addEventId(event.getHeader().getId());
+		notificationIntent.getHeader().setFlowId(genericEvent.getFlowId());
+		notificationIntent.getHeader().generateAndSetID();
+		notificationIntent.getHeader().addEventId(notificationIntent.getHeader().getId());
 
-		event.getBody().setAttributeValue(ORIGINAL_EVENT_FIELD, JsonUtils.writeObjectToJSONString(genericEvent));
+		notificationIntent.getBody().setAttributeValue(ORIGINAL_EVENT_FIELD, JsonUtils.writeObjectToJSONString(genericEvent));
 		
-		event.stepFinish();
+		notificationIntent.stepFinish();
 		
-		return event;
+		return notificationIntent;
 	}
 	
 	public static final String ORIGINAL_EVENT_FIELD = "originalEvent";
