@@ -1,5 +1,6 @@
 package com.obj.nc.osk.dto;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,8 +25,8 @@ import lombok.NoArgsConstructor;
 public class IncidentTicketNotificationContactDto {
 	Long id;
 	String name;
-	List<String> emails;
-	List<String> phones;
+	List<String> emails = new ArrayList<>();
+	List<String> phones = new ArrayList<>();
 	
 	public Set<EmailEndpoint> asEmailEnpoints() {
 		Set<EmailEndpoint> emails = new HashSet<>();
@@ -56,7 +57,7 @@ public class IncidentTicketNotificationContactDto {
 	public Set<RecievingEndpoint> asEnpoints() {
 		Set<RecievingEndpoint> endpoints = new HashSet<>();
 		asEmailEnpoints().forEach(email-> endpoints.add(email));
-		asSmsEnpoints().forEach(sms-> endpoints.add(sms));
+//		asSmsEnpoints().forEach(sms-> endpoints.add(sms));
 		
 		return endpoints;
 	}

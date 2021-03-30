@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.Body;
-import com.obj.nc.domain.content.TemplateWithModelBasedContent;
+import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
@@ -167,7 +167,7 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 	} 
 	
 	private NotificationIntent createNotificationIntent(
-			TemplateWithModelBasedContent<?> messageContent,
+			TemplateWithModelContent<?> messageContent,
 			Set<? extends RecievingEndpoint> endpoints) {
 		
 		Body eventBody = new Body();

@@ -12,8 +12,8 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-@JsonTypeName(SimpleText.JSON_TYPE_IDENTIFIER)
-public class SimpleText extends Content {
+@JsonTypeName(SimpleTextContent.JSON_TYPE_IDENTIFIER)
+public class SimpleTextContent extends Content {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "TEXT_CONTENT";
 
@@ -23,8 +23,8 @@ public class SimpleText extends Content {
 	@EqualsAndHashCode.Include
 	private String text;
 
-	public SimpleText concat(SimpleText other) {
-		SimpleText concated = new SimpleText();
+	public SimpleTextContent concat(SimpleTextContent other) {
+		SimpleTextContent concated = new SimpleTextContent();
 		concated.text = text.concat(TEXT_CONCAT_DELIMITER).concat(other.text);
 		return concated;
 	}

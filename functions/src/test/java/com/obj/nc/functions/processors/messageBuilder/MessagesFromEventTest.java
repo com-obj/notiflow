@@ -16,7 +16,7 @@ import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.Body;
 import com.obj.nc.domain.Header;
 import com.obj.nc.domain.ProcessingInfo;
-import com.obj.nc.domain.content.EmailContent;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.DeliveryOptions.AGGREGATION_TYPE;
 import com.obj.nc.domain.endpoints.DeliveryOptions.TIME_CONSTRAINT_TYPE;

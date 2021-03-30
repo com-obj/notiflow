@@ -3,7 +3,7 @@ package com.obj.nc.mapper;
 import com.obj.nc.config.MailchimpApiConfig;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.EmailContent;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;

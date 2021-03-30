@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 
-import com.obj.nc.domain.content.AggregatedEmail;
+import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -16,8 +16,8 @@ public class AggregateToSingleEmailTransformer extends ProcessorFunctionAdapter<
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
-		if (!(payload.getBody().getMessage() instanceof AggregatedEmail)) {
-			throw new PayloadValidationException("Cannot process message with content other then AggregatedEmail. Is " + payload.getBody().getMessage());
+		if (!(payload.getBody().getMessage() instanceof AggregatedEmailContent)) {
+			throw new PayloadValidationException("Cannot process message with content other then AggregatedEmailContent. Is " + payload.getBody().getMessage());
 		}
 		return Optional.empty();
 	}
@@ -26,7 +26,7 @@ public class AggregateToSingleEmailTransformer extends ProcessorFunctionAdapter<
 	protected Message execute(Message aggregatedMessage) {
 		TestModeDiggestModel digestModel = new TestModeDiggestModel();
 		
-		AggregatedEmail aggregate = ((AggregatedEmail)aggregatedMessage.getBody().getMessage());
+		AggregatedEmailContent aggregate = ((AggregatedEmailContent)aggregatedMessage.getBody().getMessage());
 		aggregate.getAggregateContent().stream().forEach(e -> {
 			digestModel.getEmailContents().add(e);
 			if (!e.getContentType().equals(MediaType.TEXT_HTML_VALUE)) {

@@ -17,8 +17,8 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.ProcessingInfo;
-import com.obj.nc.domain.content.AggregatedEmail;
-import com.obj.nc.domain.content.EmailContent;
+import com.obj.nc.domain.content.email.AggregatedEmailContent;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.EmailSender;
@@ -121,7 +121,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         MimeMessage message = greenMail.getReceivedMessages()[0];
         String msg = GreenMailUtil.getWholeMessage(message);
 
-        AggregatedEmail aggregated = outputMessage.getContentTyped();
+        AggregatedEmailContent aggregated = outputMessage.getContentTyped();
         aggregated.getAggregateContent()
                 .forEach(messageContent -> {
                     Assertions.assertThat(msg).contains(messageContent.getSubject());

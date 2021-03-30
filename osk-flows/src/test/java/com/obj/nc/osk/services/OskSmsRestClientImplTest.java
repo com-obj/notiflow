@@ -1,7 +1,7 @@
 package com.obj.nc.osk.services;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.SimpleText;
+import com.obj.nc.domain.content.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.osk.dto.OskSendSmsRequestDto;
@@ -60,7 +60,7 @@ class OskSmsRestClientImplTest {
         Assertions.assertThat(oskSendSmsRequestDto.getSenderAddress()).isEqualTo(properties.getSenderAddress());
         Assertions.assertThat(oskSendSmsRequestDto.getBillCode()).isEqualTo(properties.getBillCode());
 
-        SimpleText contentTyped = inputMessage.getBody().getContentTyped();
+        SimpleTextContent contentTyped = inputMessage.getBody().getContentTyped();
         Assertions.assertThat(oskSendSmsRequestDto.getMessage()).isEqualTo(contentTyped.getText());
         Assertions.assertThat(oskSendSmsRequestDto.getClientCorrelator()).contains(properties.getClientCorrelatorPrefix());
         Assertions.assertThat(oskSendSmsRequestDto.getNotifyURL()).isEqualTo(properties.getNotifyUrl());

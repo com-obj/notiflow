@@ -1,7 +1,7 @@
 package com.obj.nc.functions.sources;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.EmailContent;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfigProperties;

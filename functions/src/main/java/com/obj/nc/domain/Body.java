@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.obj.nc.domain.content.AggregatedEmail;
 import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.SimpleText;
+import com.obj.nc.domain.content.SimpleTextContent;
+import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 
@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public class Body extends BaseJSONObject{
 
-	private Content message = new SimpleText();
+	private Content message = new SimpleTextContent();
 	
 	private List<RecievingEndpoint> recievingEndpoints = new ArrayList<RecievingEndpoint>();
 	

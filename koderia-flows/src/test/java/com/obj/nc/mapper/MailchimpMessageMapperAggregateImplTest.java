@@ -2,7 +2,7 @@ package com.obj.nc.mapper;
 
 import com.obj.nc.KoderiaFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.AggregatedEmail;
+import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.dto.mailchimp.SendMessageWithTemplateDto;
 import com.obj.nc.utils.JsonUtils;
@@ -37,7 +37,7 @@ class MailchimpMessageMapperAggregateImplTest {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
-        AggregatedEmail aggregatedContent = inputMessage.getContentTyped();
+        AggregatedEmailContent aggregatedContent = inputMessage.getContentTyped();
         aggregatedContent.getAggregateContent().forEach(part -> {
         	part.getAttachments().forEach(attachement -> {
                 try {

@@ -1,4 +1,4 @@
-package com.obj.nc.domain.content;
+package com.obj.nc.domain.content.email;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,7 @@ import org.springframework.context.NoSuchMessageException;
 
 import com.obj.nc.Get;
 import com.obj.nc.domain.Attachement;
+import com.obj.nc.domain.content.TemplateWithModelContent;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,10 +23,8 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Log4j2
-public abstract class TemplateWithModelBasedContent<MODEL_TYPE> extends Content {
+public abstract class TemplateWithModelEmailContent<MODEL_TYPE> extends TemplateWithModelContent<MODEL_TYPE> {
 
-
-	
 	@NonNull
 	@EqualsAndHashCode.Include
 	private String subjectResourceKey;
@@ -33,16 +32,6 @@ public abstract class TemplateWithModelBasedContent<MODEL_TYPE> extends Content 
 	@NonNull
 	@EqualsAndHashCode.Include
 	private String[] subjectResourcesMessageParameters;
-	
-	@NonNull
-	@EqualsAndHashCode.Include
-	private String templateFileName;
-	
-	@NonNull
-	@EqualsAndHashCode.Include
-	private MODEL_TYPE model;
-	
-	private List<Locale> requiredLocales = new ArrayList<>();
 	
 	@NonNull
 	@EqualsAndHashCode.Include
@@ -59,5 +48,4 @@ public abstract class TemplateWithModelBasedContent<MODEL_TYPE> extends Content 
 		}
 		return subject;
 	}
-
 }

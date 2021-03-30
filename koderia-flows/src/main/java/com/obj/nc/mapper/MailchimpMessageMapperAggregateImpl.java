@@ -1,7 +1,7 @@
 package com.obj.nc.mapper;
 
-import com.obj.nc.domain.content.AggregatedEmail;
 import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.dto.mailchimp.*;
@@ -25,7 +25,7 @@ public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperI
 
     @Override
     protected List<MergeVarDto> mapGlobalMergeVars(Message message) {
-    	AggregatedEmail aggregateContent = (AggregatedEmail)message.getBody().getMessage();
+    	AggregatedEmailContent aggregateContent = (AggregatedEmailContent)message.getBody().getMessage();
 
         Map<String, List<Object>> globalMergeCategoryValues = new HashMap<>();
         Arrays.stream(EmitEventDto.Type.values())
@@ -40,7 +40,7 @@ public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperI
 
     @Override
     protected List<AttachmentDto> mapAttachments(Message message) {
-    	AggregatedEmail aggregateContent = (AggregatedEmail)message.getBody().getMessage();
+    	AggregatedEmailContent aggregateContent = (AggregatedEmailContent)message.getBody().getMessage();
     	
         return aggregateContent.getAggregateContent().stream()
                 .flatMap(messageContent -> messageContent.getAttachments().stream().map(this::mapAttachment))

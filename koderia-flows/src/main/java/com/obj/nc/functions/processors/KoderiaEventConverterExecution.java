@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 import org.springframework.stereotype.Component;
 
-import com.obj.nc.domain.content.EmailContent;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.dto.EmitEventDto;
 

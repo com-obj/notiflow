@@ -1,8 +1,8 @@
 package com.obj.nc.functions.processors.senders;
 
-import com.obj.nc.domain.content.AggregatedEmail;
 import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.EmailContent;
+import com.obj.nc.domain.content.email.AggregatedEmailContent;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.dto.EmitEventDto;
@@ -26,8 +26,8 @@ public class MailchimpSenderPreCondition implements PreCondition<Message> {
 		}
 
 		Content messageContent = message.getBody().getMessage();
-		if (messageContent instanceof AggregatedEmail) {
-			AggregatedEmail aggregatedContent = (AggregatedEmail)messageContent;
+		if (messageContent instanceof AggregatedEmailContent) {
+			AggregatedEmailContent aggregatedContent = (AggregatedEmailContent)messageContent;
 			
 			for (EmailContent messageContentPart : aggregatedContent.getAggregateContent()) {
 				

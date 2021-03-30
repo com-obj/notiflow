@@ -1,4 +1,4 @@
-package com.obj.nc.domain.content;
+package com.obj.nc.domain.content.email;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-@JsonTypeName(AggregatedEmail.JSON_TYPE_IDENTIFIER)
-public class AggregatedEmail extends EmailContent {
+@JsonTypeName(AggregatedEmailContent.JSON_TYPE_IDENTIFIER)
+public class AggregatedEmailContent extends EmailContent {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "AGGREGATED_EMAIL_MESSAGE_CONTENT";
 

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.Body;
 import com.obj.nc.domain.Messages;
-import com.obj.nc.domain.content.AggregatedEmail;
+import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -56,7 +56,7 @@ public class AggregatedInContentStrategy extends ProcessorFunctionAdapter<Messag
 		outputMessage.getBody().setRecievingEndpoints(messages.getMessages().get(0).getBody().getRecievingEndpoints());
 		outputMessage.getBody().setDeliveryOptions(messages.getMessages().get(0).getBody().getDeliveryOptions());
 
-		AggregatedEmail aggregatedContent = outputMessage.getContentTyped();
+		AggregatedEmailContent aggregatedContent = outputMessage.getContentTyped();
 		for (Message msg : messages.getMessages()) {
 			aggregatedContent.add(msg.getContentTyped());
 		}

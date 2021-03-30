@@ -31,7 +31,7 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.AggregatedEmail;
+import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
 import com.obj.nc.flows.testmode.config.TestModeFlowConfig;
@@ -112,9 +112,9 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         System.out.println(GreenMailUtil.getWholeMessage(msg));
         
         
-        AggregatedEmail aggregated1 = message1.getContentTyped();
-        AggregatedEmail aggregated2 = message2.getContentTyped();
-        AggregatedEmail aggregated3 = message3.getContentTyped();
+        AggregatedEmailContent aggregated1 = message1.getContentTyped();
+        AggregatedEmailContent aggregated2 = message2.getContentTyped();
+        AggregatedEmailContent aggregated3 = message3.getContentTyped();
         Assertions.assertThat(msg.getSubject()).isEqualTo("Notifications digest while running test mode");
         
         Assertions.assertThat(GreenMailUtil.getBody(msg)).contains(

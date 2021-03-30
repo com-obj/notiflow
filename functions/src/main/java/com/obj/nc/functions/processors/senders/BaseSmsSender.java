@@ -1,7 +1,7 @@
 package com.obj.nc.functions.processors.senders;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.content.SimpleText;
+import com.obj.nc.domain.content.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -28,8 +28,8 @@ public abstract class BaseSmsSender<REQUEST_T, RESPONSE_T> extends ProcessorFunc
             return Optional.of(new PayloadValidationException(String.format("Sms sender can only send message to endpoint of type %s", SmsEndpoint.JSON_TYPE_IDENTIFIER)));
         }
 
-        if (!(payload.getBody().getMessage() instanceof SimpleText)) {
-            return Optional.of(new PayloadValidationException(String.format("Sms sender can only send message with content of type %s", SimpleText.JSON_TYPE_IDENTIFIER)));
+        if (!(payload.getBody().getMessage() instanceof SimpleTextContent)) {
+            return Optional.of(new PayloadValidationException(String.format("Sms sender can only send message with content of type %s", SimpleTextContent.JSON_TYPE_IDENTIFIER)));
         }
 
         return Optional.empty();

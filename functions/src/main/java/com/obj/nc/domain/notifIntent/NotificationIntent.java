@@ -2,7 +2,7 @@ package com.obj.nc.domain.notifIntent;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.content.SimpleText;
+import com.obj.nc.domain.content.SimpleTextContent;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class NotificationIntent extends BasePayload {
 	public static NotificationIntent createWithSimpleMessage(String flowId, String message) {
 		NotificationIntent notificationIntent = new NotificationIntent();
 		notificationIntent.header.setFlowId(flowId);
-		notificationIntent.body.setMessage(new SimpleText(message));
+		notificationIntent.body.setMessage(new SimpleTextContent(message));
 		
 		return notificationIntent;
 	}

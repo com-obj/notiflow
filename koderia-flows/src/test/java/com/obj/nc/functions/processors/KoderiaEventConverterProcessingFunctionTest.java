@@ -1,6 +1,6 @@
 package com.obj.nc.functions.processors;
 
-import com.obj.nc.domain.content.EmailContent;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.dto.*;
 import com.obj.nc.exceptions.PayloadValidationException;

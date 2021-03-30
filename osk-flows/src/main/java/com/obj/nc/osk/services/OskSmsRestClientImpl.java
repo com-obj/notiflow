@@ -1,6 +1,6 @@
 package com.obj.nc.osk.services;
 
-import com.obj.nc.domain.content.SimpleText;
+import com.obj.nc.domain.content.SimpleTextContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.osk.dto.SendSmsResourceReferenceDto;
@@ -49,7 +49,7 @@ public class OskSmsRestClientImpl implements SmsClient<OskSendSmsRequestDto, Osk
         ZonedDateTime zdt = ZonedDateTime.now();
         result.setClientCorrelator(properties.getClientCorrelatorPrefix() + "-" +  DateTimeFormatter.ISO_INSTANT.format(zdt));
 
-        SimpleText content = message.getBody().getContentTyped();
+        SimpleTextContent content = message.getBody().getContentTyped();
         result.setMessage(content.getText());
 
         result.setNotifyURL(properties.getNotifyUrl());
