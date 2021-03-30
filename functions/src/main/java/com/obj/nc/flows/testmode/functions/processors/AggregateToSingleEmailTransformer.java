@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 
-import com.obj.nc.domain.message.AggregatedEmail;
+import com.obj.nc.domain.content.AggregatedEmail;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;

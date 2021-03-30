@@ -31,7 +31,7 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.message.AggregatedEmail;
+import com.obj.nc.domain.content.AggregatedEmail;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
 import com.obj.nc.flows.testmode.config.TestModeFlowConfig;

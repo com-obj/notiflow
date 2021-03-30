@@ -1,10 +1,10 @@
 package com.obj.nc.functions.processors.senders;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.AggregatedEmail;
+import com.obj.nc.domain.content.Email;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.AggregatedEmail;
-import com.obj.nc.domain.message.Email;
 import com.obj.nc.dto.mailchimp.MessageResponseDto;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.utils.JsonUtils;

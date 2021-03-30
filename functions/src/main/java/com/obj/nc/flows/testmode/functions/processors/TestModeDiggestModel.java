@@ -3,7 +3,7 @@ package com.obj.nc.flows.testmode.functions.processors;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.content.Email;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

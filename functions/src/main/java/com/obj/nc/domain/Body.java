@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.obj.nc.domain.content.AggregatedEmail;
+import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.SimpleText;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.Content;
-import com.obj.nc.domain.message.SimpleText;
-import com.obj.nc.domain.message.AggregatedEmail;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

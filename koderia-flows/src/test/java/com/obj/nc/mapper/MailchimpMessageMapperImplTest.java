@@ -2,7 +2,7 @@ package com.obj.nc.mapper;
 
 import com.obj.nc.KoderiaFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.content.Email;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.dto.mailchimp.SendMessageWithTemplateDto;
 import com.obj.nc.utils.JsonUtils;

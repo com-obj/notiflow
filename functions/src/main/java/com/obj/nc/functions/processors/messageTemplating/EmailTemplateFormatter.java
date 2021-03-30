@@ -13,9 +13,9 @@ import org.thymeleaf.context.Context;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.BaseJSONObject;
-import com.obj.nc.domain.message.TemplateWithModelBasedContent;
-import com.obj.nc.domain.message.Content;
-import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.Email;
+import com.obj.nc.domain.content.TemplateWithModelBasedContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;

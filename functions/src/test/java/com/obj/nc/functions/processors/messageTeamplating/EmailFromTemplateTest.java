@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.content.Email;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.utils.JsonUtils;

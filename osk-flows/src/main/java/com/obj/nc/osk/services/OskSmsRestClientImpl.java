@@ -1,8 +1,8 @@
 package com.obj.nc.osk.services;
 
+import com.obj.nc.domain.content.SimpleText;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SimpleText;
 import com.obj.nc.osk.dto.SendSmsResourceReferenceDto;
 import com.obj.nc.osk.dto.OskSendSmsRequestDto;
 import com.obj.nc.osk.dto.OskSendSmsResponseDto;

@@ -1,9 +1,9 @@
 package com.obj.nc.osk.services;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.SimpleText;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SimpleText;
 import com.obj.nc.osk.dto.OskSendSmsRequestDto;
 import com.obj.nc.osk.dto.OskSendSmsResponseDto;
 import com.obj.nc.osk.exception.SmsClientException;

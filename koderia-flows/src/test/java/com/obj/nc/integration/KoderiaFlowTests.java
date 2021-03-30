@@ -4,7 +4,7 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.KoderiaFlowsApplication;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.config.MailchimpApiConfig;
-import com.obj.nc.domain.message.Email;
+import com.obj.nc.domain.content.Email;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.dto.EventDataDto;
 import com.obj.nc.dto.mailchimp.MessageResponseDto;

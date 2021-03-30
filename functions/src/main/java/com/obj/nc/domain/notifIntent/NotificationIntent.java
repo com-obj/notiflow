@@ -2,7 +2,7 @@ package com.obj.nc.domain.notifIntent;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.message.SimpleText;
+import com.obj.nc.domain.content.SimpleText;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

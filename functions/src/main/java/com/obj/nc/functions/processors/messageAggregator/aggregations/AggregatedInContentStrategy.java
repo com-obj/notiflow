@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.Body;
 import com.obj.nc.domain.Messages;
+import com.obj.nc.domain.content.AggregatedEmail;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;

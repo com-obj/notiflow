@@ -1,4 +1,4 @@
-package com.obj.nc.domain.message;
+package com.obj.nc.domain.content;
 
 import java.util.ArrayList;
 import java.util.List;

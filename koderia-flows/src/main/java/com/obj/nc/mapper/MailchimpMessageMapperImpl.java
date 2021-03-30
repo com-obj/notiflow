@@ -2,11 +2,11 @@ package com.obj.nc.mapper;
 
 import com.obj.nc.config.MailchimpApiConfig;
 import com.obj.nc.domain.Attachement;
+import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.Email;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.Content;
-import com.obj.nc.domain.message.Email;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.dto.mailchimp.*;
 import org.springframework.beans.factory.annotation.Autowired;

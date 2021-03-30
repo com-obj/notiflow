@@ -1,8 +1,8 @@
 package com.obj.nc.mapper;
 
+import com.obj.nc.domain.content.AggregatedEmail;
+import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.Content;
-import com.obj.nc.domain.message.AggregatedEmail;
 import com.obj.nc.dto.EmitEventDto;
 import com.obj.nc.dto.mailchimp.*;
 import org.springframework.stereotype.Component;

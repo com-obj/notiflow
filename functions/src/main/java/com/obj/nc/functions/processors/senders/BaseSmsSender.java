@@ -1,9 +1,9 @@
 package com.obj.nc.functions.processors.senders;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.domain.content.SimpleText;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SimpleText;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.services.SmsClient;

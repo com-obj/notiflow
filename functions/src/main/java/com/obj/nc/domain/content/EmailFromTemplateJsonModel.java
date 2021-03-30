@@ -1,4 +1,4 @@
-package com.obj.nc.domain.message;
+package com.obj.nc.domain.content;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.domain.BaseJSONObject;
