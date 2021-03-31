@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,15 +24,14 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.osk.flows.siaFlows.FlowsConfig;
-import com.obj.nc.osk.dto.IncidentTicketOutageStartEventDto;
+import com.obj.nc.osk.domain.incidentTicket.IncidentTicketOutageStartEventDto;
+import com.obj.nc.osk.flows.FlowsConfig;
 import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunctionTest;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest
-@SpringBootTest
 public class OskFlowsTest extends BaseIntegrationTest {
     
     @Autowired

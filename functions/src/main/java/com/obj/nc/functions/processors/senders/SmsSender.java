@@ -1,22 +1,23 @@
 package com.obj.nc.functions.processors.senders;
 
+import java.util.Optional;
+
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.content.SimpleTextContent;
+import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import com.obj.nc.services.SmsClient;
+import com.obj.nc.services.SmsSenderExcecution;
+
 import lombok.AllArgsConstructor;
 
-import java.util.Optional;
-
 @AllArgsConstructor
-public abstract class BaseSmsSender<REQUEST_T, RESPONSE_T> extends ProcessorFunctionAdapter<Message, Message> {
+public class SmsSender extends ProcessorFunctionAdapter<Message, Message> {
 
     public static final String SEND_SMS_RESPONSE_ATTRIBUTE = "sendSmsResponse";
     
-    private final SmsClient<REQUEST_T, RESPONSE_T> smsClient;
+    private final SmsSenderExcecution<?> smsSenderExcecution;
 
     @Override
     protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
@@ -38,8 +39,7 @@ public abstract class BaseSmsSender<REQUEST_T, RESPONSE_T> extends ProcessorFunc
     @Override
     @DocumentProcessingInfo("SmsSender")
     protected Message execute(Message payload) {
-        REQUEST_T sendSmsRequest = smsClient.convertMessageToRequest(payload);
-        RESPONSE_T sendSmsResponse = smsClient.sendRequest(sendSmsRequest);
+        Object sendSmsResponse = smsSenderExcecution.apply(payload);
         payload.getBody().setAttributeValue(SEND_SMS_RESPONSE_ATTRIBUTE, sendSmsResponse);
         return payload;
     }

@@ -1,11 +1,11 @@
-package com.obj.nc.osk.dto;
+package com.obj.nc.osk.domain.incidentTicket;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.obj.nc.osk.dto.IncidentTicketServiceOutageForCustomerDto.CustomerSegment;
+import com.obj.nc.osk.domain.incidentTicket.IncidentTicketServiceOutageForCustomerDto.CustomerSegment;
 import com.obj.nc.osk.functions.config.NotifEventConverterConfig;
 
 import lombok.Data;

@@ -33,12 +33,12 @@ import lombok.extern.log4j.Log4j2;
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
 @Log4j2
-public class TestModeFlowConfig {
+public class TestModeEmailsFlowConfig {
 	 
 	@Autowired private TestModeProperties testModeProps;
 	@Autowired private GreenMailReceiverSourceSupplier greenMailMessageSource;
     
-    @Qualifier(TestModeBeansConfig.TEST_MODE_EMAIL_SENDER_FUNCTION_BEAN_NAME)
+    @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_EMAIL_SENDER_FUNCTION_BEAN_NAME)
     @Autowired private EmailSender sendEmailRealSmtp;
     @Autowired private PaylaodLoggerSinkConsumer logConsumer;
     @Autowired private MessageAggregationStrategy aggregationStrategy;
@@ -62,7 +62,7 @@ public class TestModeFlowConfig {
         			aggSpec-> aggSpec
         				.correlationStrategy( testModeCorrelationStrategy() )
         				.releaseStrategy( testModeReleaseStrategy() )
-        					.groupTimeout((testModeProps.getPeriodInSeconds()*2*1000)+500) //wait min 2 polls interval
+        					.groupTimeout((testModeProps.getPollMockSourcesPeriodInSeconds()*2*1000)+500) //wait min 2 polls interval
         					.sendPartialResultOnExpiry(true)
         					.expireGroupsUponCompletion(true)
         					.expireGroupsUponTimeout(true)
@@ -98,7 +98,6 @@ public class TestModeFlowConfig {
 		}
 
 	}
-
 	
 	public static class LoggingSimpleSequenceSizeReleaseStrategy implements ReleaseStrategy {
 
@@ -115,7 +114,7 @@ public class TestModeFlowConfig {
 
     @Bean(TEST_MODE_SOURCE_TRIGGER_BEAN_NAME)
     public Trigger testModeSourceTrigger() {
-        return new PeriodicTrigger(testModeProps.getPeriodInSeconds(), TimeUnit.SECONDS);
+        return new PeriodicTrigger(testModeProps.getPollMockSourcesPeriodInSeconds(), TimeUnit.SECONDS);
     }
     
     @Bean

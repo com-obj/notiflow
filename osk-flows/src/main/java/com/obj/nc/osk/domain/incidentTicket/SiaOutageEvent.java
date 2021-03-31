@@ -1,4 +1,4 @@
-package com.obj.nc.osk.dto;
+package com.obj.nc.osk.domain.incidentTicket;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;

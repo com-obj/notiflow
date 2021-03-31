@@ -13,4 +13,3 @@ nc:
    flows:
       test-mode:
          enabled: true
-         periodInSeconds: 5

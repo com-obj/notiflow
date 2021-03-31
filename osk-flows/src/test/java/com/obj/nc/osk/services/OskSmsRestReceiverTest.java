@@ -1,10 +1,7 @@
 package com.obj.nc.osk.services;
 
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.osk.dto.OskSendSmsRequestDto;
-import com.obj.nc.osk.dto.OskSendSmsResponseDto;
-import com.obj.nc.utils.JsonUtils;
+import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,15 +9,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.osk.services.sms.OskSmsRestReceiver;
+import com.obj.nc.osk.services.sms.OskSmsSenderRestImpl;
+import com.obj.nc.osk.services.sms.dtos.OskSendSmsRequestDto;
+import com.obj.nc.osk.services.sms.dtos.OskSendSmsResponseDto;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext // SpringBootTest.WebEnvironment.DEFINED_PORT
+@DirtiesContext
 class OskSmsRestReceiverTest {
     
     @Autowired
-    private OskSmsRestClientImpl restClient;
+    private OskSmsSenderRestImpl restClient;
     
     @Autowired
     private OskSmsRestReceiver receiver;
@@ -38,7 +41,7 @@ class OskSmsRestReceiverTest {
         receiver.waitForIncomingRequests(10000L, 3);
         
         // THEN
-        List<OskSendSmsRequestDto> requests = receiver.getAndRemoveAllRequests();
+        List<OskSendSmsRequestDto> requests = receiver.getAllRequestsAndReset();
         Assertions.assertThat(requests).hasSize(3);
         Assertions.assertThat(requests.get(0)).isEqualTo(oskSendSmsRequestDto);
         Assertions.assertThat(requests.get(1)).isEqualTo(oskSendSmsRequestDto);

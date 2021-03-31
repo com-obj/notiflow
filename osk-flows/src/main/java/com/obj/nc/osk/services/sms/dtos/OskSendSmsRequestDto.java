@@ -1,4 +1,4 @@
-package com.obj.nc.osk.dto;
+package com.obj.nc.osk.services.sms.dtos;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

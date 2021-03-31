@@ -2,16 +2,19 @@ package com.obj.nc.osk.controllers;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.osk.dto.OskSendSmsRequestDto;
-import com.obj.nc.osk.dto.OskSendSmsResponseDto;
-import com.obj.nc.osk.functions.senders.OskSmsSenderConfigProperties;
-import com.obj.nc.osk.services.OskSmsRestClientImpl;
+import com.obj.nc.osk.services.sms.OskSmsSenderRestImpl;
+import com.obj.nc.osk.services.sms.config.OskSmsSenderConfigProperties;
+import com.obj.nc.osk.services.sms.dtos.OskSendSmsRequestDto;
+import com.obj.nc.osk.services.sms.dtos.OskSendSmsResponseDto;
 import com.obj.nc.utils.JsonUtils;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+
+import static com.obj.nc.osk.services.sms.OskSmsSenderRestImpl.SEND_PATH;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,8 +23,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.context.WebApplicationContext;
-
-import static com.obj.nc.osk.services.OskSmsRestClientImpl.SEND_PATH;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -32,7 +33,7 @@ class OskSmsRestReceiverControllerTest {
     private WebApplicationContext webApplicationContext;
     
     @Autowired
-    private OskSmsRestClientImpl restClient;
+    private OskSmsSenderRestImpl restClient;
     
     @Autowired
     private OskSmsSenderConfigProperties properties;

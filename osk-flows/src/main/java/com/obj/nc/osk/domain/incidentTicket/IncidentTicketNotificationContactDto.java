@@ -1,4 +1,4 @@
-package com.obj.nc.osk.dto;
+package com.obj.nc.osk.domain.incidentTicket;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -57,7 +57,7 @@ public class IncidentTicketNotificationContactDto {
 	public Set<RecievingEndpoint> asEnpoints() {
 		Set<RecievingEndpoint> endpoints = new HashSet<>();
 		asEmailEnpoints().forEach(email-> endpoints.add(email));
-//		asSmsEnpoints().forEach(sms-> endpoints.add(sms));
+		asSmsEnpoints().forEach(sms-> endpoints.add(sms));
 		
 		return endpoints;
 	}

@@ -1,4 +1,4 @@
-package com.obj.nc.osk.dto;
+package com.obj.nc.osk.domain.incidentTicket;
 
 import java.util.ArrayList;
 import java.util.Date;

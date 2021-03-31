@@ -26,7 +26,7 @@ import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
 
-class MessagesFromEventTest {
+class MessagesFromIntentTest {
 
 	@Test
 	void createMessagesFromEvent() {

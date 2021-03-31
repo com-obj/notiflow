@@ -1,29 +1,31 @@
-package com.obj.nc.osk.services;
+package com.obj.nc.osk.services.sms;
 
-import com.obj.nc.domain.content.SimpleTextContent;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.osk.dto.SendSmsResourceReferenceDto;
-import com.obj.nc.osk.dto.OskSendSmsRequestDto;
-import com.obj.nc.osk.dto.OskSendSmsResponseDto;
-import com.obj.nc.osk.exception.SmsClientException;
-import com.obj.nc.osk.functions.senders.OskSmsSenderConfigProperties;
-import com.obj.nc.services.SmsClient;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.stream.Collectors;
+import com.obj.nc.domain.content.sms.SimpleTextContent;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.osk.exception.SmsClientException;
+import com.obj.nc.osk.services.sms.config.OskSmsSenderConfigProperties;
+import com.obj.nc.osk.services.sms.dtos.OskSendSmsRequestDto;
+import com.obj.nc.osk.services.sms.dtos.OskSendSmsResponseDto;
+import com.obj.nc.osk.services.sms.dtos.SendSmsResourceReferenceDto;
+import com.obj.nc.services.SmsSenderExcecution;
 
 @Service
 @Validated
-public class OskSmsRestClientImpl implements SmsClient<OskSendSmsRequestDto, OskSendSmsResponseDto> {
+public class OskSmsSenderRestImpl implements SmsSenderExcecution<OskSendSmsResponseDto> {
 
     public static final String SEND_PATH = "/outbound/{senderAddress}/requests";
     public static final String STATUS_SUCCESS = "SUCCESS";
@@ -32,13 +34,21 @@ public class OskSmsRestClientImpl implements SmsClient<OskSendSmsRequestDto, Osk
     private final OskSmsSenderConfigProperties properties;
     private final RestTemplate smsRestTemplate;
 
-    public OskSmsRestClientImpl(OskSmsSenderConfigProperties properties, RestTemplateBuilder restTemplateBuilder) {
+    public OskSmsSenderRestImpl(OskSmsSenderConfigProperties properties, RestTemplateBuilder restTemplateBuilder) {
         this.properties = properties;
-        this.smsRestTemplate = restTemplateBuilder.rootUri(properties.getGapApiUrl())
-                .basicAuthentication(properties.getGapApiLogin(), properties.getGapApiPassword()).build();
+        this.smsRestTemplate = restTemplateBuilder
+        		.rootUri(
+        			this.properties.getGapApiUrl())
+                .basicAuthentication(this.properties.getGapApiLogin(), this.properties.getGapApiPassword())
+                .build();
     }
+    
+	@Override
+	public OskSendSmsResponseDto apply(Message message) {
+		OskSendSmsRequestDto req = convertMessageToRequest(message);
+		return sendRequest(req);
+	}
 
-    @Override
     public OskSendSmsRequestDto convertMessageToRequest(Message message) {
         OskSendSmsRequestDto result = new OskSendSmsRequestDto();
 
@@ -59,7 +69,6 @@ public class OskSmsRestClientImpl implements SmsClient<OskSendSmsRequestDto, Osk
         return result;
     }
 
-    @Override
     public OskSendSmsResponseDto sendRequest(@Valid @NotNull OskSendSmsRequestDto oskSendSmsRequestDto) {
         OskSendSmsResponseDto responseBody = smsRestTemplate.postForEntity(
                 SEND_PATH,
@@ -91,5 +100,7 @@ public class OskSmsRestClientImpl implements SmsClient<OskSendSmsRequestDto, Osk
             throw new SmsClientException("Unknown response status");
         }
     }
+
+
 
 }

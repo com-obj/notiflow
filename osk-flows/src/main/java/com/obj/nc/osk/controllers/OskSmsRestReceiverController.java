@@ -1,8 +1,9 @@
 package com.obj.nc.osk.controllers;
 
-import com.obj.nc.osk.dto.OskSendSmsRequestDto;
-import com.obj.nc.osk.dto.OskSendSmsResponseDto;
-import com.obj.nc.osk.services.OskSmsRestReceiver;
+import com.obj.nc.osk.services.sms.OskSmsRestReceiver;
+import com.obj.nc.osk.services.sms.dtos.OskSendSmsRequestDto;
+import com.obj.nc.osk.services.sms.dtos.OskSendSmsResponseDto;
+
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;

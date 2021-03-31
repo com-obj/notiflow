@@ -1,4 +1,4 @@
-package com.obj.nc.osk.functions.senders;
+package com.obj.nc.osk.services.sms.config;
 
 import javax.validation.constraints.NotBlank;
 

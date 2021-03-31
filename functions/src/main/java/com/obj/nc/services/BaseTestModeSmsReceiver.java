@@ -1,15 +1,17 @@
 package com.obj.nc.services;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public abstract class BaseRestReceiver<REQUEST_T, RESPONSE_T> {
+public abstract class BaseTestModeSmsReceiver<REQUEST_T, RESPONSE_T> implements SmsReciever<REQUEST_T, RESPONSE_T> {
     
-    protected List<REQUEST_T> requests = new ArrayList<>();
+    protected List<REQUEST_T> requests = Collections.synchronizedList(new ArrayList<REQUEST_T>());
     
-    public RESPONSE_T receive(REQUEST_T request) {
+    @Override
+	public RESPONSE_T receive(REQUEST_T request) {
         requests.add(request);
         return createResponse(request);
     }
@@ -33,18 +35,21 @@ public abstract class BaseRestReceiver<REQUEST_T, RESPONSE_T> {
         return waitObject.getCount() == 0;
     }
     
-    public List<REQUEST_T> getAndRemoveAllRequests() {
-        List<REQUEST_T> allRequests = new ArrayList<>(requests);
-        requests.removeAll(allRequests);
+    public List<REQUEST_T> getAllRequestsAndReset() {
+        List<REQUEST_T> allRequests = getAllRequests();
+        reset();
+        
         return allRequests;
     }
     
-    public List<REQUEST_T> getAllRequests() {
-        return requests;
+    @Override
+	public List<REQUEST_T> getAllRequests() {
+        return new ArrayList<>(requests);
     }
     
-    public void reset() {
-        requests = new ArrayList<>();
+    @Override
+	public void reset() {
+        requests.clear();
     }
     
     private CountDownLatch createNewWaitObject(int requestCount) {

@@ -1,4 +1,6 @@
-package com.obj.nc.osk.flows.siaFlows;
+package com.obj.nc.osk.flows;
+
+import static com.obj.nc.flows.config.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -8,11 +10,6 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
-import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
-import com.obj.nc.functions.processors.senders.EmailSender;
-import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import com.obj.nc.osk.functions.EndOutageEventConverter;
 import com.obj.nc.osk.functions.StartOutageEventConverter;
 
@@ -21,12 +18,6 @@ public class FlowsConfig {
 	
 	@Autowired private StartOutageEventConverter startOutageEventConverter;
 	@Autowired private EndOutageEventConverter endOutageEventConverter;
-	
-	@Autowired private ValidateAndGenerateEventIdProcessingFunction generateEventId;
-	@Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
-	@Autowired private EmailSender sendMessage;
-	@Autowired private PaylaodLoggerSinkConsumer logConsumer;
-	@Autowired private EmailTemplateFormatter emailFormatter;
 	
 	public final static String OUTAGE_START_FLOW_ID = "OUTAGE_START";
 	public final static String OUTAGE_END_FLOW_ID = "OUTAGE_END";
@@ -49,16 +40,8 @@ public class FlowsConfig {
 				.from(startOutageFlowInputChangel())
 				.transform(startOutageEventConverter)
 				.split()
-				
-				/*TODO generic*/
-				.transform(generateEventId)
-				.transform(generateMessagesFromEvent)
-				.split()
-				.transform(emailFormatter)
-				.split()
-				.transform(sendMessage)
-				.handle(logConsumer).get();
-				/*generic*/
+				.channel(INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+				.get();
 	}
 	
 	@Bean
@@ -67,16 +50,8 @@ public class FlowsConfig {
 				.from(endOutageFlowInputChangel())
 				.transform(endOutageEventConverter)
 				.split()
-				
-				/*TODO generic*/
-				.transform(generateEventId)
-				.transform(generateMessagesFromEvent)
-				.split()
-				.transform(emailFormatter)
-				.split()
-				.transform(sendMessage)
-				.handle(logConsumer).get();
-				/*generic*/
+				.channel(INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+				.get();
 	}
 
 }

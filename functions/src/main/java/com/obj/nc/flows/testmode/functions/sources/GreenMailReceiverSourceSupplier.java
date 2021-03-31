@@ -33,7 +33,7 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
+import com.obj.nc.flows.testmode.config.TestModeEmailsBeansConfig;
 import com.obj.nc.flows.testmode.config.TestModeProperties;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
@@ -48,7 +48,7 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
 
     public static final String ORIGINAL_RECIPIENTS_ATTR_NAME = "ORIGINAL_RECIPIENTS";
 
-	@Qualifier(TestModeBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
+	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
     @Autowired private GreenMail gm;
 
     @Autowired private TestModeProperties properties;

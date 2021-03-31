@@ -1,13 +1,13 @@
-package com.obj.nc.osk.services;
+package com.obj.nc.osk.services.sms;
 
-import com.obj.nc.osk.dto.OskSendSmsRequestDto;
-import com.obj.nc.osk.dto.OskSendSmsResponseDto;
-import com.obj.nc.osk.dto.SendSmsResourceReferenceDto;
-import com.obj.nc.services.BaseRestReceiver;
+import com.obj.nc.osk.services.sms.dtos.OskSendSmsRequestDto;
+import com.obj.nc.osk.services.sms.dtos.OskSendSmsResponseDto;
+import com.obj.nc.osk.services.sms.dtos.SendSmsResourceReferenceDto;
+import com.obj.nc.services.BaseTestModeSmsReceiver;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OskSmsRestReceiver extends BaseRestReceiver<OskSendSmsRequestDto, OskSendSmsResponseDto> {
+public class OskSmsRestReceiver extends BaseTestModeSmsReceiver<OskSendSmsRequestDto, OskSendSmsResponseDto> {
     
     @Override
     protected OskSendSmsResponseDto createResponse(OskSendSmsRequestDto request) {

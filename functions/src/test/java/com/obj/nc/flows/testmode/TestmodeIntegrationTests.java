@@ -1,6 +1,6 @@
 package com.obj.nc.flows.testmode;
 
-import static com.obj.nc.flows.testmode.config.TestModeFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
+import static com.obj.nc.flows.testmode.config.TestModeEmailsFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
 
 import java.util.List;
 
@@ -33,8 +33,8 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
-import com.obj.nc.flows.testmode.config.TestModeFlowConfig;
+import com.obj.nc.flows.testmode.config.TestModeEmailsBeansConfig;
+import com.obj.nc.flows.testmode.config.TestModeEmailsFlowConfig;
 import com.obj.nc.flows.testmode.config.TestModeGreenMailProperties;
 import com.obj.nc.flows.testmode.config.TestModeProperties;
 import com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier;
@@ -50,7 +50,7 @@ import com.obj.nc.utils.JsonUtils;
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //Because of correct disposal of green mail used for test mode
 public class TestmodeIntegrationTests extends BaseIntegrationTest {
 	
-	@Qualifier(TestModeBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
+	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
 	@Autowired private GreenMail testModeEmailsReciver;
 	
 	@Autowired private EmailSender emailSenderSinkProcessingFunction;
@@ -136,7 +136,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     @EnableIntegrationManagement
     public static class TestModeTestConfiguration {
 
-        @Bean(TestModeFlowConfig.TEST_MODE_SOURCE_TRIGGER_BEAN_NAME)
+        @Bean(TestModeEmailsFlowConfig.TEST_MODE_SOURCE_TRIGGER_BEAN_NAME)
         public Trigger testModeSourceTrigger() {
             return new OnlyOnceTrigger();
         }

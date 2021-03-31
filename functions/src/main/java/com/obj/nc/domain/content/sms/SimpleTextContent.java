@@ -1,6 +1,7 @@
-package com.obj.nc.domain.content;
+package com.obj.nc.domain.content.sms;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.obj.nc.domain.content.Content;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

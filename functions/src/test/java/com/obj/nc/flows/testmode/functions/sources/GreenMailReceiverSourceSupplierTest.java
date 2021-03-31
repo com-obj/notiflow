@@ -28,7 +28,7 @@ import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.flows.testmode.config.TestModeBeansConfig;
+import com.obj.nc.flows.testmode.config.TestModeEmailsBeansConfig;
 import com.obj.nc.flows.testmode.config.TestModeProperties;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.utils.JsonUtils;
@@ -41,7 +41,7 @@ import com.obj.nc.utils.JsonUtils;
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //Because of correct disposal of green mail used for test mode
 class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 
-	@Qualifier(TestModeBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
+	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
     @Autowired private GreenMail testModeEmailsReciver;
 	@Autowired private TestModeProperties properties;
 	@Autowired private EmailSender emailSenderSinkProcessingFunction;

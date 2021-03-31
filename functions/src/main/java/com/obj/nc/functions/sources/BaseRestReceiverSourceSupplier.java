@@ -1,7 +1,7 @@
 package com.obj.nc.functions.sources;
 
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.services.BaseRestReceiver;
+import com.obj.nc.services.BaseTestModeSmsReceiver;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public abstract class BaseRestReceiverSourceSupplier<REQUEST_T> extends SourceSupplierAdapter<List<REQUEST_T>> {
     
-    protected final BaseRestReceiver<REQUEST_T, ?> restReceiver;
+    protected final BaseTestModeSmsReceiver<REQUEST_T, ?> smsReceiver;
     
     @Override
     protected Optional<PayloadValidationException> checkPreCondition(List<REQUEST_T> requests) {
@@ -19,7 +19,7 @@ public abstract class BaseRestReceiverSourceSupplier<REQUEST_T> extends SourceSu
     
     @Override
     protected List<REQUEST_T> execute() {
-        return restReceiver.getAndRemoveAllRequests();
+        return smsReceiver.getAllRequestsAndReset();
     }
     
 }

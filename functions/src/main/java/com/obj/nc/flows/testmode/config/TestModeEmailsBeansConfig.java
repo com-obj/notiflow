@@ -18,7 +18,7 @@ import com.obj.nc.functions.processors.senders.EmailSender;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-public class TestModeBeansConfig {
+public class TestModeEmailsBeansConfig {
 	
     public static final String TEST_MODE_REAL_MAIL_SENDER_BEAN_NAME = "testModeJavaMailSenderReal";
     public static final String TEST_MODE_EMAIL_SENDER_FUNCTION_BEAN_NAME = "testModeEmailSenderReal";   
@@ -27,7 +27,7 @@ public class TestModeBeansConfig {
     
     private TestModeGreenMailProperties properties;
 
-    public TestModeBeansConfig(@Autowired TestModeGreenMailProperties properties) {
+    public TestModeEmailsBeansConfig(@Autowired TestModeGreenMailProperties properties) {
 		super();
 		this.properties = properties;
 		
