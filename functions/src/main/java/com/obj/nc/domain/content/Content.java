@@ -25,4 +25,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public abstract class Content extends BaseJSONObject {
 	
+	
 }

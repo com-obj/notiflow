@@ -52,7 +52,7 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
     	genEventRepo.save(event);
     	
     	//THEN
-        boolean success = greenMail.waitForIncomingEmail(20000, 1);
+        boolean success = greenMail.waitForIncomingEmail(30000, 1);
         
         Assertions.assertThat(success).isTrue();
         
@@ -65,7 +65,9 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
         		"Processed with love by Notification Center by Objectify", //check if translations work
         		"Vase sluzby mozu byt nedostupne", "Your services could be affected", "Zakaznici maju problem", 
         		"cuzy@objectify.sk", "jancuzy@gmail.com", "sales@objectify.sk"/*CS Agent*/, "sales@orange.sk", "hahn@orange.sk",
-        		"dysko@objectify.sk", "nem_fukas@artin.sk", "slavkovsky@orange.sk"
+        		"dysko@objectify.sk", "nem_fukas@artin.sk", "slavkovsky@orange.sk",
+        		//SMSs
+        		"Na tuto SMS neodpovedajte.", "VPS(SN:0918186997)", "0918186997", "+421918186997", "0918186998"
         		)
         );
     }

@@ -12,10 +12,10 @@ import org.springframework.test.context.ContextConfiguration;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.osk.services.sms.OskSmsRestReceiver;
-import com.obj.nc.osk.services.sms.OskSmsSenderRestImpl;
-import com.obj.nc.osk.services.sms.config.OskSmsSenderConfigProperties;
-import com.obj.nc.osk.services.sms.dtos.OskSendSmsRequestDto;
+import com.obj.nc.osk.functions.processors.sms.OskSmsRestReceiver;
+import com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl;
+import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
+import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsRequestDto;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)

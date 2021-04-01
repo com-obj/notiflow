@@ -1,7 +1,7 @@
 package com.obj.nc.osk.senders;
 
-import static com.obj.nc.functions.processors.senders.SmsSender.SEND_SMS_RESPONSE_ATTRIBUTE;
-import static com.obj.nc.osk.services.sms.OskSmsSenderRestImpl.SEND_PATH;
+import static com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl.SEND_PATH;
+import static com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl.SEND_SMS_RESPONSE_ATTRIBUTE;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -27,8 +27,8 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.senders.SmsSender;
-import com.obj.nc.osk.services.sms.config.OskSmsSenderConfigProperties;
-import com.obj.nc.osk.services.sms.dtos.OskSendSmsResponseDto;
+import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
+import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)

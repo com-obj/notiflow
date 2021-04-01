@@ -2,10 +2,10 @@ package com.obj.nc.osk.controllers;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.osk.services.sms.OskSmsSenderRestImpl;
-import com.obj.nc.osk.services.sms.config.OskSmsSenderConfigProperties;
-import com.obj.nc.osk.services.sms.dtos.OskSendSmsRequestDto;
-import com.obj.nc.osk.services.sms.dtos.OskSendSmsResponseDto;
+import com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl;
+import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
+import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsRequestDto;
+import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
 import com.obj.nc.utils.JsonUtils;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -13,7 +13,7 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
-import static com.obj.nc.osk.services.sms.OskSmsSenderRestImpl.SEND_PATH;
+import static com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl.SEND_PATH;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

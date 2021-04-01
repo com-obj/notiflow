@@ -18,7 +18,6 @@ public class AggregatedEmailContent extends EmailContent {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "AGGREGATED_EMAIL_MESSAGE_CONTENT";
 
-	//TODO: rename to parts
     private List<EmailContent> aggregateContent = new ArrayList<>();
     
     public void add(EmailContent other) {

@@ -19,6 +19,7 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 public class MessageAggregator extends AbstractAggregatingMessageGroupProcessor {
 	
+	//TODO: toto neviem ci neni prekombinovane
 	@Autowired private MessageAggregationStrategy aggregationStrategy;
 
 	@Override

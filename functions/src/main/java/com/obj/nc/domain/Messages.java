@@ -14,6 +14,7 @@ import lombok.ToString;
 @ToString(callSuper = false)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @AllArgsConstructor
+@Deprecated
 public class Messages extends BaseJSONObject {
 
     private List<Message> messages;

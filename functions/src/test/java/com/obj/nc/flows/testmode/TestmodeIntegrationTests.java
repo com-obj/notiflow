@@ -1,6 +1,6 @@
 package com.obj.nc.flows.testmode;
 
-import static com.obj.nc.flows.testmode.config.TestModeEmailsFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
+import static com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
 
 import java.util.List;
 
@@ -33,11 +33,10 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.flows.testmode.config.TestModeEmailsBeansConfig;
-import com.obj.nc.flows.testmode.config.TestModeEmailsFlowConfig;
-import com.obj.nc.flows.testmode.config.TestModeGreenMailProperties;
-import com.obj.nc.flows.testmode.config.TestModeProperties;
-import com.obj.nc.flows.testmode.functions.sources.GreenMailReceiverSourceSupplier;
+import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
+import com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig;
+import com.obj.nc.flows.testmode.email.config.TestModeGreenMailProperties;
+import com.obj.nc.flows.testmode.email.functions.sources.GreenMailReceiverSourceSupplier;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.utils.JsonUtils;
 

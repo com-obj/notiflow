@@ -2,8 +2,10 @@ package com.obj.nc.domain.message;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.content.AggregatedContent;
 import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.sms.AggregatedSmsContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
@@ -35,6 +37,18 @@ public class Message extends BasePayload {
 	public static Message createAsAggregatedEmail() {
 		Message msg = new Message();
 		msg.getBody().setMessage(new AggregatedEmailContent());
+		return msg;
+	}
+	
+	public static Message createAsAggregatedSms() {
+		Message msg = new Message();
+		msg.getBody().setMessage(new AggregatedSmsContent());
+		return msg;
+	}
+	
+	public static Message createAsAggregatedContent() {
+		Message msg = new Message();
+		msg.getBody().setMessage(new AggregatedContent());
 		return msg;
 	}
 

@@ -12,10 +12,9 @@ import org.springframework.messaging.MessageChannel;
 import com.obj.nc.functions.processors.messageTemplating.SmsTemplateFormatter;
 import com.obj.nc.functions.processors.senders.SmsSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
-import com.obj.nc.services.SmsSenderExcecution;
 
 @Configuration
-@ConditionalOnBean(SmsSenderExcecution.class)
+@ConditionalOnBean(SmsSender.class)
 public class SmsProcessingFlowConfig {
 	
 	@Autowired private SmsSender smsSender;
@@ -39,11 +38,6 @@ public class SmsProcessingFlowConfig {
 				.transform(smsSender)
 				.handle(logConsumer)
 				.get();
-	}
-	
-	@Bean
-	public SmsSender smsSender(@Autowired SmsSenderExcecution<?> smsExecution) {
-		return new SmsSender(smsExecution);
 	}
 
 }
