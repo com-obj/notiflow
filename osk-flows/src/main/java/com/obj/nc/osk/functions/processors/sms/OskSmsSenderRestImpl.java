@@ -128,6 +128,10 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Mess
         }
     }
 
+	public RestTemplate getSmsRestTemplate() {
+		return smsRestTemplate;
+	}
+
 
 
 }
