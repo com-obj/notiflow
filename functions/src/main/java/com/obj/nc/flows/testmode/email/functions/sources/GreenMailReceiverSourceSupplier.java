@@ -29,6 +29,8 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.obj.nc.domain.Header;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.flows.testmode.TestModeProperties;
@@ -117,6 +119,10 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
             content.setText(mimeMessageContent);
             content.setAttributeValue(ORIGINAL_RECIPIENTS_EMAIL_ATTR_NAME, originalRecipients);
             content.setContentType(contentType);
+            //This is most likely not used,.. this mails are aggregated and bundled into separate mail, which will set the recipient from setting again
+            List<RecievingEndpoint> emailEndpoints = properties.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
+            result.getBody().setRecievingEndpoints(emailEndpoints);
+
 
             DeliveryOptions deliveryOptions = new DeliveryOptions();
             deliveryOptions.setAggregationType(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
