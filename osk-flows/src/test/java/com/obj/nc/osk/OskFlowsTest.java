@@ -17,7 +17,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,11 +61,6 @@ public class OskFlowsTest extends BaseIntegrationTest {
         jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
         jdbcTemplate.batchUpdate("delete from nc_endpoint");        
         jdbcTemplate.batchUpdate("delete from nc_input");              
-    }
-    
-    @Before
-    public void init() {
-        
     }
 
     @Test

@@ -1,5 +1,7 @@
 package com.obj.nc.osk.functions;
 
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_FLOW_ID_BEAN_NAME;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_PAYLOAD_TYPE_BEAN_NAME;
 import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -37,8 +40,11 @@ import com.obj.nc.osk.functions.model.ServiceOutageInfo;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
-@ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
+@ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest
+@SpringIntegrationTest(noAutoStartup = {
+		GENERIC_EVENT_CHANNEL_ADAPTER_FLOW_ID_BEAN_NAME, 
+		GENERIC_EVENT_CHANNEL_ADAPTER_PAYLOAD_TYPE_BEAN_NAME})
 public class NotificationEventConverterProcessingFunctionTest extends BaseIntegrationTest {
 	
 	@Autowired
@@ -65,7 +71,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     void testCustomerEvent() throws ParseException {
     	//WHEN OUTAGE STARTs
         GenericEvent event = readOutageStartEvent();
-        event = eventRepo.save(event);
+        event = eventRepo.save(event); //we need to stave this so that issue outage End
     	List<NotificationIntent> result = startOutageConverter.apply(event);
     	
     	//THEN
@@ -78,10 +84,10 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	//THEN
     	assertCustomerNotificationIntents(result);
     	
+    	//Assert Email contents
     	List<CustEmailTemplate> contents = result.stream()
     		.filter(e-> e.getBody().getMessage() instanceof CustEmailTemplate)
     		.map(e-> ((CustEmailTemplate)e.getBody().getMessage()))
-    		.filter(custE-> custE.getModel().getTimeStart() != null && custE.getModel().getTimeEnd() != null)
     		.collect(Collectors.toList());
     	
     	//all contents have start and end date
