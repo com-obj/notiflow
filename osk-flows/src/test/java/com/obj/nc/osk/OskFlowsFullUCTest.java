@@ -8,7 +8,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -17,18 +16,16 @@ import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpMethod;
 import org.springframework.integration.test.context.SpringIntegrationTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 
-import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
@@ -45,26 +42,21 @@ import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest
-public class OskFlowsTest extends BaseIntegrationTest {
+public class OskFlowsFullUCTest extends BaseIntegrationTest {
     
     @Autowired private GenericEventRepository genEventRepo;
-    @Autowired private JdbcTemplate jdbcTemplate;
     @Qualifier("nc.emailTemplateFormatter.messageSource")
     @Autowired private MessageSource emailMessageSource;
     @Autowired private OskSmsSenderRestImpl smsSenderRestImpl;
     @Autowired private OskSmsSenderConfigProperties properties;
     private MockRestServiceServer mockServer;
-    
-    @BeforeEach
-    void purgeNotifTables() throws FolderException, IOException {
-        jdbcTemplate.batchUpdate("delete from nc_processing_info");
-        jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
-        jdbcTemplate.batchUpdate("delete from nc_endpoint");        
-        jdbcTemplate.batchUpdate("delete from nc_input");              
-    }
+
 
     @Test
-    void testNotifyCustomersAndSalesByEmail() {
+    @Order(1)  
+    void testOutageStart() {
+    	purgeNotifTables();
+    	
     	createRestCallExpectationsFor3OutageSms();
     	
         // GIVEN
@@ -138,7 +130,6 @@ public class OskFlowsTest extends BaseIntegrationTest {
         
         //check SMS send via RestCall 
         mockServer.verify();
-
     }
 
 	private void createRestCallExpectationsFor3OutageSms() {
@@ -177,7 +168,10 @@ public class OskFlowsTest extends BaseIntegrationTest {
 	}
 
 	@Test
-    void testLAsNotConfiguredAreNotNotified() throws MessagingException {
+    @Order(3)  
+    void testOutageStartWithLAsNotConfiguredAreNotNotified() throws MessagingException {
+    	purgeNotifTables();
+    	
 		createRestCallExpectationsFor1OutageSmsFromLASegment();
 		
         // GIVEN

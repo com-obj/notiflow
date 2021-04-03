@@ -1,7 +1,5 @@
 package com.obj.nc.osk;
 
-import java.io.IOException;
-
 import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
@@ -9,10 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
@@ -29,19 +25,11 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
     
     @Autowired
     private GenericEventRepository genEventRepo;
-    
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    
+        
     @BeforeEach
-    void purgeNotifTables() throws FolderException, IOException {
-        jdbcTemplate.batchUpdate("delete from nc_processing_info");
-        jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
-        jdbcTemplate.batchUpdate("delete from nc_endpoint");        
-        jdbcTemplate.batchUpdate("delete from nc_input");       
+    void cleanTables() {
+        purgeNotifTables();     
     }
-
 	
     @Test
     void testNotifyCustomersViaTestmodeEmail() {

@@ -5,7 +5,6 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -17,10 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.test.context.SpringIntegrationTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.icegreen.greenmail.store.FolderException;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -47,24 +44,13 @@ import com.obj.nc.utils.JsonUtils;
 		GENERIC_EVENT_CHANNEL_ADAPTER_PAYLOAD_TYPE_BEAN_NAME})
 public class NotificationEventConverterProcessingFunctionTest extends BaseIntegrationTest {
 	
-	@Autowired
-	private StartOutageEventConverter startOutageConverter;
-	
-	@Autowired
-	private EndOutageEventConverter endOutageConverter;
-	
-	@Autowired
-	private GenericEventRepository eventRepo;
-	
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+	@Autowired private StartOutageEventConverter startOutageConverter;
+	@Autowired private EndOutageEventConverter endOutageConverter;
+	@Autowired private GenericEventRepository eventRepo;
     
     @BeforeEach
-    void purgeNotifTables() throws FolderException, IOException {
-        jdbcTemplate.batchUpdate("delete from nc_processing_info");
-        jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
-        jdbcTemplate.batchUpdate("delete from nc_endpoint");        
-        jdbcTemplate.batchUpdate("delete from nc_input");       
+    void cleanTables() {
+        purgeNotifTables();     
     }
     
     @Test
@@ -84,19 +70,42 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	//THEN
     	assertCustomerNotificationIntents(result);
     	
-    	//Assert Email contents
-    	List<CustEmailTemplate> contents = result.stream()
+    	//THEN check if all ending emails have outage end (and start)
+    	List<CustEmailTemplate> emails = extractEmails(result);
+    	assertThat(emails.size()).isEqualTo(3);
+
+		for (CustEmailTemplate email: emails) {
+			CustEventModel anyModel = email.getModel();
+			assertThat(anyModel.getTimeStart()).isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T20:00:00.000Z"));
+			assertThat(anyModel.getTimeEnd()).isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T22:00:00.000Z"));
+		}
+       	
+    	//THEN check if all ending smss have outage end (and start)
+    	List<CustSmsTemplate> smss = extractSmss(result);   	
+    	assertThat(smss.size()).isEqualTo(2);
+
+    	for (CustSmsTemplate sms: smss) {
+			CustEventModel smsModel = sms.getModel();
+	       	assertThat(smsModel.getTimeStart()).isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T20:00:00.000Z"));
+	       	assertThat(smsModel.getTimeEnd()).isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T22:00:00.000Z"));
+    	}
+    }
+
+	private List<CustEmailTemplate> extractEmails(List<NotificationIntent> result) {
+		List<CustEmailTemplate> contents = result.stream()
     		.filter(e-> e.getBody().getMessage() instanceof CustEmailTemplate)
     		.map(e-> ((CustEmailTemplate)e.getBody().getMessage()))
     		.collect(Collectors.toList());
-    	
-    	//all contents have start and end date
-    	assertThat(contents.size()).isEqualTo(3);
-
-		CustEventModel anyModel = contents.iterator().next().getModel();
-       	assertThat(anyModel.getTimeStart()).isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T20:00:00.000Z"));
-       	assertThat(anyModel.getTimeEnd()).isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T22:00:00.000Z"));
-    }
+		return contents;
+	}
+	
+	private List<CustSmsTemplate> extractSmss(List<NotificationIntent> result) {
+		List<CustSmsTemplate> contents = result.stream()
+    		.filter(e-> e.getBody().getMessage() instanceof CustSmsTemplate)
+    		.map(e-> ((CustSmsTemplate)e.getBody().getMessage()))
+    		.collect(Collectors.toList());
+		return contents;
+	}
 
 	@SuppressWarnings("unchecked")
 	private void assertCustomerNotificationIntents(List<NotificationIntent> result) {

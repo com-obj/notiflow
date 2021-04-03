@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
@@ -47,6 +48,14 @@ public abstract class BaseIntegrationTest {
     @BeforeEach
     protected void cleanGreenMailMailBoxes() throws FolderException {
     	greenMail.purgeEmailFromAllMailboxes();
+    }
+    
+    public static void purgeNotifTables() {
+    	JdbcTemplate jdbcTemplate  = Get.getBean(JdbcTemplate.class);
+        jdbcTemplate.batchUpdate("delete from nc_processing_info");
+        jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
+        jdbcTemplate.batchUpdate("delete from nc_endpoint");        
+        jdbcTemplate.batchUpdate("delete from nc_input");              
     }
     
     @Data
