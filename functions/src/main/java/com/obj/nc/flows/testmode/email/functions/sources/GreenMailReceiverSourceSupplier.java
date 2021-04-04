@@ -69,7 +69,7 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
 
 	@Override
 	protected List<Message> execute() {
-		log.info("Pulling messages from Test Mode GreenMail");
+		log.debug("Pulling messages from Test Mode GreenMail");
 		
         List<Message> allMessages = new ArrayList<>();
 
