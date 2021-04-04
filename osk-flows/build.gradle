@@ -89,7 +89,7 @@ task copyFatJarToDistFolder(type: Copy) {
     from bootJar // shortcut for bootJar.outputs.files
     into "dist-and-run/dist"
     
-    from 'src/main/resources' {
+    from('src/main/resources') {
        include '**/*.properties'
     }
     into 'dist-and-run/dist/resources'
