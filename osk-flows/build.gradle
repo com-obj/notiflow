@@ -85,9 +85,14 @@ test {
     useJUnitPlatform()
 }
 
-task copyDistToStagingFolder(type: Copy) {
+task copyFatJarToDistFolder(type: Copy) {
     from bootJar // shortcut for bootJar.outputs.files
-    into "./../docker/osk-flows/dist"
+    into "dist-and-run/dist"
+    
+    from 'src/main/resources' {
+       include '**/*.properties'
+    }
+    into 'dist-and-run/dist/resources'
 }
 
-build.dependsOn copyDistToStagingFolder
+build.dependsOn copyFatJarToDistFolder
