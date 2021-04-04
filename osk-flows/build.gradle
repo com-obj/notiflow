@@ -91,9 +91,7 @@ task copyFatJarToDistFolder(type: Copy) {
 }
 
 task copyResourcesToDistFolder(type: Copy) {
-    from('src/main/resources') {
-       include '**/*.properties'
-    }
+    from('src/main/resources')
     into 'dist-and-run/dist/resources'
 }
 
