@@ -88,7 +88,9 @@ test {
 task copyFatJarToDistFolder(type: Copy) {
     from bootJar // shortcut for bootJar.outputs.files
     into "dist-and-run/dist"
-    
+}
+
+task copyResourcesToDistFolder(type: Copy) {
     from('src/main/resources') {
        include '**/*.properties'
     }
@@ -96,3 +98,4 @@ task copyFatJarToDistFolder(type: Copy) {
 }
 
 build.dependsOn copyFatJarToDistFolder
+build.dependsOn copyResourcesToDistFolder
