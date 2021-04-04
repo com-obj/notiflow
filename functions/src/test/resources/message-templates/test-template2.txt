@@ -1,0 +1,6 @@
+
+Name: [(${name})]
+Parts:
+[# th:each="part : ${parts}" ]
+    [(${part.field1})], [(${part.field2})]
+[/]

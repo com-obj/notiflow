@@ -26,7 +26,7 @@
 			    </thead>
 			    <tbody>
 			     	<tr th:each="email : ${model.emailContents}">
-			            <td><span th:text="${email.getAttributeValue('ORIGINAL_RECIPIENTS')}"> cuzy@objectify.sk </span></td>
+			            <td><span th:text="${email.getAttributeValue('ORIGINAL_RECIPIENTS_EMAIL')}"> cuzy@objectify.sk </span></td>
 			            <td><span th:text="${email.subject}"> Subject1 </span></td>
 			            <td><span th:text="${email.text}"> Body1 </span></td>
 			            <td><span th:text="${email.attachments}"> Attachments </span></td>
@@ -34,6 +34,20 @@
 			    </tbody>
 		    </table>
 		 <h3>SMSs</h3>
+		 	<table>		
+			    <thead>
+			        <tr>
+			            <th th:text="#{testMode.header1.recipient}"> Rec </th>
+			            <th th:text="#{testMode.header1.message}"> Message </th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			     	<tr th:each="sms : ${model.smsContents}">
+			            <td><span th:text="${sms.getAttributeValue('ORIGINAL_RECIPIENTS_PHONE_NUM')}"> 09181111 </span></td>
+			            <td><span th:text="${sms.text}"> Body1 </span></td>
+			     	</tr>
+			    </tbody>
+		    </table>
 	 
 	 
 	 	<p th:text="#{testMode.footerMain}"></p>

@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.osk.dto.IncidentTicketOutageEndEventDto;
-import com.obj.nc.osk.dto.IncidentTicketOutageStartEventDto;
+import com.obj.nc.osk.domain.incidentTicket.IncidentTicketOutageEndEventDto;
+import com.obj.nc.osk.domain.incidentTicket.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.functions.config.NotifEventConverterConfig;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
@@ -25,6 +25,8 @@ public class EndOutageEventConverter extends BaseOutageEventConverter {
 		
 		customerEmailSubjectKey = "cust.end.subject";
 		customerEmailTemplateName = "customer-notification-outage-end.html";
+		
+		customerSmsTemplateName = "customer-notification-outage-end.txt";
 
 		salesEmailSubjectKey = "sales.end.subject";
 		salesEmailTemplateName = "sales-notification-outage-end.html";

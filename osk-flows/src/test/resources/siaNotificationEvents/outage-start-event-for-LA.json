@@ -46,7 +46,8 @@
          	{
          		"id": 777,
          		"name": "Igor Dysko",
-         		"emails": ["cuzy@objectify.sk"]
+         		"emails": ["cuzy@objectify.sk"],
+         		"phones": ["0905123456"]
          	}
          ]
       }

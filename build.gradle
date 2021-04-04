@@ -11,7 +11,6 @@ buildscript {
         classpath 'com.netflix.nebula:gradle-info-plugin:5.0.3'
         classpath 'com.netflix.nebula:nebula-release-plugin:11.1.0'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:13.0.0'
-        classpath 'com.google.cloud.tools:appengine-gradle-plugin:2.2.0'
     }
 }
 

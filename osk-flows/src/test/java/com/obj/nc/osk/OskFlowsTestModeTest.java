@@ -1,7 +1,5 @@
 package com.obj.nc.osk;
 
-import java.io.IOException;
-
 import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
@@ -9,10 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
@@ -29,19 +25,11 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
     
     @Autowired
     private GenericEventRepository genEventRepo;
-    
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    
+        
     @BeforeEach
-    void purgeNotifTables() throws FolderException, IOException {
-        jdbcTemplate.batchUpdate("delete from nc_processing_info");
-        jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
-        jdbcTemplate.batchUpdate("delete from nc_endpoint");        
-        jdbcTemplate.batchUpdate("delete from nc_input");       
+    void cleanTables() {
+        purgeNotifTables();     
     }
-
 	
     @Test
     void testNotifyCustomersViaTestmodeEmail() {
@@ -52,7 +40,7 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
     	genEventRepo.save(event);
     	
     	//THEN
-        boolean success = greenMail.waitForIncomingEmail(20000, 1);
+        boolean success = greenMail.waitForIncomingEmail(30000, 1);
         
         Assertions.assertThat(success).isTrue();
         
@@ -65,7 +53,9 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
         		"Processed with love by Notification Center by Objectify", //check if translations work
         		"Vase sluzby mozu byt nedostupne", "Your services could be affected", "Zakaznici maju problem", 
         		"cuzy@objectify.sk", "jancuzy@gmail.com", "sales@objectify.sk"/*CS Agent*/, "sales@orange.sk", "hahn@orange.sk",
-        		"dysko@objectify.sk", "nem_fukas@artin.sk", "slavkovsky@orange.sk"
+        		"dysko@objectify.sk", "nem_fukas@artin.sk", "slavkovsky@orange.sk",
+        		//SMSs
+        		"Na tuto SMS neodpovedajte.", "VPS(SN:0918186997)", "0918186997", "+421918186997", "0918186998"
         		)
         );
     }

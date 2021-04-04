@@ -1,0 +1,12 @@
+[(#{cust.start.sms.title})]
+[(#{cust.start.sms.salution})] [(${model.customerName})]
+[(#{cust.start.sms.atTime})] [# th:__df="#{dateTime.foramt}" th:"#dates.format(model.timeStart, __df)" /] [(#{cust.start.sms.hour})] [(#{cust.start.sms.outage})]
+
+[# th:each="service : ${model.services}" ]
+    [(${service.productName})](SN:[(${service.sn})])
+[/]
+
+[(#{cust.start.sms.footerLine1})]
+[(#{cust.start.sms.footerLine2})]
+[(#{cust.start.sms.signature})]
+

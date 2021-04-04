@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
@@ -98,7 +99,13 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 			helper.setTo(toEmail.getEmail());
 
 			helper.setSubject(messageContent.getSubject());
-			helper.setText(messageContent.getText(), MediaType.TEXT_HTML_VALUE.equals(messageContent.getContentType()) );
+			boolean isHtml = MediaType.TEXT_HTML_VALUE.equals(messageContent.getContentType());
+			
+			if (isHtml) {
+				helper.setText(StringEscapeUtils.unescapeHtml4( messageContent.getText() ), true );
+			} else {
+				helper.setText(messageContent.getText() );
+			}
 			
 			for (Attachement attachement: messageContent.getAttachments()) {
 				FileSystemResource file = new FileSystemResource(new File(attachement.getFileURI()));

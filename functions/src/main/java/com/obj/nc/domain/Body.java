@@ -5,8 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.SimpleTextContent;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
+import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 
@@ -19,6 +18,7 @@ public class Body extends BaseJSONObject{
 
 	private Content message = new SimpleTextContent();
 	
+	//Ak je body sucastou message tak recievingEndpoints.size() = 1
 	private List<RecievingEndpoint> recievingEndpoints = new ArrayList<RecievingEndpoint>();
 	
 	private DeliveryOptions deliveryOptions = new DeliveryOptions();	

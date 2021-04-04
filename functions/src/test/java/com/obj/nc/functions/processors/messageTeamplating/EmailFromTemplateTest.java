@@ -21,7 +21,7 @@ import com.obj.nc.utils.JsonUtils;
 @SpringBootTest
 class EmailFromTemplateTest extends BaseIntegrationTest {
 	
-	@Autowired private EmailTemplateFormatter teamplte2Html;
+	@Autowired private EmailTemplateFormatter template2Html;
 
 	@Test
 	void createSimpleHtmlEmailFromTemplate() {
@@ -30,7 +30,7 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 		Message msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 		
 		//WHEN
-		List<Message> htmlMessages = teamplte2Html.apply(msg);
+		List<Message> htmlMessages = template2Html.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
@@ -49,7 +49,7 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 		Message msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 		
 		//WHEN
-		List<Message> htmlMessages = teamplte2Html.apply(msg);
+		List<Message> htmlMessages = template2Html.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
@@ -69,7 +69,7 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 		Message msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 		
 		//WHEN
-		List<Message> htmlMessages = teamplte2Html.apply(msg);
+		List<Message> htmlMessages = template2Html.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(2);

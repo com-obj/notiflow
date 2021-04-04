@@ -1,13 +1,14 @@
 package com.obj.nc.osk.services;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.SimpleTextContent;
+import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.osk.dto.OskSendSmsRequestDto;
-import com.obj.nc.osk.dto.OskSendSmsResponseDto;
 import com.obj.nc.osk.exception.SmsClientException;
-import com.obj.nc.osk.functions.senders.OskSmsSenderConfigProperties;
+import com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl;
+import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
+import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsRequestDto;
+import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,19 +28,19 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.ConstraintViolationException;
 
-import static com.obj.nc.osk.services.OskSmsRestClientImpl.SEND_PATH;
+import static com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl.SEND_PATH;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
-@RestClientTest(OskSmsRestClientImpl.class)
+@RestClientTest(OskSmsSenderRestImpl.class)
 @ImportAutoConfiguration(ValidationAutoConfiguration.class)
 @EnableConfigurationProperties(OskSmsSenderConfigProperties.class)
 class OskSmsRestClientImplTest {
 
     @Autowired
-    private OskSmsRestClientImpl smsRestClient;
+    private OskSmsSenderRestImpl smsRestClient;
 
     @Autowired
     private OskSmsSenderConfigProperties properties;

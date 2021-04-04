@@ -1,12 +1,13 @@
 package com.obj.nc.osk.senders;
 
-import com.obj.nc.BaseIntegrationTest;
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.osk.dto.OskSendSmsResponseDto;
-import com.obj.nc.osk.functions.senders.OskSmsSender;
-import com.obj.nc.osk.functions.senders.OskSmsSenderConfigProperties;
-import com.obj.nc.utils.JsonUtils;
+import static com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl.SEND_PATH;
+import static com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl.SEND_SMS_RESPONSE_ATTRIBUTE;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,13 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import static com.obj.nc.functions.processors.senders.BaseSmsSender.SEND_SMS_RESPONSE_ATTRIBUTE;
-import static com.obj.nc.osk.services.OskSmsRestClientImpl.SEND_PATH;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import com.obj.nc.BaseIntegrationTest;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.functions.processors.senders.SmsSender;
+import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
+import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockRestServiceServer
@@ -33,7 +37,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 class OskSmsSenderTest extends BaseIntegrationTest {
 
     @Autowired
-    private OskSmsSender function;
+    private SmsSender smsSender;
 
     @Autowired
     private OskSmsSenderConfigProperties properties;
@@ -63,7 +67,7 @@ class OskSmsSenderTest extends BaseIntegrationTest {
                 );
 
         // WHEN
-        Message sentMessage = function.apply(inputMessage);
+        Message sentMessage = smsSender.apply(inputMessage);
 
         // THEN
         mockRestServiceServer.verify();
