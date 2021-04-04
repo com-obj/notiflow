@@ -69,3 +69,21 @@ nc:
             - cuzy@objectify.sk
 
 ---
+spring.config.activate.on-profile: neuron
+
+server.port: 8088
+
+nc:
+   flows:
+      test-mode:
+         enabled: true
+         recipients:
+            - cuzy@objectify.sk
+   functions:
+      email-templates:
+         templates-root-dir:
+            - ./resources/message-templates
+         messages-dir-and-base-name: file:resources/message-templates/messages
+
+
+
