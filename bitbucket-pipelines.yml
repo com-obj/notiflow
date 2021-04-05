@@ -11,11 +11,11 @@ pipelines:
   default:
     - parallel:
       - step:
-          name: Build and Test
+          name: Test
           caches:
             - gradle
           script:
-            - gradle build --tests com.obj.nc.osk.package*
+            - gradle test --tests com.obj.nc.osk.package*
           after-script:
             - pipe: atlassian/checkstyle-report:0.2.0
       - step:
