@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
@@ -22,6 +24,7 @@ import com.obj.nc.repositories.GenericEventRepository;
 		"spring.main.allow-bean-definition-overriding=true",
 		"nc.flows.test-mode.period-in-seconds=1",
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class OskFlowsTestModeTest extends BaseIntegrationTest {
     
     @Autowired

@@ -18,6 +18,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -34,6 +36,7 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockRestServiceServer
 @ImportAutoConfiguration(ValidationAutoConfiguration.class)
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 class OskSmsSenderTest extends BaseIntegrationTest {
 
     @Autowired

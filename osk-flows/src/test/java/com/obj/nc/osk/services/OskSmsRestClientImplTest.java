@@ -1,15 +1,14 @@
 package com.obj.nc.osk.services;
 
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.endpoints.SmsEndpoint;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.osk.exception.SmsClientException;
-import com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl;
-import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
-import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsRequestDto;
-import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
-import com.obj.nc.utils.JsonUtils;
+import static com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl.SEND_PATH;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+
+import javax.validation.ConstraintViolationException;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,23 +19,30 @@ import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.validation.ConstraintViolationException;
-
-import static com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl.SEND_PATH;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.sms.SimpleTextContent;
+import com.obj.nc.domain.endpoints.SmsEndpoint;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.osk.exception.SmsClientException;
+import com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl;
+import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
+import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsRequestDto;
+import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest(OskSmsSenderRestImpl.class)
 @ImportAutoConfiguration(ValidationAutoConfiguration.class)
 @EnableConfigurationProperties(OskSmsSenderConfigProperties.class)
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 class OskSmsRestClientImplTest {
 
     @Autowired

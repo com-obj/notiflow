@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.BaseIntegrationTest;
@@ -42,6 +44,7 @@ import com.obj.nc.utils.JsonUtils;
 @SpringIntegrationTest(noAutoStartup = {
 		GENERIC_EVENT_CHANNEL_ADAPTER_FLOW_ID_BEAN_NAME, 
 		GENERIC_EVENT_CHANNEL_ADAPTER_PAYLOAD_TYPE_BEAN_NAME})
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class NotificationEventConverterProcessingFunctionTest extends BaseIntegrationTest {
 	
 	@Autowired private StartOutageEventConverter startOutageConverter;

@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpMethod;
 import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 
@@ -42,6 +44,7 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest
 @TestMethodOrder(OrderAnnotation.class)
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class OskFlowsFullUCTest extends BaseIntegrationTest {
     
     @Autowired private GenericEventRepository genEventRepo;
