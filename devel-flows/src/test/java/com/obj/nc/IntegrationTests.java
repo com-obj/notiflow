@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.binder.test.InputDestination;
@@ -25,6 +26,7 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @Import(TestChannelBinderConfiguration.class)
 @ContextConfiguration(classes = EventGeneratorTestApplication.class)
+@Ignore
 public class IntegrationTests extends BaseIntegrationTest {
 
 	private static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
