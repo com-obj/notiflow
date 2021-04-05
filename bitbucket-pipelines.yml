@@ -34,7 +34,7 @@ pipelines:
          - step:
              name: Build FAT Jar
              script:
-               - gradle build -x test --stacktrace   
+               - gradle build -x test --stacktrace --info   
              astifacts:
                - osk-flows/dist/**   
 #         - step:

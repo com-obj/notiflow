@@ -13,8 +13,6 @@ spring.datasource:
    url: jdbc:postgresql://localhost:25432/nc
    username: nc
    password: ZMss4o9mdBLV
-   
-spring.main.allow-bean-definition-overriding: true
 
 nc:
    functions:
