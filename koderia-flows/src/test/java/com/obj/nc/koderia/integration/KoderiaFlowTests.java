@@ -13,7 +13,7 @@ import java.util.List;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
@@ -45,7 +45,7 @@ import com.obj.nc.utils.JsonUtils;
 })
 @AutoConfigureMockRestServiceServer
 @ContextConfiguration(classes = KoderiaFlowsApplication.class)
-@Ignore
+@Disabled
 public class KoderiaFlowTests extends BaseIntegrationTest {
 
 	public static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
@@ -66,7 +66,6 @@ public class KoderiaFlowTests extends BaseIntegrationTest {
 	private MockRestServiceServer mockMailchimpRestServer;
 
 	@Test
-	@Ignore
 	public void testJobPostKoderiaEventEmited() throws Exception {
 		// WITH MOCK SERVER CONFIG
 		String mailchimpSendMessageUri = mailchimpApiConfig.getApi().getUri() + SEND_TEMPLATE_PATH;

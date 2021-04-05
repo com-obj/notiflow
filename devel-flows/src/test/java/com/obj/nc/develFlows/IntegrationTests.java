@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.binder.test.InputDestination;
@@ -28,6 +28,7 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @Import(TestChannelBinderConfiguration.class)
 @ContextConfiguration(classes = EventGeneratorTestApplication.class)
+@Disabled
 public class IntegrationTests extends BaseIntegrationTest {
 
 	private static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
@@ -45,7 +46,6 @@ public class IntegrationTests extends BaseIntegrationTest {
 	private CompositeMessageConverter messageConverter;
 
 	@Test
-	@Ignore
 	public void testEventEmited() {
 		String INPUT_JSON_FILE = "allEvents/ba_job_post.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
@@ -67,7 +67,6 @@ public class IntegrationTests extends BaseIntegrationTest {
 	}
 
 	@Test
-	@Ignore
 	public void testProcessJournalingPersisted() {
 		// given empty processing info table
 		jdbcTemplate.execute("truncate table nc_processing_info");
