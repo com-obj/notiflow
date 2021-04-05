@@ -15,7 +15,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - gradle :functions:test :osk-flows:test -Dspring.profiles.active=bitbucket
+            - gradle :functions:test :osk-flows:test -Dspring.profiles.active=bitbucket --info --stacktrace
           after-script:
             - pipe: atlassian/checkstyle-report:0.2.0
       - step:
