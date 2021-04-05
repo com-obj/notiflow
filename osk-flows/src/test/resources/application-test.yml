@@ -1,7 +1,7 @@
 testEnv: local
 
 spring:
-   flyway.enabled: false
+ #  flyway.enabled: false
    mail:
       host: localhost
       port: 3025

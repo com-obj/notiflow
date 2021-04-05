@@ -28,7 +28,6 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @Import(TestChannelBinderConfiguration.class)
 @ContextConfiguration(classes = EventGeneratorTestApplication.class)
-
 public class IntegrationTests extends BaseIntegrationTest {
 
 	private static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";

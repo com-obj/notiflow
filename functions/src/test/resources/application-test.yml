@@ -1,6 +1,6 @@
 testEnv: local
 
-spring.flyway.enabled: false
+#spring.flyway.enabled: false
 
 spring.mail:
    host: localhost
