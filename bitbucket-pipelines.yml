@@ -1,27 +1,35 @@
 image: gradle:6.8.2
 
-runTestsStep: &runTestStep 
-  step:
-    name: Run tests
-    caches:
-      - gradle
-      - maven
-      - docker
-    services:
-      - postgres
-    script:
-      - gradle test -Dspring.profiles.active=bitbucket --stacktrace
-    after-script:
-      - pipe: atlassian/checkstyle-report:0.2.0
-#    artifacts: 
-#      - ./**/build/reports/tests/test/**
+definitions: 
+   steps:
+     - step: &runTestStep
+         name: Run tests
+         caches:
+           - gradle
+           - maven
+           - docker
+         services:
+           - postgres
+         script:
+           - gradle test -Dspring.profiles.active=bitbucket --stacktrace
+         after-script:
+           - pipe: atlassian/checkstyle-report:0.2.0
+   #      artifacts: 
+   #        - ./**/build/reports/tests/test/*
+   services: 
+     postgres: 
+       image: postgres 
+       variables: 
+         POSTGRES_DB: 'nc' 
+         POSTGRES_USER: 'nc'
+         POSTGRES_PASSWORD: 'ZMss4o9mdBLV'
 
 pipelines:
   branches: 
     develop:
-      - <<: *runTestStep
+      - step: *runTestStep
     master:
-      - <<: *runTestStep
+      - step: *runTestStep
       - parallel:
          - step:
              name: Build FAT Jar
@@ -36,11 +44,3 @@ pipelines:
 #              # See more security tools at https://bitbucket.org/product/features/pipelines/integrations?&category=security
 #              - pipe: atlassian/git-secrets-scan:0.4.        
           
-definitions: 
-   services: 
-     postgres: 
-       image: postgres 
-       variables: 
-         POSTGRES_DB: 'nc' 
-         POSTGRES_USER: 'nc'
-         POSTGRES_PASSWORD: 'ZMss4o9mdBLV'
