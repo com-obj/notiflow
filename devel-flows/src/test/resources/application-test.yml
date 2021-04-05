@@ -2,6 +2,8 @@ testEnv: local
 
 #spring.flyway.enabled: false
 
+spring.main.allow-bean-definition-overriding: true
+
 spring.mail:
    host: localhost
    port: 3025

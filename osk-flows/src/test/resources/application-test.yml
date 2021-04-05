@@ -10,6 +10,8 @@ spring:
       properties:
          mail.debug: true
 
+spring.main.allow-bean-definition-overriding: true
+
 nc:
    functions:
       event-generator:

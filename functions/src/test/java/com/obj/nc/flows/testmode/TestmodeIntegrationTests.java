@@ -43,7 +43,6 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME)
 @SpringBootTest(properties = {
-		"spring.main.allow-bean-definition-overriding=true",
 		"nc.flows.test-mode.enabled=true", 
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //Because of correct disposal of green mail used for test mode

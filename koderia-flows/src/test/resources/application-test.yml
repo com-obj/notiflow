@@ -7,6 +7,7 @@ spring:
     port: 3025
     username: no-reply@objectify.sk
     password: xxx
+  main.allow-bean-definition-overriding: true
 
 koderia.api.uri: https://www.koderia.sk/api/v1
 
