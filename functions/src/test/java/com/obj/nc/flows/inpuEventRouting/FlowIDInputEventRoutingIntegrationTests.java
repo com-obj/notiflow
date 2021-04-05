@@ -28,7 +28,7 @@ import com.obj.nc.utils.JsonUtils;
 @SpringIntegrationTest
 @SpringBootTest(properties = {
 		"nc.flows.input-evet-routing.type=FLOW_ID"})
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS) //Because of correct disposal of green mail used for test mode
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class FlowIDInputEventRoutingIntegrationTests extends BaseIntegrationTest {
 	
 	@Autowired private GenericEventPersisterConsumer persister;

@@ -29,7 +29,7 @@ import com.obj.nc.utils.JsonUtils;
 		"nc.flows.input-evet-routing.type-propery-name=@type",
 		"nc.flows.input-evet-routing.type-channel-mapping.TYPE_1=CHANNEL_1",
 		"nc.flows.input-evet-routing.type-channel-mapping.TYPE_2=CHANNEL_2"})
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS) //Because of correct disposal of green mail used for test mode
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class TypeIDInputEventRoutingIntegrationTests extends BaseIntegrationTest {
 	
 	@Autowired private GenericEventPersisterConsumer persister;
