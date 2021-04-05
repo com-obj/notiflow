@@ -8,6 +8,8 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.BaseIntegrationTest;
@@ -20,6 +22,7 @@ import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 class SmsFromTemplateTest extends BaseIntegrationTest {
 	
 	@Autowired private SmsTemplateFormatter template2Sms;
