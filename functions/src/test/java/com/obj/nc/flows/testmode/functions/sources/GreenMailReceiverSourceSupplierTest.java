@@ -36,6 +36,7 @@ import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = {"test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(properties = {
+		"spring.main.allow-bean-definition-overriding=true",
 		"nc.flows.test-mode.enabled=true", 
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk",
 		"nc.flows.test-mode.periodInSeconds=64000"}) //Don't poll, I'll make it by my self
