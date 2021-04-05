@@ -37,7 +37,6 @@ spring.datasource:
   url: jdbc:postgresql://localhost:5432/nc
 ---
 spring.config.activate.on-profile: bitbucket
-testEnv: bitbucket
 spring.datasource:
   url: jdbc:postgresql://localhost:5432/nc
 ---

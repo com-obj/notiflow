@@ -14,17 +14,20 @@ pipelines:
           name: Test
           caches:
             - gradle
+          services:
+            - postgres
           script:
             - gradle :functions:test :osk-flows:test -Dspring.profiles.active=bitbucket --info --stacktrace
           after-script:
             - pipe: atlassian/checkstyle-report:0.2.0
-      - step:
-          name: Security Scan
-          script:
-            # Run a security scan for sensitive data.
-            # See more security tools at https://bitbucket.org/product/features/pipelines/integrations?&category=security
-            - pipe: atlassian/git-secrets-scan:0.4.3
+#      - step:
+#          name: Security Scan
+#          script:
+#            # Run a security scan for sensitive data.
+#            # See more security tools at https://bitbucket.org/product/features/pipelines/integrations?&category=security
+#            - pipe: atlassian/git-secrets-scan:0.4.3
 
+          
 definitions: 
    services: 
      postgres: 
