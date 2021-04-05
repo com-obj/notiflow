@@ -35,7 +35,7 @@ pipelines:
              name: Build FAT Jar
              script:
                - gradle build -x test --stacktrace --info   
-             astifacts:
+             artifacts:
                - osk-flows/dist/**   
 #         - step:
 #             name: Security Scan
