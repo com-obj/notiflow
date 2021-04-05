@@ -66,6 +66,7 @@ public class KoderiaFlowTests extends BaseIntegrationTest {
 	private MockRestServiceServer mockMailchimpRestServer;
 
 	@Test
+	@Ignore
 	public void testJobPostKoderiaEventEmited() throws Exception {
 		// WITH MOCK SERVER CONFIG
 		String mailchimpSendMessageUri = mailchimpApiConfig.getApi().getUri() + SEND_TEMPLATE_PATH;
