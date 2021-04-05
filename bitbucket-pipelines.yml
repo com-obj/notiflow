@@ -7,23 +7,27 @@
 
 image: gradle:6.8.2
 
+runTestsStep: &runTestStep 
+  step:
+    name: Run tests
+    caches:
+      - gradle
+      - maven
+      - docker
+    services:
+      - postgres
+    script:
+      - gradle test -Dspring.profiles.active=bitbucket --stacktrace
+    after-script:
+      - pipe: atlassian/checkstyle-report:0.2.0
+    artifacts: 
+#     - ./**/dist/**
+      - ./**/build/reports/tests/test/**
+
 pipelines:
-  default:
-    - step:
-        name: Test
-        caches:
-          - gradle
-          - maven
-          - docker
-        services:
-          - postgres
-        script:
-          - gradle :functions:test :osk-flows:test -Dspring.profiles.active=bitbucket --info --stacktrace
-        after-script:
-          - pipe: atlassian/checkstyle-report:0.2.0
-        artifacts: 
-          - dist/**
-          - reports/**
+  branches: 
+    - master:
+      - <<: *runTestStep
 #      - step:
 #          name: Security Scan
 #          script:
