@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
@@ -25,7 +27,7 @@ import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS) 
 class EmailSenderSinkTest extends BaseIntegrationTest {
 
     @Autowired private JavaMailSenderImpl defaultJavaMailSender;

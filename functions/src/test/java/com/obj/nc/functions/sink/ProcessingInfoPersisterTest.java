@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.BaseIntegrationTest;
@@ -29,6 +31,7 @@ import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.Pro
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 class ProcessingInfoPersisterTest extends BaseIntegrationTest {
 
 	@Autowired private ProcessingInfoPersisterSinkConsumer processingInfoPersister;

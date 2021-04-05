@@ -46,7 +46,7 @@ import com.obj.nc.utils.JsonUtils;
 		"spring.main.allow-bean-definition-overriding=true",
 		"nc.flows.test-mode.enabled=true", 
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS) //Because of correct disposal of green mail used for test mode
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class TestmodeIntegrationTests extends BaseIntegrationTest {
 	
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
