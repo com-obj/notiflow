@@ -58,7 +58,7 @@ public class OskFlowsFullUCWithLATest extends BaseIntegrationTest {
     	genEventRepo.save(event);
     	
     	//THEN
-        boolean success = greenMail.waitForIncomingEmail(10000, 3); //en+sk
+        boolean success = greenMail.waitForIncomingEmail(20000, 3); //en+sk
         
         Assertions.assertThat(success).isTrue();
         
