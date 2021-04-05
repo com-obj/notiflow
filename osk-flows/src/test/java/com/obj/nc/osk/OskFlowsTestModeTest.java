@@ -19,6 +19,7 @@ import com.obj.nc.repositories.GenericEventRepository;
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(properties = {
 		"nc.flows.test-mode.enabled=true", 
+		"spring.main.allow-bean-definition-overriding=true",
 		"nc.flows.test-mode.period-in-seconds=1",
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
 public class OskFlowsTestModeTest extends BaseIntegrationTest {
