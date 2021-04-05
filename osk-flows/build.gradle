@@ -78,12 +78,12 @@ dependencyManagement {
 
 task copyFatJarToDistFolder(type: Copy) {
     from bootJar // shortcut for bootJar.outputs.files
-    into "dist-and-run/dist"
+    into "dist"
 }
 
 task copyResourcesToDistFolder(type: Copy) {
     from('src/main/resources')
-    into 'dist-and-run/dist/resources'
+    into 'dist/resources'
 }
 
 build.dependsOn copyFatJarToDistFolder

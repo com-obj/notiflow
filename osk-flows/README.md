@@ -3,7 +3,7 @@ To build the fat jar run (you need to run this command from the root of the repo
 
 `gradlew build -x test`
 
-This will place fat jar into ./dist-and-run/dist directory along with external resources like application.yaml, thymeleaf templates and message resources.
+This will place fat jar into ./dist directory along with external resources like application.yaml, thymeleaf templates and message resources.
 
 ### Dependent components
 To run the application you will need running postgres database. You can run pre-configured using the command
@@ -20,4 +20,4 @@ To start application run
 ### Application configuration
 The application configuration file used when running distribution can be found in 
      
-    ./dist-and-run/dist/resources/application.yml
+    ./dist/resources/application.yml
