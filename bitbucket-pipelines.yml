@@ -21,6 +21,9 @@ pipelines:
           - gradle :functions:test :osk-flows:test -Dspring.profiles.active=bitbucket --info --stacktrace
         after-script:
           - pipe: atlassian/checkstyle-report:0.2.0
+        artifacts: 
+          - dist/**
+          - reports/**
 #      - step:
 #          name: Security Scan
 #          script:
