@@ -24,3 +24,12 @@ pipelines:
             # Run a security scan for sensitive data.
             # See more security tools at https://bitbucket.org/product/features/pipelines/integrations?&category=security
             - pipe: atlassian/git-secrets-scan:0.4.3
+
+definitions: 
+   services: 
+     postgres: 
+       image: postgres 
+       variables: 
+         POSTGRES_DB: 'nc' 
+         POSTGRES_USER: 'nc'
+         POSTGRES_PASSWORD: 'ZMss4o9mdBLV'
