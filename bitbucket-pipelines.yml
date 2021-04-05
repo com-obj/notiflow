@@ -15,7 +15,7 @@ definitions:
          after-script:
            - pipe: atlassian/checkstyle-report:0.2.0
          artifacts: 
-           - ./build/**/build/reports/tests/test/**
+           - osk-flows/build/reports/tests/test/**
    services: 
      postgres: 
        image: postgres 
