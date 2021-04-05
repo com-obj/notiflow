@@ -9,17 +9,18 @@ image: gradle:6.8.2
 
 pipelines:
   default:
-    - parallel:
-      - step:
-          name: Test
-          caches:
-            - gradle
-          services:
-            - postgres
-          script:
-            - gradle :functions:test :osk-flows:test -Dspring.profiles.active=bitbucket --info --stacktrace
-          after-script:
-            - pipe: atlassian/checkstyle-report:0.2.0
+    - step:
+        name: Test
+        caches:
+          - gradle
+          - maven
+          - docker
+        services:
+          - postgres
+        script:
+          - gradle :functions:test :osk-flows:test -Dspring.profiles.active=bitbucket --info --stacktrace
+        after-script:
+          - pipe: atlassian/checkstyle-report:0.2.0
 #      - step:
 #          name: Security Scan
 #          script:
