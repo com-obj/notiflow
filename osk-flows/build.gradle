@@ -14,11 +14,6 @@ bootJar {
     archiveVersion =  '1.0.0'
 }
 
-
-repositories {
-    mavenCentral()
-}
-
 ext {
     set('testcontainersVersion', "1.15.1")
     set('junitJupiterVersion', '5.4.2')
@@ -80,10 +75,6 @@ dependencyManagement {
     }
 }
 
-test {
-    systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
-    useJUnitPlatform()
-}
 
 task copyFatJarToDistFolder(type: Copy) {
     from bootJar // shortcut for bootJar.outputs.files
@@ -97,3 +88,13 @@ task copyResourcesToDistFolder(type: Copy) {
 
 build.dependsOn copyFatJarToDistFolder
 build.dependsOn copyResourcesToDistFolder
+
+repositories {
+    mavenCentral()
+}
+
+test {
+    systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
+    useJUnitPlatform()
+}
+

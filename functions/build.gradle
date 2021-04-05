@@ -9,24 +9,6 @@ group = 'com.obj.nc.functions'
 version = '1.0.0'
 sourceCompatibility = '1.8'
 
-bootJar {
-	enabled = false
-}
-
-jar {
-	enabled = true
-}
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
-repositories {
-	mavenCentral()
-}
-
 ext {
 	set('testcontainersVersion', "1.15.1")
 	set('junitJupiterVersion', '5.4.2')
@@ -69,7 +51,7 @@ dependencies {
 		exclude group: "com.vaadin.external.google", module:"android-json"
 	}
 	  
-    testImplementation 'commons-jxpath:commons-jxpath'
+    testImplementation 'commons-jxpath:commons-jxpath:1.3'
 	
 	testCompile 'org.junit.jupiter:junit-jupiter-api'
     testRuntime 'org.junit.jupiter:junit-jupiter-engine' 
@@ -113,3 +95,23 @@ test {
 	systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
 	useJUnitPlatform()
 }
+
+bootJar {
+	enabled = false
+}
+
+jar {
+	enabled = true
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+
