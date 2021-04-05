@@ -1,18 +1,19 @@
 package com.obj.nc.koderia.integration;
 
-import com.obj.nc.BaseIntegrationTest;
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.koderia.KoderiaFlowsApplication;
-import com.obj.nc.koderia.config.MailchimpApiConfig;
-import com.obj.nc.koderia.dto.EmitEventDto;
-import com.obj.nc.koderia.dto.EventDataDto;
-import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
-import com.obj.nc.utils.JsonUtils;
-import org.flywaydb.core.Flyway;
+import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.koderia.functions.processors.senders.MailchimpSenderExecution.MAILCHIMP_RESPONSE_FIELD;
+import static com.obj.nc.koderia.services.MailchimpRestClientImpl.SEND_TEMPLATE_PATH;
+import static org.springframework.test.web.client.ExpectedCount.times;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+import java.util.Collections;
+import java.util.List;
+
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
@@ -27,15 +28,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 
-import java.util.Collections;
-import java.util.List;
-
-import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
-import static com.obj.nc.koderia.functions.processors.senders.MailchimpSenderExecution.MAILCHIMP_RESPONSE_FIELD;
-import static com.obj.nc.koderia.services.MailchimpRestClientImpl.SEND_TEMPLATE_PATH;
-import static org.springframework.test.web.client.ExpectedCount.times;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import com.obj.nc.BaseIntegrationTest;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.koderia.KoderiaFlowsApplication;
+import com.obj.nc.koderia.config.MailchimpApiConfig;
+import com.obj.nc.koderia.dto.EmitEventDto;
+import com.obj.nc.koderia.dto.EventDataDto;
+import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @Import({
@@ -44,6 +45,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 })
 @AutoConfigureMockRestServiceServer
 @ContextConfiguration(classes = KoderiaFlowsApplication.class)
+@Ignore
 public class KoderiaFlowTests extends BaseIntegrationTest {
 
 	public static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
