@@ -1,4 +1,4 @@
-package com.obj.nc;
+package com.obj.nc.develFlows;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +19,9 @@ import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
+import com.obj.nc.BaseIntegrationTest;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.develFlows.EventGeneratorTestApplication;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.utils.JsonUtils;

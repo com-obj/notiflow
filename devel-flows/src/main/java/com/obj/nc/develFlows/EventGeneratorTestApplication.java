@@ -1,4 +1,4 @@
-package com.obj.nc;
+package com.obj.nc.develFlows;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
