@@ -14,8 +14,8 @@ definitions:
            - gradle test -Dspring.profiles.active=bitbucket --stacktrace
          after-script:
            - pipe: atlassian/checkstyle-report:0.2.0
-   #      artifacts: 
-   #        - ./**/build/reports/tests/test/*
+         artifacts: 
+           - ./**/build/reports/tests/test/**
    services: 
      postgres: 
        image: postgres 
