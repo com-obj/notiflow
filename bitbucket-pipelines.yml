@@ -26,15 +26,15 @@ pipelines:
          - step:
              name: Build FAT Jar
              script:
-               - pipe: atlassian/git-secrets-scan:0.4.3   
+               - gradle build -x test --stacktrace   
              astifacts:
                - ./**/dist/**   
-         - step:
-             name: Security Scan
-             script:
-              # Run a security scan for sensitive data.
-              # See more security tools at https://bitbucket.org/product/features/pipelines/integrations?&category=security
-              - pipe: atlassian/git-secrets-scan:0.4.        
+#         - step:
+#             name: Security Scan
+#             script:
+#              # Run a security scan for sensitive data.
+#              # See more security tools at https://bitbucket.org/product/features/pipelines/integrations?&category=security
+#              - pipe: atlassian/git-secrets-scan:0.4.        
           
 definitions: 
    services: 
