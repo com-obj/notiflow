@@ -11,7 +11,7 @@ sourceCompatibility = '1.8'
 
 ext {
 	set('testcontainersVersion', "1.15.1")
-	set('junitJupiterVersion', '5.4.2')
+	set('junitJupiterVersion', '5.7.0')
 }
 
 dependencies {

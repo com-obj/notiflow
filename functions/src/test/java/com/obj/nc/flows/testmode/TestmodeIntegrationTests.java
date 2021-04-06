@@ -9,6 +9,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     }
 
     @Test
+    @Tag("test-mode")
     void testTestmode() throws MessagingException {
     	//normaly, we would send all test mail to standrdTestGMServer. When testMode profile is activated, aditional testModeEmailsReciver
     	//is created which is a different instannce. In this mode testModeEmailsReciver will catch all emails normaly send to standardTestGMServer
