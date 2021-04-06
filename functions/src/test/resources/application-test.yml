@@ -14,6 +14,8 @@ spring.datasource:
    username: nc
    password: ZMss4o9mdBLV
 
+spring.main.allow-bean-definition-overriding: true
+
 nc:
    functions:
       event-generator:

@@ -9,11 +9,15 @@ import java.util.UUID;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.ProcessingInfo;
@@ -46,6 +50,14 @@ class ProcessingInfoPersisterTest extends BaseIntegrationTest {
         jdbcTemplate.execute("truncate table nc_processing_info");
         jdbcTemplate.execute("truncate table nc_endpoint");
     }
+    
+    @RegisterExtension
+    protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+      	.withConfiguration(
+      			GreenMailConfiguration.aConfig()
+      			.withUser("no-reply@objectify.sk", "xxx"))
+      	.withPerMethodLifecycle(true);
+
 
     @Test
     void testPersistPIForEvent() {

@@ -11,8 +11,8 @@ import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,8 +21,11 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.Body;
@@ -40,11 +43,9 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = {"test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME)
 @SpringBootTest(properties = {
-		"spring.main.allow-bean-definition-overriding=true",
 		"nc.flows.test-mode.enabled=true", 
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
-@DirtiesContext(classMode =ClassMode.AFTER_CLASS) //need to dispose testModeSMTPServer
-@Disabled
+@DirtiesContext(classMode =ClassMode.AFTER_CLASS) //need to dispose @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME) testModeEmailsReciver
 public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
@@ -52,10 +53,18 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 	@Autowired private TestModeProperties properties;
 	@Autowired private EmailSender emailSenderSinkProcessingFunction;
 	@Autowired private GreenMailReceiverSourceSupplier greenMailReceiverSourceSupplier;
+	
+    @RegisterExtension
+    protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+      	.withConfiguration(
+      			GreenMailConfiguration.aConfig()
+      			.withUser("no-reply@objectify.sk", "xxx"))
+      	.withPerMethodLifecycle(true);
 
     @BeforeEach
     void setUp() throws FolderException {
     	testModeEmailsReciver.purgeEmailFromAllMailboxes();
+    	greenMail.purgeEmailFromAllMailboxes();
     }
 
     @Test
