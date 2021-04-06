@@ -1,6 +1,7 @@
 package com.obj.nc.flows.testmode.functions.sources;
 
 
+import static com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -10,10 +11,12 @@ import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -35,13 +38,14 @@ import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = {"test"}, resolver = SystemPropertyActiveProfileResolver.class)
+@SpringIntegrationTest(noAutoStartup = TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME)
 @SpringBootTest(properties = {
 		"spring.main.allow-bean-definition-overriding=true",
 		"nc.flows.test-mode.enabled=true", 
-		"nc.flows.test-mode.recipients=cuzy@objectify.sk",
-		"nc.flows.test-mode.periodInSeconds=64000"}) //Don't poll, I'll make it by my self
+		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
 @DirtiesContext(classMode =ClassMode.AFTER_CLASS) //need to dispose testModeSMTPServer
-class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
+@Disabled
+public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
     @Autowired private GreenMail testModeEmailsReciver;
