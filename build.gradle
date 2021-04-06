@@ -34,7 +34,7 @@ subprojects {
     }
 }
 
-
+/*
 task resolveDependencies(group: "build setup", description: "Resolve and prefetch dependencies") {
     doLast {
         def resolve = {
@@ -50,3 +50,4 @@ task resolveDependencies(group: "build setup", description: "Resolve and prefetc
         }
     }
 }
+*/

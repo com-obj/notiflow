@@ -11,7 +11,7 @@ definitions:
          services:
            - postgres
          script:
-           - gradle :functions:test :functions:complexTest -Dspring.profiles.active=bitbucket --stacktrace --info
+           - gradle :functions:complexTest :functions:test -Dspring.profiles.active=bitbucket --stacktrace --info
          after-script:
            - pipe: atlassian/checkstyle-report:0.2.0
          artifacts: 

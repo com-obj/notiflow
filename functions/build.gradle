@@ -99,6 +99,7 @@ test {
 }
 
 task complexTest(type: Test) {
+	systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
     useJUnitPlatform {
         includeTags 'test-mode'
     }
