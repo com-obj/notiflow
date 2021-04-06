@@ -9,7 +9,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +52,6 @@ import com.obj.nc.utils.JsonUtils;
 		"nc.flows.test-mode.enabled=true", 
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //need to dispose @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME) testModeEmailsReciver
-@Disabled
 public class TestmodeIntegrationTests extends BaseIntegrationTest {
 	
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
