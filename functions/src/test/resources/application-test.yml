@@ -1,4 +1,4 @@
-testEnv: local
+testEnv: no-test-containers
 
 #spring.flyway.enabled: false
 

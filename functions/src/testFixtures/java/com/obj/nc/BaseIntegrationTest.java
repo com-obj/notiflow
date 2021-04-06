@@ -13,7 +13,6 @@ import javax.mail.internet.MimeMessage;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -31,7 +30,6 @@ import lombok.ToString;
     SINGLETON pattern class with containers for all test classes
     see more: https://www.testcontainers.org/test_framework_integration/manual_lifecycle_control/#singleton-containers
  */
-@SpringBootTest
 public abstract class BaseIntegrationTest {
 
     static FixedPortPostgreSQLContainer<?> POSTGRESQL_CONTAINER;
@@ -43,7 +41,7 @@ public abstract class BaseIntegrationTest {
       	.withConfiguration(
       			GreenMailConfiguration.aConfig()
       			.withUser("no-reply@objectify.sk", "xxx"))
-      	.withPerMethodLifecycle(false);
+      	.withPerMethodLifecycle(true);
     
     @BeforeEach
     protected void cleanGreenMailMailBoxes() throws FolderException {

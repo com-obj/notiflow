@@ -1,7 +1,6 @@
 package com.obj.nc.osk.functions;
 
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_FLOW_ID_BEAN_NAME;
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_PAYLOAD_TYPE_BEAN_NAME;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,8 +41,7 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest
 @SpringIntegrationTest(noAutoStartup = {
-		GENERIC_EVENT_CHANNEL_ADAPTER_FLOW_ID_BEAN_NAME, 
-		GENERIC_EVENT_CHANNEL_ADAPTER_PAYLOAD_TYPE_BEAN_NAME})
+		GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class NotificationEventConverterProcessingFunctionTest extends BaseIntegrationTest {
 	

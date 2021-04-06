@@ -1,9 +1,12 @@
 package com.obj.nc.flows.inpuEventRouting;
 
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.mail.MessagingException;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,11 +14,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.channel.QueueChannel;
+import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.BaseIntegrationTest;
@@ -25,25 +27,37 @@ import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
-@SpringIntegrationTest
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest(properties = {
 		"nc.flows.input-evet-routing.type=FLOW_ID"})
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class FlowIDInputEventRoutingIntegrationTests extends BaseIntegrationTest {
 	
 	@Autowired private GenericEventPersisterConsumer persister;
 	@Qualifier("TEST_FLOW_INPUT")
 	@Autowired private PollableChannel flowInputChannel;
 	
+	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
+	@Autowired private SourcePollingChannelAdapter pollableSource;
+	
+    @BeforeEach
+    public void startSourcePolling() {
+    	pollableSource.start();
+    }
+	
     @Test
     void testGenericEventRouting() throws MessagingException {
         GenericEvent event = GenericEvent.from(JsonUtils.readJsonNodeFromClassPathResource("events/generic_event.json"));
-        event.setFlowId("TEST_FLOW");
+        event.setFlowId("TEST_FLOW"); //this maps to input channel name
         
         persister.accept(event);
-        
+             
         Message<?> springMessage = flowInputChannel.receive(5000);
 	    assertEventReadyForProcessing(springMessage);
+    }
+    
+    @AfterEach
+    public void stopSourcePolling() {
+    	pollableSource.stop();
     }
 
 	public static void assertEventReadyForProcessing(Message<?> springMessage) {

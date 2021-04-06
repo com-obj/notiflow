@@ -20,8 +20,8 @@ public class InputEventRoutingFlowConfig {
 	@Autowired private InputEventRoutingProperties routingProps;	
 	@Autowired private GenericEventsForProcessingSupplier genericEventSupplier;
 	
-    public static final String GENERIC_EVENT_CHANNEL_ADAPTER_FLOW_ID_BEAN_NAME = "genericEventSupplierFlowId"; 
-    public static final String GENERIC_EVENT_CHANNEL_ADAPTER_PAYLOAD_TYPE_BEAN_NAME = "genericEventSupplierPayloadType"; 
+    public static final String GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME = "genericEventSupplierFlowId"; 
+//    public static final String GENERIC_EVENT_CHANNEL_ADAPTER_PAYLOAD_TYPE_BEAN_NAME = "genericEventSupplierPayloadType"; 
     
     @Bean
     @ConditionalOnProperty(value = "nc.flows.input-evet-routing.type", havingValue = "FLOW_ID")
@@ -29,7 +29,7 @@ public class InputEventRoutingFlowConfig {
     	return IntegrationFlows
 			.fromSupplier(genericEventSupplier, 
 					conf-> conf.poller(Pollers.fixedRate(routingProps.getPollPeriodInMiliSeconds()))
-					.id(GENERIC_EVENT_CHANNEL_ADAPTER_FLOW_ID_BEAN_NAME))
+					.id(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME))
 			.route(flowIdRouter())
 			.get();
     }
@@ -46,7 +46,7 @@ public class InputEventRoutingFlowConfig {
     	return IntegrationFlows
 			.fromSupplier(genericEventSupplier, 
 					conf-> conf.poller(Pollers.fixedRate(routingProps.getPollPeriodInMiliSeconds()))
-					.id(GENERIC_EVENT_CHANNEL_ADAPTER_PAYLOAD_TYPE_BEAN_NAME))
+					.id(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME))
 			.channel(new DirectChannel())
 			.route(simplePayloadTypeBasedRouter())
 			.get();

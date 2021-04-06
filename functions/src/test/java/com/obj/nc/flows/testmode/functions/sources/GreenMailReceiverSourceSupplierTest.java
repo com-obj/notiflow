@@ -40,7 +40,7 @@ import com.obj.nc.utils.JsonUtils;
 		"nc.flows.test-mode.enabled=true", 
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk",
 		"nc.flows.test-mode.periodInSeconds=64000"}) //Don't poll, I'll make it by my self
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS) //Because of correct disposal of green mail used for test mode
+@DirtiesContext(classMode =ClassMode.AFTER_CLASS) //need to dispose testModeSMTPServer
 class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
