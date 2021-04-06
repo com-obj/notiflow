@@ -11,7 +11,7 @@ definitions:
          services:
            - postgres
          script:
-           - gradle :functions:complexTest :functions:test -Dspring.profiles.active=bitbucket --stacktrace --info
+           - gradle :functions:simpleTest :functions:complexTest -Dspring.profiles.active=bitbucket --stacktrace --info
          after-script:
            - pipe: atlassian/checkstyle-report:0.2.0
          artifacts: 
@@ -37,11 +37,5 @@ pipelines:
              script:
                - gradle build -x test --stacktrace --info   
              artifacts:
-               - osk-flows/dist/**   
-#         - step:
-#             name: Security Scan
-#             script:
-#              # Run a security scan for sensitive data.
-#              # See more security tools at https://bitbucket.org/product/features/pipelines/integrations?&category=security
-#              - pipe: atlassian/git-secrets-scan:0.4.        
+               - osk-flows/dist/**      
           
