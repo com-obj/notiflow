@@ -93,7 +93,15 @@ dependencyManagement {
 
 test {
 	systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
-	useJUnitPlatform()
+	useJUnitPlatform {
+		excludeTags 'test-mode'
+	}
+}
+
+task complexTest(type: Test) {
+    useJUnitPlatform {
+        includeTags 'test-mode'
+    }
 }
 
 bootJar {

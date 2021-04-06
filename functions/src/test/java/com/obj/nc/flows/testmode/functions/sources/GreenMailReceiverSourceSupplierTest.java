@@ -47,6 +47,7 @@ import com.obj.nc.utils.JsonUtils;
 		"nc.flows.test-mode.enabled=true", 
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
 @DirtiesContext(classMode =ClassMode.AFTER_CLASS) //need to dispose @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME) testModeEmailsReciver
+@Tag("test-mode")
 public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
@@ -69,7 +70,6 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
     }
 
     @Test
-    @Tag("test-mode")
     void testRecieveAndConvertMailsFromGreenMail() {
     	//normaly, we would send all test mail to standrdTestGMServer. When testMode profile is activated, aditional testModeEmailsReciver
     	//is created which is a different instannce. In this mode testModeEmailsReciver will catch all emails normaly send to standardTestGMServer
