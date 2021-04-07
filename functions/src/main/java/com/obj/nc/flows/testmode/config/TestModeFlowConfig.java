@@ -42,8 +42,9 @@ public class TestModeFlowConfig {
 
 	public final static String TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME = "tmExecutorChannel";
 	public final static String TEST_MODE_AGGREGATOR_BEAN_NAME = "tmAggregator";
+	public final static String TEST_MODE_AGGREGATE_AND_SEND_FLOW_NAME = "testModeAggregateAndSendMessage";
     
-    @Bean
+    @Bean(TEST_MODE_AGGREGATE_AND_SEND_FLOW_NAME)
     public IntegrationFlow testModeAggregateAndSendMessage() {
     	printBanner();
     	

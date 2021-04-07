@@ -42,7 +42,6 @@ import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest
-
 public class OskFlowsFullUCWithLATest extends BaseIntegrationTest {
     
     @Autowired private GenericEventRepository genEventRepo;
