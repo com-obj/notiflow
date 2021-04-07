@@ -1,23 +1,21 @@
-package com.obj.nc.osk.functions;
+package com.obj.nc.osk.functions.processors.eventConverter;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.osk.domain.incidentTicket.IncidentTicketOutageEndEventDto;
 import com.obj.nc.osk.domain.incidentTicket.IncidentTicketOutageStartEventDto;
-import com.obj.nc.osk.functions.config.NotifEventConverterConfig;
+import com.obj.nc.osk.functions.processors.eventConverter.config.NotifEventConverterConfigProperties;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
-@Component
 public class EndOutageEventConverter extends BaseOutageEventConverter {
 	
 	private GenericEventRepository eventRepo;
 
 	public EndOutageEventConverter(
-			@Autowired NotifEventConverterConfig config,
+			@Autowired NotifEventConverterConfigProperties config,
 			@Autowired GenericEventRepository eventRepo) {
 		super(config);
 		

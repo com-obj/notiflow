@@ -34,20 +34,3 @@ subprojects {
     }
 }
 
-/*
-task resolveDependencies(group: "build setup", description: "Resolve and prefetch dependencies") {
-    doLast {
-        def resolve = {
-            ConfigurationContainer configurations ->
-                configurations
-                        .findAll { it.isCanBeResolved() }
-                        .each { it.resolve() }
-        }
-
-        project.rootProject.allprojects.each { subProject ->
-            resolve(subProject.buildscript.configurations)
-            resolve(subProject.configurations)
-        }
-    }
-}
-*/

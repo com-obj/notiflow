@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.osk.domain.incidentTicket.IncidentTicketServiceOutageForCustomerDto.CustomerSegment;
-import com.obj.nc.osk.functions.config.NotifEventConverterConfig;
+import com.obj.nc.osk.functions.processors.eventConverter.config.NotifEventConverterConfigProperties;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,7 +23,7 @@ public class IncidentTicketOutageStartEventDto extends SiaOutageEvent {
 	List<IncidentTicketServiceOutageForCustomerDto> messages;
 
 	
-	public void filterOutLAsNotInConfig(NotifEventConverterConfig config) {
+	public void filterOutLAsNotInConfig(NotifEventConverterConfigProperties config) {
 		messages = 
 			messages.stream()
 				.filter(msg -> 

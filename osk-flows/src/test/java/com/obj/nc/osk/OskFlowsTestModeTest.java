@@ -4,35 +4,42 @@ import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunctionTest;
+import com.obj.nc.osk.functions.processors.eventConverter.NotificationEventConverterProcessingFunctionTest;
 import com.obj.nc.repositories.GenericEventRepository;
 
-@ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
+@ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(properties = {
 		"nc.flows.test-mode.enabled=true", 
-		"spring.main.allow-bean-definition-overriding=true",
 		"nc.flows.test-mode.period-in-seconds=1",
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS) //have to dispose test mode green mail server
+@Tag("test-mode")
 public class OskFlowsTestModeTest extends BaseIntegrationTest {
     
     @Autowired
     private GenericEventRepository genEventRepo;
         
     @BeforeEach
-    void cleanTables() {
+    void cleanTables() throws FolderException {
         purgeNotifTables();     
+        greenMail.purgeEmailFromAllMailboxes();
     }
 	
     @Test
@@ -63,6 +70,13 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
         		)
         );
     }
+    
+    @RegisterExtension
+    protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+      	.withConfiguration(
+      			GreenMailConfiguration.aConfig()
+      			.withUser("no-reply@objectify.sk", "xxx"))
+      	.withPerMethodLifecycle(true);
     
 }
 

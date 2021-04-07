@@ -13,18 +13,22 @@ import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpMethod;
-import org.springframework.integration.test.context.SpringIntegrationTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
@@ -37,8 +41,8 @@ import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
-@SpringIntegrationTest
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
+@SpringBootTest
+
 public class OskFlowsFullUCWithLATest extends BaseIntegrationTest {
     
     @Autowired private GenericEventRepository genEventRepo;
@@ -47,11 +51,17 @@ public class OskFlowsFullUCWithLATest extends BaseIntegrationTest {
     @Autowired private OskSmsSenderRestImpl smsSenderRestImpl;
     @Autowired private OskSmsSenderConfigProperties properties;
     private MockRestServiceServer mockServer;
+    
+    @BeforeEach
+    void redirectRestTemplate() throws FolderException {
+		//Toto bude volat SMS sender
+    	mockServer = MockRestServiceServer.bindTo(smsSenderRestImpl.getRestTemplate()).build();
+    	greenMail.purgeEmailFromAllMailboxes();
+    	purgeNotifTables();
+    }
   
 	@Test
     void testOutageStartWithLAsNotConfiguredAreNotNotified() throws MessagingException {
-    	purgeNotifTables();
-    	
 		createRestCallExpectationsFor1OutageSmsFromLASegment();
 		
         // GIVEN
@@ -77,7 +87,6 @@ public class OskFlowsFullUCWithLATest extends BaseIntegrationTest {
 	
 	private void createRestCallExpectationsFor1OutageSmsFromLASegment() {
 		//Toto bude volat SMS sender
-		mockServer = MockRestServiceServer.bindTo(smsSenderRestImpl.getSmsRestTemplate()).build();
     	String fullRequestUrl = properties.getGapApiUrl() + OskSmsSenderRestImpl.SEND_PATH.replace("{senderAddress}", properties.getSenderAddress());
     	
     	OskSendSmsResponseDto gapResponce = OskFlowsFullUCTest.createResponse(properties.getSenderAddress());
@@ -99,5 +108,11 @@ public class OskFlowsFullUCWithLATest extends BaseIntegrationTest {
 		return event;
 	}
     
+    @RegisterExtension
+    protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+      	.withConfiguration(
+      			GreenMailConfiguration.aConfig()
+      			.withUser("no-reply@objectify.sk", "xxx"))
+      	.withPerMethodLifecycle(true);
 }
 

@@ -9,6 +9,7 @@ spring:
       password: xxx
       properties:
          mail.debug: true
+   main.allow-bean-definition-overriding: true
 
 nc:
    functions:

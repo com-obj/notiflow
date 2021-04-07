@@ -10,8 +10,8 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
-import com.obj.nc.osk.functions.EndOutageEventConverter;
-import com.obj.nc.osk.functions.StartOutageEventConverter;
+import com.obj.nc.osk.functions.processors.eventConverter.EndOutageEventConverter;
+import com.obj.nc.osk.functions.processors.eventConverter.StartOutageEventConverter;
 
 @Configuration
 public class FlowsConfig {

@@ -9,7 +9,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -27,7 +26,6 @@ import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsRequestDto;
 import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
 import com.obj.nc.osk.functions.processors.sms.dtos.SendSmsResourceReferenceDto;
 
-@Component
 @Validated
 public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Message> implements SmsSender {
 
@@ -38,11 +36,11 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Mess
     public static final String SEND_SMS_RESPONSE_ATTRIBUTE = "sendSmsResponse";
 
     private final OskSmsSenderConfigProperties properties;
-    private final RestTemplate smsRestTemplate;
+    private final RestTemplate restTemplate;
 
     public OskSmsSenderRestImpl(OskSmsSenderConfigProperties properties, RestTemplateBuilder restTemplateBuilder) {
         this.properties = properties;
-        this.smsRestTemplate = restTemplateBuilder
+        this.restTemplate = restTemplateBuilder
         		.rootUri(
         			this.properties.getGapApiUrl())
                 .basicAuthentication(this.properties.getGapApiLogin(), this.properties.getGapApiPassword())
@@ -97,7 +95,7 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Mess
     }
 
     public OskSendSmsResponseDto sendRequest(@Valid @NotNull OskSendSmsRequestDto oskSendSmsRequestDto) {
-        OskSendSmsResponseDto responseBody = smsRestTemplate.postForEntity(
+        OskSendSmsResponseDto responseBody = restTemplate.postForEntity(
                 SEND_PATH,
                 oskSendSmsRequestDto,
                 OskSendSmsResponseDto.class,
@@ -128,8 +126,8 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Mess
         }
     }
 
-	public RestTemplate getSmsRestTemplate() {
-		return smsRestTemplate;
+	public RestTemplate getRestTemplate() {
+		return restTemplate;
 	}
 
 

@@ -1,6 +1,5 @@
-package com.obj.nc.osk.functions;
+package com.obj.nc.osk.functions.processors.eventConverter;
 
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,14 +12,15 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.integration.test.context.SpringIntegrationTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.config.InjectorConfiguration;
+import com.obj.nc.config.JdbcConfiguration;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
@@ -35,14 +35,20 @@ import com.obj.nc.osk.functions.content.SalesEmailTemplate;
 import com.obj.nc.osk.functions.model.CustEventModel;
 import com.obj.nc.osk.functions.model.CustomerInfo;
 import com.obj.nc.osk.functions.model.ServiceOutageInfo;
+import com.obj.nc.osk.functions.processors.eventConverter.config.NotifEventConverterConfig;
+import com.obj.nc.osk.functions.processors.eventConverter.config.NotifEventConverterConfigProperties;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest
-@SpringIntegrationTest(noAutoStartup = {
-		GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME})
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
+@DataJdbcTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration(
+		classes = {
+				NotifEventConverterConfig.class,
+				NotifEventConverterConfigProperties.class,
+				JdbcConfiguration.class,
+				InjectorConfiguration.class})
 public class NotificationEventConverterProcessingFunctionTest extends BaseIntegrationTest {
 	
 	@Autowired private StartOutageEventConverter startOutageConverter;

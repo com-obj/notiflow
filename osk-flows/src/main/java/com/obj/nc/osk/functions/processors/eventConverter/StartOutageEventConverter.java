@@ -1,16 +1,13 @@
-package com.obj.nc.osk.functions;
-
-import org.springframework.stereotype.Component;
+package com.obj.nc.osk.functions.processors.eventConverter;
 
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.osk.domain.incidentTicket.IncidentTicketOutageStartEventDto;
-import com.obj.nc.osk.functions.config.NotifEventConverterConfig;
+import com.obj.nc.osk.functions.processors.eventConverter.config.NotifEventConverterConfigProperties;
 import com.obj.nc.utils.JsonUtils;
 
-@Component
 public class StartOutageEventConverter extends BaseOutageEventConverter {
 
-	public StartOutageEventConverter(NotifEventConverterConfig config) {
+	public StartOutageEventConverter(NotifEventConverterConfigProperties config) {
 		super(config);
 		
 		customerEmailSubjectKey = "cust.start.subject";

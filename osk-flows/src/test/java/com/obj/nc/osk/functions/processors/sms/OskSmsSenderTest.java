@@ -1,6 +1,7 @@
-package com.obj.nc.osk.services;
+package com.obj.nc.osk.functions.processors.sms;
 
 import static com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl.SEND_PATH;
+import static com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl.SEND_SMS_RESPONSE_ATTRIBUTE;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -10,57 +11,81 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import javax.validation.ConstraintViolationException;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.osk.exception.SmsClientException;
-import com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl;
+import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfig;
 import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
 import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsRequestDto;
 import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
 import com.obj.nc.utils.JsonUtils;
 
-@ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
-@RestClientTest(OskSmsSenderRestImpl.class)
+@ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @ImportAutoConfiguration(ValidationAutoConfiguration.class)
-@EnableConfigurationProperties(OskSmsSenderConfigProperties.class)
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-class OskSmsRestClientImplTest {
+@RestClientTest(OskSmsSenderRestImpl.class)
+@ContextConfiguration(classes = {
+		OskSmsSenderConfig.class,
+		OskSmsSenderConfigProperties.class
+})
+class OskSmsSenderTest extends BaseIntegrationTest {
 
-    @Autowired
-    private OskSmsSenderRestImpl smsRestClient;
+    
+	@Autowired private OskSmsSenderRestImpl smsSender;
+	@Autowired private OskSmsSenderConfigProperties properties;
+	private MockRestServiceServer mockRestServiceServer;
+    
+    @BeforeEach
+    public void init() {
+    	mockRestServiceServer = MockRestServiceServer.createServer(smsSender.getRestTemplate());
+    }
 
-    @Autowired
-    private OskSmsSenderConfigProperties properties;
+    @Test
+    void testSendSms() {
+        // GIVEN
+        String MESSAGE_PATH = "smsNotificationMessages/message.json";
+        Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_PATH, Message.class);
+        
+        // MOCK SERVER
+        OskSendSmsResponseDto sendSmsResponseExpected = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-success.json", OskSendSmsResponseDto.class);
 
-    @Autowired
-    private MockRestServiceServer mockRestServiceServer;
+        mockRestServerWithOneRequest(sendSmsResponseExpected);
 
+        // WHEN
+        Message sentMessage = smsSender.apply(inputMessage);
+
+        // THEN
+        mockRestServiceServer.verify();
+        Assertions.assertThat(sentMessage.getBody().containsAttribute(SEND_SMS_RESPONSE_ATTRIBUTE)).isTrue();
+        OskSendSmsResponseDto sendSmsResponseActual = sentMessage.getBody().getAttributeValueAs(SEND_SMS_RESPONSE_ATTRIBUTE, OskSendSmsResponseDto.class);
+        Assertions.assertThat(sendSmsResponseActual).isEqualTo(sendSmsResponseExpected);
+    }
+    
     @Test
     void testCreateRequest() {
         // GIVEN
         String MESSAGE_PATH = "smsNotificationMessages/message.json";
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_PATH, Message.class);
 
-        OskSendSmsRequestDto oskSendSmsRequestDto = smsRestClient.convertMessageToRequest(inputMessage);
+        OskSendSmsRequestDto oskSendSmsRequestDto = smsSender.convertMessageToRequest(inputMessage);
 
         Assertions.assertThat(oskSendSmsRequestDto.getAddress()).hasSize(1);
         Assertions.assertThat(oskSendSmsRequestDto.getAddress().get(0)).isEqualTo(((SmsEndpoint) inputMessage.getBody().getRecievingEndpoints().get(0)).getPhone());
@@ -80,10 +105,10 @@ class OskSmsRestClientImplTest {
         OskSendSmsResponseDto sendSmsSuccessResponse = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-success.json", OskSendSmsResponseDto.class);
 
         // MOCK SERVER
-        mockRestServerWithOneRequest(sendSmsRequest, sendSmsSuccessResponse);
+        mockRestServerWithOneRequest(sendSmsSuccessResponse);
 
         // WHEN
-        OskSendSmsResponseDto sendSmsResponse = smsRestClient.sendRequest(sendSmsRequest);
+        OskSendSmsResponseDto sendSmsResponse = smsSender.sendRequest(sendSmsRequest);
 
         // THEN
         mockRestServiceServer.verify();
@@ -98,10 +123,10 @@ class OskSmsRestClientImplTest {
         sendSmsRequest.setSenderAddress(null);
 
         // MOCK SERVER
-        mockRestServerWithOneRequest(sendSmsRequest, sendSmsSuccessResponse);
+        mockRestServerWithOneRequest(sendSmsSuccessResponse);
 
         // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> smsRestClient.sendRequest(null))
+        Assertions.assertThatThrownBy(() -> smsSender.sendRequest(null))
                 .isInstanceOf(ConstraintViolationException.class)
                 .hasMessageContaining("must not be null");
     }
@@ -113,10 +138,10 @@ class OskSmsRestClientImplTest {
         OskSendSmsResponseDto sendSmsFailureResponse = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-failure.json", OskSendSmsResponseDto.class);
 
         // MOCK SERVER
-        mockRestServerWithOneRequest(sendSmsRequest, sendSmsFailureResponse);
+        mockRestServerWithOneRequest(sendSmsFailureResponse);
 
         // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> smsRestClient.sendRequest(sendSmsRequest))
+        Assertions.assertThatThrownBy(() -> smsSender.sendRequest(sendSmsRequest))
                 .isInstanceOf(SmsClientException.class)
                 .hasMessageContaining(sendSmsFailureResponse.getResourceReference().getResourceURL());
     }
@@ -128,10 +153,10 @@ class OskSmsRestClientImplTest {
         OskSendSmsResponseDto sendSmsInvalidResponse = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-invalid.json", OskSendSmsResponseDto.class);
 
         // MOCK SERVER
-        mockRestServerWithOneRequest(sendSmsRequest, sendSmsInvalidResponse);
+        mockRestServerWithOneRequest(sendSmsInvalidResponse);
 
         // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> smsRestClient.sendRequest(sendSmsRequest))
+        Assertions.assertThatThrownBy(() -> smsSender.sendRequest(sendSmsRequest))
                 .isInstanceOf(SmsClientException.class)
                 .hasMessageContaining("Unknown response status");
 
@@ -140,10 +165,10 @@ class OskSmsRestClientImplTest {
         sendSmsInvalidResponse.setResourceReference(null);
 
         // MOCK SERVER
-        mockRestServerWithOneRequest(sendSmsRequest, sendSmsInvalidResponse);
+        mockRestServerWithOneRequest(sendSmsInvalidResponse);
 
         // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> smsRestClient.sendRequest(sendSmsRequest))
+        Assertions.assertThatThrownBy(() -> smsSender.sendRequest(sendSmsRequest))
                 .isInstanceOf(RestClientException.class)
                 .hasMessageContaining("Resource reference must not be null");
 
@@ -152,18 +177,20 @@ class OskSmsRestClientImplTest {
         sendSmsInvalidResponse.getResourceReference().setResourceURL(null);
 
         // MOCK SERVER
-        mockRestServerWithOneRequest(sendSmsRequest, sendSmsInvalidResponse);
+        mockRestServerWithOneRequest(sendSmsInvalidResponse);
 
         // WHEN - THEN
-        Assertions.assertThatThrownBy(() -> smsRestClient.sendRequest(sendSmsRequest))
+        Assertions.assertThatThrownBy(() -> smsSender.sendRequest(sendSmsRequest))
                 .isInstanceOf(RestClientException.class)
                 .hasMessageContaining("Resource URL must not be null");
     }
 
-    private void mockRestServerWithOneRequest(OskSendSmsRequestDto sendSmsRequest, OskSendSmsResponseDto sendSmsSuccessResponse) {
+    private void mockRestServerWithOneRequest(OskSendSmsResponseDto sendSmsSuccessResponse) {
         mockRestServiceServer.reset();
-        mockRestServiceServer.expect(ExpectedCount.once(),
-                requestTo(UriComponentsBuilder.fromPath(SEND_PATH).build(sendSmsRequest.getSenderAddress())))
+        mockRestServiceServer.expect( 
+        			ExpectedCount.once(),
+        			requestTo(UriComponentsBuilder.fromHttpUrl(properties.getGapApiUrl() + SEND_PATH).build(properties.getSenderAddress()))
+                )
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(header("Authorization", "Basic dGVzdGxvZ2luOnRlc3Rwdw=="))
@@ -172,5 +199,6 @@ class OskSmsRestClientImplTest {
                         .body(JsonUtils.writeObjectToJSONString(sendSmsSuccessResponse))
                 );
     }
+
 
 }

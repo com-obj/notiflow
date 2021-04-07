@@ -16,7 +16,7 @@ bootJar {
 
 ext {
     set('testcontainersVersion', "1.15.1")
-    set('junitJupiterVersion', '5.4.2')
+    set('junitJupiterVersion', '5.7.0')
 }
 
 dependencies {
@@ -96,5 +96,21 @@ repositories {
 test {
     systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
     useJUnitPlatform()
+}
+
+//tento cirkus musim robit koly velmi zvlastnemu chovaniu v BB pipelines. Niektore testy (complex tests) obcas padaju
+//a zda sa, ze to suvisi s spring context caching. toto je trik ako rozdelim na dve skupiny pricom sring context sa urcite nereusne
+task simpleTest(type: Test) {
+	systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
+    useJUnitPlatform {
+        excludeTags 'test-mode'
+    }
+}
+
+task complexTest(type: Test) {
+	systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
+    useJUnitPlatform {
+        includeTags 'test-mode'
+    }
 }
 

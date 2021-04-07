@@ -19,21 +19,24 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpMethod;
-import org.springframework.integration.test.context.SpringIntegrationTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.osk.functions.NotificationEventConverterProcessingFunctionTest;
+import com.obj.nc.osk.functions.processors.eventConverter.NotificationEventConverterProcessingFunctionTest;
 import com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl;
 import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
 import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
@@ -42,9 +45,8 @@ import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
-@SpringIntegrationTest
 @TestMethodOrder(OrderAnnotation.class)
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
+@SpringBootTest
 public class OskFlowsFullUCTest extends BaseIntegrationTest {
     
     @Autowired private GenericEventRepository genEventRepo;
@@ -53,11 +55,13 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     @Autowired private OskSmsSenderRestImpl smsSenderRestImpl;
     @Autowired private OskSmsSenderConfigProperties properties;
     private MockRestServiceServer mockServer;
+    
 
     @BeforeEach
-    void redirectRestTemplate() {
+    void redirectRestTemplate() throws FolderException {
 		//Toto bude volat SMS sender
-    	mockServer = MockRestServiceServer.bindTo(smsSenderRestImpl.getSmsRestTemplate()).build();
+    	mockServer = MockRestServiceServer.bindTo(smsSenderRestImpl.getRestTemplate()).build();
+    	greenMail.purgeEmailFromAllMailboxes();
     }
 
     @Test
@@ -226,6 +230,13 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
         response.setResourceReference(resourceReference);
         return response;
     }
+    
+    @RegisterExtension
+    protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+      	.withConfiguration(
+      			GreenMailConfiguration.aConfig()
+      			.withUser("no-reply@objectify.sk", "xxx"))
+      	.withPerMethodLifecycle(true);
     
 }
 

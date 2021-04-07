@@ -1,4 +1,4 @@
-package com.obj.nc.osk.functions;
+package com.obj.nc.osk.functions.processors.eventConverter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +25,6 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.osk.domain.incidentTicket.IncidentTicketNotificationContactDto;
 import com.obj.nc.osk.domain.incidentTicket.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.domain.incidentTicket.IncidentTicketServiceOutageForCustomerDto;
-import com.obj.nc.osk.functions.config.NotifEventConverterConfig;
 import com.obj.nc.osk.functions.content.CustEmailTemplate;
 import com.obj.nc.osk.functions.content.CustSmsTemplate;
 import com.obj.nc.osk.functions.content.SalesAgentsEmailTemplate;
@@ -35,6 +34,7 @@ import com.obj.nc.osk.functions.model.CustomerInfo;
 import com.obj.nc.osk.functions.model.SalesAgentEventModel;
 import com.obj.nc.osk.functions.model.SalesEventModel;
 import com.obj.nc.osk.functions.model.ServiceOutageInfo;
+import com.obj.nc.osk.functions.processors.eventConverter.config.NotifEventConverterConfigProperties;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -48,7 +48,7 @@ import lombok.RequiredArgsConstructor;
 public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<GenericEvent, List<NotificationIntent>> {
 	
 	@NonNull
-	private NotifEventConverterConfig config;
+	private NotifEventConverterConfigProperties config;
 	
 	protected String customerEmailSubjectKey;
 	protected String customerEmailTemplateName;
