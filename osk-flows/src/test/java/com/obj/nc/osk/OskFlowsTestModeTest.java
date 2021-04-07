@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
@@ -29,7 +28,7 @@ import com.obj.nc.repositories.GenericEventRepository;
 		"nc.flows.test-mode.enabled=true", 
 		"nc.flows.test-mode.period-in-seconds=1",
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS) //have to dispose test mode green mail server
+@DirtiesContext //have to dispose test mode green mail server
 @Tag("test-mode")
 public class OskFlowsTestModeTest extends BaseIntegrationTest {
     

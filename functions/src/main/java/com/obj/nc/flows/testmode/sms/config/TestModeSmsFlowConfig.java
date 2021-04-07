@@ -34,7 +34,7 @@ public class TestModeSmsFlowConfig {
 	public final static String TEST_MODE_SMS_SOURCE_TRIGGER_BEAN_NAME = "tmSmsSourceTrigger";
 
     @Bean
-    @DependsOn(TestModeFlowConfig.TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME)
+    @DependsOn(TestModeFlowConfig.TEST_MODE_AGGREGATE_AND_SEND_FLOW_NAME)
     public IntegrationFlow testModeProcessRecievedSmsMessage() {
         return IntegrationFlows
         		.fromSupplier(inMemorySmsSource,

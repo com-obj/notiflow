@@ -31,7 +31,7 @@ public class TestModeEmailsFlowConfig {
 	public final static String TEST_MODE_SOURCE_TRIGGER_BEAN_NAME = "tmSourceTrigger";
 	
     @Bean
-    @DependsOn(TestModeFlowConfig.TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME)
+    @DependsOn(TestModeFlowConfig.TEST_MODE_AGGREGATE_AND_SEND_FLOW_NAME)
     public IntegrationFlow testModeProcessRecievedEmailMessage() {
         return IntegrationFlows
         		.fromSupplier(greenMailMessageSource,
