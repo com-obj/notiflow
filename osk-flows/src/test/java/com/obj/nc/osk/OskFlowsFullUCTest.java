@@ -26,7 +26,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 
@@ -49,7 +48,7 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @TestMethodOrder(OrderAnnotation.class)
 @SpringBootTest
-@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+@DirtiesContext //have to dispose test mode green mail server
 public class OskFlowsFullUCTest extends BaseIntegrationTest {
     
     @Autowired private GenericEventRepository genEventRepo;
