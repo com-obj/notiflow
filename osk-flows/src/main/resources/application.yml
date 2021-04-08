@@ -17,6 +17,7 @@ spring:
       properties:
          mail.smtp.auth: true
          mail.smtp.starttls.enable: true
+   main.allow-bean-definition-overriding: true
 
 nc:
    functions:
@@ -54,6 +55,8 @@ osk.sia.functions:
    
 #logging.level:
 #   org.springframework.beans: DEBUG
+logging.level:
+   ROOT: INFO
 
 
 #debug: true
