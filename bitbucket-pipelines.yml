@@ -40,9 +40,9 @@ pipelines:
       - step:
           name: Deploy to Bitbucket downloads
           script:
-            - pipe: atlassian/bitbucket-upload-file:0.1.2
+            - pipe: atlassian/bitbucket-upload-file:0.3.2
               variables:
                 BITBUCKET_USERNAME: $BITBUCKET_USERNAME
                 BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
-                FILENAME: "osk-flows/build/libs/*.jar"      
+                FILENAME: "osk-flows/dist/*.jar"      
           
