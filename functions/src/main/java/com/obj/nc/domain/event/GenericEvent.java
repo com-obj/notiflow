@@ -52,7 +52,7 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 		return event;
 	}
 
-	public void setFlowIdIfNotPresent(String flowId) {
+	public void overrideFlowIdIfApplicable(String flowId) {
     	if (flowId == null) {
     		return;
     	} 
@@ -60,10 +60,12 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
     	this.flowId = flowId;
 	}
 	
-	public void setExternalIdIfNotPresent(String externalId) {
-    	if (this.externalId == null) {
-    		this.externalId = externalId;
+	public void overrideExternalIdIfApplicable(String externalId) {
+		if (externalId == null) {
+    		return;
     	} 
+		
+		this.externalId = externalId;
 	}
 
 	@Override

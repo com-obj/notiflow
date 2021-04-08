@@ -3,11 +3,9 @@ package com.obj.nc.controllers;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.relational.core.conversion.DbActionExecutionException;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,17 +32,23 @@ public class EventReceiverRestController {
 	
 	@PostMapping( consumes="application/json", produces="application/json")
     public EventRecieverResponce emitJobPostEvent(
-    		@RequestBody String eventJson, 
+    		@RequestBody(required = true) String eventJson, 
     		@RequestParam(value = "flowId", required = false) String flowId,
     		@RequestParam(value = "externalId", required = false) String externalId) {
     	
      	JsonNode json = checkIfJsonValidAndReturn(eventJson);
     	
     	GenericEvent event = GenericEvent.from(json);
-    	event.setFlowIdIfNotPresent(flowId);
-    	event.setExternalIdIfNotPresent(externalId);
+    	event.overrideFlowIdIfApplicable(flowId);
+    	event.overrideExternalIdIfApplicable(externalId);
     	
-    	persister.accept(event);
+    	try {
+    		persister.accept(event);
+    	} catch (DbActionExecutionException e) {
+    		if (DuplicateKeyException.class.equals(e.getCause().getClass())) {
+    			throw new PayloadValidationException("Duplicate external ID detected. Payload rejected: " + eventJson);
+    		}
+    	}
 
     	return EventRecieverResponce.from(event.getId());
     }
@@ -58,19 +62,6 @@ public class EventReceiverRestController {
     	return JsonUtils.readJsonNodeFromJSONString(eventJson);
 	}
 
-    @ExceptionHandler({PayloadValidationException.class})
-    ResponseEntity<String> handleMethodArgumentNotValidException(PayloadValidationException e) {
-        return new ResponseEntity<>("Request not valid becase of invalid payload: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-    
-    @ExceptionHandler({MethodArgumentNotValidException.class})
-    ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        return new ResponseEntity<>("Request arguments not valid: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-    
-    @ExceptionHandler({RuntimeException.class})
-    ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        return new ResponseEntity<>("Unexpected error ocured: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+
 
 }

@@ -68,7 +68,7 @@ public class TestModeEmailsBeansConfig {
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.default-encoding", "UTF-8");
         props.put("mail.transport.protocol", "smtp");
-        props.put("mail.debug", "true");
+        props.put("mail.debug", "false");
         props.put("mail.smtp.auth", "false");
         mailSender.setJavaMailProperties(props);
         
