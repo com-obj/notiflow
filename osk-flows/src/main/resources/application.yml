@@ -55,8 +55,10 @@ osk.sia.functions:
    
 #logging.level:
 #   org.springframework.beans: DEBUG
-logging.level:
-   ROOT: INFO
+logging:
+   level:
+     ROOT: INFO
+   file: ./logs/osk-flows.log
 
 
 #debug: true
