@@ -1,6 +1,6 @@
 package com.obj.nc.osk.functions.model;
 
-import com.obj.nc.osk.domain.incidentTicket.IncidentTicketServiceOutageForCustomerDto;
+import com.obj.nc.osk.domain.IncidentTicketServiceOutageForCustomerDto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

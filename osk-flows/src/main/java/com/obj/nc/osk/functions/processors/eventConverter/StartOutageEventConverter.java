@@ -1,7 +1,7 @@
 package com.obj.nc.osk.functions.processors.eventConverter;
 
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.osk.domain.incidentTicket.IncidentTicketOutageStartEventDto;
+import com.obj.nc.osk.domain.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.functions.processors.eventConverter.config.NotifEventConverterConfigProperties;
 import com.obj.nc.utils.JsonUtils;
 

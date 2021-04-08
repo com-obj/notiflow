@@ -1,4 +1,4 @@
-package com.obj.nc.osk.domain.incidentTicket;
+package com.obj.nc.osk.domain;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @EqualsAndHashCode(of = "id")
-@NoArgsConstructor
 @JsonTypeInfo(include = As.PROPERTY, use = Id.NAME)
+@NoArgsConstructor
 public abstract class SiaOutageEvent {
 	Long id;
 

@@ -33,7 +33,7 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.osk.domain.incidentTicket.IncidentTicketOutageStartEventDto;
+import com.obj.nc.osk.domain.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.flows.FlowsConfig;
 import com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl;
 import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
