@@ -31,11 +31,18 @@ pipelines:
       - step: *runTestStep
     master:
       - step: *runTestStep
-      - parallel:
-         - step:
-             name: Build FAT Jar
-             script:
-               - gradle build -x test --stacktrace --info   
-             artifacts:
-               - osk-flows/dist/**      
+      - step:
+          name: Build FAT Jar
+          script:
+            - gradle build -x test --stacktrace --info   
+          artifacts:
+            - osk-flows/dist/**
+      - step:
+          name: Deploy to Bitbucket downloads
+          script:
+            - pipe: atlassian/bitbucket-upload-file:0.1.2
+              variables:
+                BITBUCKET_USERNAME: $BITBUCKET_USERNAME
+                BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
+                FILENAME: "osk-flows/build/libs/*.jar"      
           
