@@ -5,12 +5,19 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
     <body>
+	    <style>
+	        .grow:hover { 
+ 	            height: unset !important; 
+ 	            transition: 0.3s !important; 
+ 	        } 
+ 	    </style> 
+
     	<p>
     		<span th:text="#{testMode.headerMain}">O co ide</span>
     	</p>
     	
     	<h3>Emails</h3>
-		    <table border="1" cellpadding="5" style="border-collapse:collapse; border: 1px solid gray;">		
+		    <table border='1' style='border-collapse:collapse; border: 1px solid gray; padding: 5px;'>		
 			    <thead>
 			        <tr>
 			            <th th:text="#{testMode.header1.recipient}"> Rec </th>
@@ -23,15 +30,24 @@
 			     	<tr th:each="email : ${model.emailContents}">
 			            <td><span th:text="${email.getAttributeValue('ORIGINAL_RECIPIENTS_EMAIL')}"> cuzy@objectify.sk </span></td>
 			            <td><span th:text="${email.subject}"> Subject1 </span></td>
-			            <td>                     		
+			            <td>
+                  		<div 
+                        	class="grow"
+                        	height="15px"
+                        	style="height: 15px; background-color: rgba(0,0,0,0.2); overflow: hidden;"> 
+                        		<!-- background-color odstran -->
+                        		<p style="margin: 0px">Hover to show more</p>
+                        		
 			            		<span th:utext="${email.text}"> Body1 </span>
+			            	
+			            	</div>
 			            </td>
 			            <td><span th:text="${email.attachments}"> Attachments </span></td>
 			     	</tr>
 			    </tbody>
 		    </table>
 		 <h3>SMSs</h3>
-		 	<table border="1" cellpadding="5" style="border-collapse:collapse; border: 1px solid gray;" >		
+		 	<table border='1' style='border-collapse:collapse; border: 1px solid gray; padding: 5px;' >		
 			    <thead>
 			        <tr>
 			            <th th:text="#{testMode.header1.recipient}"> Rec </th>
@@ -41,8 +57,18 @@
 			    <tbody>
 			     	<tr th:each="sms : ${model.smsContents}">
 			            <td><span th:text="${sms.getAttributeValue('ORIGINAL_RECIPIENTS_PHONE_NUM')}"> 09181111 </span></td>
-			            <td>	
+			            <td>
+                  		<div 
+                        	class="grow"
+                        	height="15px"
+                        	style="height: 15px; background-color: rgba(0,0,0,0.2); overflow: hidden;"> 
+                        	
+                        		<p style="margin: 0px">Hover to show more</p>
+                        		
+                        		
 			            		<span th:text="${sms.text}"> Body1 </span>
+			            	
+			            	</div>	
 			            </td>
 			     	</tr>
 			    </tbody>

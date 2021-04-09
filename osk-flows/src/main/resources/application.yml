@@ -17,6 +17,8 @@ spring:
       properties:
          mail.smtp.auth: true
          mail.smtp.starttls.enable: true
+         mail.smtp.allow8bitmime: true
+         mail.smtps.allow8bitmime: true
    main.allow-bean-definition-overriding: true
 
 nc:

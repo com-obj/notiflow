@@ -16,6 +16,7 @@ import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
