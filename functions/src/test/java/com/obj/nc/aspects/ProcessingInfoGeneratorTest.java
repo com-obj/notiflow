@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.Header;
+import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;

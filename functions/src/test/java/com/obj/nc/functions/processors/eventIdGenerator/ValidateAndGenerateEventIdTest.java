@@ -6,7 +6,7 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-import com.obj.nc.domain.Header;
+import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 
 class ValidateAndGenerateEventIdTest {

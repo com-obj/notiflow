@@ -11,10 +11,10 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.HasFlowId;
-import com.obj.nc.domain.HasHeader;
 import com.obj.nc.domain.HasJsonPayload;
-import com.obj.nc.domain.Header;
 import com.obj.nc.domain.IsTypedJson;
+import com.obj.nc.domain.headers.HasHeader;
+import com.obj.nc.domain.headers.Header;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;

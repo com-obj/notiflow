@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.domain.EventRecieverResponce;
+import com.obj.nc.domain.event.EventRecieverResponce;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;

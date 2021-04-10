@@ -1,4 +1,4 @@
-package com.obj.nc.domain;
+package com.obj.nc.domain.event;
 
 import java.util.UUID;
 

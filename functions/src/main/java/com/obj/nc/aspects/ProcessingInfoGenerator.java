@@ -9,12 +9,15 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
-import com.obj.nc.domain.HasHeader;
-import com.obj.nc.domain.Header;
-import com.obj.nc.domain.ProcessingInfo;
+import com.obj.nc.domain.headers.HasHeader;
+import com.obj.nc.domain.headers.Header;
+import com.obj.nc.domain.headers.NewProcessingInfoAppEvent;
+import com.obj.nc.domain.headers.ProcessingInfo;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -37,6 +40,9 @@ public class ProcessingInfoGenerator {
 	
 	@Pointcut("processorExecution() || sinkExecution() || sourceExecution()")
 	public void endpointExecutions() {}
+	
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 	
 	@Around("endpointExecutions()")
 	public Object updateProcessingInfoOnPayload(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -74,7 +80,12 @@ public class ProcessingInfoGenerator {
 		ProcessingInfo startProcessing = startProcessingInfos.size()==1? startProcessingInfos.get(0): null;
 		Header startHeader = startPayloadAndHeaders.size()==1? startPayloadAndHeaders.get(0).getKey(): null;
 	    
-		calculateEndProcessingInfos(endPayloadAndHeaders, startProcessing, startHeader);
+		List<ProcessingInfo> endProcessings = calculateEndProcessingInfos(endPayloadAndHeaders, startProcessing, startHeader);
+		
+		endProcessings.forEach( pi-> 
+				applicationEventPublisher.publishEvent(new NewProcessingInfoAppEvent(pi))
+		);
+		
 
 		return returnValue;
 	}
@@ -95,8 +106,10 @@ public class ProcessingInfoGenerator {
 		return startProcessingInfos;
 	}
 
-	private void calculateEndProcessingInfos(List<ImmutablePair<Header, Object>> endPayloadAndHeaders,
+	private List<ProcessingInfo> calculateEndProcessingInfos(List<ImmutablePair<Header, Object>> endPayloadAndHeaders,
 			ProcessingInfo startProcessing, Header startHeader) {
+		List<ProcessingInfo> endProcessings = new ArrayList<>();
+		
 		ProcessingInfo lastProcInfo = null;
 		for (ImmutablePair<Header, Object> endPayloadAndHeader: endPayloadAndHeaders) {
 			Object endPayload = endPayloadAndHeader.getRight();
@@ -113,12 +126,15 @@ public class ProcessingInfoGenerator {
 					 startProcessing, endHeader, endPayload);
 		    endHeader.setProcessingInfo(endProcessing);  
 		    
+		    endProcessings.add(endProcessing);
 		    lastProcInfo = endProcessing;
 		}
 		
 		String duration = lastProcInfo!=null ? lastProcInfo.getDurationInMs()+"" : "N/A";
 		
 		log.info("Processing finished for step {}. Took {} ms", startProcessing.getStepName(), duration);
+		
+		return endProcessings;
 	}
 	
 	private List<ImmutablePair<Header, Object>> extractPayloads(Object input) {

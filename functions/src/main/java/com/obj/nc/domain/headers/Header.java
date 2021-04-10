@@ -1,4 +1,4 @@
-package com.obj.nc.domain;
+package com.obj.nc.domain.headers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.obj.nc.domain.BaseJSONObject;
+import com.obj.nc.domain.HasFlowId;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.EqualsAndHashCode;
@@ -37,21 +39,6 @@ public class Header extends BaseJSONObject implements HasFlowId {
 	private List<UUID> eventIds = new ArrayList<>();
 	
 	protected ProcessingInfo processingInfo;
-	
-//	public ProcessingInfo stepStart(String processingStepName, Object startPayload) {
-//	    log.info("Generating processing info for step {}", processingStepName);
-//	    
-//		ProcessingInfo processingInfo = new ProcessingInfo();
-//		processingInfo.initProcessingInfoOnStepStart(processingStepName, this, startPayload);
-//		setProcessingInfo(processingInfo);
-//
-//		return processingInfo;
-//	}
-
-//	public void stepFinish(Object startPayload) {
-//		getProcessingInfo().stepFinish(this, startPayload);
-//		
-//	}
 
 	public void generateAndSetID() {
 		id = generateUUID();

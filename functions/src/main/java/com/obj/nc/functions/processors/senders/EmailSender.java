@@ -19,11 +19,11 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.Header;
 import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.exceptions.ProcessingException;

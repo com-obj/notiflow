@@ -20,9 +20,9 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
@@ -30,7 +30,7 @@ import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEvent
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
-import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.ProcessingInfoPersisterForEventWithRecipientsSinkConsumer;
+import com.obj.nc.repositories.HeaderRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -38,12 +38,12 @@ import com.obj.nc.utils.JsonUtils;
 class ProcessingInfoPersisterTest extends BaseIntegrationTest {
 
 	@Autowired private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
-	@Autowired private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoPersisterForEventWithRecipients;
 	@Autowired private ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId;
     @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
     @Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
     @Autowired private EmailSender functionSend;
     @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired private HeaderRepository headerRepository;
 
     @BeforeEach
     void setUp() {
@@ -96,7 +96,7 @@ class ProcessingInfoPersisterTest extends BaseIntegrationTest {
         notificationIntent = resolveRecipients.apply(notificationIntent);
 
         // when
-        processingInfoPersisterForEventWithRecipients.accept(notificationIntent);
+        headerRepository.persistProcessingInfoWithRecipients(notificationIntent);
 
         // then
         List<Map<String, Object>> persistedEndpoints = jdbcTemplate.queryForList("select * from nc_endpoint");

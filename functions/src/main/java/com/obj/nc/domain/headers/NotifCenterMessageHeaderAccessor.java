@@ -6,8 +6,6 @@ import java.util.UUID;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.NativeMessageHeaderAccessor;
 
-import com.obj.nc.domain.ProcessingInfo;
-
 /**
  * Inspired by AmqpMessageHeaderAccessor
  * @author ja

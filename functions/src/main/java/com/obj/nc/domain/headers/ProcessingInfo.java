@@ -1,4 +1,4 @@
-package com.obj.nc.domain;
+package com.obj.nc.domain.headers;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -11,6 +11,7 @@ import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.Get;
+import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
