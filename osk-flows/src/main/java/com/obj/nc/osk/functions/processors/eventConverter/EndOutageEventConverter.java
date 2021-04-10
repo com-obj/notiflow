@@ -37,7 +37,7 @@ public class EndOutageEventConverter extends BaseOutageEventConverter {
 		IncidentTicketOutageEndEventDto endEventPayload = JsonUtils.readObjectFromJSON(endEvent.getPayloadJson(), IncidentTicketOutageEndEventDto.class);
 		
 		GenericEvent startEvent = eventRepo.findByExternalId(endEventPayload.getId().toString());
-		
+
 		if (startEvent == null) {
 			throw new PayloadValidationException("Didn't find matching start event with externalId="+ endEventPayload.getId()+" for outage end event: " + endEventPayload);
 		}

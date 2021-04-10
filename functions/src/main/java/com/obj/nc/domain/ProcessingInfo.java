@@ -2,7 +2,6 @@ package com.obj.nc.domain;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,21 +10,19 @@ import javax.validation.constraints.NotNull;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.Get;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.utils.DiffMatchPatch;
-import com.obj.nc.utils.DiffMatchPatch.Diff;
+import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode.Include;
 import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Log4j2
 public class ProcessingInfo {
 	@NotNull
 	@Include
@@ -71,31 +68,52 @@ public class ProcessingInfo {
         		);
         return persistedPIs;
 	}
-
 	
-	public void stepStart(String processingStepName, BasePayload event) {
-		this.eventJson = event.toJSONString();
+	public static ProcessingInfo createProcessingInfoOnStepStart(String processingStepName, Header startHeader, Object startPayload) {
+		log.info("Generating start processing info for step {}", processingStepName);
 		
-		ProcessingInfo prevProcessingInfo = event.getProcessingInfo();
-		this.prevProcessingId = prevProcessingInfo!=null? prevProcessingInfo.getProcessingId(): null;
+		ProcessingInfo stepProcessinfInfo = new ProcessingInfo();
+		stepProcessinfInfo.eventJson = JsonUtils.writeObjectToJSONString(startPayload);
 		
-		this.processingId =  BaseJSONObject.generateUUID();
+		ProcessingInfo prevProcessingInfo = startHeader.getProcessingInfo();
+		stepProcessinfInfo.prevProcessingId = prevProcessingInfo!=null? prevProcessingInfo.getProcessingId(): null;
 		
-		this.stepName = processingStepName;
-		this.stepIndex = prevProcessingInfo!=null? prevProcessingInfo.getStepIndex()+1: 0;
+		stepProcessinfInfo.stepName = processingStepName;
+		stepProcessinfInfo.stepIndex = prevProcessingInfo!=null? prevProcessingInfo.getStepIndex()+1: 0;
 
 		Instant now = Instant.now();
-		timeStampStart = now;
-		timeStampFinish = now;
+		stepProcessinfInfo.timeStampStart = now;
+		
+		return stepProcessinfInfo;
 	}
 	
-	public void stepFinish(BasePayload event) {
+	public static ProcessingInfo createProcessingInfoOnStepEnd(ProcessingInfo startProcessingInfo,
+			Header endHeader, Object endPayload) {
+		log.info("Generating end processing info for step {}", startProcessingInfo.getStepName());
+		
+		ProcessingInfo endProcessinfInfo = new ProcessingInfo();
+		endProcessinfInfo.eventJson = startProcessingInfo.eventJson;
+		endProcessinfInfo.prevProcessingId = startProcessingInfo.prevProcessingId;
+		endProcessinfInfo.stepName = startProcessingInfo.stepName;
+		endProcessinfInfo.stepIndex = startProcessingInfo.stepIndex;
+		endProcessinfInfo.timeStampStart = startProcessingInfo.timeStampStart;
+
+		endProcessinfInfo.stepFinish(endHeader, endPayload);
+		
+		return endProcessinfInfo;
+	}
+
+	private void stepFinish(Header endHeader, Object endPayload) {
+		processingId =  BaseJSONObject.generateUUID();
+		
 		timeStampFinish = Instant.now();
 		durationInMs = ChronoUnit.MILLIS.between(timeStampStart, timeStampFinish);
-		modifiedEventJson = event.toJSONString();
+		modifiedEventJson = JsonUtils.writeObjectToJSONString(endPayload);
 		
 //		calculateDiffToPreviosVersion();
+		log.info("Processing finished for step {}. Took {} ms", getStepName(), getDurationInMs());
 	}
+
 	
 //	private void calculateDiffToPreviosVersion() {
 //		try {	

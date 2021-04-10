@@ -20,27 +20,13 @@ import lombok.extern.log4j.Log4j2;
 	@Type(value = Message.class, name = Message.JSON_TYPE_IDENTIFIER) })
 @ToString(callSuper = true)
 @Log4j2
-public abstract class BasePayload extends BaseJSONObject {
+public abstract class BasePayload extends BaseJSONObject implements HasHeader {
 
 	protected Header header = new Header();
 	protected Body body = new Body();
-
-	protected ProcessingInfo processingInfo;
-
-	public ProcessingInfo stepStart(String processingStepName) {
-	    log.info("Generating processing info for step {}", processingStepName);
-	    
-		ProcessingInfo processingInfo = new ProcessingInfo();
-		processingInfo.stepStart(processingStepName, this);
-		this.processingInfo = processingInfo;
-
-		return this.processingInfo;
-	}
-
-	public void stepFinish() {
-		this.processingInfo.stepFinish(this);
-		
-		log.info("Processing finished for step {}. Took {} ms", getProcessingInfo().getStepName(), getProcessingInfo().getDurationInMs());
+	
+	public ProcessingInfo getProcessingInfo() {
+		return getHeader().getProcessingInfo();
 	}
 
 	public abstract String getPayloadTypeName();

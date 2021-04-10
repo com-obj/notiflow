@@ -17,9 +17,7 @@ class ValidateAndGenerateEventIdTest {
 		NotificationIntent inputNotificationIntent = NotificationIntent.createWithSimpleMessage("test-config", "Hi there!!");
 
 		//WHEN
-		ValidateAndGenerateEventIdProcessingFunction function = new ValidateAndGenerateEventIdProcessingFunction(
-				new ValidateAndGenerateEventIdExecution(),
-				new ValidateAndGenerateEventIdPreCondition());
+		ValidateAndGenerateEventIdProcessingFunction function = new ValidateAndGenerateEventIdProcessingFunction();
 
 		NotificationIntent outputNotificationIntent = function.apply(inputNotificationIntent);
 

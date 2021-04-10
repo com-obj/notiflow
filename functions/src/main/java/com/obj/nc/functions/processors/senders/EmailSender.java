@@ -37,6 +37,7 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @AllArgsConstructor
 @Log4j2
+@DocumentProcessingInfo("SendEmail")
 public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	
 	private final JavaMailSenderImpl mailSender;
@@ -64,11 +65,9 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	}
 
 
-	@DocumentProcessingInfo("SendEmail")
+
 	@Override
-	public Message execute(Message payload) {
-		payload.stepStart("SendEmail");
-		
+	public Message execute(Message payload) {		
 		EmailEndpoint toEmail = (EmailEndpoint) payload.getBody().getRecievingEndpoints().get(0);
 
 		EmailContent msg = payload.getContentTyped();
@@ -83,7 +82,6 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 
 		doSendMessage(toEmail, messageContent, payload.getHeader());
 		
-		payload.stepFinish();
 		return payload;
 	}
 

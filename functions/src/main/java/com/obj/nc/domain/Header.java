@@ -16,12 +16,14 @@ import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class Header extends BaseJSONObject {
+@Log4j2
+public class Header extends BaseJSONObject implements HasFlowId {
 	
 	@JsonProperty("flow-id")
 	private String flowId;
@@ -33,12 +35,33 @@ public class Header extends BaseJSONObject {
 	@NotNull
 	@Include
 	private List<UUID> eventIds = new ArrayList<>();
+	
+	protected ProcessingInfo processingInfo;
+	
+//	public ProcessingInfo stepStart(String processingStepName, Object startPayload) {
+//	    log.info("Generating processing info for step {}", processingStepName);
+//	    
+//		ProcessingInfo processingInfo = new ProcessingInfo();
+//		processingInfo.initProcessingInfoOnStepStart(processingStepName, this, startPayload);
+//		setProcessingInfo(processingInfo);
+//
+//		return processingInfo;
+//	}
+
+//	public void stepFinish(Object startPayload) {
+//		getProcessingInfo().stepFinish(this, startPayload);
+//		
+//	}
 
 	public void generateAndSetID() {
 		id = generateUUID();
 	}
 
 	public void copyHeaderFrom(Header header) {
+		if (header == null) {
+			return;
+		}
+		
 		BeanUtils.copyProperties(header, this);
 	}
 
@@ -56,6 +79,8 @@ public class Header extends BaseJSONObject {
 
 		return merged;
 	}
+
+
 
 	public String eventIdsAsJSONString() {
 		return JsonUtils.writeObjectToJSONString(eventIds);

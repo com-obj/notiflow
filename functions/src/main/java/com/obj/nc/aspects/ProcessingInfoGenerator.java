@@ -1,15 +1,20 @@
 package com.obj.nc.aspects;
 
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.reflect.MethodSignature;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
-import com.obj.nc.domain.BasePayload;
-import com.obj.nc.exceptions.ProcessingException;
+import com.obj.nc.domain.HasHeader;
+import com.obj.nc.domain.Header;
+import com.obj.nc.domain.ProcessingInfo;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -18,34 +23,132 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class ProcessingInfoGenerator {
 
-	@Around("@annotation(DocumentProcessingInfo)")
+//	@Pointcut("within(@com.obj.nc.aspects.DocumentProcessingInfo *)")
+//	public void clssAnnotatedWithDocumentProcessingInfo() {}
+//
+	@Pointcut("execution(* com.obj.nc.functions.processors.ProcessorFunction.apply(..))")
+	public void processorExecution() {}
+
+	@Pointcut("execution(* com.obj.nc.functions.sink.SinkConsumer.accept(..))")
+	public void sinkExecution() {}
+	
+	@Pointcut("execution(* com.obj.nc.functions.sources.SourceSupplier.get(..))")
+	public void sourceExecution() {}
+	
+	@Pointcut("processorExecution() || sinkExecution() || sourceExecution()")
+	public void endpointExecutions() {}
+	
+	@Around("endpointExecutions()")
 	public Object updateProcessingInfoOnPayload(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (joinPoint.getArgs().length != 1 || !(joinPoint.getArgs()[0] instanceof BasePayload)) {
-			throw new ProcessingException("@DocumentProcessingInfo can be used only on methods with single parameter which is of type BasePayload or its subtypes. Called on " + joinPoint.getSignature());
+	    DocumentProcessingInfo docProcessingInfoAnot = joinPoint.getTarget().getClass().getAnnotation(DocumentProcessingInfo.class);
+
+		if (docProcessingInfoAnot == null) {
+			return joinPoint.proceed();
 		}
 		
-		MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-	    Method method = signature.getMethod();
-
-	    DocumentProcessingInfo myAnnotation = method.getAnnotation(DocumentProcessingInfo.class);
+		List<ImmutablePair<Header, Object>> startPayloadAndHeaders = new ArrayList<>();
+		if (joinPoint.getArgs().length == 1) {
+			startPayloadAndHeaders = extractPayloads(joinPoint.getArgs()[0]);
+		}
 		
-	    log.info("Generating processing info for step {}", myAnnotation.value());
-		BasePayload payload = (BasePayload)joinPoint.getArgs()[0];
-		payload.stepStart(myAnnotation.value());
+		List<ProcessingInfo> startProcessingInfos = calculateStartProcessingInfos(
+				docProcessingInfoAnot.value(),
+				startPayloadAndHeaders);
 		
 		Object returnValue = null;
 		try {
 			returnValue = joinPoint.proceed();
 		} catch (Throwable e) {
-			log.error("Exception ocured in processing step " + myAnnotation.value(), e);
+			log.error("Exception ocured in processing step " + docProcessingInfoAnot.value(), e);
 			throw e;
 		}
-
-		payload.stepFinish();
-		log.info("Processing finished for step {}. Took {} ms", myAnnotation.value(), payload.getProcessingInfo().getDurationInMs());
+		
+		List<ImmutablePair<Header, Object>> endPayloadAndHeaders = new ArrayList<>();
+		endPayloadAndHeaders = extractPayloads(returnValue);
+		
+		if (startProcessingInfos.size()>1 /*&& endPayloadAndHeaders.size()>1*/) {
+			log.warn("Cannot automaticaly map ProcessingInfo only for 1:1, 1:N cardinalities. Have {}:{} ", startPayloadAndHeaders.size(),endPayloadAndHeaders.size());
+			return returnValue;
+		}
+		
+		ProcessingInfo startProcessing = startProcessingInfos.size()==1? startProcessingInfos.get(0): null;
+		Header startHeader = startPayloadAndHeaders.size()==1? startPayloadAndHeaders.get(0).getKey(): null;
+	    
+		calculateEndProcessingInfos(endPayloadAndHeaders, startProcessing, startHeader);
 
 		return returnValue;
-		
 	}
+
+	private List<ProcessingInfo> calculateStartProcessingInfos(String stepName,
+			List<ImmutablePair<Header, Object>> startPayloadAndHeaders) {
+		List<ProcessingInfo> startProcessingInfos = new ArrayList<>();
+		for (ImmutablePair<Header, Object> startPayloadAndHeader: startPayloadAndHeaders) {
+			 Object startPayload = startPayloadAndHeader.getRight();
+			 Header startHeader = startPayloadAndHeader.getLeft();
+			    
+		    ProcessingInfo startProcessing = ProcessingInfo.createProcessingInfoOnStepStart(
+		    		stepName, startHeader, startPayload);
+		    startHeader.setProcessingInfo(startProcessing);
+		    
+		    startProcessingInfos.add(startProcessing);
+		}
+		return startProcessingInfos;
+	}
+
+	private void calculateEndProcessingInfos(List<ImmutablePair<Header, Object>> endPayloadAndHeaders,
+			ProcessingInfo startProcessing, Header startHeader) {
+		ProcessingInfo lastProcInfo = null;
+		for (ImmutablePair<Header, Object> endPayloadAndHeader: endPayloadAndHeaders) {
+			Object endPayload = endPayloadAndHeader.getRight();
+			Header endHeader = endPayloadAndHeader.getLeft();
+			
+			
+			boolean startAndEndBeanDifferent = startHeader != endHeader;
+			if (startAndEndBeanDifferent) {
+				endHeader.copyHeaderFrom(startHeader);
+				endHeader.generateAndSetID();
+			}
+			    
+			ProcessingInfo endProcessing = ProcessingInfo.createProcessingInfoOnStepEnd(
+					 startProcessing, endHeader, endPayload);
+		    endHeader.setProcessingInfo(endProcessing);  
+		    
+		    lastProcInfo = endProcessing;
+		}
+		
+		String duration = lastProcInfo!=null ? lastProcInfo.getDurationInMs()+"" : "N/A";
+		
+		log.info("Processing finished for step {}. Took {} ms", startProcessing.getStepName(), duration);
+	}
+	
+	private List<ImmutablePair<Header, Object>> extractPayloads(Object input) {
+		List<ImmutablePair<Header, Object>> result = new ArrayList<>();
+		
+		if (input instanceof HasHeader) {
+		    Header header = ((HasHeader)input).getHeader();
+		    ImmutablePair<Header, Object> headerPayloadPair = new ImmutablePair<>(header, input);
+		    
+		    result.add(headerPayloadPair);
+		} else if (input instanceof Iterable) {
+			Iterator<?> iterator = ((Iterable<?>)input).iterator();
+			while (iterator.hasNext()) {
+				Object singleInput = iterator.next();
+				
+				List<ImmutablePair<Header, Object>> pairs = extractPayloads(singleInput);
+				result.addAll(pairs);
+			}
+		} else if (input instanceof Message<?>) {
+			Message<?> springMessage = (Message<?>)input;
+			List<ImmutablePair<Header, Object>> pairs = extractPayloads(springMessage.getPayload());
+			
+			result.addAll(pairs);
+		}
+		//Add other options if needed
+		
+		log.warn("Cannot calculate processing info for return value " + input );
+		return result;
+	}
+
+
 
 }
