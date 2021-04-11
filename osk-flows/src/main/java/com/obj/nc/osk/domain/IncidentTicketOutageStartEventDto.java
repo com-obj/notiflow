@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.osk.domain.IncidentTicketServiceOutageForCustomerDto.CustomerSegment;
 import com.obj.nc.osk.functions.processors.eventConverter.config.NotifEventConverterConfigProperties;
 
@@ -23,7 +22,6 @@ import lombok.Singular;
  */
 @Data
 @EqualsAndHashCode(callSuper=true)
-@JsonTypeName("OUTAGE_START")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

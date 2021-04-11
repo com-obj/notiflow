@@ -1,32 +1,57 @@
 package com.obj.nc.functions.processors.dummy;
 
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.functions.PreCondition;
-import com.obj.nc.functions.processors.ProcessorFunction;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 
-import java.util.function.Function;
+import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.Group;
+import com.obj.nc.domain.endpoints.Person;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Component
 @AllArgsConstructor
-public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunction<NotificationIntent, NotificationIntent> {
+@Log4j2
+@DocumentProcessingInfo("DummyRecepientsEnrichment")
+public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent, NotificationIntent> {
 
-	@Autowired
-	private DummyRecepientsEnrichmentExecution execution;
-
-	@Autowired
-	private DummyRecepientsEnrichmentPreCondition preCondition;
+	public static final List<String> REQUIRED_ATTRIBUTES = Arrays.asList("technologies");
 
 	@Override
-	public PreCondition<NotificationIntent> preCondition() {
-		return preCondition;
+	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent notificationIntent) {
+		boolean eventHasRequiredAttributes = notificationIntent.getBody().getMessage().containsNestedAttributes(REQUIRED_ATTRIBUTES, "originalEvent", "data");
+
+		if (!eventHasRequiredAttributes) {
+			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s does not contain required attributes." +
+					" Required attributes are: %s", notificationIntent.toString(), REQUIRED_ATTRIBUTES)));
+		}
+
+		return Optional.empty();
 	}
 
 	@Override
-	public Function<NotificationIntent, NotificationIntent> execution() {
-		return execution;
+	protected NotificationIntent execute(NotificationIntent notificationIntent) {
+		// find recipients based on technologies
+		Person person1 = new Person("John Doe");
+		Person person2 = new Person("John Dudly");
+		Person person3 = new Person("Jonson and johnson");
+		Group allObjectifyGroup = Group.createWithMembers("All Objectify", person1, person2, person3);
+
+		EmailEndpoint endpoint1 = EmailEndpoint.createForPerson(person1, "john.doe@objectify.sk");
+		EmailEndpoint endpoint2 = EmailEndpoint.createForPerson(person2, "john.dudly@objectify.sk");
+		EmailEndpoint endpoint3 = EmailEndpoint.createForGroup(allObjectifyGroup, "all@objectify.sk");
+
+		notificationIntent.getBody().addAllRecievingEndpoints(endpoint1, endpoint2, endpoint3);
+
+		return notificationIntent;
 	}
 
 }

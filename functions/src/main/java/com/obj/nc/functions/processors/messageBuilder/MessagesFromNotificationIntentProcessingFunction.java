@@ -1,34 +1,69 @@
 package com.obj.nc.functions.processors.messageBuilder;
 
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.functions.PreCondition;
-import com.obj.nc.functions.processors.ProcessorFunction;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.function.Function;
+import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.domain.Body;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Component
 @AllArgsConstructor
-public class MessagesFromNotificationIntentProcessingFunction extends ProcessorFunction<NotificationIntent, List<Message>> {
-
-	@Autowired
-	private MessagesFromNotificationIntentExecution execution;
-
-	@Autowired
-	private MessagesFromNotificationIntentPreCondition preCondition;
+@Log4j2
+@DocumentProcessingInfo("GenerateMessagesFromEvent")
+public class MessagesFromNotificationIntentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent, List<Message>> {
 
 	@Override
-	public PreCondition<NotificationIntent> preCondition() {
-		return preCondition;
+	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent notificationIntent) {
+
+		if (notificationIntent.getBody().getRecievingEndpoints().isEmpty()) {
+			return Optional.of(new PayloadValidationException(
+					String.format("NotificationIntent %s has no receiving endpoints defined.", notificationIntent)));
+		}
+
+		return Optional.empty();
 	}
 
 	@Override
-	public Function<NotificationIntent, List<Message>> execution() {
-		return execution;
+	protected List<Message> execute(NotificationIntent notificationIntent) {
+		log.debug("Create messages for {}",  notificationIntent);
+
+		List<Message> messages = new ArrayList<Message>();
+
+		for (RecievingEndpoint recievingEndpoint: notificationIntent.getBody().getRecievingEndpoints()) {
+
+			Message msg = new Message();
+			
+			Body msgBody = msg.getBody();
+			Body eventBody = notificationIntent.getBody();
+			msgBody.addRecievingEndpoints(recievingEndpoint);
+
+			if (recievingEndpoint.getDeliveryOptions()!=null) {
+				msgBody.setDeliveryOptions(recievingEndpoint.getDeliveryOptions());
+				recievingEndpoint.setDeliveryOptions(null);
+			} else {
+				msgBody.setDeliveryOptions(eventBody.getDeliveryOptions());
+			}
+
+			msgBody.setAttributes(eventBody.getAttributes());
+			
+			msgBody.setMessage(eventBody.getMessage());
+			msgBody.getMessage().setAttributes(eventBody.getMessage().getAttributes());
+
+			messages.add(msg);
+		}
+
+		return messages;
 	}
 
 }

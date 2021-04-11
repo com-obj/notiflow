@@ -2,10 +2,12 @@ package com.obj.nc.functions.sink;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,30 +22,28 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
 import com.obj.nc.functions.processors.senders.EmailSender;
-import com.obj.nc.functions.sink.processingInfoPersister.ProcessingInfoPersisterSinkConsumer;
-import com.obj.nc.functions.sink.processingInfoPersister.eventWithRecipients.ProcessingInfoPersisterForEventWithRecipientsSinkConsumer;
+import com.obj.nc.repositories.HeaderRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest
 class ProcessingInfoPersisterTest extends BaseIntegrationTest {
 
-	@Autowired private ProcessingInfoPersisterSinkConsumer processingInfoPersister;
-	@Autowired private ProcessingInfoPersisterForEventWithRecipientsSinkConsumer processingInfoPersisterForEventWithRecipients;
 	@Autowired private ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId;
     @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
     @Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
     @Autowired private EmailSender functionSend;
     @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired private HeaderRepository headerRepository;
 
     @BeforeEach
     void setUp() {
@@ -66,11 +66,12 @@ class ProcessingInfoPersisterTest extends BaseIntegrationTest {
         notificationIntent = validateAndGenerateEventId.apply(notificationIntent);
 
         // when
-        processingInfoPersister.accept(notificationIntent);
+        // ProcessingInfo persistence is done using aspect and in an async way
 
         // then
         UUID uuid = notificationIntent.getHeader().getId();
         final NotificationIntent finalNotificationIntent = notificationIntent;
+        Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> ProcessingInfo.findProcessingInfo(uuid, "GenerateMessagesFromEvent")!=null);
 
         List<ProcessingInfo> persistedPIs = ProcessingInfo.findProcessingInfo(uuid, "GenerateMessagesFromEvent");
         persistedPIs.forEach(persistedPI -> {
@@ -80,7 +81,7 @@ class ProcessingInfoPersisterTest extends BaseIntegrationTest {
             assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(finalNotificationIntent.getProcessingInfo().getPrevProcessingId()));
             assertThat(persistedPI.getDiffJson(), CoreMatchers.equalTo(finalNotificationIntent.getProcessingInfo().getDiffJson()));
             assertThat(persistedPI.getStepName(), CoreMatchers.equalTo(finalNotificationIntent.getProcessingInfo().getStepName()));
-            assertThat(persistedPI.getEventJson(), CoreMatchers.equalTo(finalNotificationIntent.getProcessingInfo().getEventJson()));
+            assertThat(persistedPI.getPayloadBodyJson(), CoreMatchers.equalTo(finalNotificationIntent.getProcessingInfo().getPayloadBodyJson()));
             assertThat(persistedPI.getDurationInMs(), CoreMatchers.equalTo(finalNotificationIntent.getProcessingInfo().getDurationInMs()));
             assertThat(persistedPI.getTimeStampStart(), CoreMatchers.equalTo(finalNotificationIntent.getProcessingInfo().getTimeStampStart()));
             assertThat(persistedPI.getTimeStampFinish(), CoreMatchers.equalTo(finalNotificationIntent.getProcessingInfo().getTimeStampFinish()));
@@ -96,7 +97,7 @@ class ProcessingInfoPersisterTest extends BaseIntegrationTest {
         notificationIntent = resolveRecipients.apply(notificationIntent);
 
         // when
-        processingInfoPersisterForEventWithRecipients.accept(notificationIntent);
+        headerRepository.persistProcessingInfoWithRecipients(notificationIntent);
 
         // then
         List<Map<String, Object>> persistedEndpoints = jdbcTemplate.queryForList("select * from nc_endpoint");
@@ -118,13 +119,15 @@ class ProcessingInfoPersisterTest extends BaseIntegrationTest {
         notificationIntent = resolveRecipients.apply(notificationIntent);
         List<Message> messages = generateMessagesFromEvent.apply(notificationIntent);
 
-        // when
-        messages.forEach(message -> processingInfoPersister.accept(message));
+        // ProcessingInfo persistence is done using aspect and in an async way
 
         // then
         messages.forEach(message -> {
             UUID uuid = message.getHeader().getId();
+            Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> ProcessingInfo.findProcessingInfo(uuid, "GenerateMessagesFromEvent")!=null);
+           
             List<ProcessingInfo> persistedPIs = ProcessingInfo.findProcessingInfo(uuid, "GenerateMessagesFromEvent");
+            
             persistedPIs.forEach(persistedPI -> {
                 assertThat(persistedPI.getProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getProcessingId()));
                 assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getPrevProcessingId()));
@@ -132,7 +135,7 @@ class ProcessingInfoPersisterTest extends BaseIntegrationTest {
                 assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getPrevProcessingId()));
                 assertThat(persistedPI.getDiffJson(), CoreMatchers.equalTo(message.getProcessingInfo().getDiffJson()));
                 assertThat(persistedPI.getStepName(), CoreMatchers.equalTo(message.getProcessingInfo().getStepName()));
-                assertThat(persistedPI.getEventJson(), CoreMatchers.equalTo(message.getProcessingInfo().getEventJson()));
+                assertThat(persistedPI.getPayloadBodyJson(), CoreMatchers.equalTo(message.getProcessingInfo().getPayloadBodyJson()));
                 assertThat(persistedPI.getDurationInMs(), CoreMatchers.equalTo(message.getProcessingInfo().getDurationInMs()));
                 assertThat(persistedPI.getTimeStampStart(), CoreMatchers.equalTo(message.getProcessingInfo().getTimeStampStart()));
                 assertThat(persistedPI.getTimeStampFinish(), CoreMatchers.equalTo(message.getProcessingInfo().getTimeStampFinish()));
@@ -151,11 +154,13 @@ class ProcessingInfoPersisterTest extends BaseIntegrationTest {
         messages.forEach(message -> message = functionSend.apply(message));
 
         // when
-        messages.forEach(message -> processingInfoPersister.accept(message));
+        // ProcessingInfo persistence is done using aspect and in an async way
 
         // then
         messages.forEach(message -> {
             UUID uuid = message.getHeader().getId();
+            Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> ProcessingInfo.findProcessingInfo(uuid, "SendEmail")!=null);
+            
             List<ProcessingInfo> persistedPIs = ProcessingInfo.findProcessingInfo(uuid, "SendEmail");
             persistedPIs.forEach(persistedPI -> {
                 assertThat(persistedPI.getProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getProcessingId()));
@@ -164,7 +169,7 @@ class ProcessingInfoPersisterTest extends BaseIntegrationTest {
                 assertThat(persistedPI.getPrevProcessingId(), CoreMatchers.equalTo(message.getProcessingInfo().getPrevProcessingId()));
                 assertThat(persistedPI.getDiffJson(), CoreMatchers.equalTo(message.getProcessingInfo().getDiffJson()));
                 assertThat(persistedPI.getStepName(), CoreMatchers.equalTo(message.getProcessingInfo().getStepName()));
-                assertThat(persistedPI.getEventJson(), CoreMatchers.equalTo(message.getProcessingInfo().getEventJson()));
+                assertThat(persistedPI.getPayloadBodyJson(), CoreMatchers.equalTo(message.getProcessingInfo().getPayloadBodyJson()));
                 assertThat(persistedPI.getDurationInMs(), CoreMatchers.equalTo(message.getProcessingInfo().getDurationInMs()));
                 assertThat(persistedPI.getTimeStampStart(), CoreMatchers.equalTo(message.getProcessingInfo().getTimeStampStart()));
                 assertThat(persistedPI.getTimeStampFinish(), CoreMatchers.equalTo(message.getProcessingInfo().getTimeStampFinish()));

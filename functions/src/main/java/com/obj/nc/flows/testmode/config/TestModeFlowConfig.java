@@ -110,7 +110,7 @@ public class TestModeFlowConfig {
 	
     @Bean
     public AggregateMessageToSingleEmailTransformer aggregateMessageToSingleEmailTransformer() {
-    	return new AggregateMessageToSingleEmailTransformer();
+    	return new AggregateMessageToSingleEmailTransformer(testModeProps);
     }
     
 

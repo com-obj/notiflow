@@ -1,4 +1,4 @@
-package com.obj.nc.functions.processors.koderia;
+package com.obj.nc.functions.processors.dummy;
 
 import java.util.List;
 
@@ -6,31 +6,26 @@ import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
+import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentExecution;
-import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentPreCondition;
-import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdExecution;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdPreCondition;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
 
-
-class RecepientsUsingKoderiaSubscriptionTest {
+@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@SpringBootTest
+class RecepientsUsingSubscriptionTest {
 
     private final ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId =
-            new ValidateAndGenerateEventIdProcessingFunction(
-                    new ValidateAndGenerateEventIdExecution(),
-                    new ValidateAndGenerateEventIdPreCondition());
+            new ValidateAndGenerateEventIdProcessingFunction();
 
     private final DummyRecepientsEnrichmentProcessingFunction resolveRecipients =
-            new DummyRecepientsEnrichmentProcessingFunction(
-                    new DummyRecepientsEnrichmentExecution(),
-                    new DummyRecepientsEnrichmentPreCondition());
+            new DummyRecepientsEnrichmentProcessingFunction();
 
     @Test
     void testResolveRecipientsFailWithoutRequiredAttributes() {

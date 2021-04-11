@@ -31,7 +31,8 @@ nc:
       test-mode.enabled: false
 
 logging.level:
-   org.springframework: DEBUG
+   org.springframework: INFO
+   org.springframework.aop: DEBUG
 ---
 spring.config.activate.on-profile: jenkins_test
 testEnv: jenkins

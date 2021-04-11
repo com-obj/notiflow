@@ -1,4 +1,4 @@
-package com.obj.nc.domain;
+package com.obj.nc.domain.headers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.obj.nc.domain.BaseJSONObject;
+import com.obj.nc.domain.HasFlowId;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.EqualsAndHashCode;
@@ -16,12 +18,14 @@ import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class Header extends BaseJSONObject {
+@Log4j2
+public class Header extends BaseJSONObject implements HasFlowId {
 	
 	@JsonProperty("flow-id")
 	private String flowId;
@@ -33,12 +37,18 @@ public class Header extends BaseJSONObject {
 	@NotNull
 	@Include
 	private List<UUID> eventIds = new ArrayList<>();
+	
+	protected ProcessingInfo processingInfo;
 
 	public void generateAndSetID() {
 		id = generateUUID();
 	}
 
 	public void copyHeaderFrom(Header header) {
+		if (header == null) {
+			return;
+		}
+		
 		BeanUtils.copyProperties(header, this);
 	}
 
@@ -56,6 +66,8 @@ public class Header extends BaseJSONObject {
 
 		return merged;
 	}
+
+
 
 	public String eventIdsAsJSONString() {
 		return JsonUtils.writeObjectToJSONString(eventIds);

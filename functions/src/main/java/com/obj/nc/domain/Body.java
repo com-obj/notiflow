@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
@@ -33,6 +34,7 @@ public class Body extends BaseJSONObject{
 		return this;
 	}
 	
+	@JsonIgnore
 	public <T extends Content> T getContentTyped() {
 		return (T) message;
 	}

@@ -1,5 +1,7 @@
 package com.obj.nc.domain.endpoints;
 
+import org.springframework.data.relational.core.mapping.Table;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
@@ -16,6 +18,7 @@ import lombok.NoArgsConstructor;
 })
 @Data
 @NoArgsConstructor
+@Table("nc_endpoint")
 public abstract class RecievingEndpoint {
 	
 	private DeliveryOptions deliveryOptions;

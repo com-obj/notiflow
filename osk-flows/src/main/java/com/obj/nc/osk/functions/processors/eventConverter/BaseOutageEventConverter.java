@@ -45,6 +45,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @RequiredArgsConstructor
+@DocumentProcessingInfo
 public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<GenericEvent, List<NotificationIntent>> {
 	
 	@NonNull
@@ -75,7 +76,7 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 	}
 
 	@Override
-	@DocumentProcessingInfo
+
 	protected List<NotificationIntent> execute(GenericEvent payload) {
 		List<NotificationIntent> notificationIntents = new ArrayList<>();
 		

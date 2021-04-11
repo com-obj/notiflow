@@ -1,32 +1,42 @@
 package com.obj.nc.functions.sink.processingInfoPersister;
 
-import com.obj.nc.domain.BasePayload;
-import com.obj.nc.functions.PreCondition;
-import com.obj.nc.functions.sink.SinkConsumer;
-import lombok.AllArgsConstructor;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Consumer;
+import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.headers.ProcessingInfo;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.sink.SinkConsumerAdapter;
+import com.obj.nc.repositories.HeaderRepository;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Component
 @AllArgsConstructor
-public class ProcessingInfoPersisterSinkConsumer extends SinkConsumer<BasePayload> {
+@Log4j2
+public class ProcessingInfoPersisterSinkConsumer extends SinkConsumerAdapter<BasePayload> {
 
-	@Autowired
-	private ProcessingInfoPersisterExecution execution;
-
-	@Autowired
-	private ProcessingInfoPersisterPreCondition preCondition;
-
+    @Autowired
+    private HeaderRepository headerRepository ;
+    
 	@Override
-	public PreCondition<BasePayload> preCondition() {
-		return preCondition;
+	protected Optional<PayloadValidationException> checkPreCondition(BasePayload payload) {
+		ProcessingInfo processingInfo = payload.getProcessingInfo();
+
+		if (processingInfo == null) {
+			return Optional.of(new PayloadValidationException("Could not persist ProcessingInfo because the payload didn't contain it. Payload: " + payload));
+		}
+
+		return Optional.empty();
 	}
 
 	@Override
-	public Consumer<BasePayload> execution() {
-		return execution;
+	protected void execute(BasePayload payload) {
+		headerRepository.persistPI(payload.getHeader());
 	}
+	
 
 }
