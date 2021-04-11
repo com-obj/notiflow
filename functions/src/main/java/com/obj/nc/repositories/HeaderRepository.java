@@ -53,8 +53,8 @@ public class HeaderRepository {
                 + "time_processing_start, "
                 + "time_processing_end, "
                 + "step_duration_ms, "
-                + "event_json, "
-                + "event_json_diff) "
+                + "payload_json, "
+                + "payload_json_diff) "
                 + "VALUES (to_json(?::json), ?, ?, ?, ?, ?, ?, ?, ?, ?, to_json(?::json), to_json(?::json))";
 
         long stepStartMs = processingInfo.getTimeStampStart().toEpochMilli();
@@ -64,7 +64,7 @@ public class HeaderRepository {
 
         jdbcTemplate.update(inserEventSQL,
         		header.eventIdsAsJSONString(),
-        		header.getId(),
+//        		header.getId(),
 //TODO                payload.getPayloadTypeName(),
         		null,  
                 processingInfo.getProcessingId(),

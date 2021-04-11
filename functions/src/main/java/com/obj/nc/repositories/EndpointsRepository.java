@@ -60,32 +60,32 @@ public class EndpointsRepository {
 
     public void persistEnpoint2Processing(UUID processingId, List<RecievingEndpoint> ednpoints) {
 
-        String inserEndpoint2ProcessingRelSQL = 
-        		"insert into nc_endpoint_processing "
-                + "(endpoint_id, processing_id) "
-                + "values "
-                + "(?, ?) ";
-
-        try  {
-            jdbcTemplate.batchUpdate(
-                    inserEndpoint2ProcessingRelSQL,
-                    new BatchPreparedStatementSetter() {
-
-                        public void setValues(PreparedStatement ps, int i) throws SQLException {
-                            RecievingEndpoint endpoint = ednpoints.get(i);
-                            ps.setString(1, endpoint.getEndpointId());
-                            ps.setObject(2, processingId);
-                        }
-
-                        public int getBatchSize() {
-                            return ednpoints.size();
-                        }
-
-                    });
-        } catch (RuntimeException e) {
-            log.error(e);
-            throw e;
-        }
+//        String inserEndpoint2ProcessingRelSQL = 
+//        		"insert into nc_event_2_endpoint_delivery "
+//                + "(endpoint_id, processing_id) "
+//                + "values "
+//                + "(?, ?) ";
+//
+//        try  {
+//            jdbcTemplate.batchUpdate(
+//                    inserEndpoint2ProcessingRelSQL,
+//                    new BatchPreparedStatementSetter() {
+//
+//                        public void setValues(PreparedStatement ps, int i) throws SQLException {
+//                            RecievingEndpoint endpoint = ednpoints.get(i);
+//                            ps.setString(1, endpoint.getEndpointId());
+//                            ps.setObject(2, processingId);
+//                        }
+//
+//                        public int getBatchSize() {
+//                            return ednpoints.size();
+//                        }
+//
+//                    });
+//        } catch (RuntimeException e) {
+//            log.error(e);
+//            throw e;
+//        }
 
     }
 

@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,7 @@ class ProcessingInfoPersisterTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Disabled
     void testPersistPIForEventWithRecipients() {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post.json";

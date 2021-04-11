@@ -30,7 +30,7 @@ import lombok.ToString;
 @EqualsAndHashCode(of = "id")
 @AllArgsConstructor
 @NoArgsConstructor
-@Table("nc_input")
+@Table("nc_event")
 public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayload, HasHeader {
 	
 	//TODO: do not duplicate, use from header

@@ -2,6 +2,7 @@ package com.obj.nc.domain.headers;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,6 +40,8 @@ public class ProcessingInfo {
 	private Instant timeStampFinish;
 	private long durationInMs;
 	
+	private List<UUID> eventIds = new ArrayList<>();
+	
 	@Transient
 	@JsonIgnore
 	private String payloadBodyJson;
@@ -70,8 +73,10 @@ public class ProcessingInfo {
         					rs.getTimestamp("time_processing_start").toInstant(),
         					rs.getTimestamp("time_processing_end").toInstant(),
         					rs.getLong("step_duration_ms"),
-        					rs.getString("event_json"),
-        					rs.getString("event_json_diff"),null
+        					null,
+        					rs.getString("payload_json"),
+        					rs.getString("payload_json_diff"),
+        					null
         					)
         		);
         return persistedPIs;
