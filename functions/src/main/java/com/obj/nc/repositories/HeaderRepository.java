@@ -5,12 +5,15 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.headers.Header;
+import com.obj.nc.domain.headers.NewProcessingInfoAppEvent;
 import com.obj.nc.domain.headers.ProcessingInfo;
 
 import lombok.extern.log4j.Log4j2;
@@ -24,13 +27,15 @@ import lombok.extern.log4j.Log4j2;
  */
 @Service
 @Log4j2
-public class HeaderRepository {
+@Transactional
+public class HeaderRepository implements ApplicationListener<NewProcessingInfoAppEvent> {
 	
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private EndpointsRepository endpointsRepository;
 	
+    
     public void persistPI(Header header) {
         log.debug("Persisting processing info {}",header);
 
@@ -68,7 +73,7 @@ public class HeaderRepository {
                 new Timestamp(stepStartMs),
                 new Timestamp(stepEndMs),
                 stepDurationMs,
-                processingInfo.getEventJson(),
+                processingInfo.getModifiedPayloadBodyJsonJson(),
                 processingInfo.getDiffJson());
     }
     
@@ -80,8 +85,14 @@ public class HeaderRepository {
 
         endpointsRepository.persistEnpointIfNotExists(recipients);
         endpointsRepository.persistEnpoint2Processing(processingId, recipients);
-    	
     }
+
+	@Override
+	public void onApplicationEvent(NewProcessingInfoAppEvent event) {
+		log.debug("Recieved NewProcessingInfoAppEvent: {}", event);
+		
+		persistPI(event.getHeader());
+	}
 
 
 }

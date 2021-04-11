@@ -80,10 +80,10 @@ public class ProcessingInfoGenerator {
 		ProcessingInfo startProcessing = startProcessingInfos.size()==1? startProcessingInfos.get(0): null;
 		Header startHeader = startPayloadAndHeaders.size()==1? startPayloadAndHeaders.get(0).getKey(): null;
 	    
-		List<ProcessingInfo> endProcessings = calculateEndProcessingInfos(endPayloadAndHeaders, startProcessing, startHeader);
+		List<Header> endHeaders = calculateEndProcessingInfos(endPayloadAndHeaders, startProcessing, startHeader);
 		
-		endProcessings.forEach( pi-> 
-				applicationEventPublisher.publishEvent(new NewProcessingInfoAppEvent(pi))
+		endHeaders.forEach( h-> 
+				applicationEventPublisher.publishEvent(new NewProcessingInfoAppEvent(h))
 		);
 		
 
@@ -106,9 +106,11 @@ public class ProcessingInfoGenerator {
 		return startProcessingInfos;
 	}
 
-	private List<ProcessingInfo> calculateEndProcessingInfos(List<ImmutablePair<Header, Object>> endPayloadAndHeaders,
+	private List<Header> calculateEndProcessingInfos(
+			List<ImmutablePair<Header, Object>> endPayloadAndHeaders,
 			ProcessingInfo startProcessing, Header startHeader) {
-		List<ProcessingInfo> endProcessings = new ArrayList<>();
+		
+		List<Header> endHeaders = new ArrayList<>();
 		
 		ProcessingInfo lastProcInfo = null;
 		for (ImmutablePair<Header, Object> endPayloadAndHeader: endPayloadAndHeaders) {
@@ -123,10 +125,9 @@ public class ProcessingInfoGenerator {
 			}
 			    
 			ProcessingInfo endProcessing = ProcessingInfo.createProcessingInfoOnStepEnd(
-					 startProcessing, endHeader, endPayload);
-		    endHeader.setProcessingInfo(endProcessing);  
+					 startProcessing, endHeader, endPayload); 
 		    
-		    endProcessings.add(endProcessing);
+		    endHeaders.add(endHeader);
 		    lastProcInfo = endProcessing;
 		}
 		
@@ -134,7 +135,7 @@ public class ProcessingInfoGenerator {
 		
 		log.info("Processing finished for step {}. Took {} ms", startProcessing.getStepName(), duration);
 		
-		return endProcessings;
+		return endHeaders;
 	}
 	
 	private List<ImmutablePair<Header, Object>> extractPayloads(Object input) {

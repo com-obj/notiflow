@@ -9,12 +9,12 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public class NewProcessingInfoAppEvent extends ApplicationEvent {
 
-	private final ProcessingInfo processingInfo;
+	private final Header header;
 
-	public NewProcessingInfoAppEvent(ProcessingInfo processingInfo) {
-		super(processingInfo);
+	public NewProcessingInfoAppEvent(Header header) {
+		super(header);
 		
-		this.processingInfo = processingInfo;
+		this.header = header;
 	}
 
 

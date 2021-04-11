@@ -28,6 +28,7 @@ public abstract class BasePayload extends BaseJSONObject implements HasHeader {
 	protected Header header = new Header();
 	protected Body body = new Body();
 	
+	@JsonIgnore
 	public ProcessingInfo getProcessingInfo() {
 		return getHeader().getProcessingInfo();
 	}

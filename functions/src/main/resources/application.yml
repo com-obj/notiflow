@@ -1,1 +1,3 @@
-logging.level.ROOT: INFO
+logging.level:
+   ROOT: INFO
+   com.obj.nc: DEBUG

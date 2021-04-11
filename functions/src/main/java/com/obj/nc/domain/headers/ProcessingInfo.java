@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -40,13 +41,19 @@ public class ProcessingInfo {
 	
 	@Transient
 	@JsonIgnore
-	private String eventJson;
+	private String payloadBodyJson;
 	@Transient
 	@JsonIgnore
-	private String modifiedEventJson;
+	private String modifiedPayloadBodyJsonJson;
 	@Transient
 	@JsonIgnore
 	private String diffJson;
+	
+	public static ProcessingInfo createCopy(ProcessingInfo info) {
+		ProcessingInfo newPi = new ProcessingInfo();
+		BeanUtils.copyProperties(info, newPi);
+		return newPi;
+	}
 	
 	public static List<ProcessingInfo> findProcessingInfo(UUID forEventId, String forStep) {
         List<ProcessingInfo> persistedPIs = Get.getJdbc().query(
@@ -74,7 +81,7 @@ public class ProcessingInfo {
 		log.info("Generating start processing info for step {}", processingStepName);
 		
 		ProcessingInfo stepProcessinfInfo = new ProcessingInfo();
-		stepProcessinfInfo.eventJson = JsonUtils.writeObjectToJSONString(startPayload);
+		stepProcessinfInfo.payloadBodyJson = JsonUtils.writeObjectToJSONString(startPayload);
 		
 		ProcessingInfo prevProcessingInfo = startHeader.getProcessingInfo();
 		stepProcessinfInfo.prevProcessingId = prevProcessingInfo!=null? prevProcessingInfo.getProcessingId(): null;
@@ -92,13 +99,9 @@ public class ProcessingInfo {
 			Header endHeader, Object endPayload) {
 		log.info("Generating end processing info for step {}", startProcessingInfo.getStepName());
 		
-		ProcessingInfo endProcessinfInfo = new ProcessingInfo();
-		endProcessinfInfo.eventJson = startProcessingInfo.eventJson;
-		endProcessinfInfo.prevProcessingId = startProcessingInfo.prevProcessingId;
-		endProcessinfInfo.stepName = startProcessingInfo.stepName;
-		endProcessinfInfo.stepIndex = startProcessingInfo.stepIndex;
-		endProcessinfInfo.timeStampStart = startProcessingInfo.timeStampStart;
-
+		ProcessingInfo endProcessinfInfo = createCopy(startProcessingInfo);
+		endHeader.setProcessingInfo(endProcessinfInfo); 
+		
 		endProcessinfInfo.stepFinish(endHeader, endPayload);
 		
 		return endProcessinfInfo;
@@ -109,7 +112,8 @@ public class ProcessingInfo {
 		
 		timeStampFinish = Instant.now();
 		durationInMs = ChronoUnit.MILLIS.between(timeStampStart, timeStampFinish);
-		modifiedEventJson = JsonUtils.writeObjectToJSONString(endPayload);
+		
+		modifiedPayloadBodyJsonJson = JsonUtils.writeObjectToJSONString(endPayload); //this make snapshot of its self. has to be the last call
 		
 //		calculateDiffToPreviosVersion();
 		log.info("Processing finished for step {}. Took {} ms", getStepName(), getDurationInMs());
@@ -119,7 +123,7 @@ public class ProcessingInfo {
 //	private void calculateDiffToPreviosVersion() {
 //		try {	
 //			DiffMatchPatch diff = new DiffMatchPatch();
-//			LinkedList<Diff> diffs = diff.diff_main(eventJson, modifiedEventJson);
+//			LinkedList<Diff> diffs = diff.diff_main(payloadBodyJson, modifiedPayloadBodyJsonJson);
 //			
 //			ObjectMapper objectMapper = new ObjectMapper();
 //			diffJson = objectMapper.writeValueAsString(diffs.toArray());

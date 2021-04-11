@@ -20,7 +20,7 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @AllArgsConstructor
 @Log4j2
-@DocumentProcessingInfo("FindRecepientsUsingKoderiaSubsription")
+@DocumentProcessingInfo("DummyRecepientsEnrichment")
 public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent, NotificationIntent> {
 
 	public static final List<String> REQUIRED_ATTRIBUTES = Arrays.asList("technologies");
