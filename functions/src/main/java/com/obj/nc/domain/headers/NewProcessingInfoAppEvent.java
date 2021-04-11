@@ -1,21 +1,18 @@
 package com.obj.nc.domain.headers;
 
-import org.springframework.context.ApplicationEvent;
-
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper=true)
-public class NewProcessingInfoAppEvent extends ApplicationEvent {
-
+public class NewProcessingInfoAppEvent {
+	
 	private final Header header;
+	
+	//Dirty Hack: Spring fires notifications of this type outside of my intentional firing. How: no fucking idea... 
+	//Debuged, traced, loged,.. nothign help.
+	private boolean ready = false; 
 
-	public NewProcessingInfoAppEvent(Header header) {
-		super(header);
-		
-		this.header = header;
+	public void makeReady() {
+		this.ready = true;
 	}
-
 
 }

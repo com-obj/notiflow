@@ -65,7 +65,7 @@ public class ProcessingInfoGenerator {
 		try {
 			returnValue = joinPoint.proceed();
 		} catch (Throwable e) {
-			log.error("Exception ocured in processing step " + docProcessingInfoAnot.value(), e);
+			log.trace("Exception ocured in processing step {}", docProcessingInfoAnot.value(), e);
 			throw e;
 		}
 		
@@ -82,8 +82,11 @@ public class ProcessingInfoGenerator {
 	    
 		List<Header> endHeaders = calculateEndProcessingInfos(endPayloadAndHeaders, startProcessing, startHeader);
 		
-		endHeaders.forEach( h-> 
-				applicationEventPublisher.publishEvent(new NewProcessingInfoAppEvent(h))
+		endHeaders.forEach( h-> {
+				NewProcessingInfoAppEvent event = new NewProcessingInfoAppEvent(h);
+				event.setReady(true);
+				applicationEventPublisher.publishEvent(new NewProcessingInfoAppEvent(h));
+			}
 		);
 		
 

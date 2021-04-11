@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
@@ -27,6 +28,7 @@ import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
 import com.obj.nc.osk.functions.processors.sms.dtos.SendSmsResourceReferenceDto;
 
 @Validated
+@DocumentProcessingInfo("GAPSmsSender")
 public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Message> implements SmsSender {
 
     public static final String SEND_PATH = "/outbound/{senderAddress}/requests";

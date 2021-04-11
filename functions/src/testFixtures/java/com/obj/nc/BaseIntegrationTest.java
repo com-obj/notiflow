@@ -11,6 +11,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -24,7 +27,7 @@ import lombok.ToString;
     SINGLETON pattern class with containers for all test classes
     see more: https://www.testcontainers.org/test_framework_integration/manual_lifecycle_control/#singleton-containers
  */
-public abstract class BaseIntegrationTest {
+public abstract class BaseIntegrationTest implements ApplicationContextAware {
 
     static FixedPortPostgreSQLContainer<?> POSTGRESQL_CONTAINER;
     
@@ -136,4 +139,9 @@ public abstract class BaseIntegrationTest {
     	
     	return null;
 	}
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    	Get.setApplicationContext(applicationContext);
+    }
 }

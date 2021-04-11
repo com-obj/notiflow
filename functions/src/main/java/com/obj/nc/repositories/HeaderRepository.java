@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @Log4j2
 @Transactional
-public class HeaderRepository implements ApplicationListener<NewProcessingInfoAppEvent> {
+public class HeaderRepository {
 	
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -87,9 +88,13 @@ public class HeaderRepository implements ApplicationListener<NewProcessingInfoAp
         endpointsRepository.persistEnpoint2Processing(processingId, recipients);
     }
 
-	@Override
-	public void onApplicationEvent(NewProcessingInfoAppEvent event) {
+    @Async
+    @EventListener
+	public void persistPIFromEvent(NewProcessingInfoAppEvent event) {
 		log.debug("Recieved NewProcessingInfoAppEvent: {}", event);
+		if (!event.isReady()) {
+			return;
+		}
 		
 		persistPI(event.getHeader());
 	}

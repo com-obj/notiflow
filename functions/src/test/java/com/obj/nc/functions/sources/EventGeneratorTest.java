@@ -1,14 +1,14 @@
 package com.obj.nc.functions.sources;
 
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfigProperties;
-import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Map;
+
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -20,11 +20,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.FileSystemUtils;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Map;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfigProperties;
+import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
 
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
