@@ -15,6 +15,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 import com.obj.nc.functions.processors.senders.EmailSender;
+import com.obj.nc.functions.processors.senders.config.EmailSenderConfigProperties;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
@@ -78,8 +79,8 @@ public class TestModeEmailsBeansConfig {
 
     @Bean(TEST_MODE_EMAIL_SENDER_FUNCTION_BEAN_NAME)
     public EmailSender testModeEmailSenderSinkProcessingFunction(
-    		@Qualifier(TEST_MODE_REAL_MAIL_SENDER_BEAN_NAME) JavaMailSenderImpl javaMailSender) {
-        return new EmailSender(javaMailSender);
+    		@Qualifier(TEST_MODE_REAL_MAIL_SENDER_BEAN_NAME) JavaMailSenderImpl javaMailSender, EmailSenderConfigProperties settings) {
+        return new EmailSender(javaMailSender, settings);
     }
   
     public static final String TEST_MODE_GREEN_MAIL_USER = "testmode@objectify.sk";
