@@ -31,6 +31,8 @@ pipelines:
       - step: *runTestStep
     master:
       - step: *runTestStep
+    release/*:
+      - step: *runTestStep
       - step:
           name: Build FAT Jar
           script:
@@ -44,5 +46,5 @@ pipelines:
               variables:
                 BITBUCKET_USERNAME: $BITBUCKET_USERNAME
                 BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
-                FILENAME: "osk-flows/dist/*.jar"      
+                FILENAME: "osk-flows/dist/**"      
           
