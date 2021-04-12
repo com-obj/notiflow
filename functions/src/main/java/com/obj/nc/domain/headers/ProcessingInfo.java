@@ -97,7 +97,7 @@ public class ProcessingInfo {
 	
 	public static ProcessingInfo createProcessingInfoOnStepEnd(ProcessingInfo startProcessingInfo,
 			Header endHeader, Object endPayload) {
-		log.info("Generating end processing info for step {}", startProcessingInfo.getStepName());
+		log.debug("Generating end processing info for step {}", startProcessingInfo.getStepName());
 		
 		ProcessingInfo endProcessinfInfo = createCopy(startProcessingInfo);
 		endHeader.setProcessingInfo(endProcessinfInfo); 
