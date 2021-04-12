@@ -60,8 +60,8 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
         System.out.println(GreenMailUtil.getWholeMessage(msgs[0]));
 
         assertMessagesContains(msgs, MailMessageForAssertions.as("cuzy@objectify.sk", "Notifications digest while running test mode",
-        		"Processed with love by Notification Center by Objectify", //check if translations work
-        		"Vase sluzby mozu byt nedostupne", "Your services could be affected", "Zakaznici maju problem", 
+        		"Processed using Notificaiton center coded by Objectify", //check if translations work
+        		"Ovplyvnen"/*é môžu byť*/, "Impacted may be", /*došlo k vý*/"padku, ktor"/*ý môže mať dopad na zákazníkov a ich služby*/, 
         		"cuzy@objectify.sk", "jancuzy@gmail.com", "sales@objectify.sk"/*CS Agent*/, "sales@orange.sk", "hahn@orange.sk",
         		"dysko@objectify.sk", "nem_fukas@artin.sk", "slavkovsky@orange.sk",
         		//SMSs

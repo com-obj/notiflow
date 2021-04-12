@@ -7,23 +7,26 @@
     <body>
     	<p>
     		<span th:text="#{cust.start.salution}">Vážený zákazník</span>
-    		<span th:text="${model.customerName}">Objectify</span>
-    		<br>
-    		<span th:text="#{cust.start.atTime}">o</span>
+     		<span th:text="${model.customerName}">Objectify</span>
+<!--     		<br> -->
     		<span th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
-    		<span th:text="#{cust.start.hour}">hodine</span>
     		<span th:text="#{cust.start.outage}">sme zaznamenali výpadok</span>
     	</p>
-    <table>		
+    	<p th:text="#{cust.start.services.title}">
+    		Ovplyvnené môžu byť:
+    	</p>
+    <table border="1" cellpadding="5">		
 	    <thead>
 	        <tr>
-	            <th th:text="#{cust.start.SNHeader}"> SN </th>
+	        	<th th:text="#{cust.start.b2bLoginHeader}"> B2B login </th>
+	            <th th:text="#{cust.start.snHeader}"> SN </th>
 	            <th th:text="#{cust.start.serviceNameHeader}"> Služba </th>
 	            <th th:text="#{cust.start.customerLocationHeader}"> Odberna adresa </th>
 	        </tr>
 	    </thead>
 	    <tbody>
 	     	<tr th:each="service : ${model.services}">
+	     		<td><span th:text="${service.b2bLogin}"> b2bLogin </span></td>
 	            <td><span th:text="${service.sn}"> 0905132354 </span></td>
 	            <td><span th:text="${service.productName}"> VPS </span></td>
 	            <td><span th:text="${service.installationAddress}"> Bratislava </span></td>
@@ -32,6 +35,7 @@
     </table>
     	<p th:text="#{cust.start.footerLine1}"></p>
     	<p th:text="#{cust.start.footerLine2}"></p>
-    	<p th:text="#{cust.start.signature}"></p>
+    	<p th:text="#{cust.start.signature1}"></p>
+    	<p th:text="#{cust.start.signature2}"></p>
     </body>
 </html>
