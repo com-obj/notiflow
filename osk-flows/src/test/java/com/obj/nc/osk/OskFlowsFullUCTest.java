@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpMethod;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -57,6 +58,7 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     @Autowired private OskSmsSenderRestImpl smsSenderRestImpl;
     @Autowired private OskSmsSenderConfigProperties properties;
     private MockRestServiceServer mockServer;
+    @Autowired JdbcTemplate jdbcTemplate;
     
 
     @BeforeEach
@@ -69,7 +71,7 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     @Test
     @Order(1)  
     void testOutageStart() {
-    	purgeNotifTables();
+    	purgeNotifTables(jdbcTemplate);
     	
     	createRestCallExpectationsForOutageStartSms();
     	

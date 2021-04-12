@@ -29,6 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.config.InjectorConfiguration;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -44,7 +45,8 @@ import com.obj.nc.utils.JsonUtils;
 @RestClientTest(OskSmsSenderRestImpl.class)
 @ContextConfiguration(classes = {
 		OskSmsSenderConfig.class,
-		OskSmsSenderConfigProperties.class
+		OskSmsSenderConfigProperties.class,
+		InjectorConfiguration.class
 })
 class OskSmsSenderTest extends BaseIntegrationTest {
 

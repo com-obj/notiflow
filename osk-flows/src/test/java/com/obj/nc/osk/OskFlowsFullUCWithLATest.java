@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpMethod;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -54,11 +55,11 @@ public class OskFlowsFullUCWithLATest extends BaseIntegrationTest {
     private MockRestServiceServer mockServer;
     
     @BeforeEach
-    void redirectRestTemplate() throws FolderException {
+    void redirectRestTemplate(@Autowired JdbcTemplate jdbcTemplate) throws FolderException {
 		//Toto bude volat SMS sender
     	mockServer = MockRestServiceServer.bindTo(smsSenderRestImpl.getRestTemplate()).build();
     	greenMail.purgeEmailFromAllMailboxes();
-    	purgeNotifTables();
+    	purgeNotifTables(jdbcTemplate);
     }
   
 	@Test
