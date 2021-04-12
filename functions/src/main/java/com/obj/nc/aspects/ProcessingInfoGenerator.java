@@ -142,7 +142,12 @@ public class ProcessingInfoGenerator {
 	}
 	
 	private List<ImmutablePair<Header, Object>> extractPayloads(Object input) {
+
 		List<ImmutablePair<Header, Object>> result = new ArrayList<>();
+		if (input== null) {
+			//we should record that flow ended after this step
+			return result;
+		}
 		
 		if (input instanceof HasHeader) {
 		    Header header = ((HasHeader)input).getHeader();
@@ -165,7 +170,7 @@ public class ProcessingInfoGenerator {
 		}
 		//Add other options if needed
 		
-		log.warn("Cannot calculate processing info for return value " + input );
+		log.warn("Cannot calculate processing info for return value fo type {}", input.getClass() );
 		return result;
 	}
 

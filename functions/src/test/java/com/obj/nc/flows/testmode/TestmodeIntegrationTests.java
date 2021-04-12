@@ -118,7 +118,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         mockIntegrationContext.substituteMessageSourceFor(TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME, messageSource);
 
         // THEN agregeted mail recieved by standardn green mail used by test and thus in producton standard SMTP server
-        boolean success = greenMail.waitForIncomingEmail(15000,1);
+        boolean success = greenMail.waitForIncomingEmail(30000,1);
         Assertions.assertThat( success ).isEqualTo( true );
 
         MimeMessage[] outputMimeMessages = greenMail.getReceivedMessages();

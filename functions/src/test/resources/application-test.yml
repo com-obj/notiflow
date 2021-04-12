@@ -21,12 +21,12 @@ nc:
       event-generator:
          soruce-dir: eventsQueue
          file-name: ba_job_post.json
-      send-email-message:
-         from: no-reply@objectify.skk
       email-templates:
          templates-root-dir: 
             - src/test/resources/message-templates
          messages-dir-and-base-name: file:src/test/resources/message-templates/messages
+      email-sender:
+         from-mail-address: sender@objectify.sk
    flows:
       test-mode.enabled: false
 
