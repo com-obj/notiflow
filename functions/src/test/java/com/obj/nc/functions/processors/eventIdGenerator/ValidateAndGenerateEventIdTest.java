@@ -6,7 +6,7 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-import com.obj.nc.domain.Header;
+import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 
 class ValidateAndGenerateEventIdTest {
@@ -17,9 +17,7 @@ class ValidateAndGenerateEventIdTest {
 		NotificationIntent inputNotificationIntent = NotificationIntent.createWithSimpleMessage("test-config", "Hi there!!");
 
 		//WHEN
-		ValidateAndGenerateEventIdProcessingFunction function = new ValidateAndGenerateEventIdProcessingFunction(
-				new ValidateAndGenerateEventIdExecution(),
-				new ValidateAndGenerateEventIdPreCondition());
+		ValidateAndGenerateEventIdProcessingFunction function = new ValidateAndGenerateEventIdProcessingFunction();
 
 		NotificationIntent outputNotificationIntent = function.apply(inputNotificationIntent);
 

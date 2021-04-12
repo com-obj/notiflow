@@ -160,14 +160,23 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
         assertMessageCount(msgs, "sales@orange.sk", 1);
         assertMessageCount(msgs, "hahn@orange.sk", 1);
         
-        msg = assertMessagesContains(msgs, MailMessageForAssertions.as("slavkovsky@orange.sk", getMsg("sales."+ startEnd +".subject", new Locale("sk")),
-        		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", 
-        		"Mocidla 249, Myto pod Dumbierom","Martinengova 4881/36 811 02 Bratislava",
-        		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", 
-        		"Westend tower","Dubravska cesta 2 841 04 Bratislava",
-        		"0918186999"
-        		)
-        );
+        if (startEnd.equals("start")) {
+	        msg = assertMessagesContains(msgs, MailMessageForAssertions.as("slavkovsky@orange.sk", 
+	        		getMsg("sales."+ startEnd +".subject", new Locale("sk")),
+	        		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", 
+	        		"Mocidla 249, Myto pod Dumbierom","Martinengova 4881/36 811 02 Bratislava",
+	        		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", 
+	        		"Westend tower","Dubravska cesta 2 841 04 Bratislava",
+	        		"0918186999"
+	        		)
+	        );
+        } else {
+	        msg = assertMessagesContains(msgs, MailMessageForAssertions.as("slavkovsky@orange.sk", 
+	        		getMsg("sales."+ startEnd +".subject", new Locale("sk")),
+	        		"sme o tom informovali."
+	        		)
+	        );
+        }
         System.out.println(GreenMailUtil.getWholeMessage(msg));
         assertMessagesContains(msgs, MailMessageForAssertions.as("sales@orange.sk", getMsg("sales."+ startEnd +".subject", new Locale("sk"))));
         assertMessagesContains(msgs, MailMessageForAssertions.as("hahn@orange.sk", getMsg("sales."+ startEnd +".subject", new Locale("sk"))));

@@ -19,15 +19,16 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.Header;
 import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.exceptions.ProcessingException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+import com.obj.nc.functions.processors.senders.config.EmailSenderConfigProperties;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
@@ -37,11 +38,14 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @AllArgsConstructor
 @Log4j2
+@DocumentProcessingInfo("SendEmail")
 public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	
 	private final JavaMailSenderImpl mailSender;
 	
 	public static String NOTIF_CENTER_EMAIL_HEANDER_PREFIX = "$NC_";
+	
+	private final EmailSenderConfigProperties settings;
 	
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message message) {
@@ -64,11 +68,9 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	}
 
 
-	@DocumentProcessingInfo("SendEmail")
+
 	@Override
-	public Message execute(Message payload) {
-		payload.stepStart("SendEmail");
-		
+	public Message execute(Message payload) {		
 		EmailEndpoint toEmail = (EmailEndpoint) payload.getBody().getRecievingEndpoints().get(0);
 
 		EmailContent msg = payload.getContentTyped();
@@ -83,7 +85,6 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 
 		doSendMessage(toEmail, messageContent, payload.getHeader());
 		
-		payload.stepFinish();
 		return payload;
 	}
 
@@ -94,7 +95,9 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 			
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-			helper.setFrom(mailSender.getUsername());
+			if (settings.getFromMailAddress()!=null) {
+				helper.setFrom(settings.getFromMailAddress());
+			}
 
 			helper.setTo(toEmail.getEmail());
 

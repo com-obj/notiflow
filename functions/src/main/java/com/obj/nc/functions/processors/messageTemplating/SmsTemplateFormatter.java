@@ -11,6 +11,7 @@ import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
 
 @Component
 public class SmsTemplateFormatter extends BaseTemplateFormatter {

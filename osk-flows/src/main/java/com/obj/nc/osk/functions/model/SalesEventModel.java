@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +13,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SalesEventModel {
 	
-	@NotNull
 	final private Date timeStart;
 	
-	@NotNull
 	final private Date timeEnd;
 	
-	@NotNull
 	final private Map<CustomerInfo, List<ServiceOutageInfo>> servicesPerCustomer;
+	
+	final private Integer customerCount;
 }

@@ -12,6 +12,7 @@ version = '1.0.0'
 bootJar {
     archiveBaseName = 'osk-flows'
     archiveVersion =  '1.0.0'
+
     launchScript()
 }
 

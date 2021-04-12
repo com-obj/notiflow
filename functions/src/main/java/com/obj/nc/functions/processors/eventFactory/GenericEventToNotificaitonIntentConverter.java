@@ -28,15 +28,12 @@ public class GenericEventToNotificaitonIntentConverter extends ProcessorFunction
 	@Override
 	protected NotificationIntent execute(GenericEvent genericEvent) {
 		NotificationIntent notificationIntent = new NotificationIntent();
-		notificationIntent.stepStart("EventFactory");
 		
 		notificationIntent.getHeader().setFlowId(genericEvent.getFlowId());
 		notificationIntent.getHeader().generateAndSetID();
 		notificationIntent.getHeader().addEventId(notificationIntent.getHeader().getId());
 
 		notificationIntent.getBody().setAttributeValue(ORIGINAL_EVENT_FIELD, JsonUtils.writeObjectToJSONString(genericEvent));
-		
-		notificationIntent.stepFinish();
 		
 		return notificationIntent;
 	}

@@ -6,7 +6,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.obj.nc.Get;
 import com.obj.nc.domain.content.AggregatedContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
@@ -18,13 +17,13 @@ import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
-@NoArgsConstructor
 public class AggregateMessageToSingleEmailTransformer extends ProcessorFunctionAdapter<Message, Message> {
 	
-	private TestModeProperties testModeProps = Get.getBean(TestModeProperties.class);
+//	private TestModeProperties testModeProps = Get.getBean(TestModeProperties.class);
+	
+	private TestModeProperties testModeProps;
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(Message payload) {

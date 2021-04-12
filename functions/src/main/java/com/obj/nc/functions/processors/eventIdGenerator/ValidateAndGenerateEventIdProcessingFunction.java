@@ -1,34 +1,38 @@
 package com.obj.nc.functions.processors.eventIdGenerator;
 
-import java.util.function.Function;
+import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.functions.processors.ProcessorFunction;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Component
 @AllArgsConstructor
-public class ValidateAndGenerateEventIdProcessingFunction extends ProcessorFunction<NotificationIntent, NotificationIntent> {
-	@Autowired
-	private ValidateAndGenerateEventIdExecution execution;
-
-	@Autowired
-	private ValidateAndGenerateEventIdPreCondition checkPreConditions;
+@Log4j2
+@DocumentProcessingInfo("ValidateAndGenerateEventId")
+public class ValidateAndGenerateEventIdProcessingFunction
+		extends ProcessorFunctionAdapter<NotificationIntent, NotificationIntent> {
 
 	@Override
-	public ValidateAndGenerateEventIdPreCondition preCondition() {
-		return checkPreConditions;
+	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent payload) {
+		return Optional.empty();
 	}
 
 	@Override
-	public Function<NotificationIntent, NotificationIntent> execution() {
-		return execution;
+	protected NotificationIntent execute(NotificationIntent notificationIntent) {
+		log.debug("Validating {}", notificationIntent);
+
+		notificationIntent.getHeader().generateAndSetID();
+		notificationIntent.getHeader().addEventId(notificationIntent.getHeader().getId());
+
+		return notificationIntent;
+
 	}
-
-
 
 }

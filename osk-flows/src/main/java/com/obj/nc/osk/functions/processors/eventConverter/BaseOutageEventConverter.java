@@ -45,6 +45,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @RequiredArgsConstructor
+@DocumentProcessingInfo
 public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<GenericEvent, List<NotificationIntent>> {
 	
 	@NonNull
@@ -75,7 +76,7 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 	}
 
 	@Override
-	@DocumentProcessingInfo
+
 	protected List<NotificationIntent> execute(GenericEvent payload) {
 		List<NotificationIntent> notificationIntents = new ArrayList<>();
 		
@@ -146,7 +147,8 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 				.stream()
 				.collect(Collectors.groupingBy(ServiceOutageInfo::getCustomer));
 		
-		salesMessageContent.setModel(new SalesEventModel(outageStart, outageEnd, outageInfosPerCustomer));
+		int customerCount = outageInfosPerCustomer.keySet().size();
+		salesMessageContent.setModel(new SalesEventModel(outageStart, outageEnd, outageInfosPerCustomer, customerCount));
 		return salesMessageContent;
 	}		
 	protected SalesAgentsEmailTemplate createSalesAgentsEmailContent(
@@ -159,8 +161,12 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		salesAgentMessageContent.setRequiredLocales(Arrays.asList(new Locale("sk")));
 		
 		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutages);
+		Map<CustomerInfo, List<ServiceOutageInfo>> outageInfosPerCustomer = outageInfos
+				.stream()
+				.collect(Collectors.groupingBy(ServiceOutageInfo::getCustomer));
 		
-		salesAgentMessageContent.setModel(new SalesAgentEventModel(outageStart, outageEnd, outageInfos));
+		int customerCount = outageInfosPerCustomer.keySet().size();
+		salesAgentMessageContent.setModel(new SalesAgentEventModel(outageStart, outageEnd, outageInfos, customerCount));
 		return salesAgentMessageContent;
 	}	
 

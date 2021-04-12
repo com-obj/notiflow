@@ -1,21 +1,14 @@
 package com.obj.nc.functions.processors.messageBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdExecution;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdPreCondition;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.Body;
-import com.obj.nc.domain.Header;
-import com.obj.nc.domain.ProcessingInfo;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.DeliveryOptions.AGGREGATION_TYPE;
@@ -28,43 +21,24 @@ import com.obj.nc.utils.JsonUtils;
 
 class MessagesFromIntentTest {
 
+
 	@Test
 	void createMessagesFromEvent() {
 		//GIVEN
 		String INPUT_JSON_FILE = "events/direct_message.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
-		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction(
-				new ValidateAndGenerateEventIdExecution(),
-				new ValidateAndGenerateEventIdPreCondition());
-
-		notificationIntent = funciton.apply(notificationIntent);
+		ValidateAndGenerateEventIdProcessingFunction generateEventfunction = new ValidateAndGenerateEventIdProcessingFunction();
+		notificationIntent = generateEventfunction.apply(notificationIntent);
 		
 		//WHEN
-		MessagesFromNotificationIntentProcessingFunction function = new MessagesFromNotificationIntentProcessingFunction(
-				new MessagesFromNotificationIntentExecution(),
-				new MessagesFromNotificationIntentPreCondition());
-
-		List<Message> result = function.apply(notificationIntent);
+		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
+		List<Message> result = createMessagesFunction.apply(notificationIntent);
 		
 		//THEN
 		assertThat(result.size()).isEqualTo(3);
 		
 		Message message = result.get(0);
-		ProcessingInfo processingInfo = message.getProcessingInfo();
-		assertThat(processingInfo.getStepName()).isEqualTo("CreateMessagesFromEvent");
-		assertThat(processingInfo.getStepIndex()).isEqualTo(2);
-		assertThat(processingInfo.getPrevProcessingId()).isEqualTo(notificationIntent.getProcessingInfo().getProcessingId());
-		assertThat(processingInfo.getTimeStampStart()).isBeforeOrEqualTo(processingInfo.getTimeStampFinish());
-		
-		Header header = message.getHeader();
-		assertThat(header.getFlowId()).isEqualTo(notificationIntent.getHeader().getFlowId());
-		assertThat(header.getAttributes())
-			.contains(
-					entry("custom-proerty1", Arrays.asList("xx","yy")), 
-					entry("custom-proerty2", "zz")
-			);
-		assertThat(header.getId()).isNotEqualTo(notificationIntent.getHeader().getId());
 		
 		Body body = message.getBody();
 		List<RecievingEndpoint> recievingEndpoints = message.getBody().getRecievingEndpoints();
@@ -87,18 +61,13 @@ class MessagesFromIntentTest {
 		String INPUT_JSON_FILE = "events/delivery_options.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
-		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction(
-				new ValidateAndGenerateEventIdExecution(),
-				new ValidateAndGenerateEventIdPreCondition());
+		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction();
 
 		notificationIntent = funciton.apply(notificationIntent);
 		
 		//WHEN
-		MessagesFromNotificationIntentProcessingFunction function = new MessagesFromNotificationIntentProcessingFunction(
-				new MessagesFromNotificationIntentExecution(),
-				new MessagesFromNotificationIntentPreCondition());
-
-		List<Message> result = function.apply(notificationIntent);
+		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
+		List<Message> result = createMessagesFunction.apply(notificationIntent);
 		
 		//THEN
 		assertThat(result.size()).isEqualTo(2);
@@ -131,18 +100,13 @@ class MessagesFromIntentTest {
 		String INPUT_JSON_FILE = "events/direct_message_attachements.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
-		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction(
-				new ValidateAndGenerateEventIdExecution(),
-				new ValidateAndGenerateEventIdPreCondition());
+		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction();
 
 		notificationIntent = funciton.apply(notificationIntent);
 		
 		//WHEN
-		MessagesFromNotificationIntentProcessingFunction function = new MessagesFromNotificationIntentProcessingFunction(
-				new MessagesFromNotificationIntentExecution(),
-				new MessagesFromNotificationIntentPreCondition());
-
-		List<Message> result = function.apply(notificationIntent);
+		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
+		List<Message> result = createMessagesFunction.apply(notificationIntent);
 		
 		//THEN
 		Message deliveryNullMessage = findMessageWithEnpoint(result, "john.doe@objectify.sk");

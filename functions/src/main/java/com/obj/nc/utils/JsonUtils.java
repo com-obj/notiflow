@@ -22,6 +22,8 @@ import com.obj.nc.exceptions.PayloadValidationException;
 public class JsonUtils {
 	
 	public static DateFormat stdJsonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+	
+	private static ObjectMapper instance;
 
 	public static <T> T readObjectFromJSONFile(Path filePath, Class<T> beanType) {
 		String JSONStr = readFileContent(filePath);	
@@ -56,7 +58,7 @@ public class JsonUtils {
 	public static <T> T readObjectFromJSONString(String json, Class<T> beanType) {
 		
 		try {
-			ObjectMapper objectMapper = new ObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapper();
 
 			T pojo = objectMapper.readValue(json, beanType);
 			return pojo;
@@ -69,7 +71,7 @@ public class JsonUtils {
 	public static JsonNode readJsonNodeFromJSONString(String json) {
 		
 		try {
-			ObjectMapper objectMapper = new ObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapper();
 
 			JsonNode jsonNode = objectMapper.readTree(json);
 			return jsonNode;
@@ -81,7 +83,7 @@ public class JsonUtils {
 	
 	public static <T> T readObjectFromJSON(JsonNode json, Class<T> beanType) {
 		try {
-			ObjectMapper objectMapper = new ObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapper();
 
 			T pojo = objectMapper.treeToValue(json, beanType);
 			return pojo;
@@ -92,7 +94,7 @@ public class JsonUtils {
 	}
 
 	public static <T> T readClassFromObject(Object object, Class<T> clazz) {
-			ObjectMapper objectMapper = new ObjectMapper();
+	    	final ObjectMapper objectMapper = getObjectMapper();
 			T pojo = objectMapper.convertValue(object, clazz);
 			return pojo;
 	}
@@ -100,7 +102,7 @@ public class JsonUtils {
 	public static String writeObjectToJSONString(JsonNode json) {
 		
 		try {
-			ObjectMapper objectMapper = new ObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapper();
 			String jsonString = objectMapper.writeValueAsString(json);
 
 			return jsonString;
@@ -113,7 +115,7 @@ public class JsonUtils {
 	public static String writeObjectToJSONString(Object pojo) {
 		
 		try {
-			ObjectMapper objectMapper = new ObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapper();
 			String jsonString = objectMapper.writeValueAsString(pojo);
 
 			return jsonString;
@@ -124,7 +126,7 @@ public class JsonUtils {
 	}
 	
 	public static JsonNode writeObjectToJSONNode(Object pojo) {
-		ObjectMapper objectMapper = new ObjectMapper();
+	    final ObjectMapper objectMapper = getObjectMapper();
 		JsonNode jsonNode = objectMapper.valueToTree(pojo);
 
 		return jsonNode;
@@ -133,7 +135,7 @@ public class JsonUtils {
 	public static String writeObjectToJSONStringPretty(Object pojo) {
 
 		try {
-			ObjectMapper objectMapper = new ObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapper();
 			String jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(pojo);
 
 			return jsonString;
@@ -160,7 +162,7 @@ public class JsonUtils {
 	
 	public static Optional<String> checkValidAndGetError(String jsonString) {
 		try {
-		       final ObjectMapper mapper = new ObjectMapper();
+		       final ObjectMapper mapper = getObjectMapper();
 		       mapper.readTree(jsonString);
 		       return Optional.empty();
 		} catch (Exception e) {
@@ -182,5 +184,12 @@ public class JsonUtils {
 	    Instant i = Instant.from(ta);
 	    Date d = Date.from(i);
 	    return d;
+	}
+	
+	public static ObjectMapper getObjectMapper() {
+		if (instance == null) {
+			instance = new ObjectMapper();
+		}
+		return instance;
 	}
 }

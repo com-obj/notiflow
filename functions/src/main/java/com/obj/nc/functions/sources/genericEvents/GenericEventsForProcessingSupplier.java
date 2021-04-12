@@ -23,6 +23,7 @@ public class GenericEventsForProcessingSupplier extends SourceSupplierAdapter<Ge
 	@Override
 	protected GenericEvent execute() {
 		GenericEvent eventsToProcess = repository.findFirstByTimeConsumedIsNullOrderByTimeCreatedAsc();
+
 		if (eventsToProcess==null) {
 			return null;
 		}

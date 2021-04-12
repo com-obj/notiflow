@@ -1,7 +1,4 @@
 spring:
-   cloud.gcp:
-      sql.enabled: false
-      core.enabled: false
    datasource:
       platform: postgres
       url: jdbc:postgresql://localhost:25432/nc
@@ -17,6 +14,8 @@ spring:
       properties:
          mail.smtp.auth: true
          mail.smtp.starttls.enable: true
+         mail.smtp.allow8bitmime: true
+         mail.smtps.allow8bitmime: true
    main.allow-bean-definition-overriding: true
 
 nc:
@@ -55,8 +54,10 @@ osk.sia.functions:
    
 #logging.level:
 #   org.springframework.beans: DEBUG
-logging.level:
-   ROOT: INFO
+logging:
+   level:
+     ROOT: INFO
+   file: ./logs/osk-flows.log
 
 
 #debug: true

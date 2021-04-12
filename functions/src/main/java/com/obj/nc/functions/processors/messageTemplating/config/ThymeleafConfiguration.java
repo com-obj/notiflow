@@ -1,4 +1,4 @@
-package com.obj.nc.functions.processors.messageTemplating;
+package com.obj.nc.functions.processors.messageTemplating.config;
 
 import java.io.File;
 import java.util.ArrayList;
