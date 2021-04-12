@@ -1,7 +1,4 @@
 spring:
-   cloud.gcp:
-      sql.enabled: false
-      core.enabled: false
    datasource:
       platform: postgres
       url: jdbc:postgresql://localhost:25432/nc

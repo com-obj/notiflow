@@ -28,6 +28,7 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.exceptions.ProcessingException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+import com.obj.nc.functions.processors.senders.config.EmailSenderConfigProperties;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
@@ -43,6 +44,8 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	private final JavaMailSenderImpl mailSender;
 	
 	public static String NOTIF_CENTER_EMAIL_HEANDER_PREFIX = "$NC_";
+	
+	private final EmailSenderConfigProperties settings;
 	
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message message) {
@@ -92,7 +95,9 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 			
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-			helper.setFrom(mailSender.getUsername());
+			if (settings.getFromMailAddress()!=null) {
+				helper.setFrom(settings.getFromMailAddress());
+			}
 
 			helper.setTo(toEmail.getEmail());
 

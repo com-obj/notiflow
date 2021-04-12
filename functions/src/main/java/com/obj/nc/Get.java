@@ -9,13 +9,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-@Component
 /**
  * This is spring component to give spring a hint in configuration ordering. As component it should be staticaly usable because that
  * way clients can run into problems with ordering
  * @author ja
  *
  */
+@Component
 public class Get {
 
     private static Get instance;

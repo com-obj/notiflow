@@ -1,41 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
-    <title>Zakaznicke sluzby su opat dostupne</title>
+    <title>Informácia o možnom výpadku služieb.</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
     <body>
     	<p>
-    		<span>Ahoj,</span>
+    		<span>Milý kolega,</span>
     		<br>
-    		<span>dole uvedeny zakaznici ny uz mali mat sluzby spritupnene. Informovali sme ich o tom správou. Vypadok sme odstranili o </span>
+    		<span>výpadok, ktorý trval od</span>
     		<span th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
+    		<span>bol ukončený</span>
+    		<span th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeEnd, __df)}">11:00</span>
     	</p>
     	
+    	<p>
+    		Zákazníkov sme o tom informovali.
+    	</p>
     	
-    <table>
-    	<tr th:each="services : ${model.servicesPerCustomer}">
-        	<td th:text="${services.key.customerName + ' ' + services.key.customerAddress}">Customer name</td>
-			    <table>		
-				    <thead>
-				        <tr>
-				        	<th>B2B Login</th>
-				            <th>SN</th>
-				            <th>Služba</th>
-				            <th>Odberna adresa</th>
-				        </tr>
-				    </thead>
-				    <tbody>
-				     	<tr th:each="service : ${services.value}">
-				     		<td><span th:text="${service.b2bLogin}"> mvsr.sk </span></td>
-				            <td><span th:text="${service.sn}"> 0905132354 </span></td>
-				            <td><span th:text="${service.productName}"> VPS </span></td>
-				            <td><span th:text="${service.installationAddress}"> Bratislava </span></td>
-				     	</tr>
-				    </tbody>
-			    </table>
-		</tr>
-	</table>
+    	<p>
+    		Orange
+    	</p>
     
     </body>
 </html>
