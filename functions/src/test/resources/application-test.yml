@@ -27,6 +27,8 @@ nc:
          templates-root-dir: 
             - src/test/resources/message-templates
          messages-dir-and-base-name: file:src/test/resources/message-templates/messages
+      email-sender:
+         from-mail-address: sender@objectify.sk
    flows:
       test-mode.enabled: false
 

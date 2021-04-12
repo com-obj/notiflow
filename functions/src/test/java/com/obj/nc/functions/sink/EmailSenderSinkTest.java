@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
@@ -29,14 +28,16 @@ import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.EmailSender;
+import com.obj.nc.functions.processors.senders.config.EmailSenderConfigProperties;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest
 class EmailSenderSinkTest extends BaseIntegrationTest {
 
-    @Autowired private JavaMailSenderImpl defaultJavaMailSender;
+//    @Autowired private JavaMailSenderImpl defaultJavaMailSender;
     @Autowired private EmailSender functionSend;
+    @Autowired private EmailSenderConfigProperties settings;
     
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
@@ -64,7 +65,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         MimeMessage[] messages = greenMail.getReceivedMessages();
         Assertions.assertThat( messages.length ).isEqualTo(1);
         Assertions.assertThat( messages[0].getSubject() ).isEqualTo("Subject");
-        Assertions.assertThat( messages[0].getFrom()[0] ).extracting("address").isEqualTo(defaultJavaMailSender.getUsername());
+        Assertions.assertThat( messages[0].getFrom()[0] ).extracting("address").isEqualTo(settings.getFromMailAddress());
 
         //THEN check processing info --docasne zakomentovane kym nezimplementujeme HasProcessingInfo
         ProcessingInfo processingInfo = result.getProcessingInfo();
