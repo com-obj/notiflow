@@ -151,6 +151,8 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		salesMessageContent.setModel(new SalesEventModel(outageStart, outageEnd, outageInfosPerCustomer, customerCount));
 		return salesMessageContent;
 	}		
+	
+	
 	protected SalesAgentsEmailTemplate createSalesAgentsEmailContent(
 			Date outageStart, Date outageEnd,
 			List<IncidentTicketServiceOutageForCustomerDto> serviceOutages) {

@@ -22,8 +22,8 @@ nc:
    functions:
       event-generator:
          source-dir: ${user.home}/eventsQueue    
-      send-email-message:
-         from: no-reply@objectify.sk  
+      email-sender:
+         from-mail-address: no-reply@objectify.sk  
       email-templates:
          templates-root-dir: 
             - src/main/resources/message-templates

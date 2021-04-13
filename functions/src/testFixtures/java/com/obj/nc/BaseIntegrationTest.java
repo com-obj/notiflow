@@ -12,6 +12,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.MediaType;
@@ -33,8 +34,9 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
     
-    public static void purgeNotifTables() {
-    	JdbcTemplate jdbcTemplate  = Get.getBean(JdbcTemplate.class);
+    @Autowired Get get;
+    
+    public static void purgeNotifTables(@Autowired JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
         jdbcTemplate.batchUpdate("delete from nc_endpoint_processing");
         jdbcTemplate.batchUpdate("delete from nc_endpoint");        
@@ -142,6 +144,6 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    	Get.setApplicationContext(applicationContext);
+    	get.setApplicationContext(applicationContext);
     }
 }

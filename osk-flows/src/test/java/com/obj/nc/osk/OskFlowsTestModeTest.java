@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -36,8 +37,8 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
     private GenericEventRepository genEventRepo;
         
     @BeforeEach
-    void cleanTables() throws FolderException {
-        purgeNotifTables();     
+    void cleanTables(@Autowired JdbcTemplate jdbcTemplate) throws FolderException {
+        purgeNotifTables(jdbcTemplate);     
         greenMail.purgeEmailFromAllMailboxes();
     }
 	
