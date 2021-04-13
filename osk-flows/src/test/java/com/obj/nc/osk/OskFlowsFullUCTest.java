@@ -166,7 +166,7 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
 	        msg = assertMessagesContains(msgs, MailMessageForAssertions.as("slavkovsky@orange.sk", 
 	        		getMsg("sales."+ startEnd +".subject", new Locale("sk")),
 	        		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", 
-	        		"Mocidla 249, Myto pod Dumbierom","Martinengova 4881/36 811 02 Bratislava",
+	        		"Mocidla 249, Myto pod Dumbierom","Martinengova 4881/36 811 02",
 	        		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", 
 	        		"Westend tower","Dubravska cesta 2 841 04 Bratislava",
 	        		"0918186999"
