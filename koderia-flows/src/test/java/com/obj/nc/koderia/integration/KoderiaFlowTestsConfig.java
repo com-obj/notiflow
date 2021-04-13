@@ -1,8 +1,6 @@
 package com.obj.nc.koderia.integration;
 
-import com.obj.nc.config.RestClientConfig;
 import com.obj.nc.functions.processors.senders.MailchimpSenderConfigProperties;
-import com.obj.nc.services.MailchimpRestClientImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -12,7 +10,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.client.MockRestServiceServer;
 
-import com.obj.nc.koderia.config.MailchimpApiConfig;
 import com.obj.nc.koderia.config.RestClientConfig;
 import com.obj.nc.koderia.services.MailchimpRestClientImpl;
 

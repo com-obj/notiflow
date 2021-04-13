@@ -1,5 +1,6 @@
 package com.obj.nc.koderia.services;
 
+import com.obj.nc.functions.processors.senders.MailchimpSenderConfigProperties;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +9,6 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.obj.nc.koderia.config.MailchimpApiConfig;
 import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
 import com.obj.nc.koderia.dto.mailchimp.SendMessageWithTemplateDto;
 

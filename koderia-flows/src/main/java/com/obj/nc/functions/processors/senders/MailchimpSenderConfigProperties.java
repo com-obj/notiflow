@@ -1,6 +1,6 @@
 package com.obj.nc.functions.processors.senders;
 
-import com.obj.nc.dto.EmitEventDto;
+import com.obj.nc.koderia.dto.EmitEventDto;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;

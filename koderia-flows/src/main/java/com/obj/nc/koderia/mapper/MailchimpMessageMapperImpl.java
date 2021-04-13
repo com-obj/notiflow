@@ -1,13 +1,12 @@
 package com.obj.nc.koderia.mapper;
 
-import com.obj.nc.functions.processors.senders.MailchimpSenderConfigProperties;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.koderia.config.MailchimpApiConfig;
+import com.obj.nc.functions.processors.senders.MailchimpSenderConfigProperties;
 import com.obj.nc.koderia.dto.EmitEventDto;
 import com.obj.nc.koderia.dto.mailchimp.*;
 
@@ -71,7 +70,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     }
 
     protected List<MergeVarDto> mapGlobalMergeVars(Message message) {
-        Email messageContent = message.getContentTyped();
+        EmailContent messageContent = message.getContentTyped();
         EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
 
         Map<String, Object> mergeVars = new HashMap<>();

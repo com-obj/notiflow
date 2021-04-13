@@ -1,14 +1,11 @@
 package com.obj.nc.koderia.functions.processors.senders;
 
+import com.obj.nc.functions.processors.senders.MailchimpSenderConfigProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 
-import com.obj.nc.koderia.config.MailchimpApiConfig;
 import com.obj.nc.koderia.config.RestClientConfig;
-import com.obj.nc.koderia.functions.processors.senders.MailchimpSenderExecution;
-import com.obj.nc.koderia.functions.processors.senders.MailchimpSenderPreCondition;
-import com.obj.nc.koderia.functions.processors.senders.MailchimpSenderProcessingFunction;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapperAggregateImpl;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl;
 import com.obj.nc.koderia.services.MailchimpRestClientImpl;
@@ -23,6 +20,6 @@ import com.obj.nc.koderia.services.MailchimpRestClientImpl;
         MailchimpRestClientImpl.class,
         RestClientConfig.class
 })
-@EnableConfigurationProperties(MailchimpApiConfig.class)
+@EnableConfigurationProperties(MailchimpSenderConfigProperties.class)
 public class MailchimpSenderProcessingFunctionTestConfig {
 }

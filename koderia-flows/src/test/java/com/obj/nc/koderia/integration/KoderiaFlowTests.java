@@ -4,12 +4,14 @@ import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecu
 import static com.obj.nc.koderia.functions.processors.senders.MailchimpSenderExecution.MAILCHIMP_RESPONSE_FIELD;
 import static com.obj.nc.koderia.services.MailchimpRestClientImpl.SEND_TEMPLATE_PATH;
 import static org.springframework.test.web.client.ExpectedCount.times;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import java.util.Collections;
 import java.util.List;
 
+import com.obj.nc.functions.processors.senders.MailchimpSenderConfigProperties;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -26,13 +28,13 @@ import org.springframework.http.MediaType;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.koderia.KoderiaFlowsApplication;
-import com.obj.nc.koderia.config.MailchimpApiConfig;
 import com.obj.nc.koderia.dto.EmitEventDto;
 import com.obj.nc.koderia.dto.EventDataDto;
 import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
