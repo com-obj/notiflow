@@ -11,27 +11,28 @@
     		<span>dole uvedeny zakaznici ny uz mali mat sluzby spritupnene. Informovali sme ich o tom správou. Vypadok sme odstranili o </span>
     		<span th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
     	</p>
-			    <table border="1" cellpadding="5" style="border-collapse:collapse; border: 0px;">		
-				    <thead>
-				        <tr>
-				        	<th>Zakaznik</th>
-				        	<th>Adresa zakaznika</th>
-				        	<th>B2B Login</th>
-				            <th>SN</th>
-				            <th>Služba</th>
-				            <th>Odberna adresa</th>
-				        </tr>
-				    </thead>
-				    <tbody>
-				     	<tr th:each="service : ${model.services}">
-				     		<td><span th:text="${service.customerName}"> mvsr.sk </span></td>
-				     		<td><span th:text="${service.customerAddress}"> mvsr.sk </span></td>
-				     		<td><span th:text="${service.b2bLogin}"> mvsr.sk </span></td>
-				            <td><span th:text="${service.sn}"> 0905132354 </span></td>
-				            <td><span th:text="${service.productName}"> VPS </span></td>
-				            <td><span th:text="${service.installationAddress}"> Bratislava </span></td>
-				     	</tr>
-				    </tbody>
-			    </table>
+    	
+		<table border="1" cellpadding="5" style="border-collapse:collapse; border: 0px;">		
+		<thead>
+			<tr>
+				<th>Zakaznik</th>
+				<th>Adresa zakaznika</th>
+				<th>B2B Login</th>
+				<th>SN</th>
+				<th>Služba</th>
+				<th>Odberna adresa</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="service : ${model.services}">
+				<td><span th:text="${service.customerName}"> mvsr.sk </span></td>
+				<td><span th:text="${service.customerAddress}"> mvsr.sk </span></td>
+				<td><span th:text="${service.b2bLogin}"> mvsr.sk </span></td>
+				<td><span th:text="${service.sn}"> 0905132354 </span></td>
+				<td><span th:text="${service.productName}"> VPS </span></td>
+				<td><span th:text="${service.installationAddress}"> Bratislava </span></td>
+			</tr>
+		</tbody>
+		</table>
     </body>
 </html>
