@@ -14,6 +14,7 @@ koderia.functions:
     koderia-api-url: https://www.koderia.sk/api/v1
     koderia-api-token: testToken
   mailchimp-sender:
+    aggregate-subject: Koderia digest
     mailchimp-api:
       url: http://mandrillapp.com/api/1.0
       auth-key: MOCKkey

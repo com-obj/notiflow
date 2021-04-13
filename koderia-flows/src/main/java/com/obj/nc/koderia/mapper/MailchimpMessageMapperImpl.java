@@ -6,7 +6,7 @@ import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.senders.MailchimpSenderConfigProperties;
+import com.obj.nc.koderia.functions.processors.senders.MailchimpSenderConfigProperties;
 import com.obj.nc.koderia.dto.EmitEventDto;
 import com.obj.nc.koderia.dto.mailchimp.*;
 

@@ -2,6 +2,7 @@ package com.obj.nc.koderia.mapper;
 
 import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.email.AggregatedEmailContent;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.koderia.dto.EmitEventDto;
 import com.obj.nc.koderia.dto.mailchimp.*;
@@ -32,6 +33,11 @@ public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperI
                 .forEach(originalEvent -> globalMergeCategoryValues.get(originalEvent.getType().name()).add(originalEvent.asMap()));
 
         return globalMergeCategoryValues.entrySet().stream().map(this::mapMergeVar).collect(Collectors.toList());
+    }
+    
+    @Override
+    protected String mapSubject(Message message) {
+        return mailchimpSenderConfigProperties.getAggregateSubject();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.obj.nc.functions.processors;
+package com.obj.nc.koderia.functions.processors;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

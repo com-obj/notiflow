@@ -1,6 +1,5 @@
 package com.obj.nc.koderia.functions.processors.senders;
 
-import com.obj.nc.functions.processors.senders.MailchimpSenderConfigProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;

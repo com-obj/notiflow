@@ -11,14 +11,17 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import java.util.Collections;
 import java.util.List;
 
-import com.obj.nc.functions.processors.senders.MailchimpSenderConfigProperties;
+import com.obj.nc.config.InjectorConfiguration;
+import com.obj.nc.koderia.KoderiaFlowsApplication;
+import com.obj.nc.koderia.functions.processors.senders.MailchimpSenderConfigProperties;
+import com.obj.nc.koderia.services.MailchimpRestClientImpl;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.binder.test.InputDestination;
 import org.springframework.cloud.stream.binder.test.OutputDestination;
 import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
@@ -28,26 +31,19 @@ import org.springframework.http.MediaType;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.koderia.KoderiaFlowsApplication;
 import com.obj.nc.koderia.dto.EmitEventDto;
 import com.obj.nc.koderia.dto.EventDataDto;
 import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@Import({
-		TestChannelBinderConfiguration.class,
-		KoderiaFlowTestsConfig.class
-})
-@AutoConfigureMockRestServiceServer
-@ContextConfiguration(classes = KoderiaFlowsApplication.class)
-@Disabled
+@Import(TestChannelBinderConfiguration.class)
+@SpringBootTest(classes = { KoderiaFlowsApplication.class, InjectorConfiguration.class })
 public class KoderiaFlowTests extends BaseIntegrationTest {
 
 	public static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
@@ -64,13 +60,20 @@ public class KoderiaFlowTests extends BaseIntegrationTest {
 	@Autowired
 	private CompositeMessageConverter messageConverter;
 
-	@Autowired
 	private MockRestServiceServer mockMailchimpRestServer;
 
+	@Autowired
+	private MailchimpRestClientImpl mailchimpServiceRest;
+	
+	@BeforeEach
+	void redirectRestTemplate() {
+		mockMailchimpRestServer = MockRestServiceServer.bindTo(mailchimpServiceRest.getRestTemplate()).build();
+	}
+	
 	@Test
-	public void testJobPostKoderiaEventEmited() throws Exception {
+	public void testJobPostKoderiaEventEmited() {
 		// WITH MOCK SERVER CONFIG
-		String mailchimpSendMessageUri = mailchimpSenderConfigProperties.getMailchimpApi().getUrl() + SEND_TEMPLATE_PATH;
+		String mailchimpSendMessageUrl = mailchimpSenderConfigProperties.getMailchimpApi().getUrl() + SEND_TEMPLATE_PATH;
 
 		MessageResponseDto responseDto = new MessageResponseDto();
 		responseDto.setId("string");
@@ -80,7 +83,7 @@ public class KoderiaFlowTests extends BaseIntegrationTest {
 
 		List<MessageResponseDto> responseDtos = Collections.singletonList(responseDto);
 
-		mockMailchimpRestServer.expect(times(3), requestTo(mailchimpSendMessageUri))
+		mockMailchimpRestServer.expect(times(3), requestTo(mailchimpSendMessageUrl))
 				.andExpect(method(HttpMethod.POST))
 				.andRespond(withSuccess(JsonUtils.writeObjectToJSONString(responseDtos), MediaType.APPLICATION_JSON));
 

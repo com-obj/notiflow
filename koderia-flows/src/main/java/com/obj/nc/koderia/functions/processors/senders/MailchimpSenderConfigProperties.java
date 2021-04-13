@@ -1,4 +1,4 @@
-package com.obj.nc.functions.processors.senders;
+package com.obj.nc.koderia.functions.processors.senders;
 
 import com.obj.nc.koderia.dto.EmitEventDto;
 import lombok.Data;
@@ -15,6 +15,8 @@ import javax.validation.constraints.NotBlank;
 @Configuration
 @ConfigurationProperties(prefix = "koderia.functions.mailchimp-sender")
 public class MailchimpSenderConfigProperties {
+    
+    private String aggregateSubject;
 
     private MailchimpApiProperties mailchimpApi;
 

@@ -3,7 +3,7 @@ package com.obj.nc.koderia.services;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.functions.processors.KoderiaRecipientsConfigProperties;
+import com.obj.nc.koderia.functions.processors.KoderiaRecipientsConfigProperties;
 import com.obj.nc.koderia.KoderiaFlowsApplication;
 import com.obj.nc.koderia.dto.RecipientDto;
 import com.obj.nc.koderia.dto.RecipientsQueryDto;

@@ -1,6 +1,6 @@
 package com.obj.nc.koderia.services;
 
-import com.obj.nc.functions.processors.senders.MailchimpSenderConfigProperties;
+import com.obj.nc.koderia.functions.processors.senders.MailchimpSenderConfigProperties;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;

@@ -21,6 +21,9 @@
                "type": "array",
                "items": {}
             },
+            "processingInfo": {
+               "type": "null"
+            },
             "flow-id": {
                "type": "string"
             }
@@ -29,6 +32,7 @@
             "attributes",
             "id",
             "eventIds",
+            "processingInfo",
             "flow-id"
          ]
       },
@@ -187,16 +191,12 @@
             "recievingEndpoints",
             "deliveryOptions"
          ]
-      },
-      "processingInfo": {
-         "type": "null"
       }
    },
    "required": [
       "type",
       "attributes",
       "header",
-      "body",
-      "processingInfo"
+      "body"
    ]
 }
