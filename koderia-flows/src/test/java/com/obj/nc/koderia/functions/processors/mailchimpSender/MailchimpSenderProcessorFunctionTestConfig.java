@@ -19,5 +19,5 @@ import com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl;
         RestClientConfig.class
 })
 @EnableConfigurationProperties(MailchimpSenderConfig.class)
-public class MailchimpSenderProcessingFunctionTestConfig {
+public class MailchimpSenderProcessorFunctionTestConfig {
 }

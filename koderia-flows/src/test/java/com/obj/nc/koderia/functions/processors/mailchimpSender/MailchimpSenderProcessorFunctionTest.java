@@ -37,7 +37,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest
-@Import(MailchimpSenderProcessingFunctionTestConfig.class)
+@Import(MailchimpSenderProcessorFunctionTestConfig.class)
 class MailchimpSenderProcessorFunctionTest {
 
     public static final String RESPONSE_JSON_PATH = "mailchimp/response_body.json";

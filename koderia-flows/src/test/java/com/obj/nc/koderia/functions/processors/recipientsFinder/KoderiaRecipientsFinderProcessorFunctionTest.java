@@ -1,4 +1,4 @@
-package com.obj.nc.koderia.functions.processors;
+package com.obj.nc.koderia.functions.processors.recipientsFinder;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -6,7 +6,6 @@ import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.koderia.dto.RecipientDto;
 import com.obj.nc.koderia.dto.RecipientsQueryDto;
-import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderProcessorFunction;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
@@ -34,7 +33,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest(KoderiaRestClientImpl.class)
-@Import(KoderiaRecipientsProcessingFunctionTestConfig.class)
+@Import(KoderiaRecipientsFinderProcessorFunctionTestConfig.class)
 class KoderiaRecipientsFinderProcessorFunctionTest {
 
     public static final String TEST_FILES_DIR_PATH = "koderia/recipient_queries/";

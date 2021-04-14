@@ -1,4 +1,4 @@
-package com.obj.nc.koderia.functions.processors;
+package com.obj.nc.koderia.functions.processors.recipientsFinder;
 
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderProcessorFunction;
@@ -18,5 +18,5 @@ import com.obj.nc.koderia.mapper.RecipientMapperImpl;
         RestClientConfig.class
 })
 @EnableConfigurationProperties(KoderiaRecipientsFinderConfig.class)
-class KoderiaRecipientsProcessingFunctionTestConfig {
+class KoderiaRecipientsFinderProcessorFunctionTestConfig {
 }
