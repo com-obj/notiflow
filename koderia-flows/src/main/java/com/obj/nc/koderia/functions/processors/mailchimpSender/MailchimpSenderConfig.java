@@ -1,6 +1,6 @@
 package com.obj.nc.koderia.functions.processors.mailchimpSender;
 
-import com.obj.nc.koderia.dto.EmitEventDto;
+import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,17 +51,17 @@ public class MailchimpSenderConfig {
         @NotBlank private String news;
     }
 
-    public String getTemplateNameFromMessageType(EmitEventDto.Type messageType) {
+    public String getTemplateNameFromMessageType(String messageType) {
         switch (messageType) {
-            case JOB_POST:
+            case "JOB_POST":
                 return mailchimpTemplateNames.jobPost;
-            case BLOG:
+            case "BLOG":
                 return mailchimpTemplateNames.blog;
-            case EVENT:
+            case "EVENT":
                 return mailchimpTemplateNames.event;
-            case LINK:
+            case "LINK":
                 return mailchimpTemplateNames.link;
-            case NEWS:
+            case "NEWS":
                 return mailchimpTemplateNames.news;
             default:
                 throw new IllegalArgumentException("Unknown message type");

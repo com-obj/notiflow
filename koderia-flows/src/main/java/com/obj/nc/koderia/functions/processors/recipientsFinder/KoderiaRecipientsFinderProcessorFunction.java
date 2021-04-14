@@ -1,20 +1,19 @@
 package com.obj.nc.koderia.functions.processors.recipientsFinder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import com.obj.nc.koderia.dto.EmitEventDto;
-import com.obj.nc.koderia.dto.RecipientDto;
-import com.obj.nc.koderia.dto.RecipientsQueryDto;
+import com.obj.nc.koderia.dto.koderia.data.RecipientDto;
+import com.obj.nc.koderia.dto.koderia.data.RecipientsQueryDto;
+import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import com.obj.nc.koderia.mapper.RecipientMapper;
 import com.obj.nc.koderia.services.KoderiaClient;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
@@ -26,17 +25,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterProcessorFunction.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.KODERIA_REST_TEMPLATE;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
 
 @Component
-@AllArgsConstructor
+@DocumentProcessingInfo("KoderiaRecipientsFinder")
 public class KoderiaRecipientsFinderProcessorFunction extends ProcessorFunctionAdapter<NotificationIntent, NotificationIntent> implements KoderiaClient {
 	@Qualifier(KODERIA_REST_TEMPLATE)
-	private final RestTemplate restTemplate;
-	private final RecipientMapper recipientMapper;
-	private final ObjectMapper objectMapper;
+	@Autowired private RestTemplate restTemplate;
+	@Autowired private RecipientMapper recipientMapper;
+	@Autowired private ObjectMapper objectMapper;
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent payload) {
@@ -50,7 +49,7 @@ public class KoderiaRecipientsFinderProcessorFunction extends ProcessorFunctionA
 		Object originalEvent = payload.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD);
 		
 		try {
-			objectMapper.convertValue(originalEvent, EmitEventDto.class);
+			objectMapper.convertValue(originalEvent, BaseKoderiaEventDto.class);
 		} catch (IllegalArgumentException e) {
 			return Optional.of(new PayloadValidationException(e.getMessage()));
 		}

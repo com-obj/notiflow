@@ -6,12 +6,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 
-import com.obj.nc.koderia.config.RestClientConfig;
-
 @TestConfiguration
 @Import({
-        MailchimpMessageMapperAggregateImpl.class,
-        RestClientConfig.class
+        MailchimpMessageMapperAggregateImpl.class
 })
 @EnableConfigurationProperties(MailchimpSenderConfig.class)
 class MailchimpMessageMapperAggregateImplTestConfig {

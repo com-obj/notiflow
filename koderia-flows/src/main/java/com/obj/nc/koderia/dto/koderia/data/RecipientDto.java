@@ -1,4 +1,4 @@
-package com.obj.nc.koderia.dto;
+package com.obj.nc.koderia.dto.koderia.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

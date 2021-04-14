@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,7 +23,7 @@ import org.springframework.test.context.ContextConfiguration;
 import java.io.IOException;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@JsonTest
+@RestClientTest
 @Import(MailchimpMessageMapperImplTestConfig.class)
 @ContextConfiguration(classes = KoderiaFlowsApplication.class)
 class MailchimpMessageMapperImplTest {

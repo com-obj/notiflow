@@ -1,10 +1,9 @@
-package com.obj.nc.koderia.dto;
+package com.obj.nc.koderia.dto.koderia.data;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 

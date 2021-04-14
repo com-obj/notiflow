@@ -6,15 +6,16 @@ import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig;
-import com.obj.nc.koderia.dto.EmitEventDto;
 import com.obj.nc.koderia.dto.mailchimp.*;
 
+import com.obj.nc.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 
-import static com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl.COMPONENT_NAME;
 
 import java.io.File;
@@ -71,7 +72,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
 
     protected List<MergeVarDto> mapGlobalMergeVars(Message message) {
         EmailContent messageContent = message.getContentTyped();
-        EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
+        BaseKoderiaEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, BaseKoderiaEventDto.class);
 
         Map<String, Object> mergeVars = new HashMap<>();
         mergeVars.put(EVENT_FIELD, originalEvent.asMap());
@@ -116,8 +117,8 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
 
     protected String getTemplateName(Message message) {
         Content messageContent = message.getBody().getMessage();
-        EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
-        return mailchimpSenderConfig.getTemplateNameFromMessageType(originalEvent.getType());
+        BaseKoderiaEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, BaseKoderiaEventDto.class);
+        return mailchimpSenderConfig.getTemplateNameFromMessageType(originalEvent.getTypeName());
     }
 
     protected RecipientDto mapRecipient(RecievingEndpoint endpoint) {

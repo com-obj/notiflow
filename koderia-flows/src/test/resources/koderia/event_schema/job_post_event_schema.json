@@ -15,11 +15,15 @@
                "type": "object"
             },
             "id": {
-               "type": "null"
+               "type": "string"
             },
             "eventIds": {
                "type": "array",
-               "items": {}
+               "items": [
+                  {
+                     "type": "string"
+                  }
+               ]
             },
             "processingInfo": {
                "type": "null"

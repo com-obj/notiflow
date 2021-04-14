@@ -2,12 +2,13 @@ package com.obj.nc.koderia.mapper;
 
 import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.koderia.dto.EmitEventDto;
+import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import com.obj.nc.koderia.dto.mailchimp.*;
 
+import com.obj.nc.utils.JsonUtils;
 import org.springframework.stereotype.Component;
 
-import static com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.koderia.mapper.MailchimpMessageMapperAggregateImpl.COMPONENT_NAME;
 
 import java.util.*;
@@ -23,12 +24,12 @@ public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperI
     	AggregatedEmailContent aggregateContent = (AggregatedEmailContent)message.getBody().getMessage();
 
         Map<String, List<Object>> globalMergeCategoryValues = new HashMap<>();
-        Arrays.stream(EmitEventDto.Type.values())
+        Arrays.stream(BaseKoderiaEventDto.Type.values())
                 .forEach(type -> globalMergeCategoryValues.put(type.name(), new ArrayList<>()));
 
         aggregateContent.getAggregateContent().stream()
-                .map(messageContent -> messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class))
-                .forEach(originalEvent -> globalMergeCategoryValues.get(originalEvent.getType().name()).add(originalEvent.asMap()));
+                .map(messageContent -> messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, BaseKoderiaEventDto.class))
+                .forEach(originalEvent -> globalMergeCategoryValues.get(originalEvent.getTypeName()).add(originalEvent.asMap()));
 
         return globalMergeCategoryValues.entrySet().stream().map(this::mapMergeVar).collect(Collectors.toList());
     }

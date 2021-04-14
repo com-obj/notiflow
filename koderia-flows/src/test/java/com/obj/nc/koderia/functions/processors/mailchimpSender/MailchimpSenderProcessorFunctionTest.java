@@ -28,15 +28,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
-import static com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderExecution.MAILCHIMP_RESPONSE_FIELD;
-import static com.obj.nc.koderia.services.MailchimpRestClientImpl.SEND_TEMPLATE_PATH;
+import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
+import static com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
 import static org.springframework.test.web.client.ExpectedCount.once;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@RestClientTest
+@RestClientTest(MailchimpSenderProcessorFunction.class)
 @Import(MailchimpSenderProcessorFunctionTestConfig.class)
 class MailchimpSenderProcessorFunctionTest {
 

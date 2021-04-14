@@ -69,5 +69,9 @@ public class BaseJSONObject {
 	public Object getAttributeValue(String attributeName) {
 		return attributes.get(attributeName);
 	}
+	
+	public void removeAttribute(String attributeName) {
+		attributes.remove(attributeName);
+	}
 
 }

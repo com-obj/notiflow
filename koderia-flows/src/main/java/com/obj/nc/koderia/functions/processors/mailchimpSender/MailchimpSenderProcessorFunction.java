@@ -16,6 +16,7 @@ import com.obj.nc.koderia.mapper.MailchimpMessageMapperAggregateImpl;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl;
 import com.obj.nc.koderia.services.MailchimpClient;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -29,19 +30,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterProcessorFunction.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig.*;
 
 @Component
-@AllArgsConstructor
 @DocumentProcessingInfo("SendMailchimpMessage")
 public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<Message, Message> implements MailchimpClient {
 	@Qualifier(MAILCHIMP_REST_TEMPLATE)
-	private final RestTemplate restTemplate;
+	@Autowired private RestTemplate restTemplate;
 	@Qualifier(MailchimpMessageMapperImpl.COMPONENT_NAME)
-	private final MailchimpMessageMapper mailchimpMessageMapper;
+	@Autowired private MailchimpMessageMapper mailchimpMessageMapper;
 	@Qualifier(MailchimpMessageMapperAggregateImpl.COMPONENT_NAME)
-	private final MailchimpMessageMapper mailchimpAggregateMessageMapper;
+	@Autowired private MailchimpMessageMapper mailchimpAggregateMessageMapper;
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(Message payload) {

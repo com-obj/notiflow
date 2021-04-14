@@ -1,8 +1,9 @@
-package com.obj.nc.koderia.dto;
+package com.obj.nc.koderia.dto.koderia.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -23,9 +24,5 @@ import javax.validation.constraints.NotNull;
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RecipientsQueryDto {
-
-    @NotNull
-    private EmitEventDto.Type type;
-
 }
 
