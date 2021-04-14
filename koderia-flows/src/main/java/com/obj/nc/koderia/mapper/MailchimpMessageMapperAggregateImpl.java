@@ -1,15 +1,13 @@
 package com.obj.nc.koderia.mapper;
 
-import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.email.AggregatedEmailContent;
-import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.koderia.dto.EmitEventDto;
 import com.obj.nc.koderia.dto.mailchimp.*;
 
 import org.springframework.stereotype.Component;
 
-import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.koderia.mapper.MailchimpMessageMapperAggregateImpl.COMPONENT_NAME;
 
 import java.util.*;
@@ -37,7 +35,7 @@ public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperI
     
     @Override
     protected String mapSubject(Message message) {
-        return mailchimpSenderConfigProperties.getAggregateSubject();
+        return mailchimpSenderConfig.getAggregateSubject();
     }
 
     @Override
@@ -51,7 +49,7 @@ public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperI
 
     @Override
     protected String getTemplateName(Message message) {
-        return mailchimpSenderConfigProperties.getMailchimpTemplateNames().getAggregate();
+        return mailchimpSenderConfig.getMailchimpTemplateNames().getAggregate();
     }
 
 }

@@ -4,9 +4,7 @@ import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.koderia.dto.*;
-import com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution;
-import com.obj.nc.koderia.functions.processors.KoderiaEventConverterPreCondition;
-import com.obj.nc.koderia.functions.processors.KoderiaEventConverterProcessingFunction;
+import com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterProcessorFunction;
 import com.obj.nc.utils.JsonUtils;
 import io.restassured.module.jsv.JsonSchemaValidator;
 import org.assertj.core.api.Assertions;
@@ -16,19 +14,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
 
 import java.util.Map;
 
 @SpringJUnitConfig(classes = {
-        KoderiaEventConverterProcessingFunction.class,
+        KoderiaEventConverterProcessorFunction.class,
         KoderiaEventConverterExecution.class,
         KoderiaEventConverterPreCondition.class
 })
-class KoderiaEventConverterProcessingFunctionTest {
+class KoderiaEventConverterProcessorFunctionTest {
 
     @Autowired
-    private KoderiaEventConverterProcessingFunction koderiaEventConverter;
+    private KoderiaEventConverterProcessorFunction koderiaEventConverter;
 
     @Test
     void testConvertJobPostDto() {

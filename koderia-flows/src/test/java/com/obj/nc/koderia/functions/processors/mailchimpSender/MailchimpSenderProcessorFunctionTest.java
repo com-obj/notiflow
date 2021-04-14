@@ -1,18 +1,13 @@
-package com.obj.nc.koderia.functions.processors.senders;
+package com.obj.nc.koderia.functions.processors.mailchimpSender;
 
-import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
-import static com.obj.nc.koderia.functions.processors.senders.MailchimpSenderExecution.MAILCHIMP_RESPONSE_FIELD;
-import static com.obj.nc.koderia.services.MailchimpRestClientImpl.SEND_TEMPLATE_PATH;
-import static org.springframework.test.web.client.ExpectedCount.once;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.email.AggregatedEmailContent;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
+import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -27,26 +22,30 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
-import com.obj.nc.utils.JsonUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderExecution.MAILCHIMP_RESPONSE_FIELD;
+import static com.obj.nc.koderia.services.MailchimpRestClientImpl.SEND_TEMPLATE_PATH;
+import static org.springframework.test.web.client.ExpectedCount.once;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest
 @Import(MailchimpSenderProcessingFunctionTestConfig.class)
-class MailchimpSenderProcessingFunctionTest {
+class MailchimpSenderProcessorFunctionTest {
 
     public static final String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
     public static final String MESSAGE_JSON_PATH = "mailchimp/message.json";
     public static final String AGGREGATE_MESSAGE_JSON_PATH = "mailchimp/aggregate_message.json";
 
     @Autowired
-    private MailchimpSenderProcessingFunction sendMailchimpMessage;
+    private MailchimpSenderProcessorFunction sendMailchimpMessage;
 
     @Autowired
     private MockRestServiceServer server;

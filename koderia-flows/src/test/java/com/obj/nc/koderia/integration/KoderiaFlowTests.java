@@ -1,7 +1,7 @@
 package com.obj.nc.koderia.integration;
 
-import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
-import static com.obj.nc.koderia.functions.processors.senders.MailchimpSenderExecution.MAILCHIMP_RESPONSE_FIELD;
+import static com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderExecution.MAILCHIMP_RESPONSE_FIELD;
 import static com.obj.nc.koderia.services.MailchimpRestClientImpl.SEND_TEMPLATE_PATH;
 import static org.springframework.test.web.client.ExpectedCount.times;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -13,8 +13,7 @@ import java.util.List;
 
 import com.obj.nc.config.InjectorConfiguration;
 import com.obj.nc.koderia.KoderiaFlowsApplication;
-import com.obj.nc.koderia.functions.processors.senders.MailchimpSenderConfigProperties;
-import com.obj.nc.koderia.services.MailchimpRestClientImpl;
+import com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -49,7 +48,7 @@ public class KoderiaFlowTests extends BaseIntegrationTest {
 	public static final String FINAL_STEP_QUEUE_NAME = "send-message.destination";
 
 	@Autowired
-	private MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
+	private MailchimpSenderConfig mailchimpSenderConfig;
 
 	@Autowired
 	private InputDestination source;
@@ -73,7 +72,7 @@ public class KoderiaFlowTests extends BaseIntegrationTest {
 	@Test
 	public void testJobPostKoderiaEventEmited() {
 		// WITH MOCK SERVER CONFIG
-		String mailchimpSendMessageUrl = mailchimpSenderConfigProperties.getMailchimpApi().getUrl() + SEND_TEMPLATE_PATH;
+		String mailchimpSendMessageUrl = mailchimpSenderConfig.getMailchimpApi().getUrl() + SEND_TEMPLATE_PATH;
 
 		MessageResponseDto responseDto = new MessageResponseDto();
 		responseDto.setId("string");

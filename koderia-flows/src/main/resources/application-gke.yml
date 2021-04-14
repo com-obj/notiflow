@@ -1,7 +1,3 @@
 spring.datasource:
    url: jdbc:postgresql://${release.name}-postgresql:5432/nc
 
-spring.rabbitmq:
-   host: ${release.name}-rabbitmq
-   username: nc
-   password: NoyHPHmdq2AW

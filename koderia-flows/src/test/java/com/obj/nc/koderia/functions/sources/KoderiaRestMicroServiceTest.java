@@ -3,7 +3,6 @@ package com.obj.nc.koderia.functions.sources;
 import com.obj.nc.koderia.KoderiaFlowsApplication;
 import com.obj.nc.koderia.controller.EmitEventsRestController;
 import com.obj.nc.koderia.dto.*;
-import com.obj.nc.koderia.functions.sources.KoderiaRestMicroService;
 import com.obj.nc.utils.JsonUtils;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;

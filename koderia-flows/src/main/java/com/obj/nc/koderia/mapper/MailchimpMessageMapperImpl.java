@@ -6,7 +6,7 @@ import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.koderia.functions.processors.senders.MailchimpSenderConfigProperties;
+import com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig;
 import com.obj.nc.koderia.dto.EmitEventDto;
 import com.obj.nc.koderia.dto.mailchimp.*;
 
@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 
-import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl.COMPONENT_NAME;
 
 import java.io.File;
@@ -32,12 +32,12 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     public static final String EVENT_FIELD = "event";
 
     @Autowired
-    protected MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
+    protected MailchimpSenderConfig mailchimpSenderConfig;
 
     @Override
     public SendMessageWithTemplateDto mapWithTemplate(Message message) {
         SendMessageWithTemplateDto dto = new SendMessageWithTemplateDto();
-        dto.setKey(mailchimpSenderConfigProperties.getMailchimpApi().getAuthKey());
+        dto.setKey(mailchimpSenderConfig.getMailchimpApi().getAuthKey());
         dto.setMessage(mapMessage(message));
 
         String messageTypeName = getTemplateName(message);
@@ -49,8 +49,8 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
         MessageDto messageDto = new MessageDto();
 
         messageDto.setSubject(mapSubject(message));
-        messageDto.setFromEmail(mailchimpSenderConfigProperties.getMailchimpApi().getSenderEmail());
-        messageDto.setFromName(mailchimpSenderConfigProperties.getMailchimpApi().getSenderName());
+        messageDto.setFromEmail(mailchimpSenderConfig.getMailchimpApi().getSenderEmail());
+        messageDto.setFromName(mailchimpSenderConfig.getMailchimpApi().getSenderName());
 
         List<RecipientDto> recipients = Collections.singletonList(this.mapRecipient(message.getBody().getRecievingEndpoints().get(0)));
         messageDto.setTo(recipients);
@@ -117,7 +117,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     protected String getTemplateName(Message message) {
         Content messageContent = message.getBody().getMessage();
         EmitEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class);
-        return mailchimpSenderConfigProperties.getTemplateNameFromMessageType(originalEvent.getType());
+        return mailchimpSenderConfig.getTemplateNameFromMessageType(originalEvent.getType());
     }
 
     protected RecipientDto mapRecipient(RecievingEndpoint endpoint) {

@@ -6,8 +6,7 @@ import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.koderia.dto.RecipientDto;
 import com.obj.nc.koderia.dto.RecipientsQueryDto;
-import com.obj.nc.koderia.functions.processors.KoderiaRecipientsProcessingFunction;
-import com.obj.nc.koderia.services.KoderiaRestClientImpl;
+import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderProcessorFunction;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
@@ -22,11 +21,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.koderia.services.KoderiaRestClientImpl.RECIPIENTS_PATH;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.test.web.client.ExpectedCount.once;
@@ -37,12 +35,12 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest(KoderiaRestClientImpl.class)
 @Import(KoderiaRecipientsProcessingFunctionTestConfig.class)
-class KoderiaRecipientsProcessingFunctionTest {
+class KoderiaRecipientsFinderProcessorFunctionTest {
 
     public static final String TEST_FILES_DIR_PATH = "koderia/recipient_queries/";
 
     @Autowired
-    private KoderiaRecipientsProcessingFunction getKoderiaRecipients;
+    private KoderiaRecipientsFinderProcessorFunction getKoderiaRecipients;
 
     @Autowired
     private MockRestServiceServer server;
