@@ -1,12 +1,15 @@
 package com.obj.nc.koderia.functions.processors.messageExtractor;
 
+import com.obj.nc.Get;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.config.InjectorConfiguration;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter;
 import com.obj.nc.koderia.KoderiaFlowsApplication;
+import com.obj.nc.koderia.config.NotifEventConverterConfig;
 import com.obj.nc.koderia.dto.koderia.data.*;
 import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import com.obj.nc.utils.JsonUtils;
@@ -16,15 +19,18 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 
 import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest(classes = {
-        KoderiaFlowsApplication.class, 
-        GenericEventToNotificaitonIntentConverter.class
+@JsonTest
+@ContextConfiguration(classes = {
+        KoderiaMessageExtractorProcessorFunction.class,
+        GenericEventToNotificaitonIntentConverter.class,
+        NotifEventConverterConfig.class
 })
 class KoderiaMessageExtractorProcessorFunctionTest {
 
