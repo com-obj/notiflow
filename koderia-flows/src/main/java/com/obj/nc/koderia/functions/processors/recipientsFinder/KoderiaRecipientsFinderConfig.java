@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "koderia.functions.recipients")
+@ConfigurationProperties(prefix = "koderia.functions.recipients-finder")
 public class KoderiaRecipientsFinderConfig {
     public static final String KODERIA_REST_TEMPLATE = "koderiaRestTemplate";
     public static final String RECIPIENTS_PATH = "/recipients";
