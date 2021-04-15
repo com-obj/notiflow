@@ -7,8 +7,8 @@ import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import com.obj.nc.koderia.dto.koderia.data.RecipientDto;
-import com.obj.nc.koderia.dto.koderia.data.RecipientsQueryDto;
+import com.obj.nc.koderia.dto.koderia.recipients.RecipientDto;
+import com.obj.nc.koderia.dto.koderia.recipients.RecipientsQueryDto;
 import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import com.obj.nc.koderia.mapper.RecipientMapper;
 import com.obj.nc.koderia.services.KoderiaClient;

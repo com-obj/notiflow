@@ -1,7 +1,7 @@
 package com.obj.nc.koderia.services;
 
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.koderia.dto.koderia.data.RecipientsQueryDto;
+import com.obj.nc.koderia.dto.koderia.recipients.RecipientsQueryDto;
 
 import java.util.List;
 

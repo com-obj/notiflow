@@ -10,7 +10,6 @@ import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig;
 import com.obj.nc.koderia.dto.mailchimp.*;
 
-import com.obj.nc.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
 
     public static final String COMPONENT_NAME = "mailchimpMessageMapper";
-    public static final String EVENT_FIELD = "event";
+    public static final String SIMPLE_MESSAGE_FIELD = "SIMPLE_MESSAGE";
 
     @Autowired
     protected MailchimpSenderConfig mailchimpSenderConfig;
@@ -75,7 +74,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
         BaseKoderiaEventDto originalEvent = messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, BaseKoderiaEventDto.class);
 
         Map<String, Object> mergeVars = new HashMap<>();
-        mergeVars.put(EVENT_FIELD, originalEvent.asMap());
+        mergeVars.put(SIMPLE_MESSAGE_FIELD, originalEvent.asMap());
         return mergeVars.entrySet().stream().map(this::mapMergeVar).collect(Collectors.toList());
     }
 

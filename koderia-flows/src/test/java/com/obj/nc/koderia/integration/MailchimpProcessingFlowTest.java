@@ -13,7 +13,7 @@ import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIn
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import com.obj.nc.koderia.KoderiaFlowsApplication;
-import com.obj.nc.koderia.dto.koderia.data.RecipientDto;
+import com.obj.nc.koderia.dto.koderia.recipients.RecipientDto;
 import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
 import com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig;
@@ -44,14 +44,16 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static com.obj.nc.koderia.flows.MaichimpProcessingFlowConfig.*;
+import static com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
 import static com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
-import static org.springframework.test.web.client.ExpectedCount.once;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.client.ExpectedCount.times;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -90,7 +92,7 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 	private MockRestServiceServer koderiaMockServer;
 	private MockRestServiceServer mailchimpMockServer;
 	
-	final List<Message<?>> received = new ArrayList<>();
+	private List<Message<?>> received = new ArrayList<>();
 	
 	@BeforeEach
 	public void startSourcePollingAndMockRestServers() {
@@ -106,20 +108,36 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 	
 	@Test
 	void testSendMessagesToMailchimp() {
+		// given
 		BaseKoderiaEventDto baseKoderiaEventDto = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEventDto.class);
 		GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEventDto));
 		genericEvent.setFlowId("default-flow");
 		createRestCallExpectations();
 		mockIntegrationContext.substituteMessageHandlerFor(LOG_CONSUMER_HANDLER_ID, received::add);
-		
+		// when
 		persister.accept(genericEvent);
 		Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> received.size() >= 3);
-		
+		// then
 		MatcherAssert.assertThat(received, Matchers.hasSize(3));
+		// and
+		for (Message<?> receivedMessage : received) {
+			com.obj.nc.domain.message.Message payload = (com.obj.nc.domain.message.Message) receivedMessage.getPayload();
+			checkReceivedPayload(payload);
+		}
+	}
+	
+	private void checkReceivedPayload(com.obj.nc.domain.message.Message payload) {
+		String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
+		MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
+		
+		List<MessageResponseDto> messageResponses = (List<MessageResponseDto>) payload.getBody().getAttributeValue(MAILCHIMP_RESPONSE_FIELD);
+		for (MessageResponseDto response : messageResponses) {
+			MatcherAssert.assertThat(Arrays.asList(responseDtos), contains(response));
+		}
 	}
 	
 	private void createRestCallExpectations() {
-		// koderia
+		// koderia server
 		String RECIPIENTS_JSON_PATH = "koderia/recipient_queries/job_recipients_response.json";
 		RecipientDto[] responseBody = JsonUtils.readObjectFromClassPathResource(RECIPIENTS_JSON_PATH, RecipientDto[].class);
 		
@@ -127,12 +145,15 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 				requestTo(koderiaRecipientsFinderConfig.getKoderiaApiUrl() + RECIPIENTS_PATH))
 				.andExpect(method(HttpMethod.POST))
 				.andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + koderiaRecipientsFinderConfig.getKoderiaApiToken()))
+				.andExpect(jsonPath("$.type", equalTo("JOB_POST")))
+				.andExpect(jsonPath("$.data.type", equalTo("Analytik")))
+				.andExpect(jsonPath("$.data.technologies[0]", equalTo("Microsoft Power BI")))
 				.andRespond(withStatus(HttpStatus.OK)
 						.contentType(MediaType.APPLICATION_JSON)
 						.body(JsonUtils.writeObjectToJSONString(responseBody))
 				);
 		
-		// mailchimp
+		// mailchimp server
 		String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
 		MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
 		String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
@@ -141,6 +162,9 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 				requestTo(mailchimpSenderConfig.getMailchimpApi().getUrl() + SEND_TEMPLATE_PATH))
 				.andExpect(method(HttpMethod.POST))
 				.andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfig.getMailchimpApi().getAuthKey()))
+				.andExpect(jsonPath("$.key", equalTo("MOCKkey")))
+				.andExpect(jsonPath("$.message.subject", equalTo("Business Intelligence (BI) Developer")))
+				.andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
 				.andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
 	}
 

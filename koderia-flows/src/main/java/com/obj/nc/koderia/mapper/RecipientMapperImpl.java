@@ -3,7 +3,7 @@ package com.obj.nc.koderia.mapper;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.Person;
-import com.obj.nc.koderia.dto.koderia.data.RecipientDto;
+import com.obj.nc.koderia.dto.koderia.recipients.RecipientDto;
 
 import org.springframework.stereotype.Component;
 

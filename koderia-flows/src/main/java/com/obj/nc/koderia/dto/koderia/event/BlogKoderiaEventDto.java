@@ -1,10 +1,9 @@
 package com.obj.nc.koderia.dto.koderia.event;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.obj.nc.koderia.dto.koderia.data.BlogEventDataDto;
+import com.obj.nc.koderia.dto.koderia.eventData.BlogEventDataDto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

@@ -1,7 +1,7 @@
 package com.obj.nc.koderia.dto.koderia.event;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.obj.nc.koderia.dto.koderia.data.JobPostEventDataDto;
+import com.obj.nc.koderia.dto.koderia.eventData.JobPostEventDataDto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

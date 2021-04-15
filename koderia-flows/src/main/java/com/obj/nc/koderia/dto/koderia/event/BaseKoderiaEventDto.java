@@ -1,22 +1,14 @@
 package com.obj.nc.koderia.dto.koderia.event;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.domain.IsTypedJson;
-import com.obj.nc.koderia.dto.koderia.data.BlogEventDataDto;
-import com.obj.nc.koderia.dto.koderia.data.EventEventDataDto;
-import com.obj.nc.koderia.dto.koderia.data.LinkEventDataDto;
-import com.obj.nc.koderia.dto.koderia.data.NewsEventDataDto;
-import com.obj.nc.utils.JsonUtils;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 

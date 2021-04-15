@@ -1,4 +1,4 @@
-package com.obj.nc.koderia.dto.koderia.data;
+package com.obj.nc.koderia.dto.koderia.recipients;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -24,5 +24,11 @@ import javax.validation.constraints.NotNull;
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RecipientsQueryDto {
+    
+    @NotNull private BaseKoderiaEventDto.Type type;
+    
+    static class Data {
+    }
+    
 }
 

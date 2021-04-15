@@ -20,9 +20,9 @@ import static com.obj.nc.koderia.flows.MaichimpProcessingFlowConfig.MAILCHIMP_PR
 public class NotificationIntentProcessingFlowConfig {
     
     private final ValidateAndGenerateEventIdProcessingFunction generateEventId;
-    private final MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
     private final KoderiaMessageExtractorProcessorFunction messageExtractor;
     private final KoderiaRecipientsFinderProcessorFunction recipientsFinder;
+    private final MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
     
     @Bean(INTENT_PROCESSING_FLOW_ID)
     public IntegrationFlow intentProcessingFlowDefinition() {

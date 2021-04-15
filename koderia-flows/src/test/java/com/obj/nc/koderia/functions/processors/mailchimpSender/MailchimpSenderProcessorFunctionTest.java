@@ -6,20 +6,27 @@ import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.koderia.dto.koderia.recipients.RecipientDto;
 import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.platform.suite.api.ExcludeTags;
+import org.junit.platform.suite.api.IncludeTags;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import java.io.IOException;
@@ -31,8 +38,14 @@ import java.util.Map;
 import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
 import static com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
+import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.client.ExpectedCount.once;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.ExpectedCount.times;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -44,21 +57,21 @@ class MailchimpSenderProcessorFunctionTest {
     public static final String MESSAGE_JSON_PATH = "mailchimp/message.json";
     public static final String AGGREGATE_MESSAGE_JSON_PATH = "mailchimp/aggregate_message.json";
 
-    @Autowired
-    private MailchimpSenderProcessorFunction sendMailchimpMessage;
-
-    @Autowired
-    private MockRestServiceServer server;
-
+    @Autowired private MailchimpSenderProcessorFunction sendMailchimpMessage;
+    @Autowired private MailchimpSenderConfig mailchimpSenderConfig;
+    @Autowired private MockRestServiceServer mailchimpMockServer;
+    
+    @BeforeEach
+    void setUp(TestInfo testInfo) {
+        if(testInfo.getTags().contains("aggregate")) {
+            createAggregateMessageRestServerExpectations();
+        } else {
+            createSimpleMessageRestServerExpectations();
+        }
+    }
+    
     @Test
     void testSendMessageWithTemplate() {
-        // WITH MOCK SERVER
-        MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
-        String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
-
-        server.expect(once(), requestTo(SEND_TEMPLATE_PATH))
-                .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
-
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
@@ -75,21 +88,15 @@ class MailchimpSenderProcessorFunctionTest {
         Message outputMessage = sendMailchimpMessage.apply(inputMessage);
 
         // THEN
-        server.verify();
         MatcherAssert.assertThat(outputMessage, Matchers.notNullValue());
         MessageResponseDto outputMessageResponseDto = JsonUtils.readClassFromObject(outputMessage.getBody().getAttributeValueAs(MAILCHIMP_RESPONSE_FIELD, List.class).get(0), MessageResponseDto.class);
+        MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
         MatcherAssert.assertThat(outputMessageResponseDto, Matchers.equalTo(responseDtos[0]));
     }
 
     @Test
+    @Tag("aggregate")
     void testSendAggregateMessageWithTemplate() {
-        // WITH MOCK SERVER
-        MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
-        String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
-
-        server.expect(once(), requestTo(SEND_TEMPLATE_PATH))
-                .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
-
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(AGGREGATE_MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
@@ -108,21 +115,14 @@ class MailchimpSenderProcessorFunctionTest {
         Message outputMessage = sendMailchimpMessage.apply(inputMessage);
 
         // THEN
-        server.verify();
         MatcherAssert.assertThat(outputMessage, Matchers.notNullValue());
         MessageResponseDto outputMessageResponseDto = JsonUtils.readClassFromObject(outputMessage.getBody().getAttributeValueAs(MAILCHIMP_RESPONSE_FIELD, List.class).get(0), MessageResponseDto.class);
+        MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
         MatcherAssert.assertThat(outputMessageResponseDto, Matchers.equalTo(responseDtos[0]));
     }
 
     @Test
     void testSendNullMessage() {
-        // WITH MOCK SERVER
-        MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
-        String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
-
-        server.expect(once(), requestTo(SEND_TEMPLATE_PATH))
-                .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
-
         // GIVEN
         Message inputMessage = null;
 
@@ -134,13 +134,6 @@ class MailchimpSenderProcessorFunctionTest {
 
     @Test
     void testSendMessageWithNoOriginalEvent() {
-        // WITH MOCK SERVER
-        MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
-        String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
-
-        server.expect(once(), requestTo(SEND_TEMPLATE_PATH))
-                .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
-
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
@@ -163,13 +156,6 @@ class MailchimpSenderProcessorFunctionTest {
 
     @Test
     void testSendMessageWithNoOriginalEventType() {
-        // WITH MOCK SERVER
-        MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
-        String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
-
-        server.expect(once(), requestTo(SEND_TEMPLATE_PATH))
-                .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
-
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
@@ -193,12 +179,6 @@ class MailchimpSenderProcessorFunctionTest {
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\t\t\n "})
     void testSendMessageWithNoTextSubject(String param) {
-        MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
-        String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
-
-        server.expect(once(), requestTo(SEND_TEMPLATE_PATH))
-                .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
-
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
@@ -220,13 +200,6 @@ class MailchimpSenderProcessorFunctionTest {
 
     @Test
     void testSendMessageWithNoReceivingEndpoints() {
-        // WITH MOCK SERVER
-        MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
-        String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
-
-        server.expect(once(), requestTo(SEND_TEMPLATE_PATH))
-                .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
-
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
@@ -250,13 +223,6 @@ class MailchimpSenderProcessorFunctionTest {
 
     @Test
     void testSendMessageWithNonEmailReceivingEndpoints() {
-        // WITH MOCK SERVER
-        MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
-        String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
-
-        server.expect(once(), requestTo(SEND_TEMPLATE_PATH))
-                .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
-
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
         // FIX ABSOLUTE PATHS TO TEST FILES
@@ -293,5 +259,49 @@ class MailchimpSenderProcessorFunctionTest {
                 .hasMessageContaining("Mailchimp can only send message")
                 .hasMessageContaining("to 1 EmailContent endpoint");
     }
-
+    
+    
+    private void createSimpleMessageRestServerExpectations() {
+        String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
+        MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
+        String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
+        
+        mailchimpMockServer.expect(times(1),
+                requestTo(SEND_TEMPLATE_PATH))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfig.getMailchimpApi().getAuthKey()))
+                .andExpect(jsonPath("$.key", equalTo("MOCKkey")))
+                .andExpect(jsonPath("$.message.subject", anyOf(equalTo("Business Intelligence (BI) Developer"), equalTo("Koderia digest"))))
+                .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
+                .andExpect(jsonPath("$.message.global_merge_vars[0].name", equalTo("SIMPLE_MESSAGE")))
+                .andExpect(jsonPath("$.message.global_merge_vars[0].content.type", equalTo("JOB_POST")))
+                .andExpect(jsonPath("$.message.attachments[0].name", equalTo("test1.txt")))
+                .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
+    }
+    
+    private void createAggregateMessageRestServerExpectations() {
+        String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
+        MessageResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MessageResponseDto[].class);
+        String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
+        
+        mailchimpMockServer.expect(times(1),
+                requestTo(SEND_TEMPLATE_PATH))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfig.getMailchimpApi().getAuthKey()))
+                .andExpect(jsonPath("$.key", equalTo("MOCKkey")))
+                .andExpect(jsonPath("$.message.subject", equalTo("Koderia digest")))
+                .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
+                .andExpect(jsonPath("$.message.global_merge_vars[0].name", anyOf(equalTo("JOB_POST"), equalTo("NEWS"),
+                        equalTo("LINK"), equalTo("EVENT"), equalTo("BLOG"))))
+                .andExpect(jsonPath("$.message.global_merge_vars[1].name", anyOf(equalTo("JOB_POST"), equalTo("NEWS"),
+                        equalTo("LINK"), equalTo("EVENT"), equalTo("BLOG"))))
+                .andExpect(jsonPath("$.message.global_merge_vars[2].name", anyOf(equalTo("JOB_POST"), equalTo("NEWS"),
+                        equalTo("LINK"), equalTo("EVENT"), equalTo("BLOG"))))
+                .andExpect(jsonPath("$.message.global_merge_vars[3].name", anyOf(equalTo("JOB_POST"), equalTo("NEWS"),
+                        equalTo("LINK"), equalTo("EVENT"), equalTo("BLOG"))))
+                .andExpect(jsonPath("$.message.global_merge_vars[4].name", anyOf(equalTo("JOB_POST"), equalTo("NEWS"),
+                        equalTo("LINK"), equalTo("EVENT"), equalTo("BLOG"))))
+                .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
+    }
+    
 }

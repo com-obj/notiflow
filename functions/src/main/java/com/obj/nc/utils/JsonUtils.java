@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.obj.nc.exceptions.PayloadValidationException;
 
 public class JsonUtils {
@@ -194,6 +195,7 @@ public class JsonUtils {
 	public static ObjectMapper getObjectMapper() {
 		if (instance == null) {
 			instance = new ObjectMapper();
+			instance.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 		}
 		return instance;
 	}

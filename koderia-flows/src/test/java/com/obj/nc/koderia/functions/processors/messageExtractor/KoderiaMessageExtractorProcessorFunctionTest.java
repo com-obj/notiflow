@@ -1,16 +1,13 @@
 package com.obj.nc.koderia.functions.processors.messageExtractor;
 
-import com.obj.nc.Get;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.config.InjectorConfiguration;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter;
-import com.obj.nc.koderia.KoderiaFlowsApplication;
 import com.obj.nc.koderia.config.NotifEventConverterConfig;
-import com.obj.nc.koderia.dto.koderia.data.*;
+import com.obj.nc.koderia.dto.koderia.eventData.*;
 import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import com.obj.nc.utils.JsonUtils;
 import io.restassured.module.jsv.JsonSchemaValidator;

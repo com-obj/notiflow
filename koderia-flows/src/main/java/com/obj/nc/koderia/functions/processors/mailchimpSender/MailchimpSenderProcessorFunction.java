@@ -87,7 +87,7 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 		MessageResponseDto[] responseBody = responseEntity.getBody();
 		
 		if (responseBody == null) {
-			throw new RestClientException("Response body is null");
+			throw new RestClientException("Response body must not be null");
 		}
 		
 		return Arrays.stream(responseBody).collect(Collectors.toList());

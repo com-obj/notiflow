@@ -1,7 +1,6 @@
-package com.obj.nc.koderia.dto.koderia.data;
+package com.obj.nc.koderia.dto.koderia.eventData;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;

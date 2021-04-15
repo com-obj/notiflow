@@ -5,10 +5,8 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.koderia.dto.koderia.data.JobPostEventDataDto;
-import com.obj.nc.koderia.dto.koderia.data.RecipientDto;
-import com.obj.nc.koderia.dto.koderia.data.RecipientsQueryDto;
-import com.obj.nc.koderia.dto.koderia.event.JobPostKoderiaEventDto;
+import com.obj.nc.koderia.dto.koderia.recipients.RecipientDto;
+import com.obj.nc.koderia.dto.koderia.recipients.RecipientsQueryDto;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
@@ -31,11 +29,11 @@ import org.springframework.web.client.RestClientException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 
 import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.client.ExpectedCount.once;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
@@ -103,7 +101,7 @@ class KoderiaRecipientsFinderProcessorFunctionTest {
     }
 
     @Test
-    void testFindReceivingEndpoints() throws URISyntaxException {
+    void testFindReceivingEndpoints() {
         // given
         String QUERY_JSON_PATH = "koderia/recipient_queries/job_recipients_query.json";
         RecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, RecipientsQueryDto.class);
@@ -112,9 +110,12 @@ class KoderiaRecipientsFinderProcessorFunctionTest {
         RecipientDto[] responseBody = JsonUtils.readObjectFromClassPathResource(RECIPIENTS_JSON_PATH, RecipientDto[].class);
         
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI(RECIPIENTS_PATH)))
+                requestTo(RECIPIENTS_PATH))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + koderiaRecipientsFinderConfig.getKoderiaApiToken()))
+                .andExpect(jsonPath("$.type", equalTo("JOB_POST")))
+                .andExpect(jsonPath("$.data.type", equalTo("Analytik")))
+                .andExpect(jsonPath("$.data.technologies[0]", equalTo("Microsoft Power BI")))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(responseBody))
@@ -139,7 +140,7 @@ class KoderiaRecipientsFinderProcessorFunctionTest {
     }
     
     @Test
-    void testFindReceivingEndpointsNullFail() throws URISyntaxException {
+    void testFindReceivingEndpointsNullFail() {
         // given
         String QUERY_JSON_PATH = "koderia/recipient_queries/job_recipients_query.json";
         RecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, RecipientsQueryDto.class);
@@ -147,9 +148,12 @@ class KoderiaRecipientsFinderProcessorFunctionTest {
         RecipientDto[] responseBody = null;
         
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI(RECIPIENTS_PATH)))
+                requestTo(RECIPIENTS_PATH))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + koderiaRecipientsFinderConfig.getKoderiaApiToken()))
+                .andExpect(jsonPath("$.type", equalTo("JOB_POST")))
+                .andExpect(jsonPath("$.data.type", equalTo("Analytik")))
+                .andExpect(jsonPath("$.data.technologies[0]", equalTo("Microsoft Power BI")))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(responseBody))
@@ -162,7 +166,7 @@ class KoderiaRecipientsFinderProcessorFunctionTest {
     }
     
     @Test
-    void testFindReceivingEndpoints404HandleError() throws URISyntaxException {
+    void testFindReceivingEndpoints404HandleError() {
         // given
         String QUERY_JSON_PATH = "koderia/recipient_queries/job_recipients_query.json";
         RecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, RecipientsQueryDto.class);
@@ -170,9 +174,12 @@ class KoderiaRecipientsFinderProcessorFunctionTest {
         RecipientDto[] responseBody = null;
         
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI(RECIPIENTS_PATH)))
+                requestTo(RECIPIENTS_PATH))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + koderiaRecipientsFinderConfig.getKoderiaApiToken()))
+                .andExpect(jsonPath("$.type", equalTo("JOB_POST")))
+                .andExpect(jsonPath("$.data.type", equalTo("Analytik")))
+                .andExpect(jsonPath("$.data.technologies[0]", equalTo("Microsoft Power BI")))
                 .andRespond(withStatus(HttpStatus.NOT_FOUND)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(responseBody))
@@ -185,17 +192,20 @@ class KoderiaRecipientsFinderProcessorFunctionTest {
     }
     
     @Test
-    void testFindReceivingEndpoints500HandleError() throws URISyntaxException {
+    void testFindReceivingEndpoints500HandleError() {
         // given
         String QUERY_JSON_PATH = "koderia/recipient_queries/job_recipients_query.json";
         RecipientsQueryDto recipientsQueryDto = JsonUtils.readObjectFromClassPathResource(QUERY_JSON_PATH, RecipientsQueryDto.class);
         
         RecipientDto[] responseBody = null;
-        
+    
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI(RECIPIENTS_PATH)))
+                requestTo(RECIPIENTS_PATH))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + koderiaRecipientsFinderConfig.getKoderiaApiToken()))
+                .andExpect(jsonPath("$.type", equalTo("JOB_POST")))
+                .andExpect(jsonPath("$.data.type", equalTo("Analytik")))
+                .andExpect(jsonPath("$.data.technologies[0]", equalTo("Microsoft Power BI")))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(responseBody))

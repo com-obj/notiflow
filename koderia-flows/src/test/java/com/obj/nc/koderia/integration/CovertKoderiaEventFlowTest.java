@@ -3,13 +3,13 @@ package com.obj.nc.koderia.integration;
 import static com.obj.nc.flows.config.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_ID;
 import static com.obj.nc.flows.config.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.koderia.flows.ConvertKoderiaEventFlowConfig.CONVERT_KODERIA_EVENT_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.koderia.flows.MaichimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static org.springframework.integration.scheduling.PollerMetadata.DEFAULT_POLLER;
+import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.koderia.integration.CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.RECEIVED_TEST_LIST;
 
 import com.obj.nc.config.InjectorConfiguration;
 import com.obj.nc.config.JdbcConfiguration;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig;
 import com.obj.nc.flows.inputEventRouting.config.InputEventRoutingProperties;
 import com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter;
@@ -31,26 +31,17 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.channel.PublishSubscribeChannel;
-import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.PollerSpec;
-import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
-import org.springframework.integration.test.context.MockIntegrationContext;
-import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.PollableChannel;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 
-import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +61,7 @@ import java.util.concurrent.TimeUnit;
 			PaylaodLoggerSinkConsumer.class,
 			ValidateAndGenerateEventIdProcessingFunction.class,
 			MessagesFromNotificationIntentProcessingFunction.class,
-			CovertKoderiaEventFlowTest.TestChannelConfiguration.class,
+			CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.class,
 			GenericEventPersisterConsumer.class
 })
 @DirtiesContext
@@ -79,7 +70,8 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 	@Autowired private SourcePollingChannelAdapter pollableSource;
 	@Autowired private GenericEventPersisterConsumer persister;
-	static final List<Message<?>> received = new ArrayList<>();
+	@Qualifier(RECEIVED_TEST_LIST)
+	@Autowired private List<Message<?>> received;
 	
 	@BeforeEach
 	public void startSourcePolling() {
@@ -93,23 +85,37 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 	
 	@Test
 	void testConvertKoderiaEvent() {
+		// given
 		BaseKoderiaEventDto baseKoderiaEventDto = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEventDto.class);
 		GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEventDto));
 		genericEvent.setFlowId("default-flow");
+		// when
 		persister.accept(genericEvent);
-		
 		Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> received.size() >= 1);
-		
+		// then
 		MatcherAssert.assertThat(received, Matchers.hasSize(1));
+		// and
+		NotificationIntent payload = (NotificationIntent) received.get(0).getPayload();
+		MatcherAssert.assertThat(payload.getBody().containsAttribute(ORIGINAL_EVENT_FIELD), Matchers.equalTo(true));
+		// and
+		BaseKoderiaEventDto originalEvent = payload.getBody().getAttributeValueAs(ORIGINAL_EVENT_FIELD, BaseKoderiaEventDto.class);
+		MatcherAssert.assertThat(originalEvent, Matchers.equalTo(baseKoderiaEventDto));
 	}
 	
 	@TestConfiguration
-	public static class TestChannelConfiguration {
+	public static class MockNextFlowTestConfiguration {
+		public static final String RECEIVED_TEST_LIST = "RECEIVED_TEST_LIST";
+		
+		@Bean(RECEIVED_TEST_LIST)
+		public List<Message<?>> received() {
+			return new ArrayList<>();
+		}
+		
 		@Bean(INTENT_PROCESSING_FLOW_ID)
 		public IntegrationFlow intentProcessingFlowDefinition() {
 			return IntegrationFlows
 					.from(INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
-					.handle((MessageHandler) received::add)
+					.handle((MessageHandler) received()::add)
 					.get();
 		}
 	}
