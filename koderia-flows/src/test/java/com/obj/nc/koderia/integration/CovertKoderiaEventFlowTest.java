@@ -92,7 +92,7 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 	}
 	
 	@Test
-	void testGenericEventRouting() {
+	void testConvertKoderiaEvent() {
 		BaseKoderiaEventDto baseKoderiaEventDto = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEventDto.class);
 		GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEventDto));
 		genericEvent.setFlowId("default-flow");

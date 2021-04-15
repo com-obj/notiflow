@@ -93,7 +93,7 @@ public class NotificationIntentProcessingFlowTest extends BaseIntegrationTest {
 	static final List<Message<?>> received = new ArrayList<>();
 	
 	@BeforeEach
-	public void startSourcePolling() {
+	public void startSourcePollingAndMockRestServer() {
 		mockServer = MockRestServiceServer.bindTo(koderiaRecipientsFinder.getRestTemplate()).build();
 		pollableSource.start();
 	}
@@ -104,7 +104,7 @@ public class NotificationIntentProcessingFlowTest extends BaseIntegrationTest {
 	}
 	
 	@Test
-	void testGenericEventRouting() {
+	void testProcessNotificationIntent() {
 		BaseKoderiaEventDto baseKoderiaEventDto = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEventDto.class);
 		GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEventDto));
 		genericEvent.setFlowId("default-flow");
