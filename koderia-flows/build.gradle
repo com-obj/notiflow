@@ -19,7 +19,6 @@ repositories {
 
 ext {
     set('testcontainersVersion', "1.15.1")
-    set('springCloudVersion', "2020.0.0")
     set('junitJupiterVersion', '5.4.2')
 }
 
@@ -29,25 +28,17 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    implementation 'org.springframework.boot:spring-boot-starter-integration'
+    implementation "org.springframework.integration:spring-integration-jdbc"
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.cloud:spring-cloud-function-context'
 
-    implementation 'org.springframework.cloud:spring-cloud-stream'
-    implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
     implementation 'org.postgresql:postgresql'
     implementation 'org.flywaydb:flyway-core'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.integration:spring-integration-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
-    testImplementation("org.springframework.cloud:spring-cloud-stream") {
-        artifact {
-            name = "spring-cloud-stream"
-            extension = "jar"
-            type ="test-jar"
-            classifier = "test-binder"
-        }
-    }
 
     testImplementation 'io.rest-assured:rest-assured:4.2.0'
     testImplementation 'io.rest-assured:json-path:4.2.0'
@@ -56,6 +47,7 @@ dependencies {
     testImplementation 'io.rest-assured:spring-mock-mvc:4.2.0'
     testImplementation 'io.rest-assured:json-schema-validator:4.1.2'
     testImplementation 'org.json:json:20201115'
+    testImplementation 'org.awaitility:awaitility'
 
     testCompile 'org.junit.jupiter:junit-jupiter-api'
     testRuntime 'org.junit.jupiter:junit-jupiter-engine'
@@ -71,7 +63,6 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         mavenBom "org.junit:junit-bom:${junitJupiterVersion}"
     }
 }

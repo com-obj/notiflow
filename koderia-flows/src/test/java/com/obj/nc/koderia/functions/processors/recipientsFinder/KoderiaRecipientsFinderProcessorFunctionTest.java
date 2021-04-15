@@ -93,7 +93,7 @@ class KoderiaRecipientsFinderProcessorFunctionTest {
     void testEventWithNoOriginalEvent() {
         // GIVEN
         NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(TEST_FILES_DIR_PATH + "job_event.json", NotificationIntent.class);
-        inputNotificationIntent.getBody().removeAttribute(ORIGINAL_EVENT_FIELD);
+        inputNotificationIntent.getBody().getMessage().removeAttribute(ORIGINAL_EVENT_FIELD);
 
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> getKoderiaRecipients.apply(inputNotificationIntent))

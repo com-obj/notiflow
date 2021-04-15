@@ -31,6 +31,7 @@ public class GenericEventsSupplier extends SourceSupplierAdapter<GenericEvent> {
 		}
 		
 		eventsToProcess.setTimeConsumed(Instant.now());
+		eventsToProcess.syncHeaderFields();
 		repository.save(eventsToProcess);
 		return eventsToProcess;
 	}

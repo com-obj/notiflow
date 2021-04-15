@@ -5,17 +5,15 @@
    },
    "body":{
       "message":{
-         "content" : {
-            "subject":"Nove features na Koderia.sk",
-            "text":"..."
-         }
-      },
-      "attributes" : {
-         "originalEvent" : {
-            "type" : "NEWS",
-            "data" : {
-               "subject" : "Nove features na Koderia.sk",
-               "text" : "..."
+         "subject":"Nove features na Koderia.sk",
+         "text":"...",
+         "attributes" : {
+            "originalEvent" : {
+               "type" : "NEWS",
+               "data" : {
+                  "subject" : "Nove features na Koderia.sk",
+                  "text" : "..."
+               }
             }
          }
       }

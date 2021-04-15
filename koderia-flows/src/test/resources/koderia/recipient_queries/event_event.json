@@ -5,33 +5,31 @@
    },
    "body":{
       "message":{
-         "content" : {
-            "subject":"NextStep Science",
-            "text":"Milí priatelia,\nkaždým dňom sledujeme vývoj situácie ohľadom korona vírusu..."
-         }
-      },
-      "attributes" : {
-         "originalEvent" : {
-            "type": "EVENT",
-            "data": {
-               "id": "lEUd8rGH5sCFvQCP0cMb",
-               "name": "NextStep Science",
-               "description": "Milí priatelia,\nkaždým dňom sledujeme vývoj situácie ohľadom korona vírusu...",
-               "ticketUrl": "https://www.nextstep-science.sk/kupit-listky?fbclid=IwAR3T85v2kVl7yaRe_tJkoZVGSD6S6sSGzHp_jX23Xmc2q2EBOlGZsx9iFrM",
-               "startAt": "17. 3. 2021, 16:00:00",
-               "locationId": "Bratislavský kraj",
-               "endAt": "17. 3. 2021, 22:00:00",
-               "location": {
-                  "googlePlaceId": "ChIJr7jDYumLbEcRbztTTT9OKLw",
-                  "name": "Univerzitný vedecký park UK, Ilkovičova, Karlova Ves, Slovensko"
-               },
-               "organizer": {
-                  "description": "Biospher je platforma, ktorej cieľom je popularizovať vedu na Slovensku a vytvoriť paralelnú komunitu vedcov a fanúšikov vedy.",
-                  "url": "https://www.biospher.org/",
-                  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/koderikoderom-365dd.appspot.com/o/events%2FqF8vguFkft2D69nGSG91MW343xqirUEy5myJPazmihBtZTa8VyQXWrgpVFfl0k7T?alt=media&token=344a073a-4a94-44d2-88c5-554df4a6fb22",
-                  "name": "Biospher"
-               },
-               "imageUrl": "https://firebasestorage.googleapis.com/v0/b/koderikoderom-365dd.appspot.com/o/events%2F6ubVOvL6RLiBsBHXG4lZZXWSWXcZXLwb1elmrAupo3sna4CGnY7FL2yfT8G6ynBR?alt=media&token=407c5ee1-ef5e-47ee-b384-d7ca1b07c25f"
+         "subject":"NextStep Science",
+         "text":"Milí priatelia,\nkaždým dňom sledujeme vývoj situácie ohľadom korona vírusu...",
+         "attributes" : {
+            "originalEvent" : {
+               "type": "EVENT",
+               "data": {
+                  "id": "lEUd8rGH5sCFvQCP0cMb",
+                  "name": "NextStep Science",
+                  "description": "Milí priatelia,\nkaždým dňom sledujeme vývoj situácie ohľadom korona vírusu...",
+                  "ticketUrl": "https://www.nextstep-science.sk/kupit-listky?fbclid=IwAR3T85v2kVl7yaRe_tJkoZVGSD6S6sSGzHp_jX23Xmc2q2EBOlGZsx9iFrM",
+                  "startAt": "17. 3. 2021, 16:00:00",
+                  "locationId": "Bratislavský kraj",
+                  "endAt": "17. 3. 2021, 22:00:00",
+                  "location": {
+                     "googlePlaceId": "ChIJr7jDYumLbEcRbztTTT9OKLw",
+                     "name": "Univerzitný vedecký park UK, Ilkovičova, Karlova Ves, Slovensko"
+                  },
+                  "organizer": {
+                     "description": "Biospher je platforma, ktorej cieľom je popularizovať vedu na Slovensku a vytvoriť paralelnú komunitu vedcov a fanúšikov vedy.",
+                     "url": "https://www.biospher.org/",
+                     "imageUrl": "https://firebasestorage.googleapis.com/v0/b/koderikoderom-365dd.appspot.com/o/events%2FqF8vguFkft2D69nGSG91MW343xqirUEy5myJPazmihBtZTa8VyQXWrgpVFfl0k7T?alt=media&token=344a073a-4a94-44d2-88c5-554df4a6fb22",
+                     "name": "Biospher"
+                  },
+                  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/koderikoderom-365dd.appspot.com/o/events%2F6ubVOvL6RLiBsBHXG4lZZXWSWXcZXLwb1elmrAupo3sna4CGnY7FL2yfT8G6ynBR?alt=media&token=407c5ee1-ef5e-47ee-b384-d7ca1b07c25f"
+               }
             }
          }
       }

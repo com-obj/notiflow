@@ -16,6 +16,7 @@ public class MaichimpProcessingFlowConfig {
 	
 	public final static String MAILCHIMP_PROCESSING_FLOW_ID = "MAILCHIMP_PROCESSING_FLOW_ID";
 	public final static String MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID = MAILCHIMP_PROCESSING_FLOW_ID + "_INPUT";
+	public final static String LOG_CONSUMER_HANDLER_ID = "LOG_CONSUMER";
 	
 	private final MailchimpSenderProcessorFunction mailchimpSender;
 	private final PaylaodLoggerSinkConsumer logConsumer;

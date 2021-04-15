@@ -39,14 +39,14 @@ public class KoderiaRecipientsFinderProcessorFunction extends ProcessorFunctionA
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent payload) {
-		boolean eventContainsOriginalEvent = payload.getBody().containsAttributes(Collections.singletonList(ORIGINAL_EVENT_FIELD));
+		boolean eventContainsOriginalEvent = payload.getBody().getMessage().containsAttributes(Collections.singletonList(ORIGINAL_EVENT_FIELD));
 		
 		if (!eventContainsOriginalEvent) {
 			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s does not contain required attributes." +
 					" Required attributes are: %s", payload.toString(), Collections.singletonList(ORIGINAL_EVENT_FIELD))));
 		}
 		
-		Object originalEvent = payload.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD);
+		Object originalEvent = payload.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD);
 		
 		try {
 			objectMapper.convertValue(originalEvent, BaseKoderiaEventDto.class);
@@ -59,7 +59,7 @@ public class KoderiaRecipientsFinderProcessorFunction extends ProcessorFunctionA
 	
 	@Override
 	protected NotificationIntent execute(NotificationIntent payload) {
-		Object originalEvent = payload.getBody().getAttributes().get(ORIGINAL_EVENT_FIELD);
+		Object originalEvent = payload.getBody().getMessage().getAttributes().get(ORIGINAL_EVENT_FIELD);
 		RecipientsQueryDto recipientsQueryDto = objectMapper.convertValue(originalEvent, RecipientsQueryDto.class);
 		List<RecievingEndpoint> emailEndpoints = findReceivingEndpoints(recipientsQueryDto);
 		payload.getBody().setRecievingEndpoints(emailEndpoints);

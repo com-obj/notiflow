@@ -109,7 +109,6 @@ class KoderiaMessageExtractorProcessorFunctionTest {
 
         // when
         NotificationIntent mappedNotificationIntent = messageExtractor.apply(notifIntent);
-        System.out.println(mappedNotificationIntent.toJSONString());
 
         // then
         MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/blog_event_schema.json"));
@@ -134,7 +133,6 @@ class KoderiaMessageExtractorProcessorFunctionTest {
         
         // when
         NotificationIntent mappedNotificationIntent = messageExtractor.apply(notifIntent);
-        System.out.println(mappedNotificationIntent.toJSONString());
 
         // then
         MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/event_event_schema.json"));
@@ -159,7 +157,6 @@ class KoderiaMessageExtractorProcessorFunctionTest {
 
         // when
         NotificationIntent mappedNotificationIntent = messageExtractor.apply(notifIntent);
-        System.out.println(mappedNotificationIntent.toJSONString());
 
         // then
         MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/link_event_schema.json"));
@@ -184,7 +181,6 @@ class KoderiaMessageExtractorProcessorFunctionTest {
         
         // when
         NotificationIntent mappedNotificationIntent = messageExtractor.apply(notifIntent);
-        System.out.println(mappedNotificationIntent.toJSONString());
 
         // then
         MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/news_event_schema.json"));
