@@ -57,8 +57,11 @@ public class MessagesFromNotificationIntentProcessingFunction extends ProcessorF
 
 			msgBody.setAttributes(eventBody.getAttributes());
 			
-			msgBody.setMessage(eventBody.getMessage());
-			msgBody.getMessage().setAttributes(eventBody.getMessage().getAttributes());
+			try {
+				msgBody.setMessage(eventBody.getMessage().clone());
+			} catch (CloneNotSupportedException e) {
+				throw new RuntimeException(e);
+			}
 
 			messages.add(msg);
 		}

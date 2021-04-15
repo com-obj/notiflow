@@ -23,7 +23,11 @@ import lombok.EqualsAndHashCode;
 })
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public abstract class Content extends BaseJSONObject {
+public abstract class Content extends BaseJSONObject implements Cloneable {
 	
+	@Override
+	public Content clone() throws CloneNotSupportedException {
+		return (Content) super.clone(); // return deep copy
+	}
 	
 }

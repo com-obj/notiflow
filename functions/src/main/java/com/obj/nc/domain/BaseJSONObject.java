@@ -12,7 +12,7 @@ import com.obj.nc.utils.JsonUtils;
 import lombok.Data;
 
 @Data
-public class BaseJSONObject {
+public class BaseJSONObject implements Cloneable {
 
 	private Map<String, Object> attributes = new HashMap<String, Object>();
 
@@ -72,6 +72,13 @@ public class BaseJSONObject {
 	
 	public void removeAttribute(String attributeName) {
 		attributes.remove(attributeName);
+	}
+	
+	@Override
+	public BaseJSONObject clone() throws CloneNotSupportedException {
+		BaseJSONObject baseJSONObject = (BaseJSONObject) super.clone();
+		baseJSONObject.attributes = new HashMap<>(attributes);
+		return baseJSONObject; // return deep copy
 	}
 
 }

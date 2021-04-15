@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @JsonTypeName(AggregatedEmailContent.JSON_TYPE_IDENTIFIER)
-public class AggregatedEmailContent extends EmailContent {
+public class AggregatedEmailContent extends EmailContent implements Cloneable {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "AGGREGATED_EMAIL_MESSAGE_CONTENT";
 
@@ -29,6 +29,13 @@ public class AggregatedEmailContent extends EmailContent {
     	Optional<EmailContent> simpleContent = aggregateContent.stream().reduce(EmailContent::concat);
 		return simpleContent
 				.orElseThrow(() -> new IllegalStateException("Failed to build message content"));
+    }
+    
+    @Override
+    public AggregatedEmailContent clone() throws CloneNotSupportedException {
+        AggregatedEmailContent clone = (AggregatedEmailContent) super.clone();
+        clone.aggregateContent = new ArrayList<>(aggregateContent);
+        return clone; // return deep copy
     }
 
 }
