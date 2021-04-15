@@ -6,9 +6,9 @@ import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.flows.testmode.mailchimp.dto.*;
 import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig;
-import com.obj.nc.koderia.dto.mailchimp.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;

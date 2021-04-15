@@ -2,10 +2,10 @@ package com.obj.nc.koderia.mapper;
 
 import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.flows.testmode.mailchimp.dto.AttachmentDto;
+import com.obj.nc.flows.testmode.mailchimp.dto.MergeVarDto;
 import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
-import com.obj.nc.koderia.dto.mailchimp.*;
 
-import com.obj.nc.utils.JsonUtils;
 import org.springframework.stereotype.Component;
 
 import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;

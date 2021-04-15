@@ -1,4 +1,4 @@
-package com.obj.nc.koderia.dto.mailchimp;
+package com.obj.nc.flows.testmode.mailchimp.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

@@ -9,13 +9,12 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
-import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
-import com.obj.nc.koderia.dto.mailchimp.SendMessageWithTemplateDto;
+import com.obj.nc.flows.testmode.mailchimp.dto.MessageResponseDto;
+import com.obj.nc.flows.testmode.mailchimp.dto.SendMessageWithTemplateDto;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapper;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapperAggregateImpl;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl;
-import com.obj.nc.koderia.services.MailchimpClient;
-import lombok.AllArgsConstructor;
+import com.obj.nc.functions.processors.senders.MailchimpSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +34,7 @@ import static com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpS
 
 @Component
 @DocumentProcessingInfo("SendMailchimpMessage")
-public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<Message, Message> implements MailchimpClient {
+public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<Message, Message> implements MailchimpSender {
 	@Qualifier(MAILCHIMP_REST_TEMPLATE)
 	@Autowired private RestTemplate restTemplate;
 	@Qualifier(MailchimpMessageMapperImpl.COMPONENT_NAME)
@@ -93,7 +92,6 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 		return Arrays.stream(responseBody).collect(Collectors.toList());
 	}
 	
-	@Override
 	public RestTemplate getRestTemplate() {
 		return restTemplate;
 	}

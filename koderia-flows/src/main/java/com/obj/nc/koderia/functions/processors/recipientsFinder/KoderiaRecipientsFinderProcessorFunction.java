@@ -11,7 +11,6 @@ import com.obj.nc.koderia.dto.koderia.recipients.RecipientDto;
 import com.obj.nc.koderia.dto.koderia.recipients.RecipientsQueryDto;
 import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import com.obj.nc.koderia.mapper.RecipientMapper;
-import com.obj.nc.koderia.services.KoderiaClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +30,7 @@ import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRe
 
 @Component
 @DocumentProcessingInfo("KoderiaRecipientsFinder")
-public class KoderiaRecipientsFinderProcessorFunction extends ProcessorFunctionAdapter<NotificationIntent, NotificationIntent> implements KoderiaClient {
+public class KoderiaRecipientsFinderProcessorFunction extends ProcessorFunctionAdapter<NotificationIntent, NotificationIntent> {
 	@Qualifier(KODERIA_REST_TEMPLATE)
 	@Autowired private RestTemplate restTemplate;
 	@Autowired private RecipientMapper recipientMapper;
@@ -66,7 +65,6 @@ public class KoderiaRecipientsFinderProcessorFunction extends ProcessorFunctionA
 		return payload;
 	}
 	
-	@Override
 	public List<RecievingEndpoint> findReceivingEndpoints(RecipientsQueryDto query) {
 		ResponseEntity<RecipientDto[]> responseEntity = restTemplate.postForEntity(RECIPIENTS_PATH, query, RecipientDto[].class);
 		if (responseEntity.getBody() == null) {
@@ -75,7 +73,6 @@ public class KoderiaRecipientsFinderProcessorFunction extends ProcessorFunctionA
 		return Arrays.stream(responseEntity.getBody()).map(recipientMapper::map).collect(Collectors.toList());
 	}
 	
-	@Override
 	public RestTemplate getRestTemplate() {
 		return restTemplate;
 	}

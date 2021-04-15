@@ -15,7 +15,7 @@ import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import com.obj.nc.koderia.KoderiaFlowsApplication;
 import com.obj.nc.koderia.dto.koderia.recipients.RecipientDto;
 import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
-import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
+import com.obj.nc.flows.testmode.mailchimp.dto.MessageResponseDto;
 import com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig;
 import com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderProcessorFunction;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
