@@ -1,23 +1,14 @@
 package com.obj.nc.koderia.integration;
 
-import static com.obj.nc.flows.config.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_ID;
-import static com.obj.nc.flows.config.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.koderia.flows.KoderiaNotificationIntentProcessingFlowConfig.KODERIA_INTENT_PROCESSING_FLOW_ID;
+import static com.obj.nc.koderia.flows.KoderiaNotificationIntentProcessingFlowConfig.KODERIA_INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.koderia.integration.CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.RECEIVED_TEST_LIST;
 
-import com.obj.nc.config.InjectorConfiguration;
-import com.obj.nc.config.JdbcConfiguration;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig;
-import com.obj.nc.flows.inputEventRouting.config.InputEventRoutingProperties;
-import com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
-import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
-import com.obj.nc.koderia.KoderiaFlowsApplication;
 import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import com.obj.nc.utils.JsonUtils;
 import org.awaitility.Awaitility;
@@ -34,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
+import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.test.annotation.DirtiesContext;
@@ -47,29 +39,17 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest(
-	properties = {
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
+@SpringBootTest(properties = {
 			"nc.flows.input-evet-routing.type=FLOW_ID", 
 			"spring.main.allow-bean-definition-overriding=true"
-	}, classes = {
-			KoderiaFlowsApplication.class, 
-			InputEventRoutingFlowConfig.class, 
-			InjectorConfiguration.class, 
-			InputEventRoutingProperties.class,
-			JdbcConfiguration.class,
-			GenericEventToNotificaitonIntentConverter.class,
-			PaylaodLoggerSinkConsumer.class,
-			ValidateAndGenerateEventIdProcessingFunction.class,
-			MessagesFromNotificationIntentProcessingFunction.class,
-			CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.class,
-			GenericEventPersisterConsumer.class
 })
 @DirtiesContext
 public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 	
+	@Autowired private GenericEventPersisterConsumer persister;
 	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 	@Autowired private SourcePollingChannelAdapter pollableSource;
-	@Autowired private GenericEventPersisterConsumer persister;
 	@Qualifier(RECEIVED_TEST_LIST)
 	@Autowired private List<Message<?>> received;
 	
@@ -111,10 +91,10 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 			return new ArrayList<>();
 		}
 		
-		@Bean(INTENT_PROCESSING_FLOW_ID)
+		@Bean(KODERIA_INTENT_PROCESSING_FLOW_ID)
 		public IntegrationFlow intentProcessingFlowDefinition() {
 			return IntegrationFlows
-					.from(INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+					.from(KODERIA_INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 					.handle((MessageHandler) received()::add)
 					.get();
 		}

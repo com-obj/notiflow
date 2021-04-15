@@ -15,7 +15,6 @@ import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIn
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import com.obj.nc.koderia.KoderiaFlowsApplication;
-import com.obj.nc.koderia.dto.koderia.event.JobPostKoderiaEventDto;
 import com.obj.nc.koderia.dto.koderia.recipients.RecipientDto;
 import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
@@ -62,25 +61,12 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest(
-	properties = {
-			"nc.flows.input-evet-routing.type=FLOW_ID", 
-			"spring.main.allow-bean-definition-overriding=true"
-	}, classes = {
-			KoderiaFlowsApplication.class, 
-			InputEventRoutingFlowConfig.class, 
-			InjectorConfiguration.class, 
-			InputEventRoutingProperties.class,
-			JdbcConfiguration.class,
-			GenericEventToNotificaitonIntentConverter.class,
-			PaylaodLoggerSinkConsumer.class,
-			ValidateAndGenerateEventIdProcessingFunction.class,
-			MessagesFromNotificationIntentProcessingFunction.class,
-			NotificationIntentProcessingFlowTest.MockNextFlowTestConfiguration.class,
-			GenericEventPersisterConsumer.class
+@SpringBootTest(properties = {
+		"nc.flows.input-evet-routing.type=FLOW_ID",
+		"spring.main.allow-bean-definition-overriding=true"
 })
 @DirtiesContext
-public class NotificationIntentProcessingFlowTest extends BaseIntegrationTest {
+public class KoderiaNotificationIntentProcessingFlowTest extends BaseIntegrationTest {
 	
 	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 	@Autowired private SourcePollingChannelAdapter pollableSource;

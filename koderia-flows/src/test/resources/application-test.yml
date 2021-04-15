@@ -1,12 +1,13 @@
 testEnv: local
 
 spring:
-  flyway.enabled: false
   mail:
     host: localhost
     port: 3025
     username: no-reply@objectify.sk
     password: xxx
+    properties:
+      mail.debug: true
   main.allow-bean-definition-overriding: true
 
 koderia.functions:

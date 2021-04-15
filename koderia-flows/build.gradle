@@ -55,6 +55,7 @@ dependencies {
     testCompile 'org.junit.platform:junit-platform-launcher'
     testCompile 'org.junit.platform:junit-platform-runner'
 
+    testImplementation 'com.icegreen:greenmail-junit5:1.6.0'
     testImplementation "org.testcontainers:testcontainers"
     testImplementation "org.testcontainers:junit-jupiter"
     testImplementation(testFixtures(project(":functions")))

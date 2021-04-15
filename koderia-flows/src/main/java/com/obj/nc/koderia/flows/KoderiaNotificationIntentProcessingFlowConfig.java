@@ -7,27 +7,34 @@ import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipient
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.messaging.MessageChannel;
 
-import static com.obj.nc.flows.config.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_ID;
-import static com.obj.nc.flows.config.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.koderia.flows.MaichimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 @Configuration
 @AllArgsConstructor
-public class NotificationIntentProcessingFlowConfig {
+public class KoderiaNotificationIntentProcessingFlowConfig {
+    
+    public final static String KODERIA_INTENT_PROCESSING_FLOW_ID = "KODERIA_INTENT_PROCESSING_FLOW_ID";
+    public final static String KODERIA_INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID = KODERIA_INTENT_PROCESSING_FLOW_ID + "_INPUT";
     
     private final ValidateAndGenerateEventIdProcessingFunction generateEventId;
     private final KoderiaMessageExtractorProcessorFunction messageExtractor;
     private final KoderiaRecipientsFinderProcessorFunction recipientsFinder;
     private final MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
     
-    @Bean(INTENT_PROCESSING_FLOW_ID)
-    public IntegrationFlow intentProcessingFlowDefinition() {
+    @Bean(KODERIA_INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+    public MessageChannel koderiaIntentProcessingInputChangel() {
+        return new PublishSubscribeChannel();
+    }
+    
+    @Bean(KODERIA_INTENT_PROCESSING_FLOW_ID)
+    public IntegrationFlow koderiaIntentProcessingFlowDefinition() {
         return IntegrationFlows
-                .from(INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+                .from(KODERIA_INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
                 .transform(generateEventId)
                 .transform(messageExtractor)
                 .transform(recipientsFinder)

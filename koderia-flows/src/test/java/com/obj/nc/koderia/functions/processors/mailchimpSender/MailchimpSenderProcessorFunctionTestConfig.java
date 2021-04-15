@@ -9,10 +9,9 @@ import com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl;
 
 @TestConfiguration
 @Import({
-        MailchimpSenderProcessorFunction.class,
+        MailchimpSenderConfig.class,
         MailchimpMessageMapperImpl.class,
         MailchimpMessageMapperAggregateImpl.class
 })
-@EnableConfigurationProperties(MailchimpSenderConfig.class)
 public class MailchimpSenderProcessorFunctionTestConfig {
 }

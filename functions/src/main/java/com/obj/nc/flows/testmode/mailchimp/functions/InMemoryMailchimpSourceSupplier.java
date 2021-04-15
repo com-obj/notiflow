@@ -8,13 +8,13 @@ import com.obj.nc.functions.sources.SourceSupplierAdapter;
 
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Queue;
 
 public class InMemoryMailchimpSourceSupplier extends SourceSupplierAdapter<Message> {
     
     public static final String ORIGINAL_RECIPIENTS_EMAIL_ATTR_NAME = "ORIGINAL_RECIPIENTS_EMAIL";
-    public static final String ORIGINAL_RECIPIENTS_NAME_ATTR_NAME = "ORIGINAL_RECIPIENTS_NAME";
     
-    private final LinkedList<Message> recieved = new LinkedList<Message>();
+    private final Queue<Message> received = new LinkedList<Message>();
     
     @Override
     protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
@@ -23,27 +23,19 @@ public class InMemoryMailchimpSourceSupplier extends SourceSupplierAdapter<Messa
     
     @Override
     protected Message execute() {
-        if (recieved.isEmpty()) {
+        if (received.isEmpty()) {
             return null;
         }
         
-        Message mailchimpMessage = recieved.getFirst();
-        
+        Message mailchimpMessage = received.poll();
         EmailEndpoint recipient = (EmailEndpoint) mailchimpMessage.getBody().getRecievingEndpoints().iterator().next();
-        
         EmailContent content = mailchimpMessage.getContentTyped();
         content.setAttributeValue(ORIGINAL_RECIPIENTS_EMAIL_ATTR_NAME, recipient.getEmail());
-        if (recipient.getRecipient()!=null) {
-            content.setAttributeValue(ORIGINAL_RECIPIENTS_NAME_ATTR_NAME, recipient.getRecipient().getName());
-        }
-        
-        recieved.removeFirst();
-        
         return mailchimpMessage;
     }
     
     public void recieve(Message msg) {
-        recieved.addLast(msg);
+        received.add(msg);
     }
     
 }

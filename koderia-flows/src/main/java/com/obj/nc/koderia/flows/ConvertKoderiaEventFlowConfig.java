@@ -4,13 +4,12 @@ import com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIn
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
-import static com.obj.nc.flows.config.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.koderia.flows.KoderiaNotificationIntentProcessingFlowConfig.KODERIA_INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 @Configuration
 @AllArgsConstructor
@@ -32,7 +31,7 @@ public class ConvertKoderiaEventFlowConfig {
                 .from(CONVERT_KODERIA_EVENT_FLOW_INPUT_CHANNEL_ID)
                 .transform(eventConverter)
                 .split()
-                .channel(INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+                .channel(KODERIA_INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
                 .get();
     }
     

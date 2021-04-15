@@ -3,7 +3,7 @@ package com.obj.nc.flows.testmode.mailchimp.config;
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.config.TestModeFlowConfig;
 import com.obj.nc.flows.testmode.mailchimp.functions.InMemoryMailchimpSourceSupplier;
-import com.obj.nc.functions.processors.senders.SmsSender;
+import com.obj.nc.functions.processors.senders.MailchimpSender;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-@ConditionalOnBean(SmsSender.class)
+@ConditionalOnBean(MailchimpSender.class)
 @Log4j2
 public class TestModeMailchimpFlowConfig {
 	

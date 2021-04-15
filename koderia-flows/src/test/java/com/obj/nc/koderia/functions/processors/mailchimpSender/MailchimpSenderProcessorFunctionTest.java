@@ -7,6 +7,7 @@ import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.flows.testmode.mailchimp.dto.MessageResponseDto;
+import com.obj.nc.functions.processors.senders.MailchimpSender;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;

@@ -3,7 +3,9 @@ package com.obj.nc.flows.intenToMessageToSender;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
+import com.obj.nc.functions.processors.senders.SmsSender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -17,6 +19,7 @@ import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIn
 import com.obj.nc.functions.sink.deliveryInfoPersister.DeliveryInfoPersister;
 
 @Configuration
+@ConditionalOnBean(SmsSender.class) // ked nie je definovany SmsSender, Spring nemoze vytvorit flow SMS_PROCESSING_FLOW_ID a teda neda sa routovat do SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID
 public class NotificationIntentProcessingFlowConfig {
 		
 //	@Autowired private GenerateEventIdProcessingFunction generateEventId;

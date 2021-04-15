@@ -1,5 +1,7 @@
 package com.obj.nc.koderia.functions.processors.mailchimpSender;
 
+import com.obj.nc.functions.processors.senders.MailchimpSender;
+import com.obj.nc.functions.processors.senders.SmsSender;
 import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
 import lombok.Data;
 import lombok.Getter;
@@ -81,4 +83,10 @@ public class MailchimpSenderConfig {
                         })
                 .build();
     }
+    
+    @Bean
+    public MailchimpSender mailchimpSender() {
+        return new MailchimpSenderProcessorFunction();
+    }
+    
 }

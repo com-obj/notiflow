@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderConfig.*;
 
-@Component
 @DocumentProcessingInfo("SendMailchimpMessage")
 public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<Message, Message> implements MailchimpSender {
 	@Qualifier(MAILCHIMP_REST_TEMPLATE)
@@ -80,7 +79,6 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 		return payload;
 	}
 	
-	@Override
 	public List<MessageResponseDto> sendMessageWithTemplate(SendMessageWithTemplateDto sendMessageDto) {
 		ResponseEntity<MessageResponseDto[]> responseEntity = restTemplate.postForEntity(SEND_TEMPLATE_PATH, sendMessageDto, MessageResponseDto[].class);
 		MessageResponseDto[] responseBody = responseEntity.getBody();

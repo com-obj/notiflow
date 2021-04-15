@@ -10,6 +10,7 @@ import com.obj.nc.flows.inputEventRouting.config.InputEventRoutingProperties;
 import com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter;
 import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
+import com.obj.nc.functions.processors.senders.MailchimpSender;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import com.obj.nc.koderia.KoderiaFlowsApplication;
@@ -61,21 +62,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = LOG_CONSUMER_HANDLER_ID)
-@SpringBootTest(
-	properties = {
-			"nc.flows.input-evet-routing.type=FLOW_ID", 
-			"spring.main.allow-bean-definition-overriding=true"
-	}, classes = {
-			KoderiaFlowsApplication.class, 
-			InputEventRoutingFlowConfig.class, 
-			InjectorConfiguration.class, 
-			InputEventRoutingProperties.class,
-			JdbcConfiguration.class,
-			GenericEventToNotificaitonIntentConverter.class,
-			PaylaodLoggerSinkConsumer.class,
-			ValidateAndGenerateEventIdProcessingFunction.class,
-			MessagesFromNotificationIntentProcessingFunction.class,
-			GenericEventPersisterConsumer.class
+@SpringBootTest(properties = {
+		"nc.flows.input-evet-routing.type=FLOW_ID",
+		"spring.main.allow-bean-definition-overriding=true"
 })
 @DirtiesContext
 public class MailchimpProcessingFlowTest extends BaseIntegrationTest {

@@ -7,8 +7,9 @@ import org.springframework.context.annotation.Import;
 
 @TestConfiguration
 @Import({
-        MailchimpMessageMapperImpl.class
+        MailchimpSenderConfig.class,
+        MailchimpMessageMapperImpl.class,
+        MailchimpMessageMapperAggregateImpl.class
 })
-@EnableConfigurationProperties(MailchimpSenderConfig.class)
 class MailchimpMessageMapperImplTestConfig {
 }

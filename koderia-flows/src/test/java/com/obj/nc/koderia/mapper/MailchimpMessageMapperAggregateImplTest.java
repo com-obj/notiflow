@@ -22,7 +22,6 @@ import java.io.IOException;
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest
 @Import(MailchimpMessageMapperAggregateImplTestConfig.class)
-@ContextConfiguration(classes = KoderiaFlowsApplication.class)
 class MailchimpMessageMapperAggregateImplTest {
 
     public static final String MESSAGE_JSON_PATH = "mailchimp/aggregate_message.json";
