@@ -186,6 +186,11 @@ public class JsonUtils {
 	    return d;
 	}
 	
+	//only for tests
+	public static void resetObjectMapper( ) {
+		instance = null;
+	}
+	
 	public static ObjectMapper getObjectMapper() {
 		if (instance == null) {
 			instance = new ObjectMapper();

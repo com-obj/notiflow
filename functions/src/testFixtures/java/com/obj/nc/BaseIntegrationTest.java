@@ -38,7 +38,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     
     public static void purgeNotifTables(@Autowired JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
-        jdbcTemplate.batchUpdate("delete from nc_event_2_endpoint_delivery");
+        jdbcTemplate.batchUpdate("delete from nc_delivery_info");
         jdbcTemplate.batchUpdate("delete from nc_endpoint");        
         jdbcTemplate.batchUpdate("delete from nc_event");              
     }

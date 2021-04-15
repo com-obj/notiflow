@@ -148,9 +148,7 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
 				dest.setEventIds(eventUUIDs);
 			} else if (header.getName().equals(EmailSender.NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "FLOW_ID")) {
 				dest.setFlowId(header.getValue());
-			} else if (header.getName().equals(EmailSender.NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "MSG_ID")) {
-				dest.setId(UUID.fromString(header.getValue()));
-			}
+			} 
 			dest.setAttributeValue(header.getName(), header.getValue());
 		}
 	}

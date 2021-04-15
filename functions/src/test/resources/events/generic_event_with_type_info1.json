@@ -1,7 +1,7 @@
 {
    
    "str":"xxx",
-   "int": 1,
+   "num": 1,
    "@type": "TYPE_1"
 
 }

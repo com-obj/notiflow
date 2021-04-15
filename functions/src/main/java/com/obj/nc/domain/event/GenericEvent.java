@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.relational.core.mapping.event.AfterLoadCallback;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.HasFlowId;
@@ -18,6 +19,7 @@ import com.obj.nc.domain.headers.Header;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +33,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table("nc_event")
-public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayload, HasHeader {
+@Builder
+public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayload, HasHeader, AfterLoadCallback<GenericEvent> {
 	
 	//TODO: do not duplicate, use from header
 	@Id
@@ -48,7 +51,7 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	private Instant timeConsumed;
 	
 	@Transient
-	protected Header header = new Header();
+	protected Header header;
 	
 	public static GenericEvent from(JsonNode state) {
 		GenericEvent event = new GenericEvent();
@@ -56,8 +59,7 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 		event.flowId = state.get("flowId")!=null?state.get("flowId").textValue():"default-flow";
 		event.externalId = state.get("externalId")!=null?state.get("externalId").textValue():null;
 		
-		event.header.generateAndSetID();
-		event.id = event.header.getId();
+		event.id = UUID.randomUUID();
 
 		event.syncHeaderFields();
 		
@@ -65,17 +67,16 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	}
 	
 	public void syncHeaderFields() {
-		header.setId(id);
-		header.setFlowId(flowId);
-		header.addEventId(id);
+		getHeader().setFlowId(flowId);
+		getHeader().addEventId(id);
 	}
 	
 	public String getFlowId() {
-		return header.getFlowId();
+		return flowId;
 	}
 
 	public void setFlowId(String flowId) {
-		header.setFlowId(flowId);
+		getHeader().setFlowId(flowId);
 		this.flowId = flowId;
 	}
 	
@@ -100,8 +101,22 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 		return timeCreated == null;
 	}
 	
+	public Header getHeader() {
+		if (header==null) {
+			header = new Header();
+		}
+		return header;
+	}
+	
 	public <T extends IsTypedJson> T getPayloadAsPojo() {
 		return (T)JsonUtils.readObjectFromJSON(payloadJson, IsTypedJson.class);
+	}
+
+	@Override
+	//TODO: need to register
+	public GenericEvent onAfterLoad(GenericEvent aggregate) {
+		aggregate.syncHeaderFields();
+		return aggregate;
 	}
 	
 }

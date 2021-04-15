@@ -3,6 +3,8 @@ package com.obj.nc.controllers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
+
 import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,7 +62,7 @@ class EventReceiverTest extends BaseIntegrationTest {
 			.andExpect(jsonPath("$.ncEventId").value(CoreMatchers.notNullValue()));
         
         String eventId = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.ncEventId");
-        GenericEvent genericEvent = genericEventRepository.findById(eventId).get();
+        GenericEvent genericEvent = genericEventRepository.findById(UUID.fromString(eventId)).get();
         
         Assertions.assertThat(genericEvent).isNotNull();
     }
@@ -121,7 +123,7 @@ class EventReceiverTest extends BaseIntegrationTest {
 			.andExpect(jsonPath("$.ncEventId").value(CoreMatchers.notNullValue()));
         
         String eventId = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.ncEventId");
-        GenericEvent genericEvent = genericEventRepository.findById(eventId).get();
+        GenericEvent genericEvent = genericEventRepository.findById(UUID.fromString(eventId)).get();
         
         Assertions.assertThat(genericEvent.getExternalId()).isEqualTo("EXTERNAL_ID_OVERRIDE");
         Assertions.assertThat(genericEvent.getFlowId()).isEqualTo("FLOW_ID_OVERRIDE");
@@ -146,7 +148,7 @@ class EventReceiverTest extends BaseIntegrationTest {
         	.andExpect(status().is2xxSuccessful());
         
         String eventId = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.ncEventId");
-        GenericEvent genericEvent = genericEventRepository.findById(eventId).get();
+        GenericEvent genericEvent = genericEventRepository.findById(UUID.fromString(eventId)).get();
         
         Assertions.assertThat(genericEvent.getFlowId()).isEqualTo("FLOW_ID");
     }
@@ -170,7 +172,7 @@ class EventReceiverTest extends BaseIntegrationTest {
         	.andExpect(status().is2xxSuccessful());
         
         String eventId = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.ncEventId");
-        GenericEvent genericEvent = genericEventRepository.findById(eventId).get();
+        GenericEvent genericEvent = genericEventRepository.findById(UUID.fromString(eventId)).get();
         
         Assertions.assertThat(genericEvent.getExternalId()).isEqualTo("EXTERNAL_ID");
     }

@@ -16,7 +16,7 @@ import com.obj.nc.domain.endpoints.DeliveryOptions.TIME_CONSTRAINT_TYPE;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
+import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
 
 class MessagesFromIntentTest {
@@ -28,8 +28,8 @@ class MessagesFromIntentTest {
 		String INPUT_JSON_FILE = "events/direct_message.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
-		ValidateAndGenerateEventIdProcessingFunction generateEventfunction = new ValidateAndGenerateEventIdProcessingFunction();
-		notificationIntent = generateEventfunction.apply(notificationIntent);
+		GenerateEventIdProcessingFunction generateEventfunction = new GenerateEventIdProcessingFunction();
+		notificationIntent = (NotificationIntent)generateEventfunction.apply(notificationIntent);
 		
 		//WHEN
 		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
@@ -61,9 +61,9 @@ class MessagesFromIntentTest {
 		String INPUT_JSON_FILE = "events/delivery_options.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
-		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction();
+		GenerateEventIdProcessingFunction funciton = new GenerateEventIdProcessingFunction();
 
-		notificationIntent = funciton.apply(notificationIntent);
+		notificationIntent = (NotificationIntent)funciton.apply(notificationIntent);
 		
 		//WHEN
 		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
@@ -100,9 +100,9 @@ class MessagesFromIntentTest {
 		String INPUT_JSON_FILE = "events/direct_message_attachements.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
-		ValidateAndGenerateEventIdProcessingFunction funciton = new ValidateAndGenerateEventIdProcessingFunction();
+		GenerateEventIdProcessingFunction funciton = new GenerateEventIdProcessingFunction();
 
-		notificationIntent = funciton.apply(notificationIntent);
+		notificationIntent = (NotificationIntent)funciton.apply(notificationIntent);
 		
 		//WHEN
 		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();

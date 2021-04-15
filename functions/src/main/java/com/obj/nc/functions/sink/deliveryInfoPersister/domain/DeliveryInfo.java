@@ -1,14 +1,16 @@
-package com.obj.nc.domain.event;
+package com.obj.nc.functions.sink.deliveryInfoPersister.domain;
 
 import java.time.Instant;
 import java.util.UUID;
 
-import org.springframework.data.annotation.CreatedDate;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,28 +23,31 @@ import lombok.ToString;
 @EqualsAndHashCode(of = "id")
 @AllArgsConstructor
 @NoArgsConstructor
-@Table("nc_event_2_endpoint_delivery")
-public class Event2EnpointDelivery implements Persistable<UUID> {
+@Table("nc_delivery_info")
+@Builder(toBuilder=true)
+public class DeliveryInfo {
 	
 	public static enum DELIVERY_STATUS {
-		DELIVERED
+		PROCESSING, DELIVERED, FAILED
 	}
 
+	@NotNull
 	@Id
 	private UUID id;
-
-	@CreatedDate
-	private Instant timeCreated;
 	
-	private DELIVERY_STATUS[] status;
-	private Instant daliveredOn;
+	@Version
+	private Integer version;
 	
-	private UUID[] eventIds;
+	@NotNull
+	private DELIVERY_STATUS status;
 	
+	@NotNull
+	private Instant processedOn;
+	
+	@NotNull
+	private UUID eventId;
+	
+	@NotNull
 	private String endpointId;
 	
-	@Override
-	public boolean isNew() {
-		return timeCreated == null;
-	}
 }

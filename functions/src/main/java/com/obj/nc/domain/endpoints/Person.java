@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor
+@Builder
 public class Person extends Recipient{
 	
 	public static final String JSON_TYPE_IDENTIFIER = "PERSON";

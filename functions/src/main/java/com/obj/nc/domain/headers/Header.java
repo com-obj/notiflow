@@ -30,9 +30,9 @@ public class Header extends BaseJSONObject implements HasFlowId {
 	@JsonProperty("flow-id")
 	private String flowId;
 		
-	@NotNull
-	@Include
-	private UUID id;
+//	@NotNull
+//	@Include
+//	private UUID id;
 	
 	@NotNull
 	@Include
@@ -40,9 +40,9 @@ public class Header extends BaseJSONObject implements HasFlowId {
 	
 	protected ProcessingInfo processingInfo;
 
-	public void generateAndSetID() {
-		id = generateUUID();
-	}
+//	public void generateAndSetID() {
+//		id = generateUUID();
+//	}
 
 	public void copyHeaderFrom(Header header) {
 		if (header == null) {
@@ -58,10 +58,10 @@ public class Header extends BaseJSONObject implements HasFlowId {
 		merged.setAttributes(this.getAttributes());
 		other.getAttributes().forEach((key, value) -> merged.getAttributes().putIfAbsent(key, value));
 
-		merged.flowId = flowId;
-		merged.generateAndSetID();
+		merged.flowId = other.flowId;
+//		merged.generateAndSetID();
 
-		merged.eventIds = eventIds;
+		merged.eventIds = other.eventIds;
 		merged.eventIds.addAll(other.getEventIds());
 
 		return merged;
@@ -75,6 +75,10 @@ public class Header extends BaseJSONObject implements HasFlowId {
 
 	public void addEventId(UUID eventId) {
 		eventIds.add(eventId);
+	}
+	
+	public UUID[] getEventIdsAsArray() {
+		return eventIds.toArray(new UUID[0]);
 	}
 
 }

@@ -1,14 +1,16 @@
-DROP INDEX ndx_endpoint_processing;
+DROP table nc_endpoint_processing;
 
-ALTER TABLE nc_endpoint_processing RENAME TO nc_event_2_endpoint_delivery;
-ALTER TABLE nc_event_2_endpoint_delivery DROP COLUMN processing_id;
+CREATE TABLE nc_delivery_info (
+	endpoint_id varchar(100) NULL,
+	status varchar NULL,
+	dalivered_on timestamptz NULL,
+	id uuid NOT NULL,
+	event_id uuid NULL,
+	CONSTRAINT nc_event_2_endpoint_delivery_pk PRIMARY KEY (id)
+);
 
-ALTER TABLE nc_event_2_endpoint_delivery ADD event_ids UUID[];
-ALTER TABLE nc_event_2_endpoint_delivery ADD status varchar[];
-ALTER TABLE nc_event_2_endpoint_delivery ADD dalivered_on timestamp with time ZONE;
+ALTER TABLE nc_delivery_info ADD "version" int NULL;
 
-alter table nc_event_2_endpoint_delivery add id UUID;
-ALTER TABLE nc_event_2_endpoint_delivery ADD CONSTRAINT nc_event_2_endpoint_delivery_pk PRIMARY KEY (id);
+ALTER TABLE nc_delivery_info RENAME COLUMN dalivered_on TO processed_on;
 
-alter table nc_input 
-add COLUMN time_created timestamptz;
+ALTER TABLE nc_endpoint RENAME COLUMN endpoint_name TO endpoint_id;

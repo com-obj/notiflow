@@ -121,7 +121,7 @@ public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {
     }
 
     protected RecipientDto mapRecipient(RecievingEndpoint endpoint) {
-        if (!EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointTypeName())) {
+        if (!EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType())) {
             throw new UnsupportedOperationException("Mapper can only map EmailContent endpoint");
         }
 

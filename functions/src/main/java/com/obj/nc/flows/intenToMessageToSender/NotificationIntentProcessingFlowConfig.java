@@ -1,7 +1,7 @@
-package com.obj.nc.flows.config;
+package com.obj.nc.flows.intenToMessageToSender;
 
-import static com.obj.nc.flows.config.EmailProcessingFlowConfig.EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.config.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,13 +12,12 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
 
 @Configuration
 public class NotificationIntentProcessingFlowConfig {
 		
-	@Autowired private ValidateAndGenerateEventIdProcessingFunction generateEventId;
+//	@Autowired private GenerateEventIdProcessingFunction generateEventId;
 	@Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
 		
 	public final static String INTENT_PROCESSING_FLOW_ID = "INTENT_PROCESSING_FLOW_ID";
@@ -33,7 +32,7 @@ public class NotificationIntentProcessingFlowConfig {
 	public IntegrationFlow intentProcessingFlowDefinition() {
 		return IntegrationFlows
 				.from(intentProcessingInputChangel())
-				.transform(generateEventId)
+//				.transform(generateEventId)
 				.transform(generateMessagesFromEvent)
 				.split()
 				.routeToRecipients(spec -> spec.

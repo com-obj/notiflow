@@ -98,27 +98,21 @@ public class IntegrationTests extends BaseIntegrationTest {
 		MatcherAssert.assertThat(step1.get("step_name"), CoreMatchers.equalTo("FindRecepientsUsingKoderiaSubsription"));
 
 		Map<String, Object> step2 = journaledRows.get(2);
-		MatcherAssert.assertThat(step2.get("payload_id"), CoreMatchers.equalTo(message1.getHeader().getId()));
 		MatcherAssert.assertThat(step2.get("step_name"), CoreMatchers.equalTo("CreateMessagesFromEvent"));
 
 		Map<String, Object> step3 = journaledRows.get(3);
-		MatcherAssert.assertThat(step3.get("payload_id"), CoreMatchers.equalTo(message1.getHeader().getId()));
 		MatcherAssert.assertThat(step3.get("step_name"), CoreMatchers.equalTo("SendEmail"));
 
 		Map<String, Object> step4 = journaledRows.get(4);
-		MatcherAssert.assertThat(step4.get("payload_id"), CoreMatchers.equalTo(message2.getHeader().getId()));
 		MatcherAssert.assertThat(step4.get("step_name"), CoreMatchers.equalTo("CreateMessagesFromEvent"));
 
 		Map<String, Object> step5 = journaledRows.get(5);
-		MatcherAssert.assertThat(step5.get("payload_id"), CoreMatchers.equalTo(message2.getHeader().getId()));
 		MatcherAssert.assertThat(step5.get("step_name"), CoreMatchers.equalTo("SendEmail"));
 
 		Map<String, Object> step6 = journaledRows.get(6);
-		MatcherAssert.assertThat(step6.get("payload_id"), CoreMatchers.equalTo(message3.getHeader().getId()));
 		MatcherAssert.assertThat(step6.get("step_name"), CoreMatchers.equalTo("CreateMessagesFromEvent"));
 
 		Map<String, Object> step7 = journaledRows.get(7);
-		MatcherAssert.assertThat(step7.get("payload_id"), CoreMatchers.equalTo(message3.getHeader().getId()));
 		MatcherAssert.assertThat(step7.get("step_name"), CoreMatchers.equalTo("SendEmail"));
 	}
 

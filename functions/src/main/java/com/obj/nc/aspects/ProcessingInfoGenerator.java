@@ -11,13 +11,17 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.Message;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.headers.NewProcessingInfoAppEvent;
 import com.obj.nc.domain.headers.ProcessingInfo;
+import com.obj.nc.repositories.ProcessingInfoRepository;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -43,6 +47,8 @@ public class ProcessingInfoGenerator {
 	
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    private ProcessingInfoRepository piRepo;
 	
 	@Around("endpointExecutions()")
 	public Object updateProcessingInfoOnPayload(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -80,12 +86,12 @@ public class ProcessingInfoGenerator {
 		ProcessingInfo startProcessing = startProcessingInfos.size()==1? startProcessingInfos.get(0): null;
 		Header startHeader = startPayloadAndHeaders.size()==1? startPayloadAndHeaders.get(0).getKey(): null;
 	    
-		List<Header> endHeaders = calculateEndProcessingInfos(endPayloadAndHeaders, startProcessing, startHeader);
+		List<Header> endHeaders = calculateEndHeaders(endPayloadAndHeaders, startProcessing, startHeader);
 		
 		endHeaders.forEach( h-> {
-				NewProcessingInfoAppEvent event = new NewProcessingInfoAppEvent(h);
+				NewProcessingInfoAppEvent event = new NewProcessingInfoAppEvent(h.getProcessingInfo());
 				event.setReady(true);
-				applicationEventPublisher.publishEvent(new NewProcessingInfoAppEvent(h));
+				applicationEventPublisher.publishEvent(event);
 			}
 		);
 		
@@ -96,20 +102,31 @@ public class ProcessingInfoGenerator {
 	private List<ProcessingInfo> calculateStartProcessingInfos(String stepName,
 			List<ImmutablePair<Header, Object>> startPayloadAndHeaders) {
 		List<ProcessingInfo> startProcessingInfos = new ArrayList<>();
+		
+		if (startPayloadAndHeaders.size() == 0) {
+			//suppliers
+			
+			ProcessingInfo startProcessing = ProcessingInfo.createProcessingInfoOnStepStart(
+		    		stepName, null, null);
+			
+			startProcessingInfos.add(startProcessing);
+			return startProcessingInfos;
+		}
+		
+		//oters
 		for (ImmutablePair<Header, Object> startPayloadAndHeader: startPayloadAndHeaders) {
 			 Object startPayload = startPayloadAndHeader.getRight();
 			 Header startHeader = startPayloadAndHeader.getLeft();
 			    
 		    ProcessingInfo startProcessing = ProcessingInfo.createProcessingInfoOnStepStart(
-		    		stepName, startHeader, startPayload);
-		    startHeader.setProcessingInfo(startProcessing);
+		    		stepName, startHeader.getProcessingInfo(), startPayload);
 		    
 		    startProcessingInfos.add(startProcessing);
 		}
 		return startProcessingInfos;
 	}
 
-	private List<Header> calculateEndProcessingInfos(
+	private List<Header> calculateEndHeaders(
 			List<ImmutablePair<Header, Object>> endPayloadAndHeaders,
 			ProcessingInfo startProcessing, Header startHeader) {
 		
@@ -124,7 +141,6 @@ public class ProcessingInfoGenerator {
 			boolean startAndEndBeanDifferent = startHeader != endHeader;
 			if (startAndEndBeanDifferent) {
 				endHeader.copyHeaderFrom(startHeader);
-				endHeader.generateAndSetID();
 			}
 			    
 			ProcessingInfo endProcessing = ProcessingInfo.createProcessingInfoOnStepEnd(
@@ -134,7 +150,7 @@ public class ProcessingInfoGenerator {
 		    lastProcInfo = endProcessing;
 		}
 		
-		String duration = lastProcInfo!=null ? lastProcInfo.getDurationInMs()+"" : "N/A";
+		String duration = lastProcInfo!=null ? lastProcInfo.getStepDurationMs()+"" : "N/A";
 		
 		log.info("Processing finished for step {}. Took {} ms", startProcessing.getStepName(), duration);
 		
@@ -167,12 +183,26 @@ public class ProcessingInfoGenerator {
 			List<ImmutablePair<Header, Object>> pairs = extractPayloads(springMessage.getPayload());
 			
 			result.addAll(pairs);
-		}
+		} else {
 		//Add other options if needed
-		
-		log.warn("Cannot calculate processing info for return value fo type {}", input.getClass() );
+			log.warn("Cannot calculate processing info for return value fo type {}", input.getClass() );
+		}
+
 		return result;
 	}
+	
+	
+    @Async
+    @EventListener
+	public void persistPIFromEvent(@Validated NewProcessingInfoAppEvent event) {
+		log.debug("Recieved NewProcessingInfoAppEvent: {}", event);
+		if (!event.isReady()) {
+			return;
+		}
+		
+		piRepo.save(event.getPi());
+	}
+
 
 
 

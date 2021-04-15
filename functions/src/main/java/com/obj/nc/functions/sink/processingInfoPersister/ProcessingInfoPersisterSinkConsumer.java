@@ -9,7 +9,7 @@ import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sink.SinkConsumerAdapter;
-import com.obj.nc.repositories.HeaderRepository;
+import com.obj.nc.repositories.ProcessingInfoRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,14 +17,15 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @AllArgsConstructor
 @Log4j2
+@Deprecated
 public class ProcessingInfoPersisterSinkConsumer extends SinkConsumerAdapter<BasePayload> {
 
     @Autowired
-    private HeaderRepository headerRepository ;
+    private ProcessingInfoRepository piRepo;
     
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(BasePayload payload) {
-		ProcessingInfo processingInfo = payload.getProcessingInfo();
+		ProcessingInfo processingInfo = payload.getHeader().getProcessingInfo();
 
 		if (processingInfo == null) {
 			return Optional.of(new PayloadValidationException("Could not persist ProcessingInfo because the payload didn't contain it. Payload: " + payload));
@@ -35,7 +36,7 @@ public class ProcessingInfoPersisterSinkConsumer extends SinkConsumerAdapter<Bas
 
 	@Override
 	protected void execute(BasePayload payload) {
-		headerRepository.persistPI(payload.getHeader());
+		piRepo.save(payload.getHeader().getProcessingInfo());
 	}
 	
 
