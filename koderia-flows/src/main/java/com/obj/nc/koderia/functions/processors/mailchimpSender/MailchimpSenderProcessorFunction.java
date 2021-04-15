@@ -9,8 +9,8 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
-import com.obj.nc.flows.testmode.mailchimp.dto.MessageResponseDto;
-import com.obj.nc.flows.testmode.mailchimp.dto.SendMessageWithTemplateDto;
+import com.obj.nc.dto.mailchimp.MessageResponseDto;
+import com.obj.nc.dto.mailchimp.SendMessageWithTemplateDto;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapper;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapperAggregateImpl;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl;
@@ -18,7 +18,6 @@ import com.obj.nc.functions.processors.senders.MailchimpSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;

@@ -1,4 +1,4 @@
-package com.obj.nc.flows.testmode.mailchimp.dto;
+package com.obj.nc.dto.mailchimp;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
