@@ -67,6 +67,9 @@ public class ProcessingInfoGeneratorTest {
     void setUp() {
         jdbcTemplate.execute("truncate table nc_processing_info");
         jdbcTemplate.execute("truncate table nc_endpoint");
+        
+    	JsonUtils.resetObjectMapper();
+    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
     }
     
 	@Test
@@ -144,7 +147,6 @@ public class ProcessingInfoGeneratorTest {
 
     @Test
     void testPersistPIForGenericEvent() {
-    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
     	//GIVEN
     	JsonNode payload = JsonUtils.writeObjectToJSONNode(TestPayload.builder().content("Test").build());
     	
