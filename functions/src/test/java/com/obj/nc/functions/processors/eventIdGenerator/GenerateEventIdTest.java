@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 
-class ValidateAndGenerateEventIdTest {
+class GenerateEventIdTest {
 
 	@Test
 	void test() {
@@ -17,17 +17,14 @@ class ValidateAndGenerateEventIdTest {
 		NotificationIntent inputNotificationIntent = NotificationIntent.createWithSimpleMessage("test-config", "Hi there!!");
 
 		//WHEN
-		ValidateAndGenerateEventIdProcessingFunction function = new ValidateAndGenerateEventIdProcessingFunction();
+		GenerateEventIdProcessingFunction function = new GenerateEventIdProcessingFunction();
 
-		NotificationIntent outputNotificationIntent = function.apply(inputNotificationIntent);
+		NotificationIntent outputNotificationIntent = (NotificationIntent)function.apply(inputNotificationIntent);
 
 		//THEN
 		Header header = outputNotificationIntent.getHeader();
-		assertThat(header.getId(), CoreMatchers.notNullValue());
 		assertThat(header.getEventIds(), Matchers.hasSize(1));
 		assertThat(header.getEventIds().get(0), CoreMatchers.notNullValue());
-		//in first step id = eventId
-		assertThat(header.getEventIds().get(0), CoreMatchers.is(header.getId()));
 	}
 
 }

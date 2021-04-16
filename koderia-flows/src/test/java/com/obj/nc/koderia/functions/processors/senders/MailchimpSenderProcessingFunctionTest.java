@@ -278,7 +278,7 @@ class MailchimpSenderProcessingFunctionTest {
                     }
 
                     @Override
-                    public String getEndpointTypeName() {
+                    public String getEndpointType() {
                         return "TEST";
                     }
                 }

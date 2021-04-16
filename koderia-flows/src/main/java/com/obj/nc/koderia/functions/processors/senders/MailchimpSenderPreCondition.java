@@ -66,7 +66,7 @@ public class MailchimpSenderPreCondition implements PreCondition<Message> {
 	private Optional<PayloadValidationException> checkReceivingEndpoints(Message message) {
 		boolean hasNoneOrTooMuchEndpoints = message.getBody().getRecievingEndpoints().size() != 1;
 		boolean containsNonEmailEndpoint = message.getBody().getRecievingEndpoints().stream()
-				.anyMatch(endpoint -> !EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointTypeName()));
+				.anyMatch(endpoint -> !EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType()));
 
 		if (hasNoneOrTooMuchEndpoints || containsNonEmailEndpoint) {
 			return Optional.of(new PayloadValidationException(String.format("Mailchimp can only send message %s to 1 EmailContent endpoint", message)));

@@ -1,6 +1,10 @@
 package com.obj.nc.domain;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.obj.nc.utils.JsonUtils;
@@ -15,6 +19,10 @@ public class BaseJSONObject {
 	@JsonAnySetter
 	public void setAttributeValue(String key, Object value) {
 		attributes.put(key, value);
+	}
+	
+	public boolean hasAttribute(String key) {
+		return attributes.containsKey(key);
 	}
 
 	public static UUID generateUUID() {

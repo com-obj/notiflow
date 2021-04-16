@@ -11,6 +11,7 @@ import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.flows.testmode.TestModeProperties;
@@ -60,6 +61,8 @@ public class AggregateMessageToSingleEmailTransformer extends ProcessorFunctionA
 		
 		List<RecievingEndpoint> emailEndpoints = testModeProps.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
 		aggregatedMessage.getBody().setRecievingEndpoints(emailEndpoints);
+		
+		aggregatedMessage.getHeader().setAttributeValue(Header.SUPRESS_GENERATE_PROC_INFO_PARAM_NAME, true);
 
 		return aggregatedMessage;
 	}

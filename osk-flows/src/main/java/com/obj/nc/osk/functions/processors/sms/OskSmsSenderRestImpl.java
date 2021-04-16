@@ -28,7 +28,7 @@ import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
 import com.obj.nc.osk.functions.processors.sms.dtos.SendSmsResourceReferenceDto;
 
 @Validated
-@DocumentProcessingInfo("GAPSmsSender")
+@DocumentProcessingInfo("GAP_SMSSender")
 public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Message> implements SmsSender {
 
     public static final String SEND_PATH = "/outbound/{senderAddress}/requests";

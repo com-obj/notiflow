@@ -12,13 +12,13 @@ import org.springframework.integration.router.AbstractMessageRouter;
 
 import com.obj.nc.flows.inputEventRouting.FlowId2InputMessageRouter;
 import com.obj.nc.flows.inputEventRouting.SimpleTypeBasedMessageRouter;
-import com.obj.nc.functions.sources.genericEvents.GenericEventsForProcessingSupplier;
+import com.obj.nc.functions.sources.genericEvents.GenericEventsSupplier;
 
 @Configuration
 public class InputEventRoutingFlowConfig {
 	
 	@Autowired private InputEventRoutingProperties routingProps;	
-	@Autowired private GenericEventsForProcessingSupplier genericEventSupplier;
+	@Autowired private GenericEventsSupplier genericEventSupplier;
 	
     public static final String GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME = "genericEventSupplierFlowId"; 
 //    public static final String GENERIC_EVENT_CHANNEL_ADAPTER_PAYLOAD_TYPE_BEAN_NAME = "genericEventSupplierPayloadType"; 
@@ -61,8 +61,8 @@ public class InputEventRoutingFlowConfig {
 
     
     @Bean
-    public GenericEventsForProcessingSupplier genericEventSupplier() {
-    	return new GenericEventsForProcessingSupplier();
+    public GenericEventsSupplier genericEventSupplier() {
+    	return new GenericEventsSupplier();
     }
 
 }

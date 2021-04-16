@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 
+import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
@@ -14,6 +15,7 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
 
 @Component
+@DocumentProcessingInfo("SmsFormatter")
 public class SmsTemplateFormatter extends BaseTemplateFormatter {
 
 	public SmsTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {

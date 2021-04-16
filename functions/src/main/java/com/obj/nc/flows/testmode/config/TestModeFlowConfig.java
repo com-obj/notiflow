@@ -34,9 +34,9 @@ import lombok.extern.log4j.Log4j2;
 public class TestModeFlowConfig {
 
 	@Autowired private TestModeProperties testModeProps;
-    @Autowired private PaylaodLoggerSinkConsumer logConsumer;
     @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_EMAIL_SENDER_FUNCTION_BEAN_NAME)
     @Autowired private EmailSender sendEmailRealSmtp;
+    @Autowired private PaylaodLoggerSinkConsumer logConsumer;
 
     @Autowired private EmailTemplateFormatter digestEmailFormatter;
 
@@ -61,10 +61,11 @@ public class TestModeFlowConfig {
         				.outputProcessor( testModeMessageAggregator() )
         				.id(TEST_MODE_AGGREGATOR_BEAN_NAME)
         			)
-        		.transform(aggregateMessageToSingleEmailTransformer())
-        		.transform(digestEmailFormatter)
-                .transform(sendEmailRealSmtp)
-                .handle(logConsumer).get();
+        		.handle(aggregateMessageToSingleEmailTransformer())
+        		.handle(digestEmailFormatter)
+                .handle(sendEmailRealSmtp)
+                .handle(logConsumer)
+                .get();
     }
     
     @Bean

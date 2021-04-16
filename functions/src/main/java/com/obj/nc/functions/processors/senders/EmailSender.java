@@ -91,7 +91,7 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	private void doSendMessage(EmailEndpoint toEmail, EmailContent messageContent, Header header) {
 		try {
 			MimeMessage message = mailSender.createMimeMessage();	
-			copyHeaderValues(header, message);
+			copyHeaderValuesToMimeMessage(header, message);
 			
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
@@ -121,13 +121,22 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 			
 			log.info("Sending mail vie SMTP took {} ms", ChronoUnit.MILLIS.between(sendStart, Instant.now()));
 			
+//			DeliveryInfoSendResult info = DeliveryInfoSendResult.builder()
+//				.daliveredOn(Instant.now())
+//				.eventIds(header.getEventIds().toArray(new UUID[0]))
+//				.status(DELIVERY_STATUS.DELIVERED)
+//				.recievingEndpoint(toEmail)
+//				.build();
+//				
+//			return info;
+			
 		} catch (MessagingException e) {
 			throw new ProcessingException(EmailSender.class, e);
 		}
 	}
 
 
-	private void copyHeaderValues(Header header, MimeMessage message) {
+	private void copyHeaderValuesToMimeMessage(Header header, MimeMessage message) {
 		header.getAttributes().entrySet().forEach(entry-> {
 			try {
 				message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + entry.getKey(), entry.getValue()+"");
@@ -141,9 +150,6 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 			
 			if (header.getFlowId()!= null) {
 				message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "FLOW_ID", header.getFlowId());
-			}
-			if (header.getId()!= null) {
-				message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "MSG_ID", header.getId().toString());
 			}
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);

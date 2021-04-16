@@ -28,6 +28,6 @@ public abstract class RecievingEndpoint {
 	public abstract String getEndpointId();
 	
 	@JsonIgnore
-	public abstract String getEndpointTypeName();
+	public abstract String getEndpointType();
 
 }

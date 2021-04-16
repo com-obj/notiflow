@@ -1,0 +1,1 @@
+ALTER TABLE nc_input RENAME TO nc_event;

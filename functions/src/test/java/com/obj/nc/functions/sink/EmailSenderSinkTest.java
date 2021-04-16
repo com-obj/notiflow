@@ -1,6 +1,7 @@
 package com.obj.nc.functions.sink;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import javax.mail.MessagingException;
@@ -24,11 +25,13 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoDeliveredGenerator;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.processors.senders.config.EmailSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
+import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -37,6 +40,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
 
 //    @Autowired private JavaMailSenderImpl defaultJavaMailSender;
     @Autowired private EmailSender functionSend;
+    @Autowired private DeliveryInfoDeliveredGenerator delInfoGenerator;
     @Autowired private EmailSenderConfigProperties settings;
     
     @RegisterExtension
@@ -59,20 +63,22 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         UUID originalProcessingId = message.getProcessingInfo().getProcessingId();
 
         //WHEN
-        Message result = functionSend.apply(message);
+        message = functionSend.apply(message);
+        List<DeliveryInfoSendResult> delInfos = delInfoGenerator.apply(message);
+
+        
+        Assertions.assertThat(delInfos.size()).isEqualTo(1);
+        DeliveryInfoSendResult delInfo = delInfos.iterator().next();
+        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.DELIVERED);
+        Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
+        Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(message.getBody().getRecievingEndpoints().get(0));
+        Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(message.getHeader().getEventIds());
 
         //THEN
         MimeMessage[] messages = greenMail.getReceivedMessages();
         Assertions.assertThat( messages.length ).isEqualTo(1);
         Assertions.assertThat( messages[0].getSubject() ).isEqualTo("Subject");
         Assertions.assertThat( messages[0].getFrom()[0] ).extracting("address").isEqualTo(settings.getFromMailAddress());
-
-        //THEN check processing info --docasne zakomentovane kym nezimplementujeme HasProcessingInfo
-        ProcessingInfo processingInfo = result.getProcessingInfo();
-        Assertions.assertThat(processingInfo.getStepName()).isEqualTo("SendEmail");
-        Assertions.assertThat(processingInfo.getStepIndex()).isEqualTo(4);
-        Assertions.assertThat(processingInfo.getPrevProcessingId()).isEqualTo(originalProcessingId);
-        Assertions.assertThat(processingInfo.getTimeStampStart()).isBeforeOrEqualTo(processingInfo.getTimeStampFinish());
     }
 
     @Test
@@ -119,7 +125,16 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         });
 
         //WHEN
-        Message outputMessage = functionSend.apply(inputMessage);
+        inputMessage = functionSend.apply(inputMessage);
+        List<DeliveryInfoSendResult> delInfos = delInfoGenerator.apply(inputMessage);
+
+        
+        Assertions.assertThat(delInfos.size()).isEqualTo(1);
+        DeliveryInfoSendResult delInfo = delInfos.iterator().next();
+        
+        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.DELIVERED);
+        Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
+        Assertions.assertThat(delInfo.getRecievingEndpoint().getEndpointId()).isEqualTo("john.doe@objectify.sk");
 
         //THEN
         MimeMessage message = greenMail.getReceivedMessages()[0];
@@ -135,13 +150,23 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 
         //WHEN
-        Message outputMessage = functionSend.apply(inputMessage);
+        inputMessage = functionSend.apply(inputMessage);
+        List<DeliveryInfoSendResult> delInfos = delInfoGenerator.apply(inputMessage);
+
+        
+        Assertions.assertThat(delInfos.size()).isEqualTo(1);
+        DeliveryInfoSendResult delInfo = delInfos.iterator().next();
+        
+        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.DELIVERED);
+        Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
+        Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(inputMessage.getBody().getRecievingEndpoints().get(0));
+        Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(inputMessage.getHeader().getEventIds());
 
         //THEN
         MimeMessage message = greenMail.getReceivedMessages()[0];
         String msg = GreenMailUtil.getWholeMessage(message);
 
-        AggregatedEmailContent aggregated = outputMessage.getContentTyped();
+        AggregatedEmailContent aggregated = inputMessage.getContentTyped();
         aggregated.getAggregateContent()
                 .forEach(messageContent -> {
                     Assertions.assertThat(msg).contains(messageContent.getSubject());

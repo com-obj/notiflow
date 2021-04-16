@@ -27,7 +27,7 @@ public class SmsEndpoint extends RecievingEndpoint {
     }
 
     @Override
-    public String getEndpointTypeName() {
+    public String getEndpointType() {
         return JSON_TYPE_IDENTIFIER;
     }
 

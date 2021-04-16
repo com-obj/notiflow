@@ -9,6 +9,7 @@ import com.obj.nc.domain.content.sms.AggregatedSmsContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
+import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.exceptions.PayloadValidationException;
 
 import lombok.Data;
@@ -18,7 +19,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
-public class Message extends BasePayload {
+public class Message extends BasePayload implements HasHeader {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "MESSAGE";
 	

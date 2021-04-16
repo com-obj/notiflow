@@ -19,11 +19,20 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.utils.JsonUtils;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
@@ -47,11 +56,15 @@ public class TypeIDInputEventRoutingIntegrationTests extends BaseIntegrationTest
     @BeforeEach
     public void startSourcePolling() {
     	pollableSource.start();
+    	
+    	JsonUtils.resetObjectMapper();
+    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
     }
+
     
     @Test
     void testGenericEventRouting() throws MessagingException {
-    	
+  	
     	//WHEN
         GenericEvent event = GenericEvent.from(JsonUtils.readJsonNodeFromClassPathResource("events/generic_event_with_type_info1.json"));    
         persister.accept(event);
@@ -88,6 +101,19 @@ public class TypeIDInputEventRoutingIntegrationTests extends BaseIntegrationTest
             return new QueueChannel();
         }
 
+    }
+    
+    
+    @Data
+    @NoArgsConstructor
+    @JsonTypeInfo(include = As.PROPERTY, use = Id.NAME)
+    @JsonSubTypes({ 
+    	@Type(value = TestPayload.class, name = "TYPE_1"),
+    	@Type(value = TestPayload.class, name = "TYPE_2")})
+    public static class TestPayload implements IsTypedJson {
+    	
+    	private Integer num;
+    	private String str;
     }
 
 }

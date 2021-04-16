@@ -14,15 +14,15 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
+import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest
 class RecepientsUsingSubscriptionTest {
 
-    private final ValidateAndGenerateEventIdProcessingFunction validateAndGenerateEventId =
-            new ValidateAndGenerateEventIdProcessingFunction();
+    private final GenerateEventIdProcessingFunction validateAndGenerateEventId =
+            new GenerateEventIdProcessingFunction();
 
     private final DummyRecepientsEnrichmentProcessingFunction resolveRecipients =
             new DummyRecepientsEnrichmentProcessingFunction();
@@ -43,7 +43,7 @@ class RecepientsUsingSubscriptionTest {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post.json";
         NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        inputNotificationIntent = validateAndGenerateEventId.apply(inputNotificationIntent);
+        inputNotificationIntent = (NotificationIntent)validateAndGenerateEventId.apply(inputNotificationIntent);
 
         // when
         NotificationIntent outputNotificationIntent = resolveRecipients.apply(inputNotificationIntent);
@@ -57,7 +57,7 @@ class RecepientsUsingSubscriptionTest {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post.json";
         NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        inputNotificationIntent = validateAndGenerateEventId.apply(inputNotificationIntent);
+        inputNotificationIntent = (NotificationIntent)validateAndGenerateEventId.apply(inputNotificationIntent);
 
         // when
         NotificationIntent outputNotificationIntent = resolveRecipients.apply(inputNotificationIntent);
@@ -84,7 +84,7 @@ class RecepientsUsingSubscriptionTest {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post_recipients.json";
         NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        inputNotificationIntent = validateAndGenerateEventId.apply(inputNotificationIntent);
+        inputNotificationIntent = (NotificationIntent)validateAndGenerateEventId.apply(inputNotificationIntent);
 
         // when
         NotificationIntent outputNotificationIntent = resolveRecipients.apply(inputNotificationIntent);

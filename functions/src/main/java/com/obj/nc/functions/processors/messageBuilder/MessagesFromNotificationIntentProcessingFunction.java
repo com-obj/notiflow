@@ -20,7 +20,7 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @AllArgsConstructor
 @Log4j2
-@DocumentProcessingInfo("GenerateMessagesFromEvent")
+@DocumentProcessingInfo("GenerateMessagesFromIntent")
 public class MessagesFromNotificationIntentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent, List<Message>> {
 
 	@Override
