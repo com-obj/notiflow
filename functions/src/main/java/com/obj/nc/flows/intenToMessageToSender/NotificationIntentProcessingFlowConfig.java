@@ -12,13 +12,17 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoProcessingGenerator;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
+import com.obj.nc.functions.sink.deliveryInfoPersister.DeliveryInfoPersister;
 
 @Configuration
 public class NotificationIntentProcessingFlowConfig {
 		
 //	@Autowired private GenerateEventIdProcessingFunction generateEventId;
 	@Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
+	@Autowired private DeliveryInfoProcessingGenerator deliveryInfoProcessingGenerator;
+	@Autowired private DeliveryInfoPersister deliveryPersister;
 		
 	public final static String INTENT_PROCESSING_FLOW_ID = "INTENT_PROCESSING_FLOW_ID";
 	public final static String INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID = INTENT_PROCESSING_FLOW_ID + "_INPUT";
@@ -32,9 +36,14 @@ public class NotificationIntentProcessingFlowConfig {
 	public IntegrationFlow intentProcessingFlowDefinition() {
 		return IntegrationFlows
 				.from(intentProcessingInputChangel())
-//				.transform(generateEventId)
 				.transform(generateMessagesFromEvent)
 				.split()
+				.wireTap( flowConfig -> 
+					flowConfig
+					.handle(deliveryInfoProcessingGenerator)
+					.split()
+					.handle(deliveryPersister)
+				)
 				.routeToRecipients(spec -> spec.
 						recipient(EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> ((Message)m).isEmailMessage()).
 						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> ((Message)m).isSmsMessage()).

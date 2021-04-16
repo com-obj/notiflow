@@ -41,7 +41,7 @@ osk.sia.functions:
          - Tatrabanka
          - MVSR
       cs-agents-to-notify-email:
-         - sales@objectify.skk
+         - agent@objectify.sk
    sms-sender:
       gap-api-url: http://localhost:6090/API/smsmessaging/v1
       gap-api-login: testlogin

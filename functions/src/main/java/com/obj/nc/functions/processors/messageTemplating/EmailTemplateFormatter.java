@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 
+import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
@@ -15,6 +16,7 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
 
 @Component
+@DocumentProcessingInfo("EmailFormatter")
 public class EmailTemplateFormatter extends BaseTemplateFormatter {
 
 	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {

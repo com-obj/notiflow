@@ -152,7 +152,7 @@ public class ProcessingInfoGenerator {
 		
 		String duration = lastProcInfo!=null ? lastProcInfo.getStepDurationMs()+"" : "N/A";
 		
-		log.info("Processing finished for step {}. Took {} ms", startProcessing.getStepName(), duration);
+		log.debug("Processing finished for step {}. Took {} ms", startProcessing.getStepName(), duration);
 		
 		return endHeaders;
 	}
@@ -167,9 +167,11 @@ public class ProcessingInfoGenerator {
 		
 		if (input instanceof HasHeader) {
 		    Header header = ((HasHeader)input).getHeader();
-		    ImmutablePair<Header, Object> headerPayloadPair = new ImmutablePair<>(header, input);
-		    
-		    result.add(headerPayloadPair);
+		    if (!header.isSupressGenerateProcessingInfo()) {
+			    ImmutablePair<Header, Object> headerPayloadPair = new ImmutablePair<>(header, input);
+			    
+			    result.add(headerPayloadPair);
+		    }
 		} else if (input instanceof Iterable) {
 			Iterator<?> iterator = ((Iterable<?>)input).iterator();
 			while (iterator.hasNext()) {

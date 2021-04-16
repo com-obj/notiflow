@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.BeanUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.domain.HasFlowId;
@@ -29,20 +30,14 @@ public class Header extends BaseJSONObject implements HasFlowId {
 	
 	@JsonProperty("flow-id")
 	private String flowId;
-		
-//	@NotNull
-//	@Include
-//	private UUID id;
-	
+
 	@NotNull
 	@Include
 	private List<UUID> eventIds = new ArrayList<>();
 	
 	protected ProcessingInfo processingInfo;
-
-//	public void generateAndSetID() {
-//		id = generateUUID();
-//	}
+	
+	public static final String SUPRESS_GENERATE_PROC_INFO_PARAM_NAME = "SUPRESS_GENERATE_PROCESSING_INFO";
 
 	public void copyHeaderFrom(Header header) {
 		if (header == null) {
@@ -59,15 +54,12 @@ public class Header extends BaseJSONObject implements HasFlowId {
 		other.getAttributes().forEach((key, value) -> merged.getAttributes().putIfAbsent(key, value));
 
 		merged.flowId = other.flowId;
-//		merged.generateAndSetID();
 
 		merged.eventIds = other.eventIds;
 		merged.eventIds.addAll(other.getEventIds());
 
 		return merged;
 	}
-
-
 
 	public String eventIdsAsJSONString() {
 		return JsonUtils.writeObjectToJSONString(eventIds);
@@ -79,6 +71,15 @@ public class Header extends BaseJSONObject implements HasFlowId {
 	
 	public UUID[] getEventIdsAsArray() {
 		return eventIds.toArray(new UUID[0]);
+	}
+	
+	@JsonIgnore
+	public boolean isSupressGenerateProcessingInfo() {
+		if (hasAttribute(SUPRESS_GENERATE_PROC_INFO_PARAM_NAME)) {
+			return (Boolean) getAttributeValue(SUPRESS_GENERATE_PROC_INFO_PARAM_NAME);
+		}
+		
+		return false;
 	}
 
 }

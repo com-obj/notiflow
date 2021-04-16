@@ -24,6 +24,7 @@ import com.obj.nc.functions.processors.messageAggregator.aggregations.StandardMe
 import com.obj.nc.functions.processors.messageAggregator.correlations.EventIdBasedCorrelationStrategy;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
+import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -35,6 +36,7 @@ public class TestModeFlowConfig {
 	@Autowired private TestModeProperties testModeProps;
     @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_EMAIL_SENDER_FUNCTION_BEAN_NAME)
     @Autowired private EmailSender sendEmailRealSmtp;
+    @Autowired private PaylaodLoggerSinkConsumer logConsumer;
 
     @Autowired private EmailTemplateFormatter digestEmailFormatter;
 
@@ -59,9 +61,10 @@ public class TestModeFlowConfig {
         				.outputProcessor( testModeMessageAggregator() )
         				.id(TEST_MODE_AGGREGATOR_BEAN_NAME)
         			)
-        		.transform(aggregateMessageToSingleEmailTransformer())
-        		.transform(digestEmailFormatter)
-                .transform(sendEmailRealSmtp)
+        		.handle(aggregateMessageToSingleEmailTransformer())
+        		.handle(digestEmailFormatter)
+                .handle(sendEmailRealSmtp)
+                .handle(logConsumer)
                 .get();
     }
     
