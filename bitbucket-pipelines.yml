@@ -35,7 +35,6 @@ pipelines:
       - step: *runTestStep
   tags:
     v*:
-      - step: *runTestStep
       - step:
           name: Build FAT Jar
           script:
