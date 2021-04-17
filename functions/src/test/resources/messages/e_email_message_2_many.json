@@ -18,11 +18,11 @@
      },
       "recievingEndpoints":[
          {
-            "type":"EMAIL",
+            "@type":"EMAIL",
             "email":"john.doe@objectify.sk"
          },
          {
-            "type":"EMAIL",
+            "@type":"EMAIL",
             "email":"john.dudly@objectify.sk"
          }
       ],

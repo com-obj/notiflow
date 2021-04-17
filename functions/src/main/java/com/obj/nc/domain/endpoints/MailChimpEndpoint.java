@@ -2,8 +2,6 @@ package com.obj.nc.domain.endpoints;
 
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -27,9 +25,14 @@ public class MailChimpEndpoint extends RecievingEndpoint {
 	}
 
 	@Override
-	@JsonIgnore
+//	@JsonIgnore
 	public String getEndpointId() {
 		return distributionListId;
+	}
+	
+	@Override
+	public void setEndpointId(String endpointId) {
+		this.distributionListId = endpointId;
 	}
 
 	@Override

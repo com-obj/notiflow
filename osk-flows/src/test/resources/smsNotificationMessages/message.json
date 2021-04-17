@@ -8,7 +8,7 @@
       "contentTypeName" : "TEXT_CONTENT"
     },
     "recievingEndpoints" : [ {
-      "type" : "SMS",
+      "@type" : "SMS",
       "deliveryOptions" : null,
       "recipient" : {
         "type" : "PERSON",

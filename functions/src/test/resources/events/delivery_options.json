@@ -14,12 +14,12 @@
       },
       "recievingEndpoints":[
          {
-            "type":"EMAIL",
+            "@type":"EMAIL",
             "deliveryOptions":null,
             "email":"john.doe@objectify.sk"
          },
          {
-            "type":"EMAIL",
+            "@type":"EMAIL",
             "deliveryOptions":{
                "aggregationType":"ONCE_A_WEEK",
                "schedulingType":"IMMEDIATE"

@@ -22,7 +22,7 @@
      },
       "recievingEndpoints":[
          {
-            "type":"EMAIL",
+            "@type":"EMAIL",
             "recipient":{
                "type":"PERSON",
                "name":"John Doe"

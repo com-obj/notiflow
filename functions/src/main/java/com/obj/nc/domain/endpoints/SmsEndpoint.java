@@ -1,13 +1,18 @@
 package com.obj.nc.domain.endpoints;
 
-import lombok.*;
-
 import javax.validation.constraints.NotNull;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @EqualsAndHashCode(callSuper = false, of = "phone")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SmsEndpoint extends RecievingEndpoint {
 
     public static final String JSON_TYPE_IDENTIFIER = "SMS";
@@ -25,6 +30,11 @@ public class SmsEndpoint extends RecievingEndpoint {
     public String getEndpointId() {
         return phone;
     }
+    
+	@Override
+	public void setEndpointId(String endpointId) {
+		this.phone = endpointId;
+	}
 
     @Override
     public String getEndpointType() {

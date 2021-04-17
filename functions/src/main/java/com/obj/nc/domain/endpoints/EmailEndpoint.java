@@ -41,6 +41,11 @@ public class EmailEndpoint extends RecievingEndpoint {
 	public String getEndpointId() {
 		return email;
 	}
+	
+	@Override
+	public void setEndpointId(String endpointId) {
+		this.email = endpointId;
+	}
 
 	@Override
 	public String getEndpointType() {

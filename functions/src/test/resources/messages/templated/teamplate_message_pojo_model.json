@@ -21,7 +21,7 @@
       },
       "recievingEndpoints":[
          {
-            "type":"EMAIL",
+            "@type":"EMAIL",
             "email":"john.doe@objectify.sk",
             "endpointId":"john.doe@objectify.sk"
          }

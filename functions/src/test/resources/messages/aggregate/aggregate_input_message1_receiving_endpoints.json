@@ -18,7 +18,7 @@
         "attachments" : [ ]
     },
     "recievingEndpoints" : [ {
-      "type" : "EMAIL",
+      "@type" : "EMAIL",
       "deliveryOptions" : null,
       "recipient" : {
         "type" : "PERSON",
@@ -26,7 +26,7 @@
       },
       "email" : "john.doe@objectify.sk"
     }, {
-      "type":"EMAIL",
+      "@type":"EMAIL",
       "deliveryOptions": null,
       "recipient" : {
         "type" : "PERSON",

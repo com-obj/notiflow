@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
 @JsonSubTypes({ 
 	@Type(value = EmailEndpoint.class, name = EmailEndpoint.JSON_TYPE_IDENTIFIER), 
 	@Type(value = MailChimpEndpoint.class, name = MailChimpEndpoint.JSON_TYPE_IDENTIFIER),
@@ -24,8 +24,9 @@ public abstract class RecievingEndpoint {
 	private DeliveryOptions deliveryOptions;
 	private Recipient recipient;
 	
-	@JsonIgnore
 	public abstract String getEndpointId();
+	
+	public abstract void setEndpointId(String endpointId);
 	
 	@JsonIgnore
 	public abstract String getEndpointType();
