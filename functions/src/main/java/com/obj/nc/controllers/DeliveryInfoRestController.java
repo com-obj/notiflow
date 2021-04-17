@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo;
 import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.EndpointsRepository;
+import com.obj.nc.repositories.GenericEventRepository;
 
 import lombok.Builder;
 import lombok.Data;
@@ -35,9 +37,10 @@ public class DeliveryInfoRestController {
 	
 	@Autowired private DeliveryInfoRepository deliveryRepo;
 	@Autowired private EndpointsRepository endpointRepo;
+	@Autowired private GenericEventRepository eventRepo;
 	
 	@GetMapping(value = "/events/{eventId}", consumes="application/json", produces="application/json")
-    public List<EndpointDeliveryInfoDto> findDeliveryInfosForEvent(
+    public List<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
     		@PathVariable (value = "eventId", required = true) String eventId) {
 
 		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByEventIdOrderByProcessedOn(UUID.fromString(eventId));
@@ -50,6 +53,18 @@ public class DeliveryInfoRestController {
 		endpoints.forEach(re-> endpointsById.get(re.getEndpointId()).setEndpoint(re));
 		
 		return infoDtos;
+    }
+	
+	@GetMapping(value = "/events/ext/{extEventId}", consumes="application/json", produces="application/json")
+    public List<EndpointDeliveryInfoDto> findDeliveryInfosByExtId(
+    		@PathVariable (value = "extEventId", required = true) String extEventId) {
+
+		GenericEvent event = eventRepo.findByExternalId(extEventId);
+		if (event == null) {
+			throw new IllegalArgumentException("Event with " +  extEventId +" external ID not found");
+		}
+		
+		return findDeliveryInfosByEventId(event.getId().toString());
     }
 
 
