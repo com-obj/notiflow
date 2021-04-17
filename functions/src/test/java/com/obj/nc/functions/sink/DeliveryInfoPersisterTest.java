@@ -9,12 +9,14 @@ import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -34,7 +36,7 @@ import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest
-public class DeliveryInfoPersisterTest {
+public class DeliveryInfoPersisterTest extends BaseIntegrationTest {
 	
 	@Autowired private GenerateEventIdProcessingFunction generateEventId;
     @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
@@ -45,6 +47,10 @@ public class DeliveryInfoPersisterTest {
     @Autowired private DeliveryInfoRepository deliveryInfoRepo;
     @Autowired private JdbcTemplate jdbcTemplate;
 	
+    @BeforeEach
+    void setUp(@Autowired JdbcTemplate jdbcTemplate) {
+    	purgeNotifTables(jdbcTemplate);
+    }
 
     @Test
     void testPersistPIForEventWithRecipients() {
