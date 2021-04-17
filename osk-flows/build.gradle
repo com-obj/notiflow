@@ -9,7 +9,7 @@ group = 'com.obj.nc'
 sourceCompatibility = '1.8'
 
 bootJar {
-    archiveBaseName = 'osk-flows'
+    archiveFileName = 'osk-flows.jar'
 
     launchScript()
 }
