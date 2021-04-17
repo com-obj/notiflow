@@ -37,6 +37,9 @@ pipelines:
     v*:
       - step:
           name: Build FAT Jar
+          caches:
+           - gradle
+           - maven
           script:
             - gradle build -x test --stacktrace --info   
           artifacts:
