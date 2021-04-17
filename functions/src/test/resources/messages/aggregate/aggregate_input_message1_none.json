@@ -18,7 +18,7 @@
         "attachments" : [ ]
     },
     "recievingEndpoints" : [ {
-      "type" : "EMAIL",
+      "@type" : "EMAIL",
       "deliveryOptions" : null,
       "recipient" : {
         "type" : "PERSON",

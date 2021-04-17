@@ -16,7 +16,7 @@
       },
       "recievingEndpoints":[
          {
-            "type":"SMS",
+            "@type":"SMS",
             "phone":"0908186997",
             "recipient":{
                "type":"PERSON",

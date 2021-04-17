@@ -27,6 +27,7 @@ import lombok.ToString;
 @Builder(toBuilder=true)
 public class DeliveryInfo {
 	
+	//Order of elements in this enum is important. Final state should be last
 	public static enum DELIVERY_STATUS {
 		PROCESSING, DELIVERED, FAILED
 	}
