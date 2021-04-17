@@ -3,14 +3,12 @@ package com.obj.nc.repositories;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -31,12 +29,7 @@ import lombok.extern.log4j.Log4j2;
 public class EndpointsRepository {
 	
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-    
-    @Autowired
-    private NamedParameterJdbcTemplate namedJdbcTemplate;
-    
-     
+    private JdbcTemplate jdbcTemplate;     
 	 
     public void persistEnpointIfNotExists(List<RecievingEndpoint> ednpoints) {
 
@@ -72,12 +65,11 @@ public class EndpointsRepository {
     	String query = 
         		"select endpoint_id, endpoint_type "
                 + "from nc_endpoint "
-                + "where endpoint_id in (:ids)";
+                + "where endpoint_id in (%s)";  	
+    	String inSql = String.join(",", Collections.nCopies(endpointIds.length, "?"));
+    	query = String.format(query, inSql);
     	
-    	SqlParameterSource parameters = new MapSqlParameterSource("ids", Arrays.asList(endpointIds));
-    	
-        List<RecievingEndpoint> endpoints = namedJdbcTemplate.query(query, parameters, 
-       
+    	List<RecievingEndpoint> endpoints = jdbcTemplate.query(query,
         		(rs, rowNum) -> {
         	    	  String epType = rs.getString("endpoint_type");
         	    	  
@@ -89,7 +81,8 @@ public class EndpointsRepository {
         	    		  throw new RuntimeException("Uknown endpoint type for EndpointsRepository: "+ epType);
         	    	  }
 
-        	   } 		
+        	   } 
+        	, (Object[])endpointIds
         );
         
         return endpoints;
