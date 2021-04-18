@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @JsonTypeName(TemplateWithJsonModelSmsContent.JSON_TYPE_IDENTIFIER)
-public class TemplateWithJsonModelSmsContent extends TemplateWithModelContent<BaseJSONObject> implements Cloneable {
+public class TemplateWithJsonModelSmsContent extends TemplateWithModelContent<BaseJSONObject> {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "SMS_FROM_TEMPLATE_MESSAGE_CONTENT";
 

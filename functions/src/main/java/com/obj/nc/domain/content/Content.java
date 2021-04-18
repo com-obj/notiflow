@@ -27,7 +27,7 @@ public abstract class Content extends BaseJSONObject implements Cloneable {
 	
 	@Override
 	public Content clone() throws CloneNotSupportedException {
-		return (Content) super.clone(); // return deep copy
+		return (Content) super.clone();
 	}
 	
 }

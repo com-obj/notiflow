@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @JsonTypeName(EmailContent.JSON_TYPE_IDENTIFIER)
-public class EmailContent extends Content implements Cloneable {
+public class EmailContent extends Content {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CONTENT";
 
@@ -54,11 +54,4 @@ public class EmailContent extends Content implements Cloneable {
 		return concated;
 	}
 	
-	@Override
-	public EmailContent clone() throws CloneNotSupportedException {
-		EmailContent clone = (EmailContent) super.clone();
-		clone.attachments = new ArrayList<>(attachments);
-		return clone; // return deep copy
-	}
-
 }
