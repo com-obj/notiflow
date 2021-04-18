@@ -42,11 +42,7 @@ public class Body extends BaseJSONObject{
 	}
 	
 	public void copyMessage(Content message) {
-		try {
-			this.message = message.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
-		}
+		this.message = message.clone();
 		this.message.copyAttributes(message.getAttributes());
 	}
 	
