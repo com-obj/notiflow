@@ -50,7 +50,7 @@ public class Header extends BaseJSONObject implements HasFlowId {
 	public Header merge(Header other) {
 		Header merged = new Header();
 
-		merged.copyAttributes(this.getAttributes());
+		merged.setAttributes(this.getAttributes());
 		other.getAttributes().forEach((key, value) -> merged.getAttributes().putIfAbsent(key, value));
 
 		merged.flowId = other.flowId;

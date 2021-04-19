@@ -1,6 +1,7 @@
 package com.obj.nc.flows.testmode.mailchimp.functions;
 
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -16,7 +17,7 @@ public class TestModeMailchimpSender extends ProcessorFunctionAdapter<Message,Me
     
     @Override
     protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
-        if (!(payload.getBody().getMessage() instanceof EmailContent)) {
+        if (!(payload.getBody().getMessage() instanceof MailchimpContent)) {
             throw new PayloadValidationException("TestModeMailchimpSender can only process EmailContent content. Was " + payload.getBody().getMessage() );
         }
         return Optional.empty();

@@ -9,25 +9,26 @@ spring:
     properties:
       mail.debug: true
   main.allow-bean-definition-overriding: true
+  
+nc.functions:
+  mailchimp-sender:
+    aggregated-message-subject: Koderia digest
+    aggregated-message-template-name: aggregated-template
+    api-url: http://mandrillapp.com/api/1.0
+    auth-key: MOCKkey
+    sender-name: Koderia sender
+    sender-email: sender@koderia.sk
+    mailchimp-template-names:
+      JOB_POST: job-post-template
+      BLOG: blog-template
+      EVENT: event-template
+      LINK: link-template
+      NEWS: news-template
 
 koderia.functions:
   recipients:
     koderia-api-url: https://www.koderia.sk/api/v1
     koderia-api-token: testToken
-  mailchimp-sender:
-    aggregate-subject: Koderia digest
-    mailchimp-api:
-      url: http://mandrillapp.com/api/1.0
-      auth-key: MOCKkey
-      sender-name: Koderia sender
-      sender-email: sender@koderia.sk
-    mailchimp-template-names:
-      aggregate: aggregate-template
-      job-post: job-post-template
-      blog: blog-template
-      event: event-template
-      link: link-template
-      news: news-template
 
 ---
 spring.config.activate.on-profile: jenkins_test

@@ -70,12 +70,4 @@ public class BaseJSONObject {
 		return attributes.get(attributeName);
 	}
 	
-	public void removeAttribute(String attributeName) {
-		attributes.remove(attributeName);
-	}
-	
-	public void copyAttributes(Map<String, Object> attributes) {
-		this.attributes = new HashMap<>(attributes);
-	}
-	
 }

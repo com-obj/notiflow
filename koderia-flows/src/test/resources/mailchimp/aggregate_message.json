@@ -10,7 +10,7 @@
   },
   "body":{
     "message": {
-      "type" : "AGGREGATED_EMAIL_MESSAGE_CONTENT",
+      "type" : "MAILCHIMP_CONTENT",
       "aggregateContent" : [ {
         "attributes": {
           "originalEvent" : {

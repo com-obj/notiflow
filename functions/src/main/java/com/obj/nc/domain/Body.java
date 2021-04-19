@@ -41,9 +41,4 @@ public class Body extends BaseJSONObject{
 		return (T) message;
 	}
 	
-	public void copyMessage(Content message) {
-		this.message = message.clone();
-		this.message.copyAttributes(message.getAttributes());
-	}
-	
 }

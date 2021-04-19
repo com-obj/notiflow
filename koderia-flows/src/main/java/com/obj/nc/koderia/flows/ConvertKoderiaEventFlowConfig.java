@@ -1,6 +1,6 @@
 package com.obj.nc.koderia.flows;
 
-import com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter;
+import com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ public class ConvertKoderiaEventFlowConfig {
     public final static String CONVERT_KODERIA_EVENT_FLOW_ID = "default-flow";
     public final static String CONVERT_KODERIA_EVENT_FLOW_INPUT_CHANNEL_ID = CONVERT_KODERIA_EVENT_FLOW_ID + "_INPUT";
     
-    private final GenericEventToNotificaitonIntentConverter eventConverter;
+    private final KoderiaEventConverter koderiaEventConverter;
     
     @Bean(CONVERT_KODERIA_EVENT_FLOW_INPUT_CHANNEL_ID)
     public MessageChannel convertKoderiaEventFlowInputChangel() {
@@ -29,7 +29,7 @@ public class ConvertKoderiaEventFlowConfig {
     public IntegrationFlow convertKoderiaEventFlowDefinition() {
         return IntegrationFlows
                 .from(CONVERT_KODERIA_EVENT_FLOW_INPUT_CHANNEL_ID)
-                .transform(eventConverter)
+                .transform(koderiaEventConverter)
                 .split()
                 .channel(KODERIA_INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
                 .get();

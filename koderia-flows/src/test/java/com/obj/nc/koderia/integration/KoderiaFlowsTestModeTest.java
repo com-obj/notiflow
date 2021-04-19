@@ -7,21 +7,11 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.config.InjectorConfiguration;
-import com.obj.nc.config.JdbcConfiguration;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig;
-import com.obj.nc.flows.inputEventRouting.config.InputEventRoutingProperties;
-import com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
-import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
-import com.obj.nc.koderia.KoderiaFlowsApplication;
-import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
-import com.obj.nc.koderia.dto.koderia.recipients.RecipientDto;
+import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
+import com.obj.nc.koderia.domain.recipients.RecipientDto;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
-import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderProcessorFunction;
+import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinder;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
@@ -62,7 +52,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public class KoderiaFlowsTestModeTest extends BaseIntegrationTest {
     @Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
     @Autowired private SourcePollingChannelAdapter pollableSource;
-    @Autowired private KoderiaRecipientsFinderProcessorFunction koderiaRecipientsFinder;
+    @Autowired private KoderiaRecipientsFinder koderiaRecipientsFinder;
     @Autowired private KoderiaRecipientsFinderConfig koderiaRecipientsFinderConfig;
     @Autowired private GenericEventRepository genEventRepo;
     private MockRestServiceServer koderiaMockServer;
@@ -82,8 +72,8 @@ public class KoderiaFlowsTestModeTest extends BaseIntegrationTest {
     @Test
     void testNotifyCustomersViaTestmodeEmail() {
         // GIVEN
-        BaseKoderiaEventDto baseKoderiaEventDto = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEventDto.class);
-        GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEventDto));
+        BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEvent.class);
+        GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
         genericEvent.setFlowId("default-flow");
         createRestCallExpectation();
         

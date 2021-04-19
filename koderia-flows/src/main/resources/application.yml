@@ -17,30 +17,28 @@ management.endpoints.web.exposure.include: '*'
 
 nc:
    functions:
-      email-sender:
-         from-mail-address: no-reply@objectify.sk
+      mailchimp-sender:
+         aggregated-message-subject: Koderia digest
+         aggregated-message-template-name: aggregated-template
+         api-url: http://mandrillapp.com/api/1.0
+         auth-key: MOCKkey
+         sender-name: Koderia sender
+         sender-email: sender@koderia.sk
+         mailchimp-template-names:
+            JOB_POST: job-post-template
+            BLOG: blog-template
+            EVENT: event-template
+            LINK: link-template
+            NEWS: news-template
    flows:
       input-evet-routing:
          type: FLOW_ID
+         type-propery-name: type
 
 koderia.functions:
    recipients-finder:
       koderia-api-url: https://us-central1-koderia-develop.cloudfunctions.net/apiExternal
       koderia-api-token: fbtYmk5vXY9hlCKX5abBfuDhKjcY5IFQXbomVA6Uxv6CUi8gXsaruWXCA4hWPgygIx49F6Dfgk6B0sE65AytH9YXvBzKKrw2Xm0WYaWr73ZpMpDhFlaBbo1ufM5c6a81WCqKUHyIjf6ez11GqEzHHFG8v7GRMKhBGJe9zjOYMFWZ1ZBD3eEuQPal9sgsP5cWVsTZV32ls0BrWU9EkYcwwsxFXEeD3PKAyFx6Bzp4rPNsgU5f8fYgTmjynyAPaZ6p
-   mailchimp-sender:
-      aggregate-subject: Koderia digest
-      mailchimp-api:
-         url: http://mandrillapp.com/api/1.0
-         auth-key: MOCKkey
-         sender-name: Koderia sender
-         sender-email: sender@koderia.sk
-      mailchimp-template-names:
-         aggregate: aggregate-template
-         job-post: job-post-template
-         blog: blog-template
-         event: event-template
-         link: link-template
-         news: news-template
 
 ---
 spring.config.activate.on-profile: test_mode

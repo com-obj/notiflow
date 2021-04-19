@@ -1,17 +1,17 @@
 package com.obj.nc.koderia.functions.processors.mailchimpSender;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 
-import com.obj.nc.koderia.mapper.MailchimpMessageMapperAggregateImpl;
-import com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl;
+import com.obj.nc.koderia.mapper.MailchimpAggregatedContentMapper;
+import com.obj.nc.koderia.mapper.KoderiaEvent2MailchimpContentMapper;
 
 @TestConfiguration
 @Import({
         MailchimpSenderConfig.class,
-        MailchimpMessageMapperImpl.class,
-        MailchimpMessageMapperAggregateImpl.class
+        KoderiaEvent2MailchimpContentMapper.class,
+        MailchimpAggregatedContentMapper.class
 })
 public class MailchimpSenderProcessorFunctionTestConfig {
 }

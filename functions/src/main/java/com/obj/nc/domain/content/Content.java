@@ -7,6 +7,7 @@ import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithJsonModelEmailContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.content.sms.TemplateWithJsonModelSmsContent;
 
@@ -18,20 +19,12 @@ import lombok.EqualsAndHashCode;
 	@Type(value = EmailContent.class, name = EmailContent.JSON_TYPE_IDENTIFIER),
 	@Type(value = AggregatedEmailContent.class, name = AggregatedEmailContent.JSON_TYPE_IDENTIFIER),
 	@Type(value = SimpleTextContent.class, name = SimpleTextContent.JSON_TYPE_IDENTIFIER),
+	@Type(value = MailchimpContent.class, name = MailchimpContent.JSON_TYPE_IDENTIFIER),
 	@Type(value = TemplateWithJsonModelEmailContent.class, name = TemplateWithJsonModelEmailContent.JSON_TYPE_IDENTIFIER),
-	@Type(value = TemplateWithJsonModelSmsContent.class, name = TemplateWithJsonModelSmsContent.JSON_TYPE_IDENTIFIER),
+	@Type(value = TemplateWithJsonModelSmsContent.class, name = TemplateWithJsonModelSmsContent.JSON_TYPE_IDENTIFIER)
 })
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public abstract class Content extends BaseJSONObject implements Cloneable {
-	
-	@Override
-	public Content clone() {
-		try {
-			return (Content) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
-		}
-	}
+public abstract class Content extends BaseJSONObject {
 	
 }

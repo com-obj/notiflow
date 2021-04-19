@@ -2,7 +2,6 @@ package com.obj.nc.koderia.flows;
 
 import com.obj.nc.functions.processors.senders.MailchimpSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
-import com.obj.nc.koderia.functions.processors.mailchimpSender.MailchimpSenderProcessorFunction;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

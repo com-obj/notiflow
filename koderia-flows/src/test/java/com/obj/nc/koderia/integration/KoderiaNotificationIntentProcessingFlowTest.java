@@ -2,23 +2,15 @@ package com.obj.nc.koderia.integration;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.config.InjectorConfiguration;
-import com.obj.nc.config.JdbcConfiguration;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig;
-import com.obj.nc.flows.inputEventRouting.config.InputEventRoutingProperties;
-import com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter;
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
-import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
-import com.obj.nc.koderia.KoderiaFlowsApplication;
-import com.obj.nc.koderia.dto.koderia.recipients.RecipientDto;
-import com.obj.nc.koderia.dto.koderia.event.BaseKoderiaEventDto;
+import com.obj.nc.koderia.domain.recipients.RecipientDto;
+import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
-import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderProcessorFunction;
+import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinder;
 import com.obj.nc.utils.JsonUtils;
 import org.awaitility.Awaitility;
 import org.hamcrest.MatcherAssert;
@@ -46,10 +38,11 @@ import org.springframework.test.web.client.MockRestServiceServer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import static com.obj.nc.domain.content.mailchimp.MailchimpContent.DATA_MERGE_VARIABLE;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.functions.processors.eventFactory.GenericEventToNotificaitonIntentConverter.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.koderia.flows.MaichimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_ID;
 import static com.obj.nc.koderia.flows.MaichimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
@@ -58,7 +51,6 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(properties = {
@@ -71,7 +63,7 @@ public class KoderiaNotificationIntentProcessingFlowTest extends BaseIntegration
 	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 	@Autowired private SourcePollingChannelAdapter pollableSource;
 	@Autowired private GenericEventPersisterConsumer persister;
-	@Autowired private KoderiaRecipientsFinderProcessorFunction koderiaRecipientsFinder;
+	@Autowired private KoderiaRecipientsFinder koderiaRecipientsFinder;
 	@Autowired private KoderiaRecipientsFinderConfig koderiaRecipientsFinderConfig;
 	@Qualifier(RECEIVED_TEST_LIST)
 	@Autowired private List<Message<?>> received;
@@ -91,8 +83,8 @@ public class KoderiaNotificationIntentProcessingFlowTest extends BaseIntegration
 	
 	@Test
 	void testProcessNotificationIntent() {
-		BaseKoderiaEventDto baseKoderiaEventDto = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEventDto.class);
-		GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEventDto));
+		BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEvent.class);
+		GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
 		genericEvent.setFlowId("default-flow");
 		createRestCallExpectation();
 		// when
@@ -103,17 +95,18 @@ public class KoderiaNotificationIntentProcessingFlowTest extends BaseIntegration
 		// and
 		for (Message<?> receivedMessage : received) {
 			com.obj.nc.domain.message.Message payload = (com.obj.nc.domain.message.Message) receivedMessage.getPayload();
-			checkReceivedPayload(baseKoderiaEventDto, payload);
+			checkReceivedPayload(baseKoderiaEvent, payload);
 		}
 	}
 	
-	private void checkReceivedPayload(BaseKoderiaEventDto baseKoderiaEventDto, com.obj.nc.domain.message.Message payload) {
-		MatcherAssert.assertThat(payload.getBody().getMessage().containsAttribute(ORIGINAL_EVENT_FIELD), equalTo(true));
-		MatcherAssert.assertThat(payload.getBody().getMessage(), instanceOf(EmailContent.class));
+	private void checkReceivedPayload(BaseKoderiaEvent baseKoderiaEvent, com.obj.nc.domain.message.Message payload) {
+		MatcherAssert.assertThat(payload.getBody().getMessage(), instanceOf(MailchimpContent.class));
 		
-		EmailContent content = (EmailContent) payload.getBody().getMessage();
-		MatcherAssert.assertThat(content.getSubject(), equalTo(baseKoderiaEventDto.getMessageSubject()));
-		MatcherAssert.assertThat(content.getText(), equalTo(baseKoderiaEventDto.getMessageText()));
+		MailchimpContent content = payload.getContentTyped();
+		MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(baseKoderiaEvent.getMessageSubject()));
+		Optional<Object> dataVariable = content.getMessage().findMergeVariableContentByName(DATA_MERGE_VARIABLE);
+		MatcherAssert.assertThat(dataVariable.isPresent(), equalTo(true));
+		MatcherAssert.assertThat(((BaseKoderiaEvent) dataVariable.get()).getMessageText(), equalTo(baseKoderiaEvent.getMessageText()));
 		
 		MatcherAssert.assertThat(payload.getBody().getRecievingEndpoints(), hasSize(1));
 		MatcherAssert.assertThat(payload.getBody().getRecievingEndpoints().get(0), instanceOf(EmailEndpoint.class));
