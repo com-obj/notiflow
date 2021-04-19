@@ -39,8 +39,6 @@ public class KoderiaEventConverter extends ProcessorFunctionAdapter<GenericEvent
 	protected NotificationIntent execute(GenericEvent payload) {
 		NotificationIntent notificationIntent = new NotificationIntent();
 		notificationIntent.getHeader().setFlowId(payload.getFlowId());
-		notificationIntent.getHeader().generateAndSetID();
-		notificationIntent.getHeader().addEventId(notificationIntent.getHeader().getId());
 		
 		BaseKoderiaEvent koderiaEvent = payload.getPayloadAsPojo();
 		notificationIntent.getBody().setMessage(koderiaEvent2MailchimpContentMapper.map(koderiaEvent));

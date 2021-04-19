@@ -1,55 +1,40 @@
 package com.obj.nc.koderia.mapper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
 import com.obj.nc.utils.JsonUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.io.IOException;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest
 @Import(MailchimpMessageMapperImplTestConfig.class)
-@Disabled
 class MailchimpKoderiaEvent2MailchimpContentMapperTest {
 
-    public static final String MESSAGE_JSON_PATH = "mailchimp/message.json";
     public static final String EXPECTED_DTO_JSON_PATH = "mailchimp/send_message_dto.json";
 
     @Autowired
     private KoderiaEvent2MailchimpContentMapper mapper;
 
     @Test
-    void testMapWithTemplate() {
+    void testMapWithTemplate() throws JsonProcessingException {
         // GIVEN
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
-        // FIX ABSOLUTE PATHS TO TEST FILES
-        EmailContent emailContent = inputMessage.getContentTyped();
-        emailContent.getAttachments().forEach(attachement -> {
-            try {
-                attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEvent.class);
+    
+        MailchimpContent expectedContent = JsonUtils.readObjectFromClassPathResource(EXPECTED_DTO_JSON_PATH, MailchimpContent.class);
 
-//        SendMessageWithTemplateDto expectedSendMessageDto = JsonUtils.readObjectFromClassPathResource(EXPECTED_DTO_JSON_PATH, SendMessageWithTemplateDto.class);
-//
-//        // WHEN
-//        SendMessageWithTemplateDto sendMessageDto = mapper.map(inputMessage);
+        // WHEN
+        MailchimpContent actualContent = mapper.map(baseKoderiaEvent);
 
         // THEN
-//        MatcherAssert.assertThat(sendMessageDto, Matchers.equalTo(expectedSendMessageDto));
+        MatcherAssert.assertThat(JsonUtils.getObjectMapper().writeValueAsString(actualContent), Matchers.equalTo(JsonUtils.getObjectMapper().writeValueAsString(expectedContent)));
     }
 
 }

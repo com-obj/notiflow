@@ -14,15 +14,18 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @JsonTypeName(MailchimpContent.JSON_TYPE_IDENTIFIER)
 public class MailchimpContent extends EmailContent {
     
     public final static String JSON_TYPE_IDENTIFIER = "MAILCHIMP_CONTENT";
     public final static String DATA_MERGE_VARIABLE = "data";
     
+    @EqualsAndHashCode.Include
     @NotNull private MailchimpMessage message;
+    @EqualsAndHashCode.Include
     @NotBlank @JsonProperty("template_name") private String templateName;
+    @EqualsAndHashCode.Include
     @JsonProperty("template_content") private List<MailchimpTemplateContent> templateContent = new ArrayList<>();
     
     public EmailContent copyToEmailContent() {

@@ -1,8 +1,7 @@
 package com.obj.nc.koderia.flows;
 
-import com.obj.nc.functions.processors.eventIdGenerator.ValidateAndGenerateEventIdProcessingFunction;
+import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
-import com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverter;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinder;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +20,7 @@ public class KoderiaNotificationIntentProcessingFlowConfig {
     public final static String KODERIA_INTENT_PROCESSING_FLOW_ID = "KODERIA_INTENT_PROCESSING_FLOW_ID";
     public final static String KODERIA_INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID = KODERIA_INTENT_PROCESSING_FLOW_ID + "_INPUT";
     
-    private final ValidateAndGenerateEventIdProcessingFunction generateEventId;
+    private final GenerateEventIdProcessingFunction generateEventId;
     private final KoderiaRecipientsFinder recipientsFinder;
     private final MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
     

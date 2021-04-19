@@ -14,9 +14,6 @@
             "attributes": {
                "type": "object"
             },
-            "id": {
-               "type": "string"
-            },
             "eventIds": {
                "type": "array",
                "items": [
@@ -34,7 +31,6 @@
          },
          "required": [
             "attributes",
-            "id",
             "eventIds",
             "processingInfo",
             "flow-id"

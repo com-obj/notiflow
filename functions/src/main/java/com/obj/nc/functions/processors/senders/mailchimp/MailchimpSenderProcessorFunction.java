@@ -45,7 +45,7 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 		
 		boolean hasNoneOrTooMuchEndpoints = payload.getBody().getRecievingEndpoints().size() != 1;
 		boolean containsNonEmailEndpoint = payload.getBody().getRecievingEndpoints().stream()
-				.anyMatch(endpoint -> !EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointTypeName()));
+				.anyMatch(endpoint -> !EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType()));
 		
 		if (hasNoneOrTooMuchEndpoints || containsNonEmailEndpoint) {
 			return Optional.of(new PayloadValidationException(String.format("Mailchimp can only send message %s to 1 EmailEndpoint", payload)));
@@ -82,7 +82,7 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 	private List<MailchimpRecipient> mapRecipient(RecievingEndpoint endpoint) {
 		List<MailchimpRecipient> recipientInList = new ArrayList<>();
 		
-		if (!EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointTypeName())) {
+		if (!EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType())) {
 			throw new UnsupportedOperationException("Mapper can only map EmailContent endpoint");
 		}
 		
