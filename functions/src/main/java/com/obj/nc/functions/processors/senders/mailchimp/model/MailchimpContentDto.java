@@ -18,9 +18,9 @@ public class MailchimpContentDto {
     @NotBlank @JsonProperty("template_name") private String templateName;
     @JsonProperty("template_content") private List<MailchimpTemplateContent> templateContent;
     
-    public static MailchimpContentDto from(MailchimpContent content) {
+    public static MailchimpContentDto from(MailchimpContent content, String authKey) {
         MailchimpContentDto dto = new MailchimpContentDto();
-        dto.key = content.getKey();
+        dto.key = authKey;
         dto.message = content.getMessage();
         dto.templateName = content.getTemplateName();
         dto.templateContent = content.getTemplateContent();

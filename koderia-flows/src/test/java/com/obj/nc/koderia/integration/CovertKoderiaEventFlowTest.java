@@ -91,7 +91,6 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 		BaseKoderiaEvent dataTyped = (BaseKoderiaEvent) data.get();
 		assertThat(dataTyped, equalTo(baseKoderiaEvent));
 		
-		assertThat(content.getKey(), equalTo(mailchimpSenderConfig.getAuthKey()));
 		assertThat(content.getTemplateContent(), notNullValue());
 		assertThat(content.getTemplateName(), notNullValue());
 	}

@@ -32,7 +32,7 @@ public class InMemoryMailchimpSourceSupplier extends SourceSupplierAdapter<Messa
         EmailEndpoint recipient = (EmailEndpoint) mailchimpMessage.getBody().getRecievingEndpoints().iterator().next();
         
         MailchimpContent content = mailchimpMessage.getContentTyped();
-        EmailContent emailContent = content.asSimpleEmailContent();
+        EmailContent emailContent = content.copyToEmailContent();
         emailContent.setAttributeValue(ORIGINAL_RECIPIENTS_EMAIL_ATTR_NAME, recipient.getEmail());
         mailchimpMessage.getBody().setMessage(emailContent);
         

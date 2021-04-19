@@ -25,35 +25,32 @@ public class KoderiaEvent2MailchimpContentMapper {
     private final MailchimpSenderConfig mailchimpSenderConfig;
 
     public MailchimpContent map(BaseKoderiaEvent event) {
-        MailchimpContent dto = new MailchimpContent();
-        dto.setSubject(event.getMessageSubject());
-        dto.setText(event.getMessageText());
-        dto.setAttachments(event.getAttachments());
-        
-        dto.setKey(mailchimpSenderConfig.getAuthKey());
-        dto.setMessage(mapMessage(event));
+        MailchimpContent content = new MailchimpContent();
+        content.setSubject(event.getMessageSubject());
+        content.setText(event.getMessageText());
+        content.setAttachments(event.getAttachments());
 
-        String messageTypeName = getTemplateName(event);
-        dto.setTemplateName(messageTypeName);
-        return dto;
+        content.setMessage(mapMessage(event));
+        content.setTemplateName(getTemplateName(event));
+        return content;
     }
 
     protected MailchimpMessage mapMessage(BaseKoderiaEvent event) {
-        MailchimpMessage mailchimpMessageDto = new MailchimpMessage();
+        MailchimpMessage mailchimpMessage = new MailchimpMessage();
 
-        mailchimpMessageDto.setSubject(mapSubject(event));
-        mailchimpMessageDto.setFromEmail(mailchimpSenderConfig.getSenderEmail());
-        mailchimpMessageDto.setFromName(mailchimpSenderConfig.getSenderName());
+        mailchimpMessage.setSubject(mapSubject(event));
+        mailchimpMessage.setFromEmail(mailchimpSenderConfig.getSenderEmail());
+        mailchimpMessage.setFromName(mailchimpSenderConfig.getSenderName());
 
-        mailchimpMessageDto.setTo(new ArrayList<>());
+        mailchimpMessage.setTo(new ArrayList<>());
 
         List<MailchimpMergeVariable> globalMergeVars = mapGlobalMergeVars(event);
-        mailchimpMessageDto.setGlobalMergeVars(globalMergeVars);
+        mailchimpMessage.setGlobalMergeVars(globalMergeVars);
 
         List<MailchimpAttachment> mailchimpAttachments = mapAttachments(event);
-        mailchimpMessageDto.setAttachments(mailchimpAttachments);
+        mailchimpMessage.setAttachments(mailchimpAttachments);
 
-        return mailchimpMessageDto;
+        return mailchimpMessage;
     }
 
     protected String mapSubject(BaseKoderiaEvent event) {
@@ -80,13 +77,13 @@ public class KoderiaEvent2MailchimpContentMapper {
     }
 
     protected MailchimpAttachment mapAttachment(Attachement attachement) {
-        MailchimpAttachment dto = new MailchimpAttachment();
-        dto.setName(attachement.getName());
+        MailchimpAttachment attachment = new MailchimpAttachment();
+        attachment.setName(attachement.getName());
 
         FileSystemResource file = new FileSystemResource(new File(attachement.getFileURI()));
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
         String mimeType = fileNameMap.getContentTypeFor(file.getFilename());
-        dto.setType(mimeType);
+        attachment.setType(mimeType);
 
         byte[] attachmentBytes = new byte[0];
         try {
@@ -96,9 +93,9 @@ public class KoderiaEvent2MailchimpContentMapper {
         }
 
         String base64StringAttachment = Base64.getEncoder().encodeToString(attachmentBytes);
-        dto.setContent(base64StringAttachment);
+        attachment.setContent(base64StringAttachment);
 
-        return dto;
+        return attachment;
     }
 
     protected String getTemplateName(BaseKoderiaEvent event) {

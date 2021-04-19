@@ -55,9 +55,6 @@
                   "attributes": {
                      "type": "object"
                   },
-                  "key": {
-                     "type": "string"
-                  },
                   "message": {
                      "type": "object",
                      "properties": {
@@ -186,7 +183,6 @@
                "required": [
                   "type",
                   "attributes",
-                  "key",
                   "message",
                   "template_name",
                   "template_content"

@@ -70,7 +70,7 @@ public class KoderiaFlowsTestModeTest extends BaseIntegrationTest {
     }
 	
     @Test
-    void testNotifyCustomersViaTestmodeEmail() {
+    void testNotifyKoderiaPostRecipientsUsingTestMode() {
         // GIVEN
         BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEvent.class);
         GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
