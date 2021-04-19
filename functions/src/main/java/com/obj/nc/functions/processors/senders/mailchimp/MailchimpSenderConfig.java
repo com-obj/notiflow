@@ -25,13 +25,13 @@ public class MailchimpSenderConfig {
     public static final String MAILCHIMP_RESPONSE_FIELD = "mailchimpResponse";
     public static final String MAILCHIMP_REST_TEMPLATE = "mailchimpRestTemplate";
     
-    @NotBlank private String apiUrl;
-    @NotBlank private String authKey;
-    @NotBlank private String senderEmail;
-    @NotNull private String senderName;
-    @NotNull private String aggregatedMessageSubject;
-    @NotNull private String aggregatedMessageTemplateName;
-    @NotNull private Map<String, String> mailchimpTemplateNames;
+    private String apiUrl;
+    private String authKey;
+    private String senderEmail;
+    private String senderName;
+    private String aggregatedMessageSubject;
+    private String aggregatedMessageTemplateName;
+    private Map<String, String> mailchimpTemplateNames;
     
     public String getTemplateNameFromMessageType(String messageType) {
         if (mailchimpTemplateNames.containsKey(messageType)) {
