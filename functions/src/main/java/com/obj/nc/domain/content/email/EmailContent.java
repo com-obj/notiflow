@@ -25,7 +25,7 @@ public class EmailContent extends Content {
 	public final static String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CONTENT";
 
 	public static final String TEXT_CONCAT_DELIMITER = "\n\n";
-	public static final String SUBJECT_CONCAT_DELIMITER = ", ";
+	public static final String SUBJECT_CONCAT_DELIMITER = " \\ ";
 
 	private String subject;
 	

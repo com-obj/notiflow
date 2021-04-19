@@ -16,7 +16,7 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class StandardMessageAggregationStrategy extends ProcessorFunctionAdapter<Messages, Message> implements MessageAggregationStrategy {
+public class StandardMessageAggregationStrategy extends ProcessorFunctionAdapter<Messages, Message> implements PayloadAggregationStrategy {
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(Messages messages) {

@@ -8,8 +8,6 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class EmailMessageAggregationStrategy extends StandardMessageAggregationStrategy {
-	
-	//TODO: Check all content of incomming messages is EmailContent
 
 	@Override
 	protected Message execute(Messages messages) {

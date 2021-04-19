@@ -13,14 +13,15 @@ import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigProperties;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
 
 @Component
 @DocumentProcessingInfo("EmailFormatter")
 public class EmailTemplateFormatter extends BaseTemplateFormatter {
 
-	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {
-		super(templateEngine, config);
+	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config, ThymeleafConfigProperties props) {
+		super(templateEngine, config, props);
 	}
 
 	@Override
@@ -46,5 +47,17 @@ public class EmailTemplateFormatter extends BaseTemplateFormatter {
 		
 		return htmlMessage;
 	}
+	
+//	@Override
+//	protected Message merge(List<Message> result) {
+//		Message htmlMessage = Message.createAsAggregatedEmail();
+//		
+//		AggregatedEmailContent singleContent = htmlMessage.getContentTyped();
+//		singleContent.setContentType(MediaType.TEXT_HTML_VALUE);
+//		
+//		result.forEach(m-> singleContent.add(m.getContentTyped()));
+//		
+//		return htmlMessage;
+//	}
 
 }

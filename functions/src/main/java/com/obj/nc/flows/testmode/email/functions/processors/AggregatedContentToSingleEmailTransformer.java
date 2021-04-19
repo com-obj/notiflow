@@ -20,9 +20,7 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class AggregateMessageToSingleEmailTransformer extends ProcessorFunctionAdapter<Message, Message> {
-	
-//	private TestModeProperties testModeProps = Get.getBean(TestModeProperties.class);
+public class AggregatedContentToSingleEmailTransformer extends ProcessorFunctionAdapter<Message, Message> {
 	
 	private TestModeProperties testModeProps;
 

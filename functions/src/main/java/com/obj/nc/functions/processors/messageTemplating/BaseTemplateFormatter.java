@@ -16,6 +16,7 @@ import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigProperties;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
 
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public abstract class BaseTemplateFormatter extends ProcessorFunctionAdapter<Mes
 	private TemplateEngine templateEngine;
 	
 	private ThymeleafConfiguration config;
+	private ThymeleafConfigProperties props;
 
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message message) {
@@ -80,9 +82,17 @@ public abstract class BaseTemplateFormatter extends ProcessorFunctionAdapter<Mes
 			result.add(htmlMessage);
 		}
 		
+//		if (props.getMultiLocalesMergeStrategy() == MERGE) {
+//			Message mergedMessage = merge(result);
+//			result.clear();
+//			result.add(mergedMessage);
+//		}
+		
 		return result;
 	}
 
+
+//	protected abstract Message merge(List<Message> result);
 
 	protected abstract Message createMessageWithFormattedContent(String formatedContent, Locale locale,  Message payload);
 

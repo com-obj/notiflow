@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
+import com.obj.nc.domain.IsAggregatedContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -76,9 +76,9 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 		EmailContent msg = payload.getContentTyped();
 
 		EmailContent messageContent = null;
-		if (msg instanceof AggregatedEmailContent) {
+		if (msg instanceof IsAggregatedContent) {
 			//ak je stale v rezime aggregated tak mi nic ine nezostava ako spravit "dummy" aggregation. Na konci dna potrebujem jeden subject, jeden text
-			messageContent = ((AggregatedEmailContent) msg).asSimpleContent();
+			messageContent = ((IsAggregatedContent<EmailContent>) msg).asSimpleContent();
 		} else {
 			messageContent = msg;
 		}

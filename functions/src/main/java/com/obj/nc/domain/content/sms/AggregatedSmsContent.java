@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.obj.nc.domain.IsAggregatedContent;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @JsonTypeName(AggregatedSmsContent.JSON_TYPE_IDENTIFIER)
-public class AggregatedSmsContent extends SimpleTextContent {
+public class AggregatedSmsContent extends SimpleTextContent implements IsAggregatedContent<SimpleTextContent> {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "AGGREGATED_SMS_MESSAGE_CONTENT";
 

@@ -29,6 +29,7 @@ public class Message extends BasePayload implements HasHeader {
 		return msg;
 	}
 	
+	//TODO: refactor as some factory or something else
 	public static Message createAsSms() {
 		Message msg = new Message();
 		msg.getBody().setMessage(new SimpleTextContent());

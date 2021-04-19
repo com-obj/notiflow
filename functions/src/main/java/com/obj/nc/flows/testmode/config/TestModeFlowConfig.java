@@ -17,9 +17,9 @@ import org.springframework.integration.store.MessageGroup;
 
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
-import com.obj.nc.flows.testmode.email.functions.processors.AggregateMessageToSingleEmailTransformer;
+import com.obj.nc.flows.testmode.email.functions.processors.AggregatedContentToSingleEmailTransformer;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
-import com.obj.nc.functions.processors.messageAggregator.aggregations.MessageAggregationStrategy;
+import com.obj.nc.functions.processors.messageAggregator.aggregations.PayloadAggregationStrategy;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.StandardMessageAggregationStrategy;
 import com.obj.nc.functions.processors.messageAggregator.correlations.EventIdBasedCorrelationStrategy;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
@@ -61,7 +61,7 @@ public class TestModeFlowConfig {
         				.outputProcessor( testModeMessageAggregator() )
         				.id(TEST_MODE_AGGREGATOR_BEAN_NAME)
         			)
-        		.handle(aggregateMessageToSingleEmailTransformer())
+        		.handle(aggregatedContentToSingleEmailTransformer())
         		.handle(digestEmailFormatter)
                 .handle(sendEmailRealSmtp)
                 .handle(logConsumer)
@@ -74,7 +74,7 @@ public class TestModeFlowConfig {
     }
     
     @Bean
-    public MessageAggregationStrategy aggregationStrategy() {
+    public PayloadAggregationStrategy aggregationStrategy() {
     	return new StandardMessageAggregationStrategy();
     }
     
@@ -110,8 +110,8 @@ public class TestModeFlowConfig {
 	}
 	
     @Bean
-    public AggregateMessageToSingleEmailTransformer aggregateMessageToSingleEmailTransformer() {
-    	return new AggregateMessageToSingleEmailTransformer(testModeProps);
+    public AggregatedContentToSingleEmailTransformer aggregatedContentToSingleEmailTransformer() {
+    	return new AggregatedContentToSingleEmailTransformer(testModeProps);
     }
     
 
