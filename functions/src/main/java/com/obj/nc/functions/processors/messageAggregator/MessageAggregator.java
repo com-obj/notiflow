@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.aggregator.AbstractAggregatingMessageGroupProcessor;
 import org.springframework.integration.store.MessageGroup;
 
-import com.obj.nc.domain.Messages;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.PayloadAggregationStrategy;
 
@@ -28,7 +27,7 @@ public class MessageAggregator extends AbstractAggregatingMessageGroupProcessor 
 		List<Message> messages = group.getMessages().stream().map(sm -> ((Message)sm.getPayload())).collect(Collectors.toList());
 
 
-		return aggregationStrategy.merge(new Messages(messages));
+		return aggregationStrategy.merge(messages);
 	}
 
 }
