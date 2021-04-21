@@ -2,6 +2,8 @@ package com.obj.nc.flows.emailFormattingAndSending;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 
+import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
+import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessageAggregationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +26,11 @@ public class EmailProcessingFlowConfig {
 	public final static String EMAIL_PROCESSING_FLOW_ID = "EMAIL_PROCESSING_FLOW_ID";
 	public final static String EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID = EMAIL_PROCESSING_FLOW_ID + "_INPUT";
 
+	
+	public final static String DELIVERY_INFO_INPUT_CHANNEL_ID = "DELIVERY_INFO_INPUT";
+	
+	public final static String EMAIL_PROCESSING_FLOW_AGGREGATION_STRATEGY = "EMAIL_PROCESSING_FLOW_AGGREGATION_STRATEGY";
+	public final static String EMAIL_PROCESSING_FLOW_MESSAGE_AGGREGATOR = "EMAIL_PROCESSING_FLOW_MESSAGE_AGGREGATOR";
 
 	@Bean(EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel emailProcessingInputChangel() {
@@ -43,6 +50,15 @@ public class EmailProcessingFlowConfig {
 				.handle(logConsumer)
 				.get();
 	}
-
+	
+	@Bean(EMAIL_PROCESSING_FLOW_AGGREGATION_STRATEGY)
+	public EmailMessageAggregationStrategy emailMessageAggregationStrategy() {
+		return new EmailMessageAggregationStrategy();
+	}
+	
+	@Bean(EMAIL_PROCESSING_FLOW_MESSAGE_AGGREGATOR)
+	public MessageAggregator messageAggregator() {
+		return new MessageAggregator(emailMessageAggregationStrategy());
+	}
 
 }

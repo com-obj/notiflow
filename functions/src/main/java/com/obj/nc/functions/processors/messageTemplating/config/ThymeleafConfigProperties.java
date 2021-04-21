@@ -18,9 +18,4 @@ public class ThymeleafConfigProperties {
 	
 	private List<String> defaultLocaleCodes;
 	
-	private MULTI_LOCALES_MERGE_STRATEGY multiLocalesMergeStrategy;
-	
-	public enum MULTI_LOCALES_MERGE_STRATEGY {
-		MESSAGE_PER_LOCALE, MERGE
-	}
 }
