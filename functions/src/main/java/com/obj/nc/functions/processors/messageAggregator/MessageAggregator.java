@@ -9,7 +9,7 @@ import org.springframework.integration.aggregator.AbstractAggregatingMessageGrou
 import org.springframework.integration.store.MessageGroup;
 
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.messageAggregator.aggregations.PayloadAggregationStrategy;
+import com.obj.nc.functions.processors.messageAggregator.aggregations.BasePayloadAggregationStrategy;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,7 +18,7 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 public class MessageAggregator extends AbstractAggregatingMessageGroupProcessor {
 	
-	@Autowired private PayloadAggregationStrategy aggregationStrategy;
+	@Autowired private BasePayloadAggregationStrategy aggregationStrategy;
 
 	@Override
 	protected Object aggregatePayloads(MessageGroup group, Map<String, Object> defaultHeaders) {

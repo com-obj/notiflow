@@ -1,13 +1,11 @@
 package com.obj.nc.koderia.functions.processors.senders;
 
 import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
-import com.obj.nc.koderia.dto.EmitEventDto;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

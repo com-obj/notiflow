@@ -4,6 +4,7 @@ import static org.springframework.integration.dsl.MessageChannels.executor;
 
 import java.util.concurrent.Executors;
 
+import com.obj.nc.functions.processors.messageAggregator.aggregations.TestModeSingleEmailAggregationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -17,10 +18,8 @@ import org.springframework.integration.store.MessageGroup;
 
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
-import com.obj.nc.flows.testmode.email.functions.processors.AggregatedContentToSingleEmailTransformer;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
-import com.obj.nc.functions.processors.messageAggregator.aggregations.PayloadAggregationStrategy;
-import com.obj.nc.functions.processors.messageAggregator.aggregations.StandardMessageAggregationStrategy;
+import com.obj.nc.functions.processors.messageAggregator.aggregations.BasePayloadAggregationStrategy;
 import com.obj.nc.functions.processors.messageAggregator.correlations.EventIdBasedCorrelationStrategy;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
@@ -61,7 +60,7 @@ public class TestModeFlowConfig {
         				.outputProcessor( testModeMessageAggregator() )
         				.id(TEST_MODE_AGGREGATOR_BEAN_NAME)
         			)
-        		.handle(aggregatedContentToSingleEmailTransformer())
+//        		.handle(aggregatedContentToSingleEmailTransformer())
         		.handle(digestEmailFormatter)
                 .handle(sendEmailRealSmtp)
                 .handle(logConsumer)
@@ -74,8 +73,8 @@ public class TestModeFlowConfig {
     }
     
     @Bean
-    public PayloadAggregationStrategy aggregationStrategy() {
-    	return new StandardMessageAggregationStrategy();
+    public BasePayloadAggregationStrategy aggregationStrategy() {
+    	return new TestModeSingleEmailAggregationStrategy(testModeProps);
     }
     
     @Bean
@@ -109,10 +108,10 @@ public class TestModeFlowConfig {
 
 	}
 	
-    @Bean
-    public AggregatedContentToSingleEmailTransformer aggregatedContentToSingleEmailTransformer() {
-    	return new AggregatedContentToSingleEmailTransformer(testModeProps);
-    }
+//    @Bean
+//    public AggregatedContentToSingleEmailTransformer aggregatedContentToSingleEmailTransformer() {
+//    	return new AggregatedContentToSingleEmailTransformer(testModeProps);
+//    }
     
 
 	private void printBanner() {

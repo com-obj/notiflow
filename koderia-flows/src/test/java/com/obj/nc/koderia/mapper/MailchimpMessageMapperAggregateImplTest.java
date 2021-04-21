@@ -1,11 +1,9 @@
 package com.obj.nc.koderia.mapper;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.koderia.KoderiaFlowsApplication;
 import com.obj.nc.koderia.dto.mailchimp.SendMessageWithTemplateDto;
-import com.obj.nc.koderia.mapper.MailchimpMessageMapperAggregateImpl;
 import com.obj.nc.utils.JsonUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;

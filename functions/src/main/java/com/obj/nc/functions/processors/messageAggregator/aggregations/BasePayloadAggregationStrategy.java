@@ -1,6 +1,6 @@
 package com.obj.nc.functions.processors.messageAggregator.aggregations;
 
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.BasePayload;
 
 import java.util.List;
 
@@ -10,8 +10,13 @@ import java.util.List;
  * @author ja
  *
  */
-public interface PayloadAggregationStrategy {
+@FunctionalInterface
+public interface BasePayloadAggregationStrategy {
 	
-	public Message merge(List<Message> messages);
+	/**
+	 * Process the given list of payloads. Implementations are free to return as few or as many payloads
+	 * based on the invocation as needed. Common return types are return BasePayload or List<BasePayload>
+	 */
+	Object merge(List<? extends BasePayload> payloads);
 
 }

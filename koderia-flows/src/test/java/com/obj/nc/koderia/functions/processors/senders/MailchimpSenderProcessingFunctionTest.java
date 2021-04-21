@@ -28,7 +28,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;

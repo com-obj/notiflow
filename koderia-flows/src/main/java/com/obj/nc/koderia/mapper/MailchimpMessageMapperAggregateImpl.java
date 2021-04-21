@@ -1,7 +1,5 @@
 package com.obj.nc.koderia.mapper;
 
-import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.koderia.dto.EmitEventDto;
 import com.obj.nc.koderia.dto.mailchimp.*;

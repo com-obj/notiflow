@@ -30,7 +30,6 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.Body;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;

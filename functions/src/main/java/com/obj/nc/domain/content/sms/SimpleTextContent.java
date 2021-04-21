@@ -18,16 +18,8 @@ public class SimpleTextContent extends Content {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "TEXT_CONTENT";
 
-	public static final String TEXT_CONCAT_DELIMITER = "\n\n";
-
 	@NonNull
 	@EqualsAndHashCode.Include
 	private String text;
-
-	public SimpleTextContent concat(SimpleTextContent other) {
-		SimpleTextContent concated = new SimpleTextContent();
-		concated.text = text.concat(TEXT_CONCAT_DELIMITER).concat(other.text);
-		return concated;
-	}
 
 }
