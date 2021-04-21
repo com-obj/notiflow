@@ -1,6 +1,6 @@
 package com.obj.nc.flows.smsFormattingAndSending;
 
-import static com.obj.nc.flows.errorHandling.DeliveryInfoFlowConfig.DELIVERY_INFO_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -39,7 +39,7 @@ public class SmsProcessingFlowConfig {
 				.split()
 				.handle(smsSender)
 				.wireTap( flowConfig -> 
-					flowConfig.channel(DELIVERY_INFO_FLOW_INPUT_CHANNEL_ID)
+					flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
 				)
 				.handle(logConsumer)
 				.get();

@@ -1,5 +1,6 @@
 package com.obj.nc.flows.intenToMessageToSender;
 
+import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
@@ -12,17 +13,12 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoProcessingGenerator;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
-import com.obj.nc.functions.sink.deliveryInfoPersister.DeliveryInfoPersister;
 
 @Configuration
 public class NotificationIntentProcessingFlowConfig {
 		
-//	@Autowired private GenerateEventIdProcessingFunction generateEventId;
 	@Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
-	@Autowired private DeliveryInfoProcessingGenerator deliveryInfoProcessingGenerator;
-	@Autowired private DeliveryInfoPersister deliveryPersister;
 		
 	public final static String INTENT_PROCESSING_FLOW_ID = "INTENT_PROCESSING_FLOW_ID";
 	public final static String INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID = INTENT_PROCESSING_FLOW_ID + "_INPUT";
@@ -39,10 +35,7 @@ public class NotificationIntentProcessingFlowConfig {
 				.transform(generateMessagesFromEvent)
 				.split()
 				.wireTap( flowConfig -> 
-					flowConfig
-					.handle(deliveryInfoProcessingGenerator)
-					.split()
-					.handle(deliveryPersister)
+					flowConfig.channel(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 				)
 				.routeToRecipients(spec -> spec.
 						recipient(EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> ((Message)m).isEmailMessage()).

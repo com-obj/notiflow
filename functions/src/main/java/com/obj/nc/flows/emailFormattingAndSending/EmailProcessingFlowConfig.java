@@ -1,6 +1,6 @@
 package com.obj.nc.flows.emailFormattingAndSending;
 
-import static com.obj.nc.flows.errorHandling.DeliveryInfoFlowConfig.DELIVERY_INFO_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -38,7 +38,7 @@ public class EmailProcessingFlowConfig {
 				.split()
 				.handle(emailSender)
 				.wireTap( flowConfig -> 
-					flowConfig.channel(DELIVERY_INFO_FLOW_INPUT_CHANNEL_ID)
+					flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
 				)
 				.handle(logConsumer)
 				.get();
