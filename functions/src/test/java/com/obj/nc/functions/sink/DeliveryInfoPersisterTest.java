@@ -22,7 +22,7 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoDeliveredGenerator;
+import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoSendGenerator;
 import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoProcessingGenerator;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
@@ -41,7 +41,7 @@ public class DeliveryInfoPersisterTest extends BaseIntegrationTest {
 	@Autowired private GenerateEventIdProcessingFunction generateEventId;
     @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
     @Autowired private DeliveryInfoPersister deliveryInfoPersister;
-    @Autowired private DeliveryInfoDeliveredGenerator deliveryInfoDeliveredGenerator;
+    @Autowired private DeliveryInfoSendGenerator deliveryInfoSendGenerator;
     @Autowired private DeliveryInfoProcessingGenerator deliveryInfoProcessingGenerator;
     @Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromIntent;
     @Autowired private DeliveryInfoRepository deliveryInfoRepo;
@@ -86,7 +86,7 @@ public class DeliveryInfoPersisterTest extends BaseIntegrationTest {
         
         messages.forEach(msg -> {
         	//pretend delivery
-        	List<DeliveryInfoSendResult> deliveredInfos = deliveryInfoDeliveredGenerator.apply(msg);
+        	List<DeliveryInfoSendResult> deliveredInfos = deliveryInfoSendGenerator.apply(msg);
         	
         	//delivered delivery infos
         	deliveredInfos.forEach(delivery -> {
@@ -99,7 +99,7 @@ public class DeliveryInfoPersisterTest extends BaseIntegrationTest {
         deliveryInfos = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
         
         Assertions.assertThat(deliveryInfos.size()).isEqualTo(6);
-        List<DeliveryInfo> deliveredInfos = deliveryInfos.stream().filter(info -> info.getStatus() == DELIVERY_STATUS.DELIVERED).collect(Collectors.toList());
+        List<DeliveryInfo> deliveredInfos = deliveryInfos.stream().filter(info -> info.getStatus() == DELIVERY_STATUS.SEND).collect(Collectors.toList());
         
         Assertions.assertThat(deliveredInfos.size()).isEqualTo(3);
         deliveryInfos.forEach(info -> {

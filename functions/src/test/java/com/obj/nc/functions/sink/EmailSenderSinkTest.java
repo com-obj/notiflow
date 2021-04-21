@@ -27,7 +27,7 @@ import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoDeliveredGenerator;
+import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoSendGenerator;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.processors.senders.config.EmailSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
@@ -40,7 +40,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
 
 //    @Autowired private JavaMailSenderImpl defaultJavaMailSender;
     @Autowired private EmailSender functionSend;
-    @Autowired private DeliveryInfoDeliveredGenerator delInfoGenerator;
+    @Autowired private DeliveryInfoSendGenerator delInfoGenerator;
     @Autowired private EmailSenderConfigProperties settings;
     
     @RegisterExtension
@@ -69,7 +69,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         
         Assertions.assertThat(delInfos.size()).isEqualTo(1);
         DeliveryInfoSendResult delInfo = delInfos.iterator().next();
-        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.DELIVERED);
+        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SEND);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
         Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(message.getBody().getRecievingEndpoints().get(0));
         Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(message.getHeader().getEventIds());
@@ -132,7 +132,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Assertions.assertThat(delInfos.size()).isEqualTo(1);
         DeliveryInfoSendResult delInfo = delInfos.iterator().next();
         
-        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.DELIVERED);
+        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SEND);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
         Assertions.assertThat(delInfo.getRecievingEndpoint().getEndpointId()).isEqualTo("john.doe@objectify.sk");
 
@@ -157,7 +157,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Assertions.assertThat(delInfos.size()).isEqualTo(1);
         DeliveryInfoSendResult delInfo = delInfos.iterator().next();
         
-        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.DELIVERED);
+        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SEND);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
         Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(inputMessage.getBody().getRecievingEndpoints().get(0));
         Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(inputMessage.getHeader().getEventIds());

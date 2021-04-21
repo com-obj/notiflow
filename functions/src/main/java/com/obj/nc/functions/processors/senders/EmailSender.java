@@ -124,7 +124,7 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 //			DeliveryInfoSendResult info = DeliveryInfoSendResult.builder()
 //				.daliveredOn(Instant.now())
 //				.eventIds(header.getEventIds().toArray(new UUID[0]))
-//				.status(DELIVERY_STATUS.DELIVERED)
+//				.status(DELIVERY_STATUS.SEND)
 //				.recievingEndpoint(toEmail)
 //				.build();
 //				
