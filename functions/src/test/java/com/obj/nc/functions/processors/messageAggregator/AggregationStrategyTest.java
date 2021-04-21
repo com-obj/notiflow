@@ -23,8 +23,7 @@ import com.obj.nc.utils.JsonUtils;
 @SpringJUnitConfig(classes = MessageAggregatorTestConfig.class)
 class AggregationStrategyTest {
 
-    @Autowired
-    private EmailMessageAggregationStrategy aggregateEmailMessages;
+    @Autowired private EmailMessageAggregationStrategy aggregateEmailMessages;
     
     @Test
     void testAggregateValidMessagesPass() {
@@ -36,7 +35,7 @@ class AggregationStrategyTest {
         );
 
         // when
-        Message outputMessage = aggregateEmailMessages.apply(inputMessages);
+        Message outputMessage = (Message) aggregateEmailMessages.apply(inputMessages);
 
         // then
         Message expected = JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_output_message.json", Message.class);
@@ -100,9 +99,15 @@ class AggregationStrategyTest {
     public static class MessageAggregatorTestConfig {
 
         @Bean
-        public EmailMessageAggregationStrategy aggregateEmailMessages() {
+        public EmailMessageAggregationStrategy emailMessageAggregationStrategy() {
             return new EmailMessageAggregationStrategy();
         }
+    
+        @Bean
+        public MessageAggregator aggregateEmailMessages() {
+            return new MessageAggregator(emailMessageAggregationStrategy());
+        }
+        
     }
 
 }

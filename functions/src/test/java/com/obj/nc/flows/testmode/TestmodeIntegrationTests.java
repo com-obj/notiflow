@@ -130,20 +130,20 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         System.out.println(GreenMailUtil.getWholeMessage(msg));
         
         
-        AggregatedEmailContent aggregated1 = message1.getContentTyped();
-        AggregatedEmailContent aggregated2 = message2.getContentTyped();
-        AggregatedEmailContent aggregated3 = message3.getContentTyped();
-        Assertions.assertThat(msg.getSubject()).isEqualTo("Notifications digest while running test mode");
-        
-        Assertions.assertThat(GreenMailUtil.getBody(msg)).contains(
-        		aggregated1.getAggregateContent().get(0).getSubject(),
-        		aggregated2.getAggregateContent().get(0).getSubject(),
-        		aggregated3.getAggregateContent().get(0).getSubject());
-        
-        Assertions.assertThat(GreenMailUtil.getBody(msg)).contains(
-        		aggregated1.getAggregateContent().get(0).getText(),
-        		aggregated2.getAggregateContent().get(0).getText(),
-        		aggregated3.getAggregateContent().get(0).getText());
+//        AggregatedEmailContent aggregated1 = message1.getContentTyped();
+//        AggregatedEmailContent aggregated2 = message2.getContentTyped();
+//        AggregatedEmailContent aggregated3 = message3.getContentTyped();
+//        Assertions.assertThat(msg.getSubject()).isEqualTo("Notifications digest while running test mode");
+//        
+//        Assertions.assertThat(GreenMailUtil.getBody(msg)).contains(
+//        		aggregated1.getAggregateContent().get(0).getSubject(),
+//        		aggregated2.getAggregateContent().get(0).getSubject(),
+//        		aggregated3.getAggregateContent().get(0).getSubject());
+//        
+//        Assertions.assertThat(GreenMailUtil.getBody(msg)).contains(
+//        		aggregated1.getAggregateContent().get(0).getText(),
+//        		aggregated2.getAggregateContent().get(0).getText(),
+//        		aggregated3.getAggregateContent().get(0).getText());
         
         //Check tranlations
         Assertions.assertThat(GreenMailUtil.getBody(msg)).contains("Recipient","Attachments");

@@ -4,6 +4,7 @@ import static org.springframework.integration.dsl.MessageChannels.executor;
 
 import java.util.concurrent.Executors;
 
+import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.TestModeSingleEmailAggregationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,7 +19,6 @@ import org.springframework.integration.store.MessageGroup;
 
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
-import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.BasePayloadAggregationStrategy;
 import com.obj.nc.functions.processors.messageAggregator.correlations.EventIdBasedCorrelationStrategy;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;

@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class TestModeSingleEmailAggregationStrategy implements BasePayloadAggregationStrategy {
+public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregationStrategy {
     
     private final TestModeProperties testModeProps;
     
