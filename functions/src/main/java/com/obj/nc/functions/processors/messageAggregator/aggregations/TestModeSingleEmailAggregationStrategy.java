@@ -24,6 +24,8 @@ public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregati
     
     @Override
     public Object merge(List<? extends BasePayload> payloads) {
+        if (payloads.isEmpty()) return null;
+    
         //TODO: ked bude refactorovany header a ostatne veci tak tuto spravit novu message a neprepisovat existujucu
         Message aggregatedMessage = (Message) payloads.get(0);
         

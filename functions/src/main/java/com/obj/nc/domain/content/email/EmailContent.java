@@ -46,18 +46,4 @@ public class EmailContent extends Content {
 		return emailContent;
 	}
 	
-	@JsonIgnore
-	public String getTextForAggregation() {
-		if (MediaType.TEXT_PLAIN_VALUE.equals(contentType)) {
-			return text;
-		} else if (MediaType.TEXT_HTML_VALUE.equals(contentType)) {
-			Document textAsHtml = Jsoup.parse(text);
-			return textAsHtml.body().html();
-		} else {
-			throw new RuntimeException(String.format("Could not get content for aggregation for MediaType: %s", contentType));
-		}
-	}
-	
-
-
 }

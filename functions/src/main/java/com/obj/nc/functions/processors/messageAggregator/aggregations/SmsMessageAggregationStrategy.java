@@ -18,7 +18,7 @@ public class SmsMessageAggregationStrategy extends BasePayloadAggregationStrateg
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(List<? extends BasePayload> payloads) {
-		Optional<PayloadValidationException> exception = checkContentClassTypes(payloads, SimpleTextContent.class);
+		Optional<PayloadValidationException> exception = checkContentTypes(payloads, SimpleTextContent.class);
 		if (exception.isPresent()) {
 			return exception;
 		}
@@ -43,6 +43,8 @@ public class SmsMessageAggregationStrategy extends BasePayloadAggregationStrateg
 	
 	@Override
 	public Object merge(List<? extends BasePayload> payloads) {
+		if (payloads.isEmpty()) return null;
+		
 		Message outputMessage = Message.createAsSms();
 		outputMessage.getBody().setRecievingEndpoints(payloads.get(0).getBody().getRecievingEndpoints());
 		outputMessage.getBody().setDeliveryOptions(payloads.get(0).getBody().getDeliveryOptions());

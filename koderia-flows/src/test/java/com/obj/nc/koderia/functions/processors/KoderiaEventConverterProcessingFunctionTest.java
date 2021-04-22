@@ -12,6 +12,7 @@ import io.restassured.module.jsv.JsonSchemaValidator;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -25,6 +26,7 @@ import java.util.Map;
         KoderiaEventConverterExecution.class,
         KoderiaEventConverterPreCondition.class
 })
+@Disabled
 class KoderiaEventConverterProcessingFunctionTest {
 
     @Autowired

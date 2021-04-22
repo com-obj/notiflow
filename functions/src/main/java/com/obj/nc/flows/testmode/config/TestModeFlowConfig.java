@@ -60,7 +60,6 @@ public class TestModeFlowConfig {
         				.outputProcessor( testModeMessageAggregator() )
         				.id(TEST_MODE_AGGREGATOR_BEAN_NAME)
         			)
-//        		.handle(aggregatedContentToSingleEmailTransformer())
         		.handle(digestEmailFormatter)
                 .handle(sendEmailRealSmtp)
                 .handle(logConsumer)
@@ -73,13 +72,13 @@ public class TestModeFlowConfig {
     }
     
     @Bean
-    public BasePayloadAggregationStrategy aggregationStrategy() {
+    public BasePayloadAggregationStrategy testModeAggregationStrategy() {
     	return new TestModeSingleEmailAggregationStrategy(testModeProps);
     }
     
     @Bean
     public MessageAggregator testModeMessageAggregator() {
-    	return new MessageAggregator(aggregationStrategy());
+    	return new MessageAggregator(testModeAggregationStrategy());
     }
     
 	@Bean

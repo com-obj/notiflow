@@ -25,22 +25,22 @@ public class MailchimpSenderPreCondition implements PreCondition<Message> {
 		}
 
 		Content messageContent = message.getBody().getMessage();
-		if (messageContent instanceof AggregatedEmailContent) {
-			AggregatedEmailContent aggregatedContent = (AggregatedEmailContent)messageContent;
-			
-			for (EmailContent messageContentPart : aggregatedContent.getAggregateContent()) {
-				
-				Optional<PayloadValidationException> exception = checkMessageContent(messageContentPart);
-				if (exception.isPresent()) {
-					return exception;
-				}
-			}
-		} else {
+//		if (messageContent instanceof AggregatedEmailContent) {
+//			AggregatedEmailContent aggregatedContent = (AggregatedEmailContent)messageContent;
+//			
+//			for (EmailContent messageContentPart : aggregatedContent.getAggregateContent()) {
+//				
+//				Optional<PayloadValidationException> exception = checkMessageContent(messageContentPart);
+//				if (exception.isPresent()) {
+//					return exception;
+//				}
+//			}
+//		} else {
 			Optional<PayloadValidationException> exception = checkMessageContent(message.getContentTyped());
 			if (exception.isPresent()) {
 				return exception;
 			}
-		}
+//		}
 
 		return checkReceivingEndpoints(message);
 	}

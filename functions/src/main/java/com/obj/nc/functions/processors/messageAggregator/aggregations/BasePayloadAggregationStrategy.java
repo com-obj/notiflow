@@ -64,7 +64,7 @@ public abstract class BasePayloadAggregationStrategy extends ProcessorFunctionAd
 						payload.getBody().getRecievingEndpoints())));
 	}
 	
-	protected Optional<PayloadValidationException> checkContentClassTypes(List<? extends BasePayload> payloads, Class<?> clazz) {
+	protected Optional<PayloadValidationException> checkContentTypes(List<? extends BasePayload> payloads, Class<?> clazz) {
 		Optional<? extends BasePayload> invalidPayload = payloads.stream().filter(payload -> !clazz.isInstance(payload.getBody().getMessage()))
 				.findFirst();
 		

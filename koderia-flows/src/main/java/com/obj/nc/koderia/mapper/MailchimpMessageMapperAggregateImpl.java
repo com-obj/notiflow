@@ -24,26 +24,27 @@ public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperI
 
     @Override
     protected List<MergeVarDto> mapGlobalMergeVars(Message message) {
-    	AggregatedEmailContent aggregateContent = (AggregatedEmailContent)message.getBody().getMessage();
+//    	AggregatedEmailContent aggregateContent = (AggregatedEmailContent)message.getBody().getMessage();
 
         Map<String, List<Object>> globalMergeCategoryValues = new HashMap<>();
         Arrays.stream(EmitEventDto.Type.values())
                 .forEach(type -> globalMergeCategoryValues.put(type.name(), new ArrayList<>()));
 
-        aggregateContent.getAggregateContent().stream()
-                .map(messageContent -> messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class))
-                .forEach(originalEvent -> globalMergeCategoryValues.get(originalEvent.getType().name()).add(originalEvent.asMap()));
+//        aggregateContent.getAggregateContent().stream()
+//                .map(messageContent -> messageContent.getAttributeValueAs(ORIGINAL_EVENT_FIELD, EmitEventDto.class))
+//                .forEach(originalEvent -> globalMergeCategoryValues.get(originalEvent.getType().name()).add(originalEvent.asMap()));
 
         return globalMergeCategoryValues.entrySet().stream().map(this::mapMergeVar).collect(Collectors.toList());
     }
 
     @Override
     protected List<AttachmentDto> mapAttachments(Message message) {
-    	AggregatedEmailContent aggregateContent = (AggregatedEmailContent)message.getBody().getMessage();
-    	
-        return aggregateContent.getAggregateContent().stream()
-                .flatMap(messageContent -> messageContent.getAttachments().stream().map(this::mapAttachment))
-                .collect(Collectors.toList());
+//    	AggregatedEmailContent aggregateContent = (AggregatedEmailContent)message.getBody().getMessage();
+//    	
+//        return aggregateContent.getAggregateContent().stream()
+//                .flatMap(messageContent -> messageContent.getAttachments().stream().map(this::mapAttachment))
+//                .collect(Collectors.toList());
+        return new ArrayList<>();
     }
 
     @Override
