@@ -28,7 +28,7 @@ import javax.mail.internet.MimeMessage;
 
 import java.util.List;
 
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MESSAGE_PER_LOCALE;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,7 +39,7 @@ import static org.hamcrest.Matchers.*;
 @SpringBootTest
 class EmailProcessingFlowTests extends BaseIntegrationTest {
     
-    @Qualifier(EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+    @Qualifier(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID)
     @Autowired private PublishSubscribeChannel emailProcessingInputChangel;
     @Autowired private EmailProcessingFlowProperties properties;
     

@@ -1,18 +1,20 @@
 package com.obj.nc.functions.processors.messageAggregator.aggregations;
 
-import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.message.Message;
+import java.util.List;
+import java.util.Optional;
 
-import com.obj.nc.exceptions.PayloadValidationException;
-import lombok.extern.log4j.Log4j2;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.http.MediaType;
 
-import java.util.List;
-import java.util.Optional;
+import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.Body;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.exceptions.PayloadValidationException;
+
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrategy {
@@ -77,12 +79,17 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 	public Object merge(List<? extends BasePayload> payloads) {
 		if (payloads.isEmpty()) return null;
 		
-		Message outputMessage = Message.createAsEmail();
-		outputMessage.getBody().setRecievingEndpoints(payloads.get(0).getBody().getRecievingEndpoints());
-		outputMessage.getBody().setDeliveryOptions(payloads.get(0).getBody().getDeliveryOptions());
-
-		EmailContent aggregatedEmailContent = payloads.stream().map(BasePayload::<EmailContent>getContentTyped).reduce(this::concatContents)
+		EmailContent aggregatedEmailContent = payloads
+				.stream()
+				.map(BasePayload::<EmailContent>getContentTyped)
+				.reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
+		
+		Body firstBody = payloads.get(0).getBody();
+		
+		Message outputMessage = Message.createAsEmail();
+		outputMessage.getBody().setRecievingEndpoints(firstBody.getRecievingEndpoints());
+		outputMessage.getBody().setDeliveryOptions(firstBody.getDeliveryOptions());
 		outputMessage.getBody().setMessage(aggregatedEmailContent);
 		return outputMessage;
 	}
