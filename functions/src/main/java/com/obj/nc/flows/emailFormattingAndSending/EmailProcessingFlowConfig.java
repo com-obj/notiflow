@@ -19,6 +19,8 @@ import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
+
 @Configuration
 public class EmailProcessingFlowConfig {
 	
@@ -60,7 +62,7 @@ public class EmailProcessingFlowConfig {
 				.publishSubscribeChannel(c -> c.id(EMAIL_FORMATING_OUTPUT_CHANNEL_ID))
 				.routeToRecipients(spec -> spec
 						.recipient(MULTI_LOCALES_AGGREGATION_INPUT_CHANNEL_ID,
-								m -> EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE.equals(properties.getMultiLocalesMergeStrategy()))
+								m -> MERGE.equals(properties.getMultiLocalesMergeStrategy()))
 						.defaultOutputToParentFlow()
 				)
 				.split()
@@ -73,6 +75,15 @@ public class EmailProcessingFlowConfig {
 				.get();
 	}
 	
+	@Bean(EMAIL_FORMATING_FLOW_ID)
+	public IntegrationFlow emailFormatingFlowDefinition() {
+		return IntegrationFlows
+				.from(EMAIL_FORMATING_INPUT_CHANNEL_ID)
+				.handle(emailFormatter)
+				.channel(EMAIL_FORMATING_OUTPUT_CHANNEL_ID)
+				.get();
+	}
+	
 	@Bean(MULTI_LOCALES_AGGREGATION_FLOW_ID)
 	public IntegrationFlow multiLocalesAggregationFlowDefinition() {
 		return IntegrationFlows
@@ -82,13 +93,9 @@ public class EmailProcessingFlowConfig {
 				.get();
 	}
 	
-	@Bean(EMAIL_FORMATING_FLOW_ID)
-	public IntegrationFlow emailFormatingFlowDefinition() {
-		return IntegrationFlows
-				.from(EMAIL_FORMATING_INPUT_CHANNEL_ID)
-				.handle(emailFormatter)
-				.channel(EMAIL_FORMATING_OUTPUT_CHANNEL_ID)
-				.get();
+	@Bean(MULTI_LOCALES_AGGREGATION_STRATEGY)
+	public EmailMessageAggregationStrategy multiLocalesAggregationStrategy() {
+		return new EmailMessageAggregationStrategy();
 	}
 	
 	@Bean(EMAIL_FORMATING_INPUT_CHANNEL_ID)
@@ -99,11 +106,6 @@ public class EmailProcessingFlowConfig {
 	@Bean(MULTI_LOCALES_AGGREGATION_INPUT_CHANNEL_ID)
 	public MessageChannel multiLocalesAggregationInputChannel() {
 		return new PublishSubscribeChannel();
-	}
-	
-	@Bean(MULTI_LOCALES_AGGREGATION_STRATEGY)
-	public EmailMessageAggregationStrategy multiLocalesAggregationStrategy() {
-		return new EmailMessageAggregationStrategy();
 	}
 
 }
