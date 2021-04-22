@@ -4,6 +4,8 @@ import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO
 
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
+import com.obj.nc.domain.content.TemplateWithModelContent;
+import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessageAggregationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,10 +33,14 @@ public class EmailProcessingFlowConfig {
 	
 	public final static String DELIVERY_INFO_INPUT_CHANNEL_ID = "DELIVERY_INFO_INPUT";
 	
-	public final static String EMAIL_PROCESSING_FLOW_AGGREGATION_STRATEGY = "EMAIL_PROCESSING_FLOW_AGGREGATION_STRATEGY";
-	public final static String EMAIL_PROCESSING_FLOW_MESSAGE_AGGREGATOR = "EMAIL_PROCESSING_FLOW_MESSAGE_AGGREGATOR";
 	public final static String MULTI_LOCALES_AGGREGATION_FLOW_ID = "MULTI_LOCALES_AGGREGATION_FLOW_ID";
+	public final static String MULTI_LOCALES_AGGREGATION_STRATEGY = "MULTI_LOCALES_AGGREGATION_STRATEGY";
 	public final static String MULTI_LOCALES_AGGREGATION_INPUT_CHANNEL_ID = MULTI_LOCALES_AGGREGATION_FLOW_ID + "_INPUT";
+	
+	public final static String EMAIL_FORMATING_FLOW_ID = "EMAIL_FORMATING_FLOW_ID";
+	public final static String EMAIL_FORMATING_INPUT_CHANNEL_ID = EMAIL_FORMATING_FLOW_ID + "_INPUT";
+	public final static String EMAIL_FORMATING_OUTPUT_CHANNEL_ID = EMAIL_FORMATING_FLOW_ID + "_OUTPUT";
+	
 	public final static String EMAIL_SENDING_INPUT_CHANNEL_ID = "EMAIL_SENDING_INPUT";
 
 	@Bean(EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID)
@@ -46,14 +52,19 @@ public class EmailProcessingFlowConfig {
 	public IntegrationFlow emailProcessingFlowDefinition() {
 		return IntegrationFlows
 				.from(emailProcessingInputChangel())
-				.handle(emailFormatter)
 				.routeToRecipients(spec -> spec
-						.recipient(multiLocalesAggregationInputChannel(), 
+						.recipient(EMAIL_FORMATING_INPUT_CHANNEL_ID,
+								m -> ((Message) m).getBody().getMessage() instanceof TemplateWithModelContent)
+						.defaultOutputToParentFlow()
+				)
+				.publishSubscribeChannel(c -> c.id(EMAIL_FORMATING_OUTPUT_CHANNEL_ID))
+				.routeToRecipients(spec -> spec
+						.recipient(MULTI_LOCALES_AGGREGATION_INPUT_CHANNEL_ID,
 								m -> EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE.equals(properties.getMultiLocalesMergeStrategy()))
 						.defaultOutputToParentFlow()
 				)
-				.channel(emailSendingInputChannel())
 				.split()
+				.publishSubscribeChannel(c -> c.id(EMAIL_SENDING_INPUT_CHANNEL_ID))
 				.handle(emailSender)
 				.wireTap( flowConfig -> 
 					flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
@@ -63,12 +74,26 @@ public class EmailProcessingFlowConfig {
 	}
 	
 	@Bean(MULTI_LOCALES_AGGREGATION_FLOW_ID)
-	public IntegrationFlow emailAggregatingFlowDefinition() {
+	public IntegrationFlow multiLocalesAggregationFlowDefinition() {
 		return IntegrationFlows
-				.from(multiLocalesAggregationInputChannel())
-				.handle(messageAggregator())
-				.channel(emailSendingInputChannel())
+				.from(MULTI_LOCALES_AGGREGATION_INPUT_CHANNEL_ID)
+				.handle(multiLocalesAggregationStrategy())
+				.channel(EMAIL_SENDING_INPUT_CHANNEL_ID)
 				.get();
+	}
+	
+	@Bean(EMAIL_FORMATING_FLOW_ID)
+	public IntegrationFlow emailFormatingFlowDefinition() {
+		return IntegrationFlows
+				.from(EMAIL_FORMATING_INPUT_CHANNEL_ID)
+				.handle(emailFormatter)
+				.channel(EMAIL_FORMATING_OUTPUT_CHANNEL_ID)
+				.get();
+	}
+	
+	@Bean(EMAIL_FORMATING_INPUT_CHANNEL_ID)
+	public MessageChannel emailFormatingInputChannel() {
+		return new PublishSubscribeChannel();
 	}
 	
 	@Bean(MULTI_LOCALES_AGGREGATION_INPUT_CHANNEL_ID)
@@ -76,19 +101,9 @@ public class EmailProcessingFlowConfig {
 		return new PublishSubscribeChannel();
 	}
 	
-	@Bean(EMAIL_SENDING_INPUT_CHANNEL_ID)
-	public MessageChannel emailSendingInputChannel() {
-		return new PublishSubscribeChannel();
-	}
-	
-	@Bean(EMAIL_PROCESSING_FLOW_AGGREGATION_STRATEGY)
-	public EmailMessageAggregationStrategy emailMessageAggregationStrategy() {
+	@Bean(MULTI_LOCALES_AGGREGATION_STRATEGY)
+	public EmailMessageAggregationStrategy multiLocalesAggregationStrategy() {
 		return new EmailMessageAggregationStrategy();
-	}
-	
-	@Bean(EMAIL_PROCESSING_FLOW_MESSAGE_AGGREGATOR)
-	public MessageAggregator messageAggregator() {
-		return new MessageAggregator(emailMessageAggregationStrategy());
 	}
 
 }

@@ -1,10 +1,8 @@
 package com.obj.nc.functions.processors.messageAggregator.aggregations;
 
 import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
@@ -36,11 +34,11 @@ public abstract class BasePayloadAggregationStrategy extends ProcessorFunctionAd
 			return Optional.empty();
 		}
 		
-		DeliveryOptions.AGGREGATION_TYPE firstMessageAggregationType = firstPayload.get().getBody().getDeliveryOptions().getAggregationType();
-		if (DeliveryOptions.AGGREGATION_TYPE.NONE.equals(firstMessageAggregationType)) {
-			return Optional.of(new PayloadValidationException(
-					String.format("Payload %s has invalid aggregation type. Is %s", firstPayload.get(), firstMessageAggregationType)));
-		}
+//		DeliveryOptions.AGGREGATION_TYPE firstMessageAggregationType = firstPayload.get().getBody().getDeliveryOptions().getAggregationType();
+//		if (DeliveryOptions.AGGREGATION_TYPE.NONE.equals(firstMessageAggregationType)) {
+//			return Optional.of(new PayloadValidationException(
+//					String.format("Payload %s has invalid aggregation type. Is %s", firstPayload.get(), firstMessageAggregationType)));
+//		}
 		
 		Optional<? extends BasePayload> invalidPayload = payloads.stream()
 				.filter(payload -> !firstPayload.get().getBody().getDeliveryOptions().equals(payload.getBody().getDeliveryOptions()))
@@ -66,13 +64,12 @@ public abstract class BasePayloadAggregationStrategy extends ProcessorFunctionAd
 						payload.getBody().getRecievingEndpoints())));
 	}
 	
-	protected Optional<PayloadValidationException> checkContentTypes(List<? extends BasePayload> payloads, Class<?> clazz) {
+	protected Optional<PayloadValidationException> checkContentClassTypes(List<? extends BasePayload> payloads, Class<?> clazz) {
 		Optional<? extends BasePayload> invalidPayload = payloads.stream().filter(payload -> !clazz.isInstance(payload.getBody().getMessage()))
 				.findFirst();
 		
 		return invalidPayload.map(payload -> new PayloadValidationException(
 				String.format("Payload %s has content of invalid type. Is %s", payload, payload.getBody().getMessage().getClass().getName())));
-		
 	}
 	
 	protected Optional<PayloadValidationException> checkEndpointTypes(List<? extends BasePayload> payloads, Class<?> clazz) {

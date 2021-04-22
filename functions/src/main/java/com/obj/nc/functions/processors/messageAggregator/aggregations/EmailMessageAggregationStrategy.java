@@ -7,6 +7,11 @@ import com.obj.nc.domain.message.Message;
 
 import com.obj.nc.exceptions.PayloadValidationException;
 import lombok.extern.log4j.Log4j2;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +24,7 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(List<? extends BasePayload> payloads) {
-		Optional<PayloadValidationException> exception = checkContentTypes(payloads, EmailContent.class);
+		Optional<PayloadValidationException> exception = checkContentClassTypes(payloads, EmailContent.class);
 		if (exception.isPresent()) {
 			return exception;
 		}
@@ -30,6 +35,27 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 		}
 		
 		return checkReceivingEndpoints(payloads);
+	}
+	
+	@Override
+	protected Optional<PayloadValidationException> checkDeliveryOptions(List<? extends BasePayload> payloads) {
+		Optional<PayloadValidationException> exception = super.checkDeliveryOptions(payloads);
+		if (exception.isPresent()) {
+			return exception;
+		}
+		
+		Optional<? extends BasePayload> firstPayload = payloads.stream().findFirst();
+		if (!firstPayload.isPresent()) {
+			return Optional.empty();
+		}
+		
+		Optional<? extends BasePayload> invalidPayload = payloads.stream()
+				.filter(payload -> !firstPayload.get().<EmailContent>getContentTyped().getContentType()
+						.equals(payload.<EmailContent>getContentTyped().getContentType()))
+				.findFirst();
+		
+		return invalidPayload.map(payload -> new PayloadValidationException(
+				String.format("Payload %s has content of invalid type. Is %s", payload, payload.<EmailContent>getContentTyped().getContentType())));
 	}
 	
 	@Override
@@ -56,12 +82,22 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 		return outputMessage;
 	}
 	
-	private EmailContent concatContents(EmailContent a, EmailContent b) {
+	private EmailContent concatContents(EmailContent one, EmailContent other) {
 		EmailContent concated = new EmailContent();
-		concated.setSubject(a.getSubject().concat(SUBJECT_CONCAT_DELIMITER).concat(b.getSubject()));
-		concated.setText(a.getTextForAggregation().concat(TEXT_CONCAT_DELIMITER).concat(b.getTextForAggregation()));
-		concated.getAttachments().addAll(a.getAttachments());
-		concated.getAttachments().addAll(b.getAttachments());
+		concated.setContentType(one.getContentType());
+		concated.setSubject(one.getSubject().concat(SUBJECT_CONCAT_DELIMITER).concat(other.getSubject()));
+		
+		String concatedTexts = one.getTextForAggregation().concat(TEXT_CONCAT_DELIMITER).concat(other.getTextForAggregation());
+		if (MediaType.TEXT_HTML_VALUE.equals(concated.getContentType())) {
+			Document concatedTextsAsDocument = Jsoup.parseBodyFragment(concatedTexts);
+			Document oneAsDocument = Jsoup.parse(one.getText());
+			oneAsDocument.body().replaceWith(concatedTextsAsDocument.body());
+			concatedTexts = oneAsDocument.html();
+		}
+		
+		concated.setText(concatedTexts);
+		concated.getAttachments().addAll(one.getAttachments());
+		concated.getAttachments().addAll(other.getAttachments());
 		return concated;
 	}
 

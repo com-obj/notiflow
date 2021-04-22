@@ -18,7 +18,7 @@ public class SmsMessageAggregationStrategy extends BasePayloadAggregationStrateg
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(List<? extends BasePayload> payloads) {
-		Optional<PayloadValidationException> exception = checkContentTypes(payloads, SimpleTextContent.class);
+		Optional<PayloadValidationException> exception = checkContentClassTypes(payloads, SimpleTextContent.class);
 		if (exception.isPresent()) {
 			return exception;
 		}

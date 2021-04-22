@@ -82,17 +82,9 @@ public abstract class BaseTemplateFormatter extends ProcessorFunctionAdapter<Mes
 			result.add(htmlMessage);
 		}
 		
-//		if (props.getMultiLocalesMergeStrategy() == MERGE) {
-//			Message mergedMessage = merge(result);
-//			result.clear();
-//			result.add(mergedMessage);
-//		}
-		
 		return result;
 	}
 
-
-//	protected abstract Message merge(List<Message> result);
 
 	protected abstract Message createMessageWithFormattedContent(String formatedContent, Locale locale,  Message payload);
 

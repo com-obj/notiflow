@@ -47,17 +47,5 @@ public class EmailTemplateFormatter extends BaseTemplateFormatter {
 		
 		return htmlMessage;
 	}
-	
-//	@Override
-//	protected Message merge(List<Message> result) {
-//		Message htmlMessage = Message.createAsAggregatedEmail();
-//		
-//		AggregatedEmailContent singleContent = htmlMessage.getContentTyped();
-//		singleContent.setContentType(MediaType.TEXT_HTML_VALUE);
-//		
-//		result.forEach(m-> singleContent.add(m.getContentTyped()));
-//		
-//		return htmlMessage;
-//	}
 
 }

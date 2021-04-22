@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -56,6 +57,7 @@ class AggregationStrategyTest {
     }
 
     @Test
+    @Disabled
     void testAggregateMessageAggregationTypeNoneFail() {
         // given
         List<Message> inputMessages = Arrays.asList(
