@@ -107,12 +107,6 @@ public class TestModeFlowConfig {
 
 	}
 	
-//    @Bean
-//    public AggregatedContentToSingleEmailTransformer aggregatedContentToSingleEmailTransformer() {
-//    	return new AggregatedContentToSingleEmailTransformer(testModeProps);
-//    }
-    
-
 	private void printBanner() {
 		System.out.println(
 				  "████████╗███████╗███████╗████████╗    ███╗   ███╗ ██████╗ ██████╗ ███████╗     █████╗  ██████╗████████╗██╗██╗   ██╗███████╗\r\n"
