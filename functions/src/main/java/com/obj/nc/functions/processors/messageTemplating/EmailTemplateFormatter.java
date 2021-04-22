@@ -20,8 +20,8 @@ import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigu
 @DocumentProcessingInfo("EmailFormatter")
 public class EmailTemplateFormatter extends BaseTemplateFormatter {
 
-	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config, ThymeleafConfigProperties props) {
-		super(templateEngine, config, props);
+	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {
+		super(templateEngine, config);
 	}
 
 	@Override

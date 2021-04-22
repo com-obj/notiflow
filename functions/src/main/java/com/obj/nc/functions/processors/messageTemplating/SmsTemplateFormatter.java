@@ -19,8 +19,8 @@ import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigu
 @DocumentProcessingInfo("SmsFormatter")
 public class SmsTemplateFormatter extends BaseTemplateFormatter {
 
-	public SmsTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config, ThymeleafConfigProperties props) {
-		super(templateEngine, config, props);
+	public SmsTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {
+		super(templateEngine, config);
 	}
 
 	@Override
@@ -42,16 +42,5 @@ public class SmsTemplateFormatter extends BaseTemplateFormatter {
 		
 		return smsMessage;
 	}
-	
-//	@Override
-//	protected Message merge(List<Message> result) {
-//		Message htmlMessage = Message.createAsAggregatedSms();
-//		
-//		AggregatedSmsContent singleContent = htmlMessage.getContentTyped();
-//		
-//		result.forEach(m-> singleContent.add(m.getContentTyped()));
-//		
-//		return htmlMessage;
-//	}
 
 }

@@ -34,7 +34,6 @@ public abstract class BaseTemplateFormatter extends ProcessorFunctionAdapter<Mes
 	private TemplateEngine templateEngine;
 	
 	private ThymeleafConfiguration config;
-	private ThymeleafConfigProperties props;
 
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message message) {
