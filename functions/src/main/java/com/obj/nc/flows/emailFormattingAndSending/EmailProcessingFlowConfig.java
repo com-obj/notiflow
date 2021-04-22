@@ -33,6 +33,9 @@ public class EmailProcessingFlowConfig {
 	
 	public final static String EMAIL_PROCESSING_FLOW_AGGREGATION_STRATEGY = "EMAIL_PROCESSING_FLOW_AGGREGATION_STRATEGY";
 	public final static String EMAIL_PROCESSING_FLOW_MESSAGE_AGGREGATOR = "EMAIL_PROCESSING_FLOW_MESSAGE_AGGREGATOR";
+	public final static String MULTI_LOCALES_AGGREGATION_FLOW_ID = "MULTI_LOCALES_AGGREGATION_FLOW_ID";
+	public final static String MULTI_LOCALES_AGGREGATION_INPUT_CHANNEL_ID = MULTI_LOCALES_AGGREGATION_FLOW_ID + "_INPUT";
+	public final static String EMAIL_SENDING_INPUT_CHANNEL_ID = "EMAIL_SENDING_INPUT";
 
 	@Bean(EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel emailProcessingInputChangel() {
@@ -45,11 +48,11 @@ public class EmailProcessingFlowConfig {
 				.from(emailProcessingInputChangel())
 				.handle(emailFormatter)
 				.routeToRecipients(spec -> spec
-						.recipient("aggregationChannel", 
+						.recipient(multiLocalesAggregationInputChannel(), 
 								m -> EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE.equals(properties.getMultiLocalesMergeStrategy()))
-						.defaultOutputChannel("emailSendingChannel")
+						.defaultOutputChannel(emailSendingInputChannel())
 				)
-				.channel("emailSendingChannel")
+				.channel(emailSendingInputChannel())
 				.split()
 				.handle(emailSender)
 				.wireTap( flowConfig -> 
@@ -59,13 +62,23 @@ public class EmailProcessingFlowConfig {
 				.get();
 	}
 	
-	@Bean("emailAggregatingFlowId")
+	@Bean(MULTI_LOCALES_AGGREGATION_FLOW_ID)
 	public IntegrationFlow emailAggregatingFlowDefinition() {
 		return IntegrationFlows
-				.from("aggregationChannel")
+				.from(multiLocalesAggregationInputChannel())
 				.handle(messageAggregator())
-				.channel("emailSendingChannel")
+				.channel(emailSendingInputChannel())
 				.get();
+	}
+	
+	@Bean(MULTI_LOCALES_AGGREGATION_INPUT_CHANNEL_ID)
+	public MessageChannel multiLocalesAggregationInputChannel() {
+		return new PublishSubscribeChannel();
+	}
+	
+	@Bean(EMAIL_SENDING_INPUT_CHANNEL_ID)
+	public MessageChannel emailSendingInputChannel() {
+		return new PublishSubscribeChannel();
 	}
 	
 	@Bean(EMAIL_PROCESSING_FLOW_AGGREGATION_STRATEGY)
