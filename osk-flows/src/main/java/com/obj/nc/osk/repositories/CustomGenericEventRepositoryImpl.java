@@ -21,6 +21,7 @@ public class CustomGenericEventRepositoryImpl implements CustomGenericEventRepos
 
 	@Override
 	public Optional<GenericEvent> findStartEventByEventId(Long eventId) {
+		//TODO: ADD HASH INDEX TO DB on payload_json->'id'
 		String query = 
 				"select id, flow_id, external_id, payload_json, time_created, time_consumed from nc_event "
         		+ "where (payload_json->'id')::int4 = " +eventId

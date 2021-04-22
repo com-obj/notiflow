@@ -87,7 +87,7 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     	String startEventStr = JsonUtils.writeObjectToJSONString(startEvent);
 
     	//WHEN
-    	genericEventsService.emitJobPostEvent(startEventStr, null, "111_START");
+    	genericEventsService.emitJobPostEvent(startEventStr, null, "111xx_START");
     	
     	//THEN
         boolean success = greenMail.waitForIncomingEmail(30000L, 12);
@@ -111,7 +111,7 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
         mockServer.verify();
         
         //check delivery infos
-        List<EndpointDeliveryInfoDto> infos = deliveryInfosService.findDeliveryInfosByExtId("111_START");
+        List<EndpointDeliveryInfoDto> infos = deliveryInfosService.findDeliveryInfosByExtId("111xx_START");
         infos.forEach(info -> Assertions.assertThat(info.getCurrentStatus() == DELIVERY_STATUS.SEND));
         
         Assertions.assertThat(infos.size()).isEqualTo(11); //malo by byt 12, nastava grupnutie sprav pre dany nedpoint. Zatial neviem spravi inac, lebo mi chyba pojem sprava.
@@ -127,7 +127,7 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     	String endEventStr = JsonUtils.writeObjectToJSONString(endEvent);
 
     	//WHEN
-    	genericEventsService.emitJobPostEvent(endEventStr, null, "111_END");
+    	genericEventsService.emitJobPostEvent(endEventStr, null, "111xx_END");
     	
     	//THEN
         boolean success = greenMail.waitForIncomingEmail(30000L, 12);
@@ -151,7 +151,7 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
         mockServer.verify();
         
         //check delivery infos
-        List<EndpointDeliveryInfoDto> infos = deliveryInfosService.findDeliveryInfosByExtId("111_START");
+        List<EndpointDeliveryInfoDto> infos = deliveryInfosService.findDeliveryInfosByExtId("111xx_END");
         infos.forEach(info -> Assertions.assertThat(info.getCurrentStatus() == DELIVERY_STATUS.SEND));
         
         Assertions.assertThat(infos.size()).isEqualTo(11);
