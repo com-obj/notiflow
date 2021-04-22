@@ -50,7 +50,7 @@ public class EmailProcessingFlowConfig {
 				.routeToRecipients(spec -> spec
 						.recipient(multiLocalesAggregationInputChannel(), 
 								m -> EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE.equals(properties.getMultiLocalesMergeStrategy()))
-						.defaultOutputChannel(emailSendingInputChannel())
+						.defaultOutputToParentFlow()
 				)
 				.channel(emailSendingInputChannel())
 				.split()

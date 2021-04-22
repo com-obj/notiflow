@@ -105,7 +105,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
             functionSend.apply(message);
         })
                 .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("EmailContent sender can send to EmailContent endpoints only. Found ");
+                .hasMessageContaining("EmailContent sender can send to EmailEndpoint endpoints only. Found ");
     }
 
     @Test
