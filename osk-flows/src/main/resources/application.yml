@@ -35,6 +35,7 @@ nc:
          type-channel-mapping:
             OUTAGE_START: OUTAGE_START_INPUT
             OUTAGE_END: OUTAGE_END_INPUT
+#     email-processing.multi-locales-merge-strategy: MERGE
 
 osk.sia.functions:
    impact-notif-converter:
