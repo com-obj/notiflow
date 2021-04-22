@@ -12,16 +12,12 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.config.InjectorConfiguration;
-import com.obj.nc.config.JdbcConfiguration;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
@@ -36,20 +32,11 @@ import com.obj.nc.osk.functions.content.SalesEmailTemplate;
 import com.obj.nc.osk.functions.model.CustEventModel;
 import com.obj.nc.osk.functions.model.CustomerInfo;
 import com.obj.nc.osk.functions.model.ServiceOutageInfo;
-import com.obj.nc.osk.functions.processors.eventConverter.config.NotifEventConverterConfig;
-import com.obj.nc.osk.functions.processors.eventConverter.config.NotifEventConverterConfigProperties;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
-@DataJdbcTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ContextConfiguration(
-		classes = {
-				NotifEventConverterConfig.class,
-				NotifEventConverterConfigProperties.class,
-				JdbcConfiguration.class,
-				InjectorConfiguration.class})
+@SpringBootTest
 public class NotificationEventConverterProcessingFunctionTest extends BaseIntegrationTest {
 	
 	@Autowired private StartOutageEventConverter startOutageConverter;

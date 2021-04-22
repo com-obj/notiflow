@@ -1,5 +1,6 @@
 package com.obj.nc.osk;
 
+import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
@@ -37,13 +38,16 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.osk.functions.processors.eventConverter.NotificationEventConverterProcessingFunctionTest;
+import com.obj.nc.controllers.DeliveryInfoRestController;
+import com.obj.nc.controllers.DeliveryInfoRestController.EndpointDeliveryInfoDto;
+import com.obj.nc.controllers.EventReceiverRestController;
+import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo.DELIVERY_STATUS;
+import com.obj.nc.osk.domain.IncidentTicketOutageEndEventDto;
+import com.obj.nc.osk.domain.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl;
 import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
 import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
 import com.obj.nc.osk.functions.processors.sms.dtos.SendSmsResourceReferenceDto;
-import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
@@ -52,13 +56,16 @@ import com.obj.nc.utils.JsonUtils;
 @DirtiesContext //have to dispose test mode green mail server
 public class OskFlowsFullUCTest extends BaseIntegrationTest {
     
-    @Autowired private GenericEventRepository genEventRepo;
+
     @Qualifier("nc.emailTemplateFormatter.messageSource")
     @Autowired private MessageSource emailMessageSource;
     @Autowired private OskSmsSenderRestImpl smsSenderRestImpl;
     @Autowired private OskSmsSenderConfigProperties properties;
+    @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired private EventReceiverRestController genericEventsService;
+	@Autowired private DeliveryInfoRestController deliveryInfosService;
+	
     private MockRestServiceServer mockServer;
-    @Autowired JdbcTemplate jdbcTemplate;
     
 
     @BeforeEach
@@ -76,10 +83,11 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     	createRestCallExpectationsForOutageStartSms();
     	
         // GIVEN
-    	GenericEvent event = NotificationEventConverterProcessingFunctionTest.readOutageStartEvent();
+    	IncidentTicketOutageStartEventDto startEvent = readObjectFromClassPathResource("siaNotificationEvents/outage-start-event-full.json", IncidentTicketOutageStartEventDto.class);	
+    	String startEventStr = JsonUtils.writeObjectToJSONString(startEvent);
 
     	//WHEN
-    	genEventRepo.save(event);
+    	genericEventsService.emitJobPostEvent(startEventStr, null, "111_START");
     	
     	//THEN
         boolean success = greenMail.waitForIncomingEmail(30000L, 12);
@@ -101,6 +109,12 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
         
         //check SMS send via RestCall 
         mockServer.verify();
+        
+        //check delivery infos
+        List<EndpointDeliveryInfoDto> infos = deliveryInfosService.findDeliveryInfosByExtId("111_START");
+        infos.forEach(info -> Assertions.assertThat(info.getCurrentStatus() == DELIVERY_STATUS.SEND));
+        
+        Assertions.assertThat(infos.size()).isEqualTo(11); //malo by byt 12, nastava grupnutie sprav pre dany nedpoint. Zatial neviem spravi inac, lebo mi chyba pojem sprava.
     }
     
     @Test
@@ -109,13 +123,14 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     	createRestCallExpectationsForOutageEndSms();
     	
         // GIVEN
-    	GenericEvent event = NotificationEventConverterProcessingFunctionTest.readOutageEndEvent();
+    	IncidentTicketOutageEndEventDto endEvent = readObjectFromClassPathResource("siaNotificationEvents/outage-end-event.json", IncidentTicketOutageEndEventDto.class);
+    	String endEventStr = JsonUtils.writeObjectToJSONString(endEvent);
 
     	//WHEN
-    	genEventRepo.save(event);
+    	genericEventsService.emitJobPostEvent(endEventStr, null, "111_END");
     	
     	//THEN
-        boolean success = greenMail.waitForIncomingEmail(20000L, 12);
+        boolean success = greenMail.waitForIncomingEmail(30000L, 12);
         
         Assertions.assertThat(success).isTrue();
         
@@ -134,6 +149,12 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
         
         //check SMS send via RestCall 
         mockServer.verify();
+        
+        //check delivery infos
+        List<EndpointDeliveryInfoDto> infos = deliveryInfosService.findDeliveryInfosByExtId("111_START");
+        infos.forEach(info -> Assertions.assertThat(info.getCurrentStatus() == DELIVERY_STATUS.SEND));
+        
+        Assertions.assertThat(infos.size()).isEqualTo(11);
     }
     
     private String getMsg(String key, Locale loc) {

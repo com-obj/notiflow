@@ -11,7 +11,7 @@ import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.osk.domain.SiaOutageEvent;
 import com.obj.nc.osk.functions.processors.eventConverter.EndOutageEventConverter;
 import com.obj.nc.osk.functions.processors.eventConverter.StartOutageEventConverter;
-import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.osk.repositories.ExtendedGenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
@@ -33,9 +33,9 @@ public class NotifEventConverterConfig {
 	@Bean
 	public EndOutageEventConverter endOutageEventConverter(
 			NotifEventConverterConfigProperties props, 
-			GenericEventRepository eventRepo) {
+			ExtendedGenericEventRepository customEventRepo) {
 		
-		return new EndOutageEventConverter(props,eventRepo);
+		return new EndOutageEventConverter(props,customEventRepo);
 	}
 	
     @PostConstruct
