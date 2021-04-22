@@ -48,7 +48,7 @@ public abstract class BasePayloadAggregationStrategy extends ProcessorFunctionAd
 		
 		return invalidPayload.map(payload -> new PayloadValidationException(
 				String.format("Payload %s has different delivery options to other payloads. Is %s", payload, 
-						payload.getBody().getDeliveryOptions().getAggregationType())));
+						payload.getBody().getDeliveryOptions())));
 	}
 	
 	protected Optional<PayloadValidationException> checkReceivingEndpoints(List<? extends BasePayload> payloads) {

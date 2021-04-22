@@ -3,6 +3,7 @@ package com.obj.nc.domain.content.email;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -45,6 +46,7 @@ public class EmailContent extends Content {
 		return emailContent;
 	}
 	
+	@JsonIgnore
 	public String getTextForAggregation() {
 		if (MediaType.TEXT_PLAIN_VALUE.equals(contentType)) {
 			return text;

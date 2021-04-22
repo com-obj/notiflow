@@ -44,6 +44,8 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 	
 	@Override
 	public Object merge(List<? extends BasePayload> payloads) {
+		if (payloads.isEmpty()) return null;
+		
 		Message outputMessage = Message.createAsEmail();
 		outputMessage.getBody().setRecievingEndpoints(payloads.get(0).getBody().getRecievingEndpoints());
 		outputMessage.getBody().setDeliveryOptions(payloads.get(0).getBody().getDeliveryOptions());

@@ -2,6 +2,7 @@ package com.obj.nc.flows.emailFormattingAndSending;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 
+import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessageAggregationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class EmailProcessingFlowConfig {
 	@Autowired private EmailSender emailSender;
 	@Autowired private PaylaodLoggerSinkConsumer logConsumer;
 	@Autowired private EmailTemplateFormatter emailFormatter;
+	@Autowired private EmailProcessingFlowProperties properties;
 	
 	public final static String EMAIL_PROCESSING_FLOW_ID = "EMAIL_PROCESSING_FLOW_ID";
 	public final static String EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID = EMAIL_PROCESSING_FLOW_ID + "_INPUT";
@@ -42,12 +44,27 @@ public class EmailProcessingFlowConfig {
 		return IntegrationFlows
 				.from(emailProcessingInputChangel())
 				.handle(emailFormatter)
+				.routeToRecipients(spec -> spec
+						.recipient("aggregationChannel", 
+								m -> EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE.equals(properties.getMultiLocalesMergeStrategy()))
+						.defaultOutputChannel("emailSendingChannel")
+				)
+				.channel("emailSendingChannel")
 				.split()
 				.handle(emailSender)
 				.wireTap( flowConfig -> 
 					flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
 				)
 				.handle(logConsumer)
+				.get();
+	}
+	
+	@Bean("emailAggregatingFlowId")
+	public IntegrationFlow emailAggregatingFlowDefinition() {
+		return IntegrationFlows
+				.from("aggregationChannel")
+				.handle(messageAggregator())
+				.channel("emailSendingChannel")
 				.get();
 	}
 	
