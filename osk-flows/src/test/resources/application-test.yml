@@ -15,6 +15,8 @@ nc:
    functions:
       event-generator:
         source-dir: src/test/resources/eventsQueue
+      email-templates:
+         multi-locales-merge-strategy: MESSAGE_PER_LOCALE
             
 osk.sia.functions:
    impact-notif-converter:

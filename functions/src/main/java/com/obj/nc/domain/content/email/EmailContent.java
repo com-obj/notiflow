@@ -3,6 +3,10 @@ package com.obj.nc.domain.content.email;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.text.StringEscapeUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -24,9 +28,6 @@ public class EmailContent extends Content {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CONTENT";
 
-	public static final String TEXT_CONCAT_DELIMITER = "\n\n";
-	public static final String SUBJECT_CONCAT_DELIMITER = ", ";
-
 	private String subject;
 	
 	@NonNull
@@ -44,14 +45,5 @@ public class EmailContent extends Content {
 		emailContent.setSubject(subject);
 		return emailContent;
 	}
-
-	public EmailContent concat(EmailContent other) {
-		EmailContent concated = new EmailContent();
-		concated.text = text.concat(TEXT_CONCAT_DELIMITER).concat(other.text);
-		concated.subject = subject.concat(SUBJECT_CONCAT_DELIMITER).concat(other.subject);
-		concated.attachments.addAll(attachments);
-		concated.attachments.addAll(other.attachments);
-		return concated;
-	}
-
+	
 }

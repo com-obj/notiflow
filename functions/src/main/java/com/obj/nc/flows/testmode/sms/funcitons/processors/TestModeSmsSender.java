@@ -29,8 +29,17 @@ public class TestModeSmsSender extends ProcessorFunctionAdapter<Message,Message>
 	
 	@Override
 	protected Message execute(Message smsMessage) {
-		reciever.recieve(smsMessage);
+		
+		Message messageContent = convertAggregatedIfNeeded(smsMessage);
+		
+		reciever.recieve(messageContent);
 
+		return smsMessage;
+	}
+
+	private Message convertAggregatedIfNeeded(Message smsMessage) {
+		SimpleTextContent content = smsMessage.getContentTyped();
+		smsMessage.getBody().setMessage(content);
 		return smsMessage;
 	}
 

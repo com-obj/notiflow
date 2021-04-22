@@ -28,6 +28,7 @@ nc:
          templates-root-dir: 
             - src/main/resources/message-templates
          messages-dir-and-base-name: file:src/main/resources/message-templates/messages
+         multi-locales-merge-strategy: MERGE
    flows:    
       input-evet-routing:
          type: PAYLOAD_TYPE

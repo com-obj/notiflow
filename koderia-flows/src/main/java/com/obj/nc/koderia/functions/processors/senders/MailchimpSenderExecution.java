@@ -32,16 +32,16 @@ public class MailchimpSenderExecution implements Function<Message, Message> {
 	@Qualifier(MailchimpMessageMapperImpl.COMPONENT_NAME)
 	private MailchimpMessageMapper mailchimpMessageMapper;
 
-	@Autowired
-	@Qualifier(MailchimpMessageMapperAggregateImpl.COMPONENT_NAME)
-	private MailchimpMessageMapper mailchimpAggregateMessageMapper;
+//	@Autowired
+//	@Qualifier(MailchimpMessageMapperAggregateImpl.COMPONENT_NAME)
+//	private MailchimpMessageMapper mailchimpAggregateMessageMapper;
 
 
 	@Override
 	public Message apply(Message message) {
-		SendMessageWithTemplateDto sendMessageDto = message.isAggregateMessage()
-				? mailchimpAggregateMessageMapper.mapWithTemplate(message)
-				: mailchimpMessageMapper.mapWithTemplate(message);
+		SendMessageWithTemplateDto sendMessageDto = mailchimpMessageMapper.mapWithTemplate(message);
+//				? mailchimpAggregateMessageMapper.mapWithTemplate(message)
+//				: mailchimpMessageMapper.mapWithTemplate(message);
 
 		List<MessageResponseDto> messageResponseDtos = mailchimpClient.sendMessageWithTemplate(sendMessageDto);
 		message.getBody().setAttributeValue(MAILCHIMP_RESPONSE_FIELD, messageResponseDtos);

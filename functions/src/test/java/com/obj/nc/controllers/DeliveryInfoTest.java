@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -49,6 +50,7 @@ class DeliveryInfoTest extends BaseIntegrationTest {
     }
     
     @Test
+	@Disabled
     void testFindDeliveryInfos() throws Exception {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();

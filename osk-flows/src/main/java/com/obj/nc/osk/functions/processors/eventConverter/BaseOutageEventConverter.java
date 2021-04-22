@@ -93,8 +93,6 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		notificationIntents.addAll(salesNotificationIntents);
 		notificationIntents.addAll(salesAgentNotificationIntents);
 		
-		notificationIntents.forEach(e-> e.getHeader().addEventId(payload.getId()));
-		
 		return notificationIntents;
 	}
 

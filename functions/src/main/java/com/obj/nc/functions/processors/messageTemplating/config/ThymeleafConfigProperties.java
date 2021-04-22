@@ -17,4 +17,5 @@ public class ThymeleafConfigProperties {
 	private String messagesDirAndBaseName;
 	
 	private List<String> defaultLocaleCodes;
+	
 }
