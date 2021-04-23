@@ -11,9 +11,11 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.senders.SmsSender;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnMissingBean(type = "SmsSender")
 @RequiredArgsConstructor
 @DocumentProcessingInfo("TestSMSSender")
 public class InMemorySmsSender extends ProcessorFunctionAdapter<Message,Message> implements SmsSender  {
