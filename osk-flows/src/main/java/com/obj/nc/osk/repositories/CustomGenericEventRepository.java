@@ -6,6 +6,6 @@ import com.obj.nc.domain.event.GenericEvent;
 
 public interface CustomGenericEventRepository {
 	
-	 Optional<GenericEvent> findStartEventByEventId(Long eventId);
+	 Optional<GenericEvent> findStartEventByTicketId(String ticketId);
 
 }

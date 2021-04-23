@@ -20,11 +20,11 @@ public class CustomGenericEventRepositoryImpl implements CustomGenericEventRepos
 	@Autowired private JdbcTemplate jdbcTemplate; 
 
 	@Override
-	public Optional<GenericEvent> findStartEventByEventId(Long eventId) {
+	public Optional<GenericEvent> findStartEventByTicketId(String ticketId) {
 		//TODO: ADD HASH INDEX TO DB on payload_json->'id'
 		String query = 
 				"select id, flow_id, external_id, payload_json, time_created, time_consumed from nc_event "
-        		+ "where (payload_json->'id')::int4 = " +eventId
+        		+ "where payload_json->'id' = '\"" +ticketId+"\"'"
         		+ " AND payload_json->'@type' = '\"OUTAGE_START\"'";
 
 		List<GenericEvent> events = jdbcTemplate.query(query
@@ -47,7 +47,7 @@ public class CustomGenericEventRepositoryImpl implements CustomGenericEventRepos
 			return Optional.of(events.iterator().next());
 		}
 		
-		throw new RuntimeException("Found more than one OUTAGE_START event with ID: " + eventId);
+		throw new RuntimeException("Found more than one OUTAGE_START events with ID: " + ticketId);
 	}
 
 }

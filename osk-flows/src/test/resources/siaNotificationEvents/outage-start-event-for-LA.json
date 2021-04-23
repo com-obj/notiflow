@@ -1,5 +1,5 @@
 {
-   "id":111,
+   "id":"111",
    "@type": "OUTAGE_START",
    "name":"Outage MME",
    "description":"MME is down, bad things will happen",
