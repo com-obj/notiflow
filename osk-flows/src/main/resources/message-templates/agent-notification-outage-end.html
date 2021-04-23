@@ -8,8 +8,14 @@
     	<p>
     		<span>Ahoj,</span>
     		<br>
-    		<span>dole uvedeny zakaznici ny uz mali mat sluzby spritupnene. Informovali sme ich o tom správou. Vypadok sme odstranili o </span>
-    		<span th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
+			<p>
+				<span>dole uvedeni zakaznici by uz mali mat sluzby spritupnene. </span>
+				<span style="font-weight:bold">Informovali</span>
+				<span> sme ich o tom správou. Vypadok, ktorý trval od </span>
+				<span style="font-weight:bold" th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">10:00</span>
+				<span>sme odstranili </span>
+				<span style="font-weight:bold" th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeEnd, __df)}">11:00</span>
+			</p>
     	</p>
     	
 		<table border="1" cellpadding="5" style="border-collapse:collapse; border: 0px;">		
@@ -25,9 +31,9 @@
 		</thead>
 		<tbody>
 			<tr th:each="service : ${model.services}">
-				<td><span th:text="${service.customerName}"> mvsr.sk </span></td>
+				<td><span style="font-weight:bold" th:text="${service.customerName}"> mvsr.sk </span></td>
 				<td><span th:text="${service.customerAddress}"> mvsr.sk </span></td>
-				<td><span th:text="${service.b2bLogin}"> mvsr.sk </span></td>
+				<td><span style="font-weight:bold" th:text="${service.b2bLogin}"> mvsr.sk </span></td>
 				<td><span th:text="${service.sn}"> 0905132354 </span></td>
 				<td><span th:text="${service.productName}"> VPS </span></td>
 				<td><span th:text="${service.installationAddress}"> Bratislava </span></td>

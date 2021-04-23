@@ -9,13 +9,13 @@
     		<span>Milý kolega,</span>
     		<br>
     		<span>výpadok, ktorý trval od</span>
-    		<span th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
+    		<span style="font-weight:bold" th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
     		<span>bol ukončený</span>
-    		<span th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeEnd, __df)}">11:00</span>
+    		<span style="font-weight:bold" th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeEnd, __df)}">11:00</span>
     	</p>
     	
-    	<p>Zákazníkov sme o tom informovali.</p>	
-    	<p>Orange</p>
+    	<p style="font-weight:bold">Zákazníkov sme o tom informovali.</p>	
+    	<p style="font-weight:bold">Orange</p>
     
     </body>
 </html>
