@@ -8,7 +8,10 @@ import static com.obj.nc.flows.testmode.sms.config.TestModeSmsFlowConfig.TEST_MO
 import static org.awaitility.Awaitility.await;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -91,6 +94,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     void setUp() throws FolderException {
     	testModeEmailsReciver.purgeEmailFromAllMailboxes();
     	greenMail.purgeEmailFromAllMailboxes();
+    	smsSourceSupplier.purgeAllReceivedMessages();
     }
 
     @Test
@@ -173,17 +177,15 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         //AND GIVEN RECEIVED EMAILs
         emailProcessingInputChannel.send(new GenericMessage<>(inputEmail));
         testModeEmailsReciver.waitForIncomingEmail(1);
-        MimeMessage[] inputMimeMessages = testModeEmailsReciver.getReceivedMessages();
-        Assertions.assertThat(inputMimeMessages.length).isEqualTo(1);
         List<Message> receivedEmailMessages = greenMailReceiverSourceSupplier.get();
+        Assertions.assertThat(receivedEmailMessages).hasSize(1);
         MessageSource<?> emailMessageSource = () -> new GenericMessage<>(receivedEmailMessages);
     
         // AND RECEIVED SMSs
         smsProcessingInputChannel.send(new GenericMessage<>(inputSms));
         await().atMost(10, TimeUnit.SECONDS).until(() -> smsSourceSupplier.getReceivedCount() >= 1);
-        List<Message> receivedSmsMessages = smsSourceSupplier.getAndPurgeRecievedMessages();
-        Assertions.assertThat(smsSourceSupplier.getReceivedCount()).isEqualTo(2);
-    
+        List<Message> receivedSmsMessages = Stream.generate(smsSourceSupplier).limit(10).filter(Objects::nonNull).collect(Collectors.toList());
+        Assertions.assertThat(receivedSmsMessages).hasSize(2);
         MessageSource<?> smsMessageSource = () -> new GenericMessage<>(receivedSmsMessages);
     
         // WHEN SUBSTITUTE MESSAGE SOURCES

@@ -50,14 +50,12 @@ public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<Message> {
 		recieved.addLast(msg);
 	}
 	
-	public List<Message> getAndPurgeRecievedMessages() {
-		List<Message> receivedCopy = new LinkedList<>(recieved);
-		recieved = new LinkedList<>();
-		return receivedCopy;
-	}
-	
 	public int getReceivedCount() {
 		return recieved.size();
+	}
+	
+	public void purgeAllReceivedMessages() {
+		recieved = new LinkedList<>();
 	}
 
 }
