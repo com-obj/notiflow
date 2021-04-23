@@ -45,10 +45,8 @@ public class SmsMessageAggregationStrategy extends BasePayloadAggregationStrateg
 	public Object merge(List<? extends BasePayload> payloads) {
 		if (payloads.isEmpty()) return null;
 		
-		Message outputMessage = Message.createAsSms();
-		outputMessage.getBody().setRecievingEndpoints(payloads.get(0).getBody().getRecievingEndpoints());
-		outputMessage.getBody().setDeliveryOptions(payloads.get(0).getBody().getDeliveryOptions());
-		
+		//TODO: ked bude refactorovany header a ostatne veci tak tuto spravit novu message a neprepisovat existujucu
+		Message outputMessage = (Message) payloads.get(0);
 		SimpleTextContent aggregatedSmsContent = payloads.stream().map(BasePayload::<SimpleTextContent>getContentTyped).reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		outputMessage.getBody().setMessage(aggregatedSmsContent);
