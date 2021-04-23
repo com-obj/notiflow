@@ -11,6 +11,7 @@ import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.functions.processors.TestModeDiggestMailContent;
 import com.obj.nc.flows.testmode.email.functions.processors.TestModeDiggestModel;
 import lombok.RequiredArgsConstructor;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +38,8 @@ public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregati
         payloads.stream().map(msg -> msg.getBody().getMessage())
                 .filter(content -> content instanceof SimpleTextContent).map(content -> (SimpleTextContent) content)
                 .forEach(digestModel::addSmsContent);
+        
+        digestModel.getSmsContents().forEach(smsContent -> smsContent.setText(StringUtils.replace(smsContent.getText(), "\n", "<br>")));
         
         TestModeDiggestMailContent resultMail = new TestModeDiggestMailContent();
         resultMail.setSubject("Notifications digest while running test mode");
