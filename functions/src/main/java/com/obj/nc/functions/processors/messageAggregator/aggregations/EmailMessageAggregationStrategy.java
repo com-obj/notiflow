@@ -8,7 +8,6 @@ import org.jsoup.nodes.Document;
 import org.springframework.http.MediaType;
 
 import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.Body;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -85,7 +84,7 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 				.reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		
-		
+		//TODO: ked bude refactorovany header a ostatne veci tak tuto spravit novu message a neprepisovat existujucu
 		Message outputMessage = (Message) payloads.get(0);
 		outputMessage.getBody().setMessage(aggregatedEmailContent);
 		return outputMessage;

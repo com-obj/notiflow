@@ -1,14 +1,12 @@
 package com.obj.nc.flows.testmode.sms.funcitons.sources;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.senders.SmsSender;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;

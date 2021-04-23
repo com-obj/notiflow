@@ -13,10 +13,6 @@ import com.obj.nc.functions.processors.senders.SmsSender;
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
 public class TestModeSmsBeansConfig {
 	
-    public static final String TEST_MODE_REAL_MAIL_SENDER_BEAN_NAME = "testModeJavaMailSenderReal";
-    public static final String TEST_MODE_SMS_SENDER_FUNCTION_BEAN_NAME = "testModeSMSSender";   
-
-    
     /**
      * The provided smsSender service override. Instead of performing real SMS delivery, this implementation sends sms
      * to in memory store which is then used to create digest email
