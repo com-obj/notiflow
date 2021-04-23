@@ -93,7 +93,7 @@ public class OskFlowsFullUCWithLATest extends BaseIntegrationTest {
     	mockServer
 			.expect(requestTo(fullRequestUrl))
 			.andExpect(method(HttpMethod.POST))
-			.andExpect(jsonPath("$.message", stringContainsInOrder("Vážený zákazník Objectify, s.r.o.", "VPS(SN:0918186997)")))
+			.andExpect(jsonPath("$.message", stringContainsInOrder("Vážený zákazník,", "VPS(SN:0918186997)")))
 			.andExpect(jsonPath("$.address", contains(Matchers.equalTo("0918186997"))))
 			.andRespond(
 					withSuccess(
