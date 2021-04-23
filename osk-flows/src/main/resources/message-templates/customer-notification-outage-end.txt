@@ -1,6 +1,6 @@
 [(#{cust.end.sms.title})]
-[(#{cust.end.sms.salution})] [(${model.customerName})]
-[(#{cust.end.sms.atTime})] [# th:with="__df=#{dateTime.foramt}" th:text="${#dates.format(model.timeStart, __df)}" /] [(#{cust.end.sms.hour})] [(#{cust.end.sms.outage})]
+[(#{cust.end.sms.salution})]
+[# th:with="__df=#{dateTime.foramt}" th:text="${#dates.format(model.timeStart, __df)}" /] [(#{cust.end.sms.hour})] [(#{cust.end.sms.outage})]
 
 [# th:each="service : ${model.services}" ]
     [(${service.productName})](SN:[(${service.sn})])
