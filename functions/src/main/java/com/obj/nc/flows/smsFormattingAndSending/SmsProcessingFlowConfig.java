@@ -2,8 +2,7 @@ package com.obj.nc.flows.smsFormattingAndSending;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -16,12 +15,12 @@ import com.obj.nc.functions.processors.senders.SmsSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 
 @Configuration
-@ConditionalOnBean(SmsSender.class)
+@RequiredArgsConstructor
 public class SmsProcessingFlowConfig {
 	
-	@Autowired private SmsSender smsSender;
-	@Autowired private SmsTemplateFormatter smsFomratter;
-	@Autowired private PaylaodLoggerSinkConsumer logConsumer;
+	private final SmsSender smsSender;
+	private final SmsTemplateFormatter smsFormatter;
+	private final PaylaodLoggerSinkConsumer logConsumer;
 
 	public final static String SMS_PROCESSING_FLOW_ID = "SMS_PROCESSING_FLOW_ID";
 	public final static String SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID = SMS_PROCESSING_FLOW_ID + "_INPUT";
@@ -35,7 +34,7 @@ public class SmsProcessingFlowConfig {
 	public IntegrationFlow smsProcessingFlowDefinition() {
 		return IntegrationFlows
 				.from(smsProcessingInputChangel())
-				.handle(smsFomratter)
+				.handle(smsFormatter)
 				.split()
 				.handle(smsSender)
 				.wireTap( flowConfig -> 

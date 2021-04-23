@@ -17,13 +17,11 @@ import org.springframework.scheduling.support.PeriodicTrigger;
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.config.TestModeFlowConfig;
 import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
-import com.obj.nc.functions.processors.senders.SmsSender;
 
 import lombok.extern.log4j.Log4j2;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-@ConditionalOnBean(SmsSender.class)
 @Log4j2
 public class TestModeSmsFlowConfig {
 	

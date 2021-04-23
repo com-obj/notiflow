@@ -2,7 +2,7 @@ package com.obj.nc.flows.testmode.sms.funcitons.processors;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
@@ -11,12 +11,16 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.senders.SmsSender;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.stereotype.Component;
 
+@Component
+@ConditionalOnMissingBean(type = "SmsSender")
+@RequiredArgsConstructor
 @DocumentProcessingInfo("TestSMSSender")
-public class TestModeSmsSender extends ProcessorFunctionAdapter<Message,Message> implements SmsSender  {
+public class InMemorySmsSender extends ProcessorFunctionAdapter<Message,Message> implements SmsSender  {
 	
-	@Autowired
-	private InMemorySmsSourceSupplier reciever;
+	private final InMemorySmsSourceSupplier reciever;
 
 	
 	@Override

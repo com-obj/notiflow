@@ -1,13 +1,23 @@
 package com.obj.nc.flows.testmode;
 
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
+import static com.obj.nc.flows.testmode.sms.config.TestModeSmsFlowConfig.TEST_MODE_SMS_SOURCE_BEAN_NAME;
+import static com.obj.nc.flows.testmode.sms.config.TestModeSmsFlowConfig.TEST_MODE_SMS_SOURCE_TRIGGER_BEAN_NAME;
+import static org.awaitility.Awaitility.await;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -25,6 +35,7 @@ import org.springframework.integration.test.context.MockIntegrationContext;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.integration.test.util.OnlyOnceTrigger;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.scheduling.Trigger;
 import org.springframework.test.annotation.DirtiesContext;
@@ -48,7 +59,7 @@ import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
-@SpringIntegrationTest(noAutoStartup = TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME)
+@SpringIntegrationTest(noAutoStartup = {TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME, TEST_MODE_SMS_SOURCE_BEAN_NAME })
 @SpringBootTest(properties = {
 		"nc.flows.test-mode.enabled=true", 
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
@@ -58,13 +69,19 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
 	
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
 	@Autowired private GreenMail testModeEmailsReciver;
+    
+    @Qualifier(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID)
+    @Autowired private MessageChannel emailProcessingInputChannel;
+    @Qualifier(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+    @Autowired private MessageChannel smsProcessingInputChannel;
 	
-	@Autowired private EmailSender emailSenderSinkProcessingFunction;
+	@Autowired private EmailSender emailSender;
 	@Autowired private GreenMailReceiverSourceSupplier greenMailReceiverSourceSupplier;
+    @Autowired private InMemorySmsSourceSupplier smsSourceSupplier;
 	@Autowired private TestModeGreenMailProperties gmProps;
 	@Autowired private TestModeProperties props;
 	@Autowired private MockIntegrationContext mockIntegrationContext;
-	@Autowired private JavaMailSenderImpl mailSender;
+	@Autowired private JavaMailSenderImpl javaMailSender;
 	
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
@@ -77,6 +94,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     void setUp() throws FolderException {
     	testModeEmailsReciver.purgeEmailFromAllMailboxes();
     	greenMail.purgeEmailFromAllMailboxes();
+    	smsSourceSupplier.purgeAllReceivedMessages();
     }
 
     @Test
@@ -90,8 +108,8 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
 
     	//PRE-CONDITION
     	//Any injected JavaMailSenderImpl has to be configured to send email to testModeEmailReviver. Not to standard SMTP
-    	Assertions.assertThat(mailSender.getHost()).isEqualTo("localhost");
-    	Assertions.assertThat(mailSender.getPort()).isEqualTo(gmProps.getSmtpPort());
+    	Assertions.assertThat(javaMailSender.getHost()).isEqualTo("localhost");
+    	Assertions.assertThat(javaMailSender.getPort()).isEqualTo(gmProps.getSmtpPort());
     	
     	
         // GIVEN
@@ -100,9 +118,9 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         Message message3 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message3.json", Message.class);
         
         //WHEN
-        emailSenderSinkProcessingFunction.apply(message1);
-        emailSenderSinkProcessingFunction.apply(message2);
-        emailSenderSinkProcessingFunction.apply(message3);
+        emailSender.apply(message1);
+        emailSender.apply(message2);
+        emailSender.apply(message3);
 
         testModeEmailsReciver.waitForIncomingEmail(3);
 
@@ -149,14 +167,51 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         //Check tranlations
         Assertions.assertThat(GreenMailUtil.getBody(msg)).contains("Recipient","Attachments");
     }
-
+    
+    @Test
+    void testSendEmailAndSmsDigestInOneEmail() {
+        // GIVEN
+        Message inputEmail = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", Message.class);
+        Message inputSms = JsonUtils.readObjectFromClassPathResource("messages/templated/txt_template_message_en_de.json", Message.class);
+    
+        //AND GIVEN RECEIVED EMAILs
+        emailProcessingInputChannel.send(new GenericMessage<>(inputEmail));
+        testModeEmailsReciver.waitForIncomingEmail(1);
+        List<Message> receivedEmailMessages = greenMailReceiverSourceSupplier.get();
+        Assertions.assertThat(receivedEmailMessages).hasSize(1);
+        MessageSource<?> emailMessageSource = () -> new GenericMessage<>(receivedEmailMessages);
+    
+        // AND RECEIVED SMSs
+        smsProcessingInputChannel.send(new GenericMessage<>(inputSms));
+        await().atMost(10, TimeUnit.SECONDS).until(() -> smsSourceSupplier.getReceivedCount() >= 1);
+        List<Message> receivedSmsMessages = Stream.generate(smsSourceSupplier).limit(10).filter(Objects::nonNull).collect(Collectors.toList());
+        Assertions.assertThat(receivedSmsMessages).hasSize(2);
+        MessageSource<?> smsMessageSource = () -> new GenericMessage<>(receivedSmsMessages);
+    
+        // WHEN SUBSTITUTE MESSAGE SOURCES
+        mockIntegrationContext.substituteMessageSourceFor(TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME, emailMessageSource);
+        mockIntegrationContext.substituteMessageSourceFor(TEST_MODE_SMS_SOURCE_BEAN_NAME, smsMessageSource);
+    
+        // THEN agregeted mail recieved by standardn green mail used by test and thus in producton standard SMTP server
+        boolean success = greenMail.waitForIncomingEmail(30000, 1);
+        Assertions.assertThat(success).isEqualTo(true);
+    
+        MimeMessage[] outputMimeMessages = greenMail.getReceivedMessages();
+        Assertions.assertThat(outputMimeMessages.length).isEqualTo(1);
+    }
+    
     @TestConfiguration
     @EnableMessageHistory
     @EnableIntegrationManagement
     public static class TestModeTestConfiguration {
 
         @Bean(TestModeEmailsFlowConfig.TEST_MODE_SOURCE_TRIGGER_BEAN_NAME)
-        public Trigger testModeSourceTrigger() {
+        public Trigger testModeEmailSourceTrigger() {
+            return new OnlyOnceTrigger();
+        }
+    
+        @Bean(TEST_MODE_SMS_SOURCE_TRIGGER_BEAN_NAME)
+        public Trigger testModeSmsSourceTrigger() {
             return new OnlyOnceTrigger();
         }
 

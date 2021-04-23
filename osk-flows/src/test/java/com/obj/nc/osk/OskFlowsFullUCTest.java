@@ -90,20 +90,20 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     	genericEventsService.emitJobPostEvent(startEventStr, null, "111xx_START");
     	
     	//THEN
-        boolean success = greenMail.waitForIncomingEmail(30000L, 12);
+        boolean success = greenMail.waitForIncomingEmail(30000L, 8);
         
         Assertions.assertThat(success).isTrue();
         
         MimeMessage[] msgs = greenMail.getReceivedMessages();
-        Assertions.assertThat(msgs.length).isEqualTo(12); //4xcustomers(en/sk), 3xsales, 1xsales agent 
+        Assertions.assertThat(msgs.length).isEqualTo(8); //4xcustomers(en+sk), 3xsales, 1xsales agent 
         System.out.println(GreenMailUtil.getWholeMessage(msgs[0]));
         
         //customers
         //slovak/english
-        assertMessageCount(msgs, "cuzy@objectify.sk", 2);
-        assertMessageCount(msgs, "jancuzy@gmail.com", 2);
-        assertMessageCount(msgs, "dysko@objectify.sk", 2);
-        assertMessageCount(msgs, "nem_fukas@artin.sk", 2);
+        assertMessageCount(msgs, "cuzy@objectify.sk", 1);
+        assertMessageCount(msgs, "jancuzy@gmail.com", 1);
+        assertMessageCount(msgs, "dysko@objectify.sk", 1);
+        assertMessageCount(msgs, "nem_fukas@artin.sk", 1);
         
         assertMessagesContent(msgs, "start");
         
@@ -130,20 +130,20 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     	genericEventsService.emitJobPostEvent(endEventStr, null, "111xx_END");
     	
     	//THEN
-        boolean success = greenMail.waitForIncomingEmail(30000L, 12);
+        boolean success = greenMail.waitForIncomingEmail(30000L, 8);
         
         Assertions.assertThat(success).isTrue();
         
         MimeMessage[] msgs = greenMail.getReceivedMessages();
-        Assertions.assertThat(msgs.length).isEqualTo(12); //4xcustomers(en/sk), 3xsales, 1xsales agent 
+        Assertions.assertThat(msgs.length).isEqualTo(8); //4xcustomers(en+sk), 3xsales, 1xsales agent 
         System.out.println(GreenMailUtil.getWholeMessage(msgs[0]));
         
         //customers
         //slovak/english
-        assertMessageCount(msgs, "cuzy@objectify.sk", 2);
-        assertMessageCount(msgs, "jancuzy@gmail.com", 2);
-        assertMessageCount(msgs, "dysko@objectify.sk", 2);
-        assertMessageCount(msgs, "nem_fukas@artin.sk", 2);
+        assertMessageCount(msgs, "cuzy@objectify.sk", 1);
+        assertMessageCount(msgs, "jancuzy@gmail.com", 1);
+        assertMessageCount(msgs, "dysko@objectify.sk", 1);
+        assertMessageCount(msgs, "nem_fukas@artin.sk", 1);
         
         assertMessagesContent(msgs, "end");
         
