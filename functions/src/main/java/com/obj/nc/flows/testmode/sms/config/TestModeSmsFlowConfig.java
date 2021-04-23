@@ -23,7 +23,6 @@ import lombok.extern.log4j.Log4j2;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-@ConditionalOnBean(SmsSender.class)
 @Log4j2
 public class TestModeSmsFlowConfig {
 	

@@ -83,13 +83,13 @@ public class EmailProcessingFlowConfig {
 							.channel(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID))
 					.subscribe(mesagePerLocaleFlow -> mesagePerLocaleFlow
 							.filter(m-> !MERGE.equals(properties.getMultiLocalesMergeStrategy()))
-							.handle(emailFormatter)
-							.split()
+							.split(emailFormatter)
 							.channel(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID))	
 				);
 
 	}
 	
+	@Bean
 	public EmailMessageAggregationStrategy multiLocalesAggregationStrategy() {
 		return new EmailMessageAggregationStrategy();
 	}
