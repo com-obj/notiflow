@@ -196,7 +196,7 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
         } else {
 	        msg = assertMessagesContains(msgs, MailMessageForAssertions.as("slavkovsky@orange.sk", 
 	        		getMsg("sales."+ startEnd +".subject", new Locale("sk")),
-	        		"sme o tom informovali."
+	        		"sme o tom"
 	        		)
 	        );
         }
