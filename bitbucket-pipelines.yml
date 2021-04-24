@@ -40,7 +40,6 @@ pipelines:
           caches:
            - gradle
            - maven
-           - docker
           script:
             - gradle build -x test --stacktrace --info   
           artifacts:
