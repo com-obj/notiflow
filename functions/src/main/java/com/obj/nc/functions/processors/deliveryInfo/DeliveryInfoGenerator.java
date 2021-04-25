@@ -11,10 +11,9 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
 import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo.DELIVERY_STATUS;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
 
-//TODO: toto bude HasHeader, DeliveryInfo..
-@Data
+@AllArgsConstructor
 public abstract class DeliveryInfoGenerator extends ProcessorFunctionAdapter<BasePayload, List<DeliveryInfoSendResult>> {
 	
 	private final DELIVERY_STATUS status;
