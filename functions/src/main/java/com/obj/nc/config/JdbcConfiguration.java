@@ -15,7 +15,6 @@ import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.obj.nc.repositories.GenericEventRepository;
@@ -30,7 +29,7 @@ import com.obj.nc.repositories.converters.UUIDArrayToPgObjectConverter;
 public class JdbcConfiguration extends AbstractJdbcConfiguration {
 
     @Bean
-    public NamedParameterJdbcOperations namedParameterJdbcOperations(DataSource dataSource) { 
+    public NamedParameterJdbcTemplate namedParameterJdbcTemplate(DataSource dataSource) { 
         return new NamedParameterJdbcTemplate(dataSource);
     }
     
