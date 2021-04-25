@@ -116,7 +116,7 @@ public class NotificationIntentRepository {
         			
         			PgArray array = (PgArray)rs.getArray("event_ids");
         			UUID[] eventIds = (UUID[])array.getArray();
-        			intent.getHeader().setEventIds(eventIds);
+        			intent.getHeader().setEventIdsAsArray(eventIds);
         			
         			JsonNode json = PGObjectToJsonNode.convert((PGobject)rs.getObject("payload_json"));
         			Body body = JsonUtils.readObjectFromJSON(json, Body.class);

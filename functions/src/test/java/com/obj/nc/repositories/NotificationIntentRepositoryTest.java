@@ -30,7 +30,7 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	     NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 	     notificationIntent.getHeader().setFlowId("default-flow");
 	     UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
-	     notificationIntent.getHeader().setEventIds(eventIds);
+	     notificationIntent.getHeader().setEventIdsAsArray(eventIds);
 	     
 	     notificationIntent = intentRepository.save(notificationIntent);
 	     

@@ -65,9 +65,9 @@ public class Header extends BaseJSONObject implements HasFlowId {
 	public String eventIdsAsJSONString() {
 		return JsonUtils.writeObjectToJSONString(eventIds);
 	}
-	
+
 	@JsonIgnore
-	public void setEventIds(UUID[] eventIds) {
+	public void setEventIdsAsArray(UUID[] eventIds) {
 		this.eventIds.clear();
 		this.eventIds.addAll(Arrays.asList(eventIds));
 	}

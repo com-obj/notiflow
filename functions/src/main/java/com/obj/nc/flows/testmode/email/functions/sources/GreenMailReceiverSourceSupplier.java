@@ -142,11 +142,11 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
 		while  (headers.hasMoreElements()) {
 			javax.mail.Header header =headers.nextElement();
 			
-			if (header.getName().equals(EmailSender.NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "EVENT_ID")) {
+			if (header.getName().equals(EmailSender.EVENT_IDS_EMAIL_HEANDER)) {
 				List<String> eventIDs = JsonUtils.readObjectFromJSONString(header.getValue(), List.class);
 				List<UUID> eventUUIDs = eventIDs.stream().map(eId-> UUID.fromString(eId)).collect(Collectors.toList());
 				dest.setEventIds(eventUUIDs);
-			} else if (header.getName().equals(EmailSender.NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "FLOW_ID")) {
+			} else if (header.getName().equals(EmailSender.FLOW_ID_EMAIL_HEANDER)) {
 				dest.setFlowId(header.getValue());
 			} 
 			dest.setAttributeValue(header.getName(), header.getValue());

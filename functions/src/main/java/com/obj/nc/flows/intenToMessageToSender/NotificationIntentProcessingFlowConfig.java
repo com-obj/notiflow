@@ -14,12 +14,15 @@ import org.springframework.messaging.MessageChannel;
 
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
+import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo;
+import com.obj.nc.functions.sink.intentPersister.NotificationIntentPersister;
 
 @Configuration
 public class NotificationIntentProcessingFlowConfig {
 		
-	@Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromEvent;
-		
+	@Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromIntent;
+	@Autowired private NotificationIntentPersister notificationIntentPersister;
+	
 	public final static String INTENT_PROCESSING_FLOW_ID = "INTENT_PROCESSING_FLOW_ID";
 	public final static String INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID = INTENT_PROCESSING_FLOW_ID + "_INPUT";
 	
@@ -32,7 +35,9 @@ public class NotificationIntentProcessingFlowConfig {
 	public IntegrationFlow intentProcessingFlowDefinition() {
 		return IntegrationFlows
 				.from(intentProcessingInputChangel())
-				.transform(generateMessagesFromEvent)
+				.wireTap( flowConfig->
+					flowConfig.handle(notificationIntentPersister))
+				.transform(generateMessagesFromIntent)
 				.split()
 				.wireTap( flowConfig -> 
 					flowConfig.channel(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
