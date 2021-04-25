@@ -2,12 +2,14 @@ package com.obj.nc.repositories;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.postgresql.jdbc.PgArray;
 import org.postgresql.util.PGobject;
@@ -80,7 +82,6 @@ public class NotificationIntentRepository {
         }
     }
     
-    private PgObjectToUUIDArrayConverter PGObjectToUUIDs  = new PgObjectToUUIDArrayConverter();
     private PgObjectToJsonNodeConverter PGObjectToJsonNode  = new PgObjectToJsonNodeConverter();
     
     public Optional<NotificationIntent> findById(UUID intentId) {
@@ -105,22 +106,23 @@ public class NotificationIntentRepository {
     	String inSql = String.join(",", Collections.nCopies(intentIds.length, "?"));
     	query = String.format(query, inSql);
     	
-    	List<NotificationIntent> intents = jdbcTemplate.query(query,
+    	List<NotificationIntent> intents = jdbcTemplate.query(
+    			query,
         		(rs, rowNum) -> {
         			NotificationIntent intent = new NotificationIntent();
         			intent.setId(UUID.fromString(rs.getString("id")));
+        			intent.setTimeCreated(rs.getTimestamp("time_created").toInstant());
         			intent.getHeader().setFlowId(rs.getString("flow_id"));
         			
-        			PgArray array = (PgArray)rs.getObject("event_ids");
-        			//TODO
-        	//		intent.getHeader().setEventIds(Arrays.asList(PGObjectToUUIDs.convert());
+        			PgArray array = (PgArray)rs.getArray("event_ids");
+        			UUID[] eventIds = (UUID[])array.getArray();
+        			intent.getHeader().setEventIds(eventIds);
         			
         			JsonNode json = PGObjectToJsonNode.convert((PGobject)rs.getObject("payload_json"));
         			Body body = JsonUtils.readObjectFromJSON(json, Body.class);
         			intent.setBody(body);
         			
         			return intent;
-
         	   } 
         	, (Object[])intentIds
         );

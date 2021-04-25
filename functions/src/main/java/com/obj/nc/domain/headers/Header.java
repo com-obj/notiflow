@@ -1,6 +1,7 @@
 package com.obj.nc.domain.headers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,6 +64,16 @@ public class Header extends BaseJSONObject implements HasFlowId {
 
 	public String eventIdsAsJSONString() {
 		return JsonUtils.writeObjectToJSONString(eventIds);
+	}
+	
+	@JsonIgnore
+	public void setEventIds(UUID[] eventIds) {
+		this.eventIds.clear();
+		this.eventIds.addAll(Arrays.asList(eventIds));
+	}
+	
+	public void setEventIds(List<UUID> eventIds) {
+		this.eventIds = eventIds;
 	}
 
 	public void addEventId(UUID eventId) {
