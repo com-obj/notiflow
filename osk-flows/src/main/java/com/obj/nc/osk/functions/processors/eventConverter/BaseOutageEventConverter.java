@@ -76,7 +76,6 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 	}
 
 	@Override
-
 	protected List<NotificationIntent> execute(GenericEvent payload) {
 		List<NotificationIntent> notificationIntents = new ArrayList<>();
 		
