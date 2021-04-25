@@ -1,13 +1,13 @@
 package com.obj.nc.koderia.config;
 
+import java.io.IOException;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClientException;
-
-import java.io.IOException;
 
 @Configuration
 public class RestClientConfig {

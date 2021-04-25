@@ -3,10 +3,6 @@ package com.obj.nc.domain.content.email;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.text.StringEscapeUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;

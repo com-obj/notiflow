@@ -1,6 +1,9 @@
 package com.obj.nc.koderia.services;
 
-import lombok.extern.log4j.Log4j2;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,9 +15,7 @@ import com.obj.nc.koderia.config.MailchimpApiConfig;
 import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
 import com.obj.nc.koderia.dto.mailchimp.SendMessageWithTemplateDto;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.extern.log4j.Log4j2;
 
 @Service
 @Log4j2

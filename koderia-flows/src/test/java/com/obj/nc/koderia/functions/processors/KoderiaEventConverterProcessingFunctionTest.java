@@ -1,14 +1,9 @@
 package com.obj.nc.koderia.functions.processors;
 
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.koderia.dto.*;
-import com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution;
-import com.obj.nc.koderia.functions.processors.KoderiaEventConverterPreCondition;
-import com.obj.nc.koderia.functions.processors.KoderiaEventConverterProcessingFunction;
-import com.obj.nc.utils.JsonUtils;
-import io.restassured.module.jsv.JsonSchemaValidator;
+import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+
+import java.util.Map;
+
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -17,9 +12,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.koderia.dto.BlogEventDataDto;
+import com.obj.nc.koderia.dto.EmitEventDto;
+import com.obj.nc.koderia.dto.EventEventDataDto;
+import com.obj.nc.koderia.dto.JobPostEventDataDto;
+import com.obj.nc.koderia.dto.LinkEventDataDto;
+import com.obj.nc.koderia.dto.NewsEventDataDto;
+import com.obj.nc.utils.JsonUtils;
 
-import java.util.Map;
+import io.restassured.module.jsv.JsonSchemaValidator;
 
 @SpringJUnitConfig(classes = {
         KoderiaEventConverterProcessingFunction.class,

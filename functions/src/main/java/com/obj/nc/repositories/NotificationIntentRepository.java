@@ -2,14 +2,12 @@ package com.obj.nc.repositories;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.postgresql.jdbc.PgArray;
 import org.postgresql.util.PGobject;
@@ -23,7 +21,6 @@ import com.obj.nc.domain.Body;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.repositories.converters.JsonNodeToPgObjectConverter;
 import com.obj.nc.repositories.converters.PgObjectToJsonNodeConverter;
-import com.obj.nc.repositories.converters.PgObjectToUUIDArrayConverter;
 import com.obj.nc.repositories.converters.UUIDArrayToPgObjectConverter;
 import com.obj.nc.utils.JsonUtils;
 

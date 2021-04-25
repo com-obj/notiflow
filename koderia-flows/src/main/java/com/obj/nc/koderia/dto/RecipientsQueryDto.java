@@ -1,11 +1,12 @@
 package com.obj.nc.koderia.dto;
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 @Data
 @JsonTypeInfo(

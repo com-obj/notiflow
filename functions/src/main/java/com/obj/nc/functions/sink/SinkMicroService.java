@@ -1,8 +1,8 @@
 package com.obj.nc.functions.sink;
 
-import reactor.core.publisher.Flux;
-
 import java.util.function.Consumer;
+
+import reactor.core.publisher.Flux;
 
 public abstract class SinkMicroService<IN, C extends SinkConsumer<IN>> {
 	

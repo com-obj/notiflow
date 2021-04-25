@@ -12,7 +12,6 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.koderia.dto.mailchimp.MessageResponseDto;
 import com.obj.nc.koderia.dto.mailchimp.SendMessageWithTemplateDto;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapper;
-import com.obj.nc.koderia.mapper.MailchimpMessageMapperAggregateImpl;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl;
 import com.obj.nc.koderia.services.MailchimpClient;
 

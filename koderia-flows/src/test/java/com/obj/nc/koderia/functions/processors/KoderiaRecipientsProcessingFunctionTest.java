@@ -1,14 +1,16 @@
 package com.obj.nc.koderia.functions.processors;
 
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.koderia.dto.RecipientDto;
-import com.obj.nc.koderia.dto.RecipientsQueryDto;
-import com.obj.nc.koderia.functions.processors.KoderiaRecipientsProcessingFunction;
-import com.obj.nc.koderia.services.KoderiaRestClientImpl;
-import com.obj.nc.utils.JsonUtils;
+import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+import static com.obj.nc.koderia.services.KoderiaRestClientImpl.RECIPIENTS_PATH;
+import static java.util.stream.Collectors.toList;
+import static org.springframework.test.web.client.ExpectedCount.once;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+import java.util.List;
+import java.util.Map;
+
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -22,17 +24,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
-import static com.obj.nc.koderia.services.KoderiaRestClientImpl.RECIPIENTS_PATH;
-import static java.util.stream.Collectors.toList;
-import static org.springframework.test.web.client.ExpectedCount.once;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.koderia.dto.RecipientDto;
+import com.obj.nc.koderia.dto.RecipientsQueryDto;
+import com.obj.nc.koderia.services.KoderiaRestClientImpl;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest(KoderiaRestClientImpl.class)

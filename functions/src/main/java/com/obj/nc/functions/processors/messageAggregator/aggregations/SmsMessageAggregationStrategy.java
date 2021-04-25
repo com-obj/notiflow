@@ -1,15 +1,15 @@
 package com.obj.nc.functions.processors.messageAggregator.aggregations;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
-
 import com.obj.nc.exceptions.PayloadValidationException;
-import lombok.extern.log4j.Log4j2;
 
-import java.util.List;
-import java.util.Optional;
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class SmsMessageAggregationStrategy extends BasePayloadAggregationStrategy {

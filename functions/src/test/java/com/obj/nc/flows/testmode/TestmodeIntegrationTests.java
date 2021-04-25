@@ -16,8 +16,6 @@ import java.util.stream.Stream;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -50,11 +48,13 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig;
 import com.obj.nc.flows.testmode.email.config.TestModeGreenMailProperties;
 import com.obj.nc.flows.testmode.email.functions.sources.GreenMailReceiverSourceSupplier;
+import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.utils.JsonUtils;
 

@@ -1,13 +1,9 @@
 package com.obj.nc.koderia.services;
 
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.koderia.config.KoderiaApiConfigProperties;
-import com.obj.nc.koderia.dto.RecipientDto;
-import com.obj.nc.koderia.dto.RecipientsQueryDto;
-import com.obj.nc.koderia.mapper.RecipientMapper;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,9 +11,13 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.koderia.config.KoderiaApiConfigProperties;
+import com.obj.nc.koderia.dto.RecipientDto;
+import com.obj.nc.koderia.dto.RecipientsQueryDto;
+import com.obj.nc.koderia.mapper.RecipientMapper;
+
+import lombok.extern.log4j.Log4j2;
 
 @Service
 @Log4j2

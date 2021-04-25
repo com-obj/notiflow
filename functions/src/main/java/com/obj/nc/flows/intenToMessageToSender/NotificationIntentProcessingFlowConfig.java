@@ -14,7 +14,6 @@ import org.springframework.messaging.MessageChannel;
 
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
-import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo;
 import com.obj.nc.functions.sink.intentPersister.NotificationIntentPersister;
 
 @Configuration

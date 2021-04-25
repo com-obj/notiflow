@@ -6,9 +6,6 @@ import org.springframework.context.annotation.Import;
 
 import com.obj.nc.koderia.config.MailchimpApiConfig;
 import com.obj.nc.koderia.config.RestClientConfig;
-import com.obj.nc.koderia.functions.processors.senders.MailchimpSenderExecution;
-import com.obj.nc.koderia.functions.processors.senders.MailchimpSenderPreCondition;
-import com.obj.nc.koderia.functions.processors.senders.MailchimpSenderProcessingFunction;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapperAggregateImpl;
 import com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl;
 import com.obj.nc.koderia.services.MailchimpRestClientImpl;

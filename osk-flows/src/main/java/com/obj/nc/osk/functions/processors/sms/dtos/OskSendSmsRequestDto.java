@@ -1,11 +1,12 @@
 package com.obj.nc.osk.functions.processors.sms.dtos;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor

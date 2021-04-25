@@ -2,6 +2,7 @@ package com.obj.nc.koderia.dto.mailchimp;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
+
 import lombok.Data;
 
 @Data

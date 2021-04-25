@@ -13,7 +13,6 @@ import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigProperties;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
 
 @Component

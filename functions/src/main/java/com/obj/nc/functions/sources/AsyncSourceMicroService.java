@@ -1,9 +1,9 @@
 package com.obj.nc.functions.sources;
 
+import java.util.function.Supplier;
+
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
-
-import java.util.function.Supplier;
 
 public abstract class AsyncSourceMicroService<OUT> {
 
