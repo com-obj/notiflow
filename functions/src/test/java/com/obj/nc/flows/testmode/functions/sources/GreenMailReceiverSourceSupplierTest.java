@@ -30,7 +30,6 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.Body;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -118,7 +117,7 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
     }
 
 	private void checkRecievedMatchOriginal(Message origianlMsgForAggreagtion, EmailContent emailContentFromTMGM) {
-		EmailContent originalContent1 = ((AggregatedEmailContent)origianlMsgForAggreagtion.getContentTyped()).getAggregateContent().get(0);
+		EmailContent originalContent1 = origianlMsgForAggreagtion.getContentTyped();
         String originalReviever1 = ((EmailEndpoint) origianlMsgForAggreagtion.getBody().getRecievingEndpoints().get(0)).getEmail();
         assertThat(emailContentFromTMGM.getSubject())
         	.contains(originalContent1.getSubject());

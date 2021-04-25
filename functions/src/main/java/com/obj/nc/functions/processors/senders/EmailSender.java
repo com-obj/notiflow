@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -61,7 +60,7 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 
 		RecievingEndpoint endpoint = to.get(0);
 		if (!(endpoint instanceof EmailEndpoint)) {
-			return Optional.of(new PayloadValidationException("EmailContent sender can send to EmailContent endpoints only. Found " + endpoint));
+			return Optional.of(new PayloadValidationException("EmailContent sender can send to EmailEndpoint endpoints only. Found " + endpoint));
 		}
 
 		return Optional.empty();
@@ -72,19 +71,8 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	@Override
 	public Message execute(Message payload) {		
 		EmailEndpoint toEmail = (EmailEndpoint) payload.getBody().getRecievingEndpoints().get(0);
-
 		EmailContent msg = payload.getContentTyped();
-
-		EmailContent messageContent = null;
-		if (msg instanceof AggregatedEmailContent) {
-			//ak je stale v rezime aggregated tak mi nic ine nezostava ako spravit "dummy" aggregation. Na konci dna potrebujem jeden subject, jeden text
-			messageContent = ((AggregatedEmailContent) msg).asSimpleContent();
-		} else {
-			messageContent = msg;
-		}
-
-		doSendMessage(toEmail, messageContent, payload.getHeader());
-		
+		doSendMessage(toEmail, msg, payload.getHeader());
 		return payload;
 	}
 

@@ -1,13 +1,11 @@
 package com.obj.nc.koderia.functions.processors.senders;
 
 import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
-import com.obj.nc.koderia.dto.EmitEventDto;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -27,22 +25,22 @@ public class MailchimpSenderPreCondition implements PreCondition<Message> {
 		}
 
 		Content messageContent = message.getBody().getMessage();
-		if (messageContent instanceof AggregatedEmailContent) {
-			AggregatedEmailContent aggregatedContent = (AggregatedEmailContent)messageContent;
-			
-			for (EmailContent messageContentPart : aggregatedContent.getAggregateContent()) {
-				
-				Optional<PayloadValidationException> exception = checkMessageContent(messageContentPart);
-				if (exception.isPresent()) {
-					return exception;
-				}
-			}
-		} else {
+//		if (messageContent instanceof AggregatedEmailContent) {
+//			AggregatedEmailContent aggregatedContent = (AggregatedEmailContent)messageContent;
+//			
+//			for (EmailContent messageContentPart : aggregatedContent.getAggregateContent()) {
+//				
+//				Optional<PayloadValidationException> exception = checkMessageContent(messageContentPart);
+//				if (exception.isPresent()) {
+//					return exception;
+//				}
+//			}
+//		} else {
 			Optional<PayloadValidationException> exception = checkMessageContent(message.getContentTyped());
 			if (exception.isPresent()) {
 				return exception;
 			}
-		}
+//		}
 
 		return checkReceivingEndpoints(message);
 	}

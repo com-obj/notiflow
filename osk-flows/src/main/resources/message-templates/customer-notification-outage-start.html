@@ -6,10 +6,8 @@
   </head>
     <body>
     	<p>
-    		<span th:text="#{cust.start.salution}">Vážený zákazník</span>
-     		<span th:text="${model.customerName}">Objectify</span>
-<!--     		<br> -->
-    		<span th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
+    		<span th:text="#{cust.start.salution}">Vážený zákazník,</span>
+    		<span style="font-weight:bold" th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
     		<span th:text="#{cust.start.outage}">sme zaznamenali výpadok</span>
     	</p>
     	<p th:text="#{cust.start.services.title}">
@@ -26,16 +24,22 @@
 	    </thead>
 	    <tbody>
 	     	<tr th:each="service : ${model.services}">
-	     		<td><span th:text="${service.b2bLogin}"> b2bLogin </span></td>
+	     		<td><span style="font-weight:bold" th:text="${service.b2bLogin}"> b2bLogin </span></td>
 	            <td><span th:text="${service.sn}"> 0905132354 </span></td>
 	            <td><span th:text="${service.productName}"> VPS </span></td>
 	            <td><span th:text="${service.installationAddress}"> Bratislava </span></td>
 	     	</tr>
 	    </tbody>
     </table>
-    	<p th:text="#{cust.start.footerLine1}"></p>
-    	<p th:text="#{cust.start.footerLine2}"></p>
-    	<p th:text="#{cust.start.signature1}"></p>
-    	<p th:text="#{cust.start.signature2}"></p>
+		<p>
+			<span th:text="#{cust.end.footerLine1.part1}"></span>
+			<span style="font-weight:bold" th:text="#{cust.end.footerLine1.part2}"></span>
+		</p>
+		<p>
+			<span th:text="#{cust.start.footerLine2.part1}">Na detailnej identifikácii a odstránení problému intenzívne pracujeme. </span>
+			<span style="font-weight:bold" th:text="#{cust.start.footerLine2.part2}">Po jeho vyriešení Vás budeme informovať.</span>
+		</p>
+    	<p style="font-weight:bold" th:text="#{cust.start.signature1}"></p>
+    	<p style="font-weight:bold" th:text="#{cust.start.signature2}"></p>
     </body>
 </html>

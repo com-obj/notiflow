@@ -8,7 +8,11 @@ import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.stereotype.Component;
 
+@Component
+@ConditionalOnMissingBean(type = "SmsSender")
 public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<Message> {
 	
 	public static final String ORIGINAL_RECIPIENTS_PHONE_ATTR_NAME = "ORIGINAL_RECIPIENTS_PHONE_NUM";
@@ -45,6 +49,14 @@ public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<Message> {
 	
 	public void recieve(Message msg) {
 		recieved.addLast(msg);
+	}
+	
+	public int getReceivedCount() {
+		return recieved.size();
+	}
+	
+	public void purgeAllReceivedMessages() {
+		recieved = new LinkedList<>();
 	}
 
 }

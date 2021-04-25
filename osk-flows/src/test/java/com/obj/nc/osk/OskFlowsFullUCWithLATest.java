@@ -73,17 +73,15 @@ public class OskFlowsFullUCWithLATest extends BaseIntegrationTest {
     	genEventRepo.save(event);
     	
     	//THEN
-        boolean success = greenMail.waitForIncomingEmail(20000, 3); //en+sk
+        boolean success = greenMail.waitForIncomingEmail(20000, 2); // 1.mergnute en+sk, 2.iba sk
         
         Assertions.assertThat(success).isTrue();
         
         MimeMessage[] messages = greenMail.getReceivedMessages();
-        Assertions.assertThat(messages.length).isEqualTo(3);
+        Assertions.assertThat(messages.length).isEqualTo(2);
        
-        System.out.println(GreenMailUtil.getWholeMessage(messages[0]));
-        
         assertMessagesSendTo(messages,"dysko@objectify.sk", 0); //should get filter out
-        assertMessagesSendTo(messages,"cuzy@objectify.sk", 2);
+        assertMessagesSendTo(messages,"cuzy@objectify.sk", 1);
         assertMessagesSendTo(messages, "sales@objectify.sk", 1);
     }
 	
@@ -95,7 +93,7 @@ public class OskFlowsFullUCWithLATest extends BaseIntegrationTest {
     	mockServer
 			.expect(requestTo(fullRequestUrl))
 			.andExpect(method(HttpMethod.POST))
-			.andExpect(jsonPath("$.message", stringContainsInOrder("Vážený zákazník Objectify, s.r.o.", "VPS(SN:0918186997)")))
+			.andExpect(jsonPath("$.message", stringContainsInOrder("Vážený zákazník,", "VPS(SN:0918186997)")))
 			.andExpect(jsonPath("$.address", contains(Matchers.equalTo("0918186997"))))
 			.andRespond(
 					withSuccess(

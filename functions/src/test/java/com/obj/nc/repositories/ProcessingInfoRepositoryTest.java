@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +37,7 @@ public class ProcessingInfoRepositoryTest {
 	}
 	
 	@Test
+	@Disabled
 	public void testFindByEventIdsAndStepName() {
 		//GIVEN
 		ProcessingInfo transientInfo = createSimpleProcessingInfo();

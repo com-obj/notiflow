@@ -1,1 +1,0 @@
-java -jar spring-cloud-dataflow-shell-2.6.2.jar --spring.shell.commandFile=register-apps-deploy-stream.shell

@@ -1,7 +1,7 @@
 package com.obj.nc.flows.intenToMessageToSender;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class NotificationIntentProcessingFlowConfig {
 					flowConfig.channel(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 				)
 				.routeToRecipients(spec -> spec.
-						recipient(EMAIL_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> ((Message)m).isEmailMessage()).
+						recipient(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID, m-> ((Message)m).isEmailMessage()).
 						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> ((Message)m).isSmsMessage()).
 						defaultOutputChannel("NON_EXTISTING_CHANNEL")
 				)
