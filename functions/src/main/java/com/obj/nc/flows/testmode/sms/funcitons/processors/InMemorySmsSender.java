@@ -21,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 @DocumentProcessingInfo("TestSMSSender")
 public class InMemorySmsSender extends ProcessorFunctionAdapter<Message,Message> implements SmsSender  {
 	
+	public static final String INVALID_GSM_0038_CHARACTERS = "[^A-Za-z0-9 \\r\\n@£$¥èéùìòÇØøÅå\\x{0394}_\\x{03A6}\\x{0393}\\x{039B}\\x{03A9}\\x{03A0}\\x{03A8}\\x{03A3}\\x{0398}\\x{039E}ÆæßÉ!\\\"#$%&\\'\\(\\)*+,\\-.\\/:;<=>;?¡ÄÖÑÜ§¿äöñüà^{}\\[\\~\\]\\|\\x{20AC}\\\\]";
+	
 	private final InMemorySmsSourceSupplier reciever;
 
 	
@@ -37,6 +39,10 @@ public class InMemorySmsSender extends ProcessorFunctionAdapter<Message,Message>
 		
 		Message messageContent = convertAggregatedIfNeeded(smsMessage);
 		
+		SimpleTextContent smsContent = messageContent.getContentTyped();
+		String text = formatGSMAlphabetForGAP(smsContent.getText());
+		smsContent.setText(text);
+		
 		reciever.recieve(messageContent);
 
 		return smsMessage;
@@ -46,6 +52,14 @@ public class InMemorySmsSender extends ProcessorFunctionAdapter<Message,Message>
 		SimpleTextContent content = smsMessage.getContentTyped();
 		smsMessage.getBody().setMessage(content);
 		return smsMessage;
+	}
+	
+	private String formatGSMAlphabetForGAP(String text) {
+		if (text == null) {
+			return null;
+		}
+		
+		return text.replaceAll(INVALID_GSM_0038_CHARACTERS, "");
 	}
 
 }

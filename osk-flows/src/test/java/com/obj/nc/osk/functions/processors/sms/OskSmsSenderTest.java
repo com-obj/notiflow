@@ -40,6 +40,8 @@ import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsRequestDto;
 import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
 import com.obj.nc.utils.JsonUtils;
 
+import java.nio.charset.StandardCharsets;
+
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @ImportAutoConfiguration(ValidationAutoConfiguration.class)
 @RestClientTest(OskSmsSenderRestImpl.class)
@@ -95,6 +97,8 @@ class OskSmsSenderTest extends BaseIntegrationTest {
         Assertions.assertThat(oskSendSmsRequestDto.getBillCode()).isEqualTo(properties.getBillCode());
 
         SimpleTextContent contentTyped = inputMessage.getBody().getContentTyped();
+        smsSender.formatContentToGSMAlphabetForGAP(contentTyped);
+        
         Assertions.assertThat(oskSendSmsRequestDto.getMessage()).isEqualTo(contentTyped.getText());
         Assertions.assertThat(oskSendSmsRequestDto.getClientCorrelator()).contains(properties.getClientCorrelatorPrefix());
         Assertions.assertThat(oskSendSmsRequestDto.getNotifyURL()).isEqualTo(properties.getNotifyUrl());
@@ -194,7 +198,7 @@ class OskSmsSenderTest extends BaseIntegrationTest {
         			requestTo(UriComponentsBuilder.fromHttpUrl(properties.getGapApiUrl() + SEND_PATH).build(properties.getSenderAddress()))
                 )
                 .andExpect(method(HttpMethod.POST))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON + ";" + StandardCharsets.ISO_8859_1))
                 .andExpect(header("Authorization", "Basic dGVzdGxvZ2luOnRlc3Rwdw=="))
                 .andRespond(withStatus(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)

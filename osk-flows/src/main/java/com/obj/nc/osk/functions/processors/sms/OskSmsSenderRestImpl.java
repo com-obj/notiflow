@@ -1,5 +1,6 @@
 package com.obj.nc.osk.functions.processors.sms;
 
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -31,6 +33,7 @@ import com.obj.nc.osk.functions.processors.sms.dtos.SendSmsResourceReferenceDto;
 @DocumentProcessingInfo("GAP_SMSSender")
 public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Message> implements SmsSender {
 
+    public static final String INVALID_GSM_0038_CHARACTERS = "[^@£$¥èéùìòÇ\\fØø\\nÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !\"#¤%&'()*+,-./[0-9]:;<=>?¡[A-Z]ÄÖÑÜ§¿[a-z]äöñüà^{}\\[~\\]|€]";
     public static final String SEND_PATH = "/outbound/{senderAddress}/requests";
     public static final String STATUS_SUCCESS = "SUCCESS";
     public static final String STATUS_FAILURE = "FAILURE";
@@ -47,6 +50,7 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Mess
         			this.properties.getGapApiUrl())
                 .basicAuthentication(this.properties.getGapApiLogin(), this.properties.getGapApiPassword())
                 .build();
+        this.restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.ISO_8859_1));
     }
     
     @Override
@@ -87,6 +91,7 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Mess
         result.setClientCorrelator(properties.getClientCorrelatorPrefix() + "-" +  DateTimeFormatter.ISO_INSTANT.format(zdt));
 
         SimpleTextContent content = message.getBody().getContentTyped();
+        formatContentToGSMAlphabetForGAP(content);
         result.setMessage(content.getText());
 
         result.setNotifyURL(properties.getNotifyUrl());
@@ -96,6 +101,10 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Mess
         return result;
     }
 
+    public void formatContentToGSMAlphabetForGAP(SimpleTextContent content) {
+        content.setText(content.getText().replaceAll(INVALID_GSM_0038_CHARACTERS, ""));
+    }
+    
     public OskSendSmsResponseDto sendRequest(@Valid @NotNull OskSendSmsRequestDto oskSendSmsRequestDto) {
         OskSendSmsResponseDto responseBody = restTemplate.postForEntity(
                 SEND_PATH,
