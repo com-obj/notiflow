@@ -28,20 +28,10 @@ definitions:
              - gradle build -x test --stacktrace --info   
            artifacts:
              - osk-flows/dist/**
-     - deploy-snaphost-2-BB: &deploy-snaphost-2-BB
+     - deploy-snaphost-2-BB: &deploy-2-BB
        - step: 
            name: Deploy snapshot to Bitbucket downloads
            script:
-             - pipe: atlassian/bitbucket-upload-file:0.3.2
-               variables:
-                 BITBUCKET_USERNAME: $BITBUCKET_USERNAME
-                 BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
-                 FILENAME: "osk-flows/dist/*.jar"
-     - deploy-release-2-BB: &deploy-release-2-BB
-       - step: 
-           name: Deploy release to Bitbucket downloads
-           script:
-             - mv osk-flows/dist/osk-flows.jar osk-flows/dist/osk-flows-$BITBUCKET_TAG.jar 
              - pipe: atlassian/bitbucket-upload-file:0.3.2
                variables:
                  BITBUCKET_USERNAME: $BITBUCKET_USERNAME
@@ -66,8 +56,8 @@ pipelines:
     release/*:
       - <<: *run-tests
       - <<: *build-jar
-      - <<: *deploy-snaphost-2-BB
+      - <<: *deploy-2-BB
   tags:
     v*:
       - <<: *build-jar
-      - <<: *deploy-release-2-BB
+      - <<: *deploy-2-BB
