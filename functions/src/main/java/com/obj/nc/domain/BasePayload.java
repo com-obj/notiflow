@@ -14,9 +14,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
+
+import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -26,11 +32,14 @@ import org.springframework.data.relational.core.mapping.Embedded;
 	@Type(value = Message.class, name = Message.JSON_TYPE_IDENTIFIER) })
 @ToString(callSuper = true)
 @Log4j2
-public abstract class BasePayload extends BaseJSONObject implements HasHeader {
-
+public abstract class BasePayload extends BaseJSONObject implements HasHeader, Persistable<UUID> {
+	
+	@Id
+	private UUID id;
+	@CreatedDate
+	private Instant timeCreated;
 	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
 	protected Header header = new Header();
-	
 	@Column("payload_json")
 	protected Body body = new Body();
 	
@@ -47,6 +56,12 @@ public abstract class BasePayload extends BaseJSONObject implements HasHeader {
 	@Transient
 	public <T> T getContentTyped() {
 		return (T)getBody().getMessage();
+	}
+	
+	@Override
+	@Transient
+	public boolean isNew() {
+		return timeCreated == null;
 	}
 
 }
