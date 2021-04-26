@@ -106,7 +106,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         
         
         Assertions.assertThat(deliveryInfos.size()).isEqualTo(6);
-        List<DeliveryInfo> deliveredInfos = deliveryInfos.stream().filter(info -> info.getStatus() == DELIVERY_STATUS.SEND).collect(Collectors.toList());
+        List<DeliveryInfo> deliveredInfos = deliveryInfos.stream().filter(info -> info.getStatus() == DELIVERY_STATUS.SENT).collect(Collectors.toList());
         
         Assertions.assertThat(deliveredInfos.size()).isEqualTo(3);
         deliveryInfos.forEach(info -> {

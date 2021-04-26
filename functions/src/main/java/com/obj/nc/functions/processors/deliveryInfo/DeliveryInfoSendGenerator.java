@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 public class DeliveryInfoSendGenerator extends DeliveryInfoGenerator {
 	
 	public DeliveryInfoSendGenerator() {
-		super(DELIVERY_STATUS.SEND);
+		super(DELIVERY_STATUS.SENT);
 	}
 
 }
