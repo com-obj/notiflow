@@ -6,6 +6,6 @@ CREATE TABLE nc_message (
 	time_created timestamptz NULL,
 	CONSTRAINT nc_message_pkey PRIMARY KEY (id)
 );
-CREATE UNIQUE INDEX ndx_intent_id ON nc_message USING btree (id);
+CREATE UNIQUE INDEX ndx_message_id ON nc_message USING btree (id);
 
 -- TODO: CHECK, copy of nc_intent
