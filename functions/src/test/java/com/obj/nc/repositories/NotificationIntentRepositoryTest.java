@@ -37,7 +37,6 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	     notificationIntent.getHeader().setFlowId("default-flow");
 	     UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
 	     notificationIntent.getHeader().setEventIdsAsArray(eventIds);
-		 notificationIntent.setId(UUID.randomUUID());
  		
 	     intentRepository.save(notificationIntent);
 	     

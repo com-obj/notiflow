@@ -10,6 +10,7 @@ import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -32,10 +33,12 @@ import java.util.UUID;
 	@Type(value = Message.class, name = Message.JSON_TYPE_IDENTIFIER) })
 @ToString(callSuper = true)
 @Log4j2
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public abstract class BasePayload extends BaseJSONObject implements HasHeader, Persistable<UUID> {
 	
 	@Id
-	private UUID id;
+	@EqualsAndHashCode.Include
+	private UUID id = UUID.randomUUID();
 	@CreatedDate
 	private Instant timeCreated;
 	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)

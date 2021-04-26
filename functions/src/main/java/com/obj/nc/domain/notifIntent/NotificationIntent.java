@@ -11,7 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @NoArgsConstructor
 @ToString(callSuper = false)
-@EqualsAndHashCode(callSuper=false, of = "id")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @Table("nc_intent")
 public class NotificationIntent extends BasePayload {
 	
