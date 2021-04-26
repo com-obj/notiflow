@@ -1,13 +1,13 @@
 package com.obj.nc.koderia.services;
 
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.koderia.KoderiaFlowsApplication;
-import com.obj.nc.koderia.dto.RecipientDto;
-import com.obj.nc.koderia.dto.RecipientsQueryDto;
-import com.obj.nc.koderia.services.KoderiaRestClientImpl;
-import com.obj.nc.utils.JsonUtils;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +22,13 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.koderia.KoderiaFlowsApplication;
+import com.obj.nc.koderia.dto.RecipientDto;
+import com.obj.nc.koderia.dto.RecipientsQueryDto;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest(KoderiaRestClientImpl.class)

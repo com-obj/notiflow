@@ -1,5 +1,8 @@
 package com.obj.nc.functions.processors.messageAggregator;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,9 +22,6 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageAggregator.AggregationStrategyTest.MessageAggregatorTestConfig;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessageAggregationStrategy;
 import com.obj.nc.utils.JsonUtils;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.nullValue;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringJUnitConfig(classes = MessageAggregatorTestConfig.class)

@@ -1,10 +1,5 @@
 package com.obj.nc.koderia.mapper;
 
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.koderia.KoderiaFlowsApplication;
-import com.obj.nc.koderia.dto.mailchimp.SendMessageWithTemplateDto;
-import com.obj.nc.utils.JsonUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Disabled;
@@ -13,11 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.io.IOException;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.koderia.KoderiaFlowsApplication;
+import com.obj.nc.koderia.dto.mailchimp.SendMessageWithTemplateDto;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @JsonTest

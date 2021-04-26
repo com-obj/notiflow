@@ -2,7 +2,6 @@ package com.obj.nc.flows.smsFormattingAndSending;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -13,6 +12,8 @@ import org.springframework.messaging.MessageChannel;
 import com.obj.nc.functions.processors.messageTemplating.SmsTemplateFormatter;
 import com.obj.nc.functions.processors.senders.SmsSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor

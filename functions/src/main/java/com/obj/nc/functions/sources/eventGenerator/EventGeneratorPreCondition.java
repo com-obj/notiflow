@@ -1,13 +1,14 @@
 package com.obj.nc.functions.sources.eventGenerator;
 
+import java.util.Optional;
+
+import org.springframework.stereotype.Component;
+
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import lombok.extern.log4j.Log4j2;
 
 @Component
 @Log4j2

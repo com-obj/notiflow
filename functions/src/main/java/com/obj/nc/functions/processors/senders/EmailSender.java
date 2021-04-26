@@ -43,6 +43,8 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	private final JavaMailSenderImpl mailSender;
 	
 	public static String NOTIF_CENTER_EMAIL_HEANDER_PREFIX = "$NC_";
+	public static String EVENT_IDS_EMAIL_HEANDER = NOTIF_CENTER_EMAIL_HEANDER_PREFIX+ "EVENT_IDS";
+	public static String FLOW_ID_EMAIL_HEANDER = NOTIF_CENTER_EMAIL_HEANDER_PREFIX+ "FLOW_ID";
 	
 	private final EmailSenderConfigProperties settings;
 	
@@ -109,15 +111,6 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 			
 			log.info("Sending mail vie SMTP took {} ms", ChronoUnit.MILLIS.between(sendStart, Instant.now()));
 			
-//			DeliveryInfoSendResult info = DeliveryInfoSendResult.builder()
-//				.daliveredOn(Instant.now())
-//				.eventIds(header.getEventIds().toArray(new UUID[0]))
-//				.status(DELIVERY_STATUS.SEND)
-//				.recievingEndpoint(toEmail)
-//				.build();
-//				
-//			return info;
-			
 		} catch (MessagingException e) {
 			throw new ProcessingException(EmailSender.class, e);
 		}
@@ -134,10 +127,10 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 		});
 		
 		try {
-			message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "EVENT_ID", JsonUtils.writeObjectToJSONString(header.getEventIds()));
+			message.setHeader(EVENT_IDS_EMAIL_HEANDER, JsonUtils.writeObjectToJSONString(header.getEventIds()));
 			
 			if (header.getFlowId()!= null) {
-				message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "FLOW_ID", header.getFlowId());
+				message.setHeader(FLOW_ID_EMAIL_HEANDER, header.getFlowId());
 			}
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.Data;
@@ -31,6 +32,10 @@ public class BaseJSONObject {
 
 	public String toJSONString() {
 		return JsonUtils.writeObjectToJSONString(this);
+	}
+	
+	public JsonNode toJSONNode() {
+		return JsonUtils.writeObjectToJSONNode(this);
 	}
 
 	public boolean containsAttributes(List<String> attributes) {

@@ -6,9 +6,6 @@ import org.springframework.context.annotation.Import;
 
 import com.obj.nc.koderia.config.KoderiaApiConfigProperties;
 import com.obj.nc.koderia.config.RestClientConfig;
-import com.obj.nc.koderia.functions.processors.KoderiaRecipientsExecution;
-import com.obj.nc.koderia.functions.processors.KoderiaRecipientsPreCondition;
-import com.obj.nc.koderia.functions.processors.KoderiaRecipientsProcessingFunction;
 import com.obj.nc.koderia.mapper.RecipientMapperImpl;
 
 @TestConfiguration

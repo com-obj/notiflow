@@ -64,7 +64,7 @@ class DeliveryInfoTest extends BaseIntegrationTest {
     	DeliveryInfo info1 = DeliveryInfo.builder()
     			.endpointId(email1.getEndpointId()).eventId(eventId).processedOn(emailDelivery).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	DeliveryInfo info2 = DeliveryInfo.builder()
-    			.endpointId(email1.getEndpointId()).eventId(eventId).processedOn(emailDelivery).status(DELIVERY_STATUS.SEND).id(UUID.randomUUID()).build();
+    			.endpointId(email1.getEndpointId()).eventId(eventId).processedOn(emailDelivery).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
 
 
     	DeliveryInfo info3 = DeliveryInfo.builder()
@@ -72,7 +72,7 @@ class DeliveryInfoTest extends BaseIntegrationTest {
     	Thread.sleep(10); // to have different processedOn
     	Instant smsDelivery = Instant.now();
     	DeliveryInfo info4 = DeliveryInfo.builder()
-    			.endpointId(sms1.getEndpointId()).eventId(eventId).processedOn(smsDelivery).status(DELIVERY_STATUS.SEND).id(UUID.randomUUID()).build();
+    			.endpointId(sms1.getEndpointId()).eventId(eventId).processedOn(smsDelivery).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
  
     	deliveryRepo.saveAll( Arrays.asList(info1, info2, info3, info4) );
     	
@@ -85,13 +85,13 @@ class DeliveryInfoTest extends BaseIntegrationTest {
 
     	Assertions.assertThat(infoForEmail.endpointId).isEqualTo("jancuzy@gmail.com");
     	Assertions.assertThat(infoForEmail.getStatusReachedAt()).isEqualTo(emailDelivery);
-    	Assertions.assertThat(infoForEmail.getCurrentStatus()).isEqualTo(DELIVERY_STATUS.SEND);
+    	Assertions.assertThat(infoForEmail.getCurrentStatus()).isEqualTo(DELIVERY_STATUS.SENT);
     	infos.remove(infoForEmail);
     	
     	EndpointDeliveryInfoDto infoForSms = infos.iterator().next();
     	Assertions.assertThat(infoForSms.endpointId).isEqualTo("0908111111");
     	Assertions.assertThat(infoForSms.getStatusReachedAt()).isEqualTo(smsDelivery);
-    	Assertions.assertThat(infoForSms.getCurrentStatus()).isEqualTo(DELIVERY_STATUS.SEND);
+    	Assertions.assertThat(infoForSms.getCurrentStatus()).isEqualTo(DELIVERY_STATUS.SENT);
     	
     }
     
@@ -107,7 +107,7 @@ class DeliveryInfoTest extends BaseIntegrationTest {
     	DeliveryInfo info1 = DeliveryInfo.builder()
     			.endpointId(email1.getEndpointId()).eventId(eventId).processedOn(emailDelivery).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	DeliveryInfo info2 = DeliveryInfo.builder()
-    			.endpointId(email1.getEndpointId()).eventId(eventId).processedOn(emailDelivery).status(DELIVERY_STATUS.SEND).id(UUID.randomUUID()).build();
+    			.endpointId(email1.getEndpointId()).eventId(eventId).processedOn(emailDelivery).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
 
     	deliveryRepo.saveAll( Arrays.asList(info1, info2) );
     	
@@ -124,7 +124,7 @@ class DeliveryInfoTest extends BaseIntegrationTest {
 			.andExpect(jsonPath("$[0].endpoint.email").value(CoreMatchers.is("jancuzy@gmail.com")))
 			.andExpect(jsonPath("$[0].endpoint.endpointId").value(CoreMatchers.is("jancuzy@gmail.com")))
 			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL")))
-			.andExpect(jsonPath("$[0].currentStatus").value(CoreMatchers.is("SEND")))
+			.andExpect(jsonPath("$[0].currentStatus").value(CoreMatchers.is("SENT")))
 			.andExpect(jsonPath("$[0].statusReachedAt").value(CoreMatchers.notNullValue()));
     }
 

@@ -1,19 +1,5 @@
 package com.obj.nc.koderia.mapper;
 
-import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.koderia.config.MailchimpApiConfig;
-import com.obj.nc.koderia.dto.EmitEventDto;
-import com.obj.nc.koderia.dto.mailchimp.*;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.stereotype.Component;
-
 import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
 import static com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl.COMPONENT_NAME;
 
@@ -22,8 +8,30 @@ import java.io.IOException;
 import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.stereotype.Component;
+
+import com.obj.nc.domain.Attachement;
+import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.koderia.config.MailchimpApiConfig;
+import com.obj.nc.koderia.dto.EmitEventDto;
+import com.obj.nc.koderia.dto.mailchimp.AttachmentDto;
+import com.obj.nc.koderia.dto.mailchimp.MergeVarDto;
+import com.obj.nc.koderia.dto.mailchimp.MessageDto;
+import com.obj.nc.koderia.dto.mailchimp.RecipientDto;
+import com.obj.nc.koderia.dto.mailchimp.SendMessageWithTemplateDto;
 
 @Component(COMPONENT_NAME)
 public class MailchimpMessageMapperImpl implements MailchimpMessageMapper {

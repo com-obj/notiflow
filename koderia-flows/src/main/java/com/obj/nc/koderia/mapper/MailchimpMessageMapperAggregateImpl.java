@@ -1,16 +1,20 @@
 package com.obj.nc.koderia.mapper;
 
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.koderia.dto.EmitEventDto;
-import com.obj.nc.koderia.dto.mailchimp.*;
+import static com.obj.nc.koderia.mapper.MailchimpMessageMapperAggregateImpl.COMPONENT_NAME;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
-import static com.obj.nc.koderia.mapper.MailchimpMessageMapperAggregateImpl.COMPONENT_NAME;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.koderia.dto.EmitEventDto;
+import com.obj.nc.koderia.dto.mailchimp.AttachmentDto;
+import com.obj.nc.koderia.dto.mailchimp.MergeVarDto;
 
 @Component(COMPONENT_NAME)
 public class MailchimpMessageMapperAggregateImpl extends MailchimpMessageMapperImpl {

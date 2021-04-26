@@ -76,11 +76,13 @@ public class EmailProcessingFlowConfig {
 		return flow -> flow
 			.publishSubscribeChannel( subscription  ->
 				subscription.id(EMAIL_FORMATING_INPUT_CHANNEL_ID)
+					//format email and merge if multilanguage
 					.subscribe(aggregateMultilangFlow -> aggregateMultilangFlow
 							.filter(m-> MERGE.equals(properties.getMultiLocalesMergeStrategy()))
 							.handle(emailFormatter)
 							.handle(multiLocalesAggregationStrategy())
 							.channel(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID))
+					//format and split if multilanguage
 					.subscribe(mesagePerLocaleFlow -> mesagePerLocaleFlow
 							.filter(m-> !MERGE.equals(properties.getMultiLocalesMergeStrategy()))
 							.split(emailFormatter)

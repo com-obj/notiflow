@@ -1,8 +1,8 @@
 package com.obj.nc.osk.functions.processors.sms.dtos;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotBlank;
+
+import lombok.Data;
 
 @Data
 public class SendSmsResourceReferenceDto {

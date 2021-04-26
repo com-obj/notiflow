@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Import;
 
 import com.obj.nc.koderia.config.MailchimpApiConfig;
 import com.obj.nc.koderia.config.RestClientConfig;
-import com.obj.nc.koderia.mapper.MailchimpMessageMapperImpl;
 
 @TestConfiguration
 @Import({

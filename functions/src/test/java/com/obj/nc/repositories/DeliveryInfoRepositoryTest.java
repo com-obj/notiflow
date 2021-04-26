@@ -35,7 +35,7 @@ public class DeliveryInfoRepositoryTest {
 				.processedOn(Instant.now())
 				.endpointId("jancuzy@gmail.com")
 				.eventId(UUID.randomUUID())
-				.status(DELIVERY_STATUS.SEND)
+				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
@@ -53,7 +53,7 @@ public class DeliveryInfoRepositoryTest {
 				.processedOn(Instant.now())
 				.endpointId("jancuzy@gmail.com")
 				.eventId(eventId)
-				.status(DELIVERY_STATUS.SEND)
+				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
@@ -61,7 +61,7 @@ public class DeliveryInfoRepositoryTest {
 				.processedOn(Instant.now())
 				.endpointId("cuzy@gmail.com")
 				.eventId(eventId)
-				.status(DELIVERY_STATUS.SEND)
+				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
@@ -69,7 +69,7 @@ public class DeliveryInfoRepositoryTest {
 				.processedOn(Instant.now())
 				.endpointId("xxx@gmail.com")
 				.eventId(UUID.randomUUID())
-				.status(DELIVERY_STATUS.SEND)
+				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
@@ -88,7 +88,7 @@ public class DeliveryInfoRepositoryTest {
 				.processedOn(Instant.now())
 				.endpointId("jancuzy@gmail.com")
 				.eventId(UUID.randomUUID())
-				.status(DELIVERY_STATUS.SEND)
+				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
@@ -96,7 +96,7 @@ public class DeliveryInfoRepositoryTest {
 				.processedOn(Instant.now())
 				.endpointId("jancuzy@gmail.com")
 				.eventId(UUID.randomUUID())
-				.status(DELIVERY_STATUS.SEND)
+				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
@@ -104,7 +104,7 @@ public class DeliveryInfoRepositoryTest {
 				.processedOn(Instant.now())
 				.endpointId("xxx@gmail.com")
 				.eventId(UUID.randomUUID())
-				.status(DELIVERY_STATUS.SEND)
+				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		

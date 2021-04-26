@@ -1,14 +1,5 @@
 package com.obj.nc.koderia.functions.sources;
 
-import com.obj.nc.koderia.KoderiaFlowsApplication;
-import com.obj.nc.koderia.controller.EmitEventsRestController;
-import com.obj.nc.koderia.dto.*;
-import com.obj.nc.koderia.functions.sources.KoderiaRestMicroService;
-import com.obj.nc.utils.JsonUtils;
-import io.restassured.config.EncoderConfig;
-import io.restassured.http.ContentType;
-import io.restassured.module.mockmvc.RestAssuredMockMvc;
-import io.restassured.module.mockmvc.config.RestAssuredMockMvcConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +7,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.context.WebApplicationContext;
+
+import com.obj.nc.koderia.KoderiaFlowsApplication;
+import com.obj.nc.koderia.controller.EmitEventsRestController;
+import com.obj.nc.koderia.dto.EmitEventDto;
+import com.obj.nc.utils.JsonUtils;
+
+import io.restassured.config.EncoderConfig;
+import io.restassured.http.ContentType;
+import io.restassured.module.mockmvc.RestAssuredMockMvc;
+import io.restassured.module.mockmvc.config.RestAssuredMockMvcConfig;
 
 @WebMvcTest(controllers = {
         EmitEventsRestController.class,

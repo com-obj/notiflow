@@ -1,19 +1,19 @@
 package com.obj.nc.koderia.functions.processors.senders;
 
+import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
+
+import java.util.Collections;
+import java.util.Optional;
+
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
 import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
-
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
-import static com.obj.nc.koderia.functions.processors.KoderiaEventConverterExecution.ORIGINAL_EVENT_FIELD;
-
-import java.util.Collections;
-import java.util.Optional;
 
 @Component
 public class MailchimpSenderPreCondition implements PreCondition<Message> {
