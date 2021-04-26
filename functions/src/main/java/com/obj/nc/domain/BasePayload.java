@@ -14,6 +14,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Embedded;
 
 @Getter
 @Setter
@@ -25,17 +28,23 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public abstract class BasePayload extends BaseJSONObject implements HasHeader {
 
+	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
 	protected Header header = new Header();
+	
+	@Column("payload_json")
 	protected Body body = new Body();
 	
 	@JsonIgnore
+	@Transient
 	public ProcessingInfo getProcessingInfo() {
 		return getHeader().getProcessingInfo();
 	}
 
+	@Transient
 	public abstract String getPayloadTypeName();
 	
 	@JsonIgnore
+	@Transient
 	public <T> T getContentTyped() {
 		return (T)getBody().getMessage();
 	}

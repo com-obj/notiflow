@@ -3,27 +3,30 @@ package com.obj.nc.domain.notifIntent;
 import java.time.Instant;
 import java.util.UUID;
 
-import org.springframework.data.relational.core.mapping.Table;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @NoArgsConstructor
 @ToString(callSuper = false)
 @EqualsAndHashCode(callSuper=false, of = "id")
 @Table("nc_intent")
-public class NotificationIntent extends BasePayload {
+public class NotificationIntent extends BasePayload implements Persistable<UUID> {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "EVENT";
 	
+	@Id
 	private UUID id;
+	@CreatedDate
 	private Instant timeCreated;
 
 	public static NotificationIntent createWithSimpleMessage(String flowId, String message) {
@@ -40,4 +43,9 @@ public class NotificationIntent extends BasePayload {
 		return JSON_TYPE_IDENTIFIER;
 	}
 	
+	@Override
+	@Transient
+	public boolean isNew() {
+		return timeCreated == null;
+	}
 }

@@ -11,10 +11,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.Data;
+import org.springframework.data.annotation.AccessType;
+import org.springframework.data.annotation.Transient;
 
 @Data
+@AccessType(AccessType.Type.PROPERTY)
 public class BaseJSONObject {
 
+	@Transient
 	private Map<String, Object> attributes = new HashMap<String, Object>();
 
 	@JsonAnySetter
