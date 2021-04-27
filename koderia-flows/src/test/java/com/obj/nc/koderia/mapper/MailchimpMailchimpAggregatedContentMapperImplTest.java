@@ -1,7 +1,6 @@
 package com.obj.nc.koderia.mapper;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.utils.JsonUtils;
 import org.hamcrest.MatcherAssert;
@@ -34,17 +33,17 @@ class MailchimpMailchimpAggregatedContentMapperImplTest {
     void testMapWithTemplate() {
         // GIVEN
         Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_JSON_PATH, Message.class);
-        // FIX ABSOLUTE PATHS TO TEST FILES
-        AggregatedEmailContent aggregatedContent = inputMessage.getContentTyped();
-        aggregatedContent.getAggregateContent().forEach(part -> {
-        	part.getAttachments().forEach(attachement -> {
-                try {
-                    attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        });
+//        // FIX ABSOLUTE PATHS TO TEST FILES
+//        AggregatedEmailContent aggregatedContent = inputMessage.getContentTyped();
+//        aggregatedContent.getAggregateContent().forEach(part -> {
+//        	part.getAttachments().forEach(attachement -> {
+//                try {
+//                    attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            });
+//        });
 
 //        SendMessageWithTemplateDto expectedSendMessageDto = JsonUtils.readObjectFromClassPathResource(EXPECTED_DTO_JSON_PATH, SendMessageWithTemplateDto.class);
 //

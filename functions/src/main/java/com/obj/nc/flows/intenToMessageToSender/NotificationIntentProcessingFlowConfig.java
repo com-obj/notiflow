@@ -19,7 +19,6 @@ import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIn
 import com.obj.nc.functions.sink.intentPersister.NotificationIntentPersister;
 
 @Configuration
-@ConditionalOnBean(SmsSender.class) // ked nie je definovany SmsSender, Spring nemoze vytvorit flow SMS_PROCESSING_FLOW_ID a teda neda sa routovat do SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID
 public class NotificationIntentProcessingFlowConfig {
 		
 	@Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromIntent;
@@ -47,7 +46,7 @@ public class NotificationIntentProcessingFlowConfig {
 				.routeToRecipients(spec -> spec.
 						recipient(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID, m-> ((Message)m).isEmailMessage()).
 						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> ((Message)m).isSmsMessage()).
-						defaultOutputChannel("NON_EXTISTING_CHANNEL")
+						defaultOutputToParentFlow()
 				)
 				.get();
 	}

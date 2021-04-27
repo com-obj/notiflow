@@ -1,7 +1,6 @@
 package com.obj.nc.koderia.functions.processors.mailchimpSender;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
