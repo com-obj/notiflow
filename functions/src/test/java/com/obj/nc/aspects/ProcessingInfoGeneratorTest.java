@@ -98,8 +98,8 @@ public class ProcessingInfoGeneratorTest {
     @Test
     void testPersistPIForNewIntent() {
         // given
-    	String notificationIntentJson = NotificationIntent.createWithSimpleMessage("test-config", "Hi there!!").toJSONString();
         NotificationIntent notificationIntent = NotificationIntent.createWithSimpleMessage("test-config", "Hi there!!");
+        String notificationIntentJson = notificationIntent.toJSONString();
         HasHeader payloadWithEventId = generateEventId.apply(notificationIntent);
 
         // when
