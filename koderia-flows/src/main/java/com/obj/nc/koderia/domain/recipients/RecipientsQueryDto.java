@@ -25,7 +25,7 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RecipientsQueryDto {
     
-    @NotNull private BaseKoderiaEvent.Type type;
+    @NotNull private String type;
     
     static class Data {
     }

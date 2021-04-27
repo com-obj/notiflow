@@ -11,7 +11,7 @@
     } ],
     "merge_language" : "handlebars",
     "global_merge_vars" : [ {
-      "name" : "data",
+      "name" : "AGGREGATED",
       "content" : [ {
         "name" : "JOB_POST",
         "content" : [ {

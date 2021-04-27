@@ -8,6 +8,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -21,9 +22,19 @@ public class MailchimpContentDto {
     public static MailchimpContentDto from(MailchimpContent content, String authKey) {
         MailchimpContentDto dto = new MailchimpContentDto();
         dto.key = authKey;
-        dto.message = content.getMessage();
-        dto.templateName = content.getTemplateName();
-        dto.templateContent = content.getTemplateContent();
+    
+        MailchimpMessage mailchimpMessage = new MailchimpMessage();
+        mailchimpMessage.setTo(new ArrayList<>(content.getMessage().getTo()));
+        mailchimpMessage.setAttachments(new ArrayList<>(content.getMessage().getAttachments()));
+        mailchimpMessage.setFromName(content.getMessage().getFromName());
+        mailchimpMessage.setFromEmail(content.getMessage().getFromEmail());
+        mailchimpMessage.setGlobalMergeVars(new ArrayList<>(content.getMessage().getGlobalMergeVars()));
+        mailchimpMessage.setSubject(content.getMessage().getSubject());
+        mailchimpMessage.setMergeLanguage(content.getMessage().getMergeLanguage());
+        dto.setMessage(mailchimpMessage);
+    
+        dto.setTemplateContent(new ArrayList<>(content.getTemplateContent()));
+        dto.setTemplateName(content.getTemplateName());
         return dto;
     }
     

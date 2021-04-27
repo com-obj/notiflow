@@ -1,8 +1,5 @@
 {
   "type" : "MAILCHIMP_CONTENT",
-  "subject" : "Business Intelligence (BI) Developer",
-  "text" : "We are looking for a Business Intelligence (BI) Developer to create...",
-  "contentType" : "text/plain",
   "message" : {
     "subject" : "Business Intelligence (BI) Developer",
     "from_email" : "sender@koderia.sk",
@@ -10,7 +7,7 @@
     "to" : [ ],
     "merge_language" : "handlebars",
     "global_merge_vars" : [ {
-      "name" : "data",
+      "name" : "JOB_POST",
       "content" : {
         "type" : "JOB_POST",
         "data" : {

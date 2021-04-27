@@ -3,6 +3,7 @@ package com.obj.nc.koderia.functions.processors.recipientsFinder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -24,14 +25,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.obj.nc.domain.content.mailchimp.MailchimpContent.DATA_MERGE_VARIABLE;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.KODERIA_REST_TEMPLATE;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
 
 @Component
 @DocumentProcessingInfo("KoderiaRecipientsFinder")
 public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<NotificationIntent, NotificationIntent> {
-	@Qualifier(KODERIA_REST_TEMPLATE)
+	
+	@Qualifier(KODERIA_REST_TEMPLATE) 
 	@Autowired private RestTemplate restTemplate;
 	@Autowired private KoderiaRecipientsMapper recipientMapper;
 	@Autowired private ObjectMapper objectMapper;
@@ -43,14 +44,14 @@ public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<Notificati
 			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s contains null content.", payload)));
 		} else if (content.getMessage() == null) {
 			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s contains null message.", payload)));
-		} else if (!content.getMessage().findMergeVariableContentByName(DATA_MERGE_VARIABLE).isPresent()) {
+		} else if (!content.getMessage().getMailchimpData().isPresent()) {
 			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s does not contain original event data.", payload)));
 		}
 		
-		Object originalEvent = content.getMessage().findMergeVariableContentByName(DATA_MERGE_VARIABLE).get();
+		MailchimpData dataMergeVar = content.getMessage().getMailchimpData().get();
 		
 		try {
-			objectMapper.convertValue(originalEvent, BaseKoderiaEvent.class);
+			objectMapper.convertValue(dataMergeVar, BaseKoderiaEvent.class);
 		} catch (IllegalArgumentException e) {
 			return Optional.of(new PayloadValidationException(e.getMessage()));
 		}
@@ -60,8 +61,9 @@ public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<Notificati
 	
 	@Override
 	protected NotificationIntent execute(NotificationIntent payload) {
-		Object originalEvent = payload.<MailchimpContent>getContentTyped().getMessage().findMergeVariableContentByName(DATA_MERGE_VARIABLE).get();
-		RecipientsQueryDto recipientsQueryDto = objectMapper.convertValue(originalEvent, RecipientsQueryDto.class);
+		MailchimpData dataMergeVar = payload.<MailchimpContent>getContentTyped().getMessage().getMailchimpData().get();
+		RecipientsQueryDto recipientsQueryDto = objectMapper.convertValue(dataMergeVar, RecipientsQueryDto.class);
+		
 		List<RecievingEndpoint> emailEndpoints = requestReceivingEndpoints(recipientsQueryDto);
 		payload.getBody().setRecievingEndpoints(emailEndpoints);
 		return payload;

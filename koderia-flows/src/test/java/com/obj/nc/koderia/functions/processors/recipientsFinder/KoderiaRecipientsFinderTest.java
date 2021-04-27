@@ -1,7 +1,9 @@
 package com.obj.nc.koderia.functions.processors.recipientsFinder;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.domain.content.mailchimp.MailchimpMergeVariable;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -34,7 +36,6 @@ import org.springframework.web.client.RestClientException;
 
 import java.util.List;
 
-import static com.obj.nc.domain.content.mailchimp.MailchimpContent.DATA_MERGE_VARIABLE;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.equalTo;
@@ -106,7 +107,7 @@ class KoderiaRecipientsFinderTest {
         MailchimpContent contentTyped = mappedNotificationIntent.getContentTyped();
         int origEventIndex = 0;
         for (MailchimpMergeVariable mailchimpTemplateContent : contentTyped.getMessage().getGlobalMergeVars()) {
-            if (DATA_MERGE_VARIABLE.equals(mailchimpTemplateContent.getName())) {
+            if (baseKoderiaEvent.getType().equals(mailchimpTemplateContent.getName())) {
                 break;
             } else {
                 origEventIndex++;

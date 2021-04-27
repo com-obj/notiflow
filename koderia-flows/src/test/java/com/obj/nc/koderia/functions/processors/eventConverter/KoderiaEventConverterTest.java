@@ -2,13 +2,14 @@ package com.obj.nc.koderia.functions.processors.eventConverter;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.koderia.domain.event.*;
 import com.obj.nc.koderia.domain.eventData.*;
-import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
-import com.obj.nc.koderia.mapper.KoderiaEvent2MailchimpContentMapper;
+import com.obj.nc.mappers.MailchimpDataToMailchimpContentMapper;
 import com.obj.nc.utils.JsonUtils;
 import io.restassured.module.jsv.JsonSchemaValidator;
 import org.assertj.core.api.Assertions;
@@ -22,7 +23,6 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Optional;
 
-import static com.obj.nc.domain.content.mailchimp.MailchimpContent.DATA_MERGE_VARIABLE;
 import static org.hamcrest.Matchers.equalTo;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.equalTo;
 @AutoConfigureWebClient
 @ContextConfiguration(classes = {
         KoderiaEventConverter.class,
-        KoderiaEvent2MailchimpContentMapper.class,
+        MailchimpDataToMailchimpContentMapper.class,
         KoderiaEventConverterConfig.class,
         MailchimpSenderConfig.class
 })
@@ -43,7 +43,7 @@ class KoderiaEventConverterTest {
     @Test
     void testExtractJobPostDto() {
         // given
-        BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEvent.class);
+        JobPostKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", JobPostKoderiaEventDto.class);
         GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
     
         // when
@@ -58,9 +58,9 @@ class KoderiaEventConverterTest {
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
         MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(jobPostEventData.getName()));
         // and
-        Optional<Object> dataVariable = content.getMessage().findMergeVariableContentByName(DATA_MERGE_VARIABLE);
+        Optional<? extends MailchimpData> dataVariable = content.getMessage().getMailchimpData();
         MatcherAssert.assertThat(dataVariable.isPresent(), equalTo(true));
-        MatcherAssert.assertThat(((BaseKoderiaEvent) dataVariable.get()).getMessageText(), equalTo(jobPostEventData.getDescription()));
+        MatcherAssert.assertThat(dataVariable.get().getMessageText(), equalTo(jobPostEventData.getDescription()));
     }
 
     @Test
@@ -73,7 +73,7 @@ class KoderiaEventConverterTest {
 
     @Test
     void testExtractNullSubjectEmitEventDto() {
-        BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEvent.class);
+        JobPostKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", JobPostKoderiaEventDto.class);
         JobPostEventDataDto jobPostEventData = baseKoderiaEvent.getData();
         jobPostEventData.setName(null);
     
@@ -87,7 +87,7 @@ class KoderiaEventConverterTest {
 
     @Test
     void testExtractNullTextEmitEventDto() {
-        BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEvent.class);
+        JobPostKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", JobPostKoderiaEventDto.class);
         JobPostEventDataDto jobPostEventData = baseKoderiaEvent.getData();
         jobPostEventData.setDescription(null);
     
@@ -102,7 +102,7 @@ class KoderiaEventConverterTest {
     @Test
     void testExtractBlogDto() {
         // given
-        BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/blog_body.json", BaseKoderiaEvent.class);
+        BlogKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/blog_body.json", BlogKoderiaEventDto.class);
         GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
 
         // when
@@ -117,15 +117,15 @@ class KoderiaEventConverterTest {
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
         MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(blogEventData.getTitle()));
         // and
-        Optional<Object> dataVariable = content.getMessage().findMergeVariableContentByName(DATA_MERGE_VARIABLE);
+        Optional<? extends MailchimpData> dataVariable = content.getMessage().getMailchimpData();
         MatcherAssert.assertThat(dataVariable.isPresent(), equalTo(true));
-        MatcherAssert.assertThat(((BaseKoderiaEvent) dataVariable.get()).getMessageText(), equalTo(blogEventData.getContent()));
+        MatcherAssert.assertThat(dataVariable.get().getMessageText(), equalTo(blogEventData.getContent()));
     }
 
     @Test
     void testExtractEventDto() {
         // given
-        BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/event_body.json", BaseKoderiaEvent.class);
+        EventKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/event_body.json", EventKoderiaEventDto.class);
     
         GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
         
@@ -141,15 +141,15 @@ class KoderiaEventConverterTest {
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
         MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(eventEventData.getName()));
         // and
-        Optional<Object> dataVariable = content.getMessage().findMergeVariableContentByName(DATA_MERGE_VARIABLE);
+        Optional<? extends MailchimpData> dataVariable = content.getMessage().getMailchimpData();
         MatcherAssert.assertThat(dataVariable.isPresent(), equalTo(true));
-        MatcherAssert.assertThat(((BaseKoderiaEvent) dataVariable.get()).getMessageText(), equalTo(eventEventData.getDescription()));
+        MatcherAssert.assertThat(dataVariable.get().getMessageText(), equalTo(eventEventData.getDescription()));
     }
 
     @Test
     void testExtractLinkDto() {
         // given
-        BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/link_body.json", BaseKoderiaEvent.class);
+        LinkKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/link_body.json", LinkKoderiaEventDto.class);
         GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
 
         // when
@@ -164,15 +164,15 @@ class KoderiaEventConverterTest {
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
         MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(linkEventData.getTitle()));
         // and
-        Optional<Object> dataVariable = content.getMessage().findMergeVariableContentByName(DATA_MERGE_VARIABLE);
+        Optional<? extends MailchimpData> dataVariable = content.getMessage().getMailchimpData();
         MatcherAssert.assertThat(dataVariable.isPresent(), equalTo(true));
-        MatcherAssert.assertThat(((BaseKoderiaEvent) dataVariable.get()).getMessageText(), equalTo(linkEventData.getDescription()));
+        MatcherAssert.assertThat(dataVariable.get().getMessageText(), equalTo(linkEventData.getDescription()));
     }
 
     @Test
     void testExtractNewsDto() {
         // given
-        BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/news_body.json", BaseKoderiaEvent.class);
+        NewsKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/news_body.json", NewsKoderiaEventDto.class);
         GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
         
         // when
@@ -187,9 +187,9 @@ class KoderiaEventConverterTest {
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
         MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(newsEventData.getSubject()));
         // and
-        Optional<Object> dataVariable = content.getMessage().findMergeVariableContentByName(DATA_MERGE_VARIABLE);
+        Optional<? extends MailchimpData> dataVariable = content.getMessage().getMailchimpData();
         MatcherAssert.assertThat(dataVariable.isPresent(), equalTo(true));
-        MatcherAssert.assertThat(((BaseKoderiaEvent) dataVariable.get()).getMessageText(), equalTo(newsEventData.getText()));
+        MatcherAssert.assertThat(dataVariable.get().getMessageText(), equalTo(newsEventData.getText()));
     }
 
 }

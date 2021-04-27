@@ -1,19 +1,16 @@
 package com.obj.nc.koderia.domain.event;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.IsTypedJson;
+import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 
 @Data
 @Validated
@@ -25,28 +22,10 @@ import java.util.Map;
         @JsonSubTypes.Type(value = LinkKoderiaEventDto.class, name = "LINK"),
         @JsonSubTypes.Type(value = NewsKoderiaEventDto.class, name = "NEWS")
 })
-public abstract class BaseKoderiaEvent implements IsTypedJson {
-    public enum Type {
-        JOB_POST, BLOG, EVENT, LINK, NEWS
-    }
-    
-    @NotNull private Type type;
-    
-    @JsonIgnore
-    public abstract String getMessageSubject();
-
-    @JsonIgnore
-    public abstract String getMessageText();
-    
-    @JsonIgnore
-    public abstract String getTypeName();
-    
-    @JsonIgnore
-    public abstract <T> T getData();
-    
-    @JsonIgnore
+@EqualsAndHashCode(callSuper = true)
+public abstract class BaseKoderiaEvent extends MailchimpData {
+    @Override
     public List<Attachement> getAttachments() {
         return new ArrayList<>();
     }
-
 }

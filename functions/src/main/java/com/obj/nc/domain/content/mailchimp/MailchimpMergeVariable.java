@@ -6,6 +6,6 @@ import lombok.Data;
 public class MailchimpMergeVariable {
 
     private String name;
-    private Object content;
+    private MailchimpData content;
 
 }

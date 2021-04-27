@@ -57,9 +57,11 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 	@Override
 	protected Message execute(Message payload) {
 		MailchimpContent content = payload.getContentTyped();
-		content.getMessage().setTo(mapRecipient(payload.getBody().getRecievingEndpoints().get(0)));
 		
-		List<MailchimpResponseDto> mailchimpResponseDtos = doSendMessage(MailchimpContentDto.from(content, mailchimpSenderConfig.getAuthKey()));
+		MailchimpContentDto dto = MailchimpContentDto.from(content, mailchimpSenderConfig.getAuthKey());
+		dto.getMessage().setTo(mapRecipient(payload.getBody().getRecievingEndpoints().get(0)));
+		
+		List<MailchimpResponseDto> mailchimpResponseDtos = doSendMessage(dto);
 		payload.getBody().setAttributeValue(MAILCHIMP_RESPONSE_FIELD, mailchimpResponseDtos);
 		
 		return payload;
@@ -79,7 +81,7 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 		return restTemplate;
 	}
 	
-	private List<MailchimpRecipient> mapRecipient(RecievingEndpoint endpoint) {
+	public List<MailchimpRecipient> mapRecipient(RecievingEndpoint endpoint) {
 		List<MailchimpRecipient> recipientInList = new ArrayList<>();
 		
 		if (!MailchimpEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType())) {
@@ -87,10 +89,12 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 		}
 		
 		MailchimpRecipient recipient = new MailchimpRecipient();
+		
 		MailchimpEndpoint mailChimpEndpoint = (MailchimpEndpoint) endpoint;
 		recipient.setName(mailChimpEndpoint.getRecipient().getName());
 		recipient.setEmail(mailChimpEndpoint.getEmail());
 		
+		recipientInList.add(recipient);
 		return recipientInList;
 	}
 

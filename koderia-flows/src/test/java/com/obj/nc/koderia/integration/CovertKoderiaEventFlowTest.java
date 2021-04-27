@@ -1,20 +1,13 @@
 package com.obj.nc.koderia.integration;
 
-import static com.obj.nc.domain.content.mailchimp.MailchimpContent.DATA_MERGE_VARIABLE;
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_ID;
-import static com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.koderia.integration.CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.RECEIVED_TEST_LIST;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-
+import com.obj.nc.BaseIntegrationTest;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
-import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
+import com.obj.nc.koderia.domain.event.JobPostKoderiaEventDto;
 import com.obj.nc.utils.JsonUtils;
 import org.awaitility.Awaitility;
 import org.hamcrest.Matchers;
@@ -35,13 +28,18 @@ import org.springframework.messaging.MessageHandler;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.obj.nc.BaseIntegrationTest;
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_ID;
+import static com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.koderia.integration.CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.RECEIVED_TEST_LIST;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
@@ -71,7 +69,7 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 	@Test
 	void testConvertKoderiaEvent() {
 		// given
-		BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEvent.class);
+		JobPostKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", JobPostKoderiaEventDto.class);
 		GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
 		genericEvent.setFlowId("default-flow");
 		// when
@@ -84,11 +82,10 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 		MailchimpContent content = payload.getContentTyped();
 		assertThat(content.getMessage(), notNullValue());
 		
-		Optional<Object> data = content.getMessage().findMergeVariableContentByName(DATA_MERGE_VARIABLE);
+		Optional<MailchimpData> data = content.getMessage().getMailchimpData();
 		assertThat(data.isPresent(), equalTo(true));
-		
-		BaseKoderiaEvent dataTyped = (BaseKoderiaEvent) data.get();
-		assertThat(dataTyped, equalTo(baseKoderiaEvent));
+		assertThat(data.get().getType(), equalTo(baseKoderiaEvent.getType()));
+		assertThat(data.get().getData(), equalTo(baseKoderiaEvent.getData()));
 		
 		assertThat(content.getTemplateContent(), notNullValue());
 		assertThat(content.getTemplateName(), notNullValue());

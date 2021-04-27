@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Map;
+import java.util.*;
 
 @Validated
 @Data
@@ -38,6 +38,10 @@ public class MailchimpSenderConfig {
             return mailchimpTemplateNames.get(messageType);
         }
         throw new IllegalArgumentException(String.format("Unknown message type: %s", messageType));
+    }
+    
+    public Set<String> getMessageTypes() {
+        return new HashSet<>(mailchimpTemplateNames.keySet());
     }
     
     @Bean

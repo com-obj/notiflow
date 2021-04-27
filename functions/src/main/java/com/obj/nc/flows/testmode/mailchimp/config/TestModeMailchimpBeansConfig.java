@@ -3,6 +3,7 @@ package com.obj.nc.flows.testmode.mailchimp.config;
 import com.obj.nc.flows.testmode.mailchimp.functions.InMemoryMailchimpSourceSupplier;
 import com.obj.nc.flows.testmode.mailchimp.functions.TestModeMailchimpSender;
 import com.obj.nc.functions.processors.senders.MailchimpSender;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -23,12 +24,18 @@ public class TestModeMailchimpBeansConfig {
     @Bean
     @Primary
     public MailchimpSender testModeMailchimpSender() {
-        return new TestModeMailchimpSender(mailchimpReciever());
+        return new TestModeMailchimpSender(testModeMailchimpReciever(), realMailchimpSender());
     }
     
     @Bean
-    public InMemoryMailchimpSourceSupplier mailchimpReciever() {
+    @Primary
+    public InMemoryMailchimpSourceSupplier testModeMailchimpReciever() {
         return new InMemoryMailchimpSourceSupplier();
+    }
+    
+    @Bean
+    public MailchimpSenderProcessorFunction realMailchimpSender() {
+        return new MailchimpSenderProcessorFunction();
     }
     
 }

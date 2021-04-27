@@ -7,6 +7,8 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
 import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpResponseDto;
+import com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterConfig;
+import com.obj.nc.mappers.MailchimpDataToMailchimpContentMapper;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
@@ -19,13 +21,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.obj.nc.domain.content.mailchimp.MailchimpContent.DATA_MERGE_VARIABLE;
 import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
 import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
 import static org.hamcrest.Matchers.anyOf;
@@ -37,7 +39,11 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest(MailchimpSenderProcessorFunction.class)
-@Import(MailchimpSenderProcessorFunctionTestConfig.class)
+@ContextConfiguration(classes = {
+        MailchimpSenderConfig.class,
+        MailchimpDataToMailchimpContentMapper.class,
+        KoderiaEventConverterConfig.class
+})
 class MailchimpSenderProcessorFunctionTest {
 
     @Autowired private MailchimpSenderProcessorFunction sendMailchimpMessage;
@@ -148,7 +154,6 @@ class MailchimpSenderProcessorFunctionTest {
                 .andExpect(jsonPath("$.key", equalTo("MOCKkey")))
                 .andExpect(jsonPath("$.message.subject", anyOf(equalTo("Business Intelligence (BI) Developer"))))
                 .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
-                .andExpect(jsonPath("$.message.global_merge_vars[0].name", equalTo(DATA_MERGE_VARIABLE)))
                 .andExpect(jsonPath("$.message.attachments[0].name", equalTo("test1.txt")))
                 .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
     }

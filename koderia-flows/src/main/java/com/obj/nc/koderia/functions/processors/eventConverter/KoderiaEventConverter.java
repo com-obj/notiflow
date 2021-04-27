@@ -7,7 +7,7 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
-import com.obj.nc.koderia.mapper.KoderiaEvent2MailchimpContentMapper;
+import com.obj.nc.mappers.MailchimpDataToMailchimpContentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ import java.util.Optional;
 @DocumentProcessingInfo("KoderiaEventConverter")
 public class KoderiaEventConverter extends ProcessorFunctionAdapter<GenericEvent, NotificationIntent> {
 	
-	private final KoderiaEvent2MailchimpContentMapper koderiaEvent2MailchimpContentMapper;
+	private final MailchimpDataToMailchimpContentMapper mailchimpDataToMailchimpContentMapper;
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(GenericEvent payload) {
@@ -41,7 +41,7 @@ public class KoderiaEventConverter extends ProcessorFunctionAdapter<GenericEvent
 		notificationIntent.getHeader().setFlowId(payload.getFlowId());
 		
 		BaseKoderiaEvent koderiaEvent = payload.getPayloadAsPojo();
-		notificationIntent.getBody().setMessage(koderiaEvent2MailchimpContentMapper.map(koderiaEvent));
+		notificationIntent.getBody().setMessage(mailchimpDataToMailchimpContentMapper.map(koderiaEvent));
 		return notificationIntent;
 	}
 	

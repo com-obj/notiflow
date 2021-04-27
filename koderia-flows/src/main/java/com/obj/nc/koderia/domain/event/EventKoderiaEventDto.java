@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class EventKoderiaEventDto extends BaseKoderiaEvent {
-    @JsonProperty("data")
     @Valid @NotNull private EventEventDataDto data;
     
     @Override
@@ -22,11 +21,6 @@ public class EventKoderiaEventDto extends BaseKoderiaEvent {
     @Override
     public String getMessageText() {
         return data.getDescription();
-    }
-    
-    @Override
-    public String getTypeName() {
-        return "EVENT";
     }
 }
 

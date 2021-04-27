@@ -1,8 +1,7 @@
-package com.obj.nc.koderia.mapper;
+package com.obj.nc.mappers;
 
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.mailchimp.*;
-import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
 
 import lombok.RequiredArgsConstructor;
@@ -17,32 +16,24 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.obj.nc.domain.content.mailchimp.MailchimpContent.DATA_MERGE_VARIABLE;
-
 @Component
 @RequiredArgsConstructor
-public class KoderiaEvent2MailchimpContentMapper {
+public class MailchimpDataToMailchimpContentMapper {
     private final MailchimpSenderConfig mailchimpSenderConfig;
 
-    public MailchimpContent map(BaseKoderiaEvent event) {
+    public MailchimpContent map(MailchimpData event) {
         MailchimpContent content = new MailchimpContent();
-        content.setSubject(event.getMessageSubject());
-        content.setText(event.getMessageText());
-        content.setAttachments(event.getAttachments());
-
         content.setMessage(mapMessage(event));
         content.setTemplateName(getTemplateName(event));
         return content;
     }
 
-    protected MailchimpMessage mapMessage(BaseKoderiaEvent event) {
+    protected MailchimpMessage mapMessage(MailchimpData event) {
         MailchimpMessage mailchimpMessage = new MailchimpMessage();
 
         mailchimpMessage.setSubject(mapSubject(event));
         mailchimpMessage.setFromEmail(mailchimpSenderConfig.getSenderEmail());
         mailchimpMessage.setFromName(mailchimpSenderConfig.getSenderName());
-
-        mailchimpMessage.setTo(new ArrayList<>());
 
         List<MailchimpMergeVariable> globalMergeVars = mapGlobalMergeVars(event);
         mailchimpMessage.setGlobalMergeVars(globalMergeVars);
@@ -53,24 +44,21 @@ public class KoderiaEvent2MailchimpContentMapper {
         return mailchimpMessage;
     }
 
-    protected String mapSubject(BaseKoderiaEvent event) {
+    protected String mapSubject(MailchimpData event) {
         return event.getMessageSubject();
     }
 
-    protected List<MailchimpMergeVariable> mapGlobalMergeVars(BaseKoderiaEvent message) {
-        Map<String, Object> mergeVars = new HashMap<>();
-        mergeVars.put(DATA_MERGE_VARIABLE, message);
-        return mergeVars.entrySet().stream().map(this::mapMergeVar).collect(Collectors.toList());
-    }
-
-    protected <T> MailchimpMergeVariable mapMergeVar(Map.Entry<String, T> entry) {
+    protected List<MailchimpMergeVariable> mapGlobalMergeVars(MailchimpData message) {
         MailchimpMergeVariable mergeVar = new MailchimpMergeVariable();
-        mergeVar.setName(entry.getKey());
-        mergeVar.setContent(entry.getValue());
-        return mergeVar;
+        mergeVar.setName(message.getType());
+        mergeVar.setContent(message);
+        
+        List<MailchimpMergeVariable> result = new ArrayList<>();
+        result.add(mergeVar);
+        return result;
     }
 
-    protected List<MailchimpAttachment> mapAttachments(BaseKoderiaEvent event) {
+    protected List<MailchimpAttachment> mapAttachments(MailchimpData event) {
         return event.getAttachments().stream()
                 .map(this::mapAttachment)
                 .collect(Collectors.toList());
@@ -98,8 +86,8 @@ public class KoderiaEvent2MailchimpContentMapper {
         return attachment;
     }
 
-    protected String getTemplateName(BaseKoderiaEvent event) {
-        return mailchimpSenderConfig.getTemplateNameFromMessageType(event.getTypeName());
+    protected String getTemplateName(MailchimpData event) {
+        return mailchimpSenderConfig.getTemplateNameFromMessageType(event.getType());
     }
 
 }

@@ -1,13 +1,16 @@
 package com.obj.nc.koderia.domain.eventData;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class EventEventDataDto {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class EventEventDataDto extends BaseKoderiaData {
 
+    @EqualsAndHashCode.Include
     @NotBlank private String id;
     @NotBlank private String name;
     @NotBlank private String description;
