@@ -238,16 +238,18 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
 
 	private void createRestCallExpectationsForOutageStartSms() {
 		//TODO: toto je asi vcelku brittle,.. nemyslim, ze viem garantovat poradie
-		createRestCallExpectation("0918186997", "Vážený zákazník,", "sme zaznamenali výpadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
-		createRestCallExpectation("+421918186997", "Vážený zákazník,", "sme zaznamenali výpadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
-		createRestCallExpectation("0918186998", "Vážený zákazník,", "sme zaznamenali výpadok", "VPS sifrovana/nesifrovana(SN:0918186998)", "VPS sifrovana(SN:0918186999)");
+        // TODO: update strings after updating template texts
+		createRestCallExpectation("0918186997", "Ven zkaznk,", "sme zaznamenali vpadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
+		createRestCallExpectation("+421918186997", "Ven zkaznk,", "sme zaznamenali vpadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
+		createRestCallExpectation("0918186998", "Ven zkaznk,", "sme zaznamenali vpadok", "VPS sifrovana/nesifrovana(SN:0918186998)", "VPS sifrovana(SN:0918186999)");
 	}
 	
 	private void createRestCallExpectationsForOutageEndSms() {
 		//TODO: toto je asi vcelku brittle,.. nemyslim, ze viem garantovat poradie
-		createRestCallExpectation("0918186997", "Vážený zákazník,", "sme odstranili vypadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
-		createRestCallExpectation("+421918186997", "Vážený zákazník,", "sme odstranili vypadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
-		createRestCallExpectation("0918186998", "Vážený zákazník,", "sme odstranili vypadok", "VPS sifrovana/nesifrovana(SN:0918186998)", "VPS sifrovana(SN:0918186999)");
+        // TODO: update strings after updating template texts
+		createRestCallExpectation("0918186997", "Ven zkaznk,", "sme odstranili vypadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
+		createRestCallExpectation("+421918186997", "Ven zkaznk,", "sme odstranili vypadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
+		createRestCallExpectation("0918186998", "Ven zkaznk,", "sme odstranili vypadok", "VPS sifrovana/nesifrovana(SN:0918186998)", "VPS sifrovana(SN:0918186999)");
 	}
 	
     public static OskSendSmsResponseDto createResponse(String senderAddrress) {

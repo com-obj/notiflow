@@ -101,7 +101,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     
     public static MimeMessage assertMessagesContains(MimeMessage[] receivedMessages, MailMessageForAssertions msgToMatch) {
 		 System.out.println("About to check message TO:" + msgToMatch.getTo() + " SUBJECT:" + msgToMatch.getSubjectPart() + " BODY:" + Arrays.toString(msgToMatch.textParts) );
-		 
+		 List<String> textsDidntMatch = new ArrayList<>();
     	try { 
 	    	 for (MimeMessage message: receivedMessages) {	    		 
 		    	 boolean isMatchingTo = true;
@@ -125,8 +125,12 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
 	    		 }
 	    		 
 	    		 for (String bodyTextToMatch: msgToMatch.getTextParts()) {
-	    			 	
-	    			 isMatchingContent &= GreenMailUtil.getBody(message).contains(bodyTextToMatch);
+				
+					 boolean contains = GreenMailUtil.getBody(message).contains(bodyTextToMatch);
+					 if (!contains) {
+						 textsDidntMatch.add(bodyTextToMatch);
+					 }
+					 isMatchingContent &= contains;
 						
 	    		 }
 	    		 
@@ -135,7 +139,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
 	    		 }
 	    	 }	
 	    	 
-	    	 Assertions.assertThat(false).as("Greenmail didn't recieve mail which would match to " + msgToMatch.toString()).isTrue();
+	    	 Assertions.assertThat(false).as(String.format("Greenmail didn't recieve mail which would match to %s. Mismatched: %s", msgToMatch.toString(), textsDidntMatch)).isTrue();
     	} catch (MessagingException e) {
     		throw new RuntimeException(e);
     	}
