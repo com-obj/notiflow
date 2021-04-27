@@ -3,16 +3,21 @@ package com.obj.nc.repositories;
 import java.util.List;
 import java.util.UUID;
 
-import com.obj.nc.Get;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.obj.nc.domain.headers.ProcessingInfo;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
+@AllArgsConstructor
 public class CustomProcessingInfoRepositoryImpl implements CustomProcessingInfoRepository {
 	
+	@Autowired private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate; 
+	
 	public List<ProcessingInfo> findByAnyEventIdAndStepName(UUID forEventId, String forStep) {
-        List<ProcessingInfo> persistedPIs = Get.getJdbc().query(
+        List<ProcessingInfo> persistedPIs = jdbcTemplate.query(
         		"select * from nc_processing_info "
         		+ "where "
         			+ "'" +forEventId+ "' = ANY (event_ids) " 

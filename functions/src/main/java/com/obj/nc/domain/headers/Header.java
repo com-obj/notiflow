@@ -1,6 +1,7 @@
 package com.obj.nc.domain.headers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,6 +21,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
 
 @Getter
 @Setter
@@ -29,12 +32,15 @@ import lombok.extern.log4j.Log4j2;
 public class Header extends BaseJSONObject implements HasFlowId {
 	
 	@JsonProperty("flow-id")
+	@Column("flow_id")
 	private String flowId;
 
 	@NotNull
 	@Include
+	@Transient
 	private List<UUID> eventIds = new ArrayList<>();
 	
+	@Transient
 	protected ProcessingInfo processingInfo;
 	
 	public static final String SUPRESS_GENERATE_PROC_INFO_PARAM_NAME = "SUPRESS_GENERATE_PROCESSING_INFO";
@@ -65,15 +71,28 @@ public class Header extends BaseJSONObject implements HasFlowId {
 		return JsonUtils.writeObjectToJSONString(eventIds);
 	}
 
+	@JsonIgnore
+	@Column("event_ids")
+	public void setEventIdsAsArray(UUID[] eventIds) {
+		this.eventIds.clear();
+		this.eventIds.addAll(Arrays.asList(eventIds));
+	}
+	
+	public void setEventIds(List<UUID> eventIds) {
+		this.eventIds = eventIds;
+	}
+
 	public void addEventId(UUID eventId) {
 		eventIds.add(eventId);
 	}
 	
+	@Column("event_ids")
 	public UUID[] getEventIdsAsArray() {
 		return eventIds.toArray(new UUID[0]);
 	}
 	
 	@JsonIgnore
+	@Transient
 	public boolean isSupressGenerateProcessingInfo() {
 		if (hasAttribute(SUPRESS_GENERATE_PROC_INFO_PARAM_NAME)) {
 			return (Boolean) getAttributeValue(SUPRESS_GENERATE_PROC_INFO_PARAM_NAME);

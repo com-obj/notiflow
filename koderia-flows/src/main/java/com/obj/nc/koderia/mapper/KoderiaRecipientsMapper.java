@@ -1,11 +1,11 @@
 package com.obj.nc.koderia.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.Person;
 import com.obj.nc.koderia.domain.recipients.RecipientDto;
-
-import org.springframework.stereotype.Component;
 
 @Component
 public class KoderiaRecipientsMapper implements RecipientMapper {

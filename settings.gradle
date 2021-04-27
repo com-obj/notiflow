@@ -1,6 +1,5 @@
 rootProject.name = 'notif-center'
 
 include 'functions'
-include 'devel-flows'
 include 'koderia-flows'
 include 'osk-flows'

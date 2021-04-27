@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -99,8 +98,8 @@ public class ProcessingInfoGeneratorTest {
     @Test
     void testPersistPIForNewIntent() {
         // given
-    	String notificationIntentJson = NotificationIntent.createWithSimpleMessage("test-config", "Hi there!!").toJSONString();
         NotificationIntent notificationIntent = NotificationIntent.createWithSimpleMessage("test-config", "Hi there!!");
+        String notificationIntentJson = notificationIntent.toJSONString();
         HasHeader payloadWithEventId = generateEventId.apply(notificationIntent);
 
         // when
@@ -254,42 +253,41 @@ public class ProcessingInfoGeneratorTest {
         UUID[] originalEventIDs = notificationIntent.getProcessingInfo().getEventIds();
         notificationIntent = resolveRecipients.apply(notificationIntent);
         List<Message> messages = generateMessagesFromIntent.apply(notificationIntent);
-        String messageJsonBeforeSend = messages.iterator().next().getBody().toJSONString();
-        UUID previosProcessingId = messages.iterator().next().getProcessingInfo().getProcessingId();
         
-        List<Message> sendMessages = new ArrayList<>();
         messages.forEach(message -> {
-        	Message sendMessage = functionSend.apply(message);
-        	sendMessages.add(sendMessage);
+        	 String messageJsonBeforeSend = message.getBody().toJSONString();
+             UUID previosProcessingId = message.getProcessingInfo().getProcessingId();
+             
+             // when
+             // ProcessingInfo persistence is done using aspect and in an async way
+             Message sendMessage = functionSend.apply(message);
+         	 
+             //then
+             Assertions.assertThat(sendMessage).isNotNull();
+             assertMessagesHaveOriginalEventId(originalEventIDs, Arrays.asList(sendMessage));
+             
+             UUID eventId = originalEventIDs[0];
+             Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "SendEmail").size()>0);
+            
+             List<ProcessingInfo> persistedPIs = procInfoRepo.findByAnyEventIdAndStepName(eventId, "SendEmail");
+             
+             Assertions.assertThat(persistedPIs.size()).isEqualTo(1);
+             
+             ProcessingInfo persistedPI = persistedPIs.iterator().next();
+
+             Assertions.assertThat(persistedPI.getEventIds()[0]).isEqualTo(eventId);
+             Assertions.assertThat(persistedPI.getPayloadJsonStart()).contains(messageJsonBeforeSend);
+             Assertions.assertThat(persistedPI.getPayloadJsonEnd()).contains(sendMessage.getBody().getMessage().toJSONString());
+             Assertions.assertThat(persistedPI.getStepDurationMs()).isGreaterThanOrEqualTo(0);
+             Assertions.assertThat(persistedPI.getStepName()).isEqualTo("SendEmail");
+             Assertions.assertThat(persistedPI.getTimeProcessingStart()).isNotNull();
+             Assertions.assertThat(persistedPI.getTimeProcessingEnd()).isAfterOrEqualTo(persistedPI.getTimeProcessingStart());
+             Assertions.assertThat(persistedPI.getProcessingId()).isNotNull();
+             Assertions.assertThat(persistedPI.getPrevProcessingId()).isEqualTo(previosProcessingId);
+             Assertions.assertThat(persistedPI.getStepIndex()).isEqualTo(3);
+             
+             procInfoRepo.delete(persistedPI); //not to interfere with next iteration
         });
-
-        // when
-        // ProcessingInfo persistence is done using aspect and in an async way
-
-        // then
-        Assertions.assertThat(sendMessages.size()).isEqualTo(3);
-        assertMessagesHaveOriginalEventId(originalEventIDs, sendMessages);
-        
-        UUID eventId = originalEventIDs[0];
-        Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "SendEmail").size()>0);
-       
-        List<ProcessingInfo> persistedPIs = procInfoRepo.findByAnyEventIdAndStepName(eventId, "SendEmail");
-        
-        Assertions.assertThat(persistedPIs.size()).isEqualTo(3);
-        
-        ProcessingInfo persistedPI = persistedPIs.iterator().next();
-        Message sendMessage = sendMessages.iterator().next();
-
-        Assertions.assertThat(persistedPI.getEventIds()[0]).isEqualTo(eventId);
-        Assertions.assertThat(persistedPI.getPayloadJsonStart()).contains(messageJsonBeforeSend);
-        Assertions.assertThat(persistedPI.getPayloadJsonEnd()).contains(sendMessage.getBody().getMessage().toJSONString());
-        Assertions.assertThat(persistedPI.getStepDurationMs()).isGreaterThanOrEqualTo(0);
-        Assertions.assertThat(persistedPI.getStepName()).isEqualTo("SendEmail");
-        Assertions.assertThat(persistedPI.getTimeProcessingStart()).isNotNull();
-        Assertions.assertThat(persistedPI.getTimeProcessingEnd()).isAfterOrEqualTo(persistedPI.getTimeProcessingStart());
-        Assertions.assertThat(persistedPI.getProcessingId()).isNotNull();
-        Assertions.assertThat(persistedPI.getPrevProcessingId()).isEqualTo(previosProcessingId);
-        Assertions.assertThat(persistedPI.getStepIndex()).isEqualTo(3);
     }
     
     

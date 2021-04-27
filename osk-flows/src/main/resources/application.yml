@@ -28,12 +28,15 @@ nc:
          templates-root-dir: 
             - src/main/resources/message-templates
          messages-dir-and-base-name: file:src/main/resources/message-templates/messages
+         multi-locales-merge-strategy: MERGE
    flows:    
       input-evet-routing:
          type: PAYLOAD_TYPE
          type-channel-mapping:
             OUTAGE_START: OUTAGE_START_INPUT
             OUTAGE_END: OUTAGE_END_INPUT
+      email-processing:
+         multi-locales-merge-strategy: MERGE
 
 osk.sia.functions:
    impact-notif-converter:

@@ -1,5 +1,7 @@
 package com.obj.nc.osk.functions.processors.eventConverter;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
@@ -8,20 +10,20 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.osk.domain.IncidentTicketOutageEndEventDto;
 import com.obj.nc.osk.domain.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.functions.processors.eventConverter.config.NotifEventConverterConfigProperties;
-import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.osk.repositories.ExtendedGenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @DocumentProcessingInfo("EndOutageEventConverter")
 public class EndOutageEventConverter extends BaseOutageEventConverter {
 	
-	private GenericEventRepository eventRepo;
+	private ExtendedGenericEventRepository customEventRepo;
 
 	public EndOutageEventConverter(
 			@Autowired NotifEventConverterConfigProperties config,
-			@Autowired GenericEventRepository eventRepo) {
+			@Autowired ExtendedGenericEventRepository eventRepo) {
 		super(config);
 		
-		this.eventRepo = eventRepo;
+		this.customEventRepo = eventRepo;
 		
 		customerEmailSubjectKey = "cust.end.subject";
 		customerEmailTemplateName = "customer-notification-outage-end.html";
@@ -38,13 +40,13 @@ public class EndOutageEventConverter extends BaseOutageEventConverter {
 	protected IncidentTicketOutageStartEventDto findIncidentTicketStartEvent(GenericEvent endEvent) {
 		IncidentTicketOutageEndEventDto endEventPayload = JsonUtils.readObjectFromJSON(endEvent.getPayloadJson(), IncidentTicketOutageEndEventDto.class);
 		
-		GenericEvent startEvent = eventRepo.findByExternalId(endEventPayload.getId().toString());
+		Optional<GenericEvent> startEvent = customEventRepo.findStartEventByTicketId(endEventPayload.getId());
 
-		if (startEvent == null) {
+		if (!startEvent.isPresent()) {
 			throw new PayloadValidationException("Didn't find matching start event with externalId="+ endEventPayload.getId()+" for outage end event: " + endEventPayload);
 		}
 		
-		IncidentTicketOutageStartEventDto startEventPayload = JsonUtils.readObjectFromJSON(startEvent.getPayloadJson(), IncidentTicketOutageStartEventDto.class);
+		IncidentTicketOutageStartEventDto startEventPayload = JsonUtils.readObjectFromJSON(startEvent.get().getPayloadJson(), IncidentTicketOutageStartEventDto.class);
 		startEventPayload.setOutageEnd(endEventPayload.getOutageEnd());
 		
 		return startEventPayload;

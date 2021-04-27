@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
+import com.obj.nc.repositories.converters.*;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,14 +16,9 @@ import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.converters.JsonNodeToPgObjectConverter;
-import com.obj.nc.repositories.converters.PgObjectToJsonNodeConverter;
-import com.obj.nc.repositories.converters.PgObjectToUUIDArrayConverter;
-import com.obj.nc.repositories.converters.UUIDArrayToPgObjectConverter;
 
 @Configuration
 @EnableJdbcRepositories(basePackageClasses = GenericEventRepository.class)
@@ -30,7 +26,7 @@ import com.obj.nc.repositories.converters.UUIDArrayToPgObjectConverter;
 public class JdbcConfiguration extends AbstractJdbcConfiguration {
 
     @Bean
-    public NamedParameterJdbcOperations namedParameterJdbcOperations(DataSource dataSource) { 
+    public NamedParameterJdbcTemplate namedParameterJdbcTemplate(DataSource dataSource) { 
         return new NamedParameterJdbcTemplate(dataSource);
     }
     
@@ -42,6 +38,9 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     	
     	converters.add(new UUIDArrayToPgObjectConverter());
     	converters.add(new PgObjectToUUIDArrayConverter());
+    	
+    	converters.add(new BodyToPgObjectConverter());
+    	converters.add(new PgObjectToBodyConverter());
     
     	return new JdbcCustomConversions(converters);
     }

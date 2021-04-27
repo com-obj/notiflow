@@ -41,6 +41,8 @@ dependencies {
     testImplementation 'org.springframework.integration:spring-integration-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 
+    implementation 'org.springframework.data:spring-data-jdbc'
+
     testImplementation 'io.rest-assured:rest-assured:4.2.0'
     testImplementation 'io.rest-assured:json-path:4.2.0'
     testImplementation 'io.rest-assured:xml-path:4.2.0'

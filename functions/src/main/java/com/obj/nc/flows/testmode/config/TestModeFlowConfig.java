@@ -17,10 +17,9 @@ import org.springframework.integration.store.MessageGroup;
 
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
-import com.obj.nc.flows.testmode.email.functions.processors.AggregateMessageToSingleEmailTransformer;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
-import com.obj.nc.functions.processors.messageAggregator.aggregations.MessageAggregationStrategy;
-import com.obj.nc.functions.processors.messageAggregator.aggregations.StandardMessageAggregationStrategy;
+import com.obj.nc.functions.processors.messageAggregator.aggregations.BasePayloadAggregationStrategy;
+import com.obj.nc.functions.processors.messageAggregator.aggregations.TestModeSingleEmailAggregationStrategy;
 import com.obj.nc.functions.processors.messageAggregator.correlations.EventIdBasedCorrelationStrategy;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
@@ -61,7 +60,6 @@ public class TestModeFlowConfig {
         				.outputProcessor( testModeMessageAggregator() )
         				.id(TEST_MODE_AGGREGATOR_BEAN_NAME)
         			)
-        		.handle(aggregateMessageToSingleEmailTransformer())
         		.handle(digestEmailFormatter)
                 .handle(sendEmailRealSmtp)
                 .handle(logConsumer)
@@ -74,13 +72,13 @@ public class TestModeFlowConfig {
     }
     
     @Bean
-    public MessageAggregationStrategy aggregationStrategy() {
-    	return new StandardMessageAggregationStrategy();
+    public BasePayloadAggregationStrategy testModeAggregationStrategy() {
+    	return new TestModeSingleEmailAggregationStrategy(testModeProps);
     }
     
     @Bean
     public MessageAggregator testModeMessageAggregator() {
-    	return new MessageAggregator(aggregationStrategy());
+    	return new MessageAggregator(testModeAggregationStrategy());
     }
     
 	@Bean
@@ -109,12 +107,6 @@ public class TestModeFlowConfig {
 
 	}
 	
-    @Bean
-    public AggregateMessageToSingleEmailTransformer aggregateMessageToSingleEmailTransformer() {
-    	return new AggregateMessageToSingleEmailTransformer(testModeProps);
-    }
-    
-
 	private void printBanner() {
 		System.out.println(
 				  "████████╗███████╗███████╗████████╗    ███╗   ███╗ ██████╗ ██████╗ ███████╗     █████╗  ██████╗████████╗██╗██╗   ██╗███████╗\r\n"

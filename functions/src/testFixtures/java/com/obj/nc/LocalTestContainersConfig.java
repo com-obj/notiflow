@@ -1,11 +1,11 @@
 package com.obj.nc;
 
+import javax.annotation.PostConstruct;
+
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.testcontainers.utility.TestcontainersConfiguration;
-
-import javax.annotation.PostConstruct;
 
 @Configuration
 @ConditionalOnProperty(value = "testEnv", havingValue = "local")

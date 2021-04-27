@@ -1,9 +1,9 @@
 package com.obj.nc.osk.functions.processors.sms.dtos;
 
-import lombok.Data;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
+import lombok.Data;
 
 @Data
 public class OskSendSmsResponseDto {

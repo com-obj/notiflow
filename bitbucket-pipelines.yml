@@ -2,21 +2,41 @@ image: gradle:6.8.2
 
 definitions: 
    steps:
-     - step: &runTestStep
-         name: Run tests
-         caches:
-           - gradle
-           - maven
-           - docker
-         services:
-           - postgres
-         script:
-           - gradle :functions:simpleTest :functions:complexTest :osk-flows:simpleTest :osk-flows:complexTest :koderia-flows:simpleTest :koderia-flows:complexTest -Dspring.profiles.active=bitbucket --stacktrace --info
-         after-script:
-           - pipe: atlassian/checkstyle-report:0.2.0
-         artifacts: 
-           - osk-flows/build/reports/tests/**
-           - functions/build/reports/tests/**
+     - run-tests: &run-tests
+       - step: 
+           name: Run tests
+           caches:
+             - gradle
+             - maven
+             - docker
+           services:
+             - postgres
+           script:
+             - gradle :functions:test :osk-flows:test -Dspring.profiles.active=bitbucket --stacktrace --info
+           after-script:
+             - pipe: atlassian/checkstyle-report:0.2.0
+           artifacts: 
+             - osk-flows/build/reports/tests/**
+             - functions/build/reports/tests/**
+     - build-jar: &build-jar
+       - step:
+           name: Build FAT Jar
+           caches:
+            - gradle
+            - maven
+           script:
+             - gradle build -x test --stacktrace --info   
+           artifacts:
+             - osk-flows/dist/**
+     - deploy-snaphost-2-BB: &deploy-2-BB
+       - step: 
+           name: Deploy snapshot to Bitbucket downloads
+           script:
+             - pipe: atlassian/bitbucket-upload-file:0.3.2
+               variables:
+                 BITBUCKET_USERNAME: $BITBUCKET_USERNAME
+                 BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
+                 FILENAME: "osk-flows/dist/*.jar"
    services: 
      postgres: 
        image: postgres 
@@ -25,34 +45,19 @@ definitions:
          POSTGRES_USER: 'nc'
          POSTGRES_PASSWORD: 'ZMss4o9mdBLV'
 
+
+
 pipelines:
   branches: 
     develop:
-      - step: *runTestStep
+      - <<: *run-tests
     master:
-      - step: *runTestStep
+      - <<: *run-tests
     release/*:
-      - step: *runTestStep
+      - <<: *run-tests
+      - <<: *build-jar
+      - <<: *deploy-2-BB
   tags:
     v*:
-      - step:
-          name: Build FAT Jar
-          caches:
-           - gradle
-           - maven
-           - docker
-          script:
-            - gradle build -x test --stacktrace --info   
-          artifacts:
-            - osk-flows/dist/**
-            - koderia-flows/dist/**
-      - step:
-          name: Deploy to Bitbucket downloads
-          script:
-            - mv osk-flows/dist/osk-flows.jar osk-flows/dist/osk-flows-$BITBUCKET_TAG.jar 
-            - pipe: atlassian/bitbucket-upload-file:0.3.2
-              variables:
-                BITBUCKET_USERNAME: $BITBUCKET_USERNAME
-                BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
-                FILENAME: "osk-flows/dist/*.jar"
-          
+      - <<: *build-jar
+      - <<: *deploy-2-BB

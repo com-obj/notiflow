@@ -1,16 +1,16 @@
 package com.obj.nc.functions.sources.eventGenerator;
 
+import java.util.function.Supplier;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.sources.SourceMicroService;
 
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import reactor.core.publisher.Flux;
-
-import java.util.function.Supplier;
 
 @Configuration
 @Log4j2

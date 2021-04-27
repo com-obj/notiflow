@@ -1,5 +1,6 @@
 package com.obj.nc.osk;
 
+import static com.obj.nc.utils.JsonUtils.readObjectFromClassPathResource;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
@@ -37,13 +38,16 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.osk.functions.processors.eventConverter.NotificationEventConverterProcessingFunctionTest;
+import com.obj.nc.controllers.DeliveryInfoRestController;
+import com.obj.nc.controllers.DeliveryInfoRestController.EndpointDeliveryInfoDto;
+import com.obj.nc.controllers.EventReceiverRestController;
+import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo.DELIVERY_STATUS;
+import com.obj.nc.osk.domain.IncidentTicketOutageEndEventDto;
+import com.obj.nc.osk.domain.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl;
 import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
 import com.obj.nc.osk.functions.processors.sms.dtos.OskSendSmsResponseDto;
 import com.obj.nc.osk.functions.processors.sms.dtos.SendSmsResourceReferenceDto;
-import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
@@ -52,13 +56,16 @@ import com.obj.nc.utils.JsonUtils;
 @DirtiesContext //have to dispose test mode green mail server
 public class OskFlowsFullUCTest extends BaseIntegrationTest {
     
-    @Autowired private GenericEventRepository genEventRepo;
+
     @Qualifier("nc.emailTemplateFormatter.messageSource")
     @Autowired private MessageSource emailMessageSource;
     @Autowired private OskSmsSenderRestImpl smsSenderRestImpl;
     @Autowired private OskSmsSenderConfigProperties properties;
+    @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired private EventReceiverRestController genericEventsService;
+	@Autowired private DeliveryInfoRestController deliveryInfosService;
+	
     private MockRestServiceServer mockServer;
-    @Autowired JdbcTemplate jdbcTemplate;
     
 
     @BeforeEach
@@ -76,31 +83,38 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     	createRestCallExpectationsForOutageStartSms();
     	
         // GIVEN
-    	GenericEvent event = NotificationEventConverterProcessingFunctionTest.readOutageStartEvent();
+    	IncidentTicketOutageStartEventDto startEvent = readObjectFromClassPathResource("siaNotificationEvents/outage-start-event-full.json", IncidentTicketOutageStartEventDto.class);	
+    	String startEventStr = JsonUtils.writeObjectToJSONString(startEvent);
 
     	//WHEN
-    	genEventRepo.save(event);
+    	genericEventsService.emitJobPostEvent(startEventStr, null, "111xx_START");
     	
     	//THEN
-        boolean success = greenMail.waitForIncomingEmail(30000L, 12);
+        boolean success = greenMail.waitForIncomingEmail(30000L, 8);
         
         Assertions.assertThat(success).isTrue();
         
         MimeMessage[] msgs = greenMail.getReceivedMessages();
-        Assertions.assertThat(msgs.length).isEqualTo(12); //4xcustomers(en/sk), 3xsales, 1xsales agent 
+        Assertions.assertThat(msgs.length).isEqualTo(8); //4xcustomers(en+sk), 3xsales, 1xsales agent 
         System.out.println(GreenMailUtil.getWholeMessage(msgs[0]));
         
         //customers
         //slovak/english
-        assertMessageCount(msgs, "cuzy@objectify.sk", 2);
-        assertMessageCount(msgs, "jancuzy@gmail.com", 2);
-        assertMessageCount(msgs, "dysko@objectify.sk", 2);
-        assertMessageCount(msgs, "nem_fukas@artin.sk", 2);
+        assertMessageCount(msgs, "cuzy@objectify.sk", 1);
+        assertMessageCount(msgs, "jancuzy@gmail.com", 1);
+        assertMessageCount(msgs, "dysko@objectify.sk", 1);
+        assertMessageCount(msgs, "nem_fukas@artin.sk", 1);
         
         assertMessagesContent(msgs, "start");
         
         //check SMS send via RestCall 
         mockServer.verify();
+        
+        //check delivery infos
+        List<EndpointDeliveryInfoDto> infos = deliveryInfosService.findDeliveryInfosByExtId("111xx_START");
+        infos.forEach(info -> Assertions.assertThat(info.getCurrentStatus() == DELIVERY_STATUS.SENT));
+        
+        Assertions.assertThat(infos.size()).isEqualTo(11); //malo by byt 12, nastava grupnutie sprav pre dany nedpoint. Zatial neviem spravi inac, lebo mi chyba pojem sprava.
     }
     
     @Test
@@ -109,31 +123,38 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     	createRestCallExpectationsForOutageEndSms();
     	
         // GIVEN
-    	GenericEvent event = NotificationEventConverterProcessingFunctionTest.readOutageEndEvent();
+    	IncidentTicketOutageEndEventDto endEvent = readObjectFromClassPathResource("siaNotificationEvents/outage-end-event.json", IncidentTicketOutageEndEventDto.class);
+    	String endEventStr = JsonUtils.writeObjectToJSONString(endEvent);
 
     	//WHEN
-    	genEventRepo.save(event);
+    	genericEventsService.emitJobPostEvent(endEventStr, null, "111xx_END");
     	
     	//THEN
-        boolean success = greenMail.waitForIncomingEmail(20000L, 12);
+        boolean success = greenMail.waitForIncomingEmail(30000L, 8);
         
         Assertions.assertThat(success).isTrue();
         
         MimeMessage[] msgs = greenMail.getReceivedMessages();
-        Assertions.assertThat(msgs.length).isEqualTo(12); //4xcustomers(en/sk), 3xsales, 1xsales agent 
+        Assertions.assertThat(msgs.length).isEqualTo(8); //4xcustomers(en+sk), 3xsales, 1xsales agent 
         System.out.println(GreenMailUtil.getWholeMessage(msgs[0]));
         
         //customers
         //slovak/english
-        assertMessageCount(msgs, "cuzy@objectify.sk", 2);
-        assertMessageCount(msgs, "jancuzy@gmail.com", 2);
-        assertMessageCount(msgs, "dysko@objectify.sk", 2);
-        assertMessageCount(msgs, "nem_fukas@artin.sk", 2);
+        assertMessageCount(msgs, "cuzy@objectify.sk", 1);
+        assertMessageCount(msgs, "jancuzy@gmail.com", 1);
+        assertMessageCount(msgs, "dysko@objectify.sk", 1);
+        assertMessageCount(msgs, "nem_fukas@artin.sk", 1);
         
         assertMessagesContent(msgs, "end");
         
         //check SMS send via RestCall 
         mockServer.verify();
+        
+        //check delivery infos
+        List<EndpointDeliveryInfoDto> infos = deliveryInfosService.findDeliveryInfosByExtId("111xx_END");
+        infos.forEach(info -> Assertions.assertThat(info.getCurrentStatus() == DELIVERY_STATUS.SENT));
+        
+        Assertions.assertThat(infos.size()).isEqualTo(11);
     }
     
     private String getMsg(String key, Locale loc) {
@@ -142,17 +163,17 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
 
 	private void assertMessagesContent(MimeMessage[] msgs, String startEnd) {
 		MimeMessage msg = assertMessagesContains(msgs, MailMessageForAssertions.as("cuzy@objectify.sk", 
-        		emailMessageSource.getMessage("cust."+startEnd+".subject", null, Locale.US), 
-        		"Objectify, s.r.o","0918186997", "VPS sifrovana", "Mocidla 249, Myto pod Dumbierom"
+        		emailMessageSource.getMessage("cust."+startEnd+".subject", null, Locale.US),
+                "0918186997", "VPS sifrovana", "Mocidla 249, Myto pod Dumbierom"
         		)
         );
         System.out.println(GreenMailUtil.getWholeMessage(msg));
-        assertMessagesContains(msgs, MailMessageForAssertions.as("jancuzy@gmail.com", getMsg("cust."+startEnd+".subject", Locale.US), "Objectify, s.r.o"));
-        assertMessagesContains(msgs, MailMessageForAssertions.as("dysko@objectify.sk", getMsg("cust."+startEnd+".subject", Locale.US), "Objectify, s.r.o"));
+        assertMessagesContains(msgs, MailMessageForAssertions.as("jancuzy@gmail.com", getMsg("cust."+startEnd+".subject", Locale.US)));
+        assertMessagesContains(msgs, MailMessageForAssertions.as("dysko@objectify.sk", getMsg("cust."+startEnd+".subject", Locale.US)));
         
-        assertMessagesContains(msgs, MailMessageForAssertions.as("cuzy@objectify.sk", getMsg("cust."+startEnd+".subject", new Locale("sk")), "Objectify, s.r.o"));
-        assertMessagesContains(msgs, MailMessageForAssertions.as("jancuzy@gmail.com", getMsg("cust."+startEnd+".subject", new Locale("sk")), "Objectify, s.r.o"));
-        assertMessagesContains(msgs, MailMessageForAssertions.as("dysko@objectify.sk", getMsg("cust."+startEnd+".subject", new Locale("sk")), "Objectify, s.r.o"));
+        assertMessagesContains(msgs, MailMessageForAssertions.as("cuzy@objectify.sk", getMsg("cust."+startEnd+".subject", new Locale("sk"))));
+        assertMessagesContains(msgs, MailMessageForAssertions.as("jancuzy@gmail.com", getMsg("cust."+startEnd+".subject", new Locale("sk"))));
+        assertMessagesContains(msgs, MailMessageForAssertions.as("dysko@objectify.sk", getMsg("cust."+startEnd+".subject", new Locale("sk"))));
         
         //sales
         //only slovak
@@ -175,7 +196,7 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
         } else {
 	        msg = assertMessagesContains(msgs, MailMessageForAssertions.as("slavkovsky@orange.sk", 
 	        		getMsg("sales."+ startEnd +".subject", new Locale("sk")),
-	        		"sme o tom informovali."
+	        		"sme o tom"
 	        		)
 	        );
         }
@@ -217,16 +238,16 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
 
 	private void createRestCallExpectationsForOutageStartSms() {
 		//TODO: toto je asi vcelku brittle,.. nemyslim, ze viem garantovat poradie
-		createRestCallExpectation("0918186997", "Vážený zákazník Objectify, s.r.o.", "sme zaznamenali výpadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
-		createRestCallExpectation("+421918186997", "Vážený zákazník Objectify, s.r.o.", "sme zaznamenali výpadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
-		createRestCallExpectation("0918186998", "Vážený zákazník Artin, s.r.o.", "sme zaznamenali výpadok", "VPS sifrovana/nesifrovana(SN:0918186998)", "VPS sifrovana(SN:0918186999)");
+		createRestCallExpectation("0918186997", "Vážený zákazník,", "sme zaznamenali výpadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
+		createRestCallExpectation("+421918186997", "Vážený zákazník,", "sme zaznamenali výpadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
+		createRestCallExpectation("0918186998", "Vážený zákazník,", "sme zaznamenali výpadok", "VPS sifrovana/nesifrovana(SN:0918186998)", "VPS sifrovana(SN:0918186999)");
 	}
 	
 	private void createRestCallExpectationsForOutageEndSms() {
 		//TODO: toto je asi vcelku brittle,.. nemyslim, ze viem garantovat poradie
-		createRestCallExpectation("0918186997", "Vážený zákazník Objectify, s.r.o.", "sme odstranili vypadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
-		createRestCallExpectation("+421918186997", "Vážený zákazník Objectify, s.r.o.", "sme odstranili vypadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
-		createRestCallExpectation("0918186998", "Vážený zákazník Artin, s.r.o.", "sme odstranili vypadok", "VPS sifrovana/nesifrovana(SN:0918186998)", "VPS sifrovana(SN:0918186999)");
+		createRestCallExpectation("0918186997", "Vážený zákazník,", "sme odstranili vypadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
+		createRestCallExpectation("+421918186997", "Vážený zákazník,", "sme odstranili vypadok", "VPS(SN:0918186997)", "VPS sifrovana(SN:0918186997)");
+		createRestCallExpectation("0918186998", "Vážený zákazník,", "sme odstranili vypadok", "VPS sifrovana/nesifrovana(SN:0918186998)", "VPS sifrovana(SN:0918186999)");
 	}
 	
     public static OskSendSmsResponseDto createResponse(String senderAddrress) {

@@ -30,7 +30,6 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.Body;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -51,7 +50,7 @@ import com.obj.nc.utils.JsonUtils;
 public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
-    @Autowired private GreenMail testModeEmailsReciver;
+    @Autowired private GreenMail testModeGreenMail;
 	@Autowired private TestModeProperties properties;
 	@Autowired private EmailSender emailSenderSinkProcessingFunction;
 	@Autowired private GreenMailReceiverSourceSupplier greenMailReceiverSourceSupplier;
@@ -65,7 +64,7 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() throws FolderException {
-    	testModeEmailsReciver.purgeEmailFromAllMailboxes();
+    	testModeGreenMail.purgeEmailFromAllMailboxes();
     	greenMail.purgeEmailFromAllMailboxes();
     }
 
@@ -75,8 +74,8 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
     	//is created which is a different instannce. In this mode testModeEmailsReciver will catch all emails normaly send to standardTestGMServer
     	//and thus in production will catch all emails send to standard SMTP server configured
     	//PRE-CONDITION
-    	Assertions.assertThat(greenMail).isNotEqualTo(testModeEmailsReciver);
-    	Assertions.assertThat(greenMail.getSmtp().getPort()).isNotEqualTo(testModeEmailsReciver.getSmtp().getPort());
+    	Assertions.assertThat(greenMail).isNotEqualTo(testModeGreenMail);
+    	Assertions.assertThat(greenMail.getSmtp().getPort()).isNotEqualTo(testModeGreenMail.getSmtp().getPort());
         // GIVEN
         Message origianlMsgForAggreagtion1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", Message.class);
         Message origianlMsgForAggreagtion2 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message2.json", Message.class);
@@ -88,9 +87,9 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
         emailSenderSinkProcessingFunction.apply(origianlMsgForAggreagtion3);
 
         //THEN testModeEmailsReciver recieved the message, not the standard greenmail used for test. This proves it has been substituted
-        boolean success = testModeEmailsReciver.waitForIncomingEmail(3);
+        boolean success = testModeGreenMail.waitForIncomingEmail(3);
         Assertions.assertThat( success ).isEqualTo( true );
-        MimeMessage[] mimeMessages = testModeEmailsReciver.getReceivedMessages();
+        MimeMessage[] mimeMessages = testModeGreenMail.getReceivedMessages();
         Assertions.assertThat( mimeMessages.length ).isEqualTo(3);
 
         // WHEN
@@ -118,7 +117,7 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
     }
 
 	private void checkRecievedMatchOriginal(Message origianlMsgForAggreagtion, EmailContent emailContentFromTMGM) {
-		EmailContent originalContent1 = ((AggregatedEmailContent)origianlMsgForAggreagtion.getContentTyped()).getAggregateContent().get(0);
+		EmailContent originalContent1 = origianlMsgForAggreagtion.getContentTyped();
         String originalReviever1 = ((EmailEndpoint) origianlMsgForAggreagtion.getBody().getRecievingEndpoints().get(0)).getEmail();
         assertThat(emailContentFromTMGM.getSubject())
         	.contains(originalContent1.getSubject());

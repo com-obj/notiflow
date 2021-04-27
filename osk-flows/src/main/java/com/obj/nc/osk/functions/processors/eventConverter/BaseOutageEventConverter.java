@@ -76,7 +76,6 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 	}
 
 	@Override
-
 	protected List<NotificationIntent> execute(GenericEvent payload) {
 		List<NotificationIntent> notificationIntents = new ArrayList<>();
 		
@@ -93,8 +92,6 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		notificationIntents.addAll(salesNotificationIntents);
 		notificationIntents.addAll(salesAgentNotificationIntents);
 		
-		notificationIntents.forEach(e-> e.getHeader().addEventId(payload.getId()));
-		
 		return notificationIntents;
 	}
 
@@ -108,7 +105,7 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		
 		customerMessageContent.setSubjectResourceKey(customerEmailSubjectKey);
 		customerMessageContent.setTemplateFileName(customerEmailTemplateName);
-		customerMessageContent.setRequiredLocales(Arrays.asList(new Locale("en"), new Locale("sk")));
+		customerMessageContent.setRequiredLocales(Arrays.asList(new Locale("sk"), new Locale("en")));
 		
 		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutagesForCustomer);
 		String customerName = extractCustomerName(serviceOutagesForCustomer);

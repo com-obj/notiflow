@@ -1,14 +1,10 @@
 package com.obj.nc.functions.sources;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import reactor.core.publisher.EmitterProcessor;
-
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public abstract class SourceSupplier<OUT> implements Supplier<OUT> {
 

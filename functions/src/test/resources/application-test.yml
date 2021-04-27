@@ -29,6 +29,8 @@ nc:
          from-mail-address: sender@objectify.sk
    flows:
       test-mode.enabled: false
+      email-processing:
+         multi-locales-merge-strategy: MERGE
 
 logging.level:
    org.springframework: INFO

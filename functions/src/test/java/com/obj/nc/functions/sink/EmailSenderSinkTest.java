@@ -23,11 +23,10 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoDeliveredGenerator;
+import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoSendGenerator;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.processors.senders.config.EmailSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
@@ -40,7 +39,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
 
 //    @Autowired private JavaMailSenderImpl defaultJavaMailSender;
     @Autowired private EmailSender functionSend;
-    @Autowired private DeliveryInfoDeliveredGenerator delInfoGenerator;
+    @Autowired private DeliveryInfoSendGenerator delInfoGenerator;
     @Autowired private EmailSenderConfigProperties settings;
     
     @RegisterExtension
@@ -69,7 +68,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         
         Assertions.assertThat(delInfos.size()).isEqualTo(1);
         DeliveryInfoSendResult delInfo = delInfos.iterator().next();
-        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.DELIVERED);
+        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
         Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(message.getBody().getRecievingEndpoints().get(0));
         Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(message.getHeader().getEventIds());
@@ -106,7 +105,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
             functionSend.apply(message);
         })
                 .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("EmailContent sender can send to EmailContent endpoints only. Found ");
+                .hasMessageContaining("EmailContent sender can send to EmailEndpoint endpoints only. Found ");
     }
 
     @Test
@@ -132,7 +131,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Assertions.assertThat(delInfos.size()).isEqualTo(1);
         DeliveryInfoSendResult delInfo = delInfos.iterator().next();
         
-        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.DELIVERED);
+        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
         Assertions.assertThat(delInfo.getRecievingEndpoint().getEndpointId()).isEqualTo("john.doe@objectify.sk");
 
@@ -157,7 +156,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Assertions.assertThat(delInfos.size()).isEqualTo(1);
         DeliveryInfoSendResult delInfo = delInfos.iterator().next();
         
-        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.DELIVERED);
+        Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
         Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(inputMessage.getBody().getRecievingEndpoints().get(0));
         Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(inputMessage.getHeader().getEventIds());
@@ -166,13 +165,11 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         MimeMessage message = greenMail.getReceivedMessages()[0];
         String msg = GreenMailUtil.getWholeMessage(message);
 
-        AggregatedEmailContent aggregated = inputMessage.getContentTyped();
-        aggregated.getAggregateContent()
-                .forEach(messageContent -> {
-                    Assertions.assertThat(msg).contains(messageContent.getSubject());
-                    Assertions.assertThat(msg).contains(messageContent.getText());
-                    messageContent.getAttachments()
-                            .forEach(attachment -> Assertions.assertThat(msg).contains(attachment.getName()));
-                });
+        EmailContent aggregated = inputMessage.getContentTyped();
+
+        Assertions.assertThat(msg).contains(aggregated.getSubject());
+        Assertions.assertThat(msg).contains(aggregated.getText().replaceAll("\n", "\r\n"));
+        aggregated.getAttachments()
+                .forEach(attachment -> Assertions.assertThat(msg).contains(attachment.getName()));
     }
 }

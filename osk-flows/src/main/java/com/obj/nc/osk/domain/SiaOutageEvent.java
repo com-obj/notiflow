@@ -19,6 +19,6 @@ import lombok.NoArgsConstructor;
 	@Type(value = IncidentTicketOutageStartEventDto.class, name = "OUTAGE_START") })
 @NoArgsConstructor
 public abstract class SiaOutageEvent implements IsTypedJson {
-	Long id;
+	String id;
 
 }

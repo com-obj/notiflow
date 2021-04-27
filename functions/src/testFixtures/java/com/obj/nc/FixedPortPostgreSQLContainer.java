@@ -1,13 +1,13 @@
 package com.obj.nc;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.util.concurrent.TimeUnit;
+
 import org.rnorth.ducttape.TimeoutException;
 import org.rnorth.ducttape.unreliables.Unreliables;
 import org.testcontainers.containers.ContainerLaunchException;
 import org.testcontainers.containers.PostgreSQLContainer;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.util.concurrent.TimeUnit;
 
 public class FixedPortPostgreSQLContainer<SELF extends FixedPortPostgreSQLContainer<SELF>> extends PostgreSQLContainer<SELF> {
 

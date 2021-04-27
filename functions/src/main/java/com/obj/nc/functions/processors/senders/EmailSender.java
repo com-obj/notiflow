@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.content.email.AggregatedEmailContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -44,6 +43,8 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	private final JavaMailSenderImpl mailSender;
 	
 	public static String NOTIF_CENTER_EMAIL_HEANDER_PREFIX = "$NC_";
+	public static String EVENT_IDS_EMAIL_HEANDER = NOTIF_CENTER_EMAIL_HEANDER_PREFIX+ "EVENT_IDS";
+	public static String FLOW_ID_EMAIL_HEANDER = NOTIF_CENTER_EMAIL_HEANDER_PREFIX+ "FLOW_ID";
 	
 	private final EmailSenderConfigProperties settings;
 	
@@ -61,7 +62,7 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 
 		RecievingEndpoint endpoint = to.get(0);
 		if (!(endpoint instanceof EmailEndpoint)) {
-			return Optional.of(new PayloadValidationException("EmailContent sender can send to EmailContent endpoints only. Found " + endpoint));
+			return Optional.of(new PayloadValidationException("EmailContent sender can send to EmailEndpoint endpoints only. Found " + endpoint));
 		}
 
 		return Optional.empty();
@@ -72,19 +73,8 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	@Override
 	public Message execute(Message payload) {		
 		EmailEndpoint toEmail = (EmailEndpoint) payload.getBody().getRecievingEndpoints().get(0);
-
 		EmailContent msg = payload.getContentTyped();
-
-		EmailContent messageContent = null;
-		if (msg instanceof AggregatedEmailContent) {
-			//ak je stale v rezime aggregated tak mi nic ine nezostava ako spravit "dummy" aggregation. Na konci dna potrebujem jeden subject, jeden text
-			messageContent = ((AggregatedEmailContent) msg).asSimpleContent();
-		} else {
-			messageContent = msg;
-		}
-
-		doSendMessage(toEmail, messageContent, payload.getHeader());
-		
+		doSendMessage(toEmail, msg, payload.getHeader());
 		return payload;
 	}
 
@@ -121,15 +111,6 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 			
 			log.info("Sending mail vie SMTP took {} ms", ChronoUnit.MILLIS.between(sendStart, Instant.now()));
 			
-//			DeliveryInfoSendResult info = DeliveryInfoSendResult.builder()
-//				.daliveredOn(Instant.now())
-//				.eventIds(header.getEventIds().toArray(new UUID[0]))
-//				.status(DELIVERY_STATUS.DELIVERED)
-//				.recievingEndpoint(toEmail)
-//				.build();
-//				
-//			return info;
-			
 		} catch (MessagingException e) {
 			throw new ProcessingException(EmailSender.class, e);
 		}
@@ -146,10 +127,10 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 		});
 		
 		try {
-			message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "EVENT_ID", JsonUtils.writeObjectToJSONString(header.getEventIds()));
+			message.setHeader(EVENT_IDS_EMAIL_HEANDER, JsonUtils.writeObjectToJSONString(header.getEventIds()));
 			
 			if (header.getFlowId()!= null) {
-				message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + "FLOW_ID", header.getFlowId());
+				message.setHeader(FLOW_ID_EMAIL_HEANDER, header.getFlowId());
 			}
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);
