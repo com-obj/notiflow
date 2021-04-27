@@ -1,30 +1,27 @@
 package com.obj.nc.koderia.mapper;
 
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.endpoints.DeliveryOptions;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.Person;
 import com.obj.nc.koderia.domain.recipients.RecipientDto;
 
 @Component
-public class KoderiaRecipientsMapper implements RecipientMapper {
+@Log4j2
+public class KoderiaRecipientsMapper {
 
-    @Override
-    public EmailEndpoint map(RecipientDto recipientDto) {
+    public MailchimpEndpoint map(RecipientDto recipientDto) {
         if (recipientDto == null) {
             return null;
         }
 
-        EmailEndpoint emailEndpoint = new EmailEndpoint(recipientDto.getEmail());
-
         Person person = new Person(recipientDto.getFirstName() + " " + recipientDto.getLastName());
-        emailEndpoint.setRecipient(person);
-
+        MailchimpEndpoint mailChimpEndpoint = MailchimpEndpoint.createForPerson(recipientDto.getEmail(), person);
         DeliveryOptions deliveryOptions = new DeliveryOptions();
-        emailEndpoint.setDeliveryOptions(deliveryOptions);
-
-        return emailEndpoint;
+        mailChimpEndpoint.setDeliveryOptions(deliveryOptions);
+        return mailChimpEndpoint;
     }
 
 }

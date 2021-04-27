@@ -2,8 +2,8 @@ package com.obj.nc.koderia.integration;
 
 import static com.obj.nc.domain.content.mailchimp.MailchimpContent.DATA_MERGE_VARIABLE;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.koderia.flows.KoderiaNotificationIntentProcessingFlowConfig.KODERIA_INTENT_PROCESSING_FLOW_ID;
-import static com.obj.nc.koderia.flows.KoderiaNotificationIntentProcessingFlowConfig.KODERIA_INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_ID;
+import static com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.koderia.integration.CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.RECEIVED_TEST_LIST;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -57,7 +57,6 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 	@Autowired private SourcePollingChannelAdapter pollableSource;
 	@Qualifier(RECEIVED_TEST_LIST)
 	@Autowired private List<Message<?>> received;
-	@Autowired private MailchimpSenderConfig mailchimpSenderConfig;
 	
 	@BeforeEach
 	public void startSourcePolling() {
@@ -104,10 +103,10 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 			return new ArrayList<>();
 		}
 		
-		@Bean(KODERIA_INTENT_PROCESSING_FLOW_ID)
+		@Bean(INTENT_PROCESSING_FLOW_ID)
 		public IntegrationFlow intentProcessingFlowDefinition() {
 			return IntegrationFlows
-					.from(KODERIA_INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+					.from(INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 					.handle((MessageHandler) received()::add)
 					.get();
 		}

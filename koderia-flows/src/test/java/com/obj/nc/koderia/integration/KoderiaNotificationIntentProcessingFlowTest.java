@@ -1,10 +1,12 @@
 package com.obj.nc.koderia.integration;
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.koderia.domain.recipients.RecipientDto;
@@ -17,6 +19,7 @@ import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,8 +46,8 @@ import java.util.concurrent.TimeUnit;
 
 import static com.obj.nc.domain.content.mailchimp.MailchimpContent.DATA_MERGE_VARIABLE;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.koderia.flows.MaichimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_ID;
-import static com.obj.nc.koderia.flows.MaichimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_ID;
+import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
 import static com.obj.nc.koderia.integration.CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.RECEIVED_TEST_LIST;
 import static org.hamcrest.Matchers.*;
@@ -109,7 +112,7 @@ public class KoderiaNotificationIntentProcessingFlowTest extends BaseIntegration
 		MatcherAssert.assertThat(((BaseKoderiaEvent) dataVariable.get()).getMessageText(), equalTo(baseKoderiaEvent.getMessageText()));
 		
 		MatcherAssert.assertThat(payload.getBody().getRecievingEndpoints(), hasSize(1));
-		MatcherAssert.assertThat(payload.getBody().getRecievingEndpoints().get(0), instanceOf(EmailEndpoint.class));
+		MatcherAssert.assertThat(payload.getBody().getRecievingEndpoints().get(0), instanceOf(MailchimpEndpoint.class));
 	}
 	
 	private void createRestCallExpectation() {
@@ -146,6 +149,13 @@ public class KoderiaNotificationIntentProcessingFlowTest extends BaseIntegration
 					.get();
 		}
 	}
+	
+	@RegisterExtension
+	protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+			.withConfiguration(
+					GreenMailConfiguration.aConfig()
+							.withUser("no-reply@objectify.sk", "xxx"))
+			.withPerMethodLifecycle(true);
 
 }
 

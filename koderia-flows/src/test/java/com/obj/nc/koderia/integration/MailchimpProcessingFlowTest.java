@@ -1,5 +1,8 @@
 package com.obj.nc.koderia.integration;
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
@@ -19,6 +22,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,7 +45,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.koderia.flows.MaichimpProcessingFlowConfig.*;
+import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.LOG_CONSUMER_HANDLER_ID;
 import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
 import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
@@ -148,6 +152,13 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 				.andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
 				.andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
 	}
+	
+	@RegisterExtension
+	protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+			.withConfiguration(
+					GreenMailConfiguration.aConfig()
+							.withUser("no-reply@objectify.sk", "xxx"))
+			.withPerMethodLifecycle(true);
 
 }
 

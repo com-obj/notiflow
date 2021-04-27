@@ -3,7 +3,7 @@ package com.obj.nc.koderia.functions.processors.recipientsFinder;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpMergeVariable;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
@@ -91,7 +91,7 @@ class KoderiaRecipientsFinderTest {
         NotificationIntent outputNotificationIntent = getKoderiaRecipients.apply(inputNotificationIntent);
 
         // THEN
-        List<String> recipientEmails = outputNotificationIntent.getBody().getRecievingEndpoints().stream().map(endpoint -> ((EmailEndpoint) endpoint).getEmail()).collect(toList());
+        List<String> recipientEmails = outputNotificationIntent.getBody().getRecievingEndpoints().stream().map(endpoint -> ((MailchimpEndpoint) endpoint).getEmail()).collect(toList());
         for (int i = 0; i < recipientEmails.size(); i++) {
             MatcherAssert.assertThat(recipientEmails.get(i), Matchers.equalTo(responseDto[i].getEmail()));
         }
@@ -139,13 +139,13 @@ class KoderiaRecipientsFinderTest {
         Assertions.assertThat(outputRecipients).isNotNull();
         Assertions.assertThat(outputRecipients).hasSize(3);
         
-        Assertions.assertThat(((EmailEndpoint) outputRecipients.get(0)).getEmail()).isEqualTo(responseBody[0].getEmail());
+        Assertions.assertThat(((MailchimpEndpoint) outputRecipients.get(0)).getEmail()).isEqualTo(responseBody[0].getEmail());
         Assertions.assertThat(outputRecipients.get(0).getRecipient().getName()).isEqualTo(responseBody[0].getFirstName() + " " + responseBody[0].getLastName());
         
-        Assertions.assertThat(((EmailEndpoint) outputRecipients.get(1)).getEmail()).isEqualTo(responseBody[1].getEmail());
+        Assertions.assertThat(((MailchimpEndpoint) outputRecipients.get(1)).getEmail()).isEqualTo(responseBody[1].getEmail());
         Assertions.assertThat(outputRecipients.get(1).getRecipient().getName()).isEqualTo(responseBody[1].getFirstName() + " " + responseBody[1].getLastName());
         
-        Assertions.assertThat(((EmailEndpoint) outputRecipients.get(2)).getEmail()).isEqualTo(responseBody[2].getEmail());
+        Assertions.assertThat(((MailchimpEndpoint) outputRecipients.get(2)).getEmail()).isEqualTo(responseBody[2].getEmail());
         Assertions.assertThat(outputRecipients.get(2).getRecipient().getName()).isEqualTo(responseBody[2].getFirstName() + " " + responseBody[2].getLastName());
     }
 

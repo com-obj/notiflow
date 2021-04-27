@@ -102,8 +102,8 @@ class MailchimpSenderProcessorFunctionTest {
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> sendMailchimpMessage.apply(inputMessage))
                 .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("Mailchimp can only send message")
-                .hasMessageContaining("to 1 EmailEndpoint");
+                .hasMessageContaining("MailchimpSender can only send message")
+                .hasMessageContaining("to 1 MailchimpEndpoint");
     }
 
     @Test
@@ -131,8 +131,8 @@ class MailchimpSenderProcessorFunctionTest {
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> sendMailchimpMessage.apply(inputMessage))
                 .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("Mailchimp can only send message")
-                .hasMessageContaining("to 1 EmailEndpoint");
+                .hasMessageContaining("MailchimpSender can only send message")
+                .hasMessageContaining("to 1 MailchimpEndpoint");
     }
     
     

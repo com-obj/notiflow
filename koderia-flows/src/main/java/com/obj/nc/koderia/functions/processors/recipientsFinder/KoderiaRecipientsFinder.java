@@ -2,7 +2,6 @@ package com.obj.nc.koderia.functions.processors.recipientsFinder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
@@ -12,7 +11,7 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.koderia.domain.recipients.RecipientDto;
 import com.obj.nc.koderia.domain.recipients.RecipientsQueryDto;
 import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
-import com.obj.nc.koderia.mapper.RecipientMapper;
+import com.obj.nc.koderia.mapper.KoderiaRecipientsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +33,7 @@ import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRe
 public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<NotificationIntent, NotificationIntent> {
 	@Qualifier(KODERIA_REST_TEMPLATE)
 	@Autowired private RestTemplate restTemplate;
-	@Autowired private RecipientMapper recipientMapper;
+	@Autowired private KoderiaRecipientsMapper recipientMapper;
 	@Autowired private ObjectMapper objectMapper;
 	
 	@Override

@@ -2,9 +2,9 @@ package com.obj.nc.functions.processors.senders.mailchimp;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpContentDto;
 import com.obj.nc.domain.content.mailchimp.MailchimpRecipient;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -45,10 +45,10 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 		
 		boolean hasNoneOrTooMuchEndpoints = payload.getBody().getRecievingEndpoints().size() != 1;
 		boolean containsNonEmailEndpoint = payload.getBody().getRecievingEndpoints().stream()
-				.anyMatch(endpoint -> !EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType()));
+				.anyMatch(endpoint -> !MailchimpEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType()));
 		
 		if (hasNoneOrTooMuchEndpoints || containsNonEmailEndpoint) {
-			return Optional.of(new PayloadValidationException(String.format("Mailchimp can only send message %s to 1 EmailEndpoint", payload)));
+			return Optional.of(new PayloadValidationException(String.format("MailchimpSender can only send message %s to 1 MailchimpEndpoint", payload)));
 		}
 		
 		return Optional.empty();
@@ -82,14 +82,14 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 	private List<MailchimpRecipient> mapRecipient(RecievingEndpoint endpoint) {
 		List<MailchimpRecipient> recipientInList = new ArrayList<>();
 		
-		if (!EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType())) {
-			throw new UnsupportedOperationException("Mapper can only map EmailContent endpoint");
+		if (!MailchimpEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType())) {
+			throw new UnsupportedOperationException("Mapper can only map MailChimpEndpoint endpoint");
 		}
 		
 		MailchimpRecipient recipient = new MailchimpRecipient();
-		EmailEndpoint emailEndpoint = (EmailEndpoint) endpoint;
-		recipient.setName(emailEndpoint.getRecipient().getName());
-		recipient.setEmail(emailEndpoint.getEmail());
+		MailchimpEndpoint mailChimpEndpoint = (MailchimpEndpoint) endpoint;
+		recipient.setName(mailChimpEndpoint.getRecipient().getName());
+		recipient.setEmail(mailChimpEndpoint.getEmail());
 		
 		return recipientInList;
 	}

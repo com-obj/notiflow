@@ -2,7 +2,7 @@ package com.obj.nc.flows.testmode.mailchimp.functions;
 
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
@@ -29,7 +29,7 @@ public class InMemoryMailchimpSourceSupplier extends SourceSupplierAdapter<Messa
         }
         
         Message mailchimpMessage = received.poll();
-        EmailEndpoint recipient = (EmailEndpoint) mailchimpMessage.getBody().getRecievingEndpoints().iterator().next();
+        MailchimpEndpoint recipient = (MailchimpEndpoint) mailchimpMessage.getBody().getRecievingEndpoints().iterator().next();
         
         MailchimpContent content = mailchimpMessage.getContentTyped();
         EmailContent emailContent = content.copyToEmailContent();

@@ -60,7 +60,7 @@
     },
     "recievingEndpoints":[
       {
-        "@type":"EMAIL",
+        "@type":"MAILCHIMP",
         "recipient":{
           "type":"PERSON",
           "name":"John Doe"
