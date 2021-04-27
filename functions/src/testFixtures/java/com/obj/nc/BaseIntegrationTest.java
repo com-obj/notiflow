@@ -42,6 +42,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
         jdbcTemplate.batchUpdate("delete from nc_endpoint");        
         jdbcTemplate.batchUpdate("delete from nc_event");    
         jdbcTemplate.batchUpdate("delete from nc_intent");  
+        jdbcTemplate.batchUpdate("delete from nc_message");  
     }
     
     @Data
