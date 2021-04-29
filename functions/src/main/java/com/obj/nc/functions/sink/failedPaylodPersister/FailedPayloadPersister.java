@@ -21,7 +21,12 @@ public class FailedPayloadPersister extends SinkConsumerAdapter<FailedPaylod> {
 
 	@Override
 	protected void execute(FailedPaylod failedPaylod) {
-		failedPayloadRepo.save(failedPaylod);
+		try {
+			failedPayloadRepo.save(failedPaylod);
+		} catch (Exception e) {
+			log.error("Error ocured in Error handling flow: ", e);
+			throw e;
+		}
 	}
 
 }

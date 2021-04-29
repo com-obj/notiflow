@@ -5,22 +5,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.Message;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
-import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,10 +27,12 @@ import lombok.NoArgsConstructor;
 public class FailedPaylodRepositoryTest {
 
 	@Autowired FailedPayloadRepository failedPaylaodRepo;
+	@Autowired ObjectMapper jsonConverterForMessages;
 	
 	@Test
 	public void testPersistingSingleInfo() {
 		TestPayload payload = TestPayload.builder().content("some error content").build();
+		Message<TestPayload> msg = MessageBuilder.withPayload(payload).build();
 		FailedPaylod failedPayload = null;
 		
 	    Exception e = Assertions.assertThrows(NumberFormatException.class, () -> {
@@ -46,12 +43,10 @@ public class FailedPaylodRepositoryTest {
 		failedPayload = FailedPaylod.builder()
 				.flowId("default-flow-id")
 				.id(UUID.randomUUID())
-				.payloadJson(JsonUtils.writeObjectToJSONNode(payload))
-				.exceptionName(e.getClass().getName())
-				.errorMessage(e.getMessage())
-				.stackTrace(ExceptionUtils.getStackTrace(e))
-				.rootCauseExceptionName(ExceptionUtils.getRootCause(e).getClass().getName())
+				.messageJson( jsonConverterForMessages.valueToTree(msg) )
+				.channelNameForRetry("channel")
 				.build();
+		failedPayload.setAttributesFromException(e);
 		
 		failedPaylaodRepo.save(failedPayload);
 		
@@ -60,21 +55,20 @@ public class FailedPaylodRepositoryTest {
 		assertThat(oFailedPayloadInDb.isPresent()).isTrue();
 		
 		assertThat(oFailedPayloadInDb.get().getFlowId()).isEqualTo(failedPayload.getFlowId());
-		assertThat(oFailedPayloadInDb.get().getPayloadJson()).isEqualTo(failedPayload.getPayloadJson());
+		assertThat(oFailedPayloadInDb.get().getTimeCreated()).isNotNull();
+		assertThat(oFailedPayloadInDb.get().getMessageJson()).isEqualTo(failedPayload.getMessageJson());
 		assertThat(oFailedPayloadInDb.get().getExceptionName()).isEqualTo(failedPayload.getExceptionName());
 		assertThat(oFailedPayloadInDb.get().getErrorMessage()).isEqualTo(failedPayload.getErrorMessage());
 		assertThat(oFailedPayloadInDb.get().getStackTrace()).isEqualTo(failedPayload.getStackTrace());
 		assertThat(oFailedPayloadInDb.get().getRootCauseExceptionName()).isEqualTo(failedPayload.getRootCauseExceptionName());		
+		assertThat(oFailedPayloadInDb.get().getChannelNameForRetry()).isEqualTo(failedPayload.getChannelNameForRetry());		
 	}
 
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @JsonTypeInfo(include = As.PROPERTY, use = Id.NAME)
-    @JsonSubTypes({ 
-    	@Type(value = TestPayload.class, name = "TYPE_NAME")})
-    public static class TestPayload implements IsTypedJson {
+    public static class TestPayload {
     	
     	private String content;
     }

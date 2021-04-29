@@ -17,7 +17,8 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class ErrorHandlingFlowConfig {
 	
-
+	public static final String ERROR_CHANNEL_NAME = "errorChannel";
+	
 	//Default channel for errorMessages used by spring
 	@Qualifier("errorChannel")
 	@Autowired private PublishSubscribeChannel errorChannel;
@@ -30,7 +31,6 @@ public class ErrorHandlingFlowConfig {
         return 
         	IntegrationFlows.from(errorChannel)
 				.handle(failedPaylodTranformer)
-				.split()
 				.handle(failedPaylodPersister)
         		.get();
     }
