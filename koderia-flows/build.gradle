@@ -8,7 +8,7 @@ bootJar {
 
 }
 
-group = 'com.obj.nc.flows'
+group = 'com.obj.nc'
 
 dependencies {
     implementation project(':functions')
