@@ -3,6 +3,7 @@ package com.obj.nc.koderia.domain.event;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.obj.nc.domain.Attachement;
+import com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData;
 import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,7 +21,9 @@ import java.util.List;
         @JsonSubTypes.Type(value = BlogKoderiaEventDto.class, name = "BLOG"),
         @JsonSubTypes.Type(value = EventKoderiaEventDto.class, name = "EVENT"),
         @JsonSubTypes.Type(value = LinkKoderiaEventDto.class, name = "LINK"),
-        @JsonSubTypes.Type(value = NewsKoderiaEventDto.class, name = "NEWS")
+        @JsonSubTypes.Type(value = NewsKoderiaEventDto.class, name = "NEWS"),
+        @JsonSubTypes.Type(value = AggregatedMailchimpData.class),
+    
 })
 @EqualsAndHashCode(callSuper = true)
 public abstract class BaseKoderiaEvent extends MailchimpData {

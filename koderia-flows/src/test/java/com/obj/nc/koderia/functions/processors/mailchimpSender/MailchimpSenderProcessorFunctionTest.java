@@ -5,6 +5,7 @@ import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
 import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpResponseDto;
 import com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterConfig;
@@ -16,7 +17,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -47,7 +47,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 class MailchimpSenderProcessorFunctionTest {
 
     @Autowired private MailchimpSenderProcessorFunction sendMailchimpMessage;
-    @Autowired private MailchimpSenderConfig mailchimpSenderConfig;
+    @Autowired private MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
     @Autowired private MockRestServiceServer mailchimpMockServer;
     
     @BeforeEach
@@ -77,7 +77,7 @@ class MailchimpSenderProcessorFunctionTest {
     @Disabled // TODO: enable when aggregation works
     void testSendAggregateMessageWithTemplate() {
         // GIVEN
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregate_message.json", Message.class);
+        Message inputMessage = JsonUtils.readObjectFromClassPathResource("messages/mailchimp_aggregate.json/aggregate_message.json", Message.class);
 
         // WHEN
         Message outputMessage = sendMailchimpMessage.apply(inputMessage);
@@ -150,7 +150,7 @@ class MailchimpSenderProcessorFunctionTest {
         mailchimpMockServer.expect(times(1),
                 requestTo(SEND_TEMPLATE_PATH))
                 .andExpect(method(HttpMethod.POST))
-                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfig.getAuthKey()))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
                 .andExpect(jsonPath("$.key", equalTo("MOCKkey")))
                 .andExpect(jsonPath("$.message.subject", anyOf(equalTo("Business Intelligence (BI) Developer"))))
                 .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
@@ -166,7 +166,7 @@ class MailchimpSenderProcessorFunctionTest {
         mailchimpMockServer.expect(times(1),
                 requestTo(SEND_TEMPLATE_PATH))
                 .andExpect(method(HttpMethod.POST))
-                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfig.getAuthKey()))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
                 .andExpect(jsonPath("$.key", equalTo("MOCKkey")))
                 .andExpect(jsonPath("$.message.subject", equalTo("Koderia digest")))
                 .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))

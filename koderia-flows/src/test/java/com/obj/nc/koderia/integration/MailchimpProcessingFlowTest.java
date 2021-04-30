@@ -6,11 +6,11 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.koderia.domain.recipients.RecipientDto;
 import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
 import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpResponseDto;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinder;
@@ -20,7 +20,6 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +61,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 		"spring.main.allow-bean-definition-overriding=true"
 })
 @DirtiesContext
-//@Disabled
 public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 	
 	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
@@ -70,7 +68,7 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 	@Autowired private GenericEventPersisterConsumer persister;
 	@Autowired private KoderiaRecipientsFinder koderiaRecipientsFinder;
 	@Autowired private MailchimpSenderProcessorFunction mailchimpSender;
-	@Autowired private MailchimpSenderConfig mailchimpSenderConfig;
+	@Autowired private MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 	@Autowired private KoderiaRecipientsFinderConfig koderiaRecipientsFinderConfig;
 	@Autowired private MockIntegrationContext mockIntegrationContext;
 	
@@ -144,9 +142,9 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 		String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
 		
 		mailchimpMockServer.expect(times(3), 
-				requestTo(mailchimpSenderConfig.getApiUrl() + SEND_TEMPLATE_PATH))
+				requestTo(mailchimpSenderConfigProperties.getApiUrl() + SEND_TEMPLATE_PATH))
 				.andExpect(method(HttpMethod.POST))
-				.andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfig.getAuthKey()))
+				.andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
 				.andExpect(jsonPath("$.key", equalTo("MOCKkey")))
 				.andExpect(jsonPath("$.message.subject", equalTo("Business Intelligence (BI) Developer")))
 				.andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))

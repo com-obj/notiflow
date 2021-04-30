@@ -61,7 +61,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 		"spring.main.allow-bean-definition-overriding=true"
 })
 @DirtiesContext
-public class KoderiaNotificationIntentProcessingFlowTest extends BaseIntegrationTest {
+public class KoderiaIntentProcessingTest extends BaseIntegrationTest {
 	
 	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 	@Autowired private SourcePollingChannelAdapter pollableSource;
@@ -102,14 +102,19 @@ public class KoderiaNotificationIntentProcessingFlowTest extends BaseIntegration
 		}
 	}
 	
-	private void checkReceivedPayload(JobPostKoderiaEventDto baseKoderiaEvent, com.obj.nc.domain.message.Message payload) {
+	private void checkReceivedPayload(JobPostKoderiaEventDto koderiaEvent, com.obj.nc.domain.message.Message payload) {
 		MatcherAssert.assertThat(payload.getBody().getMessage(), instanceOf(MailchimpContent.class));
 		
 		MailchimpContent content = payload.getContentTyped();
-		MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(baseKoderiaEvent.getMessageSubject()));
-		Optional<? extends MailchimpData> dataVariable = content.getMessage().getMailchimpData();
+		MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(koderiaEvent.getMessageSubject()));
+		Optional<MailchimpData> dataVariable = content.getMessage().getMailchimpData();
 		MatcherAssert.assertThat(dataVariable.isPresent(), equalTo(true));
-		MatcherAssert.assertThat(dataVariable.get().getMessageText(), equalTo(baseKoderiaEvent.getMessageText()));
+		
+		MailchimpData data = dataVariable.get();
+		MatcherAssert.assertThat(data.getMessageText(), equalTo(koderiaEvent.getMessageText()));
+		MatcherAssert.assertThat(data.getAttachments(), empty());
+		MatcherAssert.assertThat(data.getType(), equalTo(koderiaEvent.getType()));
+		MatcherAssert.assertThat(data.getData(), equalTo(koderiaEvent.getData()));
 		
 		MatcherAssert.assertThat(payload.getBody().getRecievingEndpoints(), hasSize(1));
 		MatcherAssert.assertThat(payload.getBody().getRecievingEndpoints().get(0), instanceOf(MailchimpEndpoint.class));

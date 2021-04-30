@@ -62,6 +62,7 @@ public abstract class BasePayload extends BaseJSONObject implements HasHeader, P
 	}
 	
 	@Override
+	@JsonIgnore
 	@Transient
 	public boolean isNew() {
 		return timeCreated == null;

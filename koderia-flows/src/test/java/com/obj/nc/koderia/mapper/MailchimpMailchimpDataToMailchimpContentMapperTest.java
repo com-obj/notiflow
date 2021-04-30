@@ -1,6 +1,5 @@
 package com.obj.nc.koderia.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
@@ -8,12 +7,9 @@ import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
 import com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterConfig;
 import com.obj.nc.mappers.MailchimpDataToMailchimpContentMapper;
 import com.obj.nc.utils.JsonUtils;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 

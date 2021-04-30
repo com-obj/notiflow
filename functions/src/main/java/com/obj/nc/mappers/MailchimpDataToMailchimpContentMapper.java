@@ -2,8 +2,8 @@ package com.obj.nc.mappers;
 
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.mailchimp.*;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
 
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class MailchimpDataToMailchimpContentMapper {
-    private final MailchimpSenderConfig mailchimpSenderConfig;
+    private final MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 
     public MailchimpContent map(MailchimpData event) {
         MailchimpContent content = new MailchimpContent();
@@ -32,8 +32,8 @@ public class MailchimpDataToMailchimpContentMapper {
         MailchimpMessage mailchimpMessage = new MailchimpMessage();
 
         mailchimpMessage.setSubject(mapSubject(event));
-        mailchimpMessage.setFromEmail(mailchimpSenderConfig.getSenderEmail());
-        mailchimpMessage.setFromName(mailchimpSenderConfig.getSenderName());
+        mailchimpMessage.setFromEmail(mailchimpSenderConfigProperties.getSenderEmail());
+        mailchimpMessage.setFromName(mailchimpSenderConfigProperties.getSenderName());
 
         List<MailchimpMergeVariable> globalMergeVars = mapGlobalMergeVars(event);
         mailchimpMessage.setGlobalMergeVars(globalMergeVars);
@@ -87,7 +87,7 @@ public class MailchimpDataToMailchimpContentMapper {
     }
 
     protected String getTemplateName(MailchimpData event) {
-        return mailchimpSenderConfig.getTemplateNameFromMessageType(event.getType());
+        return mailchimpSenderConfigProperties.getTemplateNameFromMessageType(event.getType());
     }
 
 }

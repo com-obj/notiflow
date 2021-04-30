@@ -31,7 +31,7 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 	
 	@Qualifier(MAILCHIMP_REST_TEMPLATE)
 	@Autowired private RestTemplate restTemplate;
-	@Autowired private MailchimpSenderConfig mailchimpSenderConfig;
+	@Autowired private MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
@@ -58,7 +58,7 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 	protected Message execute(Message payload) {
 		MailchimpContent content = payload.getContentTyped();
 		
-		MailchimpContentDto dto = MailchimpContentDto.from(content, mailchimpSenderConfig.getAuthKey());
+		MailchimpContentDto dto = MailchimpContentDto.from(content, mailchimpSenderConfigProperties.getAuthKey());
 		dto.getMessage().setTo(mapRecipient(payload.getBody().getRecievingEndpoints().get(0)));
 		
 		List<MailchimpResponseDto> mailchimpResponseDtos = doSendMessage(dto);

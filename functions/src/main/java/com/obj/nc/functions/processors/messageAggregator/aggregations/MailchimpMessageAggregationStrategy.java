@@ -5,7 +5,7 @@ import com.obj.nc.domain.content.mailchimp.*;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationStrategy {
 	
-	private final MailchimpSenderConfig mailchimpSenderConfig;
+	private final MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(List<? extends BasePayload> payloads) {
@@ -61,7 +61,7 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 	
 	private MailchimpContent concatContents(MailchimpContent one, MailchimpContent other) {
 		MailchimpContent concated = new MailchimpContent();
-		concated.setTemplateName(mailchimpSenderConfig.getAggregatedMessageTemplateName());
+		concated.setTemplateName(mailchimpSenderConfigProperties.getAggregatedMessageTemplateName());
 		
 		List<MailchimpTemplateContent> templateContent = new ArrayList<>(one.getTemplateContent());
 		templateContent.addAll(other.getTemplateContent());
@@ -69,7 +69,7 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 		
 		MailchimpMessage mailchimpMessage = new MailchimpMessage();
 		mailchimpMessage.setTo(one.getMessage().getTo());
-		mailchimpMessage.setSubject(mailchimpSenderConfig.getAggregatedMessageSubject());
+		mailchimpMessage.setSubject(mailchimpSenderConfigProperties.getAggregatedMessageSubject());
 		
 		ArrayList<MailchimpAttachment> attachments = new ArrayList<>(one.getMessage().getAttachments());
 		attachments.addAll(other.getMessage().getAttachments());
@@ -79,20 +79,29 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 		mailchimpMessage.setFromName(one.getMessage().getFromName());
 		mailchimpMessage.setMergeLanguage(one.getMessage().getMergeLanguage());
 		
-		Map<String, List<MailchimpMergeVariable>> globalMergeCategoryValues = new HashMap<>();
-		mailchimpSenderConfig.getMessageTypes().forEach(type -> globalMergeCategoryValues.put(type, new ArrayList<>()));
+		Map<String, List<MailchimpData>> globalMergeCategoryValues = new HashMap<>();
+		mailchimpSenderConfigProperties.getMessageTypes().forEach(type -> globalMergeCategoryValues.put(type, new ArrayList<>()));
 		
 		one.getMessage().getGlobalMergeVars().forEach(mergeVar -> {
-			globalMergeCategoryValues.get(mergeVar.getContent().getType()).add(mergeVar);
+			if (mergeVar.getContent() instanceof AggregatedMailchimpData) {
+				globalMergeCategoryValues.get(mergeVar.getName()).addAll(((AggregatedMailchimpData) mergeVar.getContent()).getData());
+			} else {
+				globalMergeCategoryValues.get(mergeVar.getName()).add(mergeVar.getContent());
+			}
 		});
 		other.getMessage().getGlobalMergeVars().forEach(mergeVar -> {
-			globalMergeCategoryValues.get(mergeVar.getContent().getType()).add(mergeVar);
+			if (mergeVar.getContent() instanceof AggregatedMailchimpData) {
+				globalMergeCategoryValues.get(mergeVar.getName()).addAll(((AggregatedMailchimpData) mergeVar.getContent()).getData());
+			} else {
+				globalMergeCategoryValues.get(mergeVar.getName()).add(mergeVar.getContent());
+			}
 		});
 		mailchimpMessage.setGlobalMergeVars(globalMergeCategoryValues.entrySet().stream().map(this::mapMergeVar).collect(Collectors.toList()));
+		concated.setMessage(mailchimpMessage);
 		return concated;
 	}
 	
-	protected MailchimpMergeVariable mapMergeVar(Map.Entry<String, List<MailchimpMergeVariable>> entry) {
+	protected MailchimpMergeVariable mapMergeVar(Map.Entry<String, List<MailchimpData>> entry) {
 		MailchimpMergeVariable mergeVar = new MailchimpMergeVariable();
 		mergeVar.setName(entry.getKey());
 		

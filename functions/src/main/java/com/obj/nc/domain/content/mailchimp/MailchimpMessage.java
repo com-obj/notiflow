@@ -1,5 +1,6 @@
 package com.obj.nc.domain.content.mailchimp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -21,6 +22,7 @@ public class MailchimpMessage {
     @JsonProperty("global_merge_vars") private List<MailchimpMergeVariable> globalMergeVars = new ArrayList<>();
     @NotNull private List<MailchimpAttachment> attachments = new ArrayList<>();
     
+    @JsonIgnore
     public Optional<MailchimpData> getMailchimpData() {
         return globalMergeVars.stream().map(MailchimpMergeVariable::getContent).findFirst();
     }
