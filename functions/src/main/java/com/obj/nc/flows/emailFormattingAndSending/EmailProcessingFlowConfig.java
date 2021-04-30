@@ -3,7 +3,6 @@ package com.obj.nc.flows.emailFormattingAndSending;
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -16,15 +15,20 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessageAggregationStrategy;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
+import com.obj.nc.functions.sink.messagePersister.MessagePersister;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
+@RequiredArgsConstructor
 public class EmailProcessingFlowConfig {
 	
-	@Autowired private EmailSender emailSender;
-	@Autowired private PaylaodLoggerSinkConsumer logConsumer;
-	@Autowired private EmailTemplateFormatter emailFormatter;
-	@Autowired private EmailProcessingFlowProperties properties;
+	private final EmailSender emailSender;
+	private final PaylaodLoggerSinkConsumer logConsumer;
+	private final EmailTemplateFormatter emailFormatter;
+	private final EmailProcessingFlowProperties properties;
+	private final MessagePersister messagePersister;
 	
 	public final static String EMAIL_FORMAT_AND_SEND_FLOW_ID = "EMAIL_FORMAT_AND_SEND_FLOW_ID";
 	public final static String EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID = EMAIL_FORMAT_AND_SEND_FLOW_ID + "_INPUT";
@@ -63,6 +67,9 @@ public class EmailProcessingFlowConfig {
 	public IntegrationFlow emaiSendingFlowDefinition() {
 		return IntegrationFlows
 				.from(emailSedningInputChangel())
+				.wireTap( flowConfig -> 
+					flowConfig.handle(messagePersister)
+				)
 				.handle(emailSender)
 				.wireTap( flowConfig -> 
 					flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
