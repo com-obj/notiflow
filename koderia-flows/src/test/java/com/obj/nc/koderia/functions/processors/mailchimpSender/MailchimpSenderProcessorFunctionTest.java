@@ -42,7 +42,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @ContextConfiguration(classes = {
         MailchimpSenderConfig.class,
         MailchimpDataToMailchimpContentMapper.class,
-        KoderiaEventConverterConfig.class
+        MailchimpSenderConfigProperties.class
 })
 class MailchimpSenderProcessorFunctionTest {
 
@@ -65,23 +65,6 @@ class MailchimpSenderProcessorFunctionTest {
         Message inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", Message.class);
         // WHEN
         Message outputMessage = sendMailchimpMessage.apply(inputMessage);
-        // THEN
-        MatcherAssert.assertThat(outputMessage, Matchers.notNullValue());
-        MailchimpResponseDto outputMailchimpResponseDto = JsonUtils.readClassFromObject(outputMessage.getBody().getAttributeValueAs(MAILCHIMP_RESPONSE_FIELD, List.class).get(0), MailchimpResponseDto.class);
-        MailchimpResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource("mailchimp/response_body.json", MailchimpResponseDto[].class);
-        MatcherAssert.assertThat(outputMailchimpResponseDto, Matchers.equalTo(responseDtos[0]));
-    }
-
-    @Test
-    @Tag("aggregate")
-    @Disabled // TODO: enable when aggregation works
-    void testSendAggregateMessageWithTemplate() {
-        // GIVEN
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource("messages/mailchimp_aggregate.json/aggregate_message.json", Message.class);
-
-        // WHEN
-        Message outputMessage = sendMailchimpMessage.apply(inputMessage);
-
         // THEN
         MatcherAssert.assertThat(outputMessage, Matchers.notNullValue());
         MailchimpResponseDto outputMailchimpResponseDto = JsonUtils.readClassFromObject(outputMessage.getBody().getAttributeValueAs(MAILCHIMP_RESPONSE_FIELD, List.class).get(0), MailchimpResponseDto.class);

@@ -17,13 +17,12 @@ import java.util.List;
 @Validated
 @JsonTypeInfo(include = JsonTypeInfo.As.EXISTING_PROPERTY, use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = JobPostKoderiaEventDto.class, name = "JOB_POST"),
-        @JsonSubTypes.Type(value = BlogKoderiaEventDto.class, name = "BLOG"),
-        @JsonSubTypes.Type(value = EventKoderiaEventDto.class, name = "EVENT"),
-        @JsonSubTypes.Type(value = LinkKoderiaEventDto.class, name = "LINK"),
-        @JsonSubTypes.Type(value = NewsKoderiaEventDto.class, name = "NEWS"),
-        @JsonSubTypes.Type(value = AggregatedMailchimpData.class),
-    
+        @JsonSubTypes.Type(value = JobPostKoderiaEventDto.class),
+        @JsonSubTypes.Type(value = BlogKoderiaEventDto.class),
+        @JsonSubTypes.Type(value = EventKoderiaEventDto.class),
+        @JsonSubTypes.Type(value = LinkKoderiaEventDto.class),
+        @JsonSubTypes.Type(value = NewsKoderiaEventDto.class),
+        @JsonSubTypes.Type(value = AggregatedMailchimpData.class)
 })
 @EqualsAndHashCode(callSuper = true)
 public abstract class BaseKoderiaEvent extends MailchimpData {

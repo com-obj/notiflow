@@ -6,6 +6,7 @@ import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import com.obj.nc.koderia.domain.event.*;
 import com.obj.nc.koderia.domain.eventData.*;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
@@ -34,7 +35,7 @@ import static org.hamcrest.Matchers.equalTo;
         KoderiaEventConverter.class,
         MailchimpDataToMailchimpContentMapper.class,
         KoderiaEventConverterConfig.class,
-        MailchimpSenderConfig.class
+        MailchimpSenderConfigProperties.class
 })
 class KoderiaEventConverterTest {
 
