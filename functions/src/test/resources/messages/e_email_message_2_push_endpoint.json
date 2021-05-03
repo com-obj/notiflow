@@ -18,12 +18,12 @@
      },
       "recievingEndpoints":[
          {
-            "@type":"MAIL_CHIMP",
+            "@type":"MAILCHIMP",
+            "email" : "john.doe@objectify.sk",
             "recipient":{
                "type":"PERSON",
                "name":"John Doe"
-            },
-            "distributionListId":"distListId"
+            }
          }
       ],
       "deliveryOptions":{

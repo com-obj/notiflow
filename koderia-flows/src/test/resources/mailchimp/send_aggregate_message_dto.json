@@ -1,5 +1,5 @@
 {
-  "key" : "ASDF",
+  "key" : "MOCKkey",
   "message" : {
     "subject" : "Koderia digest",
     "from_email" : "sender@koderia.sk",
@@ -11,10 +11,10 @@
     } ],
     "merge_language" : "handlebars",
     "global_merge_vars" : [ {
-      "name" : "JOB_POST",
+      "name" : "AGGREGATED",
       "content" : [ {
-        "type": "JOB_POST",
-        "data": {
+        "name" : "JOB_POST",
+        "content" : [ {
           "id": "unwhX7OlJYq7Kd7GfoCd",
           "name": "Business Intelligence (BI) Developer",
           "description": "We are looking for a Business Intelligence (BI) Developer to create...",
@@ -33,19 +33,16 @@
           "duration": "1 rok s možnosťou predĺženia",
           "type": "Analytik",
           "dateOfStart": "ASAP"
-        }
-      } ]
-    }, {
-      "name" : "NEWS",
-      "content" : [ ]
-    }, {
-      "name" : "LINK",
-      "content" : [ ]
-    }, {
-      "name" : "BLOG",
-      "content" : [ {
-        "type" : "BLOG",
-        "data" : {
+        } ]
+      }, {
+        "name" : "NEWS",
+        "content" : [ ]
+      }, {
+        "name" : "LINK",
+        "content" : [ ]
+      }, {
+        "name" : "BLOG",
+        "content" : [ {
           "id": "q32dHKSV3WEeKpl9cvJG",
           "title":"3 najdivnejšie programovacie jazyky na svete – 1. časť",
           "content":"",
@@ -64,22 +61,22 @@
             "name": "Dennis Fino",
             "id": "QLnrttkdIaYbbteiOQr7"
           }
-        }
+        } ]
+      }, {
+        "name" : "EVENT",
+        "content" : [ ]
+      } ],
+      "attachments" : [ {
+        "type" : "text/plain",
+        "name" : "test1.txt",
+        "content" : "YXR0YWNobWVudCB0ZXN0MQ=="
+      }, {
+        "type" : "text/plain",
+        "name" : "test2.txt",
+        "content" : "YXR0YWNobWVudCB0ZXN0Mg=="
       } ]
-    }, {
-      "name" : "EVENT",
-      "content" : [ ]
-    } ],
-    "attachments" : [ {
-      "type" : "text/plain",
-      "name" : "test1.txt",
-      "content" : "YXR0YWNobWVudCB0ZXN0MQ=="
-    }, {
-      "type" : "text/plain",
-      "name" : "test2.txt",
-      "content" : "YXR0YWNobWVudCB0ZXN0Mg=="
-    } ]
+    }]
   },
-  "template_name" : "aggregate-template",
+  "template_name" : "aggregated-template",
   "template_content" : [ ]
 }

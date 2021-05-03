@@ -24,7 +24,7 @@
 			            <td><span th:text="${email.getAttributeValue('ORIGINAL_RECIPIENTS_EMAIL')}"> cuzy@objectify.sk </span></td>
 			            <td><span th:text="${email.subject}"> Subject1 </span></td>
 			            <td>                     		
-			            		<span th:utext="${email.text}"> Body1 </span>
+			            		<span style="white-space: pre" th:utext="${email.text}"> Body1 </span>
 			            </td>
 			            <td><span th:text="${email.attachments}"> Attachments </span></td>
 			     	</tr>
@@ -42,11 +42,32 @@
 			     	<tr th:each="sms : ${model.smsContents}">
 			            <td><span th:text="${sms.getAttributeValue('ORIGINAL_RECIPIENTS_PHONE_NUM')}"> 09181111 </span></td>
 			            <td>	
-			            		<span th:text="${sms.text}"> Body1 </span>
+			            		<span style="white-space: pre" th:text="${sms.text}"> Body1 </span>
 			            </td>
 			     	</tr>
 			    </tbody>
 		    </table>
+		<h3>Mailchimp</h3>
+			<table border="1" cellpadding="5" style="border-collapse:collapse; border: 1px solid gray;">
+				<thead>
+				<tr>
+					<th th:text="#{testMode.header1.recipient}"> Rec </th>
+					<th th:text="#{testMode.header1.subject}"> Subject </th>
+					<th th:text="#{testMode.header1.mailchimp.message}"> Message </th>
+					<th th:text="#{testMode.header1.attachements}"> Attach </th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr th:each="mailchimp : ${model.mailchimpContents}">
+					<td><span th:text="${mailchimp.getAttributeValue('ORIGINAL_RECIPIENTS_EMAIL')}"> cuzy@objectify.sk </span></td>
+					<td><span th:text="${mailchimp.message.subject}"> Subject1 </span></td>
+					<td>
+						<span style="white-space: pre-wrap" th:utext="${mailchimp.getAttributeValue('MAILCHIMP_MESSAGE_AS_JSON')}"> Body1 </span>
+					</td>
+					<td><span th:text="${mailchimp.message.attachments}"> Attachments </span></td>
+				</tr>
+				</tbody>
+			</table>
 	 
 	 
 	 	<p th:text="#{testMode.footerMain}"></p>

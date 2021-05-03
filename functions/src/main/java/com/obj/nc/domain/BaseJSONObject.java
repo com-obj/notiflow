@@ -78,5 +78,5 @@ public class BaseJSONObject {
 	public Object getAttributeValue(String attributeName) {
 		return attributes.get(attributeName);
 	}
-
+	
 }

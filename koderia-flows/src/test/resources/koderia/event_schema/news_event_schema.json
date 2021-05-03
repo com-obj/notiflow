@@ -14,12 +14,16 @@
             "attributes": {
                "type": "object"
             },
-            "id": {
-               "type": "null"
-            },
             "eventIds": {
                "type": "array",
-               "items": {}
+               "items": [
+                  {
+                     "type": "string"
+                  }
+               ]
+            },
+            "processingInfo": {
+               "type": "null"
             },
             "flow-id": {
                "type": "string"
@@ -27,8 +31,8 @@
          },
          "required": [
             "attributes",
-            "id",
             "eventIds",
+            "processingInfo",
             "flow-id"
          ]
       },
@@ -45,50 +49,90 @@
                      "type": "string"
                   },
                   "attributes": {
+                     "type": "object"
+                  },
+                  "message": {
                      "type": "object",
                      "properties": {
-                        "originalEvent": {
-                           "type": "object",
-                           "properties": {
-                              "type": {
-                                 "type": "string"
-                              },
-                              "data": {
+                        "subject": {
+                           "type": "string"
+                        },
+                        "to": {
+                           "type": "array",
+                           "items": {}
+                        },
+                        "attachments": {
+                           "type": "array",
+                           "items": {}
+                        },
+                        "from_email": {
+                           "type": "string"
+                        },
+                        "from_name": {
+                           "type": "string"
+                        },
+                        "merge_language": {
+                           "type": "string"
+                        },
+                        "global_merge_vars": {
+                           "type": "array",
+                           "items": [
+                              {
                                  "type": "object",
                                  "properties": {
-                                    "subject": {
+                                    "name": {
                                        "type": "string"
                                     },
-                                    "text": {
-                                       "type": "string"
+                                    "content": {
+                                       "type": "object",
+                                       "properties": {
+                                          "type": {
+                                             "type": "string"
+                                          },
+                                          "data": {
+                                             "type": "object",
+                                             "properties": {
+                                                "subject": {
+                                                   "type": "string"
+                                                },
+                                                "text": {
+                                                   "type": "string"
+                                                }
+                                             },
+                                             "required": [
+                                                "subject",
+                                                "text"
+                                             ]
+                                          }
+                                       },
+                                       "required": [
+                                          "type",
+                                          "data"
+                                       ]
                                     }
                                  },
                                  "required": [
-                                    "subject",
-                                    "text"
+                                    "name",
+                                    "content"
                                  ]
                               }
-                           },
-                           "required": [
-                              "type",
-                              "data"
                            ]
                         }
                      },
                      "required": [
-                        "originalEvent"
+                        "subject",
+                        "to",
+                        "attachments",
+                        "from_email",
+                        "from_name",
+                        "merge_language",
+                        "global_merge_vars"
                      ]
                   },
-                  "subject": {
+                  "template_name": {
                      "type": "string"
                   },
-                  "text": {
-                     "type": "string"
-                  },
-                  "contentType": {
-                     "type": "string"
-                  },
-                  "attachments": {
+                  "template_content": {
                      "type": "array",
                      "items": {}
                   }
@@ -96,10 +140,9 @@
                "required": [
                   "type",
                   "attributes",
-                  "subject",
-                  "text",
-                  "contentType",
-                  "attachments"
+                  "message",
+                  "template_name",
+                  "template_content"
                ]
             },
             "recievingEndpoints": {
@@ -132,16 +175,12 @@
             "recievingEndpoints",
             "deliveryOptions"
          ]
-      },
-      "processingInfo": {
-         "type": "null"
       }
    },
    "required": [
       "type",
       "attributes",
       "header",
-      "body",
-      "processingInfo"
+      "body"
    ]
 }

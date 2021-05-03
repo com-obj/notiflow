@@ -1,0 +1,41 @@
+spring:
+  mail:
+    host: localhost
+    port: 3025
+    username: no-reply@objectify.sk
+    password: xxx
+    properties:
+      mail.debug: true
+  main.allow-bean-definition-overriding: true
+  
+nc.functions:
+  mailchimp-sender:
+    aggregated-message-subject: Koderia digest
+    aggregated-message-template-name: aggregated-template
+    api-url: http://mandrillapp.com/api/1.0
+    auth-key: MOCKkey
+    sender-name: Koderia sender
+    sender-email: sender@koderia.sk
+    mailchimp-template-names:
+      JOB_POST: job-post-template
+      BLOG: blog-template
+      EVENT: event-template
+      LINK: link-template
+      NEWS: news-template
+
+koderia.functions:
+  recipients:
+    koderia-api-url: https://www.koderia.sk/api/v1
+    koderia-api-token: testToken
+
+---
+spring.config.activate.on-profile: jenkins_test
+testEnv: jenkins
+spring.datasource:
+  url: jdbc:postgresql://localhost:5432/nc
+---
+spring.config.activate.on-profile: bitbucket
+testEnv: bitbucket
+spring.datasource:
+  url: jdbc:postgresql://localhost:5432/nc
+---

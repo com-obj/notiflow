@@ -1,0 +1,44 @@
+spring:
+ #  flyway.enabled: false
+   mail:
+      host: localhost
+      port: 3025
+      username: no-reply@objectify.sk
+      password: xxx
+      properties:
+         mail.debug: true
+   main.allow-bean-definition-overriding: true
+
+nc:
+   functions:
+      event-generator:
+        source-dir: src/test/resources/eventsQueue
+            
+osk.sia.functions:
+   impact-notif-converter:
+      b2b-login-of-la-custumers-to-be-notified:
+         - b2b_to_include
+      cs-agents-to-notify-email:
+         - sales@objectify.sk
+   sms-sender:
+      gap-api-url: http://localhost:8080/API/smsmessaging/v1
+      gap-api-login: testlogin
+      gap-api-password: testpw
+      client-correlator-prefix: nc
+      notify-url: http://localhost:8080/smssender
+      sender-address: 3333
+      bill-code: WZ00
+      
+logging.level:
+#   org.springframework.beans: DEBUG
+   com.zaxxer.hikari.HikariConfig: DEBUG 
+#   com.zaxxer.hikari: TRACE
+      
+---
+spring.config.activate.on-profile: bitbucket
+spring.datasource:
+  url: jdbc:postgresql://localhost:5432/nc
+  
+logging.level:
+   org.springframework: INFO
+---
