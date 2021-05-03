@@ -1,74 +1,24 @@
 plugins {
-    id 'org.springframework.boot' version '2.4.0'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'java'
-    id 'maven-publish'
+    id 'nc.java-common-conventions'
 }
 
 bootJar {
-    archiveFileName = 'koderia-flows.jar'
+    archiveFileName = 'koderia-flows'
+    launchScript()
+
 }
 
-group = 'com.obj.nc.flows'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
-}
-
-ext {
-    set('testcontainersVersion', "1.15.1")
-    set('junitJupiterVersion', '5.4.2')
-}
+group = 'com.obj.nc'
 
 dependencies {
     implementation project(':functions')
-
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-
-    implementation 'org.springframework.boot:spring-boot-starter-integration'
-    implementation "org.springframework.integration:spring-integration-jdbc"
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.data:spring-data-jdbc'
-
-    implementation 'org.postgresql:postgresql'
-    implementation 'org.flywaydb:flyway-core'
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.integration:spring-integration-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
-
-    implementation 'org.springframework.data:spring-data-jdbc'
-
     testImplementation 'io.rest-assured:rest-assured:4.2.0'
     testImplementation 'io.rest-assured:json-path:4.2.0'
     testImplementation 'io.rest-assured:xml-path:4.2.0'
     testImplementation 'io.rest-assured:rest-assured-common:4.2.0'
     testImplementation 'io.rest-assured:spring-mock-mvc:4.2.0'
-    testImplementation 'io.rest-assured:json-schema-validator:4.1.2'
-    testImplementation 'org.json:json:20201115'
-    testImplementation 'org.awaitility:awaitility'
-
-    testCompile 'org.junit.jupiter:junit-jupiter-api'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine'
-    testCompile 'org.junit.jupiter:junit-jupiter-params'
-    testCompile 'org.junit.platform:junit-platform-launcher'
-    testCompile 'org.junit.platform:junit-platform-runner'
-
-    testImplementation 'com.icegreen:greenmail-junit5:1.6.0'
-    testImplementation "org.testcontainers:testcontainers"
-    testImplementation "org.testcontainers:junit-jupiter"
+    testImplementation 'io.rest-assured:json-schema-validator:4.2.0'
     testImplementation(testFixtures(project(":functions")))
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
-        mavenBom "org.junit:junit-bom:${junitJupiterVersion}"
-    }
 }
 
 test {
@@ -79,22 +29,6 @@ test {
 task copyDistToStagingFolder(type: Copy) {
     from bootJar // shortcut for bootJar.outputs.files
     into "./../docker/koderia-flows/dist"
-}
-
-//tento cirkus musim robit koly velmi zvlastnemu chovaniu v BB pipelines. Niektore testy (complex tests) obcas padaju
-//a zda sa, ze to suvisi s spring context caching. toto je trik ako rozdelim na dve skupiny pricom sring context sa urcite nereusne
-task simpleTest(type: Test) {
-    systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
-    useJUnitPlatform {
-        excludeTags 'test-mode'
-    }
-}
-
-task complexTest(type: Test) {
-    systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
-    useJUnitPlatform {
-        includeTags 'test-mode'
-    }
 }
 
 build.dependsOn copyDistToStagingFolder

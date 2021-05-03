@@ -1,5 +1,3 @@
-testEnv: no-test-containers
-
 #spring.flyway.enabled: false
 
 spring.mail:
@@ -36,13 +34,7 @@ logging.level:
    org.springframework: INFO
    org.springframework.aop: DEBUG
 ---
-spring.config.activate.on-profile: jenkins_test
-testEnv: jenkins
-spring.datasource:
-  url: jdbc:postgresql://localhost:5432/nc
----
 spring.config.activate.on-profile: bitbucket
-testEnv: bitbucket
 spring.datasource:
   url: jdbc:postgresql://localhost:5432/nc
   

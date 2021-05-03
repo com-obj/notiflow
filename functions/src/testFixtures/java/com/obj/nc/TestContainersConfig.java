@@ -5,11 +5,12 @@ import javax.annotation.PostConstruct;
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 @Configuration
-@ConditionalOnProperty(value = "testEnv", havingValue = "local")
-public class LocalTestContainersConfig {
+@Profile("testcontainers")
+public class TestContainersConfig {
 
     @PostConstruct
     void start() {
