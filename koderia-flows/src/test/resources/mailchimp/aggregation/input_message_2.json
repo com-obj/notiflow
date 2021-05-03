@@ -1,0 +1,84 @@
+{
+  "type":"MESSAGE",
+  "header":{
+    "attributes":{
+
+    },
+    "id":"2598a791-08d6-4795-8354-2f675f72b067",
+    "eventId":"0c3f159f-103e-49fd-8eb1-f4b6de481acb",
+    "configuration-name":"static-routing-pipeline"
+  },
+  "body":{
+    "message": {
+      "type" : "MAILCHIMP_CONTENT",
+      "key" : "MOCKkey",
+      "message" : {
+        "subject" : "Business Intelligence (BI) Developer 2",
+        "from_email" : "sender@koderia.sk",
+        "from_name" : "Koderia sender",
+        "to" : [ {
+          "email" : "john.doe@objectify.sk",
+          "name" : "John Doe",
+          "type" : "to"
+        } ],
+        "merge_language" : "handlebars",
+        "global_merge_vars" : [ {
+          "name" : "JOB_POST",
+          "content" : {
+            "type" : "JOB_POST",
+            "data" : {
+              "id": "unwhX7OlJYq7Kd7GfoCd",
+              "name": "Business Intelligence (BI) Developer 2",
+              "description": "We are looking for a Business Intelligence (BI) Developer to create...",
+              "location": "Viedeň",
+              "rate": "500",
+              "technologies": [
+                "Microsoft Power BI"
+              ],
+              "specialRate": "400 – 500 € / manday",
+              "labels": [
+                "Home Office"
+              ],
+              "positionType": [
+                "Senior"
+              ],
+              "duration": "1 rok s možnosťou predĺženia",
+              "type": "Analytik",
+              "dateOfStart": "ASAP"
+            }
+          }
+        } ],
+        "attachments" : [ {
+          "type" : "text/plain",
+          "name" : "test1.txt",
+          "content" : "YXR0YWNobWVudCB0ZXN0MQ=="
+        }, {
+          "type" : "text/plain",
+          "name" : "test2.txt",
+          "content" : "YXR0YWNobWVudCB0ZXN0Mg=="
+        } ]
+      },
+      "template_name" : "job-post-template",
+      "template_content" : [ ]
+    },
+    "recievingEndpoints":[
+      {
+        "@type":"MAILCHIMP",
+        "recipient":{
+          "type":"PERSON",
+          "name":"John Doe"
+        },
+        "email":"john.doe@objectify.sk",
+        "endpointId":"john.doe@objectify.sk"
+      }
+    ],
+    "deliveryOptions":{
+      "aggregationType":"NONE",
+      "schedulingType":"IMMEDIATE"
+    }
+  },
+  "processingInfo":{
+    "processingId":"eaef533b-a512-4734-8206-9ca236a7f427",
+    "stepIndex":3
+  }
+}

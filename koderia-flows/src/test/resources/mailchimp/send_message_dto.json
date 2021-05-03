@@ -1,20 +1,16 @@
 {
-  "key" : "ASDF",
+  "type" : "MAILCHIMP_CONTENT",
   "message" : {
     "subject" : "Business Intelligence (BI) Developer",
     "from_email" : "sender@koderia.sk",
     "from_name" : "Koderia sender",
-    "to" : [ {
-      "email" : "john.doe@objectify.sk",
-      "name" : "John Doe",
-      "type" : "to"
-    } ],
+    "to" : [ ],
     "merge_language" : "handlebars",
     "global_merge_vars" : [ {
-      "name" : "event",
+      "name" : "JOB_POST",
       "content" : {
-        "type": "JOB_POST",
-        "data": {
+        "type" : "JOB_POST",
+        "data" : {
           "id": "unwhX7OlJYq7Kd7GfoCd",
           "name": "Business Intelligence (BI) Developer",
           "description": "We are looking for a Business Intelligence (BI) Developer to create...",
@@ -36,15 +32,7 @@
         }
       }
     } ],
-    "attachments" : [ {
-      "type" : "text/plain",
-      "name" : "test1.txt",
-      "content" : "YXR0YWNobWVudCB0ZXN0MQ=="
-    }, {
-      "type" : "text/plain",
-      "name" : "test2.txt",
-      "content" : "YXR0YWNobWVudCB0ZXN0Mg=="
-    } ]
+    "attachments" : [ ]
   },
   "template_name" : "job-post-template",
   "template_content" : [ ]

@@ -8,7 +8,6 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -29,7 +28,7 @@ public class GenericEventToNotificaitonIntentConverter extends ProcessorFunction
 	protected NotificationIntent execute(GenericEvent genericEvent) {
 		NotificationIntent notificationIntent = new NotificationIntent();
 
-		notificationIntent.getBody().setAttributeValue(ORIGINAL_EVENT_FIELD, JsonUtils.writeObjectToJSONString(genericEvent));
+		notificationIntent.getBody().setAttributeValue(ORIGINAL_EVENT_FIELD, genericEvent.getPayloadAsPojo());
 		
 		return notificationIntent;
 	}

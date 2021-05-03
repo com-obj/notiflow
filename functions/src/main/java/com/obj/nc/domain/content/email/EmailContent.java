@@ -24,6 +24,9 @@ public class EmailContent extends Content {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CONTENT";
 
+	public static final String TEXT_CONCAT_DELIMITER = "\n\n";
+	public static final String SUBJECT_CONCAT_DELIMITER = ", ";
+
 	private String subject;
 	
 	@NonNull
@@ -40,6 +43,15 @@ public class EmailContent extends Content {
 		EmailContent emailContent = new EmailContent(text);
 		emailContent.setSubject(subject);
 		return emailContent;
+	}
+
+	public EmailContent concat(EmailContent other) {
+		EmailContent concated = new EmailContent();
+		concated.text = text.concat(TEXT_CONCAT_DELIMITER).concat(other.text);
+		concated.subject = subject.concat(SUBJECT_CONCAT_DELIMITER).concat(other.subject);
+		concated.attachments.addAll(attachments);
+		concated.attachments.addAll(other.attachments);
+		return concated;
 	}
 	
 }
