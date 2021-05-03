@@ -1,3 +1,0 @@
-spring.datasource:
-   url: jdbc:postgresql://${release.name}-postgresql:5432/nc
-
