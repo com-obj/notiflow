@@ -1,0 +1,28 @@
+plugins {
+    id 'java-test-fixtures'
+    id 'java'
+}
+
+ext {
+    set('testContainersVersion', "1.15.3")
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    testFixturesImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testFixturesImplementation 'org.springframework.boot:spring-boot-starter-mail'
+    testFixturesImplementation 'org.springframework.boot:spring-boot-starter-web'
+    testFixturesImplementation 'org.springframework.data:spring-data-jdbc'
+    testFixturesImplementation 'org.flywaydb:flyway-core'
+    testFixturesImplementation "org.testcontainers:testcontainers:${testContainersVersion}"
+    testFixturesImplementation "org.testcontainers:junit-jupiter:${testContainersVersion}"
+    testFixturesImplementation "org.testcontainers:postgresql:${testContainersVersion}"
+    testFixturesImplementation "com.icegreen:greenmail-junit5:${greenMailVersion}"
+    testFixturesCompileOnly 'org.projectlombok:lombok'
+    testFixturesAnnotationProcessor 'org.projectlombok:lombok'
+}
