@@ -5,6 +5,7 @@ import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -61,5 +62,14 @@ public class Message extends BasePayload implements HasHeader {
 		
 		return this.getBody().getRecievingEndpoints().iterator().next() instanceof SmsEndpoint;
 	}
-
+	
+	@JsonIgnore
+	@Transient
+	public boolean isMailchimpMessage() {
+		if (this.getBody().getRecievingEndpoints().size()!=1) {
+			throw new PayloadValidationException("Message should have only single endpoint");
+		}
+		
+		return this.getBody().getRecievingEndpoints().iterator().next() instanceof MailchimpEndpoint;
+	}
 }

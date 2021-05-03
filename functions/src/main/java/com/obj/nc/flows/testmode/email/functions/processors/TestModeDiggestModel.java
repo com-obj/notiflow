@@ -3,6 +3,7 @@ package com.obj.nc.flows.testmode.email.functions.processors;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 
@@ -20,6 +21,7 @@ public class TestModeDiggestModel {
 	
 	private List<EmailContent> emailContents = new ArrayList<>();
 	private List<SimpleTextContent> smsContents = new ArrayList<>();
+	private List<MailchimpContent> mailchimpContents = new ArrayList<>();
 
 	public void addEmailContent(EmailContent emailContent) {
 		emailContents.add(emailContent);
@@ -34,5 +36,9 @@ public class TestModeDiggestModel {
 
 	public void addSmsContent(SimpleTextContent smsContent) {
 		smsContents.add(smsContent);
+	}
+	
+	public void addMailchimpContent(MailchimpContent mailchimpContent) {
+		mailchimpContents.add(mailchimpContent);
 	}
 }

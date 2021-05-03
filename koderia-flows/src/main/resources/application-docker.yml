@@ -1,2 +1,0 @@
-spring.datasource:
-  url: jdbc:postgresql://nc-postgres:25432/nc

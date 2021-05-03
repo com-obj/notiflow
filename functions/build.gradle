@@ -1,118 +1,18 @@
 plugins {
-	id 'org.springframework.boot' version '2.4.0'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
-	id 'java-test-fixtures'
+	id 'nc.java-common-conventions'
+	id 'nc.java-test-fixtures'
 }
 
 group = 'com.obj.nc.functions'
-version = '1.0.0'
 sourceCompatibility = '1.8'
 
-ext {
-	set('testcontainersVersion', "1.15.1")
-	set('junitJupiterVersion', '5.7.0')
-}
-
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	implementation 'org.springframework.boot:spring-boot-starter-aop'
-	
-	implementation 'org.springframework.data:spring-data-jdbc'
-
-	implementation 'com.icegreen:greenmail:1.6.0'
-	testImplementation 'com.icegreen:greenmail-junit5:1.6.0'
 	implementation 'org.apache.commons:commons-email:1.5'
-
-	implementation 'org.springframework.boot:spring-boot-starter-integration'
-	
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	
-	testImplementation 'org.awaitility:awaitility'
-
-	implementation 'org.postgresql:postgresql'
-	
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 	implementation 'org.apache.commons:commons-text:1.9'
-
-	implementation 'org.flywaydb:flyway-core'
-//	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
 	implementation 'org.jsoup:jsoup:1.13.1'
-
-	testImplementation 'org.springframework.integration:spring-integration-test'
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-		exclude group: "com.vaadin.external.google", module:"android-json"
-	}
 	  
     testImplementation 'commons-jxpath:commons-jxpath:1.3'
-	
-	testCompile 'org.junit.jupiter:junit-jupiter-api'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine' 
-    testCompile 'org.junit.jupiter:junit-jupiter-params' 
-    testCompile 'org.junit.platform:junit-platform-launcher' 
-    testCompile 'org.junit.platform:junit-platform-runner'
-
-	testCompileOnly 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-
-	testFixturesImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-		exclude group: "com.vaadin.external.google", module:"android-json"
-	}
-	
-
-	testFixturesImplementation 'org.testcontainers:testcontainers'
-	testFixturesImplementation 'org.testcontainers:junit-jupiter'
-	testFixturesImplementation 'org.testcontainers:postgresql'
-	testFixturesImplementation 'org.flywaydb:flyway-core'
-	testFixturesImplementation 'org.springframework.boot:spring-boot-starter-mail'
-	testFixturesImplementation 'org.springframework.boot:spring-boot-starter-web'
-	testFixturesCompileOnly 'org.projectlombok:lombok'
-	testFixturesAnnotationProcessor 'org.projectlombok:lombok'
-	testFixturesImplementation 'com.icegreen:greenmail:1.6.0'
-	testFixturesImplementation 'com.icegreen:greenmail-junit5:1.6.0'
-	testFixturesImplementation 'org.springframework.data:spring-data-jdbc'
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
-//		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-		mavenBom "org.junit:junit-bom:${junitJupiterVersion}"
-//		mavenBom "org.springframework.integration:spring-integration-bom:${springIntegrationVersion}"
-	}
-}
-
-
-test {
-	systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
-	useJUnitPlatform()
-}
-
-//tento cirkus musim robit koly velmi zvlastnemu chovaniu v BB pipelines. Niektore testy (complex tests) obcas padaju
-//a zda sa, ze to suvisi s spring context caching. toto je trik ako rozdelim na dve skupiny pricom sring context sa urcite nereusne
-task simpleTest(type: Test) {
-	systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
-    useJUnitPlatform {
-        excludeTags 'test-mode'
-    }
-}
-
-task complexTest(type: Test) {
-	systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
-    useJUnitPlatform {
-        includeTags 'test-mode'
-    }
 }
 
 bootJar {
@@ -121,16 +21,6 @@ bootJar {
 
 jar {
 	enabled = true
-}
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
-repositories {
-	mavenCentral()
 }
 
 

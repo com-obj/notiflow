@@ -40,5 +40,5 @@ public class Body extends BaseJSONObject{
 	public <T extends Content> T getContentTyped() {
 		return (T) message;
 	}
-
+	
 }
