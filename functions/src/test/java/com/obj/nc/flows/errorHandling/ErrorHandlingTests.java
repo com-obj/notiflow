@@ -32,7 +32,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.controllers.ErrorHandlingRestController;
-import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
 import com.obj.nc.repositories.FailedPayloadRepository;
 
@@ -125,7 +124,7 @@ public class ErrorHandlingTests {
     @NoArgsConstructor
     @Builder
     @JsonTypeInfo(include = As.PROPERTY, use = Id.CLASS)
-    public static class TestPayload implements IsTypedJson {
+    public static class TestPayload {
     	
     	private Integer num;
     	private String str;
