@@ -18,6 +18,7 @@ public abstract class DeliveryInfoGenerator extends ProcessorFunctionAdapter<Bas
 	
 	private final DELIVERY_STATUS status;
 	
+	//should rely on HasRecievingEndpoints
 	@Override
 	protected List<DeliveryInfoSendResult> execute(BasePayload payload) {
 		List<DeliveryInfoSendResult> results= new ArrayList<>();

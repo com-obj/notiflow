@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
+import com.obj.nc.functions.processors.errorHandling.FailedPaylodExtractor;
 import com.obj.nc.repositories.FailedPayloadRepository;
 
 @Validated
@@ -26,7 +26,7 @@ public class ErrorHandlingRestController {
 
 	@Autowired private FailedPayloadRepository failedPaylodRepo;
 	@Autowired private MessagingTemplate msgTemplate;
-	@Autowired private ObjectMapper jsonConverterForMessages;
+	@Autowired private FailedPaylodExtractor extractor;
 
 	
 	@PostMapping( consumes="application/json", produces="application/json")
@@ -45,7 +45,7 @@ public class ErrorHandlingRestController {
 		failedPaylod.setTimeResurected(Instant.now());
 		failedPaylodRepo.save(failedPaylod);
 		
-		Message<?> failedMsg = jsonConverterForMessages.treeToValue(failedPaylod.getMessageJson(), Message.class);
+		Message<?> failedMsg = extractor.apply(failedPaylod);
 		
 		Message<?> msgForRetry = MessageBuilder
 				.withPayload(failedMsg.getPayload())
@@ -53,7 +53,6 @@ public class ErrorHandlingRestController {
 				.build();
 		msgTemplate.send( failedPaylod.getChannelNameForRetry(),  msgForRetry );
     }
-
 
 
 }

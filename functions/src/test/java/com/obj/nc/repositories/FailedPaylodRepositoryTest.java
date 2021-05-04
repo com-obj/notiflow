@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
@@ -15,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +29,7 @@ import lombok.NoArgsConstructor;
 public class FailedPaylodRepositoryTest {
 
 	@Autowired FailedPayloadRepository failedPaylaodRepo;
-	@Autowired ObjectMapper jsonConverterForMessages;
+	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
 	
 	@Test
 	public void testPersistingSingleInfo() {

@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 public class SpringIntegration  {
 	
+	public static final String OBJECT_MAPPER_FOR_MESSAGES_BEAN_NAME = "jsonConverterForMessages";
+	
 	@Bean
 	public MessagingTemplate messagingTemplate(ApplicationContext beanFactory) {
 		MessagingTemplate tmpl = new MessagingTemplate();
@@ -20,7 +22,7 @@ public class SpringIntegration  {
 		return tmpl;
 	}
 	
-	@Bean
+	@Bean(OBJECT_MAPPER_FOR_MESSAGES_BEAN_NAME)
 	public ObjectMapper jsonConverterForMessages() {
 		return JacksonJsonUtils.messagingAwareMapper("com.obj.nc", "org.springframework.integration", "org.springframework.messaging");
 	}

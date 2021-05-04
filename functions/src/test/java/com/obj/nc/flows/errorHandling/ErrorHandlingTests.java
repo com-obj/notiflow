@@ -9,6 +9,7 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.controllers.ErrorHandlingRestController;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
 import com.obj.nc.repositories.FailedPayloadRepository;
@@ -47,7 +49,7 @@ public class ErrorHandlingTests {
 	@Autowired FailedPayloadRepository failedPayloadRepo;
 	@Autowired TestFlow1 testFlow1;
 	@Autowired ErrorHandlingRestController errorHandlingController;
-	@Autowired ObjectMapper jsonConverterForMessages;
+	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
 	
 	private static boolean processingFinished;
 	
@@ -65,7 +67,7 @@ public class ErrorHandlingTests {
         Future<TestPayload> result = testFlow1.execute(paylod);
  
         //THEN fail documented
-		Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> 
+		Awaitility.await().atMost(1000, TimeUnit.SECONDS).until(() -> 
 			failedPayloadRepo.count() > 0);
 		
 		FailedPaylod failed = failedPayloadRepo.findAll().iterator().next();

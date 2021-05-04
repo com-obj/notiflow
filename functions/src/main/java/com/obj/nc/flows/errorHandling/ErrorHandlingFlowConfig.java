@@ -1,5 +1,7 @@
 package com.obj.nc.flows.errorHandling;
 
+import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_FAILED_FLOW_INPUT_CHANNEL_ID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +33,9 @@ public class ErrorHandlingFlowConfig {
         return 
         	IntegrationFlows.from(errorChannel)
 				.handle(failedPaylodTranformer)
+				.wireTap( flowConfig -> 
+					flowConfig.channel(DELIVERY_INFO_FAILED_FLOW_INPUT_CHANNEL_ID)
+				)
 				.handle(failedPaylodPersister)
         		.get();
     }

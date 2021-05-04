@@ -5,6 +5,7 @@ import java.util.Properties;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.history.MessageHistory;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
@@ -24,7 +26,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class SpringMessageToFailedPaylodFunction extends ProcessorFunctionAdapter<ErrorMessage, FailedPaylod> {
 	
-	@Autowired ObjectMapper jsonConverterForMessages;
+	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
 	
 	@Override
 	protected FailedPaylod execute(ErrorMessage errorMessage) {	

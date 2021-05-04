@@ -9,6 +9,7 @@ import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.message.Message;
@@ -29,6 +30,7 @@ public class EmailProcessingFlowConfig {
 	private final EmailTemplateFormatter emailFormatter;
 	private final EmailProcessingFlowProperties properties;
 	private final MessagePersister messagePersister;
+	private ThreadPoolTaskScheduler executor;
 	
 	public final static String EMAIL_FORMAT_AND_SEND_FLOW_ID = "EMAIL_FORMAT_AND_SEND_FLOW_ID";
 	public final static String EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID = EMAIL_FORMAT_AND_SEND_FLOW_ID + "_INPUT";
@@ -41,7 +43,7 @@ public class EmailProcessingFlowConfig {
 
 	@Bean(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID)
 	public MessageChannel emailProcessingInputChangel() {
-		return new PublishSubscribeChannel();
+		return new PublishSubscribeChannel(executor);
 	}
 	
 	@Bean(EMAIL_FORMAT_AND_SEND_FLOW_ID)
@@ -60,7 +62,7 @@ public class EmailProcessingFlowConfig {
 	
 	@Bean(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel emailSedningInputChangel() {
-		return new PublishSubscribeChannel();
+		return new PublishSubscribeChannel(executor);
 	}
 	
 	@Bean(EMAIL_SENDING_FLOW_ID)
