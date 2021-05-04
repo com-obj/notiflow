@@ -11,7 +11,6 @@ import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -50,11 +49,9 @@ class DeliveryInfoTest extends BaseIntegrationTest {
     }
     
     @Test
-	@Disabled
     void testFindDeliveryInfos() throws Exception {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
-//    	EmailEndpoint email2 = EmailEndpoint.builder().email("cuzy@obj.com").build();
     	SmsEndpoint sms1 = SmsEndpoint.builder().phone("0908111111").build();
     	endpointRepo.persistEnpointIfNotExists(email1, sms1);
     	
@@ -121,11 +118,11 @@ class DeliveryInfoTest extends BaseIntegrationTest {
         //THEN
         resp
         	.andExpect(status().is2xxSuccessful())
+			.andExpect(jsonPath("$[0].currentStatus").value(CoreMatchers.is("SENT")))
+			.andExpect(jsonPath("$[0].statusReachedAt").value(CoreMatchers.notNullValue()))
 			.andExpect(jsonPath("$[0].endpoint.email").value(CoreMatchers.is("jancuzy@gmail.com")))
 			.andExpect(jsonPath("$[0].endpoint.endpointId").value(CoreMatchers.is("jancuzy@gmail.com")))
-			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL")))
-			.andExpect(jsonPath("$[0].currentStatus").value(CoreMatchers.is("SENT")))
-			.andExpect(jsonPath("$[0].statusReachedAt").value(CoreMatchers.notNullValue()));
+			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL")));
     }
 
 }
