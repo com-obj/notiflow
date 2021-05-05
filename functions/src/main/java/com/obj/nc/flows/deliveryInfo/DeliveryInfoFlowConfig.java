@@ -10,12 +10,11 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-import com.obj.nc.domain.BasePayload;
 import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoFailedGenerator;
 import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoProcessingGenerator;
 import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoSendGenerator;
-import com.obj.nc.functions.processors.errorHandling.FailedPaylodExtractor;
 import com.obj.nc.functions.sink.deliveryInfoPersister.DeliveryInfoPersister;
+import com.obj.nc.functions.sink.deliveryInfoPersister.DeliveryInfoSendPersister;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -32,11 +31,12 @@ public class DeliveryInfoFlowConfig {
 	public final static String DELIVERY_INFO_FAILED_FLOW_ID = "DELIVERY_INFO_FAILED_FLOW_ID";
 	public final static String DELIVERY_INFO_FAILED_FLOW_INPUT_CHANNEL_ID = DELIVERY_INFO_FAILED_FLOW_ID + "_INPUT";
 
-	@Autowired private DeliveryInfoPersister deliveryPersister;
+	@Autowired private DeliveryInfoSendPersister deliveryPersister;
+	@Autowired private DeliveryInfoPersister deliveryInfoPersister;
 	@Autowired private DeliveryInfoSendGenerator deliveryInfoSendGenerator;
 	@Autowired private DeliveryInfoFailedGenerator deliveryInfoFailedGenerator;
 	@Autowired private DeliveryInfoProcessingGenerator deliveryInfoProcessingGenerator;
-	@Autowired private FailedPaylodExtractor extractor;
+	@Autowired private ThreadPoolTaskScheduler executor;
 
 	//Default channel for errorMessages used by spring
 	@Autowired
@@ -44,21 +44,19 @@ public class DeliveryInfoFlowConfig {
 	private PublishSubscribeChannel errorChannel;
 
     @Bean
-    public IntegrationFlow deliveryInfoFailedFlow(ThreadPoolTaskScheduler executor) {
+    public IntegrationFlow deliveryInfoFailedFlow() {
         return 
-        	IntegrationFlows.from(deliveryInfoFailedInputChannel(executor))
-        		.handle( extractor )
-        		.filter(p-> p instanceof BasePayload)
+        	IntegrationFlows.from(deliveryInfoFailedInputChannel())
 				.handle(deliveryInfoFailedGenerator)
 				.split()
-				.handle(deliveryPersister)
+				.handle(deliveryInfoPersister)
         		.get();
     }
     
     @Bean
-    public IntegrationFlow deliveryInfoSendFlow(ThreadPoolTaskScheduler executor) {
+    public IntegrationFlow deliveryInfoSendFlow() {
         return 
-        	IntegrationFlows.from(deliveryInfoSendInputChannel(executor))
+        	IntegrationFlows.from(deliveryInfoSendInputChannel())
 				.handle(deliveryInfoSendGenerator)
 				.split()
 				.handle(deliveryPersister)
@@ -66,9 +64,9 @@ public class DeliveryInfoFlowConfig {
     }
     
     @Bean
-    public IntegrationFlow deliveryInfoProcessingFlow(ThreadPoolTaskScheduler executor) {
+    public IntegrationFlow deliveryInfoProcessingFlow() {
         return 
-        	IntegrationFlows.from(deliveryInfoProcessingInputChannel(executor))
+        	IntegrationFlows.from(deliveryInfoProcessingInputChannel())
 				.handle(deliveryInfoProcessingGenerator)
 				.split()
 				.handle(deliveryPersister)
@@ -76,17 +74,17 @@ public class DeliveryInfoFlowConfig {
     }
     
 	@Bean(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
-	public MessageChannel deliveryInfoSendInputChannel(ThreadPoolTaskScheduler executor) {
+	public MessageChannel deliveryInfoSendInputChannel() {
 		return new PublishSubscribeChannel(executor);
 	}
 	
 	@Bean(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
-	public MessageChannel deliveryInfoProcessingInputChannel(ThreadPoolTaskScheduler executor) {
+	public MessageChannel deliveryInfoProcessingInputChannel() {
 		return new PublishSubscribeChannel(executor);
 	}
 	
 	@Bean(DELIVERY_INFO_FAILED_FLOW_INPUT_CHANNEL_ID)
-	public MessageChannel deliveryInfoFailedInputChannel(ThreadPoolTaskScheduler executor) {
+	public MessageChannel deliveryInfoFailedInputChannel() {
 		return new PublishSubscribeChannel(executor);
 	}
 

@@ -1,0 +1,1 @@
+alter table nc_delivery_info add failed_payload_id uuid;

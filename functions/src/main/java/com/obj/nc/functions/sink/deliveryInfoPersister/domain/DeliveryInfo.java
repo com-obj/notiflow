@@ -5,8 +5,10 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.AllArgsConstructor;
@@ -25,14 +27,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @Table("nc_delivery_info")
 @Builder(toBuilder=true)
-public class DeliveryInfo {
+public class DeliveryInfo implements Persistable<UUID> {
 	
 	//Order of elements in this enum is important. Final state should be last
 	public static enum DELIVERY_STATUS {
 		PROCESSING, SENT, DELIVERED, FAILED
 	}
 
-	@NotNull
 	@Id
 	private UUID id;
 	
@@ -42,7 +43,8 @@ public class DeliveryInfo {
 	@NotNull
 	private DELIVERY_STATUS status;
 	
-	@NotNull
+	@CreatedDate
+	@Getter
 	private Instant processedOn;
 	
 	@NotNull
@@ -50,5 +52,12 @@ public class DeliveryInfo {
 	
 	@NotNull
 	private String endpointId;
+	
+	private UUID failedPayloadId;
+
+	@Override
+	public boolean isNew() {
+		return processedOn == null;
+	}
 	
 }

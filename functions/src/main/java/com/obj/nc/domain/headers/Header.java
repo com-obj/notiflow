@@ -8,11 +8,15 @@ import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.obj.nc.domain.BaseJSONObject;
+import com.obj.nc.domain.HasEventIds;
 import com.obj.nc.domain.HasFlowId;
+import com.obj.nc.domain.HasProcessingInfo;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.EqualsAndHashCode;
@@ -21,15 +25,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.relational.core.mapping.Column;
 
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Log4j2
-public class Header extends BaseJSONObject implements HasFlowId {
+public class Header extends BaseJSONObject implements HasFlowId, HasEventIds, HasProcessingInfo {
 	
 	@JsonProperty("flow-id")
 	@Column("flow_id")

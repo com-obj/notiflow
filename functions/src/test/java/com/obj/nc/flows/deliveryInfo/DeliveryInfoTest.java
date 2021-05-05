@@ -143,31 +143,8 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.FAILED);
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
         	Assertions.assertThat(info.getEndpointId()).isIn("wrong email");
+        	Assertions.assertThat(info.getFailedPayloadId()).isNotNull();
         });
-        
-//        //WHEN
-//        List<Message> messages = generateMessagesFromIntent.apply(notificationIntent);
-//        
-//        messages.forEach(msg -> {
-//            org.springframework.messaging.Message<Message> notifMsg = MessageBuilder.withPayload(msg).build();
-//            messageTemplate.send(deliveryInfoSendInputChannel, notifMsg);
-//        });
-//        
-//        //THEN check delivered deliveryInfo
-//        Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()>0);
-//
-//        deliveryInfos = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
-//        assertEnpointPersistedNotDuplicated(notificationIntent);
-//        
-//        
-//        Assertions.assertThat(deliveryInfos.size()).isEqualTo(6);
-//        List<DeliveryInfo> deliveredInfos = deliveryInfos.stream().filter(info -> info.getStatus() == DELIVERY_STATUS.SENT).collect(Collectors.toList());
-//        
-//        Assertions.assertThat(deliveredInfos.size()).isEqualTo(3);
-//        deliveryInfos.forEach(info -> {
-//        	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-//        	Assertions.assertThat(info.getEndpointId()).isIn("john.doe@objectify.sk","john.dudly@objectify.sk", "all@objectify.sk");
-//        });
     }
 
 
