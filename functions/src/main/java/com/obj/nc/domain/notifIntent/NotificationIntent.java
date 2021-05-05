@@ -1,12 +1,15 @@
 package com.obj.nc.domain.notifIntent;
 
-import lombok.*;
+import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 
-import org.springframework.data.relational.core.mapping.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor

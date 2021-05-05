@@ -49,7 +49,7 @@ public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFuncti
 		EmailEndpoint endpoint2 = EmailEndpoint.createForPerson(person2, "john.dudly@objectify.sk");
 		EmailEndpoint endpoint3 = EmailEndpoint.createForGroup(allObjectifyGroup, "all@objectify.sk");
 
-		notificationIntent.getBody().addAllRecievingEndpoints(endpoint1, endpoint2, endpoint3);
+		notificationIntent.getBody().addRecievingEndpoints(endpoint1, endpoint2, endpoint3);
 
 		return notificationIntent;
 	}

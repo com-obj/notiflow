@@ -1,6 +1,5 @@
 package com.obj.nc.repositories;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,7 +31,6 @@ public class DeliveryInfoRepositoryTest {
 	@Test
 	public void testPersistingSingleInfo() {
 		DeliveryInfo deliveryInfo = DeliveryInfo.builder()
-				.processedOn(Instant.now())
 				.endpointId("jancuzy@gmail.com")
 				.eventId(UUID.randomUUID())
 				.status(DELIVERY_STATUS.SENT)
@@ -50,7 +48,6 @@ public class DeliveryInfoRepositoryTest {
 	public void testFindByEventId() {
 		UUID eventId = UUID.randomUUID();
 		DeliveryInfo deliveryInfo1 = DeliveryInfo.builder()
-				.processedOn(Instant.now())
 				.endpointId("jancuzy@gmail.com")
 				.eventId(eventId)
 				.status(DELIVERY_STATUS.SENT)
@@ -58,7 +55,6 @@ public class DeliveryInfoRepositoryTest {
 				.build();
 		
 		DeliveryInfo deliveryInfo2 = DeliveryInfo.builder()
-				.processedOn(Instant.now())
 				.endpointId("cuzy@gmail.com")
 				.eventId(eventId)
 				.status(DELIVERY_STATUS.SENT)
@@ -66,7 +62,6 @@ public class DeliveryInfoRepositoryTest {
 				.build();
 		
 		DeliveryInfo deliveryInfo3 = DeliveryInfo.builder()
-				.processedOn(Instant.now())
 				.endpointId("xxx@gmail.com")
 				.eventId(UUID.randomUUID())
 				.status(DELIVERY_STATUS.SENT)
@@ -85,7 +80,6 @@ public class DeliveryInfoRepositoryTest {
 	@Test
 	public void testFindByEndpointId() {
 		DeliveryInfo deliveryInfo1 = DeliveryInfo.builder()
-				.processedOn(Instant.now())
 				.endpointId("jancuzy@gmail.com")
 				.eventId(UUID.randomUUID())
 				.status(DELIVERY_STATUS.SENT)
@@ -93,7 +87,6 @@ public class DeliveryInfoRepositoryTest {
 				.build();
 		
 		DeliveryInfo deliveryInfo2 = DeliveryInfo.builder()
-				.processedOn(Instant.now())
 				.endpointId("jancuzy@gmail.com")
 				.eventId(UUID.randomUUID())
 				.status(DELIVERY_STATUS.SENT)
@@ -101,7 +94,6 @@ public class DeliveryInfoRepositoryTest {
 				.build();
 		
 		DeliveryInfo deliveryInfo3 = DeliveryInfo.builder()
-				.processedOn(Instant.now())
 				.endpointId("xxx@gmail.com")
 				.eventId(UUID.randomUUID())
 				.status(DELIVERY_STATUS.SENT)

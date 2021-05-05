@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -11,7 +12,6 @@ import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -50,29 +50,27 @@ class DeliveryInfoTest extends BaseIntegrationTest {
     }
     
     @Test
-	@Disabled
     void testFindDeliveryInfos() throws Exception {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
-//    	EmailEndpoint email2 = EmailEndpoint.builder().email("cuzy@obj.com").build();
     	SmsEndpoint sms1 = SmsEndpoint.builder().phone("0908111111").build();
     	endpointRepo.persistEnpointIfNotExists(email1, sms1);
     	
     	//AND
     	UUID eventId = UUID.randomUUID();
-    	Instant emailDelivery = Instant.now();
+
     	DeliveryInfo info1 = DeliveryInfo.builder()
-    			.endpointId(email1.getEndpointId()).eventId(eventId).processedOn(emailDelivery).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+    			.endpointId(email1.getEndpointId()).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	DeliveryInfo info2 = DeliveryInfo.builder()
-    			.endpointId(email1.getEndpointId()).eventId(eventId).processedOn(emailDelivery).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
+    			.endpointId(email1.getEndpointId()).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
 
 
     	DeliveryInfo info3 = DeliveryInfo.builder()
-    			.endpointId(sms1.getEndpointId()).eventId(eventId).processedOn(Instant.now()).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+    			.endpointId(sms1.getEndpointId()).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	Thread.sleep(10); // to have different processedOn
-    	Instant smsDelivery = Instant.now();
+
     	DeliveryInfo info4 = DeliveryInfo.builder()
-    			.endpointId(sms1.getEndpointId()).eventId(eventId).processedOn(smsDelivery).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
+    			.endpointId(sms1.getEndpointId()).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
  
     	deliveryRepo.saveAll( Arrays.asList(info1, info2, info3, info4) );
     	
@@ -83,14 +81,17 @@ class DeliveryInfoTest extends BaseIntegrationTest {
     	Assertions.assertThat(infos.size()).isEqualTo(2);
     	EndpointDeliveryInfoDto infoForEmail = infos.stream().filter(i-> i.getEndpoint() instanceof EmailEndpoint).findFirst().get();
 
+    	Instant now = Instant.now();
+
     	Assertions.assertThat(infoForEmail.endpointId).isEqualTo("jancuzy@gmail.com");
-    	Assertions.assertThat(infoForEmail.getStatusReachedAt()).isEqualTo(emailDelivery);
+		Assertions.assertThat(infoForEmail.getStatusReachedAt()).isCloseTo(now, Assertions.within(1, ChronoUnit.MINUTES));
     	Assertions.assertThat(infoForEmail.getCurrentStatus()).isEqualTo(DELIVERY_STATUS.SENT);
     	infos.remove(infoForEmail);
     	
+    	
     	EndpointDeliveryInfoDto infoForSms = infos.iterator().next();
     	Assertions.assertThat(infoForSms.endpointId).isEqualTo("0908111111");
-    	Assertions.assertThat(infoForSms.getStatusReachedAt()).isEqualTo(smsDelivery);
+    	Assertions.assertThat(infoForSms.getStatusReachedAt()).isCloseTo(now, Assertions.within(1, ChronoUnit.MINUTES));
     	Assertions.assertThat(infoForSms.getCurrentStatus()).isEqualTo(DELIVERY_STATUS.SENT);
     	
     }
@@ -103,11 +104,10 @@ class DeliveryInfoTest extends BaseIntegrationTest {
     	
     	//AND
     	UUID eventId = UUID.randomUUID();
-    	Instant emailDelivery = Instant.now();
     	DeliveryInfo info1 = DeliveryInfo.builder()
-    			.endpointId(email1.getEndpointId()).eventId(eventId).processedOn(emailDelivery).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+    			.endpointId(email1.getEndpointId()).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	DeliveryInfo info2 = DeliveryInfo.builder()
-    			.endpointId(email1.getEndpointId()).eventId(eventId).processedOn(emailDelivery).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
+    			.endpointId(email1.getEndpointId()).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
 
     	deliveryRepo.saveAll( Arrays.asList(info1, info2) );
     	
@@ -121,11 +121,11 @@ class DeliveryInfoTest extends BaseIntegrationTest {
         //THEN
         resp
         	.andExpect(status().is2xxSuccessful())
+			.andExpect(jsonPath("$[0].currentStatus").value(CoreMatchers.is("SENT")))
+			.andExpect(jsonPath("$[0].statusReachedAt").value(CoreMatchers.notNullValue()))
 			.andExpect(jsonPath("$[0].endpoint.email").value(CoreMatchers.is("jancuzy@gmail.com")))
 			.andExpect(jsonPath("$[0].endpoint.endpointId").value(CoreMatchers.is("jancuzy@gmail.com")))
-			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL")))
-			.andExpect(jsonPath("$[0].currentStatus").value(CoreMatchers.is("SENT")))
-			.andExpect(jsonPath("$[0].statusReachedAt").value(CoreMatchers.notNullValue()));
+			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL")));
     }
 
 }

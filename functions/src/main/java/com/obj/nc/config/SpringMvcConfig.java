@@ -1,5 +1,7 @@
 package com.obj.nc.config;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -7,6 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.obj.nc.exceptions.PayloadValidationException;
 
 @ControllerAdvice
@@ -30,5 +34,14 @@ public class SpringMvcConfig {
     @ExceptionHandler({RuntimeException.class})
     ResponseEntity<String> handleRuntimeException(RuntimeException e) {
         return new ResponseEntity<>("Unexpected error ocured: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+    @Bean
+    @Primary
+    //there is another objectMapper with different setting used for message serialization. this is used for REST Controllers
+    public ObjectMapper objectMapper() {       
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        return mapper;
     }
 }

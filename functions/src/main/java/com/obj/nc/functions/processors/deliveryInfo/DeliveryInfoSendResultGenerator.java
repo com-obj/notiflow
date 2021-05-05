@@ -14,10 +14,11 @@ import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo.DELIV
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public abstract class DeliveryInfoGenerator extends ProcessorFunctionAdapter<BasePayload, List<DeliveryInfoSendResult>> {
+public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionAdapter<BasePayload, List<DeliveryInfoSendResult>> {
 	
 	private final DELIVERY_STATUS status;
 	
+	//should rely on HasRecievingEndpoints and HasEventIds like DeliveryInfoFailedGenerator
 	@Override
 	protected List<DeliveryInfoSendResult> execute(BasePayload payload) {
 		List<DeliveryInfoSendResult> results= new ArrayList<>();

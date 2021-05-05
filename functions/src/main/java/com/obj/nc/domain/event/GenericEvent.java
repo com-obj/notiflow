@@ -36,9 +36,10 @@ import lombok.ToString;
 @Builder
 public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayload, HasHeader, AfterLoadCallback<GenericEvent> {
 	
-	//TODO: do not duplicate, use from header
+
 	@Id
 	private UUID id;
+	//TODO: do not duplicate, use from header
 	private String flowId;
 	
 	private JsonNode payloadJson;

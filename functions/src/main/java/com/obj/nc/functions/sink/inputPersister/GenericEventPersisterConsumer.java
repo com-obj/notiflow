@@ -23,10 +23,10 @@ public class GenericEventPersisterConsumer extends SinkConsumerAdapter<GenericEv
     
 	protected Optional<PayloadValidationException> checkPreCondition(GenericEvent payload) {
 		if (payload == null) {
-			return Optional.of(new PayloadValidationException("Could not persist GenericEvent because its null. Payload: " + payload));
+			return Optional.of(new PayloadValidationException("Could not persist FailedPaylod because its null. Payload: " + payload));
 		}
 		if (payload.getFlowId()==null) {
-			return Optional.of(new PayloadValidationException("Could not persist GenericEvent because flowId is null. Payload: " + payload));
+			return Optional.of(new PayloadValidationException("Could not persist FailedPaylod because flowId is null. Payload: " + payload));
 		}
 
 		return Optional.empty();

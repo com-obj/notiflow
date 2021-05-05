@@ -12,12 +12,9 @@ import com.obj.nc.domain.content.Content;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @JsonTypeName(EmailContent.JSON_TYPE_IDENTIFIER)
 public class EmailContent extends Content {
@@ -27,9 +24,9 @@ public class EmailContent extends Content {
 	public static final String TEXT_CONCAT_DELIMITER = "\n\n";
 	public static final String SUBJECT_CONCAT_DELIMITER = ", ";
 
+	@EqualsAndHashCode.Include
 	private String subject;
 	
-	@NonNull
 	@EqualsAndHashCode.Include
 	private String text;
 	
@@ -40,7 +37,8 @@ public class EmailContent extends Content {
 	private List<Attachement> attachments = new ArrayList<Attachement>();
 	
 	public static EmailContent createWithSubject(String subject, String text) {
-		EmailContent emailContent = new EmailContent(text);
+		EmailContent emailContent = new EmailContent();
+		emailContent.setText(text);
 		emailContent.setSubject(subject);
 		return emailContent;
 	}

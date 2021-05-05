@@ -65,11 +65,11 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(GenericEvent payload) {
 		if (payload == null) {
-			return Optional.of(new PayloadValidationException("GenericEvent must not be null"));
+			return Optional.of(new PayloadValidationException("FailedPaylod must not be null"));
 		}
 		
 		if (payload.getPayloadJson()==null) {
-			return Optional.of(new PayloadValidationException("GenericEvent doesn't contain original message"));
+			return Optional.of(new PayloadValidationException("FailedPaylod doesn't contain original message"));
 		}
 
 		return Optional.empty();
