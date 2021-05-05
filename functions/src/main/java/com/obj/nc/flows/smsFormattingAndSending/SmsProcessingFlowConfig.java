@@ -11,6 +11,7 @@ import org.springframework.messaging.MessageChannel;
 
 import com.obj.nc.functions.processors.messageTemplating.SmsTemplateFormatter;
 import com.obj.nc.functions.processors.senders.SmsSender;
+import com.obj.nc.functions.sink.messagePersister.MessagePersister;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class SmsProcessingFlowConfig {
 	private final SmsSender smsSender;
 	private final SmsTemplateFormatter smsFormatter;
 	private final PaylaodLoggerSinkConsumer logConsumer;
+	private final MessagePersister messagePersister;
 
 	public final static String SMS_PROCESSING_FLOW_ID = "SMS_PROCESSING_FLOW_ID";
 	public final static String SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID = SMS_PROCESSING_FLOW_ID + "_INPUT";
@@ -37,6 +39,9 @@ public class SmsProcessingFlowConfig {
 				.from(smsProcessingInputChangel())
 				.handle(smsFormatter)
 				.split()
+				.wireTap( flowConfig -> 
+					flowConfig.handle(messagePersister)
+				)
 				.handle(smsSender)
 				.wireTap( flowConfig -> 
 					flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)

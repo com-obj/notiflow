@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @Component
-public class DeliveryInfoSendGenerator extends DeliveryInfoGenerator {
+public class DeliveryInfoSendGenerator extends DeliveryInfoSendResultGenerator {
 	
 	public DeliveryInfoSendGenerator() {
 		super(DELIVERY_STATUS.SENT);

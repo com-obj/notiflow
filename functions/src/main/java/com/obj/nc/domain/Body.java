@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=true)
-public class Body extends BaseJSONObject{
+public class Body extends BaseJSONObject implements HasRecievingEndpoints{
 
 	private Content message = new SimpleTextContent();
 	
@@ -25,13 +25,8 @@ public class Body extends BaseJSONObject{
 	
 	//TODO: move to Header
 	private DeliveryOptions deliveryOptions = new DeliveryOptions();	
-
-	public Body addRecievingEndpoints(RecievingEndpoint r) {
-		this.recievingEndpoints.add(r);
-		return this;
-	}
 	
-	public Body addAllRecievingEndpoints(RecievingEndpoint ... r) {
+	public Body addRecievingEndpoints(RecievingEndpoint ... r) {
 		this.recievingEndpoints.addAll(Arrays.asList(r));
 		return this;
 	}
@@ -40,5 +35,5 @@ public class Body extends BaseJSONObject{
 	public <T extends Content> T getContentTyped() {
 		return (T) message;
 	}
-
+	
 }

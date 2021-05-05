@@ -1,8 +1,5 @@
 package com.obj.nc.domain.notifIntent;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,14 +14,11 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @ToString(callSuper = false)
-@EqualsAndHashCode(callSuper=false, of = "id")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @Table("nc_intent")
 public class NotificationIntent extends BasePayload {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "EVENT";
-	
-	private UUID id;
-	private Instant timeCreated;
 
 	public static NotificationIntent createWithSimpleMessage(String flowId, String message) {
 		NotificationIntent notificationIntent = new NotificationIntent();

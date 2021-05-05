@@ -2,6 +2,7 @@ package com.obj.nc.flows.deliveryInfo;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.Duration;
@@ -55,6 +56,10 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Autowired
     @Qualifier(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
     private MessageChannel deliveryInfoProcessingInputChannel;
+    
+    @Autowired
+    @Qualifier(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID)
+    private MessageChannel emailSendingInputChannel;
  	
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
@@ -78,7 +83,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         messageTemplate.send(deliveryInfoProcessingInputChannel, notifIntentMsg);
 
         //THEN check processing deliveryInfo
-        Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()>0);
+        Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()==3);
         
         assertEnpointPersistedNotDuplicated(notificationIntent);
         List<DeliveryInfo> deliveryInfos = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
@@ -99,7 +104,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         });
         
         //THEN check delivered deliveryInfo
-        Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()>0);
+        Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()==6);
 
         deliveryInfos = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
         assertEnpointPersistedNotDuplicated(notificationIntent);
@@ -112,6 +117,33 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         deliveryInfos.forEach(info -> {
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
         	Assertions.assertThat(info.getEndpointId()).isIn("john.doe@objectify.sk","john.dudly@objectify.sk", "all@objectify.sk");
+        });
+    }
+    
+    @Test
+    void testDeliveryInfosCreateAndPersistedForFailedDelivery() {
+        // GIVEN    	
+        Message email = Message.createAsEmail();
+        email.getBody().addRecievingEndpoints(
+        		EmailEndpoint.builder().email("wrong email").build());
+        UUID eventId = UUID.randomUUID();
+        email.getHeader().addEventId(eventId);
+        
+        //WHEN
+    	MessagingTemplate messageTemplate = new MessagingTemplate();
+        messageTemplate.send(emailSendingInputChannel, MessageBuilder.withPayload(email).build());
+
+        //THEN check processing deliveryInfo
+        Awaitility.await().atMost(Duration.ofSeconds(1)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()==1);
+        
+        List<DeliveryInfo> deliveryInfos = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
+        
+        Assertions.assertThat(deliveryInfos.size()).isEqualTo(1);
+        deliveryInfos.forEach(info -> {
+        	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.FAILED);
+        	Assertions.assertThat(info.getProcessedOn()).isNotNull();
+        	Assertions.assertThat(info.getEndpointId()).isIn("wrong email");
+        	Assertions.assertThat(info.getFailedPayloadId()).isNotNull();
         });
     }
 
