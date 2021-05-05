@@ -113,7 +113,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(nisForCuzy.size()).isEqualTo(2);
     	
     	context = JXPathContext.newContext(nisForCuzy);
-    	List<RecievingEndpoint> endpoints = context.selectNodes("//recievingEndpoints");
+    	List<RecievingEndpoint> endpoints = context.selectNodes("/recievingEndpoints");
     	assertThat(endpoints.size()).isEqualTo(4);
     	
     	EmailEndpoint emailEp = (EmailEndpoint)endpoints.stream().filter(ep-> (ep instanceof EmailEndpoint)).findFirst().get();
@@ -171,7 +171,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	    	
     	NotificationIntent notificationIntentForHahn = notificationIntentsForSlavkovsky.iterator().next();
     	context = JXPathContext.newContext(notificationIntentForHahn);
-    	List<RecievingEndpoint> endpoints = context.selectNodes("//recievingEndpoints");
+    	List<RecievingEndpoint> endpoints = context.selectNodes("/recievingEndpoints");
     	assertThat(endpoints.size()).isEqualTo(1);
     	
     	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Adrian Slavkovsky");
@@ -213,7 +213,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(notificationIntentsForAgent.size()).isEqualTo(1);
     	
     	context = JXPathContext.newContext(notificationIntentsForAgent);
-    	List<RecievingEndpoint> endpoints = context.selectNodes("//recievingEndpoints");
+    	List<RecievingEndpoint> endpoints = context.selectNodes("/recievingEndpoints");
     	assertThat(endpoints.size()).isEqualTo(1);
     	
     	assertThat(endpoints.iterator().next().getRecipient()).isNull(); //Pre sales agentov nemam person
