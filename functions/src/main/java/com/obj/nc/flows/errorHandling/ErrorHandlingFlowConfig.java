@@ -15,6 +15,12 @@ import com.obj.nc.functions.sink.failedPaylodPersister.FailedPayloadPersister;
 
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * One has to make sure that error in errorHandlingFlow doesn't cuase infinite loop. Currently this is achieved by errorChannel not being async and thus 
+ * sending message to this channel wit errors will result in error propagation to the caller. If any step in the error processing chain would be 
+ * async, spring would put failed message from error handling flow back to the errorChannel
+ * @return
+ */
 @Configuration
 @Log4j2
 public class ErrorHandlingFlowConfig {

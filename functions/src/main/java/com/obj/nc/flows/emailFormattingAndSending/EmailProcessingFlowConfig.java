@@ -30,7 +30,7 @@ public class EmailProcessingFlowConfig {
 	private final EmailTemplateFormatter emailFormatter;
 	private final EmailProcessingFlowProperties properties;
 	private final MessagePersister messagePersister;
-	private ThreadPoolTaskScheduler executor;
+	private final ThreadPoolTaskScheduler executor;
 	
 	public final static String EMAIL_FORMAT_AND_SEND_FLOW_ID = "EMAIL_FORMAT_AND_SEND_FLOW_ID";
 	public final static String EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID = EMAIL_FORMAT_AND_SEND_FLOW_ID + "_INPUT";
@@ -46,6 +46,16 @@ public class EmailProcessingFlowConfig {
 		return new PublishSubscribeChannel(executor);
 	}
 	
+	@Bean(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID)
+	public MessageChannel emailSedningInputChangel() {
+		return new PublishSubscribeChannel(executor);
+	}
+	
+//	@Bean(EMAIL_FORMATING_INPUT_CHANNEL_ID)
+//	public MessageChannel emailFormatingInputChangel() {
+//		return new PublishSubscribeChannel(executor);
+//	}
+	
 	@Bean(EMAIL_FORMAT_AND_SEND_FLOW_ID)
 	public IntegrationFlow emailProcessingFlowDefinition() {
 		return IntegrationFlows
@@ -60,10 +70,7 @@ public class EmailProcessingFlowConfig {
 				.get();
 	}
 	
-	@Bean(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID)
-	public MessageChannel emailSedningInputChangel() {
-		return new PublishSubscribeChannel(executor);
-	}
+
 	
 	@Bean(EMAIL_SENDING_FLOW_ID)
 	public IntegrationFlow emaiSendingFlowDefinition() {
@@ -83,7 +90,7 @@ public class EmailProcessingFlowConfig {
 	@Bean(EMAIL_FORMATING_FLOW_ID)
 	public IntegrationFlow emailFormatingFlowDefinition() {
 		return flow -> flow
-			.publishSubscribeChannel( subscription  ->
+			.publishSubscribeChannel(executor, subscription  ->
 				subscription.id(EMAIL_FORMATING_INPUT_CHANNEL_ID)
 					//format email and merge if multilanguage
 					.subscribe(aggregateMultilangFlow -> aggregateMultilangFlow
