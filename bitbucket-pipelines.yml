@@ -12,7 +12,7 @@ definitions:
            services:
              - postgres
            script:
-             - gradle :functions:test :osk-flows:test -Dspring.profiles.active=bitbucket --stacktrace --info
+             - gradle test -Dspring.profiles.active=bitbucket --stacktrace --info
            after-script:
              - pipe: atlassian/checkstyle-report:0.2.0
            artifacts: 
