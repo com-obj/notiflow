@@ -2,7 +2,7 @@ FROM openjdk:8
 
 WORKDIR /app
 
-ENV JAR_FILE "koderia-flows.jar"
+ENV JAR_FILE "koderia-flows-deploy-koderia-flows.jar"
 
 COPY --chown=1000:0 dist/${JAR_FILE} ./
 

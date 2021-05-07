@@ -1,4 +1,4 @@
-/* try {
+try {
     podTemplate(yaml: readTrusted('jenkins/build.yaml')) {
         node(POD_LABEL) {
             checkout scm
@@ -54,7 +54,7 @@
             [$class: 'RequesterRecipientProvider']
           ])
   throw cause
-} */
+}
 
 /* Definitions */
 
