@@ -1,10 +1,33 @@
 image:
   tag: v1.0.8-dev.4
+  
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: 512m
+    cert-manager.io/cluster-issuer: letsencrypt-prod-http01
+  hosts:
+    - host: adhoc.objectify.sk
+      paths: [ /koderia-flows ]
+  tls:
+    - secretName: letsencrypt-prod
+      hosts:
+        - adhoc.objectify.sk
 
 activeProfiles:
   - gke
   - test_mode
   - override
 
+overrideProperties:
+  server:
+    servlet:
+      context-path: /koderia-flows
+
 postgresql:
   enabled: true
+  postgresqlDatabase: nc
+  postgresqlUsername: nc
+  postgresqlPassword: ZMss4o9mdBLV
+  postgresqlPostgresPassword: ZMss4o9mdBLV

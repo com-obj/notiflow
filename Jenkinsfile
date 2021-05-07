@@ -1,4 +1,4 @@
-try {
+/* try {
     podTemplate(yaml: readTrusted('jenkins/build.yaml')) {
         node(POD_LABEL) {
             checkout scm
@@ -19,7 +19,7 @@ try {
                         throw(exception)
                     }
                     finally {
-                        junit '**//* build/test-results/test *//*.xml'
+                        junit '**//*  *//* build/test-results/test *//*  *//*.xml'
                     }
                 }
                 milestone()
@@ -54,7 +54,7 @@ try {
             [$class: 'RequesterRecipientProvider']
           ])
   throw cause
-}
+} */
 
 /* Definitions */
 
