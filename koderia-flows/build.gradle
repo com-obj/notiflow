@@ -9,8 +9,6 @@ bootJar {
     launchScript()
 }
 
-group = 'com.obj.nc'
-
 dependencies {
     implementation project(':functions')
     testImplementation 'io.rest-assured:rest-assured:4.2.0'
@@ -22,14 +20,9 @@ dependencies {
     testImplementation(testFixtures(project(":functions")))
 }
 
-test {
-    systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
-    useJUnitPlatform()
-}
-
 task copyFatJarToDistFolder(type: Copy) {
     from bootJar // shortcut for bootJar.outputs.files
     into "dist"
 }
 
-build.dependsOn copyDistToStagingFolder
+build.dependsOn copyFatJarToDistFolder

@@ -17,6 +17,7 @@ definitions:
              - pipe: atlassian/checkstyle-report:0.2.0
            artifacts: 
              - osk-flows/build/reports/tests/**
+             - koderia-flows/build/reports/tests/**
              - functions/build/reports/tests/**
      - build-jar: &build-jar
        - step:
@@ -35,9 +36,10 @@ definitions:
              image: gcr.io/cloud-builders/gcloud
              caches:
                - gradle
+               - maven
              script:
-               - chown -R 1000:1000 docker/koderia-flows/
-               - gcloud builds submit docker/koderia-flows/
+               - chown -R 1000:1000 koderia-flows/docker
+               - gcloud builds submit koderia-flows/docker
      - deploy-snaphost-2-BB: &deploy-2-BB
        - step: 
            name: Deploy snapshot to Bitbucket downloads
