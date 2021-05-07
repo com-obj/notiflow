@@ -15,7 +15,7 @@ To run the application you will need running postgres database. You can run pre-
 ### Running application
 To start application run
    
-    ./osk-flows-1.0.0.jar --spring.config.location=file:./resources/application.properties --spring.profiles.active=neuron
+    ./osk-flows-1.0.0.jar --spring.config.location=file:./resources/application.properties --spring.profiles.active=test_mode
     
 ### Application configuration
 The application configuration file used when running distribution can be found in 
