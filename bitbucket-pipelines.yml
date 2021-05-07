@@ -28,6 +28,20 @@ definitions:
              - gradle build -x test --stacktrace --info   
            artifacts:
              - osk-flows/dist/**
+             - koderia-flows/dist/**
+     - build-docker: &build-docker
+         - step:
+             name: Build Docker Image
+             image: gcr.io/cloud-builders/gcloud
+             caches:
+               - gradle
+               - docker
+             script:
+               - cp -a ../../docker/koderia-flows/. .
+               - chown -R 1000:1000 .
+               - gcloud builds submit .
+             artifacts:
+               - docker/koderia-flows/dist/**
      - deploy-snaphost-2-BB: &deploy-2-BB
        - step: 
            name: Deploy snapshot to Bitbucket downloads
@@ -56,8 +70,10 @@ pipelines:
     release/*:
       - <<: *run-tests
       - <<: *build-jar
+      - <<: *build-docker
       - <<: *deploy-2-BB
   tags:
     v*:
       - <<: *build-jar
+      - <<: *build-docker
       - <<: *deploy-2-BB

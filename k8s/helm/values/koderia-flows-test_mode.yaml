@@ -1,9 +1,7 @@
 activeProfiles:
   - gke
+  - test_mode
   - override
 
 postgresql:
-  enabled: true
-
-rabbitmq:
   enabled: true

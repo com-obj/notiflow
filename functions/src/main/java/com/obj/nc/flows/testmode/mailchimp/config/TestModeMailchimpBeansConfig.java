@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Primary;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-@ConditionalOnBean(MailchimpSender.class)
 public class TestModeMailchimpBeansConfig {
 	
     /**
@@ -33,7 +32,6 @@ public class TestModeMailchimpBeansConfig {
         return new InMemoryMailchimpSourceSupplier();
     }
     
-    @Bean
     public MailchimpSenderProcessorFunction realMailchimpSender() {
         return new MailchimpSenderProcessorFunction();
     }
