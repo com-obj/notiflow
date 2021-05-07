@@ -46,7 +46,7 @@ definitions:
                - cd koderia-flows/docker/
                - chown -R 1000:1000 .
                - docker build -t eu.gcr.io/objectify-infra/koderia-flows .
-               - export TAG=$(echo "$BITBUCKET_TAG" | sed -e "s/v//g")
+               - export TAG=$(echo "$BITBUCKET_TAG")
                - export SUFFIX=$([[ ! -z "$TAG" ]] && echo ":$TAG" || echo "")
                - export IMAGE_NAME=eu.gcr.io/objectify-infra/koderia-flows${SUFFIX}
                - docker tag eu.gcr.io/objectify-infra/koderia-flows ${IMAGE_NAME}
