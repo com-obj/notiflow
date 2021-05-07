@@ -52,7 +52,7 @@ definitions:
              - koderia-flows/dist/**
      - deploy-2-gcr: &deploy-2-gcr
          - step:
-             name: Build and Tag Docker Image
+             name: Deploy Docker Image to GCR
              caches:
                - gradle
                - maven
