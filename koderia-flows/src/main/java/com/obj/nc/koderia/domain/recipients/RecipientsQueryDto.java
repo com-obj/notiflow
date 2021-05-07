@@ -27,6 +27,7 @@ public class RecipientsQueryDto {
     
     @NotNull private String type;
     
+    @JsonIgnoreProperties(ignoreUnknown = true)
     static class Data {
     }
     
