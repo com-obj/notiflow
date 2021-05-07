@@ -12,6 +12,7 @@ group = 'com.obj.nc'
 
 dependencies {
     implementation project(':functions')
+    implementation 'de.codecentric:chaos-monkey-spring-boot:2.3.10'
     testImplementation 'io.rest-assured:rest-assured:4.2.0'
     testImplementation 'io.rest-assured:json-path:4.2.0'
     testImplementation 'io.rest-assured:xml-path:4.2.0'

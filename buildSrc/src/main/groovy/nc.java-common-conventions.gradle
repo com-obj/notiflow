@@ -33,7 +33,6 @@ dependencies {
     implementation 'org.postgresql:postgresql'
     implementation 'org.flywaydb:flyway-core'
     implementation "com.icegreen:greenmail:${greenMailVersion}"
-    implementation 'de.codecentric:chaos-monkey-spring-boot:2.3.10'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     
