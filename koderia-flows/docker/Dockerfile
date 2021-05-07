@@ -4,7 +4,7 @@ WORKDIR /app
 
 ENV JAR_FILE_NAME "koderia-flows.jar"
 
-COPY --chown=1000:0 ../dist/*.jar ${JAR_FILE_NAME}
+COPY --chown=1000:0 dist/*.jar ${JAR_FILE_NAME}
 
 ENV RELEASE_NAME koderia-flows
 ENV JVM_PROPERTIES ""

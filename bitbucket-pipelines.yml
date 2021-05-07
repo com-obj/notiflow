@@ -1,5 +1,8 @@
 image: gradle:6.8.2
 
+options:
+  docker: true
+
 definitions: 
    steps:
      - run-tests: &run-tests
@@ -30,16 +33,22 @@ definitions:
            artifacts:
              - osk-flows/dist/**
              - koderia-flows/dist/**
-     - build-docker: &build-docker
+     - deploy-2-gcr: &deploy-2-gcr
          - step:
-             name: Build Docker Image
+             name: Deploy Docker Image
              image: gcr.io/cloud-builders/gcloud
              caches:
                - gradle
                - maven
              script:
-               - chown -R 1000:1000 koderia-flows/docker
-               - gcloud builds submit koderia-flows/docker
+               - export PROJECT_ID=objectify-infra
+               - gcloud auth activate-service-account --key-file koderia-flows/gcr/gcr-push-sa-key.json
+               - gcloud config set project $PROJECT_ID
+               - cp -a koderia-flows/dist/ koderia-flows/docker/
+               - cd koderia-flows/docker/
+               - chown -R 1000:1000 .
+               - gcloud builds submit .
+               - rm -rf dist/
      - deploy-snaphost-2-BB: &deploy-2-BB
        - step: 
            name: Deploy snapshot to Bitbucket downloads
@@ -68,10 +77,10 @@ pipelines:
     release/*:
       - <<: *run-tests
       - <<: *build-jar
-      - <<: *build-docker
+      - <<: *deploy-2-gcr
       - <<: *deploy-2-BB
   tags:
     v*:
       - <<: *build-jar
-      - <<: *build-docker
+      - <<: *deploy-2-gcr
       - <<: *deploy-2-BB
