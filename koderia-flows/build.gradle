@@ -27,9 +27,9 @@ test {
     useJUnitPlatform()
 }
 
-task copyDistToStagingFolder(type: Copy) {
+task copyFatJarToDistFolder(type: Copy) {
     from bootJar // shortcut for bootJar.outputs.files
-    into "./../docker/koderia-flows/dist"
+    into "dist"
 }
 
 build.dependsOn copyDistToStagingFolder
