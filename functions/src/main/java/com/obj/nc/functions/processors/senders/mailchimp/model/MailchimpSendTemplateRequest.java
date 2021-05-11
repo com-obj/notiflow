@@ -12,15 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class MailchimpContentDto {
+public class MailchimpSendTemplateRequest {
     
     @NotBlank private String key;
     @NotNull private MailchimpMessage message;
     @NotBlank @JsonProperty("template_name") private String templateName;
     @JsonProperty("template_content") private List<MailchimpTemplateContent> templateContent;
     
-    public static MailchimpContentDto from(MailchimpContent content, String authKey) {
-        MailchimpContentDto dto = new MailchimpContentDto();
+    public static MailchimpSendTemplateRequest from(MailchimpContent content, String authKey) {
+        MailchimpSendTemplateRequest dto = new MailchimpSendTemplateRequest();
         dto.key = authKey;
     
         MailchimpMessage mailchimpMessage = new MailchimpMessage();

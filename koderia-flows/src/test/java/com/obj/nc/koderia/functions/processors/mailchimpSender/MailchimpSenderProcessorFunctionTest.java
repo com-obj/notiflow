@@ -7,8 +7,7 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
-import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpResponseDto;
-import com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterConfig;
+import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemplateResponse;
 import com.obj.nc.mappers.MailchimpDataToMailchimpContentMapper;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
@@ -67,9 +66,9 @@ class MailchimpSenderProcessorFunctionTest {
         Message outputMessage = sendMailchimpMessage.apply(inputMessage);
         // THEN
         MatcherAssert.assertThat(outputMessage, Matchers.notNullValue());
-        MailchimpResponseDto outputMailchimpResponseDto = JsonUtils.readClassFromObject(outputMessage.getBody().getAttributeValueAs(MAILCHIMP_RESPONSE_FIELD, List.class).get(0), MailchimpResponseDto.class);
-        MailchimpResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource("mailchimp/response_body.json", MailchimpResponseDto[].class);
-        MatcherAssert.assertThat(outputMailchimpResponseDto, Matchers.equalTo(responseDtos[0]));
+        MailchimpSendTemplateResponse outputMailchimpSendTemplateResponse = JsonUtils.readClassFromObject(outputMessage.getBody().getAttributeValueAs(MAILCHIMP_RESPONSE_FIELD, List.class).get(0), MailchimpSendTemplateResponse.class);
+        MailchimpSendTemplateResponse[] responseDtos = JsonUtils.readObjectFromClassPathResource("mailchimp/response_body.json", MailchimpSendTemplateResponse[].class);
+        MatcherAssert.assertThat(outputMailchimpSendTemplateResponse, Matchers.equalTo(responseDtos[0]));
     }
 
     @Test
@@ -127,14 +126,14 @@ class MailchimpSenderProcessorFunctionTest {
     
     private void createSimpleMessageRestServerExpectations() {
         String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
-        MailchimpResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MailchimpResponseDto[].class);
+        MailchimpSendTemplateResponse[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MailchimpSendTemplateResponse[].class);
         String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
         
         mailchimpMockServer.expect(times(1),
                 requestTo(SEND_TEMPLATE_PATH))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
-                .andExpect(jsonPath("$.key", equalTo("MOCKkey")))
+                .andExpect(jsonPath("$.key", equalTo("ImwBPYD5hPra-tszbzTwSA")))
                 .andExpect(jsonPath("$.message.subject", anyOf(equalTo("Business Intelligence (BI) Developer"))))
                 .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
                 .andExpect(jsonPath("$.message.attachments[0].name", equalTo("test1.txt")))
@@ -143,14 +142,14 @@ class MailchimpSenderProcessorFunctionTest {
     
     private void createAggregateMessageRestServerExpectations() {
         String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
-        MailchimpResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MailchimpResponseDto[].class);
+        MailchimpSendTemplateResponse[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MailchimpSendTemplateResponse[].class);
         String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
         
         mailchimpMockServer.expect(times(1),
                 requestTo(SEND_TEMPLATE_PATH))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
-                .andExpect(jsonPath("$.key", equalTo("MOCKkey")))
+                .andExpect(jsonPath("$.key", equalTo("ImwBPYD5hPra-tszbzTwSA")))
                 .andExpect(jsonPath("$.message.subject", equalTo("Koderia digest")))
                 .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
                 .andExpect(jsonPath("$.message.global_merge_vars[0].name", anyOf(equalTo("JOB_POST"), equalTo("NEWS"),

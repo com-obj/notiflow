@@ -11,7 +11,7 @@
   "body":{
     "message": {
       "type" : "MAILCHIMP_CONTENT",
-      "key" : "MOCKkey",
+      "key" : "ImwBPYD5hPra-tszbzTwSA",
       "message" : {
         "subject" : "Business Intelligence (BI) Developer 2",
         "from_email" : "sender@koderia.sk",

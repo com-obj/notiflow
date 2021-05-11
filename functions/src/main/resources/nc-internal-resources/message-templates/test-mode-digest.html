@@ -62,7 +62,7 @@
 					<td><span th:text="${mailchimp.getAttributeValue('ORIGINAL_RECIPIENTS_EMAIL')}"> cuzy@objectify.sk </span></td>
 					<td><span th:text="${mailchimp.message.subject}"> Subject1 </span></td>
 					<td>
-						<span style="white-space: pre-wrap" th:utext="${mailchimp.getAttributeValue('MAILCHIMP_MESSAGE_AS_JSON')}"> Body1 </span>
+						<iframe srcdoc="<html><body>Could not template...</body></html>" th:srcdoc="${mailchimp.getAttributeValue('RENDERED_MAILCHIMP_MESSAGE')}"> Body1 </iframe>
 					</td>
 					<td><span th:text="${mailchimp.message.attachments}"> Attachments </span></td>
 				</tr>
