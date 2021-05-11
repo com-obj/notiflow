@@ -82,10 +82,10 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 		MailchimpContent content = payload.getContentTyped();
 		assertThat(content.getMessage(), notNullValue());
 		
-		Optional<MailchimpData> data = content.getMessage().getMailchimpData();
-		assertThat(data.isPresent(), equalTo(true));
-		assertThat(data.get().getType(), equalTo(baseKoderiaEvent.getType()));
-		assertThat(data.get().getData(), equalTo(baseKoderiaEvent.getData()));
+		MailchimpData data = content.getMessage().getMailchimpData();
+		assertThat(data, notNullValue());
+		assertThat(data.getType(), equalTo(baseKoderiaEvent.getType()));
+		assertThat(data.getData(), equalTo(baseKoderiaEvent.getData()));
 		
 		assertThat(content.getTemplateContent(), notNullValue());
 		assertThat(content.getTemplateName(), notNullValue());

@@ -22,10 +22,5 @@ public class NewsKoderiaEventDto extends BaseKoderiaEvent {
     public String getMessageSubject() {
         return data.getSubject();
     }
-    
-    @Override
-    public String getMessageText() {
-        return data.getText();
-    }
 }
 

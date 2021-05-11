@@ -28,8 +28,6 @@ public class KoderiaEventConverter extends ProcessorFunctionAdapter<GenericEvent
 			return Optional.of(new PayloadValidationException("GenericEvent doesn't contain original message"));
 		} else if (payload.<BaseKoderiaEvent>getPayloadAsPojo().getMessageSubject() == null) {
 			return Optional.of(new PayloadValidationException("Subject of Koderia event must not be null"));
-		} else if (payload.<BaseKoderiaEvent>getPayloadAsPojo().getMessageText() == null) {
-			return Optional.of(new PayloadValidationException("Text of Koderia event must not be null"));
 		} else {
 			return Optional.empty();
 		}

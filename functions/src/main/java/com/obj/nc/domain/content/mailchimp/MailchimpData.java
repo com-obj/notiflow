@@ -19,9 +19,6 @@ public abstract class MailchimpData implements IsTypedJson {
     public abstract String getMessageSubject();
     
     @JsonIgnore
-    public abstract String getMessageText();
-    
-    @JsonIgnore
     public abstract List<Attachement> getAttachments();
     
 }

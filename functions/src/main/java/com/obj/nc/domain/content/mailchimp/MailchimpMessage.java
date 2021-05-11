@@ -9,11 +9,11 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Data
 public class MailchimpMessage {
-
+    
+    @NotNull private MailchimpData originalEvent;
     @NotBlank private String subject;
     @NotBlank @JsonProperty("from_email") private String fromEmail;
     @NotBlank @JsonProperty("from_name") private String fromName;
@@ -23,8 +23,8 @@ public class MailchimpMessage {
     @NotNull private List<MailchimpAttachment> attachments = new ArrayList<>();
     
     @JsonIgnore
-    public Optional<MailchimpData> getMailchimpData() {
-        return globalMergeVars.stream().map(MailchimpMergeVariable::getContent).findFirst();
+    public MailchimpData getMailchimpData() {
+        return originalEvent;
     }
 
 }

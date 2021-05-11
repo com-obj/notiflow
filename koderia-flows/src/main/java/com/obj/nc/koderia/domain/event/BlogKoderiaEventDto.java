@@ -22,10 +22,5 @@ public class BlogKoderiaEventDto extends BaseKoderiaEvent {
     public String getMessageSubject() {
         return data.getTitle();
     }
-    
-    @Override
-    public String getMessageText() {
-        return data.getContent();
-    }
 }
 

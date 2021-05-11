@@ -25,11 +25,6 @@ public class AggregatedMailchimpData extends MailchimpData {
     }
     
     @Override
-    public String getMessageText() {
-        return getData().stream().map(var -> var.<MailchimpData>getData().getMessageText()).collect(Collectors.joining("\n\n"));
-    }
-    
-    @Override
     public List<Attachement> getAttachments() {
         return getData().stream().flatMap(var -> var.<MailchimpData>getData().getAttachments().stream()).collect(Collectors.toList());
     }

@@ -22,10 +22,5 @@ public class JobPostKoderiaEventDto extends BaseKoderiaEvent {
     public String getMessageSubject() {
         return data.getName();
     }
-    
-    @Override
-    public String getMessageText() {
-        return data.getDescription();
-    }
 }
 
