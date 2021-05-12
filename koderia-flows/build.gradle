@@ -2,13 +2,12 @@ plugins {
     id 'nc.java-common-conventions'
 }
 
-bootJar {
-    archiveFileName = 'koderia-flows'
-    launchScript()
-
-}
-
 group = 'com.obj.nc'
+
+bootJar {
+    archiveBaseName = 'koderia-flows'
+    launchScript()
+}
 
 dependencies {
     implementation project(':functions')
@@ -21,14 +20,9 @@ dependencies {
     testImplementation(testFixtures(project(":functions")))
 }
 
-test {
-    systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
-    useJUnitPlatform()
-}
-
-task copyDistToStagingFolder(type: Copy) {
+task copyFatJarToDistFolder(type: Copy) {
     from bootJar // shortcut for bootJar.outputs.files
-    into "./../docker/koderia-flows/dist"
+    into "dist"
 }
 
-build.dependsOn copyDistToStagingFolder
+build.dependsOn copyFatJarToDistFolder

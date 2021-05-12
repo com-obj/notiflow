@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "objectify-infra",
+  "private_key_id": "bd97a596a252e27644aeca4c6394b6b4dfeff4d5",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCuT7OSPB5pGkOa\n1hpb4QOOk/ZXHES+mY6FYCPXwJDpnnU0XlPtdvZkpZdl/E9sslS0MLbt0PEQSkqT\nfH9EhHdut8IY+nz9SrDapmvRBhW6172doe8FiSuo+DgrJtLiS2Esq6/qGSVUcDUp\nQdynjB73OilGZAWcuwSSRVrsDCoGYj8tVu8CHsGh1kSKvPWAxxrPp9bxkAicJG2U\nUSvdmwhr+6RUvaJDglDnUFxLJx1pcMNqJvXqE3WVrUi4EryM0r3AmJS0vtcJVrbH\ni1/T3tjT4+fnvIEnTjxDvqnxGK1FmEiv0Ah6eZpJOrnBQD8bkT+8Q6VyT9kEnlyH\nflZ8fmXpAgMBAAECggEAFTkwEIiQXVSs0Y/rAq/ZeoUqc73F4v0YXMXxZ0YTftZj\nx94KUvnukx+UWP8I/p+R76SUyUzs5QJepSl9525HimwGTntFN6Pd96lWrEsU3zyA\nYk6Cp0Zl0fty/1IJUDNEYCeBUjwAjxDgcCcMQjwt0wU6XE82XbhpnJOkN+RdQ4yE\nIKIpT+Ul84Q3zYx8/3mhvK0y7MeLKw0Bsf+Tzo913rl0xJ5/LU7ke+mvjXhl7jdZ\nTNS3jZKH67WGHHA4rslfR7KXHAUc0BofXxCRlgTsc3tEpeuoSf6eC/vXGC4dWGTy\n4LV3fLrVSf3g3QdlunZRM/k04EkvHNtAuXNJOQXERwKBgQDoD2anWhUi/B2dghzV\nZzG+nX0gwRAYhyYtHC/mR81P+ObM4aIMHIkqIFyELy2qKfs2qZXnT0Gbe5p+L4Ca\nGW+SfJmd5YgWAWcM8PASXKdry6JWk7WWJSL14E/rCpDavqelKFeV+KYcxP275bJP\nndZs+FyvJ2fWtGLufSv9rZhMrwKBgQDASy5oqsxEdX8N/jSZsVQAeqSCL1Rrg+ls\nLl09XiHj8nQP1Or9D+uB1SzvghwWC58UZ/R7yYt2vEyDR7S7Odierdr5Wz7gTeS9\ng8W139oyKhiHxxiayDMR0Ya9nddzGSlJiJUTCksoBei/lss8gkzO37yFqxIexN8Q\nBFJr61cM5wKBgFHydlasqgAjtbWUZ+g4O8nLRY+Wfb+bojCV3phcTLVr+Nzq5NWQ\nEiPtL56CJocLsimYc1Yul8V3PZRH5AsG5m59T6YBky/qKODaCH0DeR/I1jfqi1pN\nHO5k2vPuVD7aysq4100fdFF+gveiYnhZDYqHnftAWBvqsXD0hN9dOQYDAoGAJwnc\nVSF/sNJNxhB6q00l6ab8aPWk5OL166GKCmBm7vkU+PXX8yJdRJF7uvAmNY+Mbz8f\nklX7e1KFEg3nsi7vPF+9WexdWnpV2ue6ps7YZGDJdB9Gbn4AaDiqayp1SAeuqyAQ\na7omQezZMLQzdIhbgZBInLZ7SkXbp0vJU+GGXbcCgYByg1QQ1s6jIQ6VLHLTUgiD\nQF+WLTMN1+dfjf54wn6VYb2JYxFmijJ1r7gLVaeP+Lq6C3Mrb5GS78JbzqiQ61Za\nUD2EX6QHdETMjhB+JiVzFRcp1qRFBZicwJq3XAFPhm2AtqT/UtnLdr6yZCSjEHdH\nkWloRHeIZe2qzszkPCFg9A==\n-----END PRIVATE KEY-----\n",
+  "client_email": "gcr-push-sa@objectify-infra.iam.gserviceaccount.com",
+  "client_id": "107587024180088236483",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gcr-push-sa%40objectify-infra.iam.gserviceaccount.com"
+}
