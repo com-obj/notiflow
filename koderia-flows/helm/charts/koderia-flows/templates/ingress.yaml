@@ -1,9 +1,10 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "koderia-flows.fullname" . -}}
+{{- $serviceName := include "koderia-flows.fullname" . -}}
+{{- $servicePort := .Values.service.port -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ $serviceName }}
   labels:
 {{ include "koderia-flows.labels" . | indent 4 }}
   {{- with .Values.ingress.annotations }}
@@ -29,8 +30,8 @@ spec:
         {{- range .paths }}
           - path: {{ . }}
             backend:
-              serviceName: {{ $fullName }}
-              servicePort: http
+              serviceName: {{ $serviceName }}
+              servicePort: {{ $servicePort }}
         {{- end }}
   {{- end }}
 {{- end }}

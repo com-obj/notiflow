@@ -32,7 +32,6 @@ public class TestModeMailchimpBeansConfig {
         return new InMemoryMailchimpSourceSupplier();
     }
     
-    @Bean
     public MailchimpSenderProcessorFunction realMailchimpSender() {
         return new MailchimpSenderProcessorFunction();
     }
