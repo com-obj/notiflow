@@ -8,6 +8,9 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.koderia.domain.event.JobPostKoderiaEventDto;
+import com.obj.nc.koderia.domain.recipients.RecipientDto;
+import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinder;
+import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
 import com.obj.nc.utils.JsonUtils;
 import org.awaitility.Awaitility;
 import org.hamcrest.Matchers;
@@ -19,6 +22,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
@@ -27,6 +34,8 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.client.ExpectedCount;
+import org.springframework.test.web.client.MockRestServiceServer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +45,14 @@ import java.util.concurrent.TimeUnit;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_ID;
 import static com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
 import static com.obj.nc.koderia.integration.CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.RECEIVED_TEST_LIST;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
@@ -50,14 +63,18 @@ import static org.hamcrest.Matchers.notNullValue;
 @DirtiesContext
 public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 	
+	@Autowired private KoderiaRecipientsFinder koderiaRecipientsFinder;
+	@Autowired private KoderiaRecipientsFinderConfig koderiaRecipientsFinderConfig;
 	@Autowired private GenericEventPersisterConsumer persister;
 	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 	@Autowired private SourcePollingChannelAdapter pollableSource;
 	@Qualifier(RECEIVED_TEST_LIST)
 	@Autowired private List<Message<?>> received;
+	private MockRestServiceServer koderiaMockServer;
 	
 	@BeforeEach
 	public void startSourcePolling() {
+		koderiaMockServer = MockRestServiceServer.bindTo(koderiaRecipientsFinder.getRestTemplate()).build();
 		pollableSource.start();
 	}
 	
@@ -72,6 +89,7 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 		JobPostKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", JobPostKoderiaEventDto.class);
 		GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
 		genericEvent.setFlowId("default-flow");
+		createRestCallExpectation();
 		// when
 		persister.accept(genericEvent);
 		Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> received.size() >= 1);
@@ -91,7 +109,25 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 		assertThat(content.getTemplateName(), notNullValue());
 	}
 	
-	@TestConfiguration
+	private void createRestCallExpectation() {
+		// koderia server
+		String RECIPIENTS_JSON_PATH = "koderia/recipient_queries/job_recipients_response.json";
+		RecipientDto[] responseBody = JsonUtils.readObjectFromClassPathResource(RECIPIENTS_JSON_PATH, RecipientDto[].class);
+		
+		koderiaMockServer.expect(ExpectedCount.once(),
+				requestTo(koderiaRecipientsFinderConfig.getKoderiaApiUrl() + RECIPIENTS_PATH))
+				.andExpect(method(HttpMethod.POST))
+				.andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + koderiaRecipientsFinderConfig.getKoderiaApiToken()))
+				.andExpect(jsonPath("$.type", equalTo("JOB_POST")))
+				.andExpect(jsonPath("$.data.type", equalTo("Analytik")))
+				.andExpect(jsonPath("$.data.technologies[0]", equalTo("Microsoft Power BI")))
+				.andRespond(withStatus(HttpStatus.OK)
+						.contentType(MediaType.APPLICATION_JSON)
+						.body(JsonUtils.writeObjectToJSONString(responseBody))
+				);
+	}		
+		
+		@TestConfiguration
 	public static class MockNextFlowTestConfiguration {
 		public static final String RECEIVED_TEST_LIST = "RECEIVED_TEST_LIST";
 		

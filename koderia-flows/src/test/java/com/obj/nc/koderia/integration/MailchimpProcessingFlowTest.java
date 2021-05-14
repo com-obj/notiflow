@@ -145,7 +145,7 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 				requestTo(mailchimpSenderConfigProperties.getApiUrl() + SEND_TEMPLATE_PATH))
 				.andExpect(method(HttpMethod.POST))
 				.andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
-				.andExpect(jsonPath("$.key", equalTo("ImwBPYD5hPra-tszbzTwSA")))
+				.andExpect(jsonPath("$.key", equalTo("mockAuthKey")))
 				.andExpect(jsonPath("$.message.subject", equalTo("Business Intelligence (BI) Developer")))
 				.andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
 				.andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));

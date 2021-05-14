@@ -8,6 +8,9 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
+import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemplateResponse;
 import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
 import com.obj.nc.koderia.domain.recipients.RecipientDto;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
@@ -34,11 +37,14 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import javax.mail.internet.MimeMessage;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.test.web.client.ExpectedCount.times;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(properties = {
@@ -53,15 +59,19 @@ public class KoderiaFlowsTestModeTest extends BaseIntegrationTest {
     @Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
     @Autowired private SourcePollingChannelAdapter pollableSource;
     @Autowired private KoderiaRecipientsFinder koderiaRecipientsFinder;
+    @Autowired private MailchimpSenderProcessorFunction mailchimpSender;
     @Autowired private KoderiaRecipientsFinderConfig koderiaRecipientsFinderConfig;
+    @Autowired private MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
     @Autowired private GenericEventRepository genEventRepo;
     private MockRestServiceServer koderiaMockServer;
+    private MockRestServiceServer mailchimpMockServer;
         
     @BeforeEach
     void cleanTables(@Autowired JdbcTemplate jdbcTemplate) throws FolderException {
         purgeNotifTables(jdbcTemplate);     
         greenMail.purgeEmailFromAllMailboxes();
         koderiaMockServer = MockRestServiceServer.bindTo(koderiaRecipientsFinder.getRestTemplate()).build();
+        mailchimpMockServer = MockRestServiceServer.bindTo(mailchimpSender.getRestTemplate()).build();
         pollableSource.start();
     }
     @AfterEach
@@ -95,6 +105,7 @@ public class KoderiaFlowsTestModeTest extends BaseIntegrationTest {
     }
     
     private void createRestCallExpectation() {
+        // koderia server
         String RECIPIENTS_JSON_PATH = "koderia/recipient_queries/job_recipients_response.json";
         RecipientDto[] responseBody = JsonUtils.readObjectFromClassPathResource(RECIPIENTS_JSON_PATH, RecipientDto[].class);
     
@@ -109,6 +120,20 @@ public class KoderiaFlowsTestModeTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(JsonUtils.writeObjectToJSONString(responseBody))
                 );
+    
+        // mailchimp server
+        String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
+        MailchimpSendTemplateResponse[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MailchimpSendTemplateResponse[].class);
+        String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
+    
+        mailchimpMockServer.expect(times(3),
+                requestTo(mailchimpSenderConfigProperties.getApiUrl() + SEND_TEMPLATE_PATH))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
+                .andExpect(jsonPath("$.key", equalTo("mockAuthKey")))
+                .andExpect(jsonPath("$.message.subject", equalTo("Business Intelligence (BI) Developer")))
+                .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
+                .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
     }
     
     @RegisterExtension

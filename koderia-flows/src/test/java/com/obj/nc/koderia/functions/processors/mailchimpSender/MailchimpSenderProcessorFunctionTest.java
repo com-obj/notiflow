@@ -133,7 +133,7 @@ class MailchimpSenderProcessorFunctionTest {
                 requestTo(SEND_TEMPLATE_PATH))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
-                .andExpect(jsonPath("$.key", equalTo("ImwBPYD5hPra-tszbzTwSA")))
+                .andExpect(jsonPath("$.key", equalTo("mockAuthKey")))
                 .andExpect(jsonPath("$.message.subject", anyOf(equalTo("Business Intelligence (BI) Developer"))))
                 .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
                 .andExpect(jsonPath("$.message.attachments[0].name", equalTo("test1.txt")))
@@ -149,7 +149,7 @@ class MailchimpSenderProcessorFunctionTest {
                 requestTo(SEND_TEMPLATE_PATH))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
-                .andExpect(jsonPath("$.key", equalTo("ImwBPYD5hPra-tszbzTwSA")))
+                .andExpect(jsonPath("$.key", equalTo("mockAuthKey")))
                 .andExpect(jsonPath("$.message.subject", equalTo("Koderia digest")))
                 .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
                 .andExpect(jsonPath("$.message.global_merge_vars[0].name", anyOf(equalTo("JOB_POST"), equalTo("NEWS"),

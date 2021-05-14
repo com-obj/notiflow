@@ -11,7 +11,7 @@
   "body":{
     "message": {
       "type" : "MAILCHIMP_CONTENT",
-      "key" : "ImwBPYD5hPra-tszbzTwSA",
+      "key" : "mockAuthKey",
       "message" : {
         "subject" : "3 najdivnejšie programovacie jazyky na svete – 1. časť",
         "from_email" : "sender@koderia.sk",
