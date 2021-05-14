@@ -90,9 +90,8 @@ public class KoderiaFlowsTestModeTest extends BaseIntegrationTest {
         
         System.out.println(GreenMailUtil.getWholeMessage(msgs[0]));
 
-        assertMessagesContains(msgs, MailMessageForAssertions.as("bazik@objectify.sk" ,"Notifications digest while running test mode", 
-                "john.doe@objectify.sk", "john.dudly@objectify.sk", "john.jovi@objectify.sk", 
-                "Business Intelligence (BI) Developer", "We are looking for a Business Intelligence (BI) Developer to create..."));
+        assertMessagesContains(msgs, MailMessageForAssertions.as("bazik@objectify.sk" ,"Notifications digest while running test mode",
+                "To see Mailchimp result messages", "https://mandrillapp.com/activity", "Test mode"));
     }
     
     private void createRestCallExpectation() {

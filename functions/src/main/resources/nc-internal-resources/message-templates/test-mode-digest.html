@@ -48,27 +48,8 @@
 			    </tbody>
 		    </table>
 		<h3>Mailchimp</h3>
-			<table border="1" cellpadding="5" style="border-collapse:collapse; border: 1px solid gray;">
-				<thead>
-				<tr>
-					<th th:text="#{testMode.header1.recipient}"> Rec </th>
-					<th th:text="#{testMode.header1.subject}"> Subject </th>
-					<th th:text="#{testMode.header1.mailchimp.message}"> Message </th>
-					<th th:text="#{testMode.header1.attachements}"> Attach </th>
-				</tr>
-				</thead>
-				<tbody>
-				<tr th:each="mailchimp : ${model.mailchimpContents}">
-					<td><span th:text="${mailchimp.getAttributeValue('ORIGINAL_RECIPIENTS_EMAIL')}"> cuzy@objectify.sk </span></td>
-					<td><span th:text="${mailchimp.message.subject}"> Subject1 </span></td>
-					<td>
-						<iframe srcdoc="<html><body>Could not template...</body></html>" th:srcdoc="${mailchimp.getAttributeValue('RENDERED_MAILCHIMP_MESSAGE')}"> Body1 </iframe>
-					</td>
-					<td><span th:text="${mailchimp.message.attachments}"> Attachments </span></td>
-				</tr>
-				</tbody>
-			</table>
-	 
+		<p>To see Mailchimp result messages, visit: <a href="https://mandrillapp.com/activity">Mailchimp Outbound</a> and switch to Mailchimp's
+			<a href="https://mailchimp.com/developer/transactional/docs/fundamentals/#test-mode">Test mode</a>.</p>
 	 
 	 	<p th:text="#{testMode.footerMain}"></p>
     	<p th:text="#{testMode.signature}"></p>

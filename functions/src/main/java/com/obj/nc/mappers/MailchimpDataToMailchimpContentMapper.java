@@ -30,6 +30,7 @@ public class MailchimpDataToMailchimpContentMapper {
 
     protected MailchimpMessage mapMessage(MailchimpData event) {
         MailchimpMessage mailchimpMessage = new MailchimpMessage();
+        mailchimpMessage.setOriginalEvent(event);
 
         mailchimpMessage.setSubject(mapSubject(event));
         mailchimpMessage.setFromEmail(mailchimpSenderConfigProperties.getSenderEmail());

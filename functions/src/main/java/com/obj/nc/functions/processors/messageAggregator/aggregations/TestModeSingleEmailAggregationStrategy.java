@@ -41,10 +41,6 @@ public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregati
         payloads.stream().map(msg -> msg.getBody().getMessage())
                 .filter(content -> content instanceof SimpleTextContent).map(content -> (SimpleTextContent) content)
                 .forEach(digestModel::addSmsContent);
-    
-        payloads.stream().map(msg -> msg.getBody().getMessage())
-                .filter(content -> content instanceof MailchimpContent).map(content -> (MailchimpContent) content)
-                .forEach(digestModel::addMailchimpContent);
         
         digestModel.getSmsContents().forEach(smsContent -> smsContent.setText(StringUtils.replace(smsContent.getText(), "\n", "<br>")));
         

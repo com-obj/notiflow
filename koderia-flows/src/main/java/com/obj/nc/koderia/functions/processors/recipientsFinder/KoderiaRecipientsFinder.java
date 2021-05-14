@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -44,11 +45,11 @@ public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<Notificati
 			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s contains null content.", payload)));
 		} else if (content.getMessage() == null) {
 			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s contains null message.", payload)));
-		} else if (content.getMessage().getMailchimpData() == null) {
+		} else if (content.getMessage().getOriginalEvent() == null) {
 			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s does not contain original event data.", payload)));
 		}
 		
-		MailchimpData dataMergeVar = content.getMessage().getMailchimpData();
+		MailchimpData dataMergeVar = content.getMessage().getOriginalEvent();
 		
 		try {
 			objectMapper.convertValue(dataMergeVar, BaseKoderiaEvent.class);
@@ -61,7 +62,7 @@ public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<Notificati
 	
 	@Override
 	protected NotificationIntent execute(NotificationIntent payload) {
-		MailchimpData dataMergeVar = payload.<MailchimpContent>getContentTyped().getMessage().getMailchimpData();
+		MailchimpData dataMergeVar = payload.<MailchimpContent>getContentTyped().getMessage().getOriginalEvent();
 		RecipientsQueryDto recipientsQueryDto = objectMapper.convertValue(dataMergeVar, RecipientsQueryDto.class);
 		
 		List<RecievingEndpoint> emailEndpoints = requestReceivingEndpoints(recipientsQueryDto);

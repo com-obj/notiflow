@@ -105,15 +105,7 @@ class KoderiaRecipientsFinderTest {
         GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
         NotificationIntent mappedNotificationIntent = koderiaEventConverter.apply(genericEvent);
         MailchimpContent contentTyped = mappedNotificationIntent.getContentTyped();
-        int origEventIndex = 0;
-        for (MailchimpMergeVariable mailchimpTemplateContent : contentTyped.getMessage().getGlobalMergeVars()) {
-            if (baseKoderiaEvent.getType().equals(mailchimpTemplateContent.getName())) {
-                break;
-            } else {
-                origEventIndex++;
-            }
-        }
-        contentTyped.getMessage().getGlobalMergeVars().remove(origEventIndex);
+        contentTyped.getMessage().setOriginalEvent(null);
 
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> getKoderiaRecipients.apply(mappedNotificationIntent))

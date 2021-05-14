@@ -60,7 +60,7 @@ class KoderiaEventConverterTest {
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
         MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(jobPostEventData.getName()));
         // and
-        MailchimpData data = content.getMessage().getMailchimpData();
+        MailchimpData data = content.getMessage().getOriginalEvent();
         MatcherAssert.assertThat(data, notNullValue());
     }
 
@@ -87,20 +87,6 @@ class KoderiaEventConverterTest {
     }
 
     @Test
-    void testExtractNullTextEmitEventDto() {
-        JobPostKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", JobPostKoderiaEventDto.class);
-        JobPostEventDataDto jobPostEventData = baseKoderiaEvent.getData();
-        jobPostEventData.setDescription(null);
-    
-        GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
-
-        // when - then
-        Assertions.assertThatThrownBy(() -> eventConverter.apply(genericEvent))
-                .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("Text of Koderia event must not be null");
-    }
-
-    @Test
     void testExtractBlogDto() {
         // given
         BlogKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/blog_body.json", BlogKoderiaEventDto.class);
@@ -118,7 +104,7 @@ class KoderiaEventConverterTest {
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
         MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(blogEventData.getTitle()));
         // and
-        MailchimpData data = content.getMessage().getMailchimpData();
+        MailchimpData data = content.getMessage().getOriginalEvent();
         MatcherAssert.assertThat(data, notNullValue());
     }
 
@@ -141,7 +127,7 @@ class KoderiaEventConverterTest {
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
         MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(eventEventData.getName()));
         // and
-        MailchimpData data = content.getMessage().getMailchimpData();
+        MailchimpData data = content.getMessage().getOriginalEvent();
         MatcherAssert.assertThat(data, notNullValue());
     }
 
@@ -163,7 +149,7 @@ class KoderiaEventConverterTest {
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
         MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(linkEventData.getTitle()));
         // and
-        MailchimpData data = content.getMessage().getMailchimpData();
+        MailchimpData data = content.getMessage().getOriginalEvent();
         MatcherAssert.assertThat(data, notNullValue());
     }
 
@@ -185,7 +171,7 @@ class KoderiaEventConverterTest {
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
         MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(newsEventData.getSubject()));
         // and
-        MailchimpData data = content.getMessage().getMailchimpData();
+        MailchimpData data = content.getMessage().getOriginalEvent();
         MatcherAssert.assertThat(data, notNullValue());
     }
 

@@ -107,7 +107,7 @@ public class KoderiaIntentProcessingTest extends BaseIntegrationTest {
 		
 		MailchimpContent content = payload.getContentTyped();
 		MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(koderiaEvent.getMessageSubject()));
-		MailchimpData data = content.getMessage().getMailchimpData();
+		MailchimpData data = content.getMessage().getOriginalEvent();
 		MatcherAssert.assertThat(data, notNullValue());
 		
 		MatcherAssert.assertThat(data.getAttachments(), empty());

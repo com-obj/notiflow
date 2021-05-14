@@ -21,10 +21,5 @@ public class MailchimpMessage {
     @JsonProperty("merge_language") private String mergeLanguage = "handlebars";
     @JsonProperty("global_merge_vars") private List<MailchimpMergeVariable> globalMergeVars = new ArrayList<>();
     @NotNull private List<MailchimpAttachment> attachments = new ArrayList<>();
-    
-    @JsonIgnore
-    public MailchimpData getMailchimpData() {
-        return originalEvent;
-    }
 
 }
