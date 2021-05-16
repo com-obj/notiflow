@@ -21,7 +21,7 @@ public class JwtTokenUtil implements Serializable {
 	
 	public static final long JWT_TOKEN_VALIDITY = 5*60*60;
 
-	private final NcSecurityConfigProperties ncSecurityConfigProperties;
+	private final NcJwtConfigProperties ncJwtConfigProperties;
 
 	public String getUsernameFromToken(String token) {
 		return getClaimFromToken(token, Claims::getSubject);
@@ -41,7 +41,7 @@ public class JwtTokenUtil implements Serializable {
 	}
 
 	private Claims getAllClaimsFromToken(String token) {
-		return Jwts.parser().setSigningKey(ncSecurityConfigProperties.getSignatureSecret()).parseClaimsJws(token).getBody();
+		return Jwts.parser().setSigningKey(ncJwtConfigProperties.getSignatureSecret()).parseClaimsJws(token).getBody();
 	}
 
 	private Boolean isTokenExpired(String token) {
@@ -63,7 +63,7 @@ public class JwtTokenUtil implements Serializable {
 
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY*1000))
-				.signWith(SignatureAlgorithm.HS512, ncSecurityConfigProperties.getSignatureSecret()).compact();
+				.signWith(SignatureAlgorithm.HS512, ncJwtConfigProperties.getSignatureSecret()).compact();
 	}
 
 	public Boolean canTokenBeRefreshed(String token) {

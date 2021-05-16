@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties("nc.jwt")
-public class NcSecurityConfigProperties {
+public class NcJwtConfigProperties {
     
     private String username;
     private String password;

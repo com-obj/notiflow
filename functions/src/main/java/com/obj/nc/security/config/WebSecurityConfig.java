@@ -18,15 +18,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class WebSecurityConfig {
 	
 	private final UserDetailsService jwtUserDetailsService;
+	private final PasswordEncoder passwordEncoder;
 	
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
-	}
-	
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
+		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder);
 	}
 	
 }
