@@ -1,12 +1,14 @@
 package com.obj.nc.security.controller;
 
 import com.obj.nc.security.config.Constants;
+import com.obj.nc.security.config.JwtSecurityConfig;
 import com.obj.nc.security.config.JwtTokenUtil;
 import com.obj.nc.security.exception.UserNotAuthenticatedException;
 import com.obj.nc.security.model.JwtRequest;
 import com.obj.nc.security.model.JwtResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +23,7 @@ import java.util.Objects;
 @Log4j2
 @RestController
 @CrossOrigin
+@ConditionalOnBean(JwtSecurityConfig.class)
 @RequiredArgsConstructor
 public class JwtAuthenticationController {
 

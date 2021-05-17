@@ -2,12 +2,13 @@ package com.obj.nc.security.config;
 
 import com.obj.nc.security.exception.UserNotAuthenticatedException;
 import com.obj.nc.security.service.JwtUserDetailsService;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -18,6 +19,8 @@ import java.io.IOException;
 
 import static com.obj.nc.security.config.Constants.*;
 
+@Component
+@ConditionalOnBean(JwtSecurityConfig.class)
 @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -40,7 +43,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			jwtToken = requestTokenHeader.substring(JWT_TOKEN_PREFIX.length());
 			try {
 				username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-			} catch (IllegalArgumentException | ExpiredJwtException e) {
+			} catch (Exception e) {
 				throw new UserNotAuthenticatedException(e.getMessage());
 			}
 		} else {
