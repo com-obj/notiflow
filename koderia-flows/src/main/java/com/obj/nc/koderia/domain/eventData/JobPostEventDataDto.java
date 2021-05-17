@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -26,5 +27,12 @@ public class JobPostEventDataDto extends BaseKoderiaData {
     @NotBlank private String type;
     @NotBlank private String dateOfStart;
 
+    public String getRate() {
+        return specialRate != null ? specialRate : rate.concat(" €");
+    }
+    
+    public List<String> getTechnologies() {
+        return Collections.singletonList(String.join(", ", technologies));
+    }
 }
 
