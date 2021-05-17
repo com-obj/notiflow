@@ -1,6 +1,7 @@
 package com.obj.nc.security.config;
 
 import com.obj.nc.security.model.AuthenticationError;
+import com.obj.nc.security.service.JwtUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +55,11 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 					.build().toString()
 			);
 		});
+	}
+	
+	@Bean
+	public JwtRequestFilter jwtRequestFilter(JwtUserDetailsService jwtUserDetailsService, JwtTokenUtil jwtTokenUtil) {
+		return new JwtRequestFilter(jwtUserDetailsService, jwtTokenUtil);
 	}
 	
 }
