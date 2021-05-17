@@ -36,7 +36,7 @@ class JwtAuthenticationDisabledTest extends BaseIntegrationTest {
     }
     
     @Test
-    void testAuthenticateSucces() throws Exception {
+    void testAuthenticateNotFoundOnDisabled() throws Exception {
         // given
         JwtRequest jwtRequest = JwtRequest.builder().username("testUser").password("testPassword").build();
         
