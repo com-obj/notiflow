@@ -4,97 +4,92 @@ options:
   docker: true
 
 definitions:
-   steps:
-     - run-tests: &run-tests
-       - step:
-           name: Run tests
-           caches:
-             - gradle
-             - maven
-             - docker
-           services:
-             - postgres
-           script:
-             - gradle test -Dspring.profiles.active=bitbucket --stacktrace --info
-           after-script:
-             - pipe: atlassian/checkstyle-report:0.2.0
-           artifacts:
-             - osk-flows/build/reports/tests/**
-             - koderia-flows/build/reports/tests/**
-             - functions/build/reports/tests/**
-     - build-jar: &build-jar
-       - step:
-           name: Build FAT Jar
-           caches:
-            - gradle
-            - maven
-           script:
-             - gradle build -x test --stacktrace --info
-           artifacts:
-             - osk-flows/dist/**
-             - koderia-flows/dist/**
-     - deploy-snaphost-2-BB: &deploy-2-BB
-       - step:
-           name: Deploy snapshot to Bitbucket downloads
-           script:
-             - pipe: atlassian/bitbucket-upload-file:0.3.2
-               variables:
-                 BITBUCKET_USERNAME: $BITBUCKET_USERNAME
-                 BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
-                 FILENAME: "osk-flows/dist/*.jar"
-             - pipe: atlassian/bitbucket-upload-file:0.3.2
-               variables:
-                 BITBUCKET_USERNAME: $BITBUCKET_USERNAME
-                 BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
-                 FILENAME: "koderia-flows/dist/*.jar"
-           artifacts:
-             - osk-flows/dist/**
-             - koderia-flows/dist/**
-     - deploy-2-gcr: &deploy-2-gcr
-         - step:
-             name: Deploy Docker Image to GCR
-             caches:
-               - gradle
-               - maven
-             script:
-               # build
-               - cp -a koderia-flows/dist/ koderia-flows/docker/
-               - chown -R 1000:1000 koderia-flows/docker/
-               - docker build -t eu.gcr.io/objectify-infra/koderia-flows koderia-flows/docker/
-               # tag
-               - export SUFFIX=$([[ ! -z "$BITBUCKET_TAG" ]] && echo ":$BITBUCKET_TAG" || echo "") # tag name or  "" (latest) on master branch
-               - export IMAGE_NAME=eu.gcr.io/objectify-infra/koderia-flows${SUFFIX}
-               - docker tag eu.gcr.io/objectify-infra/koderia-flows ${IMAGE_NAME}
-               # push
-               - cat koderia-flows/gcr/gcr-push-sa-key.json | docker login -u _json_key --password-stdin https://eu.gcr.io
-               - docker push ${IMAGE_NAME}
-               # save for further pipeline processing (e.g. helm)
-               - docker save --output tagged-image.docker ${IMAGE_NAME}
-               - echo export IMAGE_NAME=$IMAGE_NAME > shared_vars.sh # trick to share ENV variables between steps, load with "source shared_vars.sh"
-             artifacts:
-               - tagged-image.docker
-               - shared_vars.sh
-   services:
-     postgres:
-       image: postgres
-       variables:
-         POSTGRES_DB: 'nc'
-         POSTGRES_USER: 'nc'
-         POSTGRES_PASSWORD: 'ZMss4o9mdBLV'
-
+  steps:
+    - step: &run-tests
+        name: Run tests
+        caches:
+          - gradle
+          - maven
+          - docker
+        services:
+          - postgres
+        script:
+          - gradle test -Dspring.profiles.active=bitbucket --stacktrace --info
+        after-script:
+          - pipe: atlassian/checkstyle-report:0.2.0
+        artifacts:
+          - osk-flows/build/reports/tests/**
+          - koderia-flows/build/reports/tests/**
+          - functions/build/reports/tests/**
+    - step: &build-jar
+        name: Build FAT Jar
+        caches:
+         - gradle
+         - maven
+        script:
+          - gradle build -x test --stacktrace --info
+        artifacts:
+          - osk-flows/dist/**
+          - koderia-flows/dist/**
+    - step: &deploy-2-BB
+        name: Deploy snapshot to Bitbucket downloads
+        script:
+          - pipe: atlassian/bitbucket-upload-file:0.3.2
+            variables:
+              BITBUCKET_USERNAME: $BITBUCKET_USERNAME
+              BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
+              FILENAME: "osk-flows/dist/*.jar"
+          - pipe: atlassian/bitbucket-upload-file:0.3.2
+            variables:
+              BITBUCKET_USERNAME: $BITBUCKET_USERNAME
+              BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
+              FILENAME: "koderia-flows/dist/*.jar"
+        artifacts:
+          - osk-flows/dist/**
+          - koderia-flows/dist/**
+    - step: &deploy-2-gcr
+        name: Deploy Docker Image to GCR
+        caches:
+          - gradle
+          - maven
+        script:
+          # build
+          - cp -a koderia-flows/dist/ koderia-flows/docker/
+          - chown -R 1000:1000 koderia-flows/docker/
+          - docker build -t eu.gcr.io/objectify-infra/koderia-flows koderia-flows/docker/
+          # tag
+          - export SUFFIX=$([[ ! -z "$BITBUCKET_TAG" ]] && echo ":$BITBUCKET_TAG" || echo "") # tag name or  "" (latest) on master branch
+          - export IMAGE_NAME=eu.gcr.io/objectify-infra/koderia-flows${SUFFIX}
+          - docker tag eu.gcr.io/objectify-infra/koderia-flows ${IMAGE_NAME}
+          # push
+          - cat koderia-flows/gcr/gcr-push-sa-key.json | docker login -u _json_key --password-stdin https://eu.gcr.io
+          - docker push ${IMAGE_NAME}
+          # save for further pipeline processing (e.g. helm)
+          - docker save --output tagged-image.docker ${IMAGE_NAME}
+          - echo export IMAGE_NAME=$IMAGE_NAME > shared_vars.sh # trick to share ENV variables between steps, load with "source shared_vars.sh"
+        artifacts:
+          - tagged-image.docker
+          - shared_vars.sh
+  services:
+    postgres:
+      image: postgres
+      variables:
+        POSTGRES_DB: 'nc'
+        POSTGRES_USER: 'nc'
+        POSTGRES_PASSWORD: 'ZMss4o9mdBLV'
 pipelines:
   branches:
     develop:
-      - <<: *run-tests
+      - step: *run-tests
     master:
-      - <<: *run-tests
+      - step: *run-tests
     release/*:
-      - <<: *run-tests
-      - <<: *build-jar
-      - <<: *deploy-2-BB
-      - <<: *deploy-2-gcr
+      - step: *run-tests
+      - step: *build-jar
+      - step: *deploy-2-BB
+      - step: *deploy-2-gcr
   tags:
     v*:
-      - <<: *build-jar
-      - <<: *deploy-2-BB
-      - <<: *deploy-2-gcr
+      - step: *build-jar
+      - step: *deploy-2-BB
+      - step: *deploy-2-gcr
