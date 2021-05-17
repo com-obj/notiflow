@@ -1,17 +1,14 @@
 package com.obj.nc.security.model;
 
-import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public class JwtResponse implements Serializable {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class JwtResponse {
 
-	private static final long serialVersionUID = 6737235135308995599L;
-	private final String jwttoken;
-
-	public JwtResponse(String jwttoken) {
-		this.jwttoken = jwttoken;
-	}
-
-	public String getToken() {
-		return this.jwttoken;
-	}
+	private String token;
+	
 }

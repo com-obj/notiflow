@@ -1,21 +1,29 @@
 package com.obj.nc.security.config;
 
+import com.obj.nc.security.model.AuthenticationError;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import javax.servlet.http.HttpServletResponse;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import static com.obj.nc.security.config.Constants.DEFAULT_EXCEPTION_MSG;
+import static com.obj.nc.security.config.Constants.EXCEPTION_ATTR_NAME;
+
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "nc.jwt.enabled", havingValue = "true")
 public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 	
-	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	private final JwtRequestFilter jwtRequestFilter;
 	
 	@Bean
@@ -27,13 +35,25 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
-				.authorizeRequests().antMatchers("/authenticate").permitAll()
+				.authorizeRequests().antMatchers(Constants.API.AUTHENTICATE).permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-				.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
-				.and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		
+		httpSecurity.exceptionHandling().authenticationEntryPoint((request, response, exception) -> {
+			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			
+			Exception exceptionAttribute = (Exception) request.getAttribute(EXCEPTION_ATTR_NAME);
+			String exceptionMessage = exceptionAttribute == null ? DEFAULT_EXCEPTION_MSG : exceptionAttribute.getMessage();
+			
+			response.getWriter().write(AuthenticationError.builder()
+					.timestamp(Timestamp.valueOf(LocalDateTime.now()))
+					.message(exceptionMessage)
+					.build().toString()
+			);
+		});
 	}
 	
 }
