@@ -1,5 +1,5 @@
 image:
-  tag: v1.0.8-dev.4
+  tag: v1.0.8-dev.6
   
 ingress:
   enabled: true
@@ -8,12 +8,12 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-body-size: 512m
     cert-manager.io/cluster-issuer: letsencrypt-prod-http01
   hosts:
-    - host: adhoc.objectify.sk
+    - host: nc.objectify.sk
       paths: [ /koderia-flows ]
   tls:
     - secretName: letsencrypt-prod
       hosts:
-        - adhoc.objectify.sk
+        - nc.objectify.sk
 
 activeProfiles:
   - gke
