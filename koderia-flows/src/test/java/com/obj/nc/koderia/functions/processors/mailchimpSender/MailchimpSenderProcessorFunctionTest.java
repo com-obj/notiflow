@@ -8,7 +8,7 @@ import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
 import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemplateResponse;
-import com.obj.nc.mappers.MailchimpDataToMailchimpContentMapper;
+import com.obj.nc.koderia.mapper.KoderiaMergeVarMapperImpl;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
@@ -40,7 +40,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @RestClientTest(MailchimpSenderProcessorFunction.class)
 @ContextConfiguration(classes = {
         MailchimpSenderConfig.class,
-        MailchimpDataToMailchimpContentMapper.class,
+        KoderiaMergeVarMapperImpl.class,
         MailchimpSenderConfigProperties.class
 })
 class MailchimpSenderProcessorFunctionTest {

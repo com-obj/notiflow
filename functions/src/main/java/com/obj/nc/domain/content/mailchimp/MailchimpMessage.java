@@ -1,25 +1,20 @@
 package com.obj.nc.domain.content.mailchimp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public class MailchimpMessage {
     
-    @NotNull private MailchimpData originalEvent;
-    @NotBlank private String subject;
-    @NotBlank @JsonProperty("from_email") private String fromEmail;
-    @NotBlank @JsonProperty("from_name") private String fromName;
-    @NotEmpty private List<MailchimpRecipient> to = new ArrayList<>();
-    @JsonProperty("merge_language") private String mergeLanguage = "handlebars";
+    @JsonProperty("subject") private String subject;
+    @JsonProperty("from_email") private String fromEmail;
+    @JsonProperty("from_name") private String fromName;
+    @JsonProperty("to") private List<MailchimpRecipient> recipients = new ArrayList<>();
+    @JsonProperty("merge_language") private String mergeLanguage;
     @JsonProperty("global_merge_vars") private List<MailchimpMergeVariable> globalMergeVars = new ArrayList<>();
-    @NotNull private List<MailchimpAttachment> attachments = new ArrayList<>();
+    @JsonProperty("attachments") private List<MailchimpAttachment> attachments = new ArrayList<>();
 
 }

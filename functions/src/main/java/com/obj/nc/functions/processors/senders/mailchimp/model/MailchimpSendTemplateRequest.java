@@ -4,33 +4,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpMessage;
 import com.obj.nc.domain.content.mailchimp.MailchimpTemplateContent;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public class MailchimpSendTemplateRequest {
     
-    @NotBlank private String key;
-    @NotNull private MailchimpMessage message;
-    @NotBlank @JsonProperty("template_name") private String templateName;
+    @JsonProperty("key") private String key;
+    @JsonProperty("message") private MailchimpMessage message;
+    @JsonProperty("template_name") private String templateName;
     @JsonProperty("template_content") private List<MailchimpTemplateContent> templateContent;
     
-    public static MailchimpSendTemplateRequest from(MailchimpContent content, String authKey) {
+    public static MailchimpSendTemplateRequest from(MailchimpContent content, MailchimpSenderConfigProperties properties) {
         MailchimpSendTemplateRequest dto = new MailchimpSendTemplateRequest();
-        dto.key = authKey;
+        dto.key = properties.getAuthKey();
     
         MailchimpMessage mailchimpMessage = new MailchimpMessage();
-        mailchimpMessage.setTo(new ArrayList<>(content.getMessage().getTo()));
-        mailchimpMessage.setAttachments(new ArrayList<>(content.getMessage().getAttachments()));
-        mailchimpMessage.setFromName(content.getMessage().getFromName());
-        mailchimpMessage.setFromEmail(content.getMessage().getFromEmail());
-        mailchimpMessage.setGlobalMergeVars(new ArrayList<>(content.getMessage().getGlobalMergeVars()));
-        mailchimpMessage.setSubject(content.getMessage().getSubject());
-        mailchimpMessage.setMergeLanguage(content.getMessage().getMergeLanguage());
+        mailchimpMessage.setAttachments(new ArrayList<>(content.getAttachments()));
+        mailchimpMessage.setFromName(content.getSenderName());
+        mailchimpMessage.setFromEmail(content.getSenderEmail());
+        mailchimpMessage.setSubject(content.getSubject());
+        mailchimpMessage.setGlobalMergeVars(new ArrayList<>(content.getGlobalMergeVariables()));
+        mailchimpMessage.setMergeLanguage(properties.getMergeLanguage());
         dto.setMessage(mailchimpMessage);
     
         dto.setTemplateContent(new ArrayList<>(content.getTemplateContent()));

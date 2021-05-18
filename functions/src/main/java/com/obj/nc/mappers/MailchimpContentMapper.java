@@ -3,6 +3,7 @@ package com.obj.nc.mappers;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.mailchimp.*;
 
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpMergeVarMapper;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
@@ -18,45 +19,27 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class MailchimpDataToMailchimpContentMapper {
+public class MailchimpContentMapper {
+    
     private final MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
+    private final MailchimpMergeVarMapper mailchimpMergeVarMapper;
 
     public MailchimpContent map(MailchimpData event) {
         MailchimpContent content = new MailchimpContent();
-        content.setMessage(mapMessage(event));
-        content.setTemplateName(getTemplateName(event));
-        return content;
-    }
-
-    protected MailchimpMessage mapMessage(MailchimpData event) {
-        MailchimpMessage mailchimpMessage = new MailchimpMessage();
-        mailchimpMessage.setOriginalEvent(event);
-
-        mailchimpMessage.setSubject(mapSubject(event));
-        mailchimpMessage.setFromEmail(mailchimpSenderConfigProperties.getSenderEmail());
-        mailchimpMessage.setFromName(mailchimpSenderConfigProperties.getSenderName());
-
-        List<MailchimpMergeVariable> globalMergeVars = mapGlobalMergeVars(event);
-        mailchimpMessage.setGlobalMergeVars(globalMergeVars);
-
+        content.setOriginalEvent(event);
+        content.setSubject(mapSubject(event));
+        content.setSenderName(mailchimpSenderConfigProperties.getSenderName());
+        content.setSenderEmail(mailchimpSenderConfigProperties.getSenderEmail());
+        content.setTemplateName(mailchimpSenderConfigProperties.getTemplateNameFromMessageType(event.getType()));
+        content.setGlobalMergeVariables(mailchimpMergeVarMapper.map(event));
+        
         List<MailchimpAttachment> mailchimpAttachments = mapAttachments(event);
-        mailchimpMessage.setAttachments(mailchimpAttachments);
-
-        return mailchimpMessage;
+        content.setAttachments(mailchimpAttachments);
+        return content;
     }
 
     protected String mapSubject(MailchimpData event) {
         return event.getMessageSubject();
-    }
-
-    protected List<MailchimpMergeVariable> mapGlobalMergeVars(MailchimpData message) {
-        MailchimpMergeVariable mergeVar = new MailchimpMergeVariable();
-        mergeVar.setName(message.getType());
-        mergeVar.setContent(message);
-        
-        List<MailchimpMergeVariable> result = new ArrayList<>();
-        result.add(mergeVar);
-        return result;
     }
 
     protected List<MailchimpAttachment> mapAttachments(MailchimpData event) {
@@ -85,10 +68,6 @@ public class MailchimpDataToMailchimpContentMapper {
         attachment.setContent(base64StringAttachment);
 
         return attachment;
-    }
-
-    protected String getTemplateName(MailchimpData event) {
-        return mailchimpSenderConfigProperties.getTemplateNameFromMessageType(event.getType());
     }
 
 }

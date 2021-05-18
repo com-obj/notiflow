@@ -6,6 +6,7 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
@@ -31,7 +32,10 @@ public class InMemoryMailchimpSourceSupplier extends SourceSupplierAdapter<Messa
     
         Message message = new Message();
         MailchimpContent content = new MailchimpContent();
-        content.setMessage(originalContent.getMessage());
+        content.setSubject(originalContent.getSubject());
+        content.setRecipients(new ArrayList<>(originalContent.getRecipients()));
+        content.setSenderName(originalContent.getSenderName());
+        content.setSenderEmail(originalContent.getSenderEmail());
         message.getBody().setMessage(content);
         return message;
     }

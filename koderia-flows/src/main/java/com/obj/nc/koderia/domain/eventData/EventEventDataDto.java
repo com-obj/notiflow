@@ -21,5 +21,10 @@ public class EventEventDataDto extends BaseKoderiaData {
     @NotNull private LocationDto location;
     @NotNull private OrganizerDto organizer;
     @NotBlank private String imageUrl;
+    
+    @Override
+    public Object asMailchimpMergeVarContent() {
+        return this;
+    }
 
 }

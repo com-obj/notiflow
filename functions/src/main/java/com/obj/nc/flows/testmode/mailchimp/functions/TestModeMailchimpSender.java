@@ -1,7 +1,6 @@
 package com.obj.nc.flows.testmode.mailchimp.functions;
 
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -31,10 +30,9 @@ public class TestModeMailchimpSender extends ProcessorFunctionAdapter<Message,Me
     @Override
     protected Message execute(Message payload) {
         MailchimpContent content = payload.getContentTyped();
-        MailchimpMessage mcMessage = content.getMessage();
-        mcMessage.setTo(realMailchimpSender.mapRecipient(payload.getBody().getRecievingEndpoints().get(0)));
+        content.setRecipients(realMailchimpSender.mapRecipient(payload.getBody().getRecievingEndpoints().get(0)));
         
-        MailchimpSendTemplateRequest sendRequest = MailchimpSendTemplateRequest.from(content, mailchimpSenderConfigProperties.getAuthTestKey());
+        MailchimpSendTemplateRequest sendRequest = MailchimpSendTemplateRequest.from(content, mailchimpSenderConfigProperties);
         realMailchimpSender.doSendMessage(sendRequest);
         
         receiver.recieve(payload);

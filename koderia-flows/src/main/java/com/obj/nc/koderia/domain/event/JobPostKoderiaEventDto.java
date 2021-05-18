@@ -20,7 +20,7 @@ public class JobPostKoderiaEventDto extends BaseKoderiaEvent {
     
     @Override
     public String getMessageSubject() {
-        return String.join(", ", data.getName(), data.getRate(), data.getLocation());
+        return String.join(", ", data.getName(), data.getPriorityRate(), data.getLocation());
     }
 }
 

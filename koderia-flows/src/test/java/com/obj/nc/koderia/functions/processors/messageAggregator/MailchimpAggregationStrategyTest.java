@@ -1,11 +1,11 @@
 package com.obj.nc.koderia.functions.processors.messageAggregator;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.MailchimpMessageAggregationStrategy;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
-import com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverterConfig;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Arrays;
-import java.util.List;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @JsonTest
@@ -30,14 +29,13 @@ public class MailchimpAggregationStrategyTest {
     @Test
     void testAggregateValidMessagesPass() {
         // given
-        List<Message> inputMessages = Arrays.asList(
-                JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_1.json", Message.class),
-                JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_2.json", Message.class),
-                JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_3.json", Message.class)
-        );
-        
+        Message message1 = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_1.json", Message.class);
+        message1.<MailchimpContent>getContentTyped().getMessage().setOriginalEvent();
+        Message message2 = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_2.json", Message.class);
+        Message message3 = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_3.json", Message.class);
+    
         // when
-        Message outputMessage = (Message) aggregateEmailMessages.apply(inputMessages);
+        Message outputMessage = (Message) aggregateEmailMessages.apply(Arrays.asList(message1, message2, message3));
     
         // then
         Message expectedOutputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/output_message.json", Message.class);

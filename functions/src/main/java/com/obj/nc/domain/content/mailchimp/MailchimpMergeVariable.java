@@ -1,11 +1,15 @@
 package com.obj.nc.domain.content.mailchimp;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MailchimpMergeVariable {
 
     private String name;
-    private MailchimpData content;
+    private Object content;
 
 }

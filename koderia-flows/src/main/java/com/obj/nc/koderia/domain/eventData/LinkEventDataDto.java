@@ -20,5 +20,10 @@ public class LinkEventDataDto extends BaseKoderiaData {
     @NotEmpty private List<String> images;
     @NotBlank private String url;
     @NotNull private List<String> favicons;
+    
+    @Override
+    public Object asMailchimpMergeVarContent() {
+        return this;
+    }
 
 }

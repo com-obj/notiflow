@@ -1,6 +1,6 @@
 package com.obj.nc.koderia.flows;
 
-import com.obj.nc.koderia.functions.processors.eventConverter.KoderiaEventConverter;
+import com.obj.nc.functions.processors.eventFactory.MailchimpEventConverter;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinder;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +19,7 @@ public class ConvertKoderiaEventFlowConfig {
     public final static String CONVERT_KODERIA_EVENT_FLOW_ID = "default-flow";
     public final static String CONVERT_KODERIA_EVENT_FLOW_INPUT_CHANNEL_ID = CONVERT_KODERIA_EVENT_FLOW_ID + "_INPUT";
     
-    private final KoderiaEventConverter koderiaEventConverter;
+    private final MailchimpEventConverter mailchimpEventConverter;
     private final KoderiaRecipientsFinder recipientsFinder;
     
     @Bean(CONVERT_KODERIA_EVENT_FLOW_INPUT_CHANNEL_ID)
@@ -31,7 +31,7 @@ public class ConvertKoderiaEventFlowConfig {
     public IntegrationFlow convertKoderiaEventFlowDefinition() {
         return IntegrationFlows
                 .from(CONVERT_KODERIA_EVENT_FLOW_INPUT_CHANNEL_ID)
-                .handle(koderiaEventConverter)
+                .handle(mailchimpEventConverter)
                 .handle(recipientsFinder)
                 .channel(INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
                 .get();

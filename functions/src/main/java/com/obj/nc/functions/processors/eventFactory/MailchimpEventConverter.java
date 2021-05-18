@@ -1,13 +1,13 @@
-package com.obj.nc.koderia.functions.processors.eventConverter;
+package com.obj.nc.functions.processors.eventFactory;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
-import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
-import com.obj.nc.mappers.MailchimpDataToMailchimpContentMapper;
+import com.obj.nc.mappers.MailchimpContentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,10 +15,10 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-@DocumentProcessingInfo("KoderiaEventConverter")
-public class KoderiaEventConverter extends ProcessorFunctionAdapter<GenericEvent, NotificationIntent> {
+@DocumentProcessingInfo("MailchimpEventConverter")
+public class MailchimpEventConverter extends ProcessorFunctionAdapter<GenericEvent, NotificationIntent> {
 	
-	private final MailchimpDataToMailchimpContentMapper mailchimpDataToMailchimpContentMapper;
+	private final MailchimpContentMapper mailchimpContentMapper;
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(GenericEvent payload) {
@@ -26,8 +26,11 @@ public class KoderiaEventConverter extends ProcessorFunctionAdapter<GenericEvent
 			return Optional.of(new PayloadValidationException("GenericEvent must not be null"));
 		} else if (payload.getPayloadJson()==null) {
 			return Optional.of(new PayloadValidationException("GenericEvent doesn't contain original message"));
-		} else if (payload.<BaseKoderiaEvent>getPayloadAsPojo().getMessageSubject() == null) {
-			return Optional.of(new PayloadValidationException("Subject of Koderia event must not be null"));
+		} else if (!(payload.getPayloadAsPojo() instanceof MailchimpData)) {
+			return Optional.of(new PayloadValidationException(String.format("Payload is not an instance of class %s. Is %s",
+					MailchimpData.class.getSimpleName(), payload.getPayloadAsPojo().getClass().getSimpleName())));
+		} else if (payload.<MailchimpData>getPayloadAsPojo().getMessageSubject() == null) {
+			return Optional.of(new PayloadValidationException("Subject of mailchimp event must not be null"));
 		} else {
 			return Optional.empty();
 		}
@@ -38,8 +41,8 @@ public class KoderiaEventConverter extends ProcessorFunctionAdapter<GenericEvent
 		NotificationIntent notificationIntent = new NotificationIntent();
 		notificationIntent.getHeader().setFlowId(payload.getFlowId());
 		
-		BaseKoderiaEvent koderiaEvent = payload.getPayloadAsPojo();
-		notificationIntent.getBody().setMessage(mailchimpDataToMailchimpContentMapper.map(koderiaEvent));
+		MailchimpData mailchimpData = payload.getPayloadAsPojo();
+		notificationIntent.getBody().setMessage(mailchimpContentMapper.map(mailchimpData));
 		return notificationIntent;
 	}
 	

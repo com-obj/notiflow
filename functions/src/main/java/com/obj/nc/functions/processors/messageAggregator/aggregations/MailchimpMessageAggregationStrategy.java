@@ -60,57 +60,56 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 	}
 	
 	private MailchimpContent concatContents(MailchimpContent one, MailchimpContent other) {
-		MailchimpContent concated = new MailchimpContent();
-		concated.setTemplateName(mailchimpSenderConfigProperties.getAggregatedMessageTemplateName());
+		MailchimpContent aggregatedContent = new MailchimpContent();
+		aggregatedContent.setTemplateName(mailchimpSenderConfigProperties.getAggregatedMessageTemplateName());
 		
 		List<MailchimpTemplateContent> templateContent = new ArrayList<>(one.getTemplateContent());
 		templateContent.addAll(other.getTemplateContent());
-		concated.setTemplateContent(templateContent);
+		aggregatedContent.setTemplateContent(templateContent);
 		
-		MailchimpMessage mailchimpMessage = new MailchimpMessage();
-		mailchimpMessage.setTo(one.getMessage().getTo());
-		mailchimpMessage.setSubject(mailchimpSenderConfigProperties.getAggregatedMessageSubject());
+		aggregatedContent.setRecipients(one.getRecipients());
+		aggregatedContent.setSubject(mailchimpSenderConfigProperties.getAggregatedMessageSubject());
 		
-		ArrayList<MailchimpAttachment> attachments = new ArrayList<>(one.getMessage().getAttachments());
-		attachments.addAll(other.getMessage().getAttachments());
-		mailchimpMessage.setAttachments(attachments);
+		ArrayList<MailchimpAttachment> attachments = new ArrayList<>(one.getAttachments());
+		attachments.addAll(other.getAttachments());
+		aggregatedContent.setAttachments(attachments);
 		
-		mailchimpMessage.setFromEmail(one.getMessage().getFromEmail());
-		mailchimpMessage.setFromName(one.getMessage().getFromName());
-		mailchimpMessage.setMergeLanguage(one.getMessage().getMergeLanguage());
+		aggregatedContent.setSenderName(one.getSenderName());
+		aggregatedContent.setSenderEmail(one.getSenderEmail());
 		
-		Map<String, List<MailchimpData>> globalMergeCategoryValues = new HashMap<>();
+		Map<String, List<Object>> globalMergeCategoryValues = new HashMap<>();
 		mailchimpSenderConfigProperties.getMessageTypes().forEach(type -> globalMergeCategoryValues.put(type, new ArrayList<>()));
 		
-		one.getMessage().getGlobalMergeVars().forEach(mergeVar -> {
-			if (mergeVar.getContent() instanceof AggregatedMailchimpData) {
-				globalMergeCategoryValues.get(mergeVar.getName()).addAll(((AggregatedMailchimpData) mergeVar.getContent()).getData());
-			} else {
-				globalMergeCategoryValues.get(mergeVar.getName()).add(mergeVar.getContent());
-			}
-		});
-		other.getMessage().getGlobalMergeVars().forEach(mergeVar -> {
-			if (mergeVar.getContent() instanceof AggregatedMailchimpData) {
-				globalMergeCategoryValues.get(mergeVar.getName()).addAll(((AggregatedMailchimpData) mergeVar.getContent()).getData());
-			} else {
-				globalMergeCategoryValues.get(mergeVar.getName()).add(mergeVar.getContent());
-			}
-		});
-		mailchimpMessage.setGlobalMergeVars(globalMergeCategoryValues.entrySet().stream().map(this::mapMergeVar).collect(Collectors.toList()));
-		concated.setMessage(mailchimpMessage);
-		return concated;
+		aggregateGlobalMergeVariables(one, globalMergeCategoryValues);
+		aggregateGlobalMergeVariables(other, globalMergeCategoryValues);
+		aggregatedContent.setGlobalMergeVariables(globalMergeCategoryValues.entrySet().stream().map(this::mapMergeVar)
+				.collect(Collectors.toList()));
+		
+		return aggregatedContent;
 	}
 	
-	protected MailchimpMergeVariable mapMergeVar(Map.Entry<String, List<MailchimpData>> entry) {
+	protected MailchimpMergeVariable mapMergeVar(Map.Entry<String, List<Object>> entry) {
 		MailchimpMergeVariable mergeVar = new MailchimpMergeVariable();
 		mergeVar.setName(entry.getKey());
 		
 		AggregatedMailchimpData data = new AggregatedMailchimpData();
+		data.setSubject(mailchimpSenderConfigProperties.getAggregatedMessageSubject());
 		data.setType(AggregatedMailchimpData.JSON_TYPE_NAME);
 		data.setData(entry.getValue());
 		
 		mergeVar.setContent(data);
 		return mergeVar;
+	}
+	
+	private void aggregateGlobalMergeVariables(MailchimpContent other, Map<String, List<Object>> globalMergeCategoryValues) {
+		other.getGlobalMergeVariables().forEach(mergeVar -> {
+			if (mergeVar.getContent() instanceof AggregatedMailchimpData) {
+				AggregatedMailchimpData aggregatedMailchimpData = (AggregatedMailchimpData) mergeVar.getContent();
+				globalMergeCategoryValues.get(mergeVar.getName()).addAll(aggregatedMailchimpData.getData());
+			} else {
+				globalMergeCategoryValues.get(mergeVar.getName()).add(mergeVar.getContent());
+			}
+		});
 	}
 
 }

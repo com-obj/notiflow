@@ -39,8 +39,17 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 			return Optional.of(new PayloadValidationException("Message must not be null"));
 		}
 		
-		if (payload.getContentTyped() == null) {
+		if (!(payload.getContentTyped() instanceof MailchimpContent)) {
+			return Optional.of(new PayloadValidationException(String.format("Mailchimp sender can only send %s content", MailchimpContent.class.getSimpleName())));
+		}
+		
+		MailchimpContent content = payload.getContentTyped();
+		if (content == null) {
 			return Optional.of(new PayloadValidationException("Message content must not be null"));
+		}
+		
+		if (content.getOriginalEvent() == null) {
+			return Optional.of(new PayloadValidationException("Message content must contain original event"));
 		}
 		
 		boolean hasNoneOrTooMuchEndpoints = payload.getBody().getRecievingEndpoints().size() != 1;
@@ -58,8 +67,8 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 	protected Message execute(Message payload) {
 		MailchimpContent content = payload.getContentTyped();
 		
-		MailchimpSendTemplateRequest dto = MailchimpSendTemplateRequest.from(content, mailchimpSenderConfigProperties.getAuthKey());
-		dto.getMessage().setTo(mapRecipient(payload.getBody().getRecievingEndpoints().get(0)));
+		MailchimpSendTemplateRequest dto = MailchimpSendTemplateRequest.from(content, mailchimpSenderConfigProperties);
+		dto.getMessage().setRecipients(mapRecipient(payload.getBody().getRecievingEndpoints().get(0)));
 		
 		List<MailchimpSendTemplateResponse> mailchimpSendTemplateResponses = doSendMessage(dto);
 		payload.getBody().setAttributeValue(MAILCHIMP_RESPONSE_FIELD, mailchimpSendTemplateResponses);
@@ -83,17 +92,17 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 	
 	public List<MailchimpRecipient> mapRecipient(RecievingEndpoint endpoint) {
 		List<MailchimpRecipient> recipientInList = new ArrayList<>();
-		
+
 		if (!MailchimpEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType())) {
 			throw new UnsupportedOperationException("Mapper can only map MailChimpEndpoint endpoint");
 		}
-		
+
 		MailchimpRecipient recipient = new MailchimpRecipient();
-		
+
 		MailchimpEndpoint mailChimpEndpoint = (MailchimpEndpoint) endpoint;
 		recipient.setName(mailChimpEndpoint.getRecipient().getName());
 		recipient.setEmail(mailChimpEndpoint.getEmail());
-		
+
 		recipientInList.add(recipient);
 		return recipientInList;
 	}

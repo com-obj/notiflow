@@ -14,5 +14,10 @@ public class NewsEventDataDto extends BaseKoderiaData {
     
     @EqualsAndHashCode.Include
     @NotBlank private String text;
+    
+    @Override
+    public Object asMailchimpMergeVarContent() {
+        return this;
+    }
 
 }

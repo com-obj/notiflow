@@ -17,15 +17,17 @@ import static com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData.JSON_T
 public class AggregatedMailchimpData extends MailchimpData {
     public static final String JSON_TYPE_NAME = "AGGREGATED";
     
-    @NotNull private List<MailchimpData> data;
+    @NotNull private List<Object> data;
+    @NotNull private String subject;
+    @NotNull private List<Attachement> attachements;
     
     @Override
     public String getMessageSubject() {
-        return getData().stream().map(var -> var.<MailchimpData>getData().getMessageSubject()).collect(Collectors.joining("/"));
+        return subject;
     }
     
     @Override
     public List<Attachement> getAttachments() {
-        return getData().stream().flatMap(var -> var.<MailchimpData>getData().getAttachments().stream()).collect(Collectors.toList());
+        return attachements;
     }
 }
