@@ -24,6 +24,7 @@ public class MailchimpSendTemplateRequest {
     
         MailchimpMessage mailchimpMessage = new MailchimpMessage();
         mailchimpMessage.setAttachments(new ArrayList<>(content.getAttachments()));
+        mailchimpMessage.setRecipients(content.getRecipients());
         mailchimpMessage.setFromName(content.getSenderName());
         mailchimpMessage.setFromEmail(content.getSenderEmail());
         mailchimpMessage.setSubject(content.getSubject());

@@ -62,10 +62,9 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 	@Override
 	protected Message execute(Message payload) {
 		MailchimpContent content = payload.getContentTyped();
+		content.setRecipients(mapRecipient(payload.getBody().getRecievingEndpoints().get(0)));
 		
 		MailchimpSendTemplateRequest dto = MailchimpSendTemplateRequest.from(content, mailchimpSenderConfigProperties.getAuthKey());
-		dto.getMessage().setRecipients(mapRecipient(payload.getBody().getRecievingEndpoints().get(0)));
-		
 		List<MailchimpSendTemplateResponse> mailchimpSendTemplateResponses = doSendMessage(dto);
 		payload.getBody().setAttributeValue(MAILCHIMP_RESPONSE_FIELD, mailchimpSendTemplateResponses);
 		
