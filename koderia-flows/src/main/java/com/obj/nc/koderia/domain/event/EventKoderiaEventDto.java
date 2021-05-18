@@ -19,7 +19,7 @@ public class EventKoderiaEventDto extends BaseKoderiaEvent {
     @Valid @NotNull private EventEventDataDto data;
     
     @Override
-    public String getMessageSubject() {
+    public String getSubject() {
         return data.getName();
     }
 }

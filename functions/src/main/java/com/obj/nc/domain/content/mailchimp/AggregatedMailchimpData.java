@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData.JSON_TYPE_NAME;
 
@@ -19,15 +18,6 @@ public class AggregatedMailchimpData extends MailchimpData {
     
     @NotNull private List<Object> data;
     @NotNull private String subject;
-    @NotNull private List<Attachement> attachements;
+    @NotNull private List<Attachement> attachments;
     
-    @Override
-    public String getMessageSubject() {
-        return subject;
-    }
-    
-    @Override
-    public List<Attachement> getAttachments() {
-        return attachements;
-    }
 }

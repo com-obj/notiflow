@@ -32,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.integration.test.context.MockIntegrationContext;
 import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -71,6 +72,7 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 	@Autowired private MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 	@Autowired private KoderiaRecipientsFinderConfig koderiaRecipientsFinderConfig;
 	@Autowired private MockIntegrationContext mockIntegrationContext;
+	@Autowired private JdbcTemplate jdbcTemplate;
 	
 	private MockRestServiceServer koderiaMockServer;
 	private MockRestServiceServer mailchimpMockServer;
@@ -79,6 +81,7 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 	
 	@BeforeEach
 	public void startSourcePollingAndMockRestServers() {
+		purgeNotifTables(jdbcTemplate);
 		koderiaMockServer = MockRestServiceServer.bindTo(koderiaRecipientsFinder.getRestTemplate()).build();
 		mailchimpMockServer = MockRestServiceServer.bindTo(mailchimpSender.getRestTemplate()).build();
 		pollableSource.start();
@@ -146,7 +149,7 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 				.andExpect(method(HttpMethod.POST))
 				.andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
 				.andExpect(jsonPath("$.key", equalTo("mockAuthKey")))
-				.andExpect(jsonPath("$.message.subject", equalTo("Business Intelligence (BI) Developer")))
+				.andExpect(jsonPath("$.message.subject", equalTo("Business Intelligence (BI) Developer, 400 – 500 € / manday, Viedeň")))
 				.andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
 				.andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
 	}

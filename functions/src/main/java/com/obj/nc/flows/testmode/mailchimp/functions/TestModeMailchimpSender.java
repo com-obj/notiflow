@@ -32,7 +32,7 @@ public class TestModeMailchimpSender extends ProcessorFunctionAdapter<Message,Me
         MailchimpContent content = payload.getContentTyped();
         content.setRecipients(realMailchimpSender.mapRecipient(payload.getBody().getRecievingEndpoints().get(0)));
         
-        MailchimpSendTemplateRequest sendRequest = MailchimpSendTemplateRequest.from(content, mailchimpSenderConfigProperties);
+        MailchimpSendTemplateRequest sendRequest = MailchimpSendTemplateRequest.from(content, mailchimpSenderConfigProperties.getAuthTestKey());
         realMailchimpSender.doSendMessage(sendRequest);
         
         receiver.recieve(payload);

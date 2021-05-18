@@ -18,9 +18,9 @@ public class MailchimpSendTemplateRequest {
     @JsonProperty("template_name") private String templateName;
     @JsonProperty("template_content") private List<MailchimpTemplateContent> templateContent;
     
-    public static MailchimpSendTemplateRequest from(MailchimpContent content, MailchimpSenderConfigProperties properties) {
+    public static MailchimpSendTemplateRequest from(MailchimpContent content, String authKey) {
         MailchimpSendTemplateRequest dto = new MailchimpSendTemplateRequest();
-        dto.key = properties.getAuthKey();
+        dto.key = authKey;
     
         MailchimpMessage mailchimpMessage = new MailchimpMessage();
         mailchimpMessage.setAttachments(new ArrayList<>(content.getAttachments()));
@@ -28,7 +28,7 @@ public class MailchimpSendTemplateRequest {
         mailchimpMessage.setFromEmail(content.getSenderEmail());
         mailchimpMessage.setSubject(content.getSubject());
         mailchimpMessage.setGlobalMergeVars(new ArrayList<>(content.getGlobalMergeVariables()));
-        mailchimpMessage.setMergeLanguage(properties.getMergeLanguage());
+        mailchimpMessage.setMergeLanguage(content.getMergeLanguage());
         dto.setMessage(mailchimpMessage);
     
         dto.setTemplateContent(new ArrayList<>(content.getTemplateContent()));

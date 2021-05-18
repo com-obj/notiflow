@@ -101,8 +101,8 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 		return mergeVar;
 	}
 	
-	private void aggregateGlobalMergeVariables(MailchimpContent other, Map<String, List<Object>> globalMergeCategoryValues) {
-		other.getGlobalMergeVariables().forEach(mergeVar -> {
+	private void aggregateGlobalMergeVariables(MailchimpContent content, Map<String, List<Object>> globalMergeCategoryValues) {
+		content.getGlobalMergeVariables().forEach(mergeVar -> {
 			if (mergeVar.getContent() instanceof AggregatedMailchimpData) {
 				AggregatedMailchimpData aggregatedMailchimpData = (AggregatedMailchimpData) mergeVar.getContent();
 				globalMergeCategoryValues.get(mergeVar.getName()).addAll(aggregatedMailchimpData.getData());

@@ -33,6 +33,7 @@ import org.springframework.http.MediaType;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.test.annotation.DirtiesContext;
@@ -42,7 +43,6 @@ import org.springframework.test.web.client.MockRestServiceServer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
@@ -70,11 +70,13 @@ public class KoderiaIntentProcessingTest extends BaseIntegrationTest {
 	@Autowired private KoderiaRecipientsFinderConfig koderiaRecipientsFinderConfig;
 	@Qualifier(RECEIVED_TEST_LIST)
 	@Autowired private List<Message<?>> received;
+	@Autowired private JdbcTemplate jdbcTemplate;
 	
 	private MockRestServiceServer mockServer;
 	
 	@BeforeEach
 	public void startSourcePollingAndMockRestServer() {
+		purgeNotifTables(jdbcTemplate);
 		mockServer = MockRestServiceServer.bindTo(koderiaRecipientsFinder.getRestTemplate()).build();
 		pollableSource.start();
 	}
@@ -106,8 +108,8 @@ public class KoderiaIntentProcessingTest extends BaseIntegrationTest {
 		MatcherAssert.assertThat(payload.getBody().getMessage(), instanceOf(MailchimpContent.class));
 		
 		MailchimpContent content = payload.getContentTyped();
-		MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(koderiaEvent.getMessageSubject()));
-		MailchimpData data = content.getMessage().getOriginalEvent();
+		MatcherAssert.assertThat(content.getSubject(), equalTo(koderiaEvent.getSubject()));
+		MailchimpData data = content.getOriginalEvent();
 		MatcherAssert.assertThat(data, notNullValue());
 		
 		MatcherAssert.assertThat(data.getAttachments(), empty());

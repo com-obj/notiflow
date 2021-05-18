@@ -27,5 +27,6 @@ public class MailchimpContent extends Content {
     private String templateName;
     private List<MailchimpTemplateContent> templateContent = new ArrayList<>();
     private List<MailchimpMergeVariable> globalMergeVariables = new ArrayList<>();
+    private String mergeLanguage;
     
 }

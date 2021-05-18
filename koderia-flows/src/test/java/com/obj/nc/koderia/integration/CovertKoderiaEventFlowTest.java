@@ -30,6 +30,7 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.test.annotation.DirtiesContext;
@@ -70,10 +71,12 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 	@Autowired private SourcePollingChannelAdapter pollableSource;
 	@Qualifier(RECEIVED_TEST_LIST)
 	@Autowired private List<Message<?>> received;
+	@Autowired private JdbcTemplate jdbcTemplate;
 	private MockRestServiceServer koderiaMockServer;
 	
 	@BeforeEach
 	public void startSourcePolling() {
+		purgeNotifTables(jdbcTemplate);
 		koderiaMockServer = MockRestServiceServer.bindTo(koderiaRecipientsFinder.getRestTemplate()).build();
 		pollableSource.start();
 	}
@@ -98,9 +101,9 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 		// and
 		NotificationIntent payload = (NotificationIntent) received.get(0).getPayload();
 		MailchimpContent content = payload.getContentTyped();
-		assertThat(content.getMessage(), notNullValue());
+		assertThat(content, notNullValue());
 		
-		MailchimpData data = content.getMessage().getOriginalEvent();
+		MailchimpData data = content.getOriginalEvent();
 		assertThat(data, notNullValue());
 		assertThat(data.getType(), equalTo(baseKoderiaEvent.getType()));
 		assertThat(data.getData(), equalTo(baseKoderiaEvent.getData()));

@@ -48,10 +48,6 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 			return Optional.of(new PayloadValidationException("Message content must not be null"));
 		}
 		
-		if (content.getOriginalEvent() == null) {
-			return Optional.of(new PayloadValidationException("Message content must contain original event"));
-		}
-		
 		boolean hasNoneOrTooMuchEndpoints = payload.getBody().getRecievingEndpoints().size() != 1;
 		boolean containsNonEmailEndpoint = payload.getBody().getRecievingEndpoints().stream()
 				.anyMatch(endpoint -> !MailchimpEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType()));
@@ -67,7 +63,7 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 	protected Message execute(Message payload) {
 		MailchimpContent content = payload.getContentTyped();
 		
-		MailchimpSendTemplateRequest dto = MailchimpSendTemplateRequest.from(content, mailchimpSenderConfigProperties);
+		MailchimpSendTemplateRequest dto = MailchimpSendTemplateRequest.from(content, mailchimpSenderConfigProperties.getAuthKey());
 		dto.getMessage().setRecipients(mapRecipient(payload.getBody().getRecievingEndpoints().get(0)));
 		
 		List<MailchimpSendTemplateResponse> mailchimpSendTemplateResponses = doSendMessage(dto);

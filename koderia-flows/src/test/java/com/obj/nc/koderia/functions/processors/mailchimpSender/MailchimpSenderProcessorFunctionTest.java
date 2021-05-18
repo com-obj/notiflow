@@ -8,6 +8,7 @@ import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
 import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemplateResponse;
+import com.obj.nc.koderia.config.DomainConfig;
 import com.obj.nc.koderia.mapper.KoderiaMergeVarMapperImpl;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
@@ -41,7 +42,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @ContextConfiguration(classes = {
         MailchimpSenderConfig.class,
         KoderiaMergeVarMapperImpl.class,
-        MailchimpSenderConfigProperties.class
+        MailchimpSenderConfigProperties.class,
+        DomainConfig.class
 })
 class MailchimpSenderProcessorFunctionTest {
 
@@ -50,12 +52,8 @@ class MailchimpSenderProcessorFunctionTest {
     @Autowired private MockRestServiceServer mailchimpMockServer;
     
     @BeforeEach
-    void setUp(TestInfo testInfo) {
-        if(testInfo.getTags().contains("aggregate")) {
-            createAggregateMessageRestServerExpectations();
-        } else {
-            createSimpleMessageRestServerExpectations();
-        }
+    void setUp() {
+        createSimpleMessageRestServerExpectations();
     }
     
     @Test
@@ -134,34 +132,9 @@ class MailchimpSenderProcessorFunctionTest {
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
                 .andExpect(jsonPath("$.key", equalTo("mockAuthKey")))
-                .andExpect(jsonPath("$.message.subject", anyOf(equalTo("Business Intelligence (BI) Developer"))))
+                .andExpect(jsonPath("$.message.subject", anyOf(equalTo("Business Intelligence (BI) Developer 1, 400 – 500 € / manday, Viedeň"))))
                 .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
                 .andExpect(jsonPath("$.message.attachments[0].name", equalTo("test1.txt")))
-                .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
-    }
-    
-    private void createAggregateMessageRestServerExpectations() {
-        String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
-        MailchimpSendTemplateResponse[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MailchimpSendTemplateResponse[].class);
-        String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
-        
-        mailchimpMockServer.expect(times(1),
-                requestTo(SEND_TEMPLATE_PATH))
-                .andExpect(method(HttpMethod.POST))
-                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
-                .andExpect(jsonPath("$.key", equalTo("mockAuthKey")))
-                .andExpect(jsonPath("$.message.subject", equalTo("Koderia digest")))
-                .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
-                .andExpect(jsonPath("$.message.global_merge_vars[0].name", anyOf(equalTo("JOB_POST"), equalTo("NEWS"),
-                        equalTo("LINK"), equalTo("EVENT"), equalTo("BLOG"))))
-                .andExpect(jsonPath("$.message.global_merge_vars[1].name", anyOf(equalTo("JOB_POST"), equalTo("NEWS"),
-                        equalTo("LINK"), equalTo("EVENT"), equalTo("BLOG"))))
-                .andExpect(jsonPath("$.message.global_merge_vars[2].name", anyOf(equalTo("JOB_POST"), equalTo("NEWS"),
-                        equalTo("LINK"), equalTo("EVENT"), equalTo("BLOG"))))
-                .andExpect(jsonPath("$.message.global_merge_vars[3].name", anyOf(equalTo("JOB_POST"), equalTo("NEWS"),
-                        equalTo("LINK"), equalTo("EVENT"), equalTo("BLOG"))))
-                .andExpect(jsonPath("$.message.global_merge_vars[4].name", anyOf(equalTo("JOB_POST"), equalTo("NEWS"),
-                        equalTo("LINK"), equalTo("EVENT"), equalTo("BLOG"))))
                 .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
     }
     

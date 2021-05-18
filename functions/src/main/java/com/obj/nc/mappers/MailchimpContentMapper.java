@@ -32,6 +32,7 @@ public class MailchimpContentMapper {
         content.setSenderEmail(mailchimpSenderConfigProperties.getSenderEmail());
         content.setTemplateName(mailchimpSenderConfigProperties.getTemplateNameFromMessageType(event.getType()));
         content.setGlobalMergeVariables(mailchimpMergeVarMapper.map(event));
+        content.setMergeLanguage(mailchimpSenderConfigProperties.getMergeLanguage());
         
         List<MailchimpAttachment> mailchimpAttachments = mapAttachments(event);
         content.setAttachments(mailchimpAttachments);
@@ -39,7 +40,7 @@ public class MailchimpContentMapper {
     }
 
     protected String mapSubject(MailchimpData event) {
-        return event.getMessageSubject();
+        return event.getSubject();
     }
 
     protected List<MailchimpAttachment> mapAttachments(MailchimpData event) {

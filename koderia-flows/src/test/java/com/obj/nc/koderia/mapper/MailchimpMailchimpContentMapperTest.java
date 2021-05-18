@@ -2,7 +2,9 @@ package com.obj.nc.koderia.mapper;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpMergeVarMapper;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
+import com.obj.nc.koderia.config.DomainConfig;
 import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
 import com.obj.nc.mappers.MailchimpContentMapper;
 import com.obj.nc.utils.JsonUtils;
@@ -20,7 +22,8 @@ import static org.hamcrest.Matchers.equalTo;
 @ContextConfiguration(classes = {
         MailchimpSenderConfigProperties.class,
         MailchimpContentMapper.class,
-        KoderiaEventConverterConfig.class
+        KoderiaMergeVarMapperImpl.class,
+        DomainConfig.class
 })
 class MailchimpMailchimpContentMapperTest {
 

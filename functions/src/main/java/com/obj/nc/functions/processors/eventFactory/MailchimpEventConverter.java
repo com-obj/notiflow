@@ -29,7 +29,7 @@ public class MailchimpEventConverter extends ProcessorFunctionAdapter<GenericEve
 		} else if (!(payload.getPayloadAsPojo() instanceof MailchimpData)) {
 			return Optional.of(new PayloadValidationException(String.format("Payload is not an instance of class %s. Is %s",
 					MailchimpData.class.getSimpleName(), payload.getPayloadAsPojo().getClass().getSimpleName())));
-		} else if (payload.<MailchimpData>getPayloadAsPojo().getMessageSubject() == null) {
+		} else if (payload.<MailchimpData>getPayloadAsPojo().getSubject() == null) {
 			return Optional.of(new PayloadValidationException("Subject of mailchimp event must not be null"));
 		} else {
 			return Optional.empty();

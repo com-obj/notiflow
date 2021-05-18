@@ -102,7 +102,7 @@ class KoderiaRecipientsFinderTest {
         GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
         NotificationIntent mappedNotificationIntent = mailchimpEventConverter.apply(genericEvent);
         MailchimpContent contentTyped = mappedNotificationIntent.getContentTyped();
-        contentTyped.getMessage().setOriginalEvent(null);
+        contentTyped.setOriginalEvent(null);
 
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> getKoderiaRecipients.apply(mappedNotificationIntent))

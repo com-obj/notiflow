@@ -131,7 +131,7 @@ public class KoderiaFlowsTestModeTest extends BaseIntegrationTest {
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
                 .andExpect(jsonPath("$.key", equalTo("mockAuthKey")))
-                .andExpect(jsonPath("$.message.subject", equalTo("Business Intelligence (BI) Developer")))
+                .andExpect(jsonPath("$.message.subject", equalTo("Business Intelligence (BI) Developer, 400 – 500 € / manday, Viedeň")))
                 .andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
                 .andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
     }
