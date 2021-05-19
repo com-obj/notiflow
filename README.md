@@ -19,3 +19,23 @@
 * File -> Open
 * Select root directory of this project
 * In import dialog window, select "Gradle project"
+
+# API Authentication
+
+## Properties
+| Property                | Values                  | Default |
+|-------------------------|-------------------------|---------|
+| nc.jwt.enabled          | Boolean                 | false   |
+| nc.jwt.username         | String                  | null    |
+| nc.jwt.password         | String                  | null    |
+| nc.jwt.signature-secret | String                  | null    |
+
+## Example Request (HTTP POST)
+```
+curl -H "Content-Type: application/json" --data { "username" : "nc", "password" : "3jfAEmJKYqVCLE" } http://localhost:8080/authenticate
+```
+
+## Example Response
+```
+{"token":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuYyIsImV4cCI6MTYyMTIwODUxNCwiaWF0IjoxNjIxMTkwNTE0fQ.Se6yitIkVvbyVkWZIZk8Vxpr_Gp0L9uONW9ErideekzKlQUfogSfdqVz7LPGAZcZR2JK0OiYsjRSQq5-ziIozw"}
+```
