@@ -1,14 +1,11 @@
 package com.obj.nc.domain.content.mailchimp;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.domain.content.Content;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,15 +16,17 @@ import java.util.List;
 public class MailchimpContent extends Content {
     
     public final static String JSON_TYPE_IDENTIFIER = "MAILCHIMP_CONTENT";
-    public final static String DATA_MERGE_VARIABLE = "data";
     
     @EqualsAndHashCode.Include
-    @NotNull private MailchimpMessage message;
-    
-    @EqualsAndHashCode.Include
-    @NotBlank @JsonProperty("template_name") private String templateName;
-    
-    @EqualsAndHashCode.Include
-    @JsonProperty("template_content") private List<MailchimpTemplateContent> templateContent = new ArrayList<>();
+    private MailchimpData originalEvent;
+    private String subject;
+    private String senderEmail;
+    private String senderName;
+    private List<MailchimpRecipient> recipients = new ArrayList<>();
+    private List<MailchimpAttachment> attachments = new ArrayList<>();
+    private String templateName;
+    private List<MailchimpTemplateContent> templateContent = new ArrayList<>();
+    private List<MailchimpMergeVariable> globalMergeVariables = new ArrayList<>();
+    private String mergeLanguage;
     
 }

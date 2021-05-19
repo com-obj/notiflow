@@ -21,7 +21,6 @@ public class TestModeDiggestModel {
 	
 	private List<EmailContent> emailContents = new ArrayList<>();
 	private List<SimpleTextContent> smsContents = new ArrayList<>();
-	private List<MailchimpContent> mailchimpContents = new ArrayList<>();
 
 	public void addEmailContent(EmailContent emailContent) {
 		emailContents.add(emailContent);
@@ -38,7 +37,4 @@ public class TestModeDiggestModel {
 		smsContents.add(smsContent);
 	}
 	
-	public void addMailchimpContent(MailchimpContent mailchimpContent) {
-		mailchimpContents.add(mailchimpContent);
-	}
 }

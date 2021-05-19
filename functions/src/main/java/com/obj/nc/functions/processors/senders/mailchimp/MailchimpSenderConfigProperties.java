@@ -23,8 +23,10 @@ public class MailchimpSenderConfigProperties {
     
     private String apiUrl;
     private String authKey;
+    private String authTestKey;
     private String senderEmail;
     private String senderName;
+    private String mergeLanguage;
     private String aggregatedMessageSubject;
     private String aggregatedMessageTemplateName;
     private Map<String, String> mailchimpTemplateNames;

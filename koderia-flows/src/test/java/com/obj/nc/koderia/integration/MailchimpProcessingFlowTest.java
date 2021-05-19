@@ -10,7 +10,7 @@ import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigPr
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.koderia.domain.recipients.RecipientDto;
 import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
-import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpResponseDto;
+import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemplateResponse;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinder;
@@ -32,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.integration.test.context.MockIntegrationContext;
 import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -71,6 +72,7 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 	@Autowired private MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 	@Autowired private KoderiaRecipientsFinderConfig koderiaRecipientsFinderConfig;
 	@Autowired private MockIntegrationContext mockIntegrationContext;
+	@Autowired private JdbcTemplate jdbcTemplate;
 	
 	private MockRestServiceServer koderiaMockServer;
 	private MockRestServiceServer mailchimpMockServer;
@@ -79,6 +81,7 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 	
 	@BeforeEach
 	public void startSourcePollingAndMockRestServers() {
+		purgeNotifTables(jdbcTemplate);
 		koderiaMockServer = MockRestServiceServer.bindTo(koderiaRecipientsFinder.getRestTemplate()).build();
 		mailchimpMockServer = MockRestServiceServer.bindTo(mailchimpSender.getRestTemplate()).build();
 		pollableSource.start();
@@ -111,10 +114,10 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 	
 	private void checkReceivedPayload(com.obj.nc.domain.message.Message payload) {
 		String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
-		MailchimpResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MailchimpResponseDto[].class);
+		MailchimpSendTemplateResponse[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MailchimpSendTemplateResponse[].class);
 		
-		List<MailchimpResponseDto> messageResponses = (List<MailchimpResponseDto>) payload.getBody().getAttributeValue(MAILCHIMP_RESPONSE_FIELD);
-		for (MailchimpResponseDto response : messageResponses) {
+		List<MailchimpSendTemplateResponse> messageResponses = (List<MailchimpSendTemplateResponse>) payload.getBody().getAttributeValue(MAILCHIMP_RESPONSE_FIELD);
+		for (MailchimpSendTemplateResponse response : messageResponses) {
 			MatcherAssert.assertThat(Arrays.asList(responseDtos), contains(response));
 		}
 	}
@@ -138,15 +141,15 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 		
 		// mailchimp server
 		String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
-		MailchimpResponseDto[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MailchimpResponseDto[].class);
+		MailchimpSendTemplateResponse[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MailchimpSendTemplateResponse[].class);
 		String responseDtosJsonString = JsonUtils.writeObjectToJSONString(responseDtos);
 		
 		mailchimpMockServer.expect(times(3), 
 				requestTo(mailchimpSenderConfigProperties.getApiUrl() + SEND_TEMPLATE_PATH))
 				.andExpect(method(HttpMethod.POST))
 				.andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + mailchimpSenderConfigProperties.getAuthKey()))
-				.andExpect(jsonPath("$.key", equalTo("MOCKkey")))
-				.andExpect(jsonPath("$.message.subject", equalTo("Business Intelligence (BI) Developer")))
+				.andExpect(jsonPath("$.key", equalTo("mockAuthKey")))
+				.andExpect(jsonPath("$.message.subject", equalTo("Business Intelligence (BI) Developer, 400 – 500 € / manday, Viedeň")))
 				.andExpect(jsonPath("$.message.merge_language", equalTo("handlebars")))
 				.andRespond(withSuccess(responseDtosJsonString, MediaType.APPLICATION_JSON));
 	}

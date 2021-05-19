@@ -19,13 +19,8 @@ public class LinkKoderiaEventDto extends BaseKoderiaEvent {
     @Valid @NotNull private LinkEventDataDto data;
     
     @Override
-    public String getMessageSubject() {
+    public String getSubject() {
         return data.getTitle();
-    }
-    
-    @Override
-    public String getMessageText() {
-        return data.getDescription();
     }
 }
 

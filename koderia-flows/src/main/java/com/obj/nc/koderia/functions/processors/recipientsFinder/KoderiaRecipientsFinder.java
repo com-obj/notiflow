@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpData;
+import com.obj.nc.domain.endpoints.DeliveryOptions;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
+import com.obj.nc.domain.endpoints.Person;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -12,7 +15,6 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.koderia.domain.recipients.RecipientDto;
 import com.obj.nc.koderia.domain.recipients.RecipientsQueryDto;
 import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
-import com.obj.nc.koderia.mapper.KoderiaRecipientsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +36,6 @@ public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<Notificati
 	
 	@Qualifier(KODERIA_REST_TEMPLATE) 
 	@Autowired private RestTemplate restTemplate;
-	@Autowired private KoderiaRecipientsMapper recipientMapper;
 	@Autowired private ObjectMapper objectMapper;
 	
 	@Override
@@ -42,13 +43,11 @@ public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<Notificati
 		MailchimpContent content = payload.getContentTyped();
 		if (content == null) {
 			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s contains null content.", payload)));
-		} else if (content.getMessage() == null) {
-			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s contains null message.", payload)));
-		} else if (!content.getMessage().getMailchimpData().isPresent()) {
+		} else if (content.getOriginalEvent() == null) {
 			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s does not contain original event data.", payload)));
 		}
 		
-		MailchimpData dataMergeVar = content.getMessage().getMailchimpData().get();
+		MailchimpData dataMergeVar = content.getOriginalEvent();
 		
 		try {
 			objectMapper.convertValue(dataMergeVar, BaseKoderiaEvent.class);
@@ -61,7 +60,7 @@ public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<Notificati
 	
 	@Override
 	protected NotificationIntent execute(NotificationIntent payload) {
-		MailchimpData dataMergeVar = payload.<MailchimpContent>getContentTyped().getMessage().getMailchimpData().get();
+		MailchimpData dataMergeVar = payload.<MailchimpContent>getContentTyped().getOriginalEvent();
 		RecipientsQueryDto recipientsQueryDto = objectMapper.convertValue(dataMergeVar, RecipientsQueryDto.class);
 		
 		List<RecievingEndpoint> emailEndpoints = requestReceivingEndpoints(recipientsQueryDto);
@@ -74,10 +73,22 @@ public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<Notificati
 		if (responseEntity.getBody() == null) {
 			throw new RestClientException("Response body is null");
 		}
-		return Arrays.stream(responseEntity.getBody()).map(recipientMapper::map).collect(Collectors.toList());
+		return Arrays.stream(responseEntity.getBody()).map(this::mapRecipientToEndpoint).collect(Collectors.toList());
 	}
 	
 	public RestTemplate getRestTemplate() {
 		return restTemplate;
+	}
+	
+	public MailchimpEndpoint mapRecipientToEndpoint(RecipientDto recipientDto) {
+		if (recipientDto == null) {
+			return null;
+		}
+		
+		Person person = new Person(recipientDto.getFirstName() + " " + recipientDto.getLastName());
+		MailchimpEndpoint mailChimpEndpoint = MailchimpEndpoint.createForPerson(recipientDto.getEmail(), person);
+		DeliveryOptions deliveryOptions = new DeliveryOptions();
+		mailChimpEndpoint.setDeliveryOptions(deliveryOptions);
+		return mailChimpEndpoint;
 	}
 }

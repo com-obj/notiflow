@@ -21,4 +21,8 @@ public class BlogEventDataDto extends BaseKoderiaData {
     @NotNull private BlogCategoryDto category;
     @NotNull private BlogAuthorDto author;
     
+    @Override
+    public Object asMailchimpMergeVarContent() {
+        return this;
+    }
 }

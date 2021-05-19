@@ -6,11 +6,13 @@ import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.eventFactory.MailchimpEventConverter;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
+import com.obj.nc.koderia.config.DomainConfig;
 import com.obj.nc.koderia.domain.event.*;
 import com.obj.nc.koderia.domain.eventData.*;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
-import com.obj.nc.mappers.MailchimpDataToMailchimpContentMapper;
+import com.obj.nc.koderia.mapper.KoderiaMergeVarMapperImpl;
+import com.obj.nc.mappers.MailchimpContentMapper;
 import com.obj.nc.utils.JsonUtils;
 import io.restassured.module.jsv.JsonSchemaValidator;
 import org.assertj.core.api.Assertions;
@@ -22,9 +24,8 @@ import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebCl
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.Optional;
-
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @JsonTest(properties = {
@@ -32,20 +33,21 @@ import static org.hamcrest.Matchers.equalTo;
 })
 @AutoConfigureWebClient
 @ContextConfiguration(classes = {
-        KoderiaEventConverter.class,
-        MailchimpDataToMailchimpContentMapper.class,
-        KoderiaEventConverterConfig.class,
+        MailchimpEventConverter.class,
+        KoderiaMergeVarMapperImpl.class,
+        MailchimpContentMapper.class,
+        DomainConfig.class,
         MailchimpSenderConfigProperties.class
 })
-class KoderiaEventConverterTest {
+class MailchimpEventConverterTest {
 
-    @Autowired private KoderiaEventConverter eventConverter;
+    @Autowired private MailchimpEventConverter eventConverter;
 
     @Test
     void testExtractJobPostDto() {
         // given
-        JobPostKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", JobPostKoderiaEventDto.class);
-        GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
+        JobPostKoderiaEventDto jobPostEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", JobPostKoderiaEventDto.class);
+        GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(jobPostEvent));
     
         // when
         NotificationIntent mappedNotificationIntent = eventConverter.apply(genericEvent);
@@ -54,14 +56,13 @@ class KoderiaEventConverterTest {
         MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/job_post_event_schema.json"));
 
         // and
-        JobPostEventDataDto jobPostEventData = baseKoderiaEvent.getData();
+        JobPostEventDataDto jobPostEventData = jobPostEvent.getData();
         MailchimpContent content = mappedNotificationIntent.getBody().getContentTyped();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
-        MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(jobPostEventData.getName()));
+        MatcherAssert.assertThat(content.getSubject(), equalTo(jobPostEvent.getSubject()));
         // and
-        Optional<? extends MailchimpData> dataVariable = content.getMessage().getMailchimpData();
-        MatcherAssert.assertThat(dataVariable.isPresent(), equalTo(true));
-        MatcherAssert.assertThat(dataVariable.get().getMessageText(), equalTo(jobPostEventData.getDescription()));
+        MailchimpData data = content.getOriginalEvent();
+        MatcherAssert.assertThat(data, notNullValue());
     }
 
     @Test
@@ -70,34 +71,6 @@ class KoderiaEventConverterTest {
         Assertions.assertThatThrownBy(() -> eventConverter.apply(null))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("GenericEvent must not be null");
-    }
-
-    @Test
-    void testExtractNullSubjectEmitEventDto() {
-        JobPostKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", JobPostKoderiaEventDto.class);
-        JobPostEventDataDto jobPostEventData = baseKoderiaEvent.getData();
-        jobPostEventData.setName(null);
-    
-        GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
-
-        // when - then
-        Assertions.assertThatThrownBy(() -> eventConverter.apply(genericEvent))
-                .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("Subject of Koderia event must not be null");
-    }
-
-    @Test
-    void testExtractNullTextEmitEventDto() {
-        JobPostKoderiaEventDto baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", JobPostKoderiaEventDto.class);
-        JobPostEventDataDto jobPostEventData = baseKoderiaEvent.getData();
-        jobPostEventData.setDescription(null);
-    
-        GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
-
-        // when - then
-        Assertions.assertThatThrownBy(() -> eventConverter.apply(genericEvent))
-                .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("Text of Koderia event must not be null");
     }
 
     @Test
@@ -116,11 +89,10 @@ class KoderiaEventConverterTest {
         BlogEventDataDto blogEventData = baseKoderiaEvent.getData();
         MailchimpContent content = mappedNotificationIntent.getBody().getContentTyped();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
-        MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(blogEventData.getTitle()));
+        MatcherAssert.assertThat(content.getSubject(), equalTo(blogEventData.getTitle()));
         // and
-        Optional<? extends MailchimpData> dataVariable = content.getMessage().getMailchimpData();
-        MatcherAssert.assertThat(dataVariable.isPresent(), equalTo(true));
-        MatcherAssert.assertThat(dataVariable.get().getMessageText(), equalTo(blogEventData.getContent()));
+        MailchimpData data = content.getOriginalEvent();
+        MatcherAssert.assertThat(data, notNullValue());
     }
 
     @Test
@@ -140,11 +112,10 @@ class KoderiaEventConverterTest {
         EventEventDataDto eventEventData = baseKoderiaEvent.getData();
         MailchimpContent content = mappedNotificationIntent.getBody().getContentTyped();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
-        MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(eventEventData.getName()));
+        MatcherAssert.assertThat(content.getSubject(), equalTo(eventEventData.getName()));
         // and
-        Optional<? extends MailchimpData> dataVariable = content.getMessage().getMailchimpData();
-        MatcherAssert.assertThat(dataVariable.isPresent(), equalTo(true));
-        MatcherAssert.assertThat(dataVariable.get().getMessageText(), equalTo(eventEventData.getDescription()));
+        MailchimpData data = content.getOriginalEvent();
+        MatcherAssert.assertThat(data, notNullValue());
     }
 
     @Test
@@ -163,11 +134,10 @@ class KoderiaEventConverterTest {
         LinkEventDataDto linkEventData = baseKoderiaEvent.getData();
         MailchimpContent content = mappedNotificationIntent.getBody().getContentTyped();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
-        MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(linkEventData.getTitle()));
+        MatcherAssert.assertThat(content.getSubject(), equalTo(linkEventData.getTitle()));
         // and
-        Optional<? extends MailchimpData> dataVariable = content.getMessage().getMailchimpData();
-        MatcherAssert.assertThat(dataVariable.isPresent(), equalTo(true));
-        MatcherAssert.assertThat(dataVariable.get().getMessageText(), equalTo(linkEventData.getDescription()));
+        MailchimpData data = content.getOriginalEvent();
+        MatcherAssert.assertThat(data, notNullValue());
     }
 
     @Test
@@ -186,11 +156,10 @@ class KoderiaEventConverterTest {
         NewsEventDataDto newsEventData = baseKoderiaEvent.getData();
         MailchimpContent content = mappedNotificationIntent.getBody().getContentTyped();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
-        MatcherAssert.assertThat(content.getMessage().getSubject(), equalTo(newsEventData.getSubject()));
+        MatcherAssert.assertThat(content.getSubject(), equalTo(newsEventData.getSubject()));
         // and
-        Optional<? extends MailchimpData> dataVariable = content.getMessage().getMailchimpData();
-        MatcherAssert.assertThat(dataVariable.isPresent(), equalTo(true));
-        MatcherAssert.assertThat(dataVariable.get().getMessageText(), equalTo(newsEventData.getText()));
+        MailchimpData data = content.getOriginalEvent();
+        MatcherAssert.assertThat(data, notNullValue());
     }
 
 }

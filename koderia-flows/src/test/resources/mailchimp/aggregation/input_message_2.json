@@ -11,55 +11,50 @@
   "body":{
     "message": {
       "type" : "MAILCHIMP_CONTENT",
-      "key" : "MOCKkey",
-      "message" : {
-        "subject" : "Business Intelligence (BI) Developer 2",
-        "from_email" : "sender@koderia.sk",
-        "from_name" : "Koderia sender",
-        "to" : [ {
-          "email" : "john.doe@objectify.sk",
-          "name" : "John Doe",
-          "type" : "to"
-        } ],
-        "merge_language" : "handlebars",
-        "global_merge_vars" : [ {
-          "name" : "JOB_POST",
-          "content" : {
-            "type" : "JOB_POST",
-            "data" : {
-              "id": "unwhX7OlJYq7Kd7GfoCd",
-              "name": "Business Intelligence (BI) Developer 2",
-              "description": "We are looking for a Business Intelligence (BI) Developer to create...",
-              "location": "Viedeň",
-              "rate": "500",
-              "technologies": [
-                "Microsoft Power BI"
-              ],
-              "specialRate": "400 – 500 € / manday",
-              "labels": [
-                "Home Office"
-              ],
-              "positionType": [
-                "Senior"
-              ],
-              "duration": "1 rok s možnosťou predĺženia",
-              "type": "Analytik",
-              "dateOfStart": "ASAP"
-            }
-          }
-        } ],
-        "attachments" : [ {
-          "type" : "text/plain",
-          "name" : "test1.txt",
-          "content" : "YXR0YWNobWVudCB0ZXN0MQ=="
-        }, {
-          "type" : "text/plain",
-          "name" : "test2.txt",
-          "content" : "YXR0YWNobWVudCB0ZXN0Mg=="
-        } ]
+      "originalEvent" : {
+        "type" : "JOB_POST",
+        "data" : {
+          "id": "unwhX7OlJYq7Kd7GfoCe",
+          "name": "Business Intelligence (BI) Developer 2",
+          "description": "We are looking for a Business Intelligence (BI) Developer to create....",
+          "location": "Viedeň",
+          "rate": "500",
+          "technologies": [
+            "Java"
+          ],
+          "specialRate": "500 – 600 € / manday",
+          "labels": [
+            "Home Office"
+          ],
+          "positionType": [
+            "Senior"
+          ],
+          "duration": "1 rok s možnosťou predĺženia",
+          "type": "Analytik",
+          "dateOfStart": "ASAP"
+        }
       },
-      "template_name" : "job-post-template",
-      "template_content" : [ ]
+      "subject" : "Business Intelligence (BI) Developer 2, 500 – 600 € / manday, Viedeň",
+      "senderEmail" : "sender@koderia.sk",
+      "senderName" : "Koderia sender",
+      "recipients" : [ {
+        "email" : "john.doe@objectify.sk",
+        "name" : "John Doe",
+        "type" : "to"
+      } ],
+      "mergeLanguage" : "handlebars",
+      "globalMergeVariables" : [ ],
+      "attachments" : [ {
+        "type" : "text/plain",
+        "name" : "test1.txt",
+        "content" : "YXR0YWNobWVudCB0ZXN0MQ=="
+      }, {
+        "type" : "text/plain",
+        "name" : "test2.txt",
+        "content" : "YXR0YWNobWVudCB0ZXN0Mg=="
+      } ],
+      "templateName" : "koderia-job-post",
+      "templateContent" : [ ]
     },
     "recievingEndpoints":[
       {
