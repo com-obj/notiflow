@@ -28,7 +28,7 @@ public class EventReceiverRestController {
 	private GenericEventPersisterConsumer persister;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
-    public EventRecieverResponce emitJobPostEvent(
+    public EventRecieverResponce persistGenericEvent(
     		@RequestBody(required = true) String eventJsonString, 
     		@RequestParam(value = "flowId", required = false) String flowId,
     		@RequestParam(value = "externalId", required = false) String externalId) {

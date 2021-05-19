@@ -87,7 +87,7 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     	String startEventStr = JsonUtils.writeObjectToJSONString(startEvent);
 
     	//WHEN
-    	genericEventsService.emitJobPostEvent(startEventStr, null, "111xx_START");
+    	genericEventsService.persistGenericEvent(startEventStr, null, "111xx_START");
     	
     	//THEN
         boolean success = greenMail.waitForIncomingEmail(30000L, 8);
@@ -127,7 +127,7 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     	String endEventStr = JsonUtils.writeObjectToJSONString(endEvent);
 
     	//WHEN
-    	genericEventsService.emitJobPostEvent(endEventStr, null, "111xx_END");
+    	genericEventsService.persistGenericEvent(endEventStr, null, "111xx_END");
     	
     	//THEN
         boolean success = greenMail.waitForIncomingEmail(30000L, 8);
