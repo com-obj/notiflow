@@ -1,19 +1,24 @@
 package com.obj.nc.config;
 
+import com.obj.nc.security.model.AuthenticationError;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.obj.nc.exceptions.PayloadValidationException;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+@RestControllerAdvice
 public class SpringMvcConfig {
 
     @ExceptionHandler({PayloadValidationException.class})
@@ -29,6 +34,13 @@ public class SpringMvcConfig {
     @ExceptionHandler({HttpMessageNotReadableException.class})
     ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         return new ResponseEntity<>("Request arguments not valid: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(AuthenticationException.class)
+    ResponseEntity<String> handleAuthenticationException(AuthenticationException e) {
+        return new ResponseEntity<>(AuthenticationError.builder().timestamp(Timestamp.valueOf(LocalDateTime.now()))
+                .message(e.getMessage()).build().toString(), HttpStatus.UNAUTHORIZED
+        );
     }
     
     @ExceptionHandler({RuntimeException.class})
