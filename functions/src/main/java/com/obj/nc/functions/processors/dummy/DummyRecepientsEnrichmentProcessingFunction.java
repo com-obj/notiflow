@@ -1,7 +1,5 @@
 package com.obj.nc.functions.processors.dummy;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -21,24 +19,16 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 @Log4j2
 @DocumentProcessingInfo("DummyRecepientsEnrichment")
-public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent, NotificationIntent> {
-
-	public static final List<String> REQUIRED_ATTRIBUTES = Arrays.asList("technologies");
+public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent<?>, NotificationIntent<?>> {
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent notificationIntent) {
-		boolean eventHasRequiredAttributes = notificationIntent.getBody().getMessage().containsNestedAttributes(REQUIRED_ATTRIBUTES, "originalEvent", "data");
-
-		if (!eventHasRequiredAttributes) {
-			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s does not contain required attributes." +
-					" Required attributes are: %s", notificationIntent.toString(), REQUIRED_ATTRIBUTES)));
-		}
-
+		
 		return Optional.empty();
 	}
 
 	@Override
-	protected NotificationIntent execute(NotificationIntent notificationIntent) {
+	protected NotificationIntent<?> execute(NotificationIntent<?> notificationIntent) {
 		// find recipients based on technologies
 		Person person1 = new Person("John Doe");
 		Person person2 = new Person("John Dudly");
@@ -49,7 +39,7 @@ public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFuncti
 		EmailEndpoint endpoint2 = EmailEndpoint.createForPerson(person2, "john.dudly@objectify.sk");
 		EmailEndpoint endpoint3 = EmailEndpoint.createForGroup(allObjectifyGroup, "all@objectify.sk");
 
-		notificationIntent.getBody().addRecievingEndpoints(endpoint1, endpoint2, endpoint3);
+		notificationIntent.addRecievingEndpoints(endpoint1, endpoint2, endpoint3);
 
 		return notificationIntent;
 	}

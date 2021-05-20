@@ -1,22 +1,24 @@
 package com.obj.nc.functions.processors.eventFactory;
 
+import java.util.Optional;
+
+import org.springframework.stereotype.Component;
+
 import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-
 import com.obj.nc.mappers.MailchimpContentMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 @DocumentProcessingInfo("MailchimpEventConverter")
-public class MailchimpEventConverter extends ProcessorFunctionAdapter<GenericEvent, NotificationIntent> {
+public class MailchimpEventConverter extends ProcessorFunctionAdapter<GenericEvent, NotificationIntent<MailchimpContent>> {
 	
 	private final MailchimpContentMapper mailchimpContentMapper;
 	
@@ -37,12 +39,14 @@ public class MailchimpEventConverter extends ProcessorFunctionAdapter<GenericEve
 	}
 	
 	@Override
-	protected NotificationIntent execute(GenericEvent payload) {
-		NotificationIntent notificationIntent = new NotificationIntent();
+	protected NotificationIntent<MailchimpContent> execute(GenericEvent payload) {
+		NotificationIntent<MailchimpContent> notificationIntent = new NotificationIntent<MailchimpContent>();
 		notificationIntent.getHeader().setFlowId(payload.getFlowId());
 		
 		MailchimpData mailchimpData = payload.getPayloadAsPojo();
-		notificationIntent.getBody().setMessage(mailchimpContentMapper.map(mailchimpData));
+		MailchimpContent content = mailchimpContentMapper.map(mailchimpData);
+		
+		notificationIntent.setBody(content);
 		return notificationIntent;
 	}
 	

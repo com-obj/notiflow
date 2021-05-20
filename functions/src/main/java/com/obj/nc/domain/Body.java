@@ -15,15 +15,13 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=true)
-public class Body extends BaseJSONObject implements HasRecievingEndpoints{
+public class Body extends BaseJSONObject implements HasRecievingEndpoints, HasDeliveryOptions {
 
 	private Content message = new SimpleTextContent();
 	
 	//Ak je body sucastou message tak recievingEndpoints.size() = 1
-	//TODO: move to Header
 	private List<RecievingEndpoint> recievingEndpoints = new ArrayList<RecievingEndpoint>();
 	
-	//TODO: move to Header
 	private DeliveryOptions deliveryOptions = new DeliveryOptions();	
 	
 	public Body addRecievingEndpoints(RecievingEndpoint ... r) {

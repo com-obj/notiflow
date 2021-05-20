@@ -38,7 +38,7 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 @Log4j2
 @DocumentProcessingInfo("SendEmail")
-public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
+public class EmailSender extends ProcessorFunctionAdapter<Message<EmailContent>, Message<EmailContent>> {
 	
 	private final JavaMailSenderImpl mailSender;
 	
@@ -49,12 +49,12 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 	private final EmailSenderConfigProperties settings;
 	
 	@Override
-	public Optional<PayloadValidationException> checkPreCondition(Message message) {
-		if (!(message.getBody().getMessage() instanceof EmailContent)) {
-			return Optional.of(new PayloadValidationException("EmailContent sender can process only Message with EmailContent content. Was type " + message.getBody().getMessage().getClass().getSimpleName()));
+	public Optional<PayloadValidationException> checkPreCondition(Message<EmailContent> message) {
+		if (!(message.getBody() instanceof EmailContent)) {
+			return Optional.of(new PayloadValidationException("EmailContent sender can process only Message with EmailContent content. Was type " + message.getBody().getClass().getSimpleName()));
 		}
 		
-		List<RecievingEndpoint> to = message.getBody().getRecievingEndpoints();
+		List<RecievingEndpoint> to = message.getRecievingEndpoints();
 
 		if (to.size() != 1) {
 			return Optional.of(new PayloadValidationException("EmailContent sender can send to only one recipient. Found more: " + to));
@@ -71,10 +71,9 @@ public class EmailSender extends ProcessorFunctionAdapter<Message, Message> {
 
 
 	@Override
-	public Message execute(Message payload) {		
-		EmailEndpoint toEmail = (EmailEndpoint) payload.getBody().getRecievingEndpoints().get(0);
-		EmailContent msg = payload.getContentTyped();
-		doSendMessage(toEmail, msg, payload.getHeader());
+	public Message<EmailContent> execute(Message<EmailContent> payload) {		
+		EmailEndpoint toEmail = (EmailEndpoint) payload.getRecievingEndpoints().get(0);
+		doSendMessage(toEmail, payload.getBody(), payload.getHeader());
 		return payload;
 	}
 

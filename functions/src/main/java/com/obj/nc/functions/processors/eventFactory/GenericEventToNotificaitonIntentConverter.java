@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class GenericEventToNotificaitonIntentConverter extends ProcessorFunctionAdapter<GenericEvent, NotificationIntent> {
+public class GenericEventToNotificaitonIntentConverter extends ProcessorFunctionAdapter<GenericEvent, NotificationIntent<?>> {
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(GenericEvent payload) {
@@ -25,15 +25,13 @@ public class GenericEventToNotificaitonIntentConverter extends ProcessorFunction
 	}
 
 	@Override
-	protected NotificationIntent execute(GenericEvent genericEvent) {
-		NotificationIntent notificationIntent = new NotificationIntent();
+	protected NotificationIntent<?> execute(GenericEvent genericEvent) {
+		NotificationIntent<?> notificationIntent = new NotificationIntent<Object>();
 
-		notificationIntent.getBody().setAttributeValue(ORIGINAL_EVENT_FIELD, genericEvent.getPayloadAsPojo());
+		notificationIntent.setBody(genericEvent.getPayloadAsPojo());
 		
 		return notificationIntent;
 	}
-	
-	public static final String ORIGINAL_EVENT_FIELD = "originalEvent";
 
 
 }
