@@ -57,7 +57,7 @@ public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements H
 	//move to content
 	private List<RecievingEndpoint> recievingEndpoints = new ArrayList<RecievingEndpoint>();
 
-	//move to content
+	//move to ??
 	private DeliveryOptions deliveryOptions = new DeliveryOptions();	
 	
 	public BasePayload<BODY_TYPE> addRecievingEndpoints(RecievingEndpoint ... r) {

@@ -19,33 +19,26 @@ import lombok.RequiredArgsConstructor;
 @ConditionalOnMissingBean(type = "SmsSender")
 @RequiredArgsConstructor
 @DocumentProcessingInfo("TestSMSSender")
-public class InMemorySmsSender extends ProcessorFunctionAdapter<Message,Message> implements SmsSender  {
+public class InMemorySmsSender extends ProcessorFunctionAdapter<Message<SimpleTextContent>,Message<SimpleTextContent>> implements SmsSender  {
 	
 	private final InMemorySmsSourceSupplier reciever;
 
 	
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
-		if (!(payload.getBody().getMessage() instanceof SimpleTextContent)) {
-			throw new PayloadValidationException("TestModeSmsSender can only process SimpleTextContent content. Was " + payload.getBody().getMessage() );
+	protected Optional<PayloadValidationException> checkPreCondition(Message<SimpleTextContent> payload) {
+		if (!(payload.getBody() instanceof SimpleTextContent)) {
+			throw new PayloadValidationException("TestModeSmsSender can only process SimpleTextContent content. Was " + payload.getBody() );
 		}
 		return Optional.empty();
 	}
 	
 	@Override
-	protected Message execute(Message smsMessage) {
-		
-		Message messageContent = convertAggregatedIfNeeded(smsMessage);
-		
-		reciever.recieve(messageContent);
+	protected Message<SimpleTextContent> execute(Message<SimpleTextContent> smsMessage) {
+				
+		reciever.recieve(smsMessage);
 
 		return smsMessage;
 	}
 
-	private Message convertAggregatedIfNeeded(Message smsMessage) {
-		SimpleTextContent content = smsMessage.getContentTyped();
-		smsMessage.getBody().setMessage(content);
-		return smsMessage;
-	}
 
 }

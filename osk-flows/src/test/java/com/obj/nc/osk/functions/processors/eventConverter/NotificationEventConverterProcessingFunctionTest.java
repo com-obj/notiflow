@@ -53,7 +53,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	//WHEN OUTAGE STARTs
         GenericEvent event = readOutageStartEvent();
         event = eventRepo.save(event); //we need to stave this so that issue outage End
-    	List<NotificationIntent> result = startOutageConverter.apply(event);
+    	List<NotificationIntent<?>> result = startOutageConverter.apply(event);
     	
     	//THEN
     	assertCustomerNotificationIntents(result);
@@ -86,18 +86,18 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	}
     }
 
-	private List<CustEmailTemplate> extractEmails(List<NotificationIntent> result) {
+	private List<CustEmailTemplate> extractEmails(List<NotificationIntent<?>> result) {
 		List<CustEmailTemplate> contents = result.stream()
-    		.filter(e-> e.getBody().getMessage() instanceof CustEmailTemplate)
-    		.map(e-> ((CustEmailTemplate)e.getBody().getMessage()))
+    		.filter(e-> e.getBody() instanceof CustEmailTemplate)
+    		.map(e-> ((CustEmailTemplate)e.getBody()))
     		.collect(Collectors.toList());
 		return contents;
 	}
 	
-	private List<CustSmsTemplate> extractSmss(List<NotificationIntent> result) {
+	private List<CustSmsTemplate> extractSmss(List<NotificationIntent<?>> result) {
 		List<CustSmsTemplate> contents = result.stream()
-    		.filter(e-> e.getBody().getMessage() instanceof CustSmsTemplate)
-    		.map(e-> ((CustSmsTemplate)e.getBody().getMessage()))
+    		.filter(e-> e.getBody() instanceof CustSmsTemplate)
+    		.map(e-> ((CustSmsTemplate)e.getBody()))
     		.collect(Collectors.toList());
 		return contents;
 	}

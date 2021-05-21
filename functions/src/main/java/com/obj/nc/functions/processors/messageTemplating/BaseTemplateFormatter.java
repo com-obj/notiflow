@@ -11,7 +11,6 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import com.obj.nc.domain.BaseJSONObject;
-import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -26,7 +25,7 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class BaseTemplateFormatter extends ProcessorFunctionAdapter<Message, List<Message>> {
+public abstract class BaseTemplateFormatter<OUTPUT_CONTENT_TYPE> extends ProcessorFunctionAdapter<Message<TemplateWithModelContent<?>>, List<Message<OUTPUT_CONTENT_TYPE>>> {
 	
 	public final static String LOCALE_ATTR_NAME = "@locale";
 	
@@ -35,8 +34,8 @@ public abstract class BaseTemplateFormatter extends ProcessorFunctionAdapter<Mes
 	private ThymeleafConfiguration config;
 
 	@Override
-	public Optional<PayloadValidationException> checkPreCondition(Message message) {
-		Content content = message.getBody().getMessage();
+	public Optional<PayloadValidationException> checkPreCondition(Message<TemplateWithModelContent<?>> message) {
+		TemplateWithModelContent<?> content = message.getBody();
 
 		if (content ==null ) {
 			return Optional.of(new PayloadValidationException("BaseTemplateFormatter cannot format message because its content is null"));
@@ -51,10 +50,10 @@ public abstract class BaseTemplateFormatter extends ProcessorFunctionAdapter<Mes
 
 
 	@Override
-	public List<Message> execute(Message payload) {
-		List<Message> result = new ArrayList<>();
+	public List<Message<OUTPUT_CONTENT_TYPE>> execute(Message<TemplateWithModelContent<?>> payload) {
+		List<Message<OUTPUT_CONTENT_TYPE>> result = new ArrayList<>();
 		
-		TemplateWithModelContent<?> emailFromTemplate = payload.getContentTyped();
+		TemplateWithModelContent<?> emailFromTemplate = payload.getBody();
 		
 		List<Locale> forLocales = CollectionUtils.isEmpty(emailFromTemplate.getRequiredLocales())?
 				config.getDefaultLocales()
@@ -71,11 +70,11 @@ public abstract class BaseTemplateFormatter extends ProcessorFunctionAdapter<Mes
 			
 			final String formatedContent = this.templateEngine.process(emailFromTemplate.getTemplateFileName(), ctx);
 			
-			Message htmlMessage = createMessageWithFormattedContent(formatedContent, locale, payload);
+			Message<OUTPUT_CONTENT_TYPE> htmlMessage = createMessageWithFormattedContent(formatedContent, locale, payload);
 			
 			htmlMessage.setAttributeValue(LOCALE_ATTR_NAME,locale);
-			htmlMessage.getBody().setDeliveryOptions(payload.getBody().getDeliveryOptions());
-			htmlMessage.getBody().setRecievingEndpoints(payload.getBody().getRecievingEndpoints());
+			htmlMessage.setDeliveryOptions(payload.getDeliveryOptions());
+			htmlMessage.setRecievingEndpoints(payload.getRecievingEndpoints());
 			
 			result.add(htmlMessage);
 		}
@@ -84,7 +83,7 @@ public abstract class BaseTemplateFormatter extends ProcessorFunctionAdapter<Mes
 	}
 
 
-	protected abstract Message createMessageWithFormattedContent(String formatedContent, Locale locale,  Message payload);
+	protected abstract Message<OUTPUT_CONTENT_TYPE> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelContent<?>> payload);
 
 
 }

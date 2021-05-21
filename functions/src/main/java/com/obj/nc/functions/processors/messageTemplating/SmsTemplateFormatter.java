@@ -16,15 +16,15 @@ import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigu
 
 @Component
 @DocumentProcessingInfo("SmsFormatter")
-public class SmsTemplateFormatter extends BaseTemplateFormatter {
+public class SmsTemplateFormatter extends BaseTemplateFormatter<SimpleTextContent> {
 
 	public SmsTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {
 		super(templateEngine, config);
 	}
 
 	@Override
-	public Optional<PayloadValidationException> checkPreCondition(Message message) {
-		Content content = message.getBody().getMessage();
+	public Optional<PayloadValidationException> checkPreCondition(Message<TemplateWithModelContent<?>> message) {
+		Content content = message.getBody();
 		
 		if (!(content instanceof  TemplateWithModelContent)) {
 			return Optional.of(new PayloadValidationException("SmsTemplateFormatter cannot format message because its content is not of type TemplateWithJsonModelSmsContent. Instead is " +  content.getClass().getSimpleName()));
@@ -33,10 +33,10 @@ public class SmsTemplateFormatter extends BaseTemplateFormatter {
 		return Optional.empty();
 	}
 
-	protected Message createMessageWithFormattedContent(String formatedContent, Locale locale,  Message payload) {		
-		Message smsMessage = Message.createAsSms();
+	protected Message<SimpleTextContent> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelContent<?>> payload) {		
+		Message<SimpleTextContent> smsMessage = Message.createAsSms();
 
-		SimpleTextContent smsContent = smsMessage.getContentTyped();
+		SimpleTextContent smsContent = smsMessage.getBody();
 		smsContent.setText(formatedContent);
 		
 		return smsMessage;

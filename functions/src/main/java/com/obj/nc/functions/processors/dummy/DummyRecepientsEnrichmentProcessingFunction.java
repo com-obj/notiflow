@@ -22,7 +22,7 @@ import lombok.extern.log4j.Log4j2;
 public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent<?>, NotificationIntent<?>> {
 
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent notificationIntent) {
+	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent<?> notificationIntent) {
 		
 		return Optional.empty();
 	}

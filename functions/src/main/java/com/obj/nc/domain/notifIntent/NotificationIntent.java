@@ -23,7 +23,10 @@ public class NotificationIntent<BODY_TYPE> extends BasePayload<BODY_TYPE> {
 	public static NotificationIntent<SimpleTextContent> createWithSimpleMessage(String flowId, String message) {
 		NotificationIntent<SimpleTextContent> notificationIntent = new NotificationIntent<SimpleTextContent>();
 		notificationIntent.header.setFlowId(flowId);
-		notificationIntent.setBody(new SimpleTextContent(message));
+		notificationIntent.setBody(
+				SimpleTextContent.builder()
+				.text(message)
+				.build());
 		
 		return notificationIntent;
 	}

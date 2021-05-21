@@ -1,25 +1,33 @@
 package com.obj.nc.functions.processors.messageAggregator.aggregations;
 
-import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.content.mailchimp.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData;
+import com.obj.nc.domain.content.mailchimp.MailchimpAttachment;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpMergeVariable;
+import com.obj.nc.domain.content.mailchimp.MailchimpTemplateContent;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Log4j2
 @RequiredArgsConstructor
-public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationStrategy {
+public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationStrategy<MailchimpContent> {
 	
 	private final MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 	
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(List<? extends BasePayload> payloads) {
+	protected Optional<PayloadValidationException> checkPreCondition(List<Message<MailchimpContent>> payloads) {
 		Optional<PayloadValidationException> exception = checkContentTypes(payloads, MailchimpContent.class);
 		if (exception.isPresent()) {
 			return exception;
@@ -34,7 +42,7 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 	}
 	
 	@Override
-	protected Optional<PayloadValidationException> checkReceivingEndpoints(List<? extends BasePayload> payloads) {
+	protected Optional<PayloadValidationException> checkReceivingEndpoints(List<Message<MailchimpContent>> payloads) {
 		Optional<PayloadValidationException> exception = checkEndpointTypes(payloads, MailchimpEndpoint.class);
 		if (exception.isPresent()) {
 			return exception;
@@ -44,18 +52,17 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 	}
 	
 	@Override
-	public Object merge(List<? extends BasePayload> payloads) {
+	public Object merge(List<Message<MailchimpContent>> payloads) {
 		if (payloads.isEmpty()) return null;
 		
 		MailchimpContent aggregatedMailchimpContent = payloads
 				.stream()
-				.map(BasePayload::<MailchimpContent>getContentTyped)
+				.map(Message::getBody)
 				.reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		
-		//TODO: ked bude refactorovany header a ostatne veci tak tuto spravit novu message a neprepisovat existujucu
-		Message outputMessage = (Message) payloads.get(0);
-		outputMessage.getBody().setMessage(aggregatedMailchimpContent);
+		Message<MailchimpContent> outputMessage = new Message<>();
+		outputMessage.setBody(aggregatedMailchimpContent);
 		return outputMessage;
 	}
 	

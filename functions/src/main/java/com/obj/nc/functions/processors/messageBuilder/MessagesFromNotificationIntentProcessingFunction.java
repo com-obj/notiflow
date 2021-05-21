@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.Body;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
@@ -21,12 +20,12 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 @Log4j2
 @DocumentProcessingInfo("GenerateMessagesFromIntent")
-public class MessagesFromNotificationIntentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent, List<Message>> {
+public class MessagesFromNotificationIntentProcessingFunction<CONTENT_TYPE> extends ProcessorFunctionAdapter<NotificationIntent<CONTENT_TYPE>, List<Message<CONTENT_TYPE>>> {
 
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent notificationIntent) {
+	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent<CONTENT_TYPE> notificationIntent) {
 
-		if (notificationIntent.getBody().getRecievingEndpoints().isEmpty()) {
+		if (notificationIntent.getRecievingEndpoints().isEmpty()) {
 			return Optional.of(new PayloadValidationException(
 					String.format("NotificationIntent %s has no receiving endpoints defined.", notificationIntent)));
 		}
@@ -35,28 +34,26 @@ public class MessagesFromNotificationIntentProcessingFunction extends ProcessorF
 	}
 
 	@Override
-	protected List<Message> execute(NotificationIntent notificationIntent) {
+	protected List<Message<CONTENT_TYPE>> execute(NotificationIntent<CONTENT_TYPE> notificationIntent) {
 		log.debug("Create messages for {}",  notificationIntent);
 
-		List<Message> messages = new ArrayList<Message>();
+		List<Message<CONTENT_TYPE>> messages = new ArrayList<>();
 
-		for (RecievingEndpoint recievingEndpoint: notificationIntent.getBody().getRecievingEndpoints()) {
+		for (RecievingEndpoint recievingEndpoint: notificationIntent.getRecievingEndpoints()) {
 
-			Message msg = new Message();
+			Message<CONTENT_TYPE> msg = new Message<>();
 			
-			Body msgBody = msg.getBody();
-			Body eventBody = notificationIntent.getBody();
-			msgBody.addRecievingEndpoints(recievingEndpoint);
+			msg.addRecievingEndpoints(recievingEndpoint);
 
 			if (recievingEndpoint.getDeliveryOptions()!=null) {
-				msgBody.setDeliveryOptions(recievingEndpoint.getDeliveryOptions());
+				msg.setDeliveryOptions(recievingEndpoint.getDeliveryOptions());
 				recievingEndpoint.setDeliveryOptions(null);
 			} else {
-				msgBody.setDeliveryOptions(eventBody.getDeliveryOptions());
+				msg.setDeliveryOptions(notificationIntent.getDeliveryOptions());
 			}
 
-			msgBody.setAttributes(eventBody.getAttributes());
-			msgBody.setMessage(eventBody.getMessage());
+			msg.setAttributes(notificationIntent.getAttributes());
+			msg.setBody(notificationIntent.getBody());
 			messages.add(msg);
 		}
 

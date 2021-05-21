@@ -9,6 +9,7 @@ import org.thymeleaf.TemplateEngine;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.message.Message;
@@ -17,15 +18,15 @@ import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigu
 
 @Component
 @DocumentProcessingInfo("EmailFormatter")
-public class EmailTemplateFormatter extends BaseTemplateFormatter {
+public class EmailTemplateFormatter extends BaseTemplateFormatter<EmailContent> {
 
 	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {
 		super(templateEngine, config);
 	}
 
 	@Override
-	public Optional<PayloadValidationException> checkPreCondition(Message message) {
-		Content content = message.getBody().getMessage();
+	public Optional<PayloadValidationException> checkPreCondition(Message<TemplateWithModelContent<?>> message) {
+		Content content = message.getBody();
 		
 		if (!(content instanceof  TemplateWithModelEmailContent)) {
 			return Optional.of(new PayloadValidationException("EmailTemplateFormatter cannot format message because its content is not of type TemplateWithModelEmailContent. Instead is " +  content.getClass().getSimpleName()));
@@ -34,13 +35,13 @@ public class EmailTemplateFormatter extends BaseTemplateFormatter {
 		return Optional.empty();
 	}
 
-	protected Message createMessageWithFormattedContent(String formatedContent, Locale locale,  Message payload) {		
-		Message htmlMessage = Message.createAsEmail();
+	protected Message<EmailContent> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelContent<?>> payload) {		
+		Message<EmailContent> htmlMessage = Message.createAsEmail();
 
-		EmailContent emailContent = htmlMessage.getContentTyped();
+		EmailContent emailContent = htmlMessage.getBody();
 		emailContent.setContentType(MediaType.TEXT_HTML_VALUE);
 		
-		TemplateWithModelEmailContent<?> emailFromTemplate = payload.getContentTyped();
+		TemplateWithModelEmailContent<?> emailFromTemplate = (TemplateWithModelEmailContent<?>)payload.getBody();
 		emailContent.setSubject(emailFromTemplate.getSubjectLocalised(locale));
 		emailContent.setText(formatedContent);
 		

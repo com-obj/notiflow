@@ -14,30 +14,31 @@ import com.obj.nc.functions.sources.SourceSupplierAdapter;
 
 @Component
 @ConditionalOnMissingBean(type = "SmsSender")
-public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<Message> {
+public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<Message<SimpleTextContent>> {
 	
 	public static final String ORIGINAL_RECIPIENTS_PHONE_ATTR_NAME = "ORIGINAL_RECIPIENTS_PHONE_NUM";
 	public static final String ORIGINAL_RECIPIENTS_NAME_ATTR_NAME = "ORIGINAL_RECIPIENTS_NAME";
 
 	
-	private LinkedList<Message> recieved = new LinkedList<Message>();
+	private LinkedList<Message<SimpleTextContent>> recieved = new LinkedList<Message<SimpleTextContent>>();
 
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
+	protected Optional<PayloadValidationException> checkPreCondition(Message<SimpleTextContent> payload) {
 		return Optional.empty();
 	}
 
 	@Override
-	protected Message execute() {
+	protected Message<SimpleTextContent> execute() {
 		if (recieved.isEmpty()) {
 			return null;
 		}
 		
-		Message sms= recieved.getFirst();
+		Message<SimpleTextContent> sms= recieved.getFirst();
 		
-		SmsEndpoint recipient = (SmsEndpoint)sms.getBody().getRecievingEndpoints().iterator().next();
+		SimpleTextContent content =sms.getBody();
 		
-		SimpleTextContent content =sms.getContentTyped();
+		SmsEndpoint recipient = content.getRecievingEndpoints().iterator().next();		
+
 		content.setAttributeValue(ORIGINAL_RECIPIENTS_PHONE_ATTR_NAME, recipient.getPhone());
 		if (recipient.getRecipient()!=null) {
 			content.setAttributeValue(ORIGINAL_RECIPIENTS_NAME_ATTR_NAME, recipient.getRecipient().getName());
@@ -48,7 +49,7 @@ public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<Message> {
 		return sms;
 	}
 	
-	public void recieve(Message msg) {
+	public void recieve(Message<SimpleTextContent> msg) {
 		recieved.addLast(msg);
 	}
 	
