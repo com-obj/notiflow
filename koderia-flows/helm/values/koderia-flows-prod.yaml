@@ -1,5 +1,5 @@
 image:
-  tag: v1.0.8-dev.6
+  tag: latest
   
 ingress:
   enabled: true
@@ -17,12 +17,6 @@ ingress:
 
 activeProfiles:
   - gke
-  - override
-
-overrideProperties:
-  server:
-    servlet:
-      context-path: /koderia-flows
 
 postgresql:
   enabled: true
