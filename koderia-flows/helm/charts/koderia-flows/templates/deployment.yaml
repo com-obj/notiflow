@@ -26,11 +26,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: RELEASE_NAME
-            value: {{ .Release.Name }}
-          - name: ACTIVE_PROFILES
+            value: {{ include "koderia-flows.fullname" . }}
+          - name: SPRING_PROFILES_ACTIVE
             value: {{ include "koderia-flows.activeProfiles" . }}
-          - name: OVERRIDE_CONFIG_LOCATION
-            value: /var/{{ include "koderia-flows.fullname" . }}-config/
           ports:
             - name: http
               containerPort: 8080
