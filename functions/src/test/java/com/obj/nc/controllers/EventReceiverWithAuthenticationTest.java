@@ -5,6 +5,8 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.security.config.JwtTokenUtil;
+import com.obj.nc.security.config.NcJwtConfigProperties;
 import com.obj.nc.security.exception.UserNotAuthenticatedException;
 import com.obj.nc.security.model.JwtRequest;
 import com.obj.nc.utils.JsonUtils;
@@ -12,11 +14,16 @@ import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,6 +31,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import static com.obj.nc.security.config.Constants.JWT_TOKEN_PREFIX;
@@ -44,6 +52,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class EventReceiverWithAuthenticationTest extends BaseIntegrationTest {
     
 	@Autowired protected MockMvc mockMvc;
+	@Autowired private JwtTokenUtil jwtTokenUtil;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private NcJwtConfigProperties ncJwtConfigProperties;
 
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
@@ -99,13 +110,15 @@ class EventReceiverWithAuthenticationTest extends BaseIntegrationTest {
         // given
         String INPUT_JSON_FILE = "events/generic_event.json";
         String eventJson = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
+        String token = jwtTokenUtil.generateToken(new User("testUser", passwordEncoder.encode("testPassword"), new ArrayList<>()), 
+                "invalidSignature");
         
         //when
         assertThatThrownBy(() -> mockMvc.perform(MockMvcRequestBuilders.post("/events")
                     .contentType(APPLICATION_JSON_UTF8)
                     .content(eventJson)
                     .accept(APPLICATION_JSON_UTF8)
-                    .header(AUTHORIZATION, "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhc2RmIiwiZXhwIjoxNjIxMjY3MjYwLCJpYXQiOjE2MjEyNDkyNjB9.EV9PZhSltdQQBUz3HQr3lB65g84IaYoVsedSFG7aFq7J1rmLzNs-XsYlUKPL1JEUq_8rBli18NIvYxsSeT0brQ")))
+                    .header(AUTHORIZATION, JWT_TOKEN_PREFIX.concat(token))))
                 .isInstanceOf(UserNotAuthenticatedException.class)
                 .hasMessageContaining("JWT signature does not match locally computed signature.");
     }
@@ -115,6 +128,8 @@ class EventReceiverWithAuthenticationTest extends BaseIntegrationTest {
         // given
         String INPUT_JSON_FILE = "events/generic_event.json";
         String eventJson = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
+        String token = jwtTokenUtil.generateToken(new User("invalidUser", passwordEncoder.encode("testPassword"), new ArrayList<>()), 
+                ncJwtConfigProperties.getSignatureSecret());
         
         //when
         assertThatThrownBy(() -> mockMvc
@@ -122,9 +137,9 @@ class EventReceiverWithAuthenticationTest extends BaseIntegrationTest {
                         .contentType(APPLICATION_JSON_UTF8)
                         .content(eventJson)
                         .accept(APPLICATION_JSON_UTF8)
-                        .header(AUTHORIZATION, "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0VXNlcjEiLCJleHAiOjE2MjEyODU0ODEsImlhdCI6MTYyMTI2NzQ4MX0.z-j8-OHJZI3X3d1_hNXQ-PLaZ6fsxlSw2UXHoVieXV2Sb07ybUcoLrhuk6wyf4pTscaPN3Szvv5UjtaaJNyP9g")))
+                        .header(AUTHORIZATION, JWT_TOKEN_PREFIX.concat(token))))
                 .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessageContaining("User not found with username: testUser1");
+                .hasMessageContaining("User not found with username: invalidUser");
     }
  
 }
