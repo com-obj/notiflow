@@ -18,14 +18,15 @@ import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigu
 
 @Component
 @DocumentProcessingInfo("EmailFormatter")
-public class EmailTemplateFormatter extends BaseTemplateFormatter<EmailContent> {
+public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithModelEmailContent<?>, EmailContent> {
 
 	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {
 		super(templateEngine, config);
 	}
+	
 
 	@Override
-	public Optional<PayloadValidationException> checkPreCondition(Message<TemplateWithModelContent<?>> message) {
+	public Optional<PayloadValidationException> checkPreCondition(Message<TemplateWithModelEmailContent<?>> message) {
 		Content content = message.getBody();
 		
 		if (!(content instanceof  TemplateWithModelEmailContent)) {
@@ -35,13 +36,13 @@ public class EmailTemplateFormatter extends BaseTemplateFormatter<EmailContent> 
 		return Optional.empty();
 	}
 
-	protected Message<EmailContent> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelContent<?>> payload) {		
+	protected Message<EmailContent> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelEmailContent<?>> payload) {		
 		Message<EmailContent> htmlMessage = Message.createAsEmail();
 
 		EmailContent emailContent = htmlMessage.getBody();
 		emailContent.setContentType(MediaType.TEXT_HTML_VALUE);
 		
-		TemplateWithModelEmailContent<?> emailFromTemplate = (TemplateWithModelEmailContent<?>)payload.getBody();
+		TemplateWithModelEmailContent<?> emailFromTemplate = payload.getBody();
 		emailContent.setSubject(emailFromTemplate.getSubjectLocalised(locale));
 		emailContent.setText(formatedContent);
 		

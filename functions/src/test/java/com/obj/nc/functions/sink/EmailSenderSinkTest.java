@@ -58,7 +58,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     void sendSingleMail() throws MessagingException, IOException {
         //GIVEN
         String INPUT_JSON_FILE = "messages/email_message.json";
-        Message message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+        Message<EmailContent> message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
         UUID originalProcessingId = message.getProcessingInfo().getProcessingId();
 
         //WHEN
@@ -70,7 +70,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         DeliveryInfoSendResult delInfo = delInfos.iterator().next();
         Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
-        Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(message.getBody().getRecievingEndpoints().get(0));
+        Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(message.getRecievingEndpoints().get(0));
         Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(message.getHeader().getEventIds());
 
         //THEN
@@ -84,7 +84,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     void sendMailToManyRecipients() {
         //GIVEN
         String INPUT_JSON_FILE = "messages/e_email_message_2_many.json";
-        Message message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+        Message<EmailContent> message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 
         //WHEN -THEN
         Assertions.assertThatThrownBy(() -> {
@@ -98,7 +98,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     void sendEmailToNonEmailEnpoint() {
         //GIVEN
         String INPUT_JSON_FILE = "messages/e_email_message_2_push_endpoint.json";
-        Message message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+        Message<EmailContent> message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 
         //WHEN -THEN
         Assertions.assertThatThrownBy(() -> {
@@ -112,9 +112,9 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     void sendMailWithAttachments() {
         //GIVEN
         String INPUT_JSON_FILE = "messages/email_message_attachments.json";
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+        Message<EmailContent> inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 
-        EmailContent emailContent = inputMessage.getContentTyped();
+        EmailContent emailContent = inputMessage.getBody();
         emailContent.getAttachments().forEach(attachement -> {
             try {
                 attachement.setFileURI(new ClassPathResource(attachement.getFileURI().getPath()).getURI());
@@ -146,7 +146,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     void sendAggregateMessage() {
         //GIVEN
         String INPUT_JSON_FILE = "messages/aggregate/aggregate_output_message.json";
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+        Message<EmailContent> inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 
         //WHEN
         inputMessage = functionSend.apply(inputMessage);
@@ -158,14 +158,14 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         
         Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
-        Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(inputMessage.getBody().getRecievingEndpoints().get(0));
+        Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(inputMessage.getRecievingEndpoints().get(0));
         Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(inputMessage.getHeader().getEventIds());
 
         //THEN
         MimeMessage message = greenMail.getReceivedMessages()[0];
         String msg = GreenMailUtil.getWholeMessage(message);
 
-        EmailContent aggregated = inputMessage.getContentTyped();
+        EmailContent aggregated = inputMessage.getBody();
 
         Assertions.assertThat(msg).contains(aggregated.getSubject());
         Assertions.assertThat(msg).contains(aggregated.getText().replaceAll("\n", "\r\n"));

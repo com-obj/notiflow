@@ -1,34 +1,25 @@
 {
    "type":"MESSAGE",
    "header":{
-        "id":"0c3f159f-103e-49fd-8eb1-f4b6de481acb",
-      	"eventId":"0c3f159f-103e-49fd-8eb1-f4b6de481acb",
+      	"eventIds":["0c3f159f-103e-49fd-8eb1-f4b6de481acb"],
       	"flow-id":"static-routing-pipeline"
    },
    "body":{
-      "message": {
-      		"type": "SMS_FROM_TEMPLATE_MESSAGE_CONTENT",
-            "templateFileName":"test-template-i18n.txt",
-            "requiredLocales": ["en_US","de"],
-            "model": {
-            	"name":"John Doe"
-            }
+   		"type": "SMS_FROM_TEMPLATE_MESSAGE_CONTENT",
+        "templateFileName":"test-template-i18n.txt",
+        "requiredLocales": ["en_US","de"],
+        "model": {
+          	"name":"John Doe"
+        }
       },
-      "recievingEndpoints":[
-         {
-            "@type":"SMS",
-            "phone":"0908186997",
-            "recipient":{
-               "type":"PERSON",
-               "name":"John Doe"
-            }
-         }
-      ]
-   },
-   "processingInfo":{
-      "processingId":"1863e7dd-cb43-44dc-9008-bf7915f95ccd",
-      "prevProcessingId":"7293ee75-666d-4a38-a668-9b63f8cc6b56",
-      "stepName":"FindRecepientsUsingKoderiaSubsription",
-      "stepIndex":1
+   "recievingEndpoints":[
+   {
+        "@type":"SMS",
+        "phone":"0908186997",
+        "recipient":{
+           "type":"PERSON",
+           "name":"John Doe"
+        }
    }
+   ]
 }

@@ -33,9 +33,9 @@ public class Message<BODY_TYPE extends Content> extends BasePayload<BODY_TYPE> i
 		return msg;
 	}
 	
-	//TODO: refactor as some factory or something else
 	public static Message<SimpleTextContent> createAsSms() {
 		Message<SimpleTextContent> msg = new Message<SimpleTextContent>();
+		msg.setBody(new SimpleTextContent());
 		return msg;
 	}
 

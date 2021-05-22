@@ -26,7 +26,7 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class BaseTemplateFormatter<OUTPUT_CONTENT_TYPE extends Content> extends ProcessorFunctionAdapter<Message<TemplateWithModelContent<?>>, List<Message<OUTPUT_CONTENT_TYPE>>> {
+public abstract class BaseTemplateFormatter<TEMPLATE_TYPE extends TemplateWithModelContent<?>, OUTPUT_CONTENT_TYPE extends Content> extends ProcessorFunctionAdapter<Message<TEMPLATE_TYPE>, List<Message<OUTPUT_CONTENT_TYPE>>> {
 	
 	public final static String LOCALE_ATTR_NAME = "@locale";
 	
@@ -35,7 +35,7 @@ public abstract class BaseTemplateFormatter<OUTPUT_CONTENT_TYPE extends Content>
 	private ThymeleafConfiguration config;
 
 	@Override
-	public Optional<PayloadValidationException> checkPreCondition(Message<TemplateWithModelContent<?>> message) {
+	public Optional<PayloadValidationException> checkPreCondition(Message<TEMPLATE_TYPE> message) {
 		TemplateWithModelContent<?> content = message.getBody();
 
 		if (content ==null ) {
@@ -51,7 +51,7 @@ public abstract class BaseTemplateFormatter<OUTPUT_CONTENT_TYPE extends Content>
 
 
 	@Override
-	public List<Message<OUTPUT_CONTENT_TYPE>> execute(Message<TemplateWithModelContent<?>> payload) {
+	public List<Message<OUTPUT_CONTENT_TYPE>> execute(Message<TEMPLATE_TYPE> payload) {
 		List<Message<OUTPUT_CONTENT_TYPE>> result = new ArrayList<>();
 		
 		TemplateWithModelContent<?> emailFromTemplate = payload.getBody();
@@ -84,7 +84,7 @@ public abstract class BaseTemplateFormatter<OUTPUT_CONTENT_TYPE extends Content>
 	}
 
 
-	protected abstract Message<OUTPUT_CONTENT_TYPE> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelContent<?>> payload);
+	protected abstract Message<OUTPUT_CONTENT_TYPE> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TEMPLATE_TYPE> payload);
 
 
 }

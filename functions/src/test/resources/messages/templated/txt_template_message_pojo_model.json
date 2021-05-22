@@ -1,22 +1,19 @@
 {
    "type":"MESSAGE",
    "header":{
-        "id":"0c3f159f-103e-49fd-8eb1-f4b6de481acb",
-      	"eventId":"0c3f159f-103e-49fd-8eb1-f4b6de481acb",
+      	"eventIds":["0c3f159f-103e-49fd-8eb1-f4b6de481acb"],
       	"flow-id":"static-routing-pipeline"
    },
    "body":{
-      "message": {
-      		"type": "SMS_FROM_TEMPLATE_MESSAGE_CONTENT",
-            "templateFileName":"test-template2.txt",
-            "model": {
-            	"type":"SMS_FROM_TEAMPLATE_COMLEX_MESSAGE_CONTENT",
-            	"name":"John Doe",
-            	"parts": [
-            		{"field1":"val11","field2":"val12"},
-            		{"field1":"val21","field2":"val22"}
-            	]
-            }
+  		"type": "SMS_FROM_TEMPLATE_MESSAGE_CONTENT",
+        "templateFileName":"test-template2.txt",
+        "model": {
+          	"type":"SMS_FROM_TEAMPLATE_COMLEX_MESSAGE_CONTENT",
+          	"name":"John Doe",
+           	"parts": [
+           		{"field1":"val11","field2":"val12"},
+           		{"field1":"val21","field2":"val22"}
+           	]
       },
       "recievingEndpoints":[
          {
@@ -28,11 +25,5 @@
             }
          }
       ]
-   },
-   "processingInfo":{
-      "processingId":"1863e7dd-cb43-44dc-9008-bf7915f95ccd",
-      "prevProcessingId":"7293ee75-666d-4a38-a668-9b63f8cc6b56",
-      "stepName":"FindRecepientsUsingKoderiaSubsription",
-      "stepIndex":1
    }
 }

@@ -27,10 +27,7 @@ public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregati
     @Override
     public Object merge(List<Message<Content>> payloads) {
         if (payloads.isEmpty()) return null;
-    
-        //TODO: ked bude refactorovany header a ostatne veci tak tuto spravit novu message a neprepisovat existujucu
-//        Message<?> aggregatedMessage = (Message<?>) payloads.get(0);
-        
+            
         TestModeDiggestModel digestModel = new TestModeDiggestModel();
         payloads.stream()
         		.map(msg -> msg.getBody())
@@ -51,10 +48,10 @@ public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregati
         resultMail.setModel(digestModel);
         
         List<EmailEndpoint> emailEndpoints = testModeProps.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
-        resultMail.setRecievingEndpoints(emailEndpoints);
         
         Message<TestModeDiggestMailContent> aggregatedMessage = new Message<>();
-        aggregatedMessage.setBody(resultMail);        
+        aggregatedMessage.setBody(resultMail); 
+        aggregatedMessage.setRecievingEndpoints(emailEndpoints);
         
         aggregatedMessage.getHeader().setAttributeValue(Header.SUPRESS_GENERATE_PROC_INFO_PARAM_NAME, true);
         

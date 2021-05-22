@@ -16,7 +16,7 @@ import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigu
 
 @Component
 @DocumentProcessingInfo("SmsFormatter")
-public class SmsTemplateFormatter extends BaseTemplateFormatter<SimpleTextContent> {
+public class SmsTemplateFormatter extends BaseTemplateFormatter<TemplateWithModelContent<?>, SimpleTextContent> {
 
 	public SmsTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {
 		super(templateEngine, config);

@@ -3,7 +3,7 @@
    "header":{
       	"eventIds":["0c3f159f-103e-49fd-8eb1-f4b6de481acb"],
       	"flow-id":"static-routing-pipeline",
-	    "processingInfo":{
+	    "processingInfo": {
       		"processingId":"1863e7dd-cb43-44dc-9008-bf7915f95ccd",
       		"prevProcessingId":"7293ee75-666d-4a38-a668-9b63f8cc6b56",
       		"stepName":"FindRecepientsUsingKoderiaSubsription",
@@ -26,5 +26,4 @@
             "endpointId":"john.doe@objectify.sk"
          }
       ]
-   }
 }
