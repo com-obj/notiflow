@@ -54,7 +54,7 @@ public class EmailSender extends ProcessorFunctionAdapter<Message<EmailContent>,
 			return Optional.of(new PayloadValidationException("EmailContent sender can process only Message with EmailContent content. Was type " + message.getBody().getClass().getSimpleName()));
 		}
 		
-		List<RecievingEndpoint> to = message.getRecievingEndpoints();
+		List<? extends RecievingEndpoint> to = message.getRecievingEndpoints();
 
 		if (to.size() != 1) {
 			return Optional.of(new PayloadValidationException("EmailContent sender can send to only one recipient. Found more: " + to));

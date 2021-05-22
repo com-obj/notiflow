@@ -39,8 +39,8 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     	converters.add(new UUIDArrayToPgObjectConverter());
     	converters.add(new PgObjectToUUIDArrayConverter());
     	
-    	converters.add(new BodyToPgObjectConverter());
-    	converters.add(new PgObjectToBodyConverter());
+    	converters.add(new ContentToPgObjectConverter());
+    	converters.add(new PgObjectToContentConverter());
     
     	return new JdbcCustomConversions(converters);
     }

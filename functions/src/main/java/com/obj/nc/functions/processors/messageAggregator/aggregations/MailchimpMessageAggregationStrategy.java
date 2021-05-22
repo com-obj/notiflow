@@ -33,10 +33,10 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 			return exception;
 		}
 		
-		exception = checkDeliveryOptions(payloads);
-		if (exception.isPresent()) {
-			return exception;
-		}
+//		exception = checkDeliveryOptions(payloads);
+//		if (exception.isPresent()) {
+//			return exception;
+//		}
 		
 		return checkReceivingEndpoints(payloads);
 	}

@@ -5,6 +5,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -21,7 +22,8 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
 @Table("nc_message")
-public class Message<BODY_TYPE> extends BasePayload<BODY_TYPE> implements HasHeader {
+//TODO: Make abstract, add type parameter for RecievingEndpoint
+public class Message<BODY_TYPE extends Content> extends BasePayload<BODY_TYPE> implements HasHeader {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "MESSAGE";
 	

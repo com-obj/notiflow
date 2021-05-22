@@ -27,8 +27,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
@@ -44,7 +44,7 @@ import com.obj.nc.utils.JsonUtils;
 public class DeliveryInfoTest extends BaseIntegrationTest {
 	
 	@Autowired private GenerateEventIdProcessingFunction generateEventId;
-    @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
+    @Autowired private DummyRecepientsEnrichmentProcessingFunction<EmailContent> resolveRecipients;
     @Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromIntent;
     @Autowired private DeliveryInfoRepository deliveryInfoRepo;
     @Autowired private JdbcTemplate jdbcTemplate;
@@ -72,14 +72,14 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     	MessagingTemplate messageTemplate = new MessagingTemplate();
     	
         String INPUT_JSON_FILE = "events/ba_job_post.json";
-        NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        NotificationIntent<EmailContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
-        notificationIntent = (NotificationIntent)generateEventId.apply(notificationIntent);
+        notificationIntent = (NotificationIntent<EmailContent>)generateEventId.apply(notificationIntent);
         UUID eventId = notificationIntent.getHeader().getEventIds().get(0);
         notificationIntent = resolveRecipients.apply(notificationIntent);
         
         //WHEN
-        org.springframework.messaging.Message<NotificationIntent> notifIntentMsg = MessageBuilder.withPayload(notificationIntent).build();
+        org.springframework.messaging.Message<NotificationIntent<EmailContent>> notifIntentMsg = MessageBuilder.withPayload(notificationIntent).build();
         messageTemplate.send(deliveryInfoProcessingInputChannel, notifIntentMsg);
 
         //THEN check processing deliveryInfo
@@ -96,10 +96,10 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         });
         
         //WHEN
-        List<Message> messages = generateMessagesFromIntent.apply(notificationIntent);
+        List<Message<EmailContent>> messages = (List<Message<EmailContent>>)generateMessagesFromIntent.apply(notificationIntent);
         
         messages.forEach(msg -> {
-            org.springframework.messaging.Message<Message> notifMsg = MessageBuilder.withPayload(msg).build();
+            org.springframework.messaging.Message<Message<EmailContent>> notifMsg = MessageBuilder.withPayload(msg).build();
             messageTemplate.send(deliveryInfoSendInputChannel, notifMsg);
         });
         
@@ -123,8 +123,8 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Test
     void testDeliveryInfosCreateAndPersistedForFailedDelivery() {
         // GIVEN    	
-        Message email = Message.createAsEmail();
-        email.getBody().addRecievingEndpoints(
+        Message<EmailContent> email = Message.createAsEmail();
+        email.addRecievingEndpoints(
         		EmailEndpoint.builder().email("wrong email").build());
         UUID eventId = UUID.randomUUID();
         email.getHeader().addEventId(eventId);
@@ -148,13 +148,13 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     }
 
 
-	private void assertEnpointPersistedNotDuplicated(NotificationIntent notificationIntent) {
+	private void assertEnpointPersistedNotDuplicated(NotificationIntent<EmailContent> notificationIntent) {
 		List<Map<String, Object>> persistedEndpoints = jdbcTemplate.queryForList("select * from nc_endpoint");
         assertThat(persistedEndpoints, CoreMatchers.notNullValue());
         Assertions.assertThat(persistedEndpoints.size()).isEqualTo(3);
 
         for (int i = 0; i < persistedEndpoints.size(); i++) {
-            List<RecievingEndpoint> recievingEndpoints = notificationIntent.getBody().getRecievingEndpoints();
+            List<EmailEndpoint> recievingEndpoints = (List<EmailEndpoint>)notificationIntent.getRecievingEndpoints();
             assertThat(persistedEndpoints.get(i).get("endpoint_id"), CoreMatchers.equalTo(((EmailEndpoint) recievingEndpoints.get(i)).getEmail()));
             assertThat(persistedEndpoints.get(i).get("endpoint_type"), CoreMatchers.equalTo(recievingEndpoints.get(i).getEndpointType()));
         }

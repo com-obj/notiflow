@@ -17,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
@@ -55,20 +54,19 @@ public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements H
 	
 	//Ak je body sucastou message tak recievingEndpoints.size() = 1
 	//move to content
-	private List<RecievingEndpoint> recievingEndpoints = new ArrayList<RecievingEndpoint>();
+	private List<? extends RecievingEndpoint> recievingEndpoints = new ArrayList<RecievingEndpoint>();
 
-	//move to ??
-	private DeliveryOptions deliveryOptions = new DeliveryOptions();	
+	//move to ?? (only for notification intent?)
+//	private DeliveryOptions deliveryOptions = new DeliveryOptions();	
 	
 	public BasePayload<BODY_TYPE> addRecievingEndpoints(RecievingEndpoint ... r) {
-		this.recievingEndpoints.addAll(Arrays.asList(r));
+		((List<RecievingEndpoint>)this.recievingEndpoints).addAll(Arrays.asList(r));
 		return this;
 	}
 	
 	@Override
-	@JsonIgnore
 	@Transient
-	public List<RecievingEndpoint> getRecievingEndpoints() {
+	public List<? extends RecievingEndpoint> getRecievingEndpoints() {
 		return recievingEndpoints;
 	}
 	

@@ -3,6 +3,7 @@ package com.obj.nc.functions.processors.messageAggregator.aggregations;
 import java.util.List;
 import java.util.Optional;
 
+import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -14,7 +15,7 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
  * @author ja
  *
  */
-public abstract class BasePayloadAggregationStrategy<CONTENT_TYPE> extends ProcessorFunctionAdapter<List<Message<CONTENT_TYPE>>, Object> {
+public abstract class BasePayloadAggregationStrategy<CONTENT_TYPE extends Content> extends ProcessorFunctionAdapter<List<Message<CONTENT_TYPE>>, Object> {
 	
 	/**
 	 * Process the given list of payloads. Implementations are free to return as few or as many payloads
@@ -27,20 +28,20 @@ public abstract class BasePayloadAggregationStrategy<CONTENT_TYPE> extends Proce
 		return this.merge(payload);
 	}
 	
-	protected Optional<PayloadValidationException> checkDeliveryOptions(List<Message<CONTENT_TYPE>> payloads) {
-		Optional<Message<CONTENT_TYPE>> firstPayload = payloads.stream().findFirst();
-		if (!firstPayload.isPresent()) {
-			return Optional.empty();
-		}
-				
-		Optional<Message<CONTENT_TYPE>> invalidPayload = payloads.stream()
-				.filter(payload -> !firstPayload.get().getDeliveryOptions().equals(payload.getDeliveryOptions()))
-				.findFirst();
-		
-		return invalidPayload.map(payload -> new PayloadValidationException(
-				String.format("Payload %s has different delivery options to other payloads. Is %s", payload, 
-						payload.getDeliveryOptions())));
-	}
+//	protected Optional<PayloadValidationException> checkDeliveryOptions(List<Message<CONTENT_TYPE>> payloads) {
+//		Optional<Message<CONTENT_TYPE>> firstPayload = payloads.stream().findFirst();
+//		if (!firstPayload.isPresent()) {
+//			return Optional.empty();
+//		}
+//				
+//		Optional<Message<CONTENT_TYPE>> invalidPayload = payloads.stream()
+//				.filter(payload -> !firstPayload.get().getDeliveryOptions().equals(payload.getDeliveryOptions()))
+//				.findFirst();
+//		
+//		return invalidPayload.map(payload -> new PayloadValidationException(
+//				String.format("Payload %s has different delivery options to other payloads. Is %s", payload, 
+//						payload.getDeliveryOptions())));
+//	}
 	
 	protected Optional<PayloadValidationException> checkReceivingEndpoints(List<Message<CONTENT_TYPE>> payloads) {
 		Optional<Message<CONTENT_TYPE>> firstPayload = payloads.stream().findFirst();

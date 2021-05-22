@@ -27,7 +27,6 @@ import com.icegreen.greenmail.store.MailFolder;
 import com.icegreen.greenmail.store.StoredMessage;
 import com.icegreen.greenmail.util.GreenMail;
 import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.message.Message;
@@ -120,12 +119,12 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
             content.setContentType(contentType);
             //This is most likely not used,.. this mails are aggregated and bundled into separate mail, which will set the recipient from setting again
             List<EmailEndpoint> emailEndpoints = properties.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
-            result.getBody().setRecievingEndpoints(emailEndpoints);
+            result.setRecievingEndpoints(emailEndpoints);
 
 
-            DeliveryOptions deliveryOptions = new DeliveryOptions();
-            deliveryOptions.setAggregationType(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
-            result.setDeliveryOptions(deliveryOptions);
+//            DeliveryOptions deliveryOptions = new DeliveryOptions();
+//            deliveryOptions.setAggregationType(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
+//            result.setDeliveryOptions(deliveryOptions);
             
             copyHeaderValues(mimeMessage, result.getHeader());
             

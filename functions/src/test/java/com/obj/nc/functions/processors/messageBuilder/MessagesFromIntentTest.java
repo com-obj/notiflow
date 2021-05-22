@@ -10,9 +10,6 @@ import org.junit.jupiter.api.Test;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.Body;
 import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.endpoints.DeliveryOptions;
-import com.obj.nc.domain.endpoints.DeliveryOptions.AGGREGATION_TYPE;
-import com.obj.nc.domain.endpoints.DeliveryOptions.TIME_CONSTRAINT_TYPE;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
@@ -55,44 +52,44 @@ class MessagesFromIntentTest {
 
 	}
 	
-	@Test
-	void createMessagesFromEventDeliveryOptions() {
-		//GIVEN
-		String INPUT_JSON_FILE = "events/delivery_options.json";
-		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-
-		GenerateEventIdProcessingFunction funciton = new GenerateEventIdProcessingFunction();
-
-		notificationIntent = (NotificationIntent)funciton.apply(notificationIntent);
-		
-		//WHEN
-		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
-		List<Message> result = createMessagesFunction.apply(notificationIntent);
-		
-		//THEN
-		assertThat(result.size()).isEqualTo(2);
-		
-		Message deliveryNullMessage = findMessageWithEnpoint(result, "john.doe@objectify.sk");
-		
-		DeliveryOptions msgDeliveryOptions =deliveryNullMessage.getBody().getDeliveryOptions();
-		assertThat(msgDeliveryOptions).isNotNull();
-		assertThat(msgDeliveryOptions.getAggregationType()).isEqualTo(AGGREGATION_TYPE.NONE);
-		assertThat(msgDeliveryOptions.getSchedulingType()).isEqualTo(TIME_CONSTRAINT_TYPE.IMMEDIATE);
-		
-		RecievingEndpoint recipient = deliveryNullMessage.getBody().getRecievingEndpoints().get(0);
-		assertThat(recipient.getDeliveryOptions()).isNull(); //v tomto case su uz delivery options na message a nie specificky pri recipientovi
-		
-		Message deliverySet = findMessageWithEnpoint(result, "john.dudly@objectify.sk");
-		
-		DeliveryOptions msgDeliveryOptions2 =deliverySet.getBody().getDeliveryOptions();
-		assertThat(msgDeliveryOptions2).isNotNull();
-		assertThat(msgDeliveryOptions2.getAggregationType()).isEqualTo(AGGREGATION_TYPE.ONCE_A_WEEK);
-		assertThat(msgDeliveryOptions2.getSchedulingType()).isEqualTo(TIME_CONSTRAINT_TYPE.IMMEDIATE);
-		
-		recipient = deliverySet.getBody().getRecievingEndpoints().get(0);
-		assertThat(recipient.getDeliveryOptions()).isNull(); //v tomto case su uz delivery options na message a nie specificky pri recipientovi
-
-	}
+//	@Test
+//	void createMessagesFromEventDeliveryOptions() {
+//		//GIVEN
+//		String INPUT_JSON_FILE = "events/delivery_options.json";
+//		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+//
+//		GenerateEventIdProcessingFunction funciton = new GenerateEventIdProcessingFunction();
+//
+//		notificationIntent = (NotificationIntent)funciton.apply(notificationIntent);
+//		
+//		//WHEN
+//		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
+//		List<Message> result = createMessagesFunction.apply(notificationIntent);
+//		
+//		//THEN
+//		assertThat(result.size()).isEqualTo(2);
+//		
+//		Message deliveryNullMessage = findMessageWithEnpoint(result, "john.doe@objectify.sk");
+//		
+//		DeliveryOptions msgDeliveryOptions =deliveryNullMessage.getBody().getDeliveryOptions();
+//		assertThat(msgDeliveryOptions).isNotNull();
+//		assertThat(msgDeliveryOptions.getAggregationType()).isEqualTo(AGGREGATION_TYPE.NONE);
+//		assertThat(msgDeliveryOptions.getSchedulingType()).isEqualTo(TIME_CONSTRAINT_TYPE.IMMEDIATE);
+//		
+//		RecievingEndpoint recipient = deliveryNullMessage.getBody().getRecievingEndpoints().get(0);
+//		assertThat(recipient.getDeliveryOptions()).isNull(); //v tomto case su uz delivery options na message a nie specificky pri recipientovi
+//		
+//		Message deliverySet = findMessageWithEnpoint(result, "john.dudly@objectify.sk");
+//		
+//		DeliveryOptions msgDeliveryOptions2 =deliverySet.getBody().getDeliveryOptions();
+//		assertThat(msgDeliveryOptions2).isNotNull();
+//		assertThat(msgDeliveryOptions2.getAggregationType()).isEqualTo(AGGREGATION_TYPE.ONCE_A_WEEK);
+//		assertThat(msgDeliveryOptions2.getSchedulingType()).isEqualTo(TIME_CONSTRAINT_TYPE.IMMEDIATE);
+//		
+//		recipient = deliverySet.getBody().getRecievingEndpoints().get(0);
+//		assertThat(recipient.getDeliveryOptions()).isNull(); //v tomto case su uz delivery options na message a nie specificky pri recipientovi
+//
+//	}
 	
 	@Test
 	void createMessagesFromEventAttachements() {

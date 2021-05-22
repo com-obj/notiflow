@@ -1,9 +1,6 @@
 {
    "type":"MESSAGE",
     "header":{
-      "attributes":{
-         
-      },
       "id":"2598a791-08d6-4795-8354-2f675f72b067",
       "eventId":"0c3f159f-103e-49fd-8eb1-f4b6de481acb",
       "configuration-name":"static-routing-pipeline",
@@ -13,14 +10,10 @@
       }
    },
    "body":{
-     "message": {
-         "text":"Text",
-         "subject":"Subject",
-         "attachments":[
-
-         ]
-     },
-      "recievingEndpoints":[
+      "text":"Text",
+      "subject":"Subject"
+   },
+   "recievingEndpoints":[
          {
             "@type":"EMAIL",
             "recipient":{
@@ -30,11 +23,6 @@
             "email":"john.doe@objectify.sk",
             "endpointId":"john.doe@objectify.sk"
          }
-      ],
-      "deliveryOptions":{
-         "aggregationType":"NONE",
-         "schedulingType":"IMMEDIATE"
-      }
-   }
+      ]
 
 }

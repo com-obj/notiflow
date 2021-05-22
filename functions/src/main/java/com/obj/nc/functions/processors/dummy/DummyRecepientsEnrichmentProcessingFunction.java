@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.Group;
 import com.obj.nc.domain.endpoints.Person;
@@ -19,16 +20,16 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 @Log4j2
 @DocumentProcessingInfo("DummyRecepientsEnrichment")
-public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent<?>, NotificationIntent<?>> {
+public class DummyRecepientsEnrichmentProcessingFunction<CONTENT_TYPE extends Content> extends ProcessorFunctionAdapter<NotificationIntent<CONTENT_TYPE>, NotificationIntent<CONTENT_TYPE>> {
 
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent<?> notificationIntent) {
+	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent<CONTENT_TYPE> notificationIntent) {
 		
 		return Optional.empty();
 	}
 
 	@Override
-	protected NotificationIntent<?> execute(NotificationIntent<?> notificationIntent) {
+	protected NotificationIntent<CONTENT_TYPE> execute(NotificationIntent<CONTENT_TYPE> notificationIntent) {
 		// find recipients based on technologies
 		Person person1 = new Person("John Doe");
 		Person person2 = new Person("John Dudly");

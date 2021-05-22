@@ -11,6 +11,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import com.obj.nc.domain.BaseJSONObject;
+import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -25,7 +26,7 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class BaseTemplateFormatter<OUTPUT_CONTENT_TYPE> extends ProcessorFunctionAdapter<Message<TemplateWithModelContent<?>>, List<Message<OUTPUT_CONTENT_TYPE>>> {
+public abstract class BaseTemplateFormatter<OUTPUT_CONTENT_TYPE extends Content> extends ProcessorFunctionAdapter<Message<TemplateWithModelContent<?>>, List<Message<OUTPUT_CONTENT_TYPE>>> {
 	
 	public final static String LOCALE_ATTR_NAME = "@locale";
 	
@@ -73,7 +74,7 @@ public abstract class BaseTemplateFormatter<OUTPUT_CONTENT_TYPE> extends Process
 			Message<OUTPUT_CONTENT_TYPE> htmlMessage = createMessageWithFormattedContent(formatedContent, locale, payload);
 			
 			htmlMessage.setAttributeValue(LOCALE_ATTR_NAME,locale);
-			htmlMessage.setDeliveryOptions(payload.getDeliveryOptions());
+//			htmlMessage.setDeliveryOptions(payload.getDeliveryOptions());
 			htmlMessage.setRecievingEndpoints(payload.getRecievingEndpoints());
 			
 			result.add(htmlMessage);

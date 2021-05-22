@@ -4,6 +4,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 
 import lombok.Data;
@@ -16,7 +17,7 @@ import lombok.ToString;
 @ToString(callSuper = false)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @Table("nc_intent")
-public class NotificationIntent<BODY_TYPE> extends BasePayload<BODY_TYPE> {
+public class NotificationIntent<BODY_TYPE extends Content> extends BasePayload<BODY_TYPE> {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "EVENT";
 

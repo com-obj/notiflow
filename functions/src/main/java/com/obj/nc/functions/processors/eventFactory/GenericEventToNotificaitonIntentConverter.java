@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
+import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -26,7 +27,7 @@ public class GenericEventToNotificaitonIntentConverter extends ProcessorFunction
 
 	@Override
 	protected NotificationIntent<?> execute(GenericEvent genericEvent) {
-		NotificationIntent<?> notificationIntent = new NotificationIntent<Object>();
+		NotificationIntent<?> notificationIntent = new NotificationIntent<Content>();
 
 		notificationIntent.setBody(genericEvent.getPayloadAsPojo());
 		

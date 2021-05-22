@@ -29,10 +29,10 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 			return exception;
 		}
 		
-		exception = checkDeliveryOptions(payloads);
-		if (exception.isPresent()) {
-			return exception;
-		}
+//		exception = checkDeliveryOptions(payloads);
+//		if (exception.isPresent()) {
+//			return exception;
+//		}
 		
 		return checkReceivingEndpoints(payloads);
 	}

@@ -249,7 +249,8 @@ public class ProcessingInfoGeneratorTest {
         });
 	}
 
-    @Test
+    @SuppressWarnings("unchecked")
+	@Test
     void testPersistPIForSendMessage() {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post.json";
