@@ -14,13 +14,13 @@ import reactor.core.publisher.Flux;
 
 @Configuration
 @Log4j2
-public class EventGeneratorMicroService extends SourceMicroService<NotificationIntent, EventGeneratorSourceSupplier> {
+public class EventGeneratorMicroService extends SourceMicroService<NotificationIntent<?>, EventGeneratorSourceSupplier> {
 
     @Autowired
     private EventGeneratorSourceSupplier supplier;
 
     @Bean
-    public Supplier<Flux<NotificationIntent>> generateNotificationIntent() {
+    public Supplier<Flux<NotificationIntent<?>>> generateNotificationIntent() {
         return super.executeSourceService();
     }
 

@@ -12,10 +12,10 @@ import lombok.extern.log4j.Log4j2;
 
 @Component
 @Log4j2
-public class EventGeneratorPreCondition implements PreCondition<NotificationIntent> {
+public class EventGeneratorPreCondition implements PreCondition<NotificationIntent<?>> {
 
     @Override
-    public Optional<PayloadValidationException> apply(NotificationIntent notificationIntent) {
+    public Optional<PayloadValidationException> apply(NotificationIntent<?> notificationIntent) {
         if (notificationIntent == null) {
             return Optional.of(new PayloadValidationException("Input NotificationIntent must not be null"));
         }

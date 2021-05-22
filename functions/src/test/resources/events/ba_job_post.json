@@ -2,8 +2,9 @@
    "type":"EVENT",   
    "body":{
      "subject":"Business Intelligence (BI) Developer",
-     "text":"We are looking for a Business Intelligence (BI) Developer to create...",
-     "attributes" : {
+     "text":"We are looking for a Business Intelligence (BI) Developer to create..."
+   },
+   "attributes" : {
         "originalEvent" : {
            "type" : "JOB_POST",
            "data" : {
