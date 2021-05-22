@@ -13,6 +13,8 @@ import org.springframework.test.context.ActiveProfiles;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.email.TemplateWithJsonModelEmailContent;
+import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.utils.JsonUtils;
@@ -27,15 +29,15 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 	void createSimpleHtmlEmailFromTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/teamplate_message.json";
-		Message msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+		Message<TemplateWithModelEmailContent<?>> msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 		
 		//WHEN
-		List<Message> htmlMessages = template2Html.apply(msg);
+		List<Message<EmailContent>> htmlMessages = template2Html.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
 		
-		EmailContent content = htmlMessages.iterator().next().getContentTyped();
+		EmailContent content = htmlMessages.iterator().next().getBody();
 		
 		System.out.println(content.getText());
 		assertThat(content.getSubject()).isEqualTo("Subject");
@@ -46,15 +48,15 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 	void createHtmlEmailFromPojoModelAndTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/teamplate_message_pojo_model.json";
-		Message msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+		Message<TemplateWithModelEmailContent<?>> msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 		
 		//WHEN
-		List<Message> htmlMessages = template2Html.apply(msg);
+		List<Message<EmailContent>> htmlMessages = template2Html.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
 		
-		EmailContent content = htmlMessages.iterator().next().getContentTyped();
+		EmailContent content = htmlMessages.iterator().next().getBody();
 		
 		System.out.println(content.getText());
 		assertThat(content.getSubject()).isEqualTo("Subject");
@@ -66,10 +68,10 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 	void createI18NHtmlEmailFromTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/teamplate_message_en_de.json";
-		Message msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+		Message<TemplateWithModelEmailContent<?>> msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
 		
 		//WHEN
-		List<Message> htmlMessages = template2Html.apply(msg);
+		List<Message<EmailContent>> htmlMessages = template2Html.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(2);
@@ -78,7 +80,7 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 				.stream()
 				.filter(m-> Locale.GERMAN.equals(m.getAttributes().get(EmailTemplateFormatter.LOCALE_ATTR_NAME)))
 				.findFirst()
-				.get().getContentTyped();
+				.get().getBody();
 		
 		System.out.println(deContent.getText());
 		assertThat(deContent.getSubject()).isEqualTo("Subject");
@@ -89,7 +91,7 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 				.stream()
 				.filter(m-> Locale.US.equals(m.getAttributes().get(EmailTemplateFormatter.LOCALE_ATTR_NAME)))
 				.findFirst()
-				.get().getContentTyped();
+				.get().getBody();
 		
 		System.out.println(enContent.getText());
 		assertThat(enContent.getSubject()).isEqualTo("Subject");
