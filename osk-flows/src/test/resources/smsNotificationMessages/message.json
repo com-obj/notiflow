@@ -2,12 +2,11 @@
   "type" : "MESSAGE",
   "header" : {},
   "body" : {
-    "message" : {
       "type" : "TEXT_CONTENT",
       "text" : "Vážený zákazník, o xx:xx hod. sme zaznamenali výpadok, ktorý môže mať dopad na Vašu //službu, službu s identifikátorom, službu s SN//, //s odbernou adresou\nxxx//.\nNa výpadku intenzívne pracujeme. Po jeho vyriešení Vás budeme informovať.\nPreverte prosím na Vašej strane funkčnosť //...// a v prípade spozorovania akéhokoľvek problému kontaktujte zákaznícku linku 908 Orange Slovensko, a.s.\n",
       "contentTypeName" : "TEXT_CONTENT"
-    },
-    "recievingEndpoints" : [ {
+  },
+  "recievingEndpoints" : [ {
       "@type" : "SMS",
       "deliveryOptions" : null,
       "recipient" : {
@@ -15,10 +14,5 @@
         "name" : "Peter Bazik"
       },
       "phone" : "0918368864"
-    } ],
-    "deliveryOptions" : {
-      "aggregationType" : "NONE",
-      "schedulingType" : "IMMEDIATE"
-    }
-  }
+  } ]
 }

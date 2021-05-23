@@ -15,7 +15,8 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=true)
-public class Body extends BaseJSONObject implements HasRecievingEndpoints, HasDeliveryOptions {
+@Deprecated 
+public abstract class Body extends BaseJSONObject implements HasRecievingEndpoints, HasDeliveryOptions {
 
 	private Content message = new SimpleTextContent();
 	
