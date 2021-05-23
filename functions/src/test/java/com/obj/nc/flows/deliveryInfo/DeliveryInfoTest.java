@@ -44,8 +44,8 @@ import com.obj.nc.utils.JsonUtils;
 public class DeliveryInfoTest extends BaseIntegrationTest {
 	
 	@Autowired private GenerateEventIdProcessingFunction generateEventId;
-    @Autowired private DummyRecepientsEnrichmentProcessingFunction<EmailContent> resolveRecipients;
-    @Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromIntent;
+    @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
+    @Autowired private MessagesFromNotificationIntentProcessingFunction<EmailContent> generateMessagesFromIntent;
     @Autowired private DeliveryInfoRepository deliveryInfoRepo;
     @Autowired private JdbcTemplate jdbcTemplate;
     
@@ -76,7 +76,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 
         notificationIntent = (NotificationIntent<EmailContent>)generateEventId.apply(notificationIntent);
         UUID eventId = notificationIntent.getHeader().getEventIds().get(0);
-        notificationIntent = resolveRecipients.apply(notificationIntent);
+        notificationIntent = (NotificationIntent<EmailContent>)resolveRecipients.apply(notificationIntent);
         
         //WHEN
         org.springframework.messaging.Message<NotificationIntent<EmailContent>> notifIntentMsg = MessageBuilder.withPayload(notificationIntent).build();

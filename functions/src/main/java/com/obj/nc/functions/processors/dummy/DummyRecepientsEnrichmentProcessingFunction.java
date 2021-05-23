@@ -1,5 +1,7 @@
 package com.obj.nc.functions.processors.dummy;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -20,16 +22,16 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 @Log4j2
 @DocumentProcessingInfo("DummyRecepientsEnrichment")
-public class DummyRecepientsEnrichmentProcessingFunction<CONTENT_TYPE extends Content> extends ProcessorFunctionAdapter<NotificationIntent<CONTENT_TYPE>, NotificationIntent<CONTENT_TYPE>> {
+public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent<? extends Content>, NotificationIntent<? extends Content>> {
 
+	
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent<CONTENT_TYPE> notificationIntent) {
-		
+	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent<? extends Content> notificationIntent) {
 		return Optional.empty();
 	}
 
 	@Override
-	protected NotificationIntent<CONTENT_TYPE> execute(NotificationIntent<CONTENT_TYPE> notificationIntent) {
+	protected NotificationIntent<? extends Content> execute(NotificationIntent<? extends Content> notificationIntent) {
 		// find recipients based on technologies
 		Person person1 = new Person("John Doe");
 		Person person2 = new Person("John Dudly");

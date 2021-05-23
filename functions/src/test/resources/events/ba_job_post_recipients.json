@@ -1,10 +1,6 @@
 {
    "type":"EVENT",
-   "header":{
-      "configuration-name":"static-routing-pipeline"
-   },
    "body":{
-      "message":{
          "subject":"Business Intelligence (BI) Developer",
          "text":"We are looking for a Business Intelligence (BI) Developer to create...",
          "attributes" : {
@@ -23,11 +19,11 @@
                   "duration": "1 rok s možnosťou predĺženia",
                   "type": "Analytik",
                   "dateOfStart": "ASAP"
-               }
-            }
-         }
-      },
-      "recievingEndpoints":[
+               }            
+             }
+          }
+    },
+    "recievingEndpoints":[
          {
             "@type":"EMAIL",
             "email":"john.doe@objectify.sk"
@@ -40,6 +36,5 @@
             "@type":"EMAIL",
             "email":"all@objectify.sk"
          }
-      ]
-   }
+   ]
 }
