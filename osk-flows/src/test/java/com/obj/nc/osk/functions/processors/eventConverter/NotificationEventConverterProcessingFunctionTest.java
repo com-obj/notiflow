@@ -108,7 +108,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	
     	//THEN check events for customer
     	JXPathContext context = JXPathContext.newContext(result); //"//recievingEndpoints[@endpointId='cuzy@objectify.sk']/../.."
-		List<NotificationIntent> nisForCuzy = context.selectNodes("//recipient[name='Jan Cuzy']/../../..");
+		List<NotificationIntent> nisForCuzy = context.selectNodes("//recipient[name='Jan Cuzy']/../..");
     	
     	assertThat(nisForCuzy.size()).isEqualTo(2);
     	
@@ -166,7 +166,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(result.size()).isEqualTo(8); //3xcustomers email,2xcustomer sms, 2xsales, 1xsales agent 
     	
     	JXPathContext context = JXPathContext.newContext(result);
-		List<NotificationIntent<?>> notificationIntentsForSlavkovsky = context.selectNodes("//recievingEndpoints[@endpointId='slavkovsky@orange.sk']/../..");
+		List<NotificationIntent<?>> notificationIntentsForSlavkovsky = context.selectNodes("//recievingEndpoints[@endpointId='slavkovsky@orange.sk']/..");
     	assertThat(notificationIntentsForSlavkovsky.size()).isEqualTo(1);
     	    	
     	NotificationIntent<?> notificationIntentForHahn = notificationIntentsForSlavkovsky.iterator().next();
@@ -208,7 +208,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	
     	//THEN check events for agent
     	JXPathContext context = JXPathContext.newContext(result);
-		List<NotificationIntent<?>> notificationIntentsForAgent = context.selectNodes("//recievingEndpoints[@endpointId='sales@objectify.sk']/../..");
+		List<NotificationIntent<?>> notificationIntentsForAgent = context.selectNodes("//recievingEndpoints[@endpointId='sales@objectify.sk']/..");
     	
     	assertThat(notificationIntentsForAgent.size()).isEqualTo(1);
     	
