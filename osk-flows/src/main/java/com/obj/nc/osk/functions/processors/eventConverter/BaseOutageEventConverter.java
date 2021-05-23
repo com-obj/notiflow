@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.Body;
 import com.obj.nc.domain.content.TemplateWithModelContent;
@@ -204,15 +206,14 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 	private NotificationIntent<?> createNotificationIntent(
 			TemplateWithModelContent<?> messageContent,
 			Set<? extends RecievingEndpoint> endpoints) {
-		
-//		Body eventBody = new Body();
-//		eventBody.setMessage(messageContent);
-//		eventBody.getRecievingEndpoints().addAll(endpoints);
-		
+				
 		NotificationIntent<TemplateWithModelContent<?>> notificationIntent = new NotificationIntent<
 				>();
 		notificationIntent.setBody(messageContent);
-		notificationIntent.setRecievingEndpoints(endpoints);
+		
+		List<RecievingEndpoint> typedEndpoints = Lists.newArrayList(
+				   Iterables.filter(endpoints, RecievingEndpoint.class));
+		notificationIntent.setRecievingEndpoints(typedEndpoints);
 		
 		return notificationIntent;
 	}

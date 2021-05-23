@@ -18,6 +18,8 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured-common:4.2.0'
     testImplementation 'io.rest-assured:spring-mock-mvc:4.2.0'
     testImplementation(testFixtures(project(":functions")))
+    
+    implementation 'com.google.guava:guava:30.1.1-jre'
 }
 
 task copyFatJarToDistFolder(type: Copy) {
