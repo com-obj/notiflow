@@ -3,6 +3,7 @@ package com.obj.nc.security.controller;
 import com.obj.nc.security.config.Constants;
 import com.obj.nc.security.config.JwtSecurityConfig;
 import com.obj.nc.security.config.JwtTokenUtil;
+import com.obj.nc.security.config.NcJwtConfigProperties;
 import com.obj.nc.security.exception.UserNotAuthenticatedException;
 import com.obj.nc.security.model.JwtRequest;
 import com.obj.nc.security.model.JwtResponse;
@@ -30,6 +31,7 @@ public class JwtAuthenticationController {
 	private final AuthenticationManager authenticationManager;
 	private final JwtTokenUtil jwtTokenUtil;
 	private final UserDetailsService jwtInMemoryUserDetailsService;
+	private final NcJwtConfigProperties ncJwtConfigProperties;
 
 	@PostMapping(value = Constants.API.AUTHENTICATE, consumes = MediaType.APPLICATION_JSON_VALUE, 
 			produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,7 +41,7 @@ public class JwtAuthenticationController {
 		final UserDetails userDetails = jwtInMemoryUserDetailsService
 				.loadUserByUsername(authenticationRequest.getUsername());
 		
-		final String token = jwtTokenUtil.generateToken(userDetails);
+		final String token = jwtTokenUtil.generateToken(userDetails, ncJwtConfigProperties.getSignatureSecret());
 		return ResponseEntity.ok(new JwtResponse(token));
 	}
 
