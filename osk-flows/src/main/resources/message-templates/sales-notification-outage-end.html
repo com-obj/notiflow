@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <title>Informácia o možnom výpadku služieb.</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  </head>
-    <body>
-    	<p>
-    		<span>Milý kolega,</span>
-    		<br>
-    		<span>výpadok, ktorý trval od</span>
-    		<span style="font-weight:bold" th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
-    		<span>bol ukončený</span>
-    		<span style="font-weight:bold" th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeEnd, __df)}">11:00</span>
-    	</p>
-    	
-    	<p style="font-weight:bold">Zákazníkov sme o tom informovali.</p>	
-    	<p style="font-weight:bold">Orange</p>
-    
-    </body>
+<head>
+	<title>Zakaznicke sluzby su opat dostupne</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<p>Milý kolega,</p>
+<p>
+	<span>výpadok, ktorý trval od </span>
+	<span style="font-weight:bold" th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeStart, __df)}">10:00</span>
+	<span> bol ukončený </span>
+	<span style="font-weight:bold" th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeEnd, __df)}">11:00</span>
+	<span>.</span>
+</p>
+<p>
+	<span>Zákazníkov sme o tom </span>
+	<span style="font-weight:bold">informovali.</span>
+</p>
+<p style="font-weight:bold">Orange</p>
+</body>
 </html>
