@@ -42,9 +42,9 @@ public abstract class TemplateWithModelEmailContent<MODEL_TYPE> extends Template
 	
 	public String getSubjectLocalised(Locale locale) {
 		try {
-			return Get.getBean("nc.emailTemplateFormatter.messageSource", MessageSource.class).getMessage(subjectResourceKey, subjectResourcesMessageParameters, locale);
+			return Get.getBean("nc.emailTemplateFormatter.messageSource", MessageSource.class).getMessage(getSubjectResourceKey(), getSubjectResourcesMessageParameters(), locale);
 		} catch (NoSuchMessageException e) {
-			log.debug("{} not found in resource bundle. Fallback to subject property", subjectResourceKey);
+			log.debug("{} not found in resource bundle. Fallback to subject property", getSubjectResourceKey());
 		}
 		return subject;
 	}

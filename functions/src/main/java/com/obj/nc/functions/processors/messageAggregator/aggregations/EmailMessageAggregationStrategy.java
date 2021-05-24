@@ -18,7 +18,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrategy {
 	
-	public static final String SUBJECT_CONCAT_DELIMITER = "/";
+	public static final String SUBJECT_CONCAT_DELIMITER = " / ";
 	public static final String PLAIN_TEXT_CONCAT_DELIMITER = "\n\n";
 	public static final String HTML_TEXT_CONCAT_DELIMITER = "<br>";
 	
