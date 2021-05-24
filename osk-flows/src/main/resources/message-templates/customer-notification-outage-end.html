@@ -7,7 +7,7 @@
     <body>
     	<p>
     		<span th:text="#{cust.end.salution}">Vážený zákazník,</span>     		
-    		<span style="font-weight:bold" th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
+    		<span style="font-weight:bold" th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
     		<span th:text="#{cust.end.outage.part1}">, ktorý mohol mať dopad na využívanie Vašich služieb od Orangeu, </span>
     		<span style="font-weight:bold" th:text="#{cust.end.outage.part2}">bol odstránený.</span>
     	</p>

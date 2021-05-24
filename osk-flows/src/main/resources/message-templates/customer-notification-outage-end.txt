@@ -1,5 +1,5 @@
 [(#{cust.end.sms.salution})]
-[# th:with="__df=#{dateTime.foramt}" th:text="${#dates.format(model.timeStart, __df)}" /] [(#{cust.end.sms.hour})] [(#{cust.end.sms.outage})]
+[# th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeStart, __df)}" /] [(#{cust.end.sms.hour})] [(#{cust.end.sms.outage})]
 
 [# th:each="service : ${model.services}" ]
     [(${service.productName})](SN:[(${service.sn})])

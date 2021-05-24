@@ -10,7 +10,7 @@
 		</p>
     	<p>
 			<span th:text="#{cust.start.salution}">Vážený zákazník,</span>
-    		<span style="font-weight:bold" th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
+    		<span style="font-weight:bold" th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
     		<span th:text="#{cust.start.outage}">sme zaznamenali výpadok</span>
     	</p>
     	<p th:text="#{cust.start.services.title}">

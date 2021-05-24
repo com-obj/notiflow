@@ -12,9 +12,9 @@
 				<span>dole uvedeni zakaznici by uz mali mat sluzby spritupnene. </span>
 				<span style="font-weight:bold">Informovali</span>
 				<span> sme ich o tom správou. Vypadok, ktorý trval od </span>
-				<span style="font-weight:bold" th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">10:00</span>
+				<span style="font-weight:bold" th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeStart, __df)}">10:00</span>
 				<span>sme odstranili </span>
-				<span style="font-weight:bold" th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeEnd, __df)}">11:00</span>
+				<span style="font-weight:bold" th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeEnd, __df)}">11:00</span>
 			</p>
     	</p>
     	
