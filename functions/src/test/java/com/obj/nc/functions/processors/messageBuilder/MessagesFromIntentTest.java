@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.Body;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
