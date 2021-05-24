@@ -5,12 +5,17 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
     <body>
+		<p th:if="${!#strings.isEmpty(#messages.msg('cust.end.languageInfo'))}">
+			<span th:text="#{cust.end.languageInfo}">English version follows Slovak</span>
+		</p>
     	<p>
-    		<span th:text="#{cust.end.salution}">Vážený zákazník,</span>     		
+    		<span th:text="#{cust.end.salution}">Vážený zákazník, už avizovaný výpadok z </span>     		
     		<span style="font-weight:bold" th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
     		<span th:text="#{cust.end.outage.part1}">, ktorý mohol mať dopad na využívanie Vašich služieb od Orangeu, </span>
-    		<span style="font-weight:bold" th:text="#{cust.end.outage.part2}">bol odstránený.</span>
-    	</p>
+			<span th:text="#{cust.end.outage.part2}">bol odstránený </span>
+			<span style="font-weight:bold" th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeEnd, __df)}">11:00</span>
+			<span th:text="#{cust.end.outage.part3}">.</span>
+		</p>
     	<p th:text="#{cust.end.services.title}">
     		Ovplyvnené môžu byť:
     	</p>
@@ -33,12 +38,8 @@
 	    </tbody>
     </table>
 		<p>
-			<span th:text="#{cust.end.footerLine1.part1}">Za vzniknute problemi sa ospravedlnujeme</span>
-			<span style="font-weight:bold" th:text="#{cust.end.footerLine1.part2}"></span>
-		</p>
-		<p>
-			<span th:text="#{cust.start.footerLine2.part1}"></span>
-			<span style="font-weight:bold" th:text="#{cust.start.footerLine2.part2}"></span>
+			<span th:text="#{cust.end.footerLine1}">Za vzniknute problemi sa ospravedlnujeme</span>
+			<span style="font-weight:bold" th:text="#{cust.end.footerLine2}"></span>
 		</p>
     	<p style="font-weight:bold" th:text="#{cust.end.signature1}"></p>
     	<p style="font-weight:bold" th:text="#{cust.end.signature2}"></p>
