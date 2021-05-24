@@ -1,5 +1,23 @@
 package com.obj.nc.koderia.functions.processors.messageAggregator;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
+
+import java.util.Arrays;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
@@ -12,19 +30,6 @@ import com.obj.nc.koderia.config.DomainConfig;
 import com.obj.nc.koderia.domain.eventData.BaseKoderiaData;
 import com.obj.nc.koderia.mapper.KoderiaMergeVarMapperImpl;
 import com.obj.nc.utils.JsonUtils;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.JsonTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-
-import java.util.Arrays;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @JsonTest
@@ -38,18 +43,18 @@ public class MailchimpAggregationStrategyTest {
     @Test
     void testAggregateValidMessagesPass() {
         // given
-        Message message1 = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_1.json", Message.class);
-        MailchimpContent message1Content = message1.getContentTyped();
+        Message<MailchimpContent> message1 = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_1.json", Message.class);
+        MailchimpContent message1Content = message1.getBody();
         message1Content.setGlobalMergeVariables(mergeVarMapper.map(message1Content.getOriginalEvent()));
-        Message message2 = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_2.json", Message.class);
-        MailchimpContent message2Content = message2.getContentTyped();
+        Message<MailchimpContent> message2 = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_2.json", Message.class);
+        MailchimpContent message2Content = message2.getBody();
         message2Content.setGlobalMergeVariables(mergeVarMapper.map(message2Content.getOriginalEvent()));
     
         // when
-        Message outputMessage = (Message) aggregateMailchimpMessages.apply(Arrays.asList(message1, message2));
+        Message<MailchimpContent> outputMessage = (Message<MailchimpContent>) aggregateMailchimpMessages.apply(Arrays.asList(message1, message2));
     
         // then
-        MailchimpContent content = outputMessage.getContentTyped();
+        MailchimpContent content = outputMessage.getBody();
         assertThat(content.getTemplateName(), equalTo(properties.getAggregatedMessageTemplateName()));
         assertThat(content.getTemplateContent(), empty());
         assertThat(content.getRecipients(), hasSize(1));

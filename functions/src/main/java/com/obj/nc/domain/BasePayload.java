@@ -17,6 +17,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
@@ -62,6 +64,15 @@ public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements H
 	public BasePayload<BODY_TYPE> addRecievingEndpoints(RecievingEndpoint ... r) {
 		((List<RecievingEndpoint>)this.recievingEndpoints).addAll(Arrays.asList(r));
 		return this;
+	}
+		
+	@JsonIgnore
+	@Transient
+	public void setRecievingEndpointsSL(List<RecievingEndpoint> endpoints) {
+		List<RecievingEndpoint> typedEndpoints = Lists.newArrayList(
+				   Iterables.filter(endpoints, RecievingEndpoint.class));
+		
+		this.setRecievingEndpoints(typedEndpoints);
 	}
 	
 	@Override

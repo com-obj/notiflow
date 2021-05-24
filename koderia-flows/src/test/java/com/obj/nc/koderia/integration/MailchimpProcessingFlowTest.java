@@ -49,6 +49,7 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
@@ -112,12 +113,12 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 		MatcherAssert.assertThat(received, Matchers.hasSize(3));
 		// and
 		for (Message<?> receivedMessage : received) {
-			com.obj.nc.domain.message.Message payload = (com.obj.nc.domain.message.Message) receivedMessage.getPayload();
+			com.obj.nc.domain.message.Message<MailchimpContent> payload = (com.obj.nc.domain.message.Message<MailchimpContent>) receivedMessage.getPayload();
 			checkReceivedPayload(payload);
 		}
 	}
 	
-	private void checkReceivedPayload(com.obj.nc.domain.message.Message payload) {
+	private void checkReceivedPayload(com.obj.nc.domain.message.Message<?> payload) {
 		String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
 		MailchimpSendTemplateResponse[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MailchimpSendTemplateResponse[].class);
 		

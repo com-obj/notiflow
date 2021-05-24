@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.Body;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;

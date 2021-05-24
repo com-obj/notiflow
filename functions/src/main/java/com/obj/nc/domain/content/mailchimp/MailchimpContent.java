@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.obj.nc.domain.HasRecievingEndpoints;
 import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @JsonTypeName(MailchimpContent.JSON_TYPE_IDENTIFIER)
-public class MailchimpContent extends Content implements HasRecievingEndpoints {
+public class MailchimpContent extends Content {
     
     public final static String JSON_TYPE_IDENTIFIER = "MAILCHIMP_CONTENT";
     
@@ -31,7 +29,5 @@ public class MailchimpContent extends Content implements HasRecievingEndpoints {
     private List<MailchimpTemplateContent> templateContent = new ArrayList<>();
     private List<MailchimpMergeVariable> globalMergeVariables = new ArrayList<>();
     private String mergeLanguage;
-    
-	private List<MailchimpEndpoint> recievingEndpoints = new ArrayList<MailchimpEndpoint>();
     
 }
