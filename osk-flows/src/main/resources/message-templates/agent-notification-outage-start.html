@@ -5,21 +5,20 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
     <body>
+		<p>Milý kolega,</p>
     	<p>
-    		<span>Milý kolega,</span>
-    		<br>
     		<span style="font-weight:bold" th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
-    		<span>došlo k výpadku, ktorý môže mať dopad na zákazníkov a ich služby:</span>
+    		<span> došlo k výpadku, ktorý môže mať dopad na zákazníkov a ich služby:</span>
     	</p>
 		<table border="1" cellpadding="5" style="border-collapse:collapse; border: 0px;">		
 			<thead>
 				<tr>
-					<th>Zakaznik</th>
+					<th>Meno zákazníka</th>
 				    <th>Adresa zakaznika</th>
 				    <th>B2B Login</th>
 				    <th>SN</th>
 				    <th>Služba</th>
-				    <th>Odberna adresa</th>
+				    <th>Adresa odberného miesta</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -33,15 +32,15 @@
 				</tr>
 			</tbody>
 		</table>
-
+		<p>
+			<span>Celkovo môže byť ovplyvnených </span>
+			<span style="font-weight:bold" th:text="${model.customerCount}"></span>
+			<span style="font-weight:bold"> zákazníkov.</span>
+		</p>
+		<br>
 		<p>
 			<span>Zákazníkov sme o tom </span>
 			<span style="font-weight:bold">informovali.</span>
-		</p>
-		<p>
-			<span>Celkovo môže byť ovplyvnených</span>
-			<span style="font-weight:bold" th:text="${model.customerCount}"></span>
-			<span style="font-weight:bold">zákazníkov.</span>
 		</p>
 		<p>
 			<span>Na detailnej identifikácii a odstránení výpadku intenzívne pracujeme. </span>
