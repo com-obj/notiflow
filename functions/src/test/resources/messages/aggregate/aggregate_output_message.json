@@ -13,7 +13,7 @@
     "message" : {
       "type" : "EMAIL_MESSAGE_CONTENT",
       "attributes" : { },
-      "subject" : "New position 1/New position 2/New position 3",
+      "subject" : "New position 1 / New position 2 / New position 3",
       "text" : "New position on koderia.sk 1\n\nNew position on koderia.sk 2\n\nNew position on koderia.sk 3",
       "contentType" : "text/plain",
       "attachments" : [ ]
