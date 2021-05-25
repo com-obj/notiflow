@@ -2,7 +2,6 @@ package com.obj.nc.functions.processors.dummy;
 
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -10,10 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
 
@@ -28,25 +27,14 @@ class RecepientsUsingSubscriptionTest {
             new DummyRecepientsEnrichmentProcessingFunction();
 
     @Test
-    void testResolveRecipientsFailWithoutRequiredAttributes() {
-        // given
-        NotificationIntent inputNotificationIntent = NotificationIntent.createWithSimpleMessage("test-config", "Hi there!!");
-
-        // when - then
-        Assertions.assertThatThrownBy(() -> resolveRecipients.apply(inputNotificationIntent))
-                .isInstanceOf(PayloadValidationException.class)
-                .hasMessageContaining("does not contain required attributes. Required attributes are:");
-    }
-
-    @Test
     void testResolveRecipientsPassWithRequiredAttributes() {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post.json";
-        NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        inputNotificationIntent = (NotificationIntent)validateAndGenerateEventId.apply(inputNotificationIntent);
+        NotificationIntent<EmailContent> inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        inputNotificationIntent = (NotificationIntent<EmailContent>)validateAndGenerateEventId.apply(inputNotificationIntent);
 
         // when
-        NotificationIntent outputNotificationIntent = resolveRecipients.apply(inputNotificationIntent);
+        NotificationIntent<EmailContent> outputNotificationIntent = (NotificationIntent<EmailContent>)resolveRecipients.apply(inputNotificationIntent);
 
         // then
         MatcherAssert.assertThat(outputNotificationIntent, Matchers.notNullValue());
@@ -56,16 +44,16 @@ class RecepientsUsingSubscriptionTest {
     void testResolveRecipientsResolvesAll() {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post.json";
-        NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        inputNotificationIntent = (NotificationIntent)validateAndGenerateEventId.apply(inputNotificationIntent);
+        NotificationIntent<EmailContent> inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        inputNotificationIntent = (NotificationIntent<EmailContent>)validateAndGenerateEventId.apply(inputNotificationIntent);
 
         // when
-        NotificationIntent outputNotificationIntent = resolveRecipients.apply(inputNotificationIntent);
+        NotificationIntent<EmailContent> outputNotificationIntent = (NotificationIntent<EmailContent>)resolveRecipients.apply(inputNotificationIntent);
 
         // then
         MatcherAssert.assertThat(outputNotificationIntent, Matchers.notNullValue());
 
-        List<RecievingEndpoint> outputEventEndpoints = outputNotificationIntent.getBody().getRecievingEndpoints();
+        List<? extends RecievingEndpoint> outputEventEndpoints = outputNotificationIntent.getRecievingEndpoints();
         MatcherAssert.assertThat(outputEventEndpoints, Matchers.hasSize(3));
         MatcherAssert.assertThat(outputEventEndpoints, Matchers.everyItem(Matchers.instanceOf(EmailEndpoint.class)));
 
@@ -83,14 +71,14 @@ class RecepientsUsingSubscriptionTest {
     void testResolveRecipientsMergeWithExisting() {
         // given
         String INPUT_JSON_FILE = "events/ba_job_post_recipients.json";
-        NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        inputNotificationIntent = (NotificationIntent)validateAndGenerateEventId.apply(inputNotificationIntent);
+        NotificationIntent<EmailContent> inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        inputNotificationIntent = (NotificationIntent<EmailContent>)validateAndGenerateEventId.apply(inputNotificationIntent);
 
         // when
-        NotificationIntent outputNotificationIntent = resolveRecipients.apply(inputNotificationIntent);
+        NotificationIntent<EmailContent> outputNotificationIntent = (NotificationIntent<EmailContent>)resolveRecipients.apply(inputNotificationIntent);
 
         // then
-        List<RecievingEndpoint> outputEventEndpoints = outputNotificationIntent.getBody().getRecievingEndpoints();
+        List<? extends RecievingEndpoint> outputEventEndpoints = outputNotificationIntent.getRecievingEndpoints();
         MatcherAssert.assertThat(outputEventEndpoints, Matchers.hasSize(6));
         MatcherAssert.assertThat(outputEventEndpoints, Matchers.everyItem(Matchers.instanceOf(EmailEndpoint.class)));
     }

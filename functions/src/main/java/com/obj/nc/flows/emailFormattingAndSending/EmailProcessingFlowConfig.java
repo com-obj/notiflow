@@ -63,7 +63,7 @@ public class EmailProcessingFlowConfig {
 				.routeToRecipients(spec -> spec
 						.recipient(
 								EMAIL_FORMATING_INPUT_CHANNEL_ID,
-								m -> ((Message) m).getBody().getMessage() instanceof TemplateWithModelContent)
+								m -> ((Message<?>) m).getBody() instanceof TemplateWithModelContent)
 						.defaultOutputChannel(
 								EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID)
 				)

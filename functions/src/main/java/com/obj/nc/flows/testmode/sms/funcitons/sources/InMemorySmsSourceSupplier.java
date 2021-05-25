@@ -8,36 +8,37 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
 
 @Component
 @ConditionalOnMissingBean(type = "SmsSender")
-public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<Message> {
+public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<SimpleTextMessage> {
 	
 	public static final String ORIGINAL_RECIPIENTS_PHONE_ATTR_NAME = "ORIGINAL_RECIPIENTS_PHONE_NUM";
 	public static final String ORIGINAL_RECIPIENTS_NAME_ATTR_NAME = "ORIGINAL_RECIPIENTS_NAME";
 
 	
-	private LinkedList<Message> recieved = new LinkedList<Message>();
+	private LinkedList<SimpleTextMessage> recieved = new LinkedList<SimpleTextMessage>();
 
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
+	protected Optional<PayloadValidationException> checkPreCondition(SimpleTextMessage payload) {
 		return Optional.empty();
 	}
 
 	@Override
-	protected Message execute() {
+	protected SimpleTextMessage execute() {
 		if (recieved.isEmpty()) {
 			return null;
 		}
 		
-		Message sms= recieved.getFirst();
+		SimpleTextMessage sms= recieved.getFirst();
 		
-		SmsEndpoint recipient = (SmsEndpoint)sms.getBody().getRecievingEndpoints().iterator().next();
+		SimpleTextContent content =sms.getBody();
 		
-		SimpleTextContent content =sms.getContentTyped();
+		SmsEndpoint recipient = (SmsEndpoint)sms.getRecievingEndpoints().iterator().next();		
+
 		content.setAttributeValue(ORIGINAL_RECIPIENTS_PHONE_ATTR_NAME, recipient.getPhone());
 		if (recipient.getRecipient()!=null) {
 			content.setAttributeValue(ORIGINAL_RECIPIENTS_NAME_ATTR_NAME, recipient.getRecipient().getName());
@@ -48,7 +49,7 @@ public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<Message> {
 		return sms;
 	}
 	
-	public void recieve(Message msg) {
+	public void recieve(SimpleTextMessage msg) {
 		recieved.addLast(msg);
 	}
 	

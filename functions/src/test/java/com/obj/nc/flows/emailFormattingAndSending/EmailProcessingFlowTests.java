@@ -29,6 +29,8 @@ import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.email.TemplateWithJsonModelEmailContent;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.utils.JsonUtils;
 
@@ -50,7 +52,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     void testSendMultiLocaleMessagesTypeMerge() throws Exception {
         // given
         properties.setMultiLocalesMergeStrategy(MERGE);
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", Message.class);
+        Message<TemplateWithJsonModelEmailContent> inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", Message.class);
         emailProcessingInputChangel.send(new GenericMessage<>(inputMessage));
         // when
         boolean success = greenMail.waitForIncomingEmail(5000L, 1);
@@ -78,7 +80,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     void testSendMultiLocaleMessagesTypeMessagePerLocale() {
         // given
         properties.setMultiLocalesMergeStrategy(MESSAGE_PER_LOCALE);
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", Message.class);
+        Message<TemplateWithJsonModelEmailContent> inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", Message.class);
         emailProcessingInputChangel.send(new GenericMessage<>(inputMessage));
         // when
         boolean success = greenMail.waitForIncomingEmail(10000L, 2);
@@ -93,7 +95,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     void testSendNonTemplatedEmailMessage() {
         // given
         properties.setMultiLocalesMergeStrategy(MERGE);
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", Message.class);
+        EmailMessage inputMessage = JsonUtils.readObjectFromClassPathResource("messages/simple_email_message.json", EmailMessage.class);
         emailProcessingInputChangel.send(new GenericMessage<>(inputMessage));
         // when
         boolean success = greenMail.waitForIncomingEmail(5000L, 1);

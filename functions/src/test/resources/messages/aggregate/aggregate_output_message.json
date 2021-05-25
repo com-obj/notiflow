@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "type" : "MESSAGE",
   "attributes" : { },
   "header" : {
@@ -35,3 +36,24 @@
     }
   }
 }
+=======
+	"type": "EMAIL_MESSAGE",
+	"body": {
+		"type": "EMAIL_MESSAGE_CONTENT",
+		"subject": "New position 1/New position 2/New position 3",
+		"text": "New position on koderia.sk 1\n\nNew position on koderia.sk 2\n\nNew position on koderia.sk 3",
+		"contentType": "text/plain"
+	},
+	"recievingEndpoints": [
+		{
+			"@type": "EMAIL",
+			"recipient": {
+				"type": "PERSON",
+				"name": "John Doe"
+			},
+			"email": "john.doe@objectify.sk",
+			"endpointId": "john.doe@objectify.sk"
+		}
+	]
+}
+>>>>>>> feature/mesage-content-refactoring

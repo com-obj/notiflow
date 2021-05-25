@@ -1,11 +1,11 @@
-package com.obj.nc.domain.content.mailchimp;
+package com.obj.nc.functions.processors.senders.mailchimp.dtos;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.Data;
 
 @Data
-public class MailchimpRecipient {
+public class MailchimpRecipientDto {
 
     private String email;
     private String name;

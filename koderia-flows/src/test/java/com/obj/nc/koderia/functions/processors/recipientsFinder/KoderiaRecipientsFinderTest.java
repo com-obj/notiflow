@@ -1,17 +1,19 @@
 package com.obj.nc.koderia.functions.processors.recipientsFinder;
 
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
-import com.obj.nc.koderia.domain.recipients.RecipientDto;
-import com.obj.nc.koderia.domain.recipients.RecipientsQueryDto;
-import com.obj.nc.functions.processors.eventFactory.MailchimpEventConverter;
-import com.obj.nc.utils.JsonUtils;
+import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.test.web.client.ExpectedCount.once;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -31,16 +33,18 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
 
-import java.util.List;
-
-import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.client.ExpectedCount.once;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.eventFactory.MailchimpEventConverter;
+import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
+import com.obj.nc.koderia.domain.recipients.RecipientDto;
+import com.obj.nc.koderia.domain.recipients.RecipientsQueryDto;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest(KoderiaRecipientsFinder.class)
@@ -83,13 +87,13 @@ class KoderiaRecipientsFinderTest {
         // GIVEN
         BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource(TEST_BODIES + inputEventFile, BaseKoderiaEvent.class);
         GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
-        NotificationIntent inputNotificationIntent = mailchimpEventConverter.apply(genericEvent);
+        NotificationIntent<MailchimpContent> inputNotificationIntent = mailchimpEventConverter.apply(genericEvent);
 
         // WHEN
-        NotificationIntent outputNotificationIntent = getKoderiaRecipients.apply(inputNotificationIntent);
+        NotificationIntent<MailchimpContent> outputNotificationIntent = getKoderiaRecipients.apply(inputNotificationIntent);
 
         // THEN
-        List<String> recipientEmails = outputNotificationIntent.getBody().getRecievingEndpoints().stream().map(endpoint -> ((MailchimpEndpoint) endpoint).getEmail()).collect(toList());
+        List<String> recipientEmails = outputNotificationIntent.getRecievingEndpoints().stream().map(endpoint -> ((MailchimpEndpoint) endpoint).getEmail()).collect(toList());
         for (int i = 0; i < recipientEmails.size(); i++) {
             MatcherAssert.assertThat(recipientEmails.get(i), Matchers.equalTo(responseDto[i].getEmail()));
         }
@@ -100,8 +104,8 @@ class KoderiaRecipientsFinderTest {
         // GIVEN
         BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEvent.class);
         GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
-        NotificationIntent mappedNotificationIntent = mailchimpEventConverter.apply(genericEvent);
-        MailchimpContent contentTyped = mappedNotificationIntent.getContentTyped();
+        NotificationIntent<MailchimpContent> mappedNotificationIntent = mailchimpEventConverter.apply(genericEvent);
+        MailchimpContent contentTyped = mappedNotificationIntent.getBody();
         contentTyped.setOriginalEvent(null);
 
         // WHEN - THEN

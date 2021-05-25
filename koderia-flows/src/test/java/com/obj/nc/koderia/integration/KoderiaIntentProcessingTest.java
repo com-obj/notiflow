@@ -1,20 +1,25 @@
 package com.obj.nc.koderia.integration;
 
-import com.icegreen.greenmail.configuration.GreenMailConfiguration;
-import com.icegreen.greenmail.junit5.GreenMailExtension;
-import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.BaseIntegrationTest;
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpData;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
-import com.obj.nc.koderia.domain.event.JobPostKoderiaEventDto;
-import com.obj.nc.koderia.domain.recipients.RecipientDto;
-import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
-import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinder;
-import com.obj.nc.utils.JsonUtils;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_ID;
+import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
+import static com.obj.nc.koderia.integration.CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.RECEIVED_TEST_LIST;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.awaitility.Awaitility;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.AfterEach;
@@ -41,19 +46,21 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_ID;
-import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
-import static com.obj.nc.koderia.integration.CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.RECEIVED_TEST_LIST;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import com.obj.nc.BaseIntegrationTest;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpData;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
+import com.obj.nc.koderia.domain.event.JobPostKoderiaEventDto;
+import com.obj.nc.koderia.domain.recipients.RecipientDto;
+import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinder;
+import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(properties = {
@@ -99,15 +106,15 @@ public class KoderiaIntentProcessingTest extends BaseIntegrationTest {
 		MatcherAssert.assertThat(received, hasSize(3));
 		// and
 		for (Message<?> receivedMessage : received) {
-			com.obj.nc.domain.message.Message payload = (com.obj.nc.domain.message.Message) receivedMessage.getPayload();
+			com.obj.nc.domain.message.Message<MailchimpContent> payload = (com.obj.nc.domain.message.Message<MailchimpContent>) receivedMessage.getPayload();
 			checkReceivedPayload(baseKoderiaEvent, payload);
 		}
 	}
 	
-	private void checkReceivedPayload(JobPostKoderiaEventDto koderiaEvent, com.obj.nc.domain.message.Message payload) {
-		MatcherAssert.assertThat(payload.getBody().getMessage(), instanceOf(MailchimpContent.class));
+	private void checkReceivedPayload(JobPostKoderiaEventDto koderiaEvent, com.obj.nc.domain.message.Message<MailchimpContent> payload) {
+		MatcherAssert.assertThat(payload.getBody(), instanceOf(MailchimpContent.class));
 		
-		MailchimpContent content = payload.getContentTyped();
+		MailchimpContent content = payload.getBody();
 		MatcherAssert.assertThat(content.getSubject(), equalTo(koderiaEvent.getSubject()));
 		MailchimpData data = content.getOriginalEvent();
 		MatcherAssert.assertThat(data, notNullValue());
@@ -116,8 +123,8 @@ public class KoderiaIntentProcessingTest extends BaseIntegrationTest {
 		MatcherAssert.assertThat(data.getType(), equalTo(koderiaEvent.getType()));
 		MatcherAssert.assertThat(data.getData(), equalTo(koderiaEvent.getData()));
 		
-		MatcherAssert.assertThat(payload.getBody().getRecievingEndpoints(), hasSize(1));
-		MatcherAssert.assertThat(payload.getBody().getRecievingEndpoints().get(0), instanceOf(MailchimpEndpoint.class));
+		MatcherAssert.assertThat(payload.getRecievingEndpoints(), hasSize(1));
+		MatcherAssert.assertThat(payload.getRecievingEndpoints().get(0), instanceOf(MailchimpEndpoint.class));
 	}
 	
 	private void createRestCallExpectation() {

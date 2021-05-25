@@ -43,7 +43,7 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 		Message<?> failedMsg = failedPayloadExtractor.apply(failedPayload);
 		Object payload = failedMsg.getPayload();
 		
-		List<RecievingEndpoint> endpoints = extracteEndpoints(payload);
+		List<? extends RecievingEndpoint> endpoints = extracteEndpoints(payload);
 		List<UUID> eventIds = extractEventIds(payload);
 		
 		
@@ -77,12 +77,12 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 		return evetIds;
 	}
 
-	private List<RecievingEndpoint> extracteEndpoints(Object payload) {
+	private List<? extends RecievingEndpoint> extracteEndpoints(Object payload) {
 		if (!(payload instanceof HasRecievingEndpoints)) {
 			log.debug("Cannot generate Failed delivery infos from message because payload is not of type HasRecievingEndpoints. Its of type {}", payload.getClass());
 			return new ArrayList<>();
 		}
-		List<RecievingEndpoint> endpoints = ((HasRecievingEndpoints)payload).getRecievingEndpoints();
+		List<? extends RecievingEndpoint> endpoints = ((HasRecievingEndpoints)payload).getRecievingEndpoints();
 		return endpoints;
 	}
 	

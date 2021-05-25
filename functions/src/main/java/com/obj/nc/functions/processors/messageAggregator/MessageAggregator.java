@@ -23,7 +23,7 @@ public class MessageAggregator extends AbstractAggregatingMessageGroupProcessor 
     protected Object aggregatePayloads(MessageGroup group, Map<String, Object> defaultHeaders) {
         log.info("Starting aggregating message group of " +  group.getSequenceSize() + " messages");
         
-        List<Message> messages = group.getMessages().stream().map(sm -> ((Message)sm.getPayload())).collect(Collectors.toList());
+        List<Message<?>> messages = group.getMessages().stream().map(sm -> ((Message<?>)sm.getPayload())).collect(Collectors.toList());
         
         
         return aggregationStrategy.apply(messages);

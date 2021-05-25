@@ -7,7 +7,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.http.MediaType;
 
-import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -16,20 +15,15 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrategy {
+public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrategy<EmailContent> {
 	
 	public static final String SUBJECT_CONCAT_DELIMITER = " / ";
 	public static final String PLAIN_TEXT_CONCAT_DELIMITER = "\n\n";
 	public static final String HTML_TEXT_CONCAT_DELIMITER = "<br>";
 	
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(List<? extends BasePayload> payloads) {
+	protected Optional<PayloadValidationException> checkPreCondition(List<Message<EmailContent>> payloads) {
 		Optional<PayloadValidationException> exception = checkContentTypes(payloads, EmailContent.class);
-		if (exception.isPresent()) {
-			return exception;
-		}
-		
-		exception = checkDeliveryOptions(payloads);
 		if (exception.isPresent()) {
 			return exception;
 		}
@@ -38,34 +32,28 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 	}
 	
 	@Override
-	protected Optional<PayloadValidationException> checkContentTypes(List<? extends BasePayload> payloads, Class<?> clazz) {
+	protected Optional<PayloadValidationException> checkContentTypes(List<Message<EmailContent>> payloads, Class<EmailContent> clazz) {
 		Optional<PayloadValidationException> exception = super.checkContentTypes(payloads, clazz);
 		if (exception.isPresent()) {
 			return exception;
 		}
 		
-		Optional<? extends BasePayload> firstPayload = payloads.stream().findFirst();
+		Optional<Message<EmailContent>> firstPayload = payloads.stream().findFirst();
 		if (!firstPayload.isPresent()) {
 			return Optional.empty();
 		}
 		
-		String firstPayloadContentType = firstPayload.get().<EmailContent>getContentTyped().getContentType();
+		String firstPayloadContentType = firstPayload.get().getBody().getContentType();
 		if (!MediaType.TEXT_HTML_VALUE.equals(firstPayloadContentType) && !MediaType.TEXT_PLAIN_VALUE.equals(firstPayloadContentType)) {
 			return firstPayload.map(payload -> new PayloadValidationException(
-					String.format("Payload %s has content of invalid type. Is %s", payload, payload.<EmailContent>getContentTyped().getContentType())));
+					String.format("Payload %s has content of invalid type. Is %s", payload, payload.getBody().getContentType())));
 		}
 		
-		Optional<? extends BasePayload> invalidPayload = payloads.stream()
-				.filter(payload -> !firstPayload.get().<EmailContent>getContentTyped().getContentType()
-						.equals(payload.<EmailContent>getContentTyped().getContentType()))
-				.findFirst();
-		
-		return invalidPayload.map(payload -> new PayloadValidationException(
-				String.format("Payload %s has content of invalid type. Is %s", payload, payload.<EmailContent>getContentTyped().getContentType())));
+		return Optional.empty();
 	}
 	
 	@Override
-	protected Optional<PayloadValidationException> checkReceivingEndpoints(List<? extends BasePayload> payloads) {
+	protected Optional<PayloadValidationException> checkReceivingEndpoints(List<Message<EmailContent>> payloads) {
 		Optional<PayloadValidationException> exception = checkEndpointTypes(payloads, EmailEndpoint.class);
 		if (exception.isPresent()) {
 			return exception;
@@ -75,18 +63,18 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 	}
 	
 	@Override
-	public Object merge(List<? extends BasePayload> payloads) {
+	public Object merge(List<Message<EmailContent>> payloads) {
 		if (payloads.isEmpty()) return null;
 		
 		EmailContent aggregatedEmailContent = payloads
 				.stream()
-				.map(BasePayload::<EmailContent>getContentTyped)
+				.map(Message::getBody)
 				.reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		
 		//TODO: ked bude refactorovany header a ostatne veci tak tuto spravit novu message a neprepisovat existujucu
-		Message outputMessage = (Message) payloads.get(0);
-		outputMessage.getBody().setMessage(aggregatedEmailContent);
+		Message<EmailContent> outputMessage = payloads.get(0);
+		outputMessage.setBody(aggregatedEmailContent);
 		return outputMessage;
 	}
 	

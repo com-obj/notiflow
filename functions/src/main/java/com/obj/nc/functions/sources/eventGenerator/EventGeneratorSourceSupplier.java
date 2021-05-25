@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class EventGeneratorSourceSupplier extends SourceSupplier<NotificationIntent> {
+public class EventGeneratorSourceSupplier extends SourceSupplier<NotificationIntent<?>> {
 
 	@Autowired
 	private EventGeneratorExecution execution;
@@ -22,12 +22,12 @@ public class EventGeneratorSourceSupplier extends SourceSupplier<NotificationInt
 	private EventGeneratorPreCondition preCondition;
 
 	@Override
-	public PreCondition<NotificationIntent> preCondition() {
+	public PreCondition<NotificationIntent<?>> preCondition() {
 		return preCondition;
 	}
 
 	@Override
-	public Supplier<NotificationIntent> execution() {
+	public Supplier<NotificationIntent<?>> execution() {
 		return execution;
 	}
 

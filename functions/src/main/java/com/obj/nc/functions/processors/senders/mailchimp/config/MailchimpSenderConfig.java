@@ -1,6 +1,8 @@
-package com.obj.nc.functions.processors.senders.mailchimp;
+package com.obj.nc.functions.processors.senders.mailchimp.config;
 
 import com.obj.nc.functions.processors.senders.MailchimpSender;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
+
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

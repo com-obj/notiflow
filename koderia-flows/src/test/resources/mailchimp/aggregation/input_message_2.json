@@ -1,79 +1,68 @@
 {
-  "type":"MESSAGE",
-  "header":{
-    "attributes":{
-
-    },
-    "id":"2598a791-08d6-4795-8354-2f675f72b067",
-    "eventId":"0c3f159f-103e-49fd-8eb1-f4b6de481acb",
-    "configuration-name":"static-routing-pipeline"
-  },
-  "body":{
-    "message": {
-      "type" : "MAILCHIMP_CONTENT",
-      "originalEvent" : {
-        "type" : "JOB_POST",
-        "data" : {
-          "id": "unwhX7OlJYq7Kd7GfoCe",
-          "name": "Business Intelligence (BI) Developer 2",
-          "description": "We are looking for a Business Intelligence (BI) Developer to create....",
-          "location": "Viedeň",
-          "rate": "500",
-          "technologies": [
-            "Java"
-          ],
-          "specialRate": "500 – 600 € / manday",
-          "labels": [
-            "Home Office"
-          ],
-          "positionType": [
-            "Senior"
-          ],
-          "duration": "1 rok s možnosťou predĺženia",
-          "type": "Analytik",
-          "dateOfStart": "ASAP"
-        }
-      },
-      "subject" : "Business Intelligence (BI) Developer 2, 500 – 600 € / manday, Viedeň",
-      "senderEmail" : "sender@koderia.sk",
-      "senderName" : "Koderia sender",
-      "recipients" : [ {
-        "email" : "john.doe@objectify.sk",
-        "name" : "John Doe",
-        "type" : "to"
-      } ],
-      "mergeLanguage" : "handlebars",
-      "globalMergeVariables" : [ ],
-      "attachments" : [ {
-        "type" : "text/plain",
-        "name" : "test1.txt",
-        "content" : "YXR0YWNobWVudCB0ZXN0MQ=="
-      }, {
-        "type" : "text/plain",
-        "name" : "test2.txt",
-        "content" : "YXR0YWNobWVudCB0ZXN0Mg=="
-      } ],
-      "templateName" : "koderia-job-post",
-      "templateContent" : [ ]
-    },
-    "recievingEndpoints":[
-      {
-        "@type":"MAILCHIMP",
-        "recipient":{
-          "type":"PERSON",
-          "name":"John Doe"
-        },
-        "email":"john.doe@objectify.sk",
-        "endpointId":"john.doe@objectify.sk"
-      }
-    ],
-    "deliveryOptions":{
-      "aggregationType":"NONE",
-      "schedulingType":"IMMEDIATE"
-    }
-  },
-  "processingInfo":{
-    "processingId":"eaef533b-a512-4734-8206-9ca236a7f427",
-    "stepIndex":3
-  }
+	"type": "MAILCHIMP_MESSAGE",
+	"body": {
+		"type": "MAILCHIMP_CONTENT",
+		"originalEvent": {
+			"type": "JOB_POST",
+			"data": {
+				"id": "unwhX7OlJYq7Kd7GfoCe",
+				"name": "Business Intelligence (BI) Developer 2",
+				"description": "We are looking for a Business Intelligence (BI) Developer to create....",
+				"location": "Viedeň",
+				"rate": "500",
+				"technologies": [
+					"Java"
+				],
+				"specialRate": "500 – 600 € / manday",
+				"labels": [
+					"Home Office"
+				],
+				"positionType": [
+					"Senior"
+				],
+				"duration": "1 rok s možnosťou predĺženia",
+				"type": "Analytik",
+				"dateOfStart": "ASAP"
+			}
+		},
+		"subject": "Business Intelligence (BI) Developer 2, 500 – 600 € / manday, Viedeň",
+		"senderEmail": "sender@koderia.sk",
+		"senderName": "Koderia sender",
+		"recipients": [
+			{
+				"email": "john.doe@objectify.sk",
+				"name": "John Doe",
+				"type": "to"
+			}
+		],
+		"mergeLanguage": "handlebars",
+		"globalMergeVariables": [
+		],
+		"attachments": [
+			{
+				"type": "text/plain",
+				"name": "test1.txt",
+				"content": "YXR0YWNobWVudCB0ZXN0MQ=="
+			},
+			{
+				"type": "text/plain",
+				"name": "test2.txt",
+				"content": "YXR0YWNobWVudCB0ZXN0Mg=="
+			}
+		],
+		"templateName": "koderia-job-post",
+		"templateContent": [
+		]
+	},
+	"recievingEndpoints": [
+		{
+			"@type": "MAILCHIMP",
+			"recipient": {
+				"type": "PERSON",
+				"name": "John Doe"
+			},
+			"email": "john.doe@objectify.sk",
+			"endpointId": "john.doe@objectify.sk"
+		}
+	]
 }

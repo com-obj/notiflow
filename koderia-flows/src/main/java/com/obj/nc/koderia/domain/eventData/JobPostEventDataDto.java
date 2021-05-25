@@ -1,7 +1,8 @@
 package com.obj.nc.koderia.domain.eventData;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.obj.nc.domain.content.mailchimp.MailchimpMergeVariable;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpMergeVariableDto;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -33,6 +33,7 @@ import com.obj.nc.config.InjectorConfiguration;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.osk.exception.SmsClientException;
 import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfig;
 import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
@@ -64,7 +65,7 @@ class OskSmsSenderTest extends BaseIntegrationTest {
     void testSendSms() {
         // GIVEN
         String MESSAGE_PATH = "smsNotificationMessages/message.json";
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_PATH, Message.class);
+        SimpleTextMessage inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_PATH, SimpleTextMessage.class);
         
         // MOCK SERVER
         OskSendSmsResponseDto sendSmsResponseExpected = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-success.json", OskSendSmsResponseDto.class);
@@ -72,7 +73,7 @@ class OskSmsSenderTest extends BaseIntegrationTest {
         mockRestServerWithOneRequest(sendSmsResponseExpected);
 
         // WHEN
-        Message sentMessage = smsSender.apply(inputMessage);
+        Message<SimpleTextContent> sentMessage = smsSender.apply(inputMessage);
 
         // THEN
         mockRestServiceServer.verify();
@@ -85,16 +86,16 @@ class OskSmsSenderTest extends BaseIntegrationTest {
     void testCreateRequest() {
         // GIVEN
         String MESSAGE_PATH = "smsNotificationMessages/message.json";
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_PATH, Message.class);
+        SimpleTextMessage inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_PATH, SimpleTextMessage.class);
 
         OskSendSmsRequestDto oskSendSmsRequestDto = smsSender.convertMessageToRequest(inputMessage);
 
         Assertions.assertThat(oskSendSmsRequestDto.getAddress()).hasSize(1);
-        Assertions.assertThat(oskSendSmsRequestDto.getAddress().get(0)).isEqualTo(((SmsEndpoint) inputMessage.getBody().getRecievingEndpoints().get(0)).getPhone());
+        Assertions.assertThat(oskSendSmsRequestDto.getAddress().get(0)).isEqualTo(((SmsEndpoint) inputMessage.getRecievingEndpoints().get(0)).getPhone());
         Assertions.assertThat(oskSendSmsRequestDto.getSenderAddress()).isEqualTo(properties.getSenderAddress());
         Assertions.assertThat(oskSendSmsRequestDto.getBillCode()).isEqualTo(properties.getBillCode());
 
-        SimpleTextContent contentTyped = inputMessage.getBody().getContentTyped();
+        SimpleTextContent contentTyped = inputMessage.getBody();
         Assertions.assertThat(oskSendSmsRequestDto.getMessage()).isEqualTo(contentTyped.getText());
         Assertions.assertThat(oskSendSmsRequestDto.getClientCorrelator()).contains(properties.getClientCorrelatorPrefix());
         Assertions.assertThat(oskSendSmsRequestDto.getNotifyURL()).isEqualTo(properties.getNotifyUrl());

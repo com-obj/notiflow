@@ -18,6 +18,7 @@ import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.senders.SmsSender;
@@ -29,7 +30,7 @@ import com.obj.nc.osk.functions.processors.sms.dtos.SendSmsResourceReferenceDto;
 
 @Validated
 @DocumentProcessingInfo("GAP_SMSSender")
-public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Message> implements SmsSender {
+public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<SimpleTextMessage, SimpleTextMessage> implements SmsSender {
 
     public static final String SEND_PATH = "/outbound/{senderAddress}/requests";
     public static final String STATUS_SUCCESS = "SUCCESS";
@@ -50,16 +51,16 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Mess
     }
     
     @Override
-    protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
+    protected Optional<PayloadValidationException> checkPreCondition(SimpleTextMessage payload) {
         if (payload == null) {
             return Optional.of(new PayloadValidationException("Message must not be null"));
         }
 
-        if (payload.getBody().getRecievingEndpoints().stream().anyMatch(endpoint -> !(endpoint instanceof SmsEndpoint))) {
+        if (payload.getRecievingEndpoints().stream().anyMatch(endpoint -> !(endpoint instanceof SmsEndpoint))) {
             return Optional.of(new PayloadValidationException(String.format("Sms sender can only send message to endpoint of type %s", SmsEndpoint.JSON_TYPE_IDENTIFIER)));
         }
 
-        if (!(payload.getBody().getMessage() instanceof SimpleTextContent)) {
+        if (!(payload.getBody() instanceof SimpleTextContent)) {
             return Optional.of(new PayloadValidationException(String.format("Sms sender can only send message with content of type %s", SimpleTextContent.JSON_TYPE_IDENTIFIER)));
         }
 
@@ -67,7 +68,7 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Mess
     }
     
 	@Override
-	protected Message execute(Message payload) {
+	protected SimpleTextMessage execute(SimpleTextMessage payload) {
 		OskSendSmsRequestDto req = convertMessageToRequest(payload);
 		OskSendSmsResponseDto resp = sendRequest(req);
         payload.getBody().setAttributeValue(SEND_SMS_RESPONSE_ATTRIBUTE, resp);
@@ -76,17 +77,17 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message, Mess
 
 
 
-    public OskSendSmsRequestDto convertMessageToRequest(Message message) {
+    public OskSendSmsRequestDto convertMessageToRequest(Message<SimpleTextContent> message) {
         OskSendSmsRequestDto result = new OskSendSmsRequestDto();
 
-        result.setAddress(message.getBody().getRecievingEndpoints().stream()
+        result.setAddress(message.getRecievingEndpoints().stream()
                 .map(RecievingEndpoint::getEndpointId)
                 .collect(Collectors.toList()));
     
         ZonedDateTime zdt = ZonedDateTime.now();
         result.setClientCorrelator(properties.getClientCorrelatorPrefix() + "-" +  DateTimeFormatter.ISO_INSTANT.format(zdt));
 
-        SimpleTextContent content = message.getBody().getContentTyped();
+        SimpleTextContent content = message.getBody();
         result.setMessage(content.getText());
 
         result.setNotifyURL(properties.getNotifyUrl());

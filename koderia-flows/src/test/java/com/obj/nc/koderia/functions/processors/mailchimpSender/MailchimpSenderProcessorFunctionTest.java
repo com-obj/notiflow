@@ -1,20 +1,25 @@
 package com.obj.nc.koderia.functions.processors.mailchimpSender;
 
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
-import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemplateResponse;
-import com.obj.nc.koderia.config.DomainConfig;
-import com.obj.nc.koderia.mapper.KoderiaMergeVarMapperImpl;
-import com.obj.nc.utils.JsonUtils;
+import static com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
+import static com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.test.web.client.ExpectedCount.times;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.HttpHeaders;
@@ -24,18 +29,19 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
-import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.client.ExpectedCount.times;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
+import com.obj.nc.domain.message.MailChimpMessage;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpSendTemplateResponse;
+import com.obj.nc.koderia.config.DomainConfig;
+import com.obj.nc.koderia.mapper.KoderiaMergeVarMapperImpl;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @RestClientTest(MailchimpSenderProcessorFunction.class)
@@ -59,9 +65,9 @@ class MailchimpSenderProcessorFunctionTest {
     @Test
     void testSendMessageWithTemplate() {
         // GIVEN
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", Message.class);
+        MailChimpMessage inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", MailChimpMessage.class);
         // WHEN
-        Message outputMessage = sendMailchimpMessage.apply(inputMessage);
+        Message<MailchimpContent> outputMessage = sendMailchimpMessage.apply(inputMessage);
         // THEN
         MatcherAssert.assertThat(outputMessage, Matchers.notNullValue());
         MailchimpSendTemplateResponse outputMailchimpSendTemplateResponse = JsonUtils.readClassFromObject(outputMessage.getBody().getAttributeValueAs(MAILCHIMP_RESPONSE_FIELD, List.class).get(0), MailchimpSendTemplateResponse.class);
@@ -72,7 +78,7 @@ class MailchimpSenderProcessorFunctionTest {
     @Test
     void testSendNullMessage() {
         // GIVEN
-        Message inputMessage = null;
+    	MailChimpMessage inputMessage = null;
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> sendMailchimpMessage.apply(inputMessage))
                 .isInstanceOf(PayloadValidationException.class)
@@ -82,8 +88,8 @@ class MailchimpSenderProcessorFunctionTest {
     @Test
     void testSendMessageWithNoReceivingEndpoints() {
         // GIVEN
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", Message.class);
-        inputMessage.getBody().setRecievingEndpoints(new ArrayList<>());
+    	MailChimpMessage inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", MailChimpMessage.class);
+        inputMessage.setRecievingEndpoints(new ArrayList<>());
 
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> sendMailchimpMessage.apply(inputMessage))
@@ -95,9 +101,9 @@ class MailchimpSenderProcessorFunctionTest {
     @Test
     void testSendMessageWithNonEmailReceivingEndpoints() {
         // GIVEN
-        Message inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", Message.class);
-        inputMessage.getBody().setRecievingEndpoints(Arrays.asList(
-                new RecievingEndpoint() {
+    	MailChimpMessage inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", MailChimpMessage.class);
+        inputMessage.setRecievingEndpoints(Arrays.asList(
+                new MailchimpEndpoint() {
                     @Override
                     public String getEndpointId() {
                         return "TEST";
