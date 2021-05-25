@@ -32,6 +32,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
@@ -64,7 +65,7 @@ class MailchimpSenderProcessorFunctionTest {
     @Test
     void testSendMessageWithTemplate() {
         // GIVEN
-        Message<MailchimpContent> inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", Message.class);
+        MailChimpMessage inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", MailChimpMessage.class);
         // WHEN
         Message<MailchimpContent> outputMessage = sendMailchimpMessage.apply(inputMessage);
         // THEN
@@ -77,7 +78,7 @@ class MailchimpSenderProcessorFunctionTest {
     @Test
     void testSendNullMessage() {
         // GIVEN
-        Message<MailchimpContent> inputMessage = null;
+    	MailChimpMessage inputMessage = null;
         // WHEN - THEN
         Assertions.assertThatThrownBy(() -> sendMailchimpMessage.apply(inputMessage))
                 .isInstanceOf(PayloadValidationException.class)
@@ -87,7 +88,7 @@ class MailchimpSenderProcessorFunctionTest {
     @Test
     void testSendMessageWithNoReceivingEndpoints() {
         // GIVEN
-        Message<MailchimpContent> inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", Message.class);
+    	MailChimpMessage inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", MailChimpMessage.class);
         inputMessage.setRecievingEndpoints(new ArrayList<>());
 
         // WHEN - THEN
@@ -100,7 +101,7 @@ class MailchimpSenderProcessorFunctionTest {
     @Test
     void testSendMessageWithNonEmailReceivingEndpoints() {
         // GIVEN
-        Message<MailchimpContent> inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", Message.class);
+    	MailChimpMessage inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", MailChimpMessage.class);
         inputMessage.setRecievingEndpoints(Arrays.asList(
                 new RecievingEndpoint() {
                     @Override

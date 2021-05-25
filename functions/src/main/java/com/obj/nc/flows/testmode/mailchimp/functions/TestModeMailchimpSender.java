@@ -3,7 +3,7 @@ package com.obj.nc.flows.testmode.mailchimp.functions;
 import java.util.Optional;
 
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.senders.MailchimpSender;
@@ -14,14 +14,14 @@ import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemp
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class TestModeMailchimpSender extends ProcessorFunctionAdapter<Message<MailchimpContent>,Message<MailchimpContent>> implements MailchimpSender {
+public class TestModeMailchimpSender extends ProcessorFunctionAdapter<MailChimpMessage,MailChimpMessage> implements MailchimpSender {
     
     private final MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
     private final InMemoryMailchimpSourceSupplier receiver;
     private final MailchimpSenderProcessorFunction realMailchimpSender;
     
     @Override
-    protected Optional<PayloadValidationException> checkPreCondition(Message<MailchimpContent> payload) {
+    protected Optional<PayloadValidationException> checkPreCondition(MailChimpMessage payload) {
         if (!(payload.getBody() instanceof MailchimpContent)) {
             throw new PayloadValidationException("TestModeMailchimpSender can only process MailchimpContent content. Was " + payload.getBody() );
         }
@@ -29,7 +29,7 @@ public class TestModeMailchimpSender extends ProcessorFunctionAdapter<Message<Ma
     }
     
     @Override
-    protected Message<MailchimpContent> execute(Message<MailchimpContent> payload) {
+    protected MailChimpMessage execute(MailChimpMessage payload) {
         MailchimpContent content = payload.getBody();
         content.setRecipients(realMailchimpSender.mapRecipient(payload.getRecievingEndpoints().get(0)));
         

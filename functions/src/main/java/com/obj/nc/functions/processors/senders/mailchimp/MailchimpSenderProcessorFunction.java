@@ -21,7 +21,7 @@ import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpRecipient;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.senders.MailchimpSender;
@@ -29,14 +29,14 @@ import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemp
 import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemplateResponse;
 
 @DocumentProcessingInfo("SendMailchimpMessage")
-public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<Message<MailchimpContent>, Message<MailchimpContent>> implements MailchimpSender {
+public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<MailChimpMessage, MailChimpMessage> implements MailchimpSender {
 	
 	@Qualifier(MAILCHIMP_REST_TEMPLATE)
 	@Autowired private RestTemplate restTemplate;
 	@Autowired private MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(Message<MailchimpContent> payload) {
+	protected Optional<PayloadValidationException> checkPreCondition(MailChimpMessage payload) {
 		if (payload == null) {
 			return Optional.of(new PayloadValidationException("Message must not be null"));
 		}
@@ -62,7 +62,7 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 	}
 
 	@Override
-	protected Message<MailchimpContent> execute(Message<MailchimpContent> payload) {
+	protected MailChimpMessage execute(MailChimpMessage payload) {
 		MailchimpContent content = payload.getBody();
 		content.setRecipients(mapRecipient(payload.getRecievingEndpoints().get(0)));
 		

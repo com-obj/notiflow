@@ -18,6 +18,7 @@ import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.senders.SmsSender;
@@ -29,7 +30,7 @@ import com.obj.nc.osk.functions.processors.sms.dtos.SendSmsResourceReferenceDto;
 
 @Validated
 @DocumentProcessingInfo("GAP_SMSSender")
-public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message<SimpleTextContent>, Message<SimpleTextContent>> implements SmsSender {
+public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<SimpleTextMessage, SimpleTextMessage> implements SmsSender {
 
     public static final String SEND_PATH = "/outbound/{senderAddress}/requests";
     public static final String STATUS_SUCCESS = "SUCCESS";
@@ -50,7 +51,7 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message<Simpl
     }
     
     @Override
-    protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
+    protected Optional<PayloadValidationException> checkPreCondition(SimpleTextMessage payload) {
         if (payload == null) {
             return Optional.of(new PayloadValidationException("Message must not be null"));
         }
@@ -67,7 +68,7 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<Message<Simpl
     }
     
 	@Override
-	protected Message<SimpleTextContent> execute(Message<SimpleTextContent> payload) {
+	protected SimpleTextMessage execute(SimpleTextMessage payload) {
 		OskSendSmsRequestDto req = convertMessageToRequest(payload);
 		OskSendSmsResponseDto resp = sendRequest(req);
         payload.getBody().setAttributeValue(SEND_SMS_RESPONSE_ATTRIBUTE, resp);
