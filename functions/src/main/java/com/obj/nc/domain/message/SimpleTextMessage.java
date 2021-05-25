@@ -9,6 +9,7 @@ import com.obj.nc.domain.endpoints.SmsEndpoint;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
@@ -34,7 +35,6 @@ public class SimpleTextMessage extends Message<SimpleTextContent/*, SmsEndpoint*
 	}
 	
 	//TODO: refactor as class parameter
-	@Transient
 	@JsonIgnore
 	public Class<? extends SmsEndpoint> getRecievingEndpointType() {
 		return SmsEndpoint.class;

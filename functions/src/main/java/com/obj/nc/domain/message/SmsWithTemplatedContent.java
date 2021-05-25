@@ -1,6 +1,5 @@
 package com.obj.nc.domain.message;
 
-import java.beans.Transient;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,18 +9,16 @@ import com.obj.nc.domain.endpoints.SmsEndpoint;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
+@NoArgsConstructor
 @ToString(callSuper = false)
 public class SmsWithTemplatedContent<MODEL_TYPE> extends Message<TemplateWithModelContent<MODEL_TYPE>/*, EmailEndpoint*/> {
 
 	public static final String JSON_TYPE_IDENTIFIER = "SMS_MESSAGE_TEMPLATED_CONTENT";
-	
-	public SmsWithTemplatedContent() {
-		//JSON serialiser
-	}
 	
 	public SmsWithTemplatedContent(TemplateWithModelContent<MODEL_TYPE> content) {
 		setBody(content);
@@ -39,7 +36,6 @@ public class SmsWithTemplatedContent<MODEL_TYPE> extends Message<TemplateWithMod
 	}
 	
 	//TODO: refactor as class parameter
-	@Transient
 	@JsonIgnore
 	public Class<? extends RecievingEndpoint> getRecievingEndpointType() {
 		return null;
