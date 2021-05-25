@@ -10,7 +10,7 @@
       "labels": ["Home Office"],
       "positionType": ["Senior"],
       "duration": "1 rok s možnosťou predĺženia",
-      "jobType": "Analytik",
+      "type": "Analytik",
       "dateOfStart": "ASAP"
    }
 }

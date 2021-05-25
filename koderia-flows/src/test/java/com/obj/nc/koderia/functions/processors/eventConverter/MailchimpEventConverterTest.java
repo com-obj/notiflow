@@ -91,9 +91,6 @@ class MailchimpEventConverterTest {
         NotificationIntent<MailchimpContent> mappedNotificationIntent = eventConverter.apply(genericEvent);
 
         // then
-        MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/blog_event_schema.json"));
-
-        // and
         BlogEventDataDto blogEventData = baseKoderiaEvent.getData();
         MailchimpContent content = mappedNotificationIntent.getBody();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
@@ -114,9 +111,6 @@ class MailchimpEventConverterTest {
         NotificationIntent<MailchimpContent> mappedNotificationIntent = eventConverter.apply(genericEvent);
 
         // then
-        MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/event_event_schema.json"));
-
-        // and
         EventEventDataDto eventEventData = baseKoderiaEvent.getData();
         MailchimpContent content = mappedNotificationIntent.getBody();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
@@ -136,9 +130,6 @@ class MailchimpEventConverterTest {
         NotificationIntent<MailchimpContent> mappedNotificationIntent = eventConverter.apply(genericEvent);
 
         // then
-        MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/link_event_schema.json"));
-
-        // and
         LinkEventDataDto linkEventData = baseKoderiaEvent.getData();
         MailchimpContent content = mappedNotificationIntent.getBody();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
@@ -158,9 +149,6 @@ class MailchimpEventConverterTest {
         NotificationIntent<MailchimpContent> mappedNotificationIntent = eventConverter.apply(genericEvent);
 
         // then
-        MatcherAssert.assertThat(mappedNotificationIntent.toJSONString(), JsonSchemaValidator.matchesJsonSchemaInClasspath("koderia/event_schema/news_event_schema.json"));
-
-        // and
         NewsEventDataDto newsEventData = baseKoderiaEvent.getData();
         MailchimpContent content = mappedNotificationIntent.getBody();
         MatcherAssert.assertThat(mappedNotificationIntent.getHeader().getFlowId(), equalTo("default-flow"));
