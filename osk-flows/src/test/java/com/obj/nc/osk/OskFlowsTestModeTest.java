@@ -65,8 +65,9 @@ public class OskFlowsTestModeTest extends BaseIntegrationTest {
         		"Ovplyvnen"/*é môžu byť*/, "Impacted may be", /*došlo k vý*/"padku, ktor"/*ý môže mať dopad na zákazníkov a ich služby*/, 
         		"cuzy@objectify.sk", "jancuzy@gmail.com", "sales@objectify.sk"/*CS Agent*/, "sales@orange.sk", "hahn@orange.sk",
         		"dysko@objectify.sk", "nem_fukas@artin.sk", "slavkovsky@orange.sk",
-        		//SMSs
-        		"Na tuto SMS"/* neodpovedajte.*/, "VPS(SN:09181869"/*97)*/, "0918186997", "+421918186997", "0918186998"
+                // SMSs
+                "VPS", "Mocidla 249, Myto pod Dumbierom", "0918186997", "+421918186997", "0918186998", "Na odst", "vne pracujeme.",
+                "akujeme za pochopenie.", "Orange"
         		)
         );
     }
