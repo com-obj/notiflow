@@ -9,9 +9,7 @@ import org.springframework.context.NoSuchMessageException;
 
 import com.obj.nc.Get;
 import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.HasRecievingEndpoints;
 import com.obj.nc.domain.content.TemplateWithModelContent;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -41,10 +39,7 @@ public abstract class TemplateWithModelEmailContent<MODEL_TYPE> extends Template
 
 	@EqualsAndHashCode.Include
 	private List<Attachement> attachments = new ArrayList<Attachement>();
-	
-//	@EqualsAndHashCode.Include
-//	private List<EmailEndpoint> recievingEndpoints = new ArrayList<EmailEndpoint>();
-	
+		
 	public String getSubjectLocalised(Locale locale) {
 		try {
 			return Get.getBean("nc.emailTemplateFormatter.messageSource", MessageSource.class).getMessage(subjectResourceKey, subjectResourcesMessageParameters, locale);

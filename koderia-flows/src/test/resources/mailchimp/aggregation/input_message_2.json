@@ -1,5 +1,5 @@
 {
-	"type": "MESSAGE",
+	"type": "MAILCHIMP_MESSAGE",
 	"body": {
 		"type": "MAILCHIMP_CONTENT",
 		"originalEvent": {

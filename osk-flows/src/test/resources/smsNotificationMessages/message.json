@@ -1,5 +1,5 @@
 {
-  "type" : "MESSAGE",
+  "type" : "SMS_MESSAGE",
   "header" : {},
   "body" : {
       "type" : "TEXT_CONTENT",
@@ -8,7 +8,6 @@
   },
   "recievingEndpoints" : [ {
       "@type" : "SMS",
-      "deliveryOptions" : null,
       "recipient" : {
         "type" : "PERSON",
         "name" : "Peter Bazik"

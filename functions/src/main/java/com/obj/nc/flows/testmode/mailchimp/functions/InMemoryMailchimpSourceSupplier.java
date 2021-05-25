@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
 
+import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class InMemoryMailchimpSourceSupplier extends SourceSupplierAdapter<Message<MailchimpContent>> {
     
     private final Queue<Message<MailchimpContent>> received = new LinkedList<>();
+    private final MessageFactory messageFactory;
     
     @Override
     protected Optional<PayloadValidationException> checkPreCondition(Message<MailchimpContent> payload) {
@@ -32,7 +34,7 @@ public class InMemoryMailchimpSourceSupplier extends SourceSupplierAdapter<Messa
         MailchimpContent originalContent = originalMessage.getBody();
     
         //Why do I need to clone? Why not using the received originalContent;
-        Message<MailchimpContent> message = new Message<MailchimpContent>();
+        Message<MailchimpContent> message = messageFactory.createAsMailChimp();
         MailchimpContent content = new MailchimpContent();
         content.setSubject(originalContent.getSubject());
         content.setRecipients(new ArrayList<>(originalContent.getRecipients()));

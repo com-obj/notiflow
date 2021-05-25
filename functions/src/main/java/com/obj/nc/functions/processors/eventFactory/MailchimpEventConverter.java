@@ -5,13 +5,13 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.components.api.MailchimpContentFactory;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import com.obj.nc.mappers.MailchimpContentMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @DocumentProcessingInfo("MailchimpEventConverter")
 public class MailchimpEventConverter extends ProcessorFunctionAdapter<GenericEvent, NotificationIntent<MailchimpContent>> {
 	
-	private final MailchimpContentMapper mailchimpContentMapper;
+	private final MailchimpContentFactory mailchimpContentFactoryImpl;
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(GenericEvent payload) {
@@ -44,7 +44,7 @@ public class MailchimpEventConverter extends ProcessorFunctionAdapter<GenericEve
 		notificationIntent.getHeader().setFlowId(payload.getFlowId());
 		
 		MailchimpData mailchimpData = payload.getPayloadAsPojo();
-		MailchimpContent content = mailchimpContentMapper.map(mailchimpData);
+		MailchimpContent content = mailchimpContentFactoryImpl.createFromData(mailchimpData);
 		
 		notificationIntent.setBody(content);
 		return notificationIntent;

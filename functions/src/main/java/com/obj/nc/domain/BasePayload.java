@@ -23,7 +23,12 @@ import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.headers.ProcessingInfo;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.EmailWithTestModeDiggest;
+import com.obj.nc.domain.message.EmailWithTemplatedContent;
+import com.obj.nc.domain.message.MailChimpMessage;
+import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmsWithTemplatedContent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 
 import lombok.EqualsAndHashCode;
@@ -37,7 +42,13 @@ import lombok.extern.log4j.Log4j2;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ 
 	@Type(value = NotificationIntent.class, name = NotificationIntent.JSON_TYPE_IDENTIFIER),
-	@Type(value = Message.class, name = Message.JSON_TYPE_IDENTIFIER) })
+	@Type(value = EmailMessage.class, name = EmailMessage.JSON_TYPE_IDENTIFIER),
+	@Type(value = SimpleTextMessage.class, name = SimpleTextMessage.JSON_TYPE_IDENTIFIER),
+	@Type(value = MailChimpMessage.class, name = MailChimpMessage.JSON_TYPE_IDENTIFIER),
+	@Type(value = EmailWithTemplatedContent.class, name = EmailWithTemplatedContent.JSON_TYPE_IDENTIFIER),
+	@Type(value = EmailWithTestModeDiggest.class, name = EmailWithTestModeDiggest.JSON_TYPE_IDENTIFIER),
+	@Type(value = SmsWithTemplatedContent.class, name = SmsWithTemplatedContent.JSON_TYPE_IDENTIFIER),	
+})
 @ToString(callSuper = true)
 @Log4j2
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)

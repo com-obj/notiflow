@@ -1,14 +1,16 @@
 package com.obj.nc.flows.testmode.mailchimp.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+
+import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.flows.testmode.mailchimp.functions.InMemoryMailchimpSourceSupplier;
 import com.obj.nc.flows.testmode.mailchimp.functions.TestModeMailchimpSender;
 import com.obj.nc.functions.processors.senders.MailchimpSender;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
@@ -22,14 +24,17 @@ public class TestModeMailchimpBeansConfig {
      */
     @Bean
     @Primary
-    public MailchimpSender testModeMailchimpSender(MailchimpSenderConfigProperties properties) {
-        return new TestModeMailchimpSender(properties, testModeMailchimpReciever(), realMailchimpSender());
+    public MailchimpSender testModeMailchimpSender(MailchimpSenderConfigProperties properties, MessageFactory messageFactory) {
+        return new TestModeMailchimpSender(
+        		properties, 
+        		testModeMailchimpReciever(messageFactory), 
+        		realMailchimpSender());
     }
     
     @Bean
     @Primary
-    public InMemoryMailchimpSourceSupplier testModeMailchimpReciever() {
-        return new InMemoryMailchimpSourceSupplier();
+    public InMemoryMailchimpSourceSupplier testModeMailchimpReciever(MessageFactory messageFactory) {
+        return new InMemoryMailchimpSourceSupplier(messageFactory);
     }
     
     @Bean

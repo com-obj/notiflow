@@ -3,17 +3,22 @@ package com.obj.nc.functions.processors.messageAggregator.aggregations;
 import java.util.List;
 import java.util.Optional;
 
+import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
+@RequiredArgsConstructor
 public class SmsMessageAggregationStrategy extends BasePayloadAggregationStrategy<SimpleTextContent> {
 	
 	public static final String TEXT_CONCAT_DELIMITER = "\n\n";
+	
+	private final MessageFactory messageFactory;
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(List<Message<SimpleTextContent>> payloads) {
@@ -51,7 +56,7 @@ public class SmsMessageAggregationStrategy extends BasePayloadAggregationStrateg
 				.reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		
-		Message<SimpleTextContent> outputMessage = Message.createAsSms();
+		Message<SimpleTextContent> outputMessage = messageFactory.createAsSms();
 		outputMessage.setBody(aggregatedSmsContent);
 		return outputMessage;
 	}

@@ -1,33 +1,35 @@
 {
-   "type":"MESSAGE",
-    "header":{
-      "id":"2598a791-08d6-4795-8354-2f675f72b067",
-      "eventIds":["0c3f159f-103e-49fd-8eb1-f4b6de481acb"],
-      "flow-id":"static-routing-pipeline"
-   },
-   "body":{
-         "text":"Text",
-         "subject":"Subject",
-         "attachments":[
-           {
-             "name":"test1.txt",
-             "file-URI":"messages/attachments/test1.txt"
-           },
-           {
-             "name":"test2.txt",
-             "file-URI":"messages/attachments/test2.txt"
-           }
-         ]
-   },
-   "recievingEndpoints":[
-         {
-            "@type":"EMAIL",
-            "recipient":{
-               "type":"PERSON",
-               "name":"John Doe"
-            },
-            "email":"john.doe@objectify.sk",
-            "endpointId":"john.doe@objectify.sk"
-         }
-   ]
+	"type": "EMAIL_MESSAGE",
+	"header": {
+		"id": "2598a791-08d6-4795-8354-2f675f72b067",
+		"eventIds": [
+			"0c3f159f-103e-49fd-8eb1-f4b6de481acb"
+		],
+		"flow-id": "static-routing-pipeline"
+	},
+	"body": {
+		"text": "Text",
+		"subject": "Subject",
+		"attachments": [
+			{
+				"name": "test1.txt",
+				"file-URI": "messages/attachments/test1.txt"
+			},
+			{
+				"name": "test2.txt",
+				"file-URI": "messages/attachments/test2.txt"
+			}
+		]
+	},
+	"recievingEndpoints": [
+		{
+			"@type": "EMAIL",
+			"recipient": {
+				"type": "PERSON",
+				"name": "John Doe"
+			},
+			"email": "john.doe@objectify.sk",
+			"endpointId": "john.doe@objectify.sk"
+		}
+	]
 }

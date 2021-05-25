@@ -1,19 +1,16 @@
 {
-  "type" : "MESSAGE",
+  "type" : "EMAIL_MESSAGE",
   "header" : {
     "eventIds" : [
       "23e201b5-d7fa-4231-a520-51190b5c50da"
     ]
   },
   "body" : {
-        "attributes": {},
         "text": "New position on koderia.sk 1",
-        "subject": "New position 1",
-        "attachments" : [ ]
+        "subject": "New position 1"
   },
     "recievingEndpoints" : [ {
       "@type" : "EMAIL",
-      "deliveryOptions" : null,
       "recipient" : {
         "type" : "PERSON",
         "name" : "John Doe"

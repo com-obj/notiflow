@@ -4,8 +4,8 @@ import java.beans.Transient;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 
 import lombok.Data;
@@ -15,19 +15,19 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
-public class EmailMessage extends Message<EmailContent/*, EmailEndpoint*/> {
+public class MailChimpMessage extends Message<MailchimpContent/*, MailchimpEndpoint*/> {
 
-	public static final String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE";
+	public static final String JSON_TYPE_IDENTIFIER = "MAILCHIMP_MESSAGE";
 	
-	public EmailMessage() {
-		setBody(new EmailContent());
+	public MailChimpMessage() {
+		setBody(new MailchimpContent());
 	}
-	
+
 	@Override
-	public List<EmailEndpoint> getRecievingEndpoints() {
-		return (List<EmailEndpoint>) super.getRecievingEndpoints();
+	public List<MailchimpEndpoint> getRecievingEndpoints() {
+		return (List<MailchimpEndpoint>) super.getRecievingEndpoints();
 	}
-
+	
 	@Override
 	@JsonIgnore
 	public String getPayloadTypeName() {
@@ -38,7 +38,7 @@ public class EmailMessage extends Message<EmailContent/*, EmailEndpoint*/> {
 	@Transient
 	@JsonIgnore
 	public Class<? extends RecievingEndpoint> getRecievingEndpointType() {
-		return EmailEndpoint.class;
+		return MailchimpEndpoint.class;
 	}
 
 }

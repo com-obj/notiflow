@@ -19,10 +19,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.components.MessageFactoryImpl;
+import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpMergeVariable;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.MailchimpMessageAggregationStrategy;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
@@ -43,15 +45,15 @@ public class MailchimpAggregationStrategyTest {
     @Test
     void testAggregateValidMessagesPass() {
         // given
-        Message<MailchimpContent> message1 = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_1.json", Message.class);
+    	MailChimpMessage message1 = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_1.json", MailChimpMessage.class);
         MailchimpContent message1Content = message1.getBody();
         message1Content.setGlobalMergeVariables(mergeVarMapper.map(message1Content.getOriginalEvent()));
-        Message<MailchimpContent> message2 = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_2.json", Message.class);
+        MailChimpMessage message2 = JsonUtils.readObjectFromClassPathResource("mailchimp/aggregation/input_message_2.json", MailChimpMessage.class);
         MailchimpContent message2Content = message2.getBody();
         message2Content.setGlobalMergeVariables(mergeVarMapper.map(message2Content.getOriginalEvent()));
     
         // when
-        Message<MailchimpContent> outputMessage = (Message<MailchimpContent>) aggregateMailchimpMessages.apply(Arrays.asList(message1, message2));
+        MailChimpMessage outputMessage = (MailChimpMessage) aggregateMailchimpMessages.apply(Arrays.asList(message1, message2));
     
         // then
         MailchimpContent content = outputMessage.getBody();
@@ -83,12 +85,17 @@ public class MailchimpAggregationStrategyTest {
         
         @Bean
         public MailchimpMessageAggregationStrategy mailchimpMessageAggregationStrategy() {
-            return new MailchimpMessageAggregationStrategy(properties);
+            return new MailchimpMessageAggregationStrategy(properties, messageFactory());
         }
         
         @Bean
         public MessageAggregator aggregateMailchimpMessages() {
             return new MessageAggregator(mailchimpMessageAggregationStrategy());
+        }
+
+        @Bean
+        public MessageFactory messageFactory() {
+        	return new MessageFactoryImpl();
         }
     }
     

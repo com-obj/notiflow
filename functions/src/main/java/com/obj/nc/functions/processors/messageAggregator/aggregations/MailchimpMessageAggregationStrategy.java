@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData;
 import com.obj.nc.domain.content.mailchimp.MailchimpAttachment;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
@@ -25,6 +26,7 @@ import lombok.extern.log4j.Log4j2;
 public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationStrategy<MailchimpContent> {
 	
 	private final MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
+	private final MessageFactory messageFactory;
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(List<Message<MailchimpContent>> payloads) {
@@ -61,7 +63,7 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 				.reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		
-		Message<MailchimpContent> outputMessage = new Message<>();
+		Message<MailchimpContent> outputMessage = messageFactory.createAsMailChimp();
 		outputMessage.setBody(aggregatedMailchimpContent);
 		return outputMessage;
 	}

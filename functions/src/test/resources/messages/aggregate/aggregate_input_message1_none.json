@@ -1,21 +1,23 @@
 {
-  "type" : "MESSAGE",
-  "header" : {
-    "eventIds" : [
-      "23e201b5-d7fa-4231-a520-51190b5c50da"
-    ]
-  },
-  "body" : {
-      "text": "New position on koderia.sk 1",
-      "subject": "New position 1"
-   },
-    "recievingEndpoints" : [ {
-      "@type" : "EMAIL",
-      "deliveryOptions" : null,
-      "recipient" : {
-        "type" : "PERSON",
-        "name" : "John Doe"
-      },
-      "email" : "john.doe@objectify.sk"
-    } ]
+	"type": "EMAIL_MESSAGE",
+	"header": {
+		"eventIds": [
+			"23e201b5-d7fa-4231-a520-51190b5c50da"
+		]
+	},
+	"body": {
+		"text": "New position on koderia.sk 1",
+		"subject": "New position 1"
+	},
+	"recievingEndpoints": [
+		{
+			"@type": "EMAIL",
+			"deliveryOptions": null,
+			"recipient": {
+				"type": "PERSON",
+				"name": "John Doe"
+			},
+			"email": "john.doe@objectify.sk"
+		}
+	]
 }

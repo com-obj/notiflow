@@ -6,13 +6,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.endpoints.SmsEndpoint;
-import com.obj.nc.domain.headers.HasHeader;
-import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,56 +16,35 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
 @Table("nc_message")
-//TODO: Make abstract, add type parameter for RecievingEndpoint
-public class Message<BODY_TYPE extends Content> extends BasePayload<BODY_TYPE> implements HasHeader {
+public abstract class Message<BODY_TYPE extends Content> extends BasePayload<BODY_TYPE> {
 	
-	public static final String JSON_TYPE_IDENTIFIER = "MESSAGE";
-	
-	public static Message<EmailContent> createAsEmail() {
-		Message<EmailContent> msg = new Message<EmailContent>();
-		msg.setBody(new EmailContent());
-		return msg;
-	}
-	
-	public static Message<SimpleTextContent> createAsSms() {
-		Message<SimpleTextContent> msg = new Message<SimpleTextContent>();
-		msg.setBody(new SimpleTextContent());
-		return msg;
-	}
-
-	@Override
-	@JsonIgnore
-	public String getPayloadTypeName() {
-		return JSON_TYPE_IDENTIFIER;
-	}
-
 	@JsonIgnore
 	@Transient
 	public boolean isEmailMessage() {
-		if (this.getRecievingEndpoints().size()!=1) {
-			throw new PayloadValidationException("Message should have only single endpoint");
-		}
-		
-		return this.getRecievingEndpoints().iterator().next() instanceof EmailEndpoint;
+		return (this instanceof EmailMessage);
 	}
 	
 	@JsonIgnore
 	@Transient
 	public boolean isSmsMessage() {
-		if (this.getRecievingEndpoints().size()!=1) {
-			throw new PayloadValidationException("Message should have only single endpoint");
-		}
-		
-		return this.getRecievingEndpoints().iterator().next() instanceof SmsEndpoint;
+		return (this instanceof SimpleTextMessage);
 	}
 	
 	@JsonIgnore
 	@Transient
 	public boolean isMailchimpMessage() {
-		if (this.getRecievingEndpoints().size()!=1) {
-			throw new PayloadValidationException("Message should have only single endpoint");
-		}
-		
-		return this.getRecievingEndpoints().iterator().next() instanceof MailchimpEndpoint;
+		return (this instanceof MailChimpMessage);
 	}
+
+
+	@JsonIgnore
+	@Transient
+	public Class<BODY_TYPE> getBodyType() {
+		return (Class<BODY_TYPE>)getBody().getClass();
+	}
+	
+	@Transient
+	@JsonIgnore
+	public abstract Class<? extends RecievingEndpoint> getRecievingEndpointType();
+	
 }

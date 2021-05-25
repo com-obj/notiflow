@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.components.MailchimpContentFactoryImpl;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.domain.event.GenericEvent;
@@ -31,7 +32,6 @@ import com.obj.nc.koderia.domain.eventData.EventEventDataDto;
 import com.obj.nc.koderia.domain.eventData.LinkEventDataDto;
 import com.obj.nc.koderia.domain.eventData.NewsEventDataDto;
 import com.obj.nc.koderia.mapper.KoderiaMergeVarMapperImpl;
-import com.obj.nc.mappers.MailchimpContentMapper;
 import com.obj.nc.utils.JsonUtils;
 
 import io.restassured.module.jsv.JsonSchemaValidator;
@@ -44,7 +44,7 @@ import io.restassured.module.jsv.JsonSchemaValidator;
 @ContextConfiguration(classes = {
         MailchimpEventConverter.class,
         KoderiaMergeVarMapperImpl.class,
-        MailchimpContentMapper.class,
+        MailchimpContentFactoryImpl.class,
         DomainConfig.class,
         MailchimpSenderConfigProperties.class
 })

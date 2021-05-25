@@ -13,9 +13,8 @@ import org.springframework.test.context.ActiveProfiles;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.content.email.TemplateWithJsonModelEmailContent;
-import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.EmailWithTemplatedContent;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.utils.JsonUtils;
 
@@ -29,10 +28,10 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 	void createSimpleHtmlEmailFromTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/teamplate_message.json";
-		Message<TemplateWithModelEmailContent<?>> msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+		EmailWithTemplatedContent msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailWithTemplatedContent.class);
 		
 		//WHEN
-		List<Message<EmailContent>> htmlMessages = template2Html.apply(msg);
+		List<EmailMessage> htmlMessages = template2Html.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
@@ -48,10 +47,10 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 	void createHtmlEmailFromPojoModelAndTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/teamplate_message_pojo_model.json";
-		Message<TemplateWithModelEmailContent<?>> msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+		EmailWithTemplatedContent msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailWithTemplatedContent.class);
 		
 		//WHEN
-		List<Message<EmailContent>> htmlMessages = template2Html.apply(msg);
+		List<EmailMessage> htmlMessages = template2Html.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
@@ -68,10 +67,10 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 	void createI18NHtmlEmailFromTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/teamplate_message_en_de.json";
-		Message<TemplateWithModelEmailContent<?>> msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+		EmailWithTemplatedContent msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailWithTemplatedContent.class);
 		
 		//WHEN
-		List<Message<EmailContent>> htmlMessages = template2Html.apply(msg);
+		List<EmailMessage> htmlMessages = template2Html.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(2);

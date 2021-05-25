@@ -4,7 +4,7 @@ import java.beans.Transient;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 
@@ -15,12 +15,16 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
-public class EmailMessage extends Message<EmailContent/*, EmailEndpoint*/> {
+public class EmailWithTemplatedContent<MODEL_TYPE> extends Message<TemplateWithModelEmailContent<MODEL_TYPE>/*, EmailEndpoint*/> {
 
-	public static final String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE";
+	public static final String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_TEMPLATED_CONTENT";
 	
-	public EmailMessage() {
-		setBody(new EmailContent());
+	public EmailWithTemplatedContent() {
+		//JSON serialiser
+	}
+	
+	public EmailWithTemplatedContent(TemplateWithModelEmailContent<MODEL_TYPE> content) {
+		setBody(content);
 	}
 	
 	@Override
@@ -38,7 +42,7 @@ public class EmailMessage extends Message<EmailContent/*, EmailEndpoint*/> {
 	@Transient
 	@JsonIgnore
 	public Class<? extends RecievingEndpoint> getRecievingEndpointType() {
-		return EmailEndpoint.class;
+		return null;
 	}
 
 }

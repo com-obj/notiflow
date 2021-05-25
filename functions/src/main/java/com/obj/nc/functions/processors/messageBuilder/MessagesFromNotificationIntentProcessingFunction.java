@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -23,6 +24,8 @@ import lombok.extern.log4j.Log4j2;
 @DocumentProcessingInfo("GenerateMessagesFromIntent")
 public class MessagesFromNotificationIntentProcessingFunction<CONTENT_TYPE extends Content> extends ProcessorFunctionAdapter<NotificationIntent<CONTENT_TYPE>, List<Message<CONTENT_TYPE>>> {
 
+	private final MessageFactory messageFactory;
+	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent<CONTENT_TYPE> notificationIntent) {
 
@@ -42,16 +45,9 @@ public class MessagesFromNotificationIntentProcessingFunction<CONTENT_TYPE exten
 
 		for (RecievingEndpoint recievingEndpoint: notificationIntent.getRecievingEndpoints()) {
 
-			Message<CONTENT_TYPE> msg = new Message<>();
+			Message<CONTENT_TYPE> msg = messageFactory.createBasedOnEndpoint(recievingEndpoint.getClass());
 			
 			msg.addRecievingEndpoints(recievingEndpoint);
-
-//			if (recievingEndpoint.getDeliveryOptions()!=null) {
-//				msg.setDeliveryOptions(recievingEndpoint.getDeliveryOptions());
-//				recievingEndpoint.setDeliveryOptions(null);
-//			} else {
-//				msg.setDeliveryOptions(notificationIntent.getDeliveryOptions());
-//			}
 
 			msg.setAttributes(notificationIntent.getAttributes());
 			msg.setBody(notificationIntent.getBody());

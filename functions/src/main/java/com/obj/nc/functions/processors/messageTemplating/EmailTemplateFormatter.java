@@ -8,10 +8,11 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.Content;
-import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
@@ -20,11 +21,14 @@ import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigu
 @DocumentProcessingInfo("EmailFormatter")
 public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithModelEmailContent<?>, EmailContent> {
 
-	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {
+	private final MessageFactory messageFactory;
+	
+	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config, MessageFactory messageFactory) {
 		super(templateEngine, config);
+		
+		this.messageFactory = messageFactory;
 	}
 	
-
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message<TemplateWithModelEmailContent<?>> message) {
 		Content content = message.getBody();
@@ -36,8 +40,8 @@ public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithMo
 		return Optional.empty();
 	}
 
-	protected Message<EmailContent> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelEmailContent<?>> payload) {		
-		Message<EmailContent> htmlMessage = Message.createAsEmail();
+	protected EmailMessage createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelEmailContent<?>> payload) {		
+		EmailMessage htmlMessage = messageFactory.createAsEmail();
 
 		EmailContent emailContent = htmlMessage.getBody();
 		emailContent.setContentType(MediaType.TEXT_HTML_VALUE);

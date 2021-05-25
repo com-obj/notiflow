@@ -1,30 +1,35 @@
-package com.obj.nc.mappers;
-
-import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.content.mailchimp.*;
-
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpMergeVarMapper;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
-import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.stereotype.Component;
+package com.obj.nc.components;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.stereotype.Component;
+
+import com.obj.nc.components.api.MailchimpContentFactory;
+import com.obj.nc.domain.Attachement;
+import com.obj.nc.domain.content.mailchimp.MailchimpAttachment;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpData;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpMergeVarMapper;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class MailchimpContentMapper {
+public class MailchimpContentFactoryImpl implements MailchimpContentFactory {
     
     private final MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
     private final MailchimpMergeVarMapper mailchimpMergeVarMapper;
 
-    public MailchimpContent map(MailchimpData event) {
+    public MailchimpContent createFromData(MailchimpData event) {
         MailchimpContent content = new MailchimpContent();
         content.setOriginalEvent(event);
         content.setSubject(mapSubject(event));
