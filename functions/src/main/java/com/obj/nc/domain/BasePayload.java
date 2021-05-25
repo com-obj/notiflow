@@ -104,12 +104,6 @@ public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements H
 	@Transient
 	public abstract String getPayloadTypeName();
 	
-//	@JsonIgnore
-//	@Transient
-//	public <T> T getContentTyped() {
-//		return (T)getBody().getMessage();
-//	}
-	
 	@Override
 	@JsonIgnore
 	@Transient

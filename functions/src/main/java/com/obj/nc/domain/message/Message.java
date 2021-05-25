@@ -1,8 +1,5 @@
 package com.obj.nc.domain.message;
 
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.relational.core.mapping.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.content.Content;
@@ -15,11 +12,19 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
-@Table("nc_message")
 public abstract class Message<BODY_TYPE extends Content> extends BasePayload<BODY_TYPE> {
 		
-	@Transient
 	@JsonIgnore
 	public abstract Class<? extends RecievingEndpoint> getRecievingEndpointType();
+	
+	public MessagePersistantState toPersistantState() {
+		return MessagePersistantState.builder()
+			.body(getBody())
+			.header(getHeader())
+			.id(getId())
+			.messageClass(getClass().getName())
+			.timeCreated(getTimeCreated())
+			.build();		 
+	}
 	
 }
