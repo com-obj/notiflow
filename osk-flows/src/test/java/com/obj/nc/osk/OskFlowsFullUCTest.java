@@ -186,10 +186,10 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
         if (startEnd.equals("start")) {
 	        msg = assertMessagesContains(msgs, MailMessageForAssertions.as("slavkovsky@orange.sk", 
 	        		getMsg("sales."+ startEnd +".subject", new Locale("sk")),
-	        		"Objectify, s.r.o","obj","0918186997", "VPS sifrovana", 
-	        		"Mocidla 249, Myto pod Dumbierom",
-	        		"Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana", 
-	        		"Westend tower", "0918186999"
+                    "Objectify, s.r.o","obj","0918186997", "VPS sifrovana",
+                    "Mocidla 249, Myto pod Dumbierom",
+                    "Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana",
+                    "Westend tower", "0918186999"
 	        		)
 	        );
         } else {
@@ -210,7 +210,10 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
         
         if (startEnd.equals("start")) {
             msg = assertMessagesContains(msgs, MailMessageForAssertions.as("sales@objectify.sk", getMsg("salesAgent."+ startEnd +".subject", new Locale("sk")),
-                    "dopad na z", "kov a ich slu"
+                    "Objectify, s.r.o","obj","0918186997", "VPS sifrovana",
+                    "Mocidla 249, Myto pod Dumbierom",
+                    "Artin, s.r.o.","Artin","0918186998", "VPS sifrovana/nesifrovana",
+                    "Westend tower", "0918186999", "dopad na z", "kov a ich slu"
                     )
             );
         } else {
@@ -240,16 +243,16 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
 
 	private void createRestCallExpectationsForOutageStartSms() {
 		//TODO: toto je asi vcelku brittle,.. nemyslim, ze viem garantovat poradie
-		createRestCallExpectation("0918186997", "Vážený zákazník,", "VPS", "VPS sifrovana");
-		createRestCallExpectation("+421918186997", "Vážený zákazník,", "VPS", "VPS sifrovana");
-		createRestCallExpectation("0918186998", "Vážený zákazník,", "VPS sifrovana/nesifrovana", "VPS sifrovana");
+		createRestCallExpectation("0918186997", "Vážený zákazník,", "sme zaznamenali výpadok, ktorý môže mať dopad na využívanie Vašich služieb od Orangeu.", "VPS", "0918186997", "VPS sifrovana");
+		createRestCallExpectation("+421918186997", "Vážený zákazník,", "sme zaznamenali výpadok, ktorý môže mať dopad na využívanie Vašich služieb od Orangeu.", "VPS", "0918186997", "VPS sifrovana");
+		createRestCallExpectation("0918186998", "Vážený zákazník,", "sme zaznamenali výpadok, ktorý môže mať dopad na využívanie Vašich služieb od Orangeu.", "VPS sifrovana/nesifrovana", "VPS sifrovana");
 	}
 	
 	private void createRestCallExpectationsForOutageEndSms() {
 		//TODO: toto je asi vcelku brittle,.. nemyslim, ze viem garantovat poradie
-		createRestCallExpectation("0918186997", "Vážený zákazník,", "VPS", "VPS sifrovana");
-		createRestCallExpectation("+421918186997", "Vážený zákazník,", "VPS", "VPS sifrovana");
-		createRestCallExpectation("0918186998", "Vážený zákazník,", "VPS sifrovana/nesifrovana", "VPS sifrovana");
+		createRestCallExpectation("0918186997", "Vážený zákazník, už avizovaný výpadok z", "ktorý mohol mať dopad", "bol odstránený", "VPS", "VPS sifrovana");
+		createRestCallExpectation("+421918186997", "Vážený zákazník, už avizovaný výpadok z", "ktorý mohol mať dopad", "bol odstránený", "VPS", "VPS sifrovana");
+		createRestCallExpectation("0918186998", "Vážený zákazník, už avizovaný výpadok z", "ktorý mohol mať dopad", "bol odstránený", "VPS sifrovana/nesifrovana", "VPS sifrovana");
 	}
 	
     public static OskSendSmsResponseDto createResponse(String senderAddrress) {
