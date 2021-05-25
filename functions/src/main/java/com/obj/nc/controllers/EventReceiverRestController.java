@@ -1,7 +1,6 @@
 package com.obj.nc.controllers;
 
-import java.util.Optional;
-
+import com.obj.nc.functions.processors.eventValidator.GenericEventValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.relational.core.conversion.DbActionExecutionException;
@@ -17,7 +16,6 @@ import com.obj.nc.domain.event.EventRecieverResponce;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
-import com.obj.nc.utils.JsonUtils;
 
 @Validated
 @RestController
@@ -26,6 +24,8 @@ public class EventReceiverRestController {
 
 	@Autowired
 	private GenericEventPersisterConsumer persister;
+	@Autowired
+	private GenericEventValidator validator;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
     public EventRecieverResponce persistGenericEvent(
@@ -33,7 +33,7 @@ public class EventReceiverRestController {
     		@RequestParam(value = "flowId", required = false) String flowId,
     		@RequestParam(value = "externalId", required = false) String externalId) {
     	
-     	JsonNode eventJson = checkIfJsonValidAndReturn(eventJsonString);
+     	JsonNode eventJson = validator.apply(eventJsonString);
      	
     	GenericEvent event = GenericEvent.from(eventJson);
     	event.overrideFlowIdIfApplicable(flowId);
@@ -49,15 +49,5 @@ public class EventReceiverRestController {
 
     	return EventRecieverResponce.from(event.getId());
     }
-
-	private JsonNode checkIfJsonValidAndReturn(String eventJson) {
-		Optional<String> jsonProblems = JsonUtils.checkValidAndGetError(eventJson);
-    	if (jsonProblems.isPresent()) {
-    		throw new PayloadValidationException(jsonProblems.get());
-    	}
-    	
-    	return JsonUtils.readJsonNodeFromJSONString(eventJson);
-	}
-
 
 }
