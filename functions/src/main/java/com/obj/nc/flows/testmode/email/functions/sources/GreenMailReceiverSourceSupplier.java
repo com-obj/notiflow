@@ -27,11 +27,9 @@ import com.icegreen.greenmail.store.MailFolder;
 import com.icegreen.greenmail.store.StoredMessage;
 import com.icegreen.greenmail.util.GreenMail;
 import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.headers.Header;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
@@ -44,7 +42,7 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
 @Log4j2
-public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<Message>> {
+public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<EmailMessage>> {
 
     public static final String ORIGINAL_RECIPIENTS_EMAIL_ATTR_NAME = "ORIGINAL_RECIPIENTS_EMAIL";
 
@@ -54,7 +52,7 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
     @Autowired private TestModeProperties properties;
 
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(List<Message> messages) {
+	protected Optional<PayloadValidationException> checkPreCondition(List<EmailMessage> messages) {
 		//toto neni na stav, kedy by bolo treba hadzat vynimku.. ked je source prazdy, tak je prazdny. nic sa nedeje
 //        if (payload.getMessages().isEmpty()) {
 //            return Optional.of(new PayloadValidationException("There are no messages to supply"));
@@ -68,19 +66,19 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
 	}
 
 	@Override
-	protected List<Message> execute() {
+	protected List<EmailMessage> execute() {
 		log.debug("Pulling messages from Test Mode GreenMail");
 		
-        List<Message> allMessages = new ArrayList<>();
+        List<EmailMessage> allMessages = new ArrayList<>();
 
         try {
             InMemoryStore store = (InMemoryStore) gm.getManagers().getImapHostManager().getStore();
             Collection<MailFolder> mailboxes = store.listMailboxes("*");
 
             for (MailFolder folder : mailboxes) {
-                List<Message> folderMessages = folder.getNonDeletedMessages().stream().map(
+                List<EmailMessage> folderMessages = folder.getNonDeletedMessages().stream().map(
                         greenMailMessage -> {
-                            Message message = convertGreenMailMessageToMessage(greenMailMessage);
+                        	EmailMessage message = convertGreenMailMessageToMessage(greenMailMessage);
                             greenMailMessage.setFlag(Flags.Flag.DELETED, true);
                             return message;
                         }
@@ -101,12 +99,12 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
         return allMessages;
 	}
 	
-    private Message convertGreenMailMessageToMessage(StoredMessage message) {
-        Message result = Message.createAsEmail();
+    private EmailMessage convertGreenMailMessageToMessage(StoredMessage message) {
+    	EmailMessage result = new EmailMessage();
 
         try {
             MimeMessage mimeMessage = message.getMimeMessage();
-            EmailContent content = result.getContentTyped();
+            EmailContent content = result.getBody();
             content.setSubject(mimeMessage.getSubject());
             
             MimeMessageParser parser = new MimeMessageParser(mimeMessage).parse();
@@ -120,13 +118,13 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
             content.setAttributeValue(ORIGINAL_RECIPIENTS_EMAIL_ATTR_NAME, originalRecipients);
             content.setContentType(contentType);
             //This is most likely not used,.. this mails are aggregated and bundled into separate mail, which will set the recipient from setting again
-            List<RecievingEndpoint> emailEndpoints = properties.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
-            result.getBody().setRecievingEndpoints(emailEndpoints);
+            List<EmailEndpoint> emailEndpoints = properties.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
+            result.setRecievingEndpoints(emailEndpoints);
 
 
-            DeliveryOptions deliveryOptions = new DeliveryOptions();
-            deliveryOptions.setAggregationType(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
-            result.getBody().setDeliveryOptions(deliveryOptions);
+//            DeliveryOptions deliveryOptions = new DeliveryOptions();
+//            deliveryOptions.setAggregationType(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
+//            result.setDeliveryOptions(deliveryOptions);
             
             copyHeaderValues(mimeMessage, result.getHeader());
             

@@ -6,6 +6,6 @@ import com.obj.nc.domain.endpoints.RecievingEndpoint;
 
 public interface HasRecievingEndpoints {
 	
-	List<RecievingEndpoint> getRecievingEndpoints();
+	List<? extends RecievingEndpoint> getRecievingEndpoints();
 
 }

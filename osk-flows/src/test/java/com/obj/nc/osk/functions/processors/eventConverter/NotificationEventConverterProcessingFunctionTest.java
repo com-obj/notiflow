@@ -53,7 +53,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	//WHEN OUTAGE STARTs
         GenericEvent event = readOutageStartEvent();
         event = eventRepo.save(event); //we need to stave this so that issue outage End
-    	List<NotificationIntent> result = startOutageConverter.apply(event);
+    	List<NotificationIntent<?>> result = startOutageConverter.apply(event);
     	
     	//THEN
     	assertCustomerNotificationIntents(result);
@@ -86,29 +86,29 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	}
     }
 
-	private List<CustEmailTemplate> extractEmails(List<NotificationIntent> result) {
+	private List<CustEmailTemplate> extractEmails(List<NotificationIntent<?>> result) {
 		List<CustEmailTemplate> contents = result.stream()
-    		.filter(e-> e.getBody().getMessage() instanceof CustEmailTemplate)
-    		.map(e-> ((CustEmailTemplate)e.getBody().getMessage()))
+    		.filter(e-> e.getBody() instanceof CustEmailTemplate)
+    		.map(e-> ((CustEmailTemplate)e.getBody()))
     		.collect(Collectors.toList());
 		return contents;
 	}
 	
-	private List<CustSmsTemplate> extractSmss(List<NotificationIntent> result) {
+	private List<CustSmsTemplate> extractSmss(List<NotificationIntent<?>> result) {
 		List<CustSmsTemplate> contents = result.stream()
-    		.filter(e-> e.getBody().getMessage() instanceof CustSmsTemplate)
-    		.map(e-> ((CustSmsTemplate)e.getBody().getMessage()))
+    		.filter(e-> e.getBody() instanceof CustSmsTemplate)
+    		.map(e-> ((CustSmsTemplate)e.getBody()))
     		.collect(Collectors.toList());
 		return contents;
 	}
 
 	@SuppressWarnings("unchecked")
-	private void assertCustomerNotificationIntents(List<NotificationIntent> result) {
+	private void assertCustomerNotificationIntents(List<NotificationIntent<?>> result) {
 		assertThat(result.size()).isEqualTo(8); //3xcustomers email,2xcustomer sms, 2xsales, 1xsales agent 
     	
     	//THEN check events for customer
     	JXPathContext context = JXPathContext.newContext(result); //"//recievingEndpoints[@endpointId='cuzy@objectify.sk']/../.."
-		List<NotificationIntent> nisForCuzy = context.selectNodes("//recipient[name='Jan Cuzy']/../../..");
+		List<NotificationIntent> nisForCuzy = context.selectNodes("//recipient[name='Jan Cuzy']/../..");
     	
     	assertThat(nisForCuzy.size()).isEqualTo(2);
     	
@@ -124,7 +124,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(smsEp.getRecipient().getName()).isEqualTo("Jan Cuzy");
     	assertThat(smsEp.getPhone()).contains("918186997");
     	
-    	CustEmailTemplate msgContentEmail =(CustEmailTemplate)nisForCuzy.stream().map(ni->ni.getContentTyped()).filter(c -> c instanceof CustEmailTemplate).findFirst().get();
+    	CustEmailTemplate msgContentEmail =(CustEmailTemplate)nisForCuzy.stream().map(ni->ni.getBody()).filter(c -> c instanceof CustEmailTemplate).findFirst().get();
     	assertThat(msgContentEmail.getModel().getTimeStart()).isNotNull();
     	
     	//THEN check outage infos
@@ -140,7 +140,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(context.selectSingleNode(".[@customerAddress='Martinengova 4881/36 811 02 Bratislava']")).isNotNull();
     	
     	//THEN check sms content - should be the same as email
-    	CustSmsTemplate msgContentSms =(CustSmsTemplate)nisForCuzy.stream().map(ni->ni.getContentTyped()).filter(c -> c instanceof CustSmsTemplate).findFirst().get();
+    	CustSmsTemplate msgContentSms =(CustSmsTemplate)nisForCuzy.stream().map(ni->ni.getBody()).filter(c -> c instanceof CustSmsTemplate).findFirst().get();
     	
     	outageInfos = msgContentSms.getModel().getServices();
     	assertThat(outageInfos.size()).isEqualTo(2);
@@ -160,23 +160,23 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
         GenericEvent event = readOutageStartEvent();
 
     	//WHEN
-    	List<NotificationIntent> result = startOutageConverter.apply(event);
+    	List<NotificationIntent<?>> result = startOutageConverter.apply(event);
     	
     	//THEN
     	assertThat(result.size()).isEqualTo(8); //3xcustomers email,2xcustomer sms, 2xsales, 1xsales agent 
     	
     	JXPathContext context = JXPathContext.newContext(result);
-		List<NotificationIntent> notificationIntentsForSlavkovsky = context.selectNodes("//recievingEndpoints[@endpointId='slavkovsky@orange.sk']/../..");
+		List<NotificationIntent<?>> notificationIntentsForSlavkovsky = context.selectNodes("//recievingEndpoints[@endpointId='slavkovsky@orange.sk']/..");
     	assertThat(notificationIntentsForSlavkovsky.size()).isEqualTo(1);
     	    	
-    	NotificationIntent notificationIntentForHahn = notificationIntentsForSlavkovsky.iterator().next();
+    	NotificationIntent<?> notificationIntentForHahn = notificationIntentsForSlavkovsky.iterator().next();
     	context = JXPathContext.newContext(notificationIntentForHahn);
     	List<RecievingEndpoint> endpoints = context.selectNodes("/recievingEndpoints");
     	assertThat(endpoints.size()).isEqualTo(1);
     	
     	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Adrian Slavkovsky");
     	
-    	SalesEmailTemplate msgContent = notificationIntentForHahn.getContentTyped();
+    	SalesEmailTemplate msgContent = (SalesEmailTemplate)notificationIntentForHahn.getBody();
     	assertThat(msgContent.getModel().getTimeStart()).isNotNull();
     	
     	Map<CustomerInfo, List<ServiceOutageInfo>> outageInfos = msgContent.getModel().getServicesPerCustomer();
@@ -201,14 +201,14 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	GenericEvent event = readOutageStartEvent();
 
     	//WHEN
-    	List<NotificationIntent> result = startOutageConverter.apply(event);
+    	List<NotificationIntent<?>> result = startOutageConverter.apply(event);
     	
     	//THEN
     	assertThat(result.size()).isEqualTo(8); //3xcustomers email,2xcustomer sms, 2xsales, 1xsales agent 
     	
     	//THEN check events for agent
     	JXPathContext context = JXPathContext.newContext(result);
-		List<NotificationIntent> notificationIntentsForAgent = context.selectNodes("//recievingEndpoints[@endpointId='sales@objectify.sk']/../..");
+		List<NotificationIntent<?>> notificationIntentsForAgent = context.selectNodes("//recievingEndpoints[@endpointId='sales@objectify.sk']/..");
     	
     	assertThat(notificationIntentsForAgent.size()).isEqualTo(1);
     	
@@ -218,8 +218,8 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	
     	assertThat(endpoints.iterator().next().getRecipient()).isNull(); //Pre sales agentov nemam person
     	
-    	NotificationIntent notificationIntentForAgent = notificationIntentsForAgent.iterator().next();
-    	SalesAgentsEmailTemplate msgContent = notificationIntentForAgent.getContentTyped();
+    	NotificationIntent<?> notificationIntentForAgent = notificationIntentsForAgent.iterator().next();
+    	SalesAgentsEmailTemplate msgContent = (SalesAgentsEmailTemplate)notificationIntentForAgent.getBody();
     	assertThat(msgContent.getModel().getTimeStart()).isNotNull();
     	
     	//THEN check outage infos

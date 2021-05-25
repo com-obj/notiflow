@@ -3,8 +3,9 @@ package com.obj.nc.functions.processors.messageAggregator.aggregations;
 import java.util.List;
 import java.util.Optional;
 
-import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
@@ -14,66 +15,61 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
  * @author ja
  *
  */
-public abstract class BasePayloadAggregationStrategy extends ProcessorFunctionAdapter<List<? extends BasePayload>, Object> {
+public abstract class BasePayloadAggregationStrategy<CONTENT_TYPE extends Content> extends ProcessorFunctionAdapter<List<Message<CONTENT_TYPE>>, Object> {
 	
 	/**
 	 * Process the given list of payloads. Implementations are free to return as few or as many payloads
 	 * based on the invocation as needed. Common return types are return BasePayload or List<BasePayload>
 	 */
-	abstract Object merge(List<? extends BasePayload> payloads);
+	abstract Object merge(List<Message<CONTENT_TYPE>> payloads);
 	
 	@Override
-	protected Object execute(List<? extends BasePayload> payload) {
+	protected Object execute(List<Message<CONTENT_TYPE>> payload) {
 		return this.merge(payload);
 	}
 	
-	protected Optional<PayloadValidationException> checkDeliveryOptions(List<? extends BasePayload> payloads) {
-		Optional<? extends BasePayload> firstPayload = payloads.stream().findFirst();
-		if (!firstPayload.isPresent()) {
-			return Optional.empty();
-		}
-		
-//		DeliveryOptions.AGGREGATION_TYPE firstMessageAggregationType = firstPayload.get().getBody().getDeliveryOptions().getAggregationType();
-//		if (DeliveryOptions.AGGREGATION_TYPE.NONE.equals(firstMessageAggregationType)) {
-//			return Optional.of(new PayloadValidationException(
-//					String.format("Payload %s has invalid aggregation type. Is %s", firstPayload.get(), firstMessageAggregationType)));
+//	protected Optional<PayloadValidationException> checkDeliveryOptions(List<Message<CONTENT_TYPE>> payloads) {
+//		Optional<Message<CONTENT_TYPE>> firstPayload = payloads.stream().findFirst();
+//		if (!firstPayload.isPresent()) {
+//			return Optional.empty();
 //		}
-		
-		Optional<? extends BasePayload> invalidPayload = payloads.stream()
-				.filter(payload -> !firstPayload.get().getBody().getDeliveryOptions().equals(payload.getBody().getDeliveryOptions()))
-				.findFirst();
-		
-		return invalidPayload.map(payload -> new PayloadValidationException(
-				String.format("Payload %s has different delivery options to other payloads. Is %s", payload, 
-						payload.getBody().getDeliveryOptions())));
-	}
+//				
+//		Optional<Message<CONTENT_TYPE>> invalidPayload = payloads.stream()
+//				.filter(payload -> !firstPayload.get().getDeliveryOptions().equals(payload.getDeliveryOptions()))
+//				.findFirst();
+//		
+//		return invalidPayload.map(payload -> new PayloadValidationException(
+//				String.format("Payload %s has different delivery options to other payloads. Is %s", payload, 
+//						payload.getDeliveryOptions())));
+//	}
 	
-	protected Optional<PayloadValidationException> checkReceivingEndpoints(List<? extends BasePayload> payloads) {
-		Optional<? extends BasePayload> firstPayload = payloads.stream().findFirst();
+	protected Optional<PayloadValidationException> checkReceivingEndpoints(List<Message<CONTENT_TYPE>> payloads) {
+		Optional<Message<CONTENT_TYPE>> firstPayload = payloads.stream().findFirst();
 		if (!firstPayload.isPresent()) {
 			return Optional.empty();
 		}
 		
-		Optional<? extends BasePayload> invalidPayload = payloads.stream()
-				.filter(payload -> !firstPayload.get().getBody().getRecievingEndpoints().equals(payload.getBody().getRecievingEndpoints()))
+		Optional<Message<CONTENT_TYPE>> invalidPayload = payloads.stream()
+				.filter(payload -> !firstPayload.get().getRecievingEndpoints().equals(payload.getRecievingEndpoints()))
 				.findFirst();
 		
 		return invalidPayload.map(payload -> new PayloadValidationException(
 				String.format("Payload %s has different recipients to other payloads. Is %s", payload,
-						payload.getBody().getRecievingEndpoints())));
+						payload.getRecievingEndpoints())));
 	}
 	
-	protected Optional<PayloadValidationException> checkContentTypes(List<? extends BasePayload> payloads, Class<?> clazz) {
-		Optional<? extends BasePayload> invalidPayload = payloads.stream().filter(payload -> !clazz.isInstance(payload.getBody().getMessage()))
+	protected Optional<PayloadValidationException> checkContentTypes(List<Message<CONTENT_TYPE>> payloads, Class<CONTENT_TYPE> clazz) {
+		Optional<Message<CONTENT_TYPE>> invalidPayload = payloads.stream()
+				.filter(payload -> !clazz.isInstance(payload.getBody()))
 				.findFirst();
 		
 		return invalidPayload.map(payload -> new PayloadValidationException(
-				String.format("Payload %s has content of invalid type. Is %s", payload, payload.getBody().getMessage().getClass().getName())));
+				String.format("Payload %s has content of invalid type. Is %s", payload, payload.getBody().getClass().getName())));
 	}
 	
-	protected Optional<PayloadValidationException> checkEndpointTypes(List<? extends BasePayload> payloads, Class<?> clazz) {
-		for (BasePayload payload : payloads) {
-			Optional<? extends RecievingEndpoint> invalidEndpoint = payload.getBody().getRecievingEndpoints().stream()
+	protected Optional<PayloadValidationException> checkEndpointTypes(List<Message<CONTENT_TYPE>> payloads, Class<? extends RecievingEndpoint> clazz) {
+		for (Message<CONTENT_TYPE> payload : payloads) {
+			Optional<? extends RecievingEndpoint> invalidEndpoint = payload.getRecievingEndpoints().stream()
 					.filter(endpoint -> !clazz.isInstance(endpoint))
 					.findFirst();
 			

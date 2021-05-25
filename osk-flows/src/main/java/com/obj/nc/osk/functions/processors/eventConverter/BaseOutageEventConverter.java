@@ -13,8 +13,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.Body;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -46,7 +47,7 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode(callSuper=false)
 @RequiredArgsConstructor
 @DocumentProcessingInfo
-public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<GenericEvent, List<NotificationIntent>> {
+public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<GenericEvent, List<NotificationIntent<?>>> {
 	
 	@NonNull
 	private NotifEventConverterConfigProperties config;
@@ -76,17 +77,17 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 	}
 
 	@Override
-	protected List<NotificationIntent> execute(GenericEvent payload) {
-		List<NotificationIntent> notificationIntents = new ArrayList<>();
+	protected List<NotificationIntent<?>> execute(GenericEvent payload) {
+		List<NotificationIntent<?>> notificationIntents = new ArrayList<>();
 		
 		IncidentTicketOutageStartEventDto siaNotification = findIncidentTicketStartEvent(payload);
 		
 		//toto moze znamenat, ze sa o niektorych vypadkoch nedozvedia ani salesaci za danych zakanikov... je to ok?
 		siaNotification.filterOutLAsNotInConfig(config);
 		
-		List<NotificationIntent> customerNotificationIntents = createCustomersNotificationIntents(siaNotification);	
-		List<NotificationIntent> salesNotificationIntents = createSalesNotificationIntents(siaNotification);
-		List<NotificationIntent> salesAgentNotificationIntents = createSalesAgentsNotificationIntents(siaNotification);
+		List<NotificationIntent<?>> customerNotificationIntents = createCustomersNotificationIntents(siaNotification);	
+		List<NotificationIntent<?>> salesNotificationIntents = createSalesNotificationIntents(siaNotification);
+		List<NotificationIntent<?>> salesAgentNotificationIntents = createSalesAgentsNotificationIntents(siaNotification);
 
 		notificationIntents.addAll(customerNotificationIntents);
 		notificationIntents.addAll(salesNotificationIntents);
@@ -169,10 +170,10 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		return salesAgentMessageContent;
 	}	
 
-	protected List<NotificationIntent> createCustomersNotificationIntents(
+	protected List<NotificationIntent<?>> createCustomersNotificationIntents(
 			IncidentTicketOutageStartEventDto notifEvent
 			) {
-		List<NotificationIntent> customerNotificationIntents = new ArrayList<>();
+		List<NotificationIntent<?>> customerNotificationIntents = new ArrayList<>();
 		
 		Map<IncidentTicketNotificationContactDto, List<IncidentTicketServiceOutageForCustomerDto>> outageForCustomers = groupByCustomerPerson(notifEvent.getMessages());
 		
@@ -184,7 +185,7 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 						notifEvent.getOutageEnd(),
 						outageForCustomers.get(customer));
 	
-				NotificationIntent notificationIntent  = createNotificationIntent(customerEmailContent, customer.asEmailEnpoints());
+				NotificationIntent<?> notificationIntent  = createNotificationIntent(customerEmailContent, customer.asEmailEnpoints());
 				customerNotificationIntents.add(notificationIntent);
 			}
 			
@@ -194,30 +195,31 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 						notifEvent.getOutageEnd(),
 						outageForCustomers.get(customer));
 	
-				NotificationIntent notificationIntent  = createNotificationIntent(customerSmsContent, customer.asSmsEnpoints());
+				NotificationIntent<?> notificationIntent  = createNotificationIntent(customerSmsContent, customer.asSmsEnpoints());
 				customerNotificationIntents.add(notificationIntent);
 			}
 		}
 		return customerNotificationIntents;
 	} 
 	
-	private NotificationIntent createNotificationIntent(
+	private NotificationIntent<?> createNotificationIntent(
 			TemplateWithModelContent<?> messageContent,
 			Set<? extends RecievingEndpoint> endpoints) {
+				
+		NotificationIntent<TemplateWithModelContent<?>> notificationIntent = new NotificationIntent<
+				>();
+		notificationIntent.setBody(messageContent);
 		
-		Body eventBody = new Body();
-		eventBody.setMessage(messageContent);
-		eventBody.getRecievingEndpoints().addAll(endpoints);
-		
-		NotificationIntent notificationIntent = new NotificationIntent();
-		notificationIntent.setBody(eventBody);
+		List<RecievingEndpoint> typedEndpoints = Lists.newArrayList(
+				   Iterables.filter(endpoints, RecievingEndpoint.class));
+		notificationIntent.setRecievingEndpoints(typedEndpoints);
 		
 		return notificationIntent;
 	}
 
 	
-	protected List<NotificationIntent> createSalesNotificationIntents(IncidentTicketOutageStartEventDto notifEvent) {
-		List<NotificationIntent> salesNotificationIntents = new ArrayList<>();
+	protected List<NotificationIntent<?>> createSalesNotificationIntents(IncidentTicketOutageStartEventDto notifEvent) {
+		List<NotificationIntent<?>> salesNotificationIntents = new ArrayList<>();
 		
 		Map<IncidentTicketNotificationContactDto, List<IncidentTicketServiceOutageForCustomerDto>> incidentsForSellers = groupBySalesPerson(notifEvent.getMessages());
 		
@@ -228,7 +230,7 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 					notifEvent.getOutageEnd(),
 					incidentsForSellers.get(salesContact));
 			
-			NotificationIntent notificationIntent  = createNotificationIntent(
+			NotificationIntent<?> notificationIntent  = createNotificationIntent(
 					salesMessageContent,
 					salesContact.asEmailEnpoints());
 			
@@ -237,8 +239,8 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		return salesNotificationIntents;
 	}
 	
-	protected List<NotificationIntent> createSalesAgentsNotificationIntents(IncidentTicketOutageStartEventDto notifEvent) {
-		List<NotificationIntent> salesNotificationIntents = new ArrayList<>();
+	protected List<NotificationIntent<?>> createSalesAgentsNotificationIntents(IncidentTicketOutageStartEventDto notifEvent) {
+		List<NotificationIntent<?>> salesNotificationIntents = new ArrayList<>();
 		
 		Set<EmailEndpoint> agentEmails = config.getCsAgentsToNotifyEmail().stream()
 				.map(email -> new EmailEndpoint(email))
@@ -250,7 +252,7 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 				notifEvent.getOutageEnd(),
 				notifEvent.getMessages());
 			
-		NotificationIntent notificationIntent  = createNotificationIntent(
+		NotificationIntent<?> notificationIntent  = createNotificationIntent(
 				salesMessageContent, 
 				agentEmails);
 		

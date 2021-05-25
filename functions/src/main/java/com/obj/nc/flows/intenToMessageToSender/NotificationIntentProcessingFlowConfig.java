@@ -5,7 +5,6 @@ import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConf
 import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,15 +13,19 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.MailChimpMessage;
+import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
 import com.obj.nc.functions.sink.intentPersister.NotificationIntentPersister;
+
+import lombok.extern.log4j.Log4j2;
 
 @Configuration
 @Log4j2
 public class NotificationIntentProcessingFlowConfig {
 		
-	@Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromIntent;
+	@Autowired private MessagesFromNotificationIntentProcessingFunction<?> generateMessagesFromIntent;
 	@Autowired private NotificationIntentPersister notificationIntentPersister;
 	
 	public final static String INTENT_PROCESSING_FLOW_ID = "INTENT_PROCESSING_FLOW_ID";
@@ -45,13 +48,12 @@ public class NotificationIntentProcessingFlowConfig {
 					flowConfig.channel(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 				)
 				.routeToRecipients(spec -> spec.
-						recipient(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID, m-> ((Message)m).isEmailMessage()).
-						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> ((Message)m).isSmsMessage()).
-						recipient(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> ((Message)m).isMailchimpMessage()).
+						recipient(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID, m-> m instanceof EmailMessage).
+						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof SimpleTextMessage).
+						recipient(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof MailChimpMessage).
 						defaultOutputToParentFlow()
 				)
 				.get();
 	}
 	
-
 }

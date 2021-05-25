@@ -1,14 +1,10 @@
 {
-   "type":"EVENT",
-   "header":{
-      "configuration-name":"static-routing-pipeline"
-   },
+   "type":"EVENT",   
    "body":{
-      "message": {
-            "subject":"First event in queue",
-            "text":"We are looking for a Business Intelligence (BI) Developer to create..."
-      },
-      "attributes" : {
+      "subject":"First event in queue",
+      "text":"We are looking for a Business Intelligence (BI) Developer to create..."
+   },
+   "attributes" : {
          "originalEvent" : {
             "type" : "JOB_POST",
             "data" : {
@@ -26,6 +22,5 @@
                "dateOfStart": "ASAP"
             }
          }
-      }
    }
 }

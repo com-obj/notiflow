@@ -1,12 +1,12 @@
 package com.obj.nc.koderia.mapper;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.components.MailchimpContentFactoryImpl;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpMergeVarMapper;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
 import com.obj.nc.koderia.config.DomainConfig;
 import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
-import com.obj.nc.mappers.MailchimpContentMapper;
 import com.obj.nc.utils.JsonUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.equalTo;
 @RestClientTest
 @ContextConfiguration(classes = {
         MailchimpSenderConfigProperties.class,
-        MailchimpContentMapper.class,
+        MailchimpContentFactoryImpl.class,
         KoderiaMergeVarMapperImpl.class,
         DomainConfig.class
 })
@@ -30,7 +30,7 @@ class MailchimpMailchimpContentMapperTest {
     public static final String EXPECTED_DTO_JSON_PATH = "mailchimp/send_message_dto.json";
 
     @Autowired
-    private MailchimpContentMapper mapper;
+    private MailchimpContentFactoryImpl impl;
 
     @Test
     void testMapWithTemplate() {
@@ -40,7 +40,7 @@ class MailchimpMailchimpContentMapperTest {
         MailchimpContent expectedContent = JsonUtils.readObjectFromClassPathResource(EXPECTED_DTO_JSON_PATH, MailchimpContent.class);
 
         // WHEN
-        MailchimpContent actualContent = mapper.map(baseKoderiaEvent);
+        MailchimpContent actualContent = impl.createFromData(baseKoderiaEvent);
 
         // THEN
         assertThat(actualContent, equalTo(expectedContent));

@@ -2,8 +2,8 @@ package com.obj.nc.koderia.integration;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.LOG_CONSUMER_HANDLER_ID;
-import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
-import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
+import static com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
+import static com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -49,10 +49,11 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
-import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemplateResponse;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpSendTemplateResponse;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
 import com.obj.nc.koderia.domain.recipients.RecipientDto;
@@ -112,12 +113,12 @@ public class MailchimpProcessingFlowTest extends BaseIntegrationTest {
 		MatcherAssert.assertThat(received, Matchers.hasSize(3));
 		// and
 		for (Message<?> receivedMessage : received) {
-			com.obj.nc.domain.message.Message payload = (com.obj.nc.domain.message.Message) receivedMessage.getPayload();
+			com.obj.nc.domain.message.Message<MailchimpContent> payload = (com.obj.nc.domain.message.Message<MailchimpContent>) receivedMessage.getPayload();
 			checkReceivedPayload(payload);
 		}
 	}
 	
-	private void checkReceivedPayload(com.obj.nc.domain.message.Message payload) {
+	private void checkReceivedPayload(com.obj.nc.domain.message.Message<?> payload) {
 		String RESPONSE_JSON_PATH = "mailchimp/response_body.json";
 		MailchimpSendTemplateResponse[] responseDtos = JsonUtils.readObjectFromClassPathResource(RESPONSE_JSON_PATH, MailchimpSendTemplateResponse[].class);
 		

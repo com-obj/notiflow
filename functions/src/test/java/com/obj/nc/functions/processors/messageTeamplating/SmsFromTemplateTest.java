@@ -14,7 +14,8 @@ import org.springframework.test.context.ActiveProfiles;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmsWithTemplatedContent;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.messageTemplating.SmsTemplateFormatter;
 import com.obj.nc.utils.JsonUtils;
@@ -30,15 +31,15 @@ class SmsFromTemplateTest extends BaseIntegrationTest {
 	void createSimpleHtmlEmailFromTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/txt_template_message.json";
-		Message msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+		SmsWithTemplatedContent msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, SmsWithTemplatedContent.class);
 		
 		//WHEN
-		List<Message> htmlMessages = template2Sms.apply(msg);
+		List<SimpleTextMessage> htmlMessages = template2Sms.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
 		
-		SimpleTextContent content = htmlMessages.iterator().next().getContentTyped();
+		SimpleTextContent content = htmlMessages.iterator().next().getBody();
 		
 		System.out.println(content.getText());
 		assertThat(content.getText()).contains("part1", "part2", "John Doe");
@@ -48,15 +49,15 @@ class SmsFromTemplateTest extends BaseIntegrationTest {
 	void createHtmlEmailFromPojoModelAndTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/txt_template_message_pojo_model.json";
-		Message msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+		SmsWithTemplatedContent msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, SmsWithTemplatedContent.class);
 		
 		//WHEN
-		List<Message> htmlMessages = template2Sms.apply(msg);
+		List<SimpleTextMessage> htmlMessages = template2Sms.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
 		
-		SimpleTextContent content = htmlMessages.iterator().next().getContentTyped();
+		SimpleTextContent content = htmlMessages.iterator().next().getBody();
 		
 		System.out.println(content.getText());
 		assertThat(content.getText()).contains("val11, val12", "val21, val22", "John Doe");
@@ -67,10 +68,10 @@ class SmsFromTemplateTest extends BaseIntegrationTest {
 	void createI18NHtmlEmailFromTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/txt_template_message_en_de.json";
-		Message msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+		SmsWithTemplatedContent msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, SmsWithTemplatedContent.class);
 		
 		//WHEN
-		List<Message> htmlMessages = template2Sms.apply(msg);
+		List<SimpleTextMessage> htmlMessages = template2Sms.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(2);
@@ -79,7 +80,7 @@ class SmsFromTemplateTest extends BaseIntegrationTest {
 				.stream()
 				.filter(m-> Locale.GERMAN.equals(m.getAttributes().get(EmailTemplateFormatter.LOCALE_ATTR_NAME)))
 				.findFirst()
-				.get().getContentTyped();
+				.get().getBody();
 		
 		System.out.println(deContent.getText());
 		assertThat(deContent.getText()).contains("Grues gott");
@@ -89,7 +90,7 @@ class SmsFromTemplateTest extends BaseIntegrationTest {
 				.stream()
 				.filter(m-> Locale.US.equals(m.getAttributes().get(EmailTemplateFormatter.LOCALE_ATTR_NAME)))
 				.findFirst()
-				.get().getContentTyped();
+				.get().getBody();
 		
 		System.out.println(enContent.getText());
 		assertThat(enContent.getText()).contains("Hallo World");
