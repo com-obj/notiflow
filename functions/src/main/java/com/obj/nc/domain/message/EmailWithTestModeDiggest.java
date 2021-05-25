@@ -1,6 +1,5 @@
 package com.obj.nc.domain.message;
 
-import java.beans.Transient;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,19 +9,16 @@ import com.obj.nc.flows.testmode.email.functions.processors.TestModeDiggestMailC
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
+@NoArgsConstructor
 public class EmailWithTestModeDiggest extends Message<TestModeDiggestMailContent/*, EmailEndpoint*/> {
 
 	public static final String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CUSTOM_CONTENT";
-	
-	//JSON serialiser
-	public EmailWithTestModeDiggest() {
-		
-	}
 	
 	public EmailWithTestModeDiggest(TestModeDiggestMailContent content) {
 		setBody(content);
@@ -40,7 +36,6 @@ public class EmailWithTestModeDiggest extends Message<TestModeDiggestMailContent
 	}
 	
 	//TODO: refactor as class parameter
-	@Transient
 	@JsonIgnore
 	public Class<? extends RecievingEndpoint> getRecievingEndpointType() {
 		return null;

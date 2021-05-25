@@ -13,15 +13,15 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @AllArgsConstructor
 @Log4j2
-public class MessagePersister extends SinkConsumerAdapter<Message> {
+public class MessagePersister extends SinkConsumerAdapter<Message<?>> {
 
     @Autowired
     private MessageRepository messageRepo;
 
 
 	@Override
-	protected void execute(Message message) {
-		messageRepo.save(message);
+	protected void execute(Message<?> message) {
+		messageRepo.save(message.toPersistantState());
 	}
 
 

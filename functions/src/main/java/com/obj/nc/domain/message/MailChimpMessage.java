@@ -1,6 +1,5 @@
 package com.obj.nc.domain.message;
 
-import java.beans.Transient;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,7 +34,6 @@ public class MailChimpMessage extends Message<MailchimpContent/*, MailchimpEndpo
 	}
 	
 	//TODO: refactor as class parameter
-	@Transient
 	@JsonIgnore
 	public Class<? extends RecievingEndpoint> getRecievingEndpointType() {
 		return MailchimpEndpoint.class;
