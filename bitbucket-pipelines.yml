@@ -57,6 +57,11 @@ pipelines:
       - <<: *run-tests
       - <<: *build-jar
       - <<: *deploy-2-BB
+    hotfix/*:
+      - <<: *run-tests
+      - <<: *build-jar
+      - <<: *deploy-2-BB      
+   
   tags:
     v*:
       - <<: *build-jar
