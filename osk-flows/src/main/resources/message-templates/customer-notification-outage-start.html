@@ -5,9 +5,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
     <body>
+		<p th:if="${!#strings.isEmpty(#messages.msg('cust.start.languageInfo'))}">
+			<span th:text="#{cust.start.languageInfo}">English version follows Slovak</span>
+		</p>
     	<p>
-    		<span th:text="#{cust.start.salution}">Vážený zákazník,</span>
-    		<span style="font-weight:bold" th:with="__df=#{dateTime.foramt}"  th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
+			<span th:text="#{cust.start.salution}">Vážený zákazník,</span>
+    		<span style="font-weight:bold" th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeStart, __df)}">11:00</span>
     		<span th:text="#{cust.start.outage}">sme zaznamenali výpadok</span>
     	</p>
     	<p th:text="#{cust.start.services.title}">
@@ -32,12 +35,8 @@
 	    </tbody>
     </table>
 		<p>
-			<span th:text="#{cust.end.footerLine1.part1}"></span>
-			<span style="font-weight:bold" th:text="#{cust.end.footerLine1.part2}"></span>
-		</p>
-		<p>
-			<span th:text="#{cust.start.footerLine2.part1}">Na detailnej identifikácii a odstránení problému intenzívne pracujeme. </span>
-			<span style="font-weight:bold" th:text="#{cust.start.footerLine2.part2}">Po jeho vyriešení Vás budeme informovať.</span>
+			<span th:text="#{cust.start.footerLine1}">Na odstránení problému intenzívne pracujeme. </span>
+			<span style="font-weight:bold" th:text="#{cust.start.footerLine2}">Po jeho vyriešení Vás budeme informovať.</span>
 		</p>
     	<p style="font-weight:bold" th:text="#{cust.start.signature1}"></p>
     	<p style="font-weight:bold" th:text="#{cust.start.signature2}"></p>

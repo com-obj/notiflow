@@ -1,11 +1,13 @@
-[(#{cust.start.sms.salution})]
-[# th:with="__df=#{dateTime.foramt}" th:text="${#dates.format(model.timeStart, __df)}" /] [(#{cust.start.sms.hour})] [(#{cust.start.sms.outage})]
+[(#{cust.start.salution})] [# th:with="__df=#{dateTime.format}" th:text="${#dates.format(model.timeStart, __df)}" /] [(#{cust.start.outage})]
 
+[(#{cust.start.services.title})]
 [# th:each="service : ${model.services}" ]
-    [(${service.productName})](SN:[(${service.sn})])
+    • [(${service.b2bLogin})], [(${service.sn})], [(${service.productName})], [(${service.installationAddress})]
 [/]
 
-[(#{cust.start.sms.footerLine1})]
-[(#{cust.start.sms.footerLine2})]
-[(#{cust.start.sms.signature})]
+[(#{cust.start.footerLine1})] [(#{cust.start.footerLine2})]
+
+[(#{cust.start.signature1})]
+
+[(#{cust.start.signature2})]
 

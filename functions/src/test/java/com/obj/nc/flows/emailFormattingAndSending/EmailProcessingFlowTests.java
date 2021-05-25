@@ -71,7 +71,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         assertThat(contentAsDocument.body().children().get(3).text(), equalTo("Grues gott"));
         assertThat(contentAsDocument.body().children().get(4).text(), equalTo("John Doe"));
         
-        assertMessagesContains(receivedMessages, MailMessageForAssertions.as("john.doe@objectify.sk", "Subject/Subject"));
+        assertMessagesContains(receivedMessages, MailMessageForAssertions.as("john.doe@objectify.sk", "Subject / Subject"));
     }
     
     @Test
