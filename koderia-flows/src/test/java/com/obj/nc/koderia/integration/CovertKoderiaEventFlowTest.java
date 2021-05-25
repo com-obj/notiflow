@@ -132,7 +132,7 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 				);
 	}		
 		
-		@TestConfiguration
+	@TestConfiguration
 	public static class MockNextFlowTestConfiguration {
 		public static final String RECEIVED_TEST_LIST = "RECEIVED_TEST_LIST";
 		
