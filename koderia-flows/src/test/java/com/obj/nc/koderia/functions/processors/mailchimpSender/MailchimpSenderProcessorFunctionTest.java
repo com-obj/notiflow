@@ -67,7 +67,7 @@ class MailchimpSenderProcessorFunctionTest {
         // GIVEN
         MailChimpMessage inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", MailChimpMessage.class);
         // WHEN
-        Message<MailchimpContent> outputMessage = sendMailchimpMessage.apply(inputMessage);
+        MailChimpMessage outputMessage = sendMailchimpMessage.apply(inputMessage);
         // THEN
         MatcherAssert.assertThat(outputMessage, Matchers.notNullValue());
         MailchimpSendTemplateResponse outputMailchimpSendTemplateResponse = JsonUtils.readClassFromObject(outputMessage.getBody().getAttributeValueAs(MAILCHIMP_RESPONSE_FIELD, List.class).get(0), MailchimpSendTemplateResponse.class);
