@@ -41,10 +41,6 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 			return Optional.of(new PayloadValidationException("Message must not be null"));
 		}
 		
-		if (!(payload.getBody() instanceof MailchimpContent)) {
-			return Optional.of(new PayloadValidationException(String.format("Mailchimp sender can only send %s content", MailchimpContent.class.getSimpleName())));
-		}
-		
 		MailchimpContent content = payload.getBody();
 		if (content == null) {
 			return Optional.of(new PayloadValidationException("Message content must not be null"));

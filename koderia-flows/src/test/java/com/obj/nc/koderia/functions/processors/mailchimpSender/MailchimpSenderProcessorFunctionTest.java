@@ -31,7 +31,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -103,7 +103,7 @@ class MailchimpSenderProcessorFunctionTest {
         // GIVEN
     	MailChimpMessage inputMessage = JsonUtils.readObjectFromClassPathResource("mailchimp/message.json", MailChimpMessage.class);
         inputMessage.setRecievingEndpoints(Arrays.asList(
-                new RecievingEndpoint() {
+                new MailchimpEndpoint() {
                     @Override
                     public String getEndpointId() {
                         return "TEST";
