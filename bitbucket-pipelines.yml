@@ -59,5 +59,6 @@ pipelines:
       - <<: *deploy-2-BB
   tags:
     v*:
+      - <<: *run-tests
       - <<: *build-jar
       - <<: *deploy-2-BB
