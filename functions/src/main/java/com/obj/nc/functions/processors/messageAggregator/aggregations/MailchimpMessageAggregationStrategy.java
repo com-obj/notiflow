@@ -8,15 +8,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData;
-import com.obj.nc.domain.content.mailchimp.MailchimpAttachment;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpMergeVariable;
-import com.obj.nc.domain.content.mailchimp.MailchimpTemplateContent;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpAttachmentDto;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpMergeVariableDto;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpTemplateContentDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -66,16 +66,16 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 		MailchimpContent aggregatedContent = new MailchimpContent();
 		aggregatedContent.setTemplateName(mailchimpSenderConfigProperties.getAggregatedMessageTemplateName());
 		
-		List<MailchimpTemplateContent> templateContent = new ArrayList<>(one.getTemplateContent());
+		List<MailchimpTemplateContentDto> templateContent = new ArrayList<>(one.getTemplateContent());
 		templateContent.addAll(other.getTemplateContent());
 		aggregatedContent.setTemplateContent(templateContent);
 		
 		aggregatedContent.setRecipients(one.getRecipients());
 		aggregatedContent.setSubject(mailchimpSenderConfigProperties.getAggregatedMessageSubject());
 		
-		ArrayList<MailchimpAttachment> attachments = new ArrayList<>(one.getAttachments());
-		attachments.addAll(other.getAttachments());
-		aggregatedContent.setAttachments(attachments);
+		ArrayList<MailchimpAttachmentDto> dtos = new ArrayList<>(one.getAttachments());
+		dtos.addAll(other.getAttachments());
+		aggregatedContent.setAttachments(dtos);
 		
 		aggregatedContent.setSenderName(one.getSenderName());
 		aggregatedContent.setSenderEmail(one.getSenderEmail());
@@ -91,8 +91,8 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 		return aggregatedContent;
 	}
 	
-	protected MailchimpMergeVariable mapMergeVar(Map.Entry<String, List<Object>> entry) {
-		MailchimpMergeVariable mergeVar = new MailchimpMergeVariable();
+	protected MailchimpMergeVariableDto mapMergeVar(Map.Entry<String, List<Object>> entry) {
+		MailchimpMergeVariableDto mergeVar = new MailchimpMergeVariableDto();
 		mergeVar.setName(entry.getKey());
 		
 		AggregatedMailchimpData data = new AggregatedMailchimpData();

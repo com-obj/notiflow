@@ -20,7 +20,7 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.eventFactory.MailchimpEventConverter;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
 import com.obj.nc.koderia.config.DomainConfig;
 import com.obj.nc.koderia.domain.event.BlogKoderiaEventDto;
 import com.obj.nc.koderia.domain.event.EventKoderiaEventDto;

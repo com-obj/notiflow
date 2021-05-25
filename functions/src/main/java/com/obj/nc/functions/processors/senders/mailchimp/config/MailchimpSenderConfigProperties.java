@@ -1,19 +1,14 @@
-package com.obj.nc.functions.processors.senders.mailchimp;
-
-import com.obj.nc.functions.processors.senders.MailchimpSender;
-import lombok.Data;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.client.RestTemplate;
+package com.obj.nc.functions.processors.senders.mailchimp.config;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.annotation.Validated;
+
+import lombok.Data;
 
 @Validated
 @Data

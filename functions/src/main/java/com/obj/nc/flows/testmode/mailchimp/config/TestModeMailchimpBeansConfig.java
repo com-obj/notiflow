@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Primary;
 import com.obj.nc.flows.testmode.mailchimp.functions.InMemoryMailchimpSourceSupplier;
 import com.obj.nc.flows.testmode.mailchimp.functions.TestModeMailchimpSender;
 import com.obj.nc.functions.processors.senders.MailchimpSender;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")

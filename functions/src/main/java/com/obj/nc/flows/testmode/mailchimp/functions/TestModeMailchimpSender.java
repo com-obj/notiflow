@@ -7,9 +7,9 @@ import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.senders.MailchimpSender;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
-import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemplateRequest;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpSendTemplateRequest;
 
 import lombok.RequiredArgsConstructor;
 

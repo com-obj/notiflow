@@ -1,7 +1,7 @@
 package com.obj.nc.koderia.functions.processors.mailchimpSender;
 
-import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
-import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
+import static com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
+import static com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.client.ExpectedCount.times;
@@ -35,10 +35,10 @@ import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
-import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemplateResponse;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpSendTemplateResponse;
 import com.obj.nc.koderia.config.DomainConfig;
 import com.obj.nc.koderia.mapper.KoderiaMergeVarMapperImpl;
 import com.obj.nc.utils.JsonUtils;

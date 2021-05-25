@@ -21,11 +21,11 @@ import org.springframework.test.context.ContextConfiguration;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpMergeVariable;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.MailchimpMessageAggregationStrategy;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpMergeVariableDto;
 import com.obj.nc.koderia.config.DomainConfig;
 import com.obj.nc.koderia.domain.eventData.BaseKoderiaData;
 import com.obj.nc.koderia.mapper.KoderiaMergeVarMapperImpl;
@@ -62,7 +62,7 @@ public class MailchimpAggregationStrategyTest {
         assertThat(content.getOriginalEvent(), nullValue());
         assertThat(content.getSubject(), equalTo(properties.getAggregatedMessageSubject()));
         
-        for (MailchimpMergeVariable globalMergeVariable : content.getGlobalMergeVariables()) {
+        for (MailchimpMergeVariableDto globalMergeVariable : content.getGlobalMergeVariables()) {
             if (message1Content.getOriginalEvent().getType().equals(globalMergeVariable.getName())) {
                 AggregatedMailchimpData aggregatedContent = (AggregatedMailchimpData) globalMergeVariable.getContent();
                 assertThat(aggregatedContent.getData(), hasSize(2));

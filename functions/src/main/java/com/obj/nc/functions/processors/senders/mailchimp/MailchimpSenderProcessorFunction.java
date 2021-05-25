@@ -1,8 +1,8 @@
 package com.obj.nc.functions.processors.senders.mailchimp;
 
-import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
-import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.MAILCHIMP_REST_TEMPLATE;
-import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
+import static com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
+import static com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig.MAILCHIMP_REST_TEMPLATE;
+import static com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,15 +18,16 @@ import org.springframework.web.client.RestTemplate;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpRecipient;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.senders.MailchimpSender;
-import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemplateRequest;
-import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpSendTemplateResponse;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpRecipientDto;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpSendTemplateRequest;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpSendTemplateResponse;
 
 @DocumentProcessingInfo("SendMailchimpMessage")
 public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<MailChimpMessage, MailChimpMessage> implements MailchimpSender {
@@ -83,14 +84,14 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 		return restTemplate;
 	}
 	
-	public List<MailchimpRecipient> mapRecipient(RecievingEndpoint endpoint) {
-		List<MailchimpRecipient> recipientInList = new ArrayList<>();
+	public List<MailchimpRecipientDto> mapRecipient(RecievingEndpoint endpoint) {
+		List<MailchimpRecipientDto> recipientInList = new ArrayList<>();
 
 		if (!MailchimpEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType())) {
 			throw new UnsupportedOperationException("Mapper can only map MailChimpEndpoint endpoint");
 		}
 
-		MailchimpRecipient recipient = new MailchimpRecipient();
+		MailchimpRecipientDto recipient = new MailchimpRecipientDto();
 
 		MailchimpEndpoint mailChimpEndpoint = (MailchimpEndpoint) endpoint;
 		recipient.setName(mailChimpEndpoint.getRecipient().getName());

@@ -14,11 +14,11 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.components.api.MailchimpContentFactory;
 import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.content.mailchimp.MailchimpAttachment;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpMergeVarMapper;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpAttachmentDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,8 +39,8 @@ public class MailchimpContentFactoryImpl implements MailchimpContentFactory {
         content.setGlobalMergeVariables(mailchimpMergeVarMapper.map(event));
         content.setMergeLanguage(mailchimpSenderConfigProperties.getMergeLanguage());
         
-        List<MailchimpAttachment> mailchimpAttachments = mapAttachments(event);
-        content.setAttachments(mailchimpAttachments);
+        List<MailchimpAttachmentDto> mailchimpAttachmentDtos = mapDtos(event);
+        content.setAttachments(mailchimpAttachmentDtos);
         return content;
     }
 
@@ -48,20 +48,20 @@ public class MailchimpContentFactoryImpl implements MailchimpContentFactory {
         return event.getSubject();
     }
 
-    protected List<MailchimpAttachment> mapAttachments(MailchimpData event) {
+    protected List<MailchimpAttachmentDto> mapDtos(MailchimpData event) {
         return event.getAttachments().stream()
-                .map(this::mapAttachment)
+                .map(this::mapDto)
                 .collect(Collectors.toList());
     }
 
-    protected MailchimpAttachment mapAttachment(Attachement attachement) {
-        MailchimpAttachment attachment = new MailchimpAttachment();
-        attachment.setName(attachement.getName());
+    protected MailchimpAttachmentDto mapDto(Attachement attachement) {
+        MailchimpAttachmentDto dto = new MailchimpAttachmentDto();
+        dto.setName(attachement.getName());
 
         FileSystemResource file = new FileSystemResource(new File(attachement.getFileURI()));
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
         String mimeType = fileNameMap.getContentTypeFor(file.getFilename());
-        attachment.setType(mimeType);
+        dto.setType(mimeType);
 
         byte[] attachmentBytes = new byte[0];
         try {
@@ -71,9 +71,9 @@ public class MailchimpContentFactoryImpl implements MailchimpContentFactory {
         }
 
         String base64StringAttachment = Base64.getEncoder().encodeToString(attachmentBytes);
-        attachment.setContent(base64StringAttachment);
+        dto.setContent(base64StringAttachment);
 
-        return attachment;
+        return dto;
     }
 
 }

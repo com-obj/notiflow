@@ -4,7 +4,7 @@ import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.components.MailchimpContentFactoryImpl;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpMergeVarMapper;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
 import com.obj.nc.koderia.config.DomainConfig;
 import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
 import com.obj.nc.utils.JsonUtils;

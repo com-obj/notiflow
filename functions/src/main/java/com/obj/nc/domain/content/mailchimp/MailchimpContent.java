@@ -5,6 +5,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.domain.content.Content;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpAttachmentDto;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpMergeVariableDto;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpRecipientDto;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpTemplateContentDto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,11 +27,11 @@ public class MailchimpContent extends Content {
     private String subject;
     private String senderEmail;
     private String senderName;
-    private List<MailchimpRecipient> recipients = new ArrayList<>();
-    private List<MailchimpAttachment> attachments = new ArrayList<>();
+    private List<MailchimpRecipientDto> recipients = new ArrayList<>();
+    private List<MailchimpAttachmentDto> attachments = new ArrayList<>();
     private String templateName;
-    private List<MailchimpTemplateContent> templateContent = new ArrayList<>();
-    private List<MailchimpMergeVariable> globalMergeVariables = new ArrayList<>();
+    private List<MailchimpTemplateContentDto> templateContent = new ArrayList<>();
+    private List<MailchimpMergeVariableDto> globalMergeVariables = new ArrayList<>();
     private String mergeLanguage;
     
 }

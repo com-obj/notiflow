@@ -103,7 +103,7 @@ public class ProcessingInfoGeneratorTest {
     @Test
     void testPersistPIForNewIntent() {
         // given
-        NotificationIntent<SimpleTextContent> notificationIntent = NotificationIntent.createWithSimpleMessage("test-config", "Hi there!!");
+        NotificationIntent<SimpleTextContent> notificationIntent = createWithSimpleMessage("test-config", "Hi there!!");
         String notificationIntentJson = notificationIntent.toJSONString();
         HasHeader payloadWithEventId = generateEventId.apply(notificationIntent);
 
@@ -136,6 +136,18 @@ public class ProcessingInfoGeneratorTest {
         Assertions.assertThat(persistedPI.getPrevProcessingId()).isNull();
         Assertions.assertThat(persistedPI.getStepIndex()).isEqualTo(0);
     }
+    
+
+	public static NotificationIntent<SimpleTextContent> createWithSimpleMessage(String flowId, String message) {
+		NotificationIntent<SimpleTextContent> notificationIntent = new NotificationIntent<SimpleTextContent>();
+		notificationIntent.getHeader().setFlowId(flowId);
+		notificationIntent.setBody(
+				SimpleTextContent.builder()
+				.text(message)
+				.build());
+		
+		return notificationIntent;
+	}
     
     @Data
     @Builder
