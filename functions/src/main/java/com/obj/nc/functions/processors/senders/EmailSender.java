@@ -23,7 +23,7 @@ import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.headers.Header;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.exceptions.ProcessingException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -38,7 +38,7 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 @Log4j2
 @DocumentProcessingInfo("SendEmail")
-public class EmailSender extends ProcessorFunctionAdapter<Message<EmailContent>, Message<EmailContent>> {
+public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMessage> {
 	
 	private final JavaMailSenderImpl mailSender;
 	
@@ -49,7 +49,7 @@ public class EmailSender extends ProcessorFunctionAdapter<Message<EmailContent>,
 	private final EmailSenderConfigProperties settings;
 	
 	@Override
-	public Optional<PayloadValidationException> checkPreCondition(Message<EmailContent> message) {
+	public Optional<PayloadValidationException> checkPreCondition(EmailMessage message) {
 		if (!(message.getBody() instanceof EmailContent)) {
 			return Optional.of(new PayloadValidationException("EmailContent sender can process only Message with EmailContent content. Was type " + message.getBody().getClass().getSimpleName()));
 		}
@@ -71,7 +71,7 @@ public class EmailSender extends ProcessorFunctionAdapter<Message<EmailContent>,
 
 
 	@Override
-	public Message<EmailContent> execute(Message<EmailContent> payload) {		
+	public EmailMessage execute(EmailMessage payload) {		
 		EmailEndpoint toEmail = (EmailEndpoint) payload.getRecievingEndpoints().get(0);
 		doSendMessage(toEmail, payload.getBody(), payload.getHeader());
 		return payload;

@@ -31,7 +31,7 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
 import com.obj.nc.flows.testmode.email.functions.sources.GreenMailReceiverSourceSupplier;
@@ -75,9 +75,9 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
     	Assertions.assertThat(greenMail).isNotEqualTo(testModeGreenMail);
     	Assertions.assertThat(greenMail.getSmtp().getPort()).isNotEqualTo(testModeGreenMail.getSmtp().getPort());
         // GIVEN
-        Message<EmailContent> origianlMsgForAggreagtion1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", Message.class);
-        Message<EmailContent> origianlMsgForAggreagtion2 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message2.json", Message.class);
-        Message<EmailContent> origianlMsgForAggreagtion3 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message3.json", Message.class);
+    	EmailMessage origianlMsgForAggreagtion1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", EmailMessage.class);
+    	EmailMessage origianlMsgForAggreagtion2 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message2.json", EmailMessage.class);
+    	EmailMessage origianlMsgForAggreagtion3 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message3.json", EmailMessage.class);
 
         //WHEN
         emailSenderSinkProcessingFunction.apply(origianlMsgForAggreagtion1);
@@ -91,7 +91,7 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
         Assertions.assertThat( mimeMessages.length ).isEqualTo(3);
 
         // WHEN
-        List<Message<EmailContent>> msgsCauthByTestModeGM = greenMailReceiverSourceSupplier.get();
+        List<EmailMessage> msgsCauthByTestModeGM = greenMailReceiverSourceSupplier.get();
         msgsCauthByTestModeGM.forEach(m-> assertThat(m.getHeader().getEventIds()).contains(UUID.fromString("23e201b5-d7fa-4231-a520-51190b5c50da")));
 
         EmailContent emailContentFromTMGM1 = msgsCauthByTestModeGM.get(0).getBody();
@@ -104,17 +104,14 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
         EmailContent emailContentFromTMGM3 = msgsCauthByTestModeGM.get(2).getBody();
         checkRecievedMatchOriginal(origianlMsgForAggreagtion3, emailContentFromTMGM3);
 
-        Message<EmailContent> emailBodyFromTMGM2 = msgsCauthByTestModeGM.get(2);
+        EmailMessage emailBodyFromTMGM2 = msgsCauthByTestModeGM.get(2);
         
         assertThat(emailBodyFromTMGM2.getRecievingEndpoints()).hasSize(1);
         String recipient = properties.getRecipients().iterator().next();
         assertThat(((EmailEndpoint) emailBodyFromTMGM2.getRecievingEndpoints().get(0)).getEmail()).isEqualTo(recipient);
-
-//        assertThat(emailBodyFromTMGM2.getDeliveryOptions()).isNotNull();
-//        assertThat((emailBodyFromTMGM2.getDeliveryOptions().getAggregationType())).isEqualTo(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
     }
 
-	private void checkRecievedMatchOriginal(Message<EmailContent> origianlMsgForAggreagtion, EmailContent emailContentFromTMGM) {
+	private void checkRecievedMatchOriginal(EmailMessage origianlMsgForAggreagtion, EmailContent emailContentFromTMGM) {
 		EmailContent originalContent1 = origianlMsgForAggreagtion.getBody();
         String originalReviever1 = ((EmailEndpoint) origianlMsgForAggreagtion.getRecievingEndpoints().get(0)).getEmail();
         assertThat(emailContentFromTMGM.getSubject())

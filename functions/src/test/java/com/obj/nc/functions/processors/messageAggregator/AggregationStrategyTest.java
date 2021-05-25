@@ -18,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageAggregator.AggregationStrategyTest.MessageAggregatorTestConfig;
@@ -34,16 +35,16 @@ class AggregationStrategyTest {
     void testAggregateValidMessagesPass() {
         // given
         List<Message<EmailContent>> inputMessages = Arrays.asList(
-                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1.json", Message.class),
-                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message2.json", Message.class),
-                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message3.json", Message.class)
+                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1.json", EmailMessage.class),
+                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message2.json", EmailMessage.class),
+                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message3.json", EmailMessage.class)
         );
 
         // when
-        Message<EmailContent> outputMessage = (Message<EmailContent>) aggregateEmailMessages.apply(inputMessages);
+        EmailMessage outputMessage = (EmailMessage) aggregateEmailMessages.apply(inputMessages);
 
         // then
-        Message<EmailContent> expected = JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_output_message.json", Message.class);
+        EmailMessage expected = JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_output_message.json", EmailMessage.class);
         Assertions.assertThat(outputMessage.getBody()).isEqualTo(expected.getBody());
     }
 
@@ -62,8 +63,8 @@ class AggregationStrategyTest {
     void testAggregateMessageAggregationTypeNoneFail() {
         // given
         List<Message<EmailContent>> inputMessages = Arrays.asList(
-                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1_none.json", Message.class),
-                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1.json", Message.class)
+                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1_none.json", EmailMessage.class),
+                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1.json", EmailMessage.class)
         );
 
         // when - then
@@ -92,8 +93,8 @@ class AggregationStrategyTest {
     void testAggregateMessagesWithDifferentReceivingEndpointsFail() {
         // given
         List<Message<EmailContent>> inputMessages = Arrays.asList(
-                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1.json", Message.class),
-                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1_receiving_endpoints.json", Message.class)
+                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1.json", EmailMessage.class),
+                JsonUtils.readObjectFromClassPathResource("messages/aggregate/aggregate_input_message1_receiving_endpoints.json", EmailMessage.class)
         );
 
         // when - then

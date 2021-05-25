@@ -24,7 +24,7 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoSendGenerator;
 import com.obj.nc.functions.processors.senders.EmailSender;
@@ -58,7 +58,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     void sendSingleMail() throws MessagingException, IOException {
         //GIVEN
         String INPUT_JSON_FILE = "messages/email_message.json";
-        Message<EmailContent> message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+        EmailMessage message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
         UUID originalProcessingId = message.getProcessingInfo().getProcessingId();
 
         //WHEN
@@ -84,7 +84,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     void sendMailToManyRecipients() {
         //GIVEN
         String INPUT_JSON_FILE = "messages/e_email_message_2_many.json";
-        Message<EmailContent> message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+        EmailMessage message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 
         //WHEN -THEN
         Assertions.assertThatThrownBy(() -> {
@@ -98,7 +98,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     void sendEmailToNonEmailEnpoint() {
         //GIVEN
         String INPUT_JSON_FILE = "messages/e_email_message_2_push_endpoint.json";
-        Message<EmailContent> message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+        EmailMessage message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 
         //WHEN -THEN
         Assertions.assertThatThrownBy(() -> {
@@ -112,7 +112,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     void sendMailWithAttachments() {
         //GIVEN
         String INPUT_JSON_FILE = "messages/email_message_attachments.json";
-        Message<EmailContent> inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+        EmailMessage inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 
         EmailContent emailContent = inputMessage.getBody();
         emailContent.getAttachments().forEach(attachement -> {
@@ -146,7 +146,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     void sendAggregateMessage() {
         //GIVEN
         String INPUT_JSON_FILE = "messages/aggregate/aggregate_output_message.json";
-        Message<EmailContent> inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
+        EmailMessage inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 
         //WHEN
         inputMessage = functionSend.apply(inputMessage);

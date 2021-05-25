@@ -7,7 +7,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.http.MediaType;
 
-import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -28,11 +27,6 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 		if (exception.isPresent()) {
 			return exception;
 		}
-		
-//		exception = checkDeliveryOptions(payloads);
-//		if (exception.isPresent()) {
-//			return exception;
-//		}
 		
 		return checkReceivingEndpoints(payloads);
 	}
@@ -55,14 +49,7 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 					String.format("Payload %s has content of invalid type. Is %s", payload, payload.getBody().getContentType())));
 		}
 		
-		//TODO: toto uz asi neni potrebne
-		Optional<? extends BasePayload<?>> invalidPayload = payloads.stream()
-				.filter(payload -> !firstPayload.get().getBody().getContentType()
-						.equals(payload.getBody().getContentType()))
-				.findFirst();
-		
-		return invalidPayload.map(payload -> new PayloadValidationException(
-				String.format("Payload %s has content of invalid type. Is %s", payload, payload.getBody().getClass())));
+		return Optional.empty();
 	}
 	
 	@Override

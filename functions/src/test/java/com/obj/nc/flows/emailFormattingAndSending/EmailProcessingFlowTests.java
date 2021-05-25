@@ -29,8 +29,8 @@ import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithJsonModelEmailContent;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.utils.JsonUtils;
 
@@ -95,7 +95,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     void testSendNonTemplatedEmailMessage() {
         // given
         properties.setMultiLocalesMergeStrategy(MERGE);
-        Message<EmailContent> inputMessage = JsonUtils.readObjectFromClassPathResource("messages/simple_email_message.json", Message.class);
+        EmailMessage inputMessage = JsonUtils.readObjectFromClassPathResource("messages/simple_email_message.json", EmailMessage.class);
         emailProcessingInputChangel.send(new GenericMessage<>(inputMessage));
         // when
         boolean success = greenMail.waitForIncomingEmail(5000L, 1);

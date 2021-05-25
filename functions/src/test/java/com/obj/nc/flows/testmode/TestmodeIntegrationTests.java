@@ -50,9 +50,9 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithJsonModelEmailContent;
-import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.content.sms.TemplateWithJsonModelSmsContent;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig;
@@ -117,9 +117,9 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     	
     	
         // GIVEN
-        Message<EmailContent> message1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", Message.class);
-        Message<EmailContent> message2 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message2.json", Message.class);
-        Message<EmailContent> message3 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message3.json", Message.class);
+    	EmailMessage message1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", EmailMessage.class);
+    	EmailMessage message2 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message2.json", EmailMessage.class);
+    	EmailMessage message3 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message3.json", EmailMessage.class);
         
         //WHEN
         emailSender.apply(message1);
@@ -132,7 +132,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         MimeMessage[] inputMimeMessages = testModeEmailsReciver.getReceivedMessages();
         Assertions.assertThat(inputMimeMessages.length).isEqualTo(3);
 
-        List<Message<EmailContent>> messages = greenMailReceiverSourceSupplier.get();
+        List<EmailMessage> messages = greenMailReceiverSourceSupplier.get();
 //        List<Message> messages = messagesWrapped.getMessages();
 
         // WHEN Simulate further aggregation processing
@@ -181,7 +181,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         //AND GIVEN RECEIVED EMAILs
         emailProcessingInputChannel.send(new GenericMessage<>(inputEmail));
         testModeEmailsReciver.waitForIncomingEmail(1);
-        List<Message<EmailContent>> receivedEmailMessages = greenMailReceiverSourceSupplier.get();
+        List<EmailMessage> receivedEmailMessages = greenMailReceiverSourceSupplier.get();
         Assertions.assertThat(receivedEmailMessages).hasSize(1);
         MessageSource<?> emailMessageSource = () -> new GenericMessage<>(receivedEmailMessages);
     

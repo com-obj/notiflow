@@ -35,6 +35,7 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.headers.ProcessingInfo;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
@@ -266,7 +267,7 @@ public class ProcessingInfoGeneratorTest {
              
              // when
              // ProcessingInfo persistence is done using aspect and in an async way
-             Message<EmailContent> sendMessage = functionSend.apply(message);
+             Message<EmailContent> sendMessage = functionSend.apply((EmailMessage)message);
          	 
              //then
              Assertions.assertThat(sendMessage).isNotNull();
