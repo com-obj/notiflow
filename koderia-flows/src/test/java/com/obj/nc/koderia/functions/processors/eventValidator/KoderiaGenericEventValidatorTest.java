@@ -27,20 +27,20 @@ class KoderiaGenericEventValidatorTest {
     @Test
     void testValidSchemaJobPostEvent() {
         // given
-        JobPostKoderiaEventDto jobPostEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", JobPostKoderiaEventDto.class);
+        String jobPostEvent = JsonUtils.readJsonStringFromClassPathResource("koderia/create_request/job_body.json");
         // when
-        JsonNode validated = validator.apply(JsonUtils.writeObjectToJSONString(jobPostEvent));
+        JsonNode validated = validator.apply(jobPostEvent);
         // then
         assertThat(validated).isNotNull();
     }
     
     @Test
-    void testInvalidSchemaJobPostEvent() {
+    void testJobPostWithoutDescription() {
         // given
-        JobPostKoderiaEventDto jobPostEventWithoutDescription = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body_no_text.json", JobPostKoderiaEventDto.class);
+        String jobPostEventWithoutDescription = JsonUtils.readJsonStringFromClassPathResource("koderia/create_request/job_body_no_text.json");
         // when - then
         assertThatThrownBy(() -> {
-            JsonNode validated = validator.apply(JsonUtils.writeObjectToJSONString(jobPostEventWithoutDescription));
+            JsonNode validated = validator.apply(jobPostEventWithoutDescription);
         }).hasMessageContaining("Koderia event json does not match any known json schema");
     }
     
