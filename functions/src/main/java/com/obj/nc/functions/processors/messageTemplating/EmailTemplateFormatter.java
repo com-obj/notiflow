@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
@@ -21,12 +20,8 @@ import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigu
 @DocumentProcessingInfo("EmailFormatter")
 public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithModelEmailContent<?>, EmailContent> {
 
-	private final MessageFactory messageFactory;
-	
-	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config, MessageFactory messageFactory) {
+	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {
 		super(templateEngine, config);
-		
-		this.messageFactory = messageFactory;
 	}
 	
 	@Override
@@ -41,7 +36,7 @@ public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithMo
 	}
 
 	protected EmailMessage createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelEmailContent<?>> payload) {		
-		EmailMessage htmlMessage = messageFactory.createAsEmail();
+		EmailMessage htmlMessage = new EmailMessage();
 
 		EmailContent emailContent = htmlMessage.getBody();
 		emailContent.setContentType(MediaType.TEXT_HTML_VALUE);

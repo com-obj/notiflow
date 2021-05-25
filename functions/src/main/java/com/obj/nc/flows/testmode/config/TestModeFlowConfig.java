@@ -15,7 +15,6 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.store.MessageGroup;
 
-import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
@@ -34,7 +33,6 @@ import lombok.extern.log4j.Log4j2;
 public class TestModeFlowConfig {
 
 	@Autowired private TestModeProperties testModeProps;
-	@Autowired private MessageFactory messageFactory;
     @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_EMAIL_SENDER_FUNCTION_BEAN_NAME)
     @Autowired private EmailSender sendEmailRealSmtp;
     @Autowired private PaylaodLoggerSinkConsumer logConsumer;
@@ -75,7 +73,7 @@ public class TestModeFlowConfig {
     
     @Bean
     public BasePayloadAggregationStrategy testModeAggregationStrategy() {
-    	return new TestModeSingleEmailAggregationStrategy(testModeProps, messageFactory);
+    	return new TestModeSingleEmailAggregationStrategy(testModeProps);
     }
     
     @Bean

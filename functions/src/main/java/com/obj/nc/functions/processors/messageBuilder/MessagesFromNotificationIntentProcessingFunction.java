@@ -3,11 +3,14 @@ package com.obj.nc.functions.processors.messageBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -16,6 +19,7 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
 @Component
@@ -24,8 +28,6 @@ import lombok.extern.log4j.Log4j2;
 @DocumentProcessingInfo("GenerateMessagesFromIntent")
 public class MessagesFromNotificationIntentProcessingFunction<CONTENT_TYPE extends Content> extends ProcessorFunctionAdapter<NotificationIntent<CONTENT_TYPE>, List<Message<CONTENT_TYPE>>> {
 
-	private final MessageFactory messageFactory;
-	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent<CONTENT_TYPE> notificationIntent) {
 
@@ -45,7 +47,7 @@ public class MessagesFromNotificationIntentProcessingFunction<CONTENT_TYPE exten
 
 		for (RecievingEndpoint recievingEndpoint: notificationIntent.getRecievingEndpoints()) {
 
-			Message<CONTENT_TYPE> msg = messageFactory.createBasedOnEndpoint(recievingEndpoint.getClass());
+			Message<CONTENT_TYPE> msg = createBasedOnEndpoint(recievingEndpoint.getClass());
 			
 			msg.addRecievingEndpoints(recievingEndpoint);
 
@@ -55,6 +57,36 @@ public class MessagesFromNotificationIntentProcessingFunction<CONTENT_TYPE exten
 		}
 
 		return messages;
+	}
+	
+	@SneakyThrows
+	protected <T extends Message<?>> T createBasedOnEndpoint(Class<? extends RecievingEndpoint> endpointCls) {
+		List<Class<? extends Message<?>>> messageClasses =  findMessageSublasses();
+
+		for (Class<? extends Message<?>> msgClass: messageClasses) {
+			Message<?> msg = msgClass.newInstance();
+			
+			if (endpointCls.equals(msg.getRecievingEndpointType())) {
+				return (T) msg;
+			}
+		}
+		
+		throw new IllegalArgumentException("Cannot infere message type from endpoint type: " + endpointCls.getName());
+	}
+
+	@SneakyThrows
+	private List<Class<? extends Message<?>>> findMessageSublasses() {
+		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
+		provider.addIncludeFilter(new AssignableTypeFilter(Message.class));
+
+		List<Class<? extends Message<?>>> messageSubtypes = new ArrayList<>();
+		Set<BeanDefinition> components = provider.findCandidateComponents("com/obj/nc");		
+		for (BeanDefinition component : components)
+		{
+		    Class<? extends Message<?>> cls = (Class<? extends Message<?>>)Class.forName(component.getBeanClassName());
+		    messageSubtypes.add(cls);
+		}
+		return messageSubtypes;
 	}
 
 }

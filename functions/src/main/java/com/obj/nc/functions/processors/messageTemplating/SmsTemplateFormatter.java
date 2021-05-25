@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
 
@@ -19,12 +19,8 @@ import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigu
 @DocumentProcessingInfo("SmsFormatter")
 public class SmsTemplateFormatter extends BaseTemplateFormatter<TemplateWithModelContent<?>, SimpleTextContent> {
 
-	private final MessageFactory messageFactory;
-	
-	public SmsTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config, MessageFactory messageFactory) {
+	public SmsTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {
 		super(templateEngine, config);
-		
-		this.messageFactory = messageFactory;
 	}
 
 	@Override
@@ -39,10 +35,9 @@ public class SmsTemplateFormatter extends BaseTemplateFormatter<TemplateWithMode
 	}
 
 	protected Message<SimpleTextContent> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelContent<?>> payload) {		
-		Message<SimpleTextContent> smsMessage = messageFactory.createAsSms();
+		SimpleTextMessage smsMessage = new SimpleTextMessage();
 
-		SimpleTextContent smsContent = smsMessage.getBody();
-		smsContent.setText(formatedContent);
+		smsMessage.getBody().setText(formatedContent);
 		
 		return smsMessage;
 	}

@@ -26,10 +26,10 @@ import com.icegreen.greenmail.store.InMemoryStore;
 import com.icegreen.greenmail.store.MailFolder;
 import com.icegreen.greenmail.store.StoredMessage;
 import com.icegreen.greenmail.util.GreenMail;
-import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.headers.Header;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.flows.testmode.TestModeProperties;
@@ -51,7 +51,6 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
     @Autowired private GreenMail gm;
 
     @Autowired private TestModeProperties properties;
-	@Autowired private MessageFactory messageFactory;
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(List<Message<EmailContent>> messages) {
@@ -102,7 +101,7 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
 	}
 	
     private Message<EmailContent> convertGreenMailMessageToMessage(StoredMessage message) {
-        Message<EmailContent> result = messageFactory.createAsEmail();
+    	EmailMessage result = new EmailMessage();
 
         try {
             MimeMessage mimeMessage = message.getMimeMessage();

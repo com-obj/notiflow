@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData;
 import com.obj.nc.domain.content.mailchimp.MailchimpAttachment;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpMergeVariable;
 import com.obj.nc.domain.content.mailchimp.MailchimpTemplateContent;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
+import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
@@ -26,7 +26,6 @@ import lombok.extern.log4j.Log4j2;
 public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationStrategy<MailchimpContent> {
 	
 	private final MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
-	private final MessageFactory messageFactory;
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(List<Message<MailchimpContent>> payloads) {
@@ -34,11 +33,6 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 		if (exception.isPresent()) {
 			return exception;
 		}
-		
-//		exception = checkDeliveryOptions(payloads);
-//		if (exception.isPresent()) {
-//			return exception;
-//		}
 		
 		return checkReceivingEndpoints(payloads);
 	}
@@ -63,7 +57,7 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 				.reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		
-		Message<MailchimpContent> outputMessage = messageFactory.createAsMailChimp();
+		MailChimpMessage outputMessage = new MailChimpMessage();
 		outputMessage.setBody(aggregatedMailchimpContent);
 		return outputMessage;
 	}

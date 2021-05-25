@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
-import com.obj.nc.components.MessageFactoryImpl;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -30,7 +29,7 @@ class MessagesFromIntentTest {
 		notificationIntent = (NotificationIntent<EmailContent>)generateEventfunction.apply(notificationIntent);
 		
 		//WHEN
-		MessagesFromNotificationIntentProcessingFunction<EmailContent> createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction<EmailContent>(new MessageFactoryImpl());
+		MessagesFromNotificationIntentProcessingFunction<EmailContent> createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction<EmailContent>();
 		List<Message<EmailContent>> result = createMessagesFunction.apply(notificationIntent);
 		
 		//THEN
@@ -102,7 +101,7 @@ class MessagesFromIntentTest {
 		notificationIntent = (NotificationIntent<EmailContent>)funciton.apply(notificationIntent);
 		
 		//WHEN
-		MessagesFromNotificationIntentProcessingFunction<EmailContent> createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction<EmailContent>(new MessageFactoryImpl());
+		MessagesFromNotificationIntentProcessingFunction<EmailContent> createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction<EmailContent>();
 		List<Message<EmailContent>> result = createMessagesFunction.apply(notificationIntent);
 		
 		//THEN

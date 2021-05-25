@@ -24,8 +24,8 @@ import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailWithTestModeDiggest;
 import com.obj.nc.domain.message.EmailWithTemplatedContent;
+import com.obj.nc.domain.message.EmailWithTestModeDiggest;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.domain.message.SmsWithTemplatedContent;
@@ -66,11 +66,7 @@ public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements H
 	protected BODY_TYPE body;
 	
 	//Ak je body sucastou message tak recievingEndpoints.size() = 1
-	//move to content
 	private List<? extends RecievingEndpoint> recievingEndpoints = new ArrayList<RecievingEndpoint>();
-
-	//move to ?? (only for notification intent?)
-//	private DeliveryOptions deliveryOptions = new DeliveryOptions();	
 	
 	public BasePayload<BODY_TYPE> addRecievingEndpoints(RecievingEndpoint ... r) {
 		((List<RecievingEndpoint>)this.recievingEndpoints).addAll(Arrays.asList(r));

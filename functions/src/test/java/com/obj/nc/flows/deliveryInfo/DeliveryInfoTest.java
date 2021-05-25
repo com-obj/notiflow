@@ -27,9 +27,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
@@ -49,7 +49,6 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Autowired private MessagesFromNotificationIntentProcessingFunction<EmailContent> generateMessagesFromIntent;
     @Autowired private DeliveryInfoRepository deliveryInfoRepo;
     @Autowired private JdbcTemplate jdbcTemplate;
-    @Autowired private MessageFactory messageFactory;
     
     @Autowired
     @Qualifier(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
@@ -125,7 +124,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Test
     void testDeliveryInfosCreateAndPersistedForFailedDelivery() {
         // GIVEN    	
-        Message<EmailContent> email = messageFactory.createAsEmail();
+    	EmailMessage email = new EmailMessage();
         email.addRecievingEndpoints(
         		EmailEndpoint.builder().email("wrong email").build());
         UUID eventId = UUID.randomUUID();

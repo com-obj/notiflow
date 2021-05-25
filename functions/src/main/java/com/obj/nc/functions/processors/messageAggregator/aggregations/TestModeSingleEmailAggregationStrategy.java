@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import org.thymeleaf.util.StringUtils;
 
-import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
@@ -25,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregationStrategy<Content> {
     
     private final TestModeProperties testModeProps;
-	private final MessageFactory messageFactory;
     
     @Override
     public Object merge(List<Message<Content>> payloads) {
@@ -52,7 +50,7 @@ public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregati
         
         List<EmailEndpoint> emailEndpoints = testModeProps.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
         
-        EmailWithTestModeDiggest aggregatedMessage = messageFactory.createAsEmailWithTestModeDiggest(resultMail);
+        EmailWithTestModeDiggest aggregatedMessage = new EmailWithTestModeDiggest(resultMail);
         aggregatedMessage.setBody(resultMail); 
         aggregatedMessage.setRecievingEndpoints(emailEndpoints);
         

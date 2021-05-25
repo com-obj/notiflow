@@ -19,8 +19,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.components.MessageFactoryImpl;
-import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpMergeVariable;
@@ -85,17 +83,12 @@ public class MailchimpAggregationStrategyTest {
         
         @Bean
         public MailchimpMessageAggregationStrategy mailchimpMessageAggregationStrategy() {
-            return new MailchimpMessageAggregationStrategy(properties, messageFactory());
+            return new MailchimpMessageAggregationStrategy(properties);
         }
         
         @Bean
         public MessageAggregator aggregateMailchimpMessages() {
             return new MessageAggregator(mailchimpMessageAggregationStrategy());
-        }
-
-        @Bean
-        public MessageFactory messageFactory() {
-        	return new MessageFactoryImpl();
         }
     }
     

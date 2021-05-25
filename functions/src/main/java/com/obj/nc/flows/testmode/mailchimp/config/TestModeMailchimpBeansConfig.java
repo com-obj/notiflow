@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import com.obj.nc.components.api.MessageFactory;
 import com.obj.nc.flows.testmode.mailchimp.functions.InMemoryMailchimpSourceSupplier;
 import com.obj.nc.flows.testmode.mailchimp.functions.TestModeMailchimpSender;
 import com.obj.nc.functions.processors.senders.MailchimpSender;
@@ -24,17 +23,17 @@ public class TestModeMailchimpBeansConfig {
      */
     @Bean
     @Primary
-    public MailchimpSender testModeMailchimpSender(MailchimpSenderConfigProperties properties, MessageFactory messageFactory) {
+    public MailchimpSender testModeMailchimpSender(MailchimpSenderConfigProperties properties) {
         return new TestModeMailchimpSender(
         		properties, 
-        		testModeMailchimpReciever(messageFactory), 
+        		testModeMailchimpReciever(), 
         		realMailchimpSender());
     }
     
     @Bean
     @Primary
-    public InMemoryMailchimpSourceSupplier testModeMailchimpReciever(MessageFactory messageFactory) {
-        return new InMemoryMailchimpSourceSupplier(messageFactory);
+    public InMemoryMailchimpSourceSupplier testModeMailchimpReciever() {
+        return new InMemoryMailchimpSourceSupplier();
     }
     
     @Bean
