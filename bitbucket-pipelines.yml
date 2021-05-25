@@ -75,15 +75,12 @@ pipelines:
       - <<: *run-tests
       - <<: *build-jar
       - <<: *deploy-2-BB
-<<<<<<< HEAD
       - <<: *deploy-2-gcr
-=======
     hotfix/*:
       - <<: *run-tests
       - <<: *build-jar
-      - <<: *deploy-2-BB      
-   
->>>>>>> 1.0.8
+      - <<: *deploy-2-BB
+      - <<: *deploy-2-gcr            
   tags:
     v*:
       - <<: *build-jar
