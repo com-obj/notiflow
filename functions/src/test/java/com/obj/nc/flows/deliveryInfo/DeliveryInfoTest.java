@@ -2,13 +2,14 @@ package com.obj.nc.flows.deliveryInfo;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
@@ -32,6 +33,7 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.flows.emailFormattingAndSending.EmailSendingFlow;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
@@ -49,6 +51,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Autowired private MessagesFromNotificationIntentProcessingFunction<EmailContent> generateMessagesFromIntent;
     @Autowired private DeliveryInfoRepository deliveryInfoRepo;
     @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired private EmailSendingFlow emailSendingFlow;
     
     @Autowired
     @Qualifier(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
@@ -57,10 +60,6 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Autowired
     @Qualifier(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
     private MessageChannel deliveryInfoProcessingInputChannel;
-    
-    @Autowired
-    @Qualifier(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID)
-    private MessageChannel emailSendingInputChannel;
  	
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
@@ -122,7 +121,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     }
     
     @Test
-    void testDeliveryInfosCreateAndPersistedForFailedDelivery() {
+    void testDeliveryInfosCreateAndPersistedForFailedDelivery() throws InterruptedException, ExecutionException, TimeoutException {
         // GIVEN    	
     	EmailMessage email = new EmailMessage();
         email.addRecievingEndpoints(
@@ -131,8 +130,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         email.getHeader().addEventId(eventId);
         
         //WHEN
-    	MessagingTemplate messageTemplate = new MessagingTemplate();
-        messageTemplate.send(emailSendingInputChannel, MessageBuilder.withPayload(email).build());
+        emailSendingFlow.sendEmail(email);
 
         //THEN check processing deliveryInfo
         Awaitility.await().atMost(Duration.ofSeconds(1)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()==1);

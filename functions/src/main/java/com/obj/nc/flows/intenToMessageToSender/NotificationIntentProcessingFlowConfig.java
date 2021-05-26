@@ -2,6 +2,7 @@ package com.obj.nc.flows.intenToMessageToSender;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
@@ -14,8 +15,9 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
 import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.EmailWithTemplatedContent;
 import com.obj.nc.domain.message.MailChimpMessage;
-import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmsWithTemplatedContent;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
 import com.obj.nc.functions.sink.intentPersister.NotificationIntentPersister;
 
@@ -48,8 +50,9 @@ public class NotificationIntentProcessingFlowConfig {
 					flowConfig.channel(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 				)
 				.routeToRecipients(spec -> spec.
-						recipient(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID, m-> m instanceof EmailMessage).
-						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof SimpleTextMessage).
+						recipient(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof EmailMessage).
+						recipient(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID, m-> m instanceof EmailWithTemplatedContent).
+						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof SmsWithTemplatedContent).
 						recipient(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof MailChimpMessage).
 						defaultOutputToParentFlow()
 				)

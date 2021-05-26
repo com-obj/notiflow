@@ -36,7 +36,7 @@ import com.obj.nc.repositories.EndpointsRepository;
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
 @SpringBootTest
-class DeliveryInfoTest extends BaseIntegrationTest {
+class DeliveryInfoControllerTest extends BaseIntegrationTest {
     
     
 	@Autowired private DeliveryInfoRepository deliveryRepo;
