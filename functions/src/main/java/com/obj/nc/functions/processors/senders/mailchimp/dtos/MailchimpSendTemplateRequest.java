@@ -12,7 +12,7 @@ import lombok.Data;
 public class MailchimpSendTemplateRequest {
     
     @JsonProperty("key") private String key;
-    @JsonProperty("dto") private MailchimpMessageDto message;
+    @JsonProperty("message") private MailchimpMessageDto message;
     @JsonProperty("template_name") private String templateName;
     @JsonProperty("template_content") private List<MailchimpTemplateContentDto> templateContent;
     
