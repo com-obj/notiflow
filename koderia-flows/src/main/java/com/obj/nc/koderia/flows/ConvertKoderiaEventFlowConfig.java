@@ -3,14 +3,15 @@ package com.obj.nc.koderia.flows;
 import com.obj.nc.functions.processors.eventFactory.MailchimpEventConverter;
 import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinder;
 import lombok.AllArgsConstructor;
+
+import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
-
-import static com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 @Configuration
 @AllArgsConstructor
@@ -33,7 +34,7 @@ public class ConvertKoderiaEventFlowConfig {
                 .from(CONVERT_KODERIA_EVENT_FLOW_INPUT_CHANNEL_ID)
                 .handle(mailchimpEventConverter)
                 .handle(recipientsFinder)
-                .channel(INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+                .channel(MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID)
                 .get();
     }
     

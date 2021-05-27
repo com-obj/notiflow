@@ -1,14 +1,15 @@
 package com.obj.nc.flows.deliveryInfo;
 
-import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
@@ -19,24 +20,29 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.messaging.MessageChannel;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlow;
+import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
-import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo;
-import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.utils.JsonUtils;
 
@@ -49,18 +55,9 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Autowired private MessagesFromNotificationIntentProcessingFunction<EmailContent> generateMessagesFromIntent;
     @Autowired private DeliveryInfoRepository deliveryInfoRepo;
     @Autowired private JdbcTemplate jdbcTemplate;
-    
-    @Autowired
-    @Qualifier(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
-    private MessageChannel deliveryInfoSendInputChannel;
-    
-    @Autowired
-    @Qualifier(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
-    private MessageChannel deliveryInfoProcessingInputChannel;
-    
-    @Autowired
-    @Qualifier(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID)
-    private MessageChannel emailSendingInputChannel;
+    @Autowired private EmailProcessingFlow emailSendingFlow;
+    @Autowired private DeliveryInfoFlow deliveryInfoFlow;
+	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForSpringMessages;    
  	
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
@@ -70,8 +67,6 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Test
     void testDeliveryInfosCreateAndPersisted() {
         // GIVEN
-    	MessagingTemplate messageTemplate = new MessagingTemplate();
-    	
         String INPUT_JSON_FILE = "events/ba_job_post.json";
         NotificationIntent<EmailContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
@@ -80,9 +75,8 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         notificationIntent = (NotificationIntent<EmailContent>)resolveRecipients.apply(notificationIntent);
         
         //WHEN
-        org.springframework.messaging.Message<NotificationIntent<EmailContent>> notifIntentMsg = MessageBuilder.withPayload(notificationIntent).build();
-        messageTemplate.send(deliveryInfoProcessingInputChannel, notifIntentMsg);
-
+        deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(notificationIntent);
+        
         //THEN check processing deliveryInfo
         Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()==3);
         
@@ -100,8 +94,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         List<Message<EmailContent>> messages = (List<Message<EmailContent>>)generateMessagesFromIntent.apply(notificationIntent);
         
         messages.forEach(msg -> {
-            org.springframework.messaging.Message<Message<EmailContent>> notifMsg = MessageBuilder.withPayload(msg).build();
-            messageTemplate.send(deliveryInfoSendInputChannel, notifMsg);
+            deliveryInfoFlow.createAndPersistSentDeliveryInfo(msg);
         });
         
         //THEN check delivered deliveryInfo
@@ -122,7 +115,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     }
     
     @Test
-    void testDeliveryInfosCreateAndPersistedForFailedDelivery() {
+    void testDeliveryInfosCreateAndPersistedForFailedDelivery() throws InterruptedException, ExecutionException, TimeoutException {
         // GIVEN    	
     	EmailMessage email = new EmailMessage();
         email.addRecievingEndpoints(
@@ -131,8 +124,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         email.getHeader().addEventId(eventId);
         
         //WHEN
-    	MessagingTemplate messageTemplate = new MessagingTemplate();
-        messageTemplate.send(emailSendingInputChannel, MessageBuilder.withPayload(email).build());
+        emailSendingFlow.sendEmail(email);
 
         //THEN check processing deliveryInfo
         Awaitility.await().atMost(Duration.ofSeconds(1)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()==1);
@@ -146,6 +138,95 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         	Assertions.assertThat(info.getEndpointId()).isIn("wrong email");
         	Assertions.assertThat(info.getFailedPayloadId()).isNotNull();
         });
+    }
+    
+    @Test
+    void testDeliveryInfosCreateAndPersistedForFailedDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
+		// GIVEN    	
+    	UUID eventId = UUID.randomUUID();
+    	SimpleTextMessage failedMessage = createTestSMS(eventId, "09050123456");
+    	org.springframework.messaging.Message<SimpleTextMessage> failedSpringMessage = MessageBuilder.withPayload(failedMessage).build();
+    	
+    	JsonNode messageJson = jsonConverterForSpringMessages.valueToTree(failedSpringMessage);
+    	
+    	FailedPaylod failedPaylod = FailedPaylod.builder()
+        		.errorMessage("Error")
+        		.exceptionName("Exception")
+        		.flowId("flow_id")
+        		.id(UUID.randomUUID())
+        		.messageJson(messageJson)
+        		.build();
+        
+        //WHEN
+        List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistFailedDeliveryInfo(failedPaylod).get(1, TimeUnit.SECONDS);
+
+
+        //THEN check infos
+        Assertions.assertThat(delInfo.size()).isEqualTo(1);
+        delInfo.forEach(info -> {
+        	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.FAILED);
+        	Assertions.assertThat(info.getProcessedOn()).isNotNull();
+        	Assertions.assertThat(info.getEndpointId()).isIn("09050123456");
+        	Assertions.assertThat(info.getFailedPayloadId()).isNotNull();
+        });
+        
+        //THEN check infos in DB
+        checkSingleDelInfoExistsForEvent(eventId);
+    }
+    
+    @Test
+    void testDeliveryInfosCreateAndPersistedForProcessingDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
+		// GIVEN    	
+    	UUID eventId = UUID.randomUUID();
+    	SimpleTextMessage msg = createTestSMS(eventId, "09050123456");
+    	        
+        //WHEN
+        List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(msg).get(1, TimeUnit.SECONDS);
+
+
+        //THEN check infos
+        Assertions.assertThat(delInfo.size()).isEqualTo(1);
+        delInfo.forEach(info -> {
+        	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.PROCESSING);
+        	Assertions.assertThat(info.getProcessedOn()).isNotNull();
+        	Assertions.assertThat(info.getEndpointId()).isIn("09050123456");
+        });
+        
+        //THEN check infos in DB
+        checkSingleDelInfoExistsForEvent(eventId);
+    }
+
+	private SimpleTextMessage createTestSMS(UUID eventId, String telNumber) {
+		SimpleTextMessage msg = new SimpleTextMessage();
+    	msg.getHeader().setEventIds(Arrays.asList(eventId));
+    	msg.addRecievingEndpoints(new SmsEndpoint(telNumber));
+		return msg;
+	}
+
+	private void checkSingleDelInfoExistsForEvent(UUID eventId) {
+		List<DeliveryInfo> deliveryInfosInDB = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
+        Assertions.assertThat(deliveryInfosInDB.size()).isEqualTo(1);
+	}
+    
+    @Test
+    void testDeliveryInfosCreateAndPersistedForSentDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
+		// GIVEN    	
+    	UUID eventId = UUID.randomUUID();
+    	SimpleTextMessage msg = createTestSMS(eventId, "09050123456");
+    	        
+        //WHEN
+        List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistSentDeliveryInfo(msg).get(1, TimeUnit.SECONDS);
+
+        //THEN check infos
+        Assertions.assertThat(delInfo.size()).isEqualTo(1);
+        delInfo.forEach(info -> {
+        	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
+        	Assertions.assertThat(info.getProcessedOn()).isNotNull();
+        	Assertions.assertThat(info.getEndpointId()).isIn("09050123456");
+        });
+        
+        //THEN check infos in DB
+        checkSingleDelInfoExistsForEvent(eventId);
     }
 
 

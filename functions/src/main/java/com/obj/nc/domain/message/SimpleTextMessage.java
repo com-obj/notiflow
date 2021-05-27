@@ -1,6 +1,5 @@
 package com.obj.nc.domain.message;
 
-import java.beans.Transient;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,7 +8,6 @@ import com.obj.nc.domain.endpoints.SmsEndpoint;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data

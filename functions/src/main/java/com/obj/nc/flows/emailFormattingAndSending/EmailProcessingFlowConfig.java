@@ -17,7 +17,6 @@ import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessa
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.messagePersister.MessagePersister;
-import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 public class EmailProcessingFlowConfig {
 	
 	private final EmailSender emailSender;
-	private final PaylaodLoggerSinkConsumer logConsumer;
 	private final EmailTemplateFormatter emailFormatter;
 	private final EmailProcessingFlowProperties properties;
 	private final MessagePersister messagePersister;
@@ -37,6 +35,7 @@ public class EmailProcessingFlowConfig {
 
 	public final static String EMAIL_SENDING_FLOW_ID = "EMAIL_SENDING_FLOW_ID";
 	public final static String EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID = EMAIL_SENDING_FLOW_ID + "_INPUT";
+	public final static String EMAIL_SENDING_FLOW_OUTPUT_CHANNEL_ID = EMAIL_SENDING_FLOW_ID + "_OUTPUT";
 	
 	public final static String EMAIL_FORMATING_FLOW_ID = "EMAIL_FORMATING_FLOW_ID";
 	public final static String EMAIL_FORMATING_INPUT_CHANNEL_ID = EMAIL_FORMATING_FLOW_ID + "_INPUT";
@@ -51,6 +50,11 @@ public class EmailProcessingFlowConfig {
 		return new PublishSubscribeChannel(executor);
 	}
 	
+	@Bean(EMAIL_SENDING_FLOW_OUTPUT_CHANNEL_ID)
+	public MessageChannel emailSedningOutputChangel() {
+		return new PublishSubscribeChannel();
+	}
+	
 //	@Bean(EMAIL_FORMATING_INPUT_CHANNEL_ID)
 //	public MessageChannel emailFormatingInputChangel() {
 //		return new PublishSubscribeChannel(executor);
@@ -63,7 +67,9 @@ public class EmailProcessingFlowConfig {
 				.routeToRecipients(spec -> spec
 						.recipient(
 								EMAIL_FORMATING_INPUT_CHANNEL_ID,
-								m -> ((Message<?>) m).getBody() instanceof TemplateWithModelContent)
+								m -> 
+									((Message<?>) m).getBody() instanceof TemplateWithModelContent
+								)
 						.defaultOutputChannel(
 								EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID)
 				)
@@ -83,7 +89,7 @@ public class EmailProcessingFlowConfig {
 				.wireTap( flowConfig -> 
 					flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
 				)
-				.handle(logConsumer)
+				.channel(emailSedningOutputChangel())
 				.get();
 	}
 	

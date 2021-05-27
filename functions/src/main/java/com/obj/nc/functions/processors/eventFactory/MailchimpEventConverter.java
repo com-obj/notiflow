@@ -9,7 +9,7 @@ import com.obj.nc.components.api.MailchimpContentFactory;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 @DocumentProcessingInfo("MailchimpEventConverter")
-public class MailchimpEventConverter extends ProcessorFunctionAdapter<GenericEvent, NotificationIntent<MailchimpContent>> {
+public class MailchimpEventConverter extends ProcessorFunctionAdapter<GenericEvent, MailChimpMessage> {
 	
 	private final MailchimpContentFactory mailchimpContentFactoryImpl;
 	
@@ -39,15 +39,15 @@ public class MailchimpEventConverter extends ProcessorFunctionAdapter<GenericEve
 	}
 	
 	@Override
-	protected NotificationIntent<MailchimpContent> execute(GenericEvent payload) {
-		NotificationIntent<MailchimpContent> notificationIntent = new NotificationIntent<MailchimpContent>();
-		notificationIntent.getHeader().setFlowId(payload.getFlowId());
+	protected MailChimpMessage execute(GenericEvent payload) {
+		MailChimpMessage message = new MailChimpMessage();
+		message.getHeader().setFlowId(payload.getFlowId());
 		
 		MailchimpData mailchimpData = payload.getPayloadAsPojo();
 		MailchimpContent content = mailchimpContentFactoryImpl.createFromData(mailchimpData);
 		
-		notificationIntent.setBody(content);
-		return notificationIntent;
+		message.setBody(content);
+		return message;
 	}
 	
 }

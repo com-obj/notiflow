@@ -23,7 +23,7 @@ import com.obj.nc.domain.endpoints.DeliveryOptions;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.Person;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
@@ -32,14 +32,14 @@ import com.obj.nc.koderia.domain.recipients.RecipientsQueryDto;
 
 @Component
 @DocumentProcessingInfo("KoderiaRecipientsFinder")
-public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<NotificationIntent<MailchimpContent>, NotificationIntent<MailchimpContent>> {
+public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<MailChimpMessage, MailChimpMessage> {
 	
 	@Qualifier(KODERIA_REST_TEMPLATE) 
 	@Autowired private RestTemplate restTemplate;
 	@Autowired private ObjectMapper objectMapper;
 	
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent<MailchimpContent> payload) {
+	protected Optional<PayloadValidationException> checkPreCondition(MailChimpMessage payload) {
 		MailchimpContent content = payload.getBody();
 		if (content == null) {
 			return Optional.of(new PayloadValidationException(String.format("NotificationIntent %s contains null content.", payload)));
@@ -59,7 +59,7 @@ public class KoderiaRecipientsFinder extends ProcessorFunctionAdapter<Notificati
 	}
 	
 	@Override
-	protected NotificationIntent<MailchimpContent> execute(NotificationIntent<MailchimpContent> payload) {
+	protected MailChimpMessage execute(MailChimpMessage payload) {
 		MailchimpData dataMergeVar = payload.getBody().getOriginalEvent();
 		RecipientsQueryDto recipientsQueryDto = objectMapper.convertValue(dataMergeVar, RecipientsQueryDto.class);
 		

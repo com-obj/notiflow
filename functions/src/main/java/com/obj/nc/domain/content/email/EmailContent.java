@@ -52,4 +52,10 @@ public class EmailContent extends Content {
 		return concated;
 	}
 	
+	@Override
+	public String getContentTypeName() {
+		return JSON_TYPE_IDENTIFIER;
+	}
+
+	
 }

@@ -24,7 +24,7 @@ import lombok.extern.log4j.Log4j2;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Log4j2
 public abstract class TemplateWithModelEmailContent<MODEL_TYPE> extends TemplateWithModelContent<MODEL_TYPE>  {
-
+	
 	@NonNull
 	@EqualsAndHashCode.Include
 	private String subjectResourceKey;
@@ -48,4 +48,5 @@ public abstract class TemplateWithModelEmailContent<MODEL_TYPE> extends Template
 		}
 		return subject;
 	}
+	
 }

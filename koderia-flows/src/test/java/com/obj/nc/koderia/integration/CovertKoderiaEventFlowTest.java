@@ -1,8 +1,8 @@
 package com.obj.nc.koderia.integration;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_ID;
-import static com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_ID;
+import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
 import static com.obj.nc.koderia.integration.CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.RECEIVED_TEST_LIST;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -49,7 +49,7 @@ import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpData;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.koderia.domain.event.JobPostKoderiaEventDto;
 import com.obj.nc.koderia.domain.recipients.RecipientDto;
@@ -101,7 +101,7 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 		// then
 		assertThat(received, Matchers.hasSize(1));
 		// and
-		NotificationIntent<MailchimpContent> payload = (NotificationIntent<MailchimpContent>) received.get(0).getPayload();
+		MailChimpMessage payload = (MailChimpMessage) received.get(0).getPayload();
 		MailchimpContent content = payload.getBody();
 		assertThat(content, notNullValue());
 		
@@ -141,10 +141,10 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 			return new ArrayList<>();
 		}
 		
-		@Bean(INTENT_PROCESSING_FLOW_ID)
+		@Bean(MESSAGE_PROCESSING_FLOW_ID)
 		public IntegrationFlow intentProcessingFlowDefinition() {
 			return IntegrationFlows
-					.from(INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+					.from(MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 					.handle((MessageHandler) received()::add)
 					.get();
 		}

@@ -38,7 +38,7 @@ import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.eventFactory.MailchimpEventConverter;
 import com.obj.nc.koderia.domain.event.BaseKoderiaEvent;
@@ -87,10 +87,10 @@ class KoderiaRecipientsFinderTest {
         // GIVEN
         BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource(TEST_BODIES + inputEventFile, BaseKoderiaEvent.class);
         GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
-        NotificationIntent<MailchimpContent> inputNotificationIntent = mailchimpEventConverter.apply(genericEvent);
+        MailChimpMessage inputNotificationIntent = mailchimpEventConverter.apply(genericEvent);
 
         // WHEN
-        NotificationIntent<MailchimpContent> outputNotificationIntent = getKoderiaRecipients.apply(inputNotificationIntent);
+        MailChimpMessage outputNotificationIntent = getKoderiaRecipients.apply(inputNotificationIntent);
 
         // THEN
         List<String> recipientEmails = outputNotificationIntent.getRecievingEndpoints().stream().map(endpoint -> ((MailchimpEndpoint) endpoint).getEmail()).collect(toList());
@@ -104,7 +104,7 @@ class KoderiaRecipientsFinderTest {
         // GIVEN
         BaseKoderiaEvent baseKoderiaEvent = JsonUtils.readObjectFromClassPathResource("koderia/create_request/job_body.json", BaseKoderiaEvent.class);
         GenericEvent genericEvent = GenericEvent.from(JsonUtils.writeObjectToJSONNode(baseKoderiaEvent));
-        NotificationIntent<MailchimpContent> mappedNotificationIntent = mailchimpEventConverter.apply(genericEvent);
+        MailChimpMessage mappedNotificationIntent = mailchimpEventConverter.apply(genericEvent);
         MailchimpContent contentTyped = mappedNotificationIntent.getBody();
         contentTyped.setOriginalEvent(null);
 

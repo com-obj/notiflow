@@ -28,7 +28,7 @@ public class ErrorHandlingFlowConfig {
 	public static final String ERROR_CHANNEL_NAME = "errorChannel";
 	
 	//Default channel for errorMessages used by spring
-	@Qualifier("errorChannel")
+	@Qualifier(ERROR_CHANNEL_NAME)
 	@Autowired private PublishSubscribeChannel errorChannel;
 	@Autowired private SpringMessageToFailedPaylodFunction failedPaylodTranformer;
 	@Autowired private FailedPayloadPersister failedPaylodPersister;

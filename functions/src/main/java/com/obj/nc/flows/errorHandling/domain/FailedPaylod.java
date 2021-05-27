@@ -50,7 +50,6 @@ public class FailedPaylod implements Persistable<UUID>, HasFlowId {
 	//failed message resurection attempt
 	private Instant timeResurected;
 	
-
 	@Override
 	public boolean isNew() {
 		return timeCreated == null;

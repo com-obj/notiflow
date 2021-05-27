@@ -16,7 +16,7 @@ public abstract class Message<BODY_TYPE extends Content> extends BasePayload<BOD
 		
 	@JsonIgnore
 	public abstract Class<? extends RecievingEndpoint> getRecievingEndpointType();
-	
+		
 	public MessagePersistantState toPersistantState() {
 		return MessagePersistantState.builder()
 			.body(getBody())
