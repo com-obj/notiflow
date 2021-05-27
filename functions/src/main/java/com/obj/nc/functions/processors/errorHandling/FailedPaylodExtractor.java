@@ -18,7 +18,7 @@ import lombok.SneakyThrows;
 @Component
 public class FailedPaylodExtractor extends ProcessorFunctionAdapter<FailedPaylod, Message<?>> {
 
-	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_MESSAGES_BEAN_NAME)
+	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME)
 	private ObjectMapper jsonConverterForMessages;
 	
 	@Override

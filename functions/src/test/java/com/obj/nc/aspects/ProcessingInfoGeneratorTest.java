@@ -270,11 +270,14 @@ public class ProcessingInfoGeneratorTest {
         NotificationIntent<EmailContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
         notificationIntent = (NotificationIntent<EmailContent>)generateEventId.apply(notificationIntent);
         UUID[] originalEventIDs = notificationIntent.getProcessingInfo().getEventIds();
+        UUID eventId = originalEventIDs[0];
         notificationIntent = (NotificationIntent<EmailContent>)resolveRecipients.apply(notificationIntent);
-        List<Message<EmailContent>> messages = generateMessagesFromIntent.apply(notificationIntent);
-                
+        List<Message<EmailContent>> messages = generateMessagesFromIntent.apply(notificationIntent);                      
+        
+        Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "GenerateMessagesFromIntent").size()>0);
         
     	 EmailMessage email = (EmailMessage)messages.iterator().next();
+    	 email.getProcessingInfo().setVersion(0);//need to set to avoid async error in test. it's no hack
     	 String messageJsonBeforeSend = email.toJSONString();
          UUID previosProcessingId = email.getProcessingInfo().getProcessingId();
          
@@ -286,7 +289,7 @@ public class ProcessingInfoGeneratorTest {
          Assertions.assertThat(sendMessage).isNotNull();
          assertMessagesHaveOriginalEventId(originalEventIDs, Arrays.asList(sendMessage));
          
-         UUID eventId = originalEventIDs[0];
+
          Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "SendEmail").size()>0);
         
          List<ProcessingInfo> persistedPIs = procInfoRepo.findByAnyEventIdAndStepName(eventId, "SendEmail");

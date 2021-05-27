@@ -51,7 +51,7 @@ public class ErrorHandlingTests {
 	@Autowired FailedPayloadRepository failedPayloadRepo;
 	@Autowired TestFlow1 testFlow1;
 	@Autowired ErrorHandlingRestController errorHandlingController;
-	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
+	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
 	
 	private static boolean processingFinished;
 	

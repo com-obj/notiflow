@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 
 public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUID> {
 	

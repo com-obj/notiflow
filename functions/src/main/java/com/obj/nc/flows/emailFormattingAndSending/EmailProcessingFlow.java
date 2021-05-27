@@ -14,7 +14,7 @@ import com.obj.nc.domain.message.EmailWithTemplatedContent;
 import com.obj.nc.flows.errorHandling.ErrorHandlingFlowConfig;
 
 @MessagingGateway(errorChannel = ErrorHandlingFlowConfig.ERROR_CHANNEL_NAME)
-public interface EmailSendingFlow {
+public interface EmailProcessingFlow {
 
 	@Gateway(requestChannel=EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID, replyChannel = EMAIL_SENDING_FLOW_OUTPUT_CHANNEL_ID)
     Future<EmailMessage> sendEmail(EmailMessage msg);

@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 public class FailedPaylodRepositoryTest {
 
 	@Autowired FailedPayloadRepository failedPaylaodRepo;
-	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
+	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
 	
 	@Test
 	public void testPersistingSingleInfo() {

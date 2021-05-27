@@ -40,7 +40,7 @@ import com.obj.nc.utils.JsonUtils;
 class EmailProcessingFlowTests extends BaseIntegrationTest {
 
     @Autowired private EmailProcessingFlowProperties properties;
-    @Autowired private EmailSendingFlow emailSendingFlow;
+    @Autowired private EmailProcessingFlow emailSendingFlow;
     
     @BeforeEach
     void setupGreenMail() throws FolderException {

@@ -1,4 +1,4 @@
-package com.obj.nc.functions.sink.deliveryInfoPersister.domain;
+package com.obj.nc.functions.processors.deliveryInfo.domain;
 
 import java.time.Instant;
 import java.util.UUID;
