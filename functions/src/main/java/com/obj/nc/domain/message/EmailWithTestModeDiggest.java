@@ -38,7 +38,8 @@ public class EmailWithTestModeDiggest extends Message<TestModeDiggestMailContent
 	//TODO: refactor as class parameter
 	@JsonIgnore
 	public Class<? extends RecievingEndpoint> getRecievingEndpointType() {
-		return null;
+		return EmailEndpoint.class;
 	}
+
 
 }

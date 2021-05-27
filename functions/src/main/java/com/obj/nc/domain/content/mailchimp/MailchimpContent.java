@@ -34,4 +34,9 @@ public class MailchimpContent extends Content {
     private List<MailchimpMergeVariableDto> globalMergeVariables = new ArrayList<>();
     private String mergeLanguage;
     
+    @Override
+    public String getContentTypeName() {
+    	return JSON_TYPE_IDENTIFIER;
+    }
+    
 }

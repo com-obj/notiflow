@@ -51,7 +51,7 @@ public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMes
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(EmailMessage message) {
 		if (!(message.getBody() instanceof EmailContent)) {
-			return Optional.of(new PayloadValidationException("EmailContent sender can process only Message with EmailContent content. Was type " + message.getBody().getClass().getSimpleName()));
+			return Optional.of(new PayloadValidationException("EmailContent sender can process only Message with EmailContent content. Message was: " + message));
 		}
 		
 		List<? extends RecievingEndpoint> to = message.getRecievingEndpoints();

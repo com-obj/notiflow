@@ -14,4 +14,8 @@ public class TemplateWithJsonModelSmsContent extends TemplateWithModelContent<Ba
 	
 	public final static String JSON_TYPE_IDENTIFIER = "SMS_FROM_TEMPLATE_MESSAGE_CONTENT";
 
+    @Override
+    public String getContentTypeName() {
+    	return JSON_TYPE_IDENTIFIER;
+    }
 }

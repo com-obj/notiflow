@@ -22,7 +22,8 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.message.EmailWithTemplatedContent;
+import com.obj.nc.domain.message.Message;
 import com.obj.nc.osk.domain.IncidentTicketOutageEndEventDto;
 import com.obj.nc.osk.domain.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.functions.content.CustEmailTemplate;
@@ -53,7 +54,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	//WHEN OUTAGE STARTs
         GenericEvent event = readOutageStartEvent();
         event = eventRepo.save(event); //we need to stave this so that issue outage End
-    	List<NotificationIntent<?>> result = startOutageConverter.apply(event);
+    	List<Message<?>> result = startOutageConverter.apply(event);
     	
     	//THEN
     	assertCustomerNotificationIntents(result);
@@ -86,7 +87,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	}
     }
 
-	private List<CustEmailTemplate> extractEmails(List<NotificationIntent<?>> result) {
+	private List<CustEmailTemplate> extractEmails(List<Message<?>> result) {
 		List<CustEmailTemplate> contents = result.stream()
     		.filter(e-> e.getBody() instanceof CustEmailTemplate)
     		.map(e-> ((CustEmailTemplate)e.getBody()))
@@ -94,7 +95,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
 		return contents;
 	}
 	
-	private List<CustSmsTemplate> extractSmss(List<NotificationIntent<?>> result) {
+	private List<CustSmsTemplate> extractSmss(List<Message<?>> result) {
 		List<CustSmsTemplate> contents = result.stream()
     		.filter(e-> e.getBody() instanceof CustSmsTemplate)
     		.map(e-> ((CustSmsTemplate)e.getBody()))
@@ -103,12 +104,12 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
 	}
 
 	@SuppressWarnings("unchecked")
-	private void assertCustomerNotificationIntents(List<NotificationIntent<?>> result) {
+	private void assertCustomerNotificationIntents(List<Message<?>> result) {
 		assertThat(result.size()).isEqualTo(8); //3xcustomers email,2xcustomer sms, 2xsales, 1xsales agent 
     	
     	//THEN check events for customer
     	JXPathContext context = JXPathContext.newContext(result); //"//recievingEndpoints[@endpointId='cuzy@objectify.sk']/../.."
-		List<NotificationIntent> nisForCuzy = context.selectNodes("//recipient[name='Jan Cuzy']/../..");
+		List<Message<?>> nisForCuzy = context.selectNodes("//recipient[name='Jan Cuzy']/../..");
     	
     	assertThat(nisForCuzy.size()).isEqualTo(2);
     	
@@ -160,23 +161,23 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
         GenericEvent event = readOutageStartEvent();
 
     	//WHEN
-    	List<NotificationIntent<?>> result = startOutageConverter.apply(event);
+    	List<Message<?>> result = startOutageConverter.apply(event);
     	
     	//THEN
     	assertThat(result.size()).isEqualTo(8); //3xcustomers email,2xcustomer sms, 2xsales, 1xsales agent 
     	
     	JXPathContext context = JXPathContext.newContext(result);
-		List<NotificationIntent<?>> notificationIntentsForSlavkovsky = context.selectNodes("//recievingEndpoints[@endpointId='slavkovsky@orange.sk']/..");
+		List<Message<?>> notificationIntentsForSlavkovsky = context.selectNodes("//recievingEndpoints[@endpointId='slavkovsky@orange.sk']/..");
     	assertThat(notificationIntentsForSlavkovsky.size()).isEqualTo(1);
     	    	
-    	NotificationIntent<?> notificationIntentForHahn = notificationIntentsForSlavkovsky.iterator().next();
-    	context = JXPathContext.newContext(notificationIntentForHahn);
+    	Message<?> notificationIntentForSlavkovsky = notificationIntentsForSlavkovsky.iterator().next();
+    	context = JXPathContext.newContext(notificationIntentForSlavkovsky);
     	List<RecievingEndpoint> endpoints = context.selectNodes("/recievingEndpoints");
     	assertThat(endpoints.size()).isEqualTo(1);
     	
     	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Adrian Slavkovsky");
     	
-    	SalesEmailTemplate msgContent = (SalesEmailTemplate)notificationIntentForHahn.getBody();
+    	SalesEmailTemplate msgContent = (SalesEmailTemplate)notificationIntentForSlavkovsky.getBody();
     	assertThat(msgContent.getModel().getTimeStart()).isNotNull();
     	
     	Map<CustomerInfo, List<ServiceOutageInfo>> outageInfos = msgContent.getModel().getServicesPerCustomer();
@@ -201,14 +202,14 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	GenericEvent event = readOutageStartEvent();
 
     	//WHEN
-    	List<NotificationIntent<?>> result = startOutageConverter.apply(event);
+    	List<Message<?>> result = startOutageConverter.apply(event);
     	
     	//THEN
     	assertThat(result.size()).isEqualTo(8); //3xcustomers email,2xcustomer sms, 2xsales, 1xsales agent 
     	
     	//THEN check events for agent
     	JXPathContext context = JXPathContext.newContext(result);
-		List<NotificationIntent<?>> notificationIntentsForAgent = context.selectNodes("//recievingEndpoints[@endpointId='sales@objectify.sk']/..");
+		List<EmailWithTemplatedContent<?>> notificationIntentsForAgent = context.selectNodes("//recievingEndpoints[@endpointId='sales@objectify.sk']/..");
     	
     	assertThat(notificationIntentsForAgent.size()).isEqualTo(1);
     	
@@ -218,8 +219,8 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	
     	assertThat(endpoints.iterator().next().getRecipient()).isNull(); //Pre sales agentov nemam person
     	
-    	NotificationIntent<?> notificationIntentForAgent = notificationIntentsForAgent.iterator().next();
-    	SalesAgentsEmailTemplate msgContent = (SalesAgentsEmailTemplate)notificationIntentForAgent.getBody();
+    	EmailWithTemplatedContent<SalesAgentsEmailTemplate> notificationIntentForAgent = (EmailWithTemplatedContent<SalesAgentsEmailTemplate>)notificationIntentsForAgent.iterator().next();
+    	SalesAgentsEmailTemplate msgContent = notificationIntentForAgent.getBody();
     	assertThat(msgContent.getModel().getTimeStart()).isNotNull();
     	
     	//THEN check outage infos

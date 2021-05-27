@@ -38,5 +38,5 @@ public class EmailMessage extends Message<EmailContent/*, EmailEndpoint*/> {
 	public Class<? extends RecievingEndpoint> getRecievingEndpointType() {
 		return EmailEndpoint.class;
 	}
-
+	
 }

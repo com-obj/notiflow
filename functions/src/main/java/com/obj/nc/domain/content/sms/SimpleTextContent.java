@@ -22,4 +22,8 @@ public class SimpleTextContent extends Content {
 	@EqualsAndHashCode.Include
 	private String text;
 
+    @Override
+    public String getContentTypeName() {
+    	return JSON_TYPE_IDENTIFIER;
+    }
 }

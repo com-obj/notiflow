@@ -6,5 +6,9 @@ import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 @JsonTypeName("EMAIL_FROM_TEAMPLATE_COMLEX_MESSAGE_CONTENT")
 public class TestEmailTemplateComplexPojoModel extends TemplateWithModelEmailContent<TestModel> {
 
+	@Override
+	public String getContentTypeName() {
+		return "EMAIL_FROM_TEAMPLATE_COMLEX_MESSAGE_CONTENT";
+	}
 }
 
