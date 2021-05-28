@@ -47,7 +47,7 @@ public class MessagesFromNotificationIntentProcessingFunction<CONTENT_TYPE exten
 
 		for (RecievingEndpoint recievingEndpoint: notificationIntent.getRecievingEndpoints()) {
 
-			Message<CONTENT_TYPE> msg = createBasedOnEndpoint(recievingEndpoint.getClass(), notificationIntent.getBody().getClass());
+			Message<CONTENT_TYPE> msg = createBasedOnContentType(notificationIntent.getBody().getClass());
 			
 			msg.addRecievingEndpoints(recievingEndpoint);
 
@@ -59,20 +59,21 @@ public class MessagesFromNotificationIntentProcessingFunction<CONTENT_TYPE exten
 		return messages;
 	}
 	
+	// TODO: was based on endpoint type, but didn't work, refactor if required
 	@SneakyThrows
-	protected <T extends Message<?>> T createBasedOnEndpoint(Class<? extends RecievingEndpoint> endpointCls, Class<?> contentType) {
+	protected <T extends Message<?>> T createBasedOnContentType(Class<?> contentType) {
 		List<Class<? extends Message<?>>> messageClasses =  findMessageSublasses();
 
 		for (Class<? extends Message<?>> msgClass: messageClasses) {
 			Message<?> msg = msgClass.newInstance();
 			
-			if (endpointCls.equals(msg.getRecievingEndpointType())) {
+			if (contentType.isInstance(msg.getBody())) {
 				return (T) msg;
 			}
 						
 		}
 		
-		throw new IllegalArgumentException("Cannot infere message type from endpoint type: " + endpointCls.getName());
+		throw new IllegalArgumentException("Cannot infere message type from content type: " + contentType.getName());
 	}
 
 	@SneakyThrows
