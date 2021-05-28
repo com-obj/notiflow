@@ -1,23 +1,17 @@
 package com.obj.nc.koderia.integration;
 
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_ID;
-import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
-import static com.obj.nc.koderia.integration.CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.RECEIVED_TEST_LIST;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import com.obj.nc.BaseIntegrationTest;
+import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpData;
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.message.MailChimpMessage;
+import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
+import com.obj.nc.koderia.domain.event.JobPostKoderiaEventDto;
+import com.obj.nc.koderia.domain.recipients.RecipientDto;
+import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinder;
+import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
+import com.obj.nc.utils.JsonUtils;
 import org.awaitility.Awaitility;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -44,24 +38,26 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 
-import com.obj.nc.BaseIntegrationTest;
-import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpData;
-import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.message.MailChimpMessage;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
-import com.obj.nc.koderia.domain.event.JobPostKoderiaEventDto;
-import com.obj.nc.koderia.domain.recipients.RecipientDto;
-import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinder;
-import com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig;
-import com.obj.nc.utils.JsonUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_ID;
+import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.koderia.functions.processors.recipientsFinder.KoderiaRecipientsFinderConfig.RECIPIENTS_PATH;
+import static com.obj.nc.koderia.integration.CovertKoderiaEventFlowTest.MockNextFlowTestConfiguration.RECEIVED_TEST_LIST;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest(properties = {
-			"nc.flows.input-evet-routing.type=FLOW_ID", 
-			"spring.main.allow-bean-definition-overriding=true"
+		"nc.flows.input-evet-routing.type=FLOW_ID",
+		"spring.main.allow-bean-definition-overriding=true"
 })
 @DirtiesContext
 public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
@@ -130,8 +126,8 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.body(JsonUtils.writeObjectToJSONString(responseBody))
 				);
-	}		
-		
+	}
+	
 	@TestConfiguration
 	public static class MockNextFlowTestConfiguration {
 		public static final String RECEIVED_TEST_LIST = "RECEIVED_TEST_LIST";
@@ -149,6 +145,6 @@ public class CovertKoderiaEventFlowTest extends BaseIntegrationTest {
 					.get();
 		}
 	}
-
+	
 }
 
