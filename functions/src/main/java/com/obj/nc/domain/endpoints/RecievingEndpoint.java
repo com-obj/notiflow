@@ -5,6 +5,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import lombok.Data;

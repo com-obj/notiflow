@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpData;
-import com.obj.nc.domain.endpoints.DeliveryOptions;
+import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.Person;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
