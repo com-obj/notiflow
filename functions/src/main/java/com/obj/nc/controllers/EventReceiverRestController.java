@@ -1,6 +1,9 @@
 package com.obj.nc.controllers;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.obj.nc.functions.processors.eventValidator.GenericEventJsonSchemaValidator;
 import com.obj.nc.functions.processors.eventValidator.GenericEventValidator;
+import com.obj.nc.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.relational.core.conversion.DbActionExecutionException;
@@ -25,19 +28,30 @@ public class EventReceiverRestController {
 	@Autowired
 	private GenericEventPersisterConsumer persister;
 	@Autowired
-	private GenericEventValidator validator;
+	private GenericEventValidator simpleValidator;
+	@Autowired
+	private GenericEventJsonSchemaValidator jsonSchemaValidator;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
     public EventRecieverResponce persistGenericEvent(
     		@RequestBody(required = true) String eventJsonString, 
     		@RequestParam(value = "flowId", required = false) String flowId,
-    		@RequestParam(value = "externalId", required = false) String externalId) {
-    	
-     	JsonNode eventJson = validator.apply(eventJsonString);
-     	
-    	GenericEvent event = GenericEvent.from(eventJson);
+    		@RequestParam(value = "externalId", required = false) String externalId,
+			@RequestParam(value = "payloadType", required = false) String payloadType) {
+		
+		eventJsonString = simpleValidator.apply(eventJsonString);
+		JsonNode eventJson = JsonUtils.readJsonNodeFromJSONString(eventJsonString);
+		
+		if (payloadType != null) {
+			ObjectNode eventJsonAsObjectNode = (ObjectNode) eventJson;
+			eventJsonAsObjectNode.put("payloadType", payloadType);
+			eventJson = jsonSchemaValidator.apply(eventJson);
+		}
+		
+		GenericEvent event = GenericEvent.from(eventJson);
     	event.overrideFlowIdIfApplicable(flowId);
     	event.overrideExternalIdIfApplicable(externalId);
+    	event.overridePayloadTypeIfApplicable(payloadType);
 
     	try {
     		persister.accept(event);

@@ -41,6 +41,7 @@ class EventReceiverTest extends BaseIntegrationTest {
         //when
         ResultActions resp = mockMvc
                 .perform(MockMvcRequestBuilders.post("/events")
+                        .param("payloadType", "JOB_POST")
                         .contentType(APPLICATION_JSON_UTF8)
                         .content(validJobPostEvent)
                         .accept(APPLICATION_JSON_UTF8))
@@ -58,15 +59,16 @@ class EventReceiverTest extends BaseIntegrationTest {
         //when
         ResultActions resp = mockMvc
         		.perform(MockMvcRequestBuilders.post("/events")
-        		.contentType(APPLICATION_JSON_UTF8)
-        		.content(jobPostEventWithoutDescription)
-                .accept(APPLICATION_JSON_UTF8))
+                        .param("payloadType", "JOB_POST")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content(jobPostEventWithoutDescription)
+                        .accept(APPLICATION_JSON_UTF8))
                 .andDo(MockMvcResultHandlers.print());
         
         //then
         resp
         	.andExpect(status().is4xxClientError())
-			.andExpect(jsonPath("$").value(CoreMatchers.startsWith("Request not valid becase of invalid payload: Koderia event json does not match any known json schema")));
+			.andExpect(jsonPath("$").value(CoreMatchers.startsWith("Request not valid becase of invalid payload: Payload")));
         
     }
  
