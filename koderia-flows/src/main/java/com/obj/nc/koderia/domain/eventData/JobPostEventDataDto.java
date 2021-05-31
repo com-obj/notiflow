@@ -19,23 +19,13 @@ import java.util.Map;
 public class JobPostEventDataDto extends BaseKoderiaData {
     
     @EqualsAndHashCode.Include
-    @NotBlank private String id;
-    @NotBlank private String name;
-    @NotBlank private String description;
-    @NotBlank private String location;
-    @NotBlank private String rate;
-    @NotEmpty private List<String> technologies;
-    @NotBlank private String specialRate;
-    @NotNull private List<String> labels;
-    @NotEmpty private List<String> positionType;
-    @NotBlank private String duration;
-    @NotBlank private String type;
-    @NotBlank private String dateOfStart;
-    
-    @JsonIgnore
-    public String getPriorityRate() {
-        return specialRate != null ? specialRate : rate.concat(" €");
-    }
+    private String id;
+    private String name;
+    private String description;
+    private String location;
+    private String type;
+    private String rate;
+    private List<String> technologies;
     
     @JsonIgnore
     @Override
@@ -45,7 +35,7 @@ public class JobPostEventDataDto extends BaseKoderiaData {
         content.put("name", name);
         content.put("description", description);
         content.put("location", location);
-        content.put("rate", getPriorityRate());
+        content.put("rate", rate);
         content.put("technologies", String.join(", ", technologies));
         return content;
     }
