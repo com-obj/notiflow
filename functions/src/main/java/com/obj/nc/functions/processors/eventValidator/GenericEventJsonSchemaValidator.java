@@ -50,7 +50,7 @@ public class GenericEventJsonSchemaValidator extends ProcessorFunctionAdapter<Js
             }
             matchesSchema = JsonSchemaValidator.matchesJsonSchema(resources[0].getFile()).matches(JsonUtils.writeObjectToJSONString(payload));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
         
         if (!matchesSchema) {
