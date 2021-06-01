@@ -2,6 +2,7 @@ package com.obj.nc.functions.processors.eventValidator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.utils.JsonUtils;
@@ -17,24 +18,22 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class GenericEventJsonSchemaValidator extends ProcessorFunctionAdapter<JsonNode, JsonNode> {
+public class GenericEventJsonSchemaValidator extends ProcessorFunctionAdapter<GenericEvent, GenericEvent> {
     
     private final JsonSchemaValidatorConfigProperties properties;
     
     @Override
-    protected Optional<PayloadValidationException> checkPreCondition(JsonNode payload) {
-        Optional<PayloadValidationException> exception = super.checkPreCondition(payload);
+    protected Optional<PayloadValidationException> checkPreCondition(GenericEvent genericEvent) {
+        Optional<PayloadValidationException> exception = super.checkPreCondition(genericEvent);
         if (exception.isPresent()) {
             return exception;
         }
     
-        JsonNode payloadType = payload.get("payloadType");
-        ObjectNode payloadAsObjectNode = (ObjectNode) payload;
-        payloadAsObjectNode.remove("payloadType");
+        String payloadType = genericEvent.getPayloadType();
         
         if (payloadType == null) {
             return Optional.of(new PayloadValidationException(
-                    String.format("Payload %s does not contain required property \"payloadType\"", JsonUtils.writeObjectToJSONString(payload))));
+                    String.format("GenericEvent %s does not contain required property \"payloadType\"", genericEvent)));
         }
     
         ClassLoader classLoader = this.getClass().getClassLoader();
@@ -43,26 +42,26 @@ public class GenericEventJsonSchemaValidator extends ProcessorFunctionAdapter<Js
         boolean matchesSchema = false;
         try {
             Resource[] resources = resolver.getResources("classpath:" + properties.getJsonSchemaResourceDir() 
-                    + "/" + properties.getJsonSchemaNameForPayloadType(payloadType.textValue()) + ".json");
+                    + "/" + properties.getJsonSchemaNameForPayloadType(payloadType) + ".json");
             if (resources.length == 0) {
                 return Optional.of(new PayloadValidationException(
-                        String.format("Could not find json schema for payload type %s", payloadType.textValue())));
+                        String.format("Could not find json schema for genericEvent type %s", payloadType)));
             }
-            matchesSchema = JsonSchemaValidator.matchesJsonSchema(resources[0].getFile()).matches(JsonUtils.writeObjectToJSONString(payload));
+            matchesSchema = JsonSchemaValidator.matchesJsonSchema(resources[0].getFile()).matches(JsonUtils.writeObjectToJSONString(genericEvent.getPayloadJson()));
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
         
         if (!matchesSchema) {
             return Optional.of(new PayloadValidationException(String.format("Payload %s does not match json schema of type %s", 
-                    JsonUtils.writeObjectToJSONString(payload), payloadType.textValue())));
+                    genericEvent.getPayloadJson(), payloadType)));
         }
         return Optional.empty();
     }
     
     @Override
-    protected JsonNode execute(JsonNode payload) {
-        return payload;
+    protected GenericEvent execute(GenericEvent genericEvent) {
+        return genericEvent;
     }
     
 }

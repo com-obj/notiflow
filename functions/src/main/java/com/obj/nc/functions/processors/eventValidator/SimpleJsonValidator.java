@@ -1,5 +1,6 @@
 package com.obj.nc.functions.processors.eventValidator;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.utils.JsonUtils;
@@ -10,7 +11,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class GenericEventValidator extends ProcessorFunctionAdapter<String, String> {
+public class SimpleJsonValidator extends ProcessorFunctionAdapter<String, JsonNode> {
     
     @Override
     protected Optional<PayloadValidationException> checkPreCondition(String payload) {
@@ -19,8 +20,8 @@ public class GenericEventValidator extends ProcessorFunctionAdapter<String, Stri
     }
     
     @Override
-    protected String execute(String payload) {
-        return payload;
+    protected JsonNode execute(String payload) {
+        return JsonUtils.readJsonNodeFromJSONString(payload);
     }
     
 }
