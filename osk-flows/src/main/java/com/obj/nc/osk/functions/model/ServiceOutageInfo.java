@@ -6,10 +6,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Comparator;
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-public class ServiceOutageInfo {
+public class ServiceOutageInfo implements Comparable<ServiceOutageInfo> {
 
 	private String customerName;
 	private String productName;
@@ -32,5 +34,13 @@ public class ServiceOutageInfo {
 	
 	public CustomerInfo getCustomer() {
 		return new CustomerInfo(customerName, customerAddress);
+	}
+	
+	@Override
+	public int compareTo(ServiceOutageInfo other) {
+		return Comparator.comparing(ServiceOutageInfo::getCustomerName)
+				.thenComparing(ServiceOutageInfo::getB2bLogin)
+				.thenComparing(ServiceOutageInfo::getProductName)
+				.compare(this, other);
 	}
 }
