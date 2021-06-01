@@ -274,11 +274,7 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 			outageInfos.add(outage);
 		}
 		
-		return outageInfos.stream().sorted(
-				Comparator.comparing(ServiceOutageInfo::getCustomerName)
-						.thenComparing(ServiceOutageInfo::getB2bLogin)
-						.thenComparing(ServiceOutageInfo::getProductName))
-				.collect(Collectors.toList());
+		return outageInfos.stream().sorted().collect(Collectors.toList());
 	}
 	
 	protected String extractCustomerName(List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
