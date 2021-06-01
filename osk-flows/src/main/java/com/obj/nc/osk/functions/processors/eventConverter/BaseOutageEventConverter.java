@@ -1,14 +1,6 @@
 package com.obj.nc.osk.functions.processors.eventConverter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -282,7 +274,11 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 			outageInfos.add(outage);
 		}
 		
-		return outageInfos;
+		return outageInfos.stream().sorted(
+				Comparator.comparing(ServiceOutageInfo::getCustomerName)
+						.thenComparing(ServiceOutageInfo::getB2bLogin)
+						.thenComparing(ServiceOutageInfo::getProductName))
+				.collect(Collectors.toList());
 	}
 	
 	protected String extractCustomerName(List<IncidentTicketServiceOutageForCustomerDto> serviceOutagesForCustomer) {
