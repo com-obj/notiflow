@@ -245,14 +245,14 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
 		//TODO: toto je asi vcelku brittle,.. nemyslim, ze viem garantovat poradie
 		createRestCallExpectation("0918186997", "Vážený zákazník,", "sme zaznamenali výpadok, ktorý môže mať dopad na využívanie Vašich služieb od Orangeu.", "VPS", "0918186997", "VPS sifrovana");
 		createRestCallExpectation("+421918186997", "Vážený zákazník,", "sme zaznamenali výpadok, ktorý môže mať dopad na využívanie Vašich služieb od Orangeu.", "VPS", "0918186997", "VPS sifrovana");
-		createRestCallExpectation("0918186998", "Vážený zákazník,", "sme zaznamenali výpadok, ktorý môže mať dopad na využívanie Vašich služieb od Orangeu.", "VPS sifrovana/nesifrovana", "VPS sifrovana");
+		createRestCallExpectation("0918186998", "Vážený zákazník,", "sme zaznamenali výpadok, ktorý môže mať dopad na využívanie Vašich služieb od Orangeu.", "VPS sifrovana", "VPS sifrovana/nesifrovana");
 	}
 	
 	private void createRestCallExpectationsForOutageEndSms() {
 		//TODO: toto je asi vcelku brittle,.. nemyslim, ze viem garantovat poradie
 		createRestCallExpectation("0918186997", "Vážený zákazník, už avizovaný výpadok z", "ktorý mohol mať dopad", "bol odstránený", "VPS", "VPS sifrovana");
 		createRestCallExpectation("+421918186997", "Vážený zákazník, už avizovaný výpadok z", "ktorý mohol mať dopad", "bol odstránený", "VPS", "VPS sifrovana");
-		createRestCallExpectation("0918186998", "Vážený zákazník, už avizovaný výpadok z", "ktorý mohol mať dopad", "bol odstránený", "VPS sifrovana/nesifrovana", "VPS sifrovana");
+		createRestCallExpectation("0918186998", "Vážený zákazník, už avizovaný výpadok z", "ktorý mohol mať dopad", "bol odstránený", "VPS sifrovana", "VPS sifrovana/nesifrovana");
 	}
 	
     public static OskSendSmsResponseDto createResponse(String senderAddrress) {
