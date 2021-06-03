@@ -214,6 +214,87 @@ class EventReceiverTest extends BaseIntegrationTest {
 			.andExpect(jsonPath("$").value(CoreMatchers.startsWith("Request arguments not valid: Required request body is missing")));
         
     }
+    
+    @Test
+    void testJsonSchemaPresentValidEvent() throws Exception {
+        // given
+        String validJobPostEvent = JsonUtils.readJsonStringFromClassPathResource("generic_events/job_body.json");
+        
+        //when
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.post("/events")
+                        .param("payloadType", "JOB_POST")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content(validJobPostEvent)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        
+        //then
+        resp.andExpect(status().is2xxSuccessful());
+    }
+    
+    @Test
+    void testJsonSchemaPresentInvalidEvent() throws Exception {
+        // given
+        String jobPostEventWithoutDescription = JsonUtils.readJsonStringFromClassPathResource("generic_events/job_body_no_text.json");
+        
+        //when
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.post("/events")
+                        .param("payloadType", "JOB_POST")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content(jobPostEventWithoutDescription)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        
+        //then
+        resp
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$").value(CoreMatchers.startsWith("Request not valid becase of invalid payload: Payload")));
+        
+    }
+    
+    @Test
+    void testInvalidPayloadType() throws Exception {
+        // given
+        String validJobPostEvent = JsonUtils.readJsonStringFromClassPathResource("generic_events/job_body.json");
+        
+        //when
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.post("/events")
+                        .param("payloadType", "JOB_POST_NOT_EXISTING")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content(validJobPostEvent)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        
+        //then
+        resp
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$").value(CoreMatchers.startsWith("Unknown message type: JOB_POST_NOT_EXISTING")));
+        
+    }
+    
+    @Test
+    void testJsonSchemaAbsent() throws Exception {
+        // given
+        String validJobPostEvent = JsonUtils.readJsonStringFromClassPathResource("generic_events/job_body.json");
+        
+        //when
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.post("/events")
+                        .param("payloadType", "BLOG")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content(validJobPostEvent)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        
+        //then
+        resp
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$").value(CoreMatchers.startsWith("java.io.FileNotFoundException: class path resource")));
+        
+    }
 
  
 }

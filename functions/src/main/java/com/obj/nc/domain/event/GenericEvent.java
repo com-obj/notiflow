@@ -42,6 +42,8 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	//TODO: do not duplicate, use from header
 	private String flowId;
 	
+	private String payloadType;
+	
 	private JsonNode payloadJson;
 
 	private String externalId;
@@ -59,6 +61,7 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 		event.setPayloadJson(state);
 		event.flowId = state.get("flowId")!=null?state.get("flowId").textValue():"default-flow";
 		event.externalId = state.get("externalId")!=null?state.get("externalId").textValue():null;
+		event.payloadType = state.get("payloadType")!=null?state.get("payloadType").textValue():null;
 		
 		event.id = UUID.randomUUID();
 
@@ -95,6 +98,14 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
     	} 
 		
 		this.externalId = externalId;
+	}
+	
+	public void overridePayloadTypeIfApplicable(String payloadType) {
+		if (payloadType == null) {
+			return;
+		}
+		
+		this.payloadType = payloadType;
 	}
 
 	@Override
