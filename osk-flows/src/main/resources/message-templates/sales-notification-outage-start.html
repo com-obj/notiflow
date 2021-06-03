@@ -20,8 +20,7 @@
 		<th>Adresa odberného miesta</th>
 	</tr>
 	</thead>
-	<tbody>
-	<span th:each="services : ${model.servicesPerCustomer}">
+	<tbody th:each="services : ${model.servicesPerCustomer}">
 		<tr th:each="service : ${services.value}">
 			<td><span style="font-weight:bold" th:text="${service.customerName}"> mvsr.sk </span></td>
 			<td><span style="font-weight:bold" th:text="${service.b2bLogin}"> mvsr.sk </span></td>
@@ -29,7 +28,6 @@
 			<td><span th:text="${service.productName}"> VPS </span></td>
 			<td><span th:text="${service.installationAddress}"> Bratislava </span></td>
 		</tr>
-	</span>
 	</tbody>
 </table>
 <p>
