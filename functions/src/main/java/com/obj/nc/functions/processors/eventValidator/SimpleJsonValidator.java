@@ -4,10 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.utils.JsonUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-public abstract class GenericEventValidator extends ProcessorFunctionAdapter<String, JsonNode> {
+@Component
+@RequiredArgsConstructor
+public class SimpleJsonValidator extends ProcessorFunctionAdapter<String, JsonNode> {
     
     @Override
     protected Optional<PayloadValidationException> checkPreCondition(String payload) {

@@ -3,7 +3,6 @@ version: '3'
 services:
   nc-postgres:
     image: postgres:11.9
-#    restart: always
     environment:
       POSTGRES_DB: nc
       POSTGRES_USER: nc
@@ -12,5 +11,3 @@ services:
       - 5432
     ports:
       - 25432:5432
-    networks:
-      - koderia-flows

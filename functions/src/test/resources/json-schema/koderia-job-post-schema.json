@@ -31,6 +31,9 @@
             }
           ]
         },
+        "specialRate": {
+          "type": "string"
+        },
         "type": {
           "type": "string"
         }
@@ -42,6 +45,7 @@
         "location",
         "rate",
         "technologies",
+        "specialRate",
         "type"
       ]
     }
