@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.message.Message;
@@ -25,7 +25,7 @@ public class SmsTemplateFormatter extends BaseTemplateFormatter<TemplateWithMode
 
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message<TemplateWithModelContent<?>> message) {
-		Content content = message.getBody();
+		MessageContent content = message.getBody();
 		
 		if (!(content instanceof  TemplateWithModelContent)) {
 			return Optional.of(new PayloadValidationException("SmsTemplateFormatter cannot format message because its content is not of type TemplateWithJsonModelSmsContent. Instead is " +  content.getClass().getSimpleName()));

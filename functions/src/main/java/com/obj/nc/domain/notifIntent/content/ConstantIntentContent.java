@@ -1,5 +1,6 @@
-package com.obj.nc.domain.content.intent;
+package com.obj.nc.domain.notifIntent.content;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -9,13 +10,12 @@ import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.deliveryOptions.ChannelDeliveryOption.CHANNEL_TYPE;
-import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.endpoints.SmsEndpoint;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,14 +37,16 @@ import lombok.NoArgsConstructor;
  * @author i76700
  *
  */
-public class ConstantIntentContent extends BaseIntentContent {
+public class ConstantIntentContent extends IntentContent {
 
 	public final static String JSON_TYPE_IDENTIFIER = "CONSTANT_INTENT_CONTENT";
 
 	@NotNull
 	private String body;
 	private String subject;
-	private List<Attachement> attachments;
+
+	@Builder.Default
+	private List<Attachement> attachments = new ArrayList<>();
 	
 	@Builder.Default
 	private String contentType=MediaType.TEXT_PLAIN_VALUE;
@@ -55,8 +57,8 @@ public class ConstantIntentContent extends BaseIntentContent {
 	}
 
 	@Override
-	public Content createMessageContent(CHANNEL_TYPE type) {
-		if (type == CHANNEL_TYPE.EMAIL) {
+	public MessageContent createMessageContent(RecievingEndpoint endpoint) {
+		if (endpoint instanceof EmailEndpoint) {
 			EmailContent emailContent = EmailContent.builder()
 				.text(getBody())
 				.subject(getSubject())
@@ -65,7 +67,7 @@ public class ConstantIntentContent extends BaseIntentContent {
 				.build();
 			
 			return emailContent;
-		} else if (type == CHANNEL_TYPE.SMS) {
+		} else if (endpoint instanceof SmsEndpoint) {
 			SimpleTextContent smsContent = SimpleTextContent.builder()
 					.text(getBody())
 					.build();

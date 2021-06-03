@@ -10,8 +10,10 @@ import org.junit.jupiter.api.Test;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.notifIntent.content.ConstantIntentContent;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
 
@@ -22,15 +24,15 @@ class MessagesFromIntentTest {
 	@Test
 	void createMessagesFromEvent() {
 		//GIVEN
-		String INPUT_JSON_FILE = "events/direct_message.json";
-		NotificationIntent<EmailContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		String INPUT_JSON_FILE = "intents/direct_message.json";
+		NotificationIntent<ConstantIntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
 		GenerateEventIdProcessingFunction generateEventfunction = new GenerateEventIdProcessingFunction();
-		notificationIntent = (NotificationIntent<EmailContent>)generateEventfunction.apply(notificationIntent);
+		notificationIntent = (NotificationIntent<ConstantIntentContent>)generateEventfunction.apply(notificationIntent);
 		
 		//WHEN
-		MessagesFromNotificationIntentProcessingFunction<EmailContent> createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction<EmailContent>();
-		List<Message<EmailContent>> result = createMessagesFunction.apply(notificationIntent);
+		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
+		List<EmailMessage> result = (List<EmailMessage>)createMessagesFunction.apply(notificationIntent);
 		
 		//THEN
 		assertThat(result.size()).isEqualTo(3);
@@ -44,7 +46,6 @@ class MessagesFromIntentTest {
 		assertThat(recipient).extracting("email").isIn("john.doe@objectify.sk", "john.dudly@objectify.sk", "all@objectify.sk");
 		
         EmailContent emailContent = message.getBody();
-		assertThat(emailContent).isEqualTo(notificationIntent.getBody());
 		assertThat(emailContent.getSubject()).isEqualTo("Subject");
 		assertThat(emailContent.getText()).isEqualTo("Text");
 		assertThat(emailContent.getAttachments().size()).isEqualTo(0);
@@ -93,19 +94,18 @@ class MessagesFromIntentTest {
 	@Test
 	void createMessagesFromEventAttachements() {
 		//GIVEN
-		String INPUT_JSON_FILE = "events/direct_message_attachements.json";
-		NotificationIntent<EmailContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		String INPUT_JSON_FILE = "intents/direct_message_attachements.json";
+		NotificationIntent<ConstantIntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
-		GenerateEventIdProcessingFunction funciton = new GenerateEventIdProcessingFunction();
-
-		notificationIntent = (NotificationIntent<EmailContent>)funciton.apply(notificationIntent);
+		GenerateEventIdProcessingFunction generateEventFunc = new GenerateEventIdProcessingFunction();
+		notificationIntent = (NotificationIntent<ConstantIntentContent>)generateEventFunc.apply(notificationIntent);
 		
 		//WHEN
-		MessagesFromNotificationIntentProcessingFunction<EmailContent> createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction<EmailContent>();
-		List<Message<EmailContent>> result = createMessagesFunction.apply(notificationIntent);
+		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
+		List<EmailMessage> result = (List<EmailMessage>)createMessagesFunction.apply(notificationIntent);
 		
 		//THEN
-		Message<EmailContent> deliveryNullMessage = findMessageWithEnpoint(result, "john.doe@objectify.sk");
+		EmailMessage deliveryNullMessage = (EmailMessage)findMessageWithEnpoint(result, "john.doe@objectify.sk");
 		
         EmailContent emailContent = deliveryNullMessage.getBody();
 		List<Attachement> attachements = emailContent.getAttachments();
@@ -115,8 +115,8 @@ class MessagesFromIntentTest {
 		assertThat(attachements).first().extracting("fileURI").hasToString("http://domain/location/name.extension");
 	}
 	
-	private Message<EmailContent> findMessageWithEnpoint(List<Message<EmailContent>> result, String endpointName) {
-		Message<EmailContent> deliveryNullMessage = result
+	private EmailMessage findMessageWithEnpoint(List<EmailMessage> result, String endpointName) {
+		EmailMessage deliveryNullMessage = result
 				.stream()
 				.filter( msg -> msg.getRecievingEndpoints().get(0).getEndpointId().equals(endpointName))
 				.collect(Collectors.toList())

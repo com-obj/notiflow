@@ -27,7 +27,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class NotificationIntentProcessingFlowConfig {
 		
-	@Autowired private MessagesFromNotificationIntentProcessingFunction<?> generateMessagesFromIntent;
+	@Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromIntent;
 	@Autowired private NotificationIntentPersister notificationIntentPersister;
 	
 	public final static String INTENT_PROCESSING_FLOW_ID = "INTENT_PROCESSING_FLOW_ID";

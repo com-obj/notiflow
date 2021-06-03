@@ -12,7 +12,7 @@ import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.headers.Header;
 
 import lombok.Builder;
@@ -35,7 +35,7 @@ public class MessagePersistantState implements Persistable<UUID>{
 	private Header header;
 	
 	@Column("content_json")
-	private Content body;
+	private MessageContent body;
 	
 	private String messageClass;
 	

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpAttachmentDto;
 import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpMergeVariableDto;
 import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpRecipientDto;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @JsonTypeName(MailchimpContent.JSON_TYPE_IDENTIFIER)
-public class MailchimpContent extends Content {
+public class MailchimpContent extends MessageContent {
     
     public final static String JSON_TYPE_IDENTIFIER = "MAILCHIMP_CONTENT";
     

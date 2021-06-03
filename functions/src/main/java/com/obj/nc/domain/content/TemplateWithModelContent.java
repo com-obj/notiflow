@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public abstract class TemplateWithModelContent<MODEL_TYPE> extends Content {
+public abstract class TemplateWithModelContent<MODEL_TYPE> extends MessageContent {
 	
 	@NonNull
 	@EqualsAndHashCode.Include

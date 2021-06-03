@@ -7,6 +7,10 @@ import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 
+import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -14,6 +18,8 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Group extends Recipient{
 	
 	public static final String JSON_TYPE_IDENTIFIER = "GROUP";
@@ -21,18 +27,25 @@ public class Group extends Recipient{
 	@NotNull
 	private String name;
 	
+	@Builder.Default
 	private List<Recipient> members = new ArrayList<>();
 	
-	private boolean wasRsolved = false;
+	@Builder.Default
+	private boolean wasResolved = false;
+	
+	private DeliveryOptions deliveryOptions; 
 	
 	public Group(String name) {
 		this.name = name;
 	}
 	
 	public static Group createWithMembers(String name, Recipient ... members ) {
-		Group group = new Group(name);
-		group.members.addAll(Arrays.asList(members));
-		group.wasRsolved = true;
+		Group group = Group.builder()
+				.name(name)
+				.members(Arrays.asList(members))
+				.wasResolved(true)
+				.build();
+		
 		return group;
 	}
 

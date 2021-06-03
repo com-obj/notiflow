@@ -9,10 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.notifIntent.content.ConstantIntentContent;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.utils.JsonUtils;
 
@@ -29,12 +29,12 @@ class RecepientsUsingSubscriptionTest {
     @Test
     void testResolveRecipientsPassWithRequiredAttributes() {
         // given
-        String INPUT_JSON_FILE = "events/ba_job_post.json";
-        NotificationIntent<EmailContent> inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        inputNotificationIntent = (NotificationIntent<EmailContent>)validateAndGenerateEventId.apply(inputNotificationIntent);
+        String INPUT_JSON_FILE = "intents/ba_job_post.json";
+        NotificationIntent<ConstantIntentContent> inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        inputNotificationIntent = (NotificationIntent<ConstantIntentContent>)validateAndGenerateEventId.apply(inputNotificationIntent);
 
         // when
-        NotificationIntent<EmailContent> outputNotificationIntent = (NotificationIntent<EmailContent>)resolveRecipients.apply(inputNotificationIntent);
+        NotificationIntent<ConstantIntentContent> outputNotificationIntent = (NotificationIntent<ConstantIntentContent>)resolveRecipients.apply(inputNotificationIntent);
 
         // then
         MatcherAssert.assertThat(outputNotificationIntent, Matchers.notNullValue());
@@ -43,12 +43,12 @@ class RecepientsUsingSubscriptionTest {
     @Test
     void testResolveRecipientsResolvesAll() {
         // given
-        String INPUT_JSON_FILE = "events/ba_job_post.json";
-        NotificationIntent<EmailContent> inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        inputNotificationIntent = (NotificationIntent<EmailContent>)validateAndGenerateEventId.apply(inputNotificationIntent);
+        String INPUT_JSON_FILE = "intents/ba_job_post.json";
+        NotificationIntent<ConstantIntentContent> inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        inputNotificationIntent = (NotificationIntent<ConstantIntentContent>)validateAndGenerateEventId.apply(inputNotificationIntent);
 
         // when
-        NotificationIntent<EmailContent> outputNotificationIntent = (NotificationIntent<EmailContent>)resolveRecipients.apply(inputNotificationIntent);
+        NotificationIntent<ConstantIntentContent> outputNotificationIntent = (NotificationIntent<ConstantIntentContent>)resolveRecipients.apply(inputNotificationIntent);
 
         // then
         MatcherAssert.assertThat(outputNotificationIntent, Matchers.notNullValue());
@@ -70,12 +70,12 @@ class RecepientsUsingSubscriptionTest {
     @Test
     void testResolveRecipientsMergeWithExisting() {
         // given
-        String INPUT_JSON_FILE = "events/ba_job_post_recipients.json";
-        NotificationIntent<EmailContent> inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        inputNotificationIntent = (NotificationIntent<EmailContent>)validateAndGenerateEventId.apply(inputNotificationIntent);
+        String INPUT_JSON_FILE = "intents/ba_job_post_recipients.json";
+        NotificationIntent<ConstantIntentContent> inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        inputNotificationIntent = (NotificationIntent<ConstantIntentContent>)validateAndGenerateEventId.apply(inputNotificationIntent);
 
         // when
-        NotificationIntent<EmailContent> outputNotificationIntent = (NotificationIntent<EmailContent>)resolveRecipients.apply(inputNotificationIntent);
+        NotificationIntent<ConstantIntentContent> outputNotificationIntent = (NotificationIntent<ConstantIntentContent>)resolveRecipients.apply(inputNotificationIntent);
 
         // then
         List<? extends RecievingEndpoint> outputEventEndpoints = outputNotificationIntent.getRecievingEndpoints();

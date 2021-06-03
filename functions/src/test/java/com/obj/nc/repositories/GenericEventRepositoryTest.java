@@ -23,7 +23,7 @@ public class GenericEventRepositoryTest {
 	@Test
 	public void testPersistingSingleEvent() {
 		//GIVEN
-		String INPUT_JSON_FILE = "events/direct_message.json";
+		String INPUT_JSON_FILE = "intents/direct_message.json";
 		String content = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
 		
 		GenericEvent event = GenericEvent.builder()

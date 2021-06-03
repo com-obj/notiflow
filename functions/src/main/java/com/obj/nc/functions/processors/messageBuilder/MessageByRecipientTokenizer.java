@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -21,7 +21,7 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 @Log4j2
 @DocumentProcessingInfo("MessageByRecipientTokenizer")
-public class MessageByRecipientTokenizer<CONTENT_TYPE extends Content> extends ProcessorFunctionAdapter<Message<CONTENT_TYPE>, List<Message<CONTENT_TYPE>>> {
+public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> extends ProcessorFunctionAdapter<Message<CONTENT_TYPE>, List<Message<CONTENT_TYPE>>> {
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(Message<CONTENT_TYPE> notificationIntent) {

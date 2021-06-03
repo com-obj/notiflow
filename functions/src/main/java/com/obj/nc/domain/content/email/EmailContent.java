@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.domain.Attachement;
-import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.MessageContent;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @JsonTypeName(EmailContent.JSON_TYPE_IDENTIFIER)
-public class EmailContent extends Content {
+public class EmailContent extends MessageContent {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CONTENT";
 
@@ -40,7 +40,7 @@ public class EmailContent extends Content {
 
 	@EqualsAndHashCode.Include
 	@Builder.Default
-	private List<Attachement> attachments = new ArrayList<Attachement>();
+	private List<Attachement> attachments = new ArrayList();
 	
 	@Override
 	public String getContentTypeName() {
