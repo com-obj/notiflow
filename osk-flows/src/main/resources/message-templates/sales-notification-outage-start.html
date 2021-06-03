@@ -11,32 +11,26 @@
 	<span> došlo k výpadku, ktorý môže mať dopad na zákazníkov a ich služby:</span>
 </p>
 <table border="1" cellpadding="5" style="border-collapse:collapse; border: 0px;">
-<tbody>
-	<tr th:each="services : ${model.servicesPerCustomer}">
-		<td>
-			<table border="1" cellpadding="5" style="border-collapse:collapse; border: 0px;">
-				<thead>
-				<tr>
-					<th>Meno zákazníka</th>
-					<th>B2B Login</th>
-					<th>SN</th>
-					<th>Služba</th>
-					<th>Adresa odberného miesta</th>
-				</tr>
-				</thead>
-				<tbody>
-				<tr th:each="service : ${services.value}">
-					<td><span style="font-weight:bold" th:text="${service.customerName}"> mvsr.sk </span></td>
-					<td><span style="font-weight:bold" th:text="${service.b2bLogin}"> mvsr.sk </span></td>
-					<td><span th:text="${service.sn}"> 0905132354 </span></td>
-					<td><span th:text="${service.productName}"> VPS </span></td>
-					<td><span th:text="${service.installationAddress}"> Bratislava </span></td>
-				</tr>
-				</tbody>
-			</table>
-		</td>
+	<thead>
+	<tr>
+		<th>Meno zákazníka</th>
+		<th>B2B Login</th>
+		<th>SN</th>
+		<th>Služba</th>
+		<th>Adresa odberného miesta</th>
 	</tr>
-</tbody>
+	</thead>
+	<tbody>
+	<span th:each="services : ${model.servicesPerCustomer}">
+		<tr th:each="service : ${services.value}">
+			<td><span style="font-weight:bold" th:text="${service.customerName}"> mvsr.sk </span></td>
+			<td><span style="font-weight:bold" th:text="${service.b2bLogin}"> mvsr.sk </span></td>
+			<td><span th:text="${service.sn}"> 0905132354 </span></td>
+			<td><span th:text="${service.productName}"> VPS </span></td>
+			<td><span th:text="${service.installationAddress}"> Bratislava </span></td>
+		</tr>
+	</span>
+	</tbody>
 </table>
 <p>
 	<span>Celkovo môže byť ovplyvnených </span>
