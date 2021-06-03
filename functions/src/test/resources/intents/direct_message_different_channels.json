@@ -12,11 +12,11 @@
 		"attachments": [
 			{
 				"name": "name.extension",
-				"file-URI": "file://./resources/intents/0_ba_job_post.json"
+				"file-name": "src/test/resources/intents/0_ba_job_post.json"
 			},
 			{
 				"name": "name.extension",
-				"file-URI": "file://./resources/intents/0_ba_job_post.json"
+				"file-name": "src/test/resources/intents/0_ba_job_post.json"
 			}
 		]
 	},

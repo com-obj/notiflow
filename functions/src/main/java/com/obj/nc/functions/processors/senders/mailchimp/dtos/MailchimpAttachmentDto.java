@@ -32,7 +32,12 @@ public class MailchimpAttachmentDto {
 		MailchimpAttachmentDto dto = new MailchimpAttachmentDto();
 		dto.setName(attachement.getName());
 
-		FileSystemResource file = new FileSystemResource(new File(attachement.getFileURI()));
+		FileSystemResource file;
+		if (attachement.getFilePathAndName()!=null) {
+			file = new FileSystemResource(new File(attachement.getFilePathAndName()));
+		} else {
+			file = new FileSystemResource(new File(attachement.getFileURI()));			
+		}
 		FileNameMap fileNameMap = URLConnection.getFileNameMap();
 		String mimeType = fileNameMap.getContentTypeFor(file.getFilename());
 		dto.setType(mimeType);

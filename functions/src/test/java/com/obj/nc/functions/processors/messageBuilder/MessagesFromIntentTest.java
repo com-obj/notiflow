@@ -150,7 +150,7 @@ class MessagesFromIntentTest {
 		assertThat(attachements).isNotNull();
 		assertThat(attachements.size()).isEqualTo(2);
 		assertThat(attachements).first().extracting("name").isEqualTo("name.extension");
-		assertThat(attachements).first().extracting("fileURI").hasToString("http://domain/location/name.extension");
+		assertThat(attachements).first().extracting("content").isNotNull();
 
 	}
 	
