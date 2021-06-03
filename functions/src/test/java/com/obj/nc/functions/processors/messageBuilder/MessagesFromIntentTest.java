@@ -9,12 +9,17 @@ import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.domain.notifIntent.content.ConstantIntentContent;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpAttachmentDto;
 import com.obj.nc.utils.JsonUtils;
 
 class MessagesFromIntentTest {
@@ -102,10 +107,10 @@ class MessagesFromIntentTest {
 		
 		//WHEN
 		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
-		List<EmailMessage> result = (List<EmailMessage>)createMessagesFunction.apply(notificationIntent);
+		List<Message<?>> result = (List<Message<?>>)createMessagesFunction.apply(notificationIntent);
 		
 		//THEN
-		EmailMessage deliveryNullMessage = (EmailMessage)findMessageWithEnpoint(result, "john.doe@objectify.sk");
+		EmailMessage deliveryNullMessage = findMessageWithEnpoint(result, "john.doe@objectify.sk");
 		
         EmailContent emailContent = deliveryNullMessage.getBody();
 		List<Attachement> attachements = emailContent.getAttachments();
@@ -115,8 +120,43 @@ class MessagesFromIntentTest {
 		assertThat(attachements).first().extracting("fileURI").hasToString("http://domain/location/name.extension");
 	}
 	
-	private EmailMessage findMessageWithEnpoint(List<EmailMessage> result, String endpointName) {
-		EmailMessage deliveryNullMessage = result
+	@SuppressWarnings("unchecked")
+	@Test
+	void createMessagesFromEventDifferentChannels() {
+		//GIVEN
+		String INPUT_JSON_FILE = "intents/direct_message_different_channels.json";
+		NotificationIntent<ConstantIntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		
+		//WHEN
+		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
+		List<Message<?>> result = (List<Message<?>>)createMessagesFunction.apply(notificationIntent);
+		
+		//AND THEN
+		assertThat(result.size()).isEqualTo(3);
+		
+		SimpleTextMessage message = findMessageWithEnpoint(result, "0918186997");
+		
+		List<? extends RecievingEndpoint> recievingEndpoints = message.getRecievingEndpoints();
+		assertThat(recievingEndpoints.size()).isEqualTo(1);
+				
+		SimpleTextContent smsContent = message.getBody();
+		assertThat(smsContent.getText()).isEqualTo("Text");
+		
+		//AND THEN
+		MailChimpMessage mailChimpMessage = findMessageWithEnpoint(result, "all@objectify.sk");
+		
+        MailchimpContent emailContent = mailChimpMessage.getBody();
+		List<MailchimpAttachmentDto> attachements = emailContent.getAttachments();
+		assertThat(attachements).isNotNull();
+		assertThat(attachements.size()).isEqualTo(2);
+		assertThat(attachements).first().extracting("name").isEqualTo("name.extension");
+		assertThat(attachements).first().extracting("fileURI").hasToString("http://domain/location/name.extension");
+
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends Message<?>> T findMessageWithEnpoint(List<Message<?>> result, String endpointName) {
+		T deliveryNullMessage = (T) result
 				.stream()
 				.filter( msg -> msg.getRecievingEndpoints().get(0).getEndpointId().equals(endpointName))
 				.collect(Collectors.toList())

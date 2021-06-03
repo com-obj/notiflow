@@ -7,10 +7,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
 
 import lombok.Data;
@@ -55,13 +61,25 @@ public class NotificationIntent<BODY_TYPE extends IntentContent> extends BasePay
 
 	public Message<?> createMessage(RecievingEndpoint endpointsForOneSubject) {		
 		if (endpointsForOneSubject instanceof EmailEndpoint) {
-			EmailMessage msg = new EmailMessage();
+			EmailMessage email = new EmailMessage();
 			MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
-			msg.setBody((EmailContent)msgContent);
+			email.setBody((EmailContent)msgContent);
 			
-			return msg;
+			return email;
+		} else if (endpointsForOneSubject instanceof SmsEndpoint) {
+			SimpleTextMessage sms = new SimpleTextMessage();
+			MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
+			sms.setBody((SimpleTextContent)msgContent);
+			
+			return sms;
+		} else if (endpointsForOneSubject instanceof MailchimpEndpoint) {
+			MailChimpMessage mailChimp = new MailChimpMessage();
+			MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
+			mailChimp.setBody((MailchimpContent)msgContent);
+			
+			return mailChimp;
 		}
-		
+
 		throw new NotImplementedException("Add additional cases");
 
 	}

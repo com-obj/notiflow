@@ -12,10 +12,13 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpAttachmentDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -70,6 +73,17 @@ public class ConstantIntentContent extends IntentContent {
 		} else if (endpoint instanceof SmsEndpoint) {
 			SimpleTextContent smsContent = SimpleTextContent.builder()
 					.text(getBody())
+					.build();
+			
+			return smsContent;
+		} else if (endpoint instanceof MailchimpEndpoint) {
+			List<MailchimpAttachmentDto> mailchimpAttachmentDtos = MailchimpAttachmentDto.fromAttachements(attachments);
+			
+			//TODO: add missing peaces
+			MailchimpContent smsContent = MailchimpContent.builder()
+					.subject(getSubject())
+					.attachments(mailchimpAttachmentDtos)
+					.templateName(getBody())
 					.build();
 			
 			return smsContent;
