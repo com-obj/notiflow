@@ -34,7 +34,7 @@ import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.domain.notifIntent.content.ConstantIntentContent;
+import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlow;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
@@ -67,11 +67,11 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     void testDeliveryInfosCreateAndPersisted() {
         // GIVEN
         String INPUT_JSON_FILE = "intents/ba_job_post.json";
-        NotificationIntent<ConstantIntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        NotificationIntent<IntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
-        notificationIntent = (NotificationIntent<ConstantIntentContent>)generateEventId.apply(notificationIntent);
+        notificationIntent = (NotificationIntent<IntentContent>)generateEventId.apply(notificationIntent);
         UUID eventId = notificationIntent.getHeader().getEventIds().get(0);
-        notificationIntent = (NotificationIntent<ConstantIntentContent>)resolveRecipients.apply(notificationIntent);
+        notificationIntent = (NotificationIntent<IntentContent>)resolveRecipients.apply(notificationIntent);
         
         //WHEN
         deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(notificationIntent);
@@ -229,7 +229,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     }
 
 
-	private void assertEnpointPersistedNotDuplicated(NotificationIntent<ConstantIntentContent> notificationIntent) {
+	private void assertEnpointPersistedNotDuplicated(NotificationIntent<IntentContent> notificationIntent) {
 		List<Map<String, Object>> persistedEndpoints = jdbcTemplate.queryForList("select * from nc_endpoint");
         assertThat(persistedEndpoints, CoreMatchers.notNullValue());
         Assertions.assertThat(persistedEndpoints.size()).isEqualTo(3);

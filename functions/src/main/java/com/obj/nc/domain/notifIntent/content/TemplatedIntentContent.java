@@ -8,24 +8,17 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.NotImplementedException;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-@Builder
 @JsonTypeName(TemplatedIntentContent.JSON_TYPE_IDENTIFIER)
 public class TemplatedIntentContent extends IntentContent {
 	
@@ -36,10 +29,7 @@ public class TemplatedIntentContent extends IntentContent {
 
 	private String subjectResourceKey;	
 	
-	//leave empty if based on recipients settings
 	private List<Locale> messageBodyLocales;
-
-	private List<Attachement> attachments;
 
 	//model should be provided when creating message from intent
 //	private List<MODEL_TYPE> model;

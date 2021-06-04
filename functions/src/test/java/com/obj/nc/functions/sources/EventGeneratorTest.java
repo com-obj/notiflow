@@ -22,7 +22,7 @@ import org.springframework.util.FileSystemUtils;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.domain.notifIntent.content.ConstantIntentContent;
+import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfigProperties;
 import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
@@ -71,12 +71,12 @@ class EventGeneratorTest {
         config.setFileName(EVENT_FILE_NAME);
 
         // when
-        NotificationIntent<ConstantIntentContent> notificationIntentFromFile = (NotificationIntent<ConstantIntentContent>)generateEvent.get();
+        NotificationIntent<IntentContent> notificationIntentFromFile = (NotificationIntent<IntentContent>)generateEvent.get();
 
         // then
         Assertions.assertThat(notificationIntentFromFile).isNotNull();
         
-        ConstantIntentContent emailContent = notificationIntentFromFile.getBody();
+        IntentContent emailContent = notificationIntentFromFile.getBody();
         Assertions.assertThat(emailContent.getBody()).isEqualTo("We are looking for a Business Intelligence (BI) Developer to create...");
         Assertions.assertThat(emailContent.getSubject()).isEqualTo("Business Intelligence (BI) Developer");
         Assertions.assertThat(((Map<?, ?>) notificationIntentFromFile.getAttributes().get("originalEvent"))).hasSize(2);
@@ -133,10 +133,10 @@ class EventGeneratorTest {
         config.setFileName(null);
 
         // when
-        NotificationIntent<ConstantIntentContent> notificationIntentFromFile = (NotificationIntent<ConstantIntentContent>)generateEvent.get();
+        NotificationIntent<IntentContent> notificationIntentFromFile = (NotificationIntent<IntentContent>)generateEvent.get();
 
         // then
-        ConstantIntentContent emailContent = notificationIntentFromFile.getBody();
+        IntentContent emailContent = notificationIntentFromFile.getBody();
         Assertions.assertThat(emailContent.getSubject()).isEqualTo("First event in queue");
     }
 
@@ -149,7 +149,7 @@ class EventGeneratorTest {
         // when - then
         Assertions.assertThat(Files.exists(Paths.get(EVENT_QUEUE_DIR + EVENT_FILE_NAME))).isTrue();
 
-        NotificationIntent<ConstantIntentContent> notificationIntentFromFile = (NotificationIntent<ConstantIntentContent>)generateEvent.get();
+        NotificationIntent<IntentContent> notificationIntentFromFile = (NotificationIntent<IntentContent>)generateEvent.get();
 
         Assertions.assertThat(Files.exists(Paths.get(EVENT_QUEUE_DIR + EVENT_FILE_NAME))).isFalse();
     }

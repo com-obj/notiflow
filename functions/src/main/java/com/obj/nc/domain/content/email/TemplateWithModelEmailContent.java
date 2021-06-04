@@ -12,7 +12,6 @@ import org.springframework.context.NoSuchMessageException;
 import com.obj.nc.Get;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.TemplateWithModelContent;
-import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +19,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Data

@@ -17,7 +17,7 @@ import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.domain.notifIntent.content.ConstantIntentContent;
+import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpAttachmentDto;
 import com.obj.nc.utils.JsonUtils;
@@ -30,10 +30,10 @@ class MessagesFromIntentTest {
 	void createMessagesFromEvent() {
 		//GIVEN
 		String INPUT_JSON_FILE = "intents/direct_message.json";
-		NotificationIntent<ConstantIntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent<IntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
 		GenerateEventIdProcessingFunction generateEventfunction = new GenerateEventIdProcessingFunction();
-		notificationIntent = (NotificationIntent<ConstantIntentContent>)generateEventfunction.apply(notificationIntent);
+		notificationIntent = (NotificationIntent<IntentContent>)generateEventfunction.apply(notificationIntent);
 		
 		//WHEN
 		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
@@ -100,10 +100,10 @@ class MessagesFromIntentTest {
 	void createMessagesFromEventAttachements() {
 		//GIVEN
 		String INPUT_JSON_FILE = "intents/direct_message_attachements.json";
-		NotificationIntent<ConstantIntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent<IntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
 		GenerateEventIdProcessingFunction generateEventFunc = new GenerateEventIdProcessingFunction();
-		notificationIntent = (NotificationIntent<ConstantIntentContent>)generateEventFunc.apply(notificationIntent);
+		notificationIntent = (NotificationIntent<IntentContent>)generateEventFunc.apply(notificationIntent);
 		
 		//WHEN
 		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
@@ -125,7 +125,7 @@ class MessagesFromIntentTest {
 	void createMessagesFromEventDifferentChannels() {
 		//GIVEN
 		String INPUT_JSON_FILE = "intents/direct_message_different_channels.json";
-		NotificationIntent<ConstantIntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent<IntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 		
 		//WHEN
 		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
