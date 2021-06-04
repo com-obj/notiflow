@@ -26,6 +26,4 @@ public abstract class TemplateWithModelContent<MODEL_TYPE> extends MessageConten
 	
 	private List<Locale> requiredLocales = new ArrayList<>();
 	
-
-
 }

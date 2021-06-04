@@ -8,18 +8,20 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.Attachement;
+import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.MailChimpMessage;
+import com.obj.nc.domain.message.EmailWithTemplatedContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmsWithTemplatedContent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpAttachmentDto;
+import com.obj.nc.functions.processors.messageTeamplating.domain.TestModel;
 import com.obj.nc.utils.JsonUtils;
 
 class MessagesFromIntentTest {
@@ -57,45 +59,6 @@ class MessagesFromIntentTest {
 
 	}
 	
-//	@Test
-//	void createMessagesFromEventDeliveryOptions() {
-//		//GIVEN
-//		String INPUT_JSON_FILE = "events/delivery_options.json";
-//		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-//
-//		GenerateEventIdProcessingFunction funciton = new GenerateEventIdProcessingFunction();
-//
-//		notificationIntent = (NotificationIntent)funciton.apply(notificationIntent);
-//		
-//		//WHEN
-//		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
-//		List<Message> result = createMessagesFunction.apply(notificationIntent);
-//		
-//		//THEN
-//		assertThat(result.size()).isEqualTo(2);
-//		
-//		Message deliveryNullMessage = findMessageWithEnpoint(result, "john.doe@objectify.sk");
-//		
-//		DeliveryOptions msgDeliveryOptions =deliveryNullMessage.getBody().getDeliveryOptions();
-//		assertThat(msgDeliveryOptions).isNotNull();
-//		assertThat(msgDeliveryOptions.getAggregationType()).isEqualTo(AGGREGATION_TYPE.NONE);
-//		assertThat(msgDeliveryOptions.getSchedulingType()).isEqualTo(TIME_CONSTRAINT_TYPE.IMMEDIATE);
-//		
-//		RecievingEndpoint recipient = deliveryNullMessage.getBody().getRecievingEndpoints().get(0);
-//		assertThat(recipient.getDeliveryOptions()).isNull(); //v tomto case su uz delivery options na message a nie specificky pri recipientovi
-//		
-//		Message deliverySet = findMessageWithEnpoint(result, "john.dudly@objectify.sk");
-//		
-//		DeliveryOptions msgDeliveryOptions2 =deliverySet.getBody().getDeliveryOptions();
-//		assertThat(msgDeliveryOptions2).isNotNull();
-//		assertThat(msgDeliveryOptions2.getAggregationType()).isEqualTo(AGGREGATION_TYPE.ONCE_A_WEEK);
-//		assertThat(msgDeliveryOptions2.getSchedulingType()).isEqualTo(TIME_CONSTRAINT_TYPE.IMMEDIATE);
-//		
-//		recipient = deliverySet.getBody().getRecievingEndpoints().get(0);
-//		assertThat(recipient.getDeliveryOptions()).isNull(); //v tomto case su uz delivery options na message a nie specificky pri recipientovi
-//
-//	}
-	
 	@Test
 	void createMessagesFromEventAttachements() {
 		//GIVEN
@@ -132,7 +95,7 @@ class MessagesFromIntentTest {
 		List<Message<?>> result = (List<Message<?>>)createMessagesFunction.apply(notificationIntent);
 		
 		//AND THEN
-		assertThat(result.size()).isEqualTo(3);
+		assertThat(result.size()).isEqualTo(2);
 		
 		SimpleTextMessage message = findMessageWithEnpoint(result, "0918186997");
 		
@@ -143,16 +106,64 @@ class MessagesFromIntentTest {
 		assertThat(smsContent.getText()).isEqualTo("Text");
 		
 		//AND THEN
-		MailChimpMessage mailChimpMessage = findMessageWithEnpoint(result, "all@objectify.sk");
+		EmailMessage mail = findMessageWithEnpoint(result, "john.doe@objectify.sk");
 		
-        MailchimpContent emailContent = mailChimpMessage.getBody();
-		List<MailchimpAttachmentDto> attachements = emailContent.getAttachments();
+        EmailContent emailContent = mail.getBody();
+		List<Attachement> attachements = emailContent.getAttachments();
 		assertThat(attachements).isNotNull();
 		assertThat(attachements.size()).isEqualTo(2);
 		assertThat(attachements).first().extracting("name").isEqualTo("name.extension");
-		assertThat(attachements).first().extracting("content").isNotNull();
-
+		assertThat(attachements).first().extracting("filePathAndName").isEqualTo("src/test/resources/intents/0_ba_job_post.json");
 	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	void createTemplatedMessagesFromEventDifferentChannels() {
+		//GIVEN
+		String INPUT_JSON_FILE = "intents/teamplate_message_en_de.json";
+		NotificationIntent<IntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		
+		//WHEN
+		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
+		List<Message<?>> result = (List<Message<?>>)createMessagesFunction.apply(notificationIntent);
+		
+		//AND THEN
+		assertThat(result.size()).isEqualTo(2);
+		
+		SmsWithTemplatedContent<TemplateWithModelContent<TestModel>> message = findMessageWithEnpoint(result, "0908186997");
+		
+		List<? extends RecievingEndpoint> recievingEndpoints = message.getRecievingEndpoints();
+		assertThat(recievingEndpoints.size()).isEqualTo(1);
+				
+		TemplateWithModelContent<TestModel> smsContent = message.getBody();
+		assertThat(smsContent.getTemplateFileName()).isEqualTo("test-template2.txt");
+//		assertThat(smsContent.getRequiredLocales()).isEqualTo(Arrays.asList(new Locale("en_US"), new Locale("de")));		
+		assertThat(smsContent.getModel()).isNotNull();
+		assertThat(smsContent.getModel().getClass()).isEqualTo(TestModel.class);
+		
+		TestModel model = smsContent.getModel();
+		assertThat(model.getName()).isEqualTo("John Doe");
+		
+		//AND THEN
+		EmailWithTemplatedContent<TemplateWithModelEmailContent<TestModel>> mail = findMessageWithEnpoint(result, "john.doe@objectify.sk");
+		
+		TemplateWithModelEmailContent<TestModel> emailContent = mail.getBody();
+		assertThat(smsContent.getTemplateFileName()).isEqualTo("test-template2.txt");
+//		assertThat(smsContent.getRequiredLocales()).isEqualTo(Arrays.asList(new Locale("en_US"), new Locale("de")));		
+		assertThat(smsContent.getModel()).isNotNull();
+		assertThat(smsContent.getModel().getClass()).isEqualTo(TestModel.class);
+		
+		model = smsContent.getModel();
+		assertThat(model.getName()).isEqualTo("John Doe");
+		
+		List<Attachement> attachements = emailContent.getAttachments();
+		assertThat(attachements).isNotNull();
+		assertThat(attachements.size()).isEqualTo(2);
+		assertThat(attachements).first().extracting("name").isEqualTo("name.extension");
+		assertThat(attachements).first().extracting("filePathAndName").isEqualTo("src/test/resources/intents/0_ba_job_post.json");
+	}
+	
+	
 	
 	@SuppressWarnings("unchecked")
 	private <T extends Message<?>> T findMessageWithEnpoint(List<Message<?>> result, String endpointName) {

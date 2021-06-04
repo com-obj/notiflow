@@ -18,12 +18,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 @Log4j2
 @Builder
 @AllArgsConstructor
@@ -31,23 +30,16 @@ public class TemplateWithModelEmailContent<MODEL_TYPE> extends TemplateWithModel
 	
 	public final static String JSON_TYPE_IDENTIFIER = "EMAIL_FROM_TEAMPLATE_POJO_CONTENT";
 	
-	@NonNull
-	@EqualsAndHashCode.Include
 	private String subjectResourceKey;
 	
-	@NonNull
-	@EqualsAndHashCode.Include
 	private String[] subjectResourcesMessageParameters;
 	
-	@NonNull
-	@EqualsAndHashCode.Include
 	private String subject;
 
-	@EqualsAndHashCode.Include
 	@Builder.Default
 	private List<Attachement> attachments = new ArrayList<Attachement>();
 		
-	public String getSubjectLocalised(Locale locale) {
+	public String getSubjectLocalised(Locale locale) {		
 		try {
 			return Get.getBean(MESSAGE_SOURCE_FOR_TEMPLATES_BEAN_NAME, MessageSource.class).getMessage(getSubjectResourceKey(), getSubjectResourcesMessageParameters(), locale);
 		} catch (NoSuchMessageException e) {

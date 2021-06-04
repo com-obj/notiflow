@@ -16,13 +16,11 @@ import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
-import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpAttachmentDto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -81,16 +79,17 @@ public class IntentContent extends BaseJSONObject {
 			
 			return smsContent;
 		} else if (endpoint instanceof MailchimpEndpoint) {
-			List<MailchimpAttachmentDto> mailchimpAttachmentDtos = MailchimpAttachmentDto.fromAttachements(attachments);
-			
-			//TODO: add missing peaces
-			MailchimpContent smsContent = MailchimpContent.builder()
-					.subject(getSubject())
-					.attachments(mailchimpAttachmentDtos)
-					.templateName(getBody())
-					.build();
-			
-			return smsContent;
+			throw new NotImplementedException();
+//			List<MailchimpAttachmentDto> mailchimpAttachmentDtos = MailchimpAttachmentDto.fromAttachements(attachments);
+//			
+//			//TODO: add missing peaces
+//			MailchimpContent smsContent = MailchimpContent.builder()
+//					.subject(getSubject())
+//					.attachments(mailchimpAttachmentDtos)
+//					.templateName(getBody())
+//					.build();
+//			
+//			return smsContent;
 		} else {
 			throw new NotImplementedException();
 		}

@@ -6,17 +6,20 @@ import org.springframework.data.relational.core.mapping.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.content.MessageContent;
+import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.content.sms.TemplateWithModelSmsContent;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.EmailWithTemplatedContent;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmsWithTemplatedContent;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
 
 import lombok.Data;
@@ -59,22 +62,40 @@ public class NotificationIntent<BODY_TYPE extends IntentContent> extends BasePay
 		return JSON_TYPE_IDENTIFIER;
 	}
 
-	public Message<?> createMessage(RecievingEndpoint endpointsForOneSubject) {		
-		if (endpointsForOneSubject instanceof EmailEndpoint) {
+	public Message<?> createMessage(RecievingEndpoint endpointsForOneSubject) {
+		MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
+
+		if (msgContent instanceof EmailContent) {
 			EmailMessage email = new EmailMessage();
-			MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
 			email.setBody((EmailContent)msgContent);
 			
 			return email;
-		} else if (endpointsForOneSubject instanceof SmsEndpoint) {
+		} 
+		
+		if (msgContent instanceof TemplateWithModelEmailContent<?>) {
+			EmailWithTemplatedContent<TemplateWithModelEmailContent<?>> email = new EmailWithTemplatedContent<>();
+			email.setBody((TemplateWithModelEmailContent<?>)msgContent);
+			
+			return email;
+		} 
+				
+		if (msgContent instanceof SimpleTextContent) {
 			SimpleTextMessage sms = new SimpleTextMessage();
-			MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
 			sms.setBody((SimpleTextContent)msgContent);
 			
 			return sms;
-		} else if (endpointsForOneSubject instanceof MailchimpEndpoint) {
+		} 
+		
+		if (msgContent instanceof TemplateWithModelSmsContent<?>) {
+			SmsWithTemplatedContent<TemplateWithModelContent<?>> sms = new SmsWithTemplatedContent<>();
+			sms.setBody((TemplateWithModelSmsContent<?>)msgContent);
+			
+			return sms;
+		} 
+
+		
+		if (endpointsForOneSubject instanceof MailchimpEndpoint) {
 			MailChimpMessage mailChimp = new MailChimpMessage();
-			MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
 			mailChimp.setBody((MailchimpContent)msgContent);
 			
 			return mailChimp;

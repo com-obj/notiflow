@@ -27,7 +27,6 @@ public class MailchimpContent extends MessageContent {
     public final static String JSON_TYPE_IDENTIFIER = "MAILCHIMP_CONTENT";
     
     @EqualsAndHashCode.Include
-    //TODO: this is not a content, it should be part of the message
     private MailchimpData originalEvent;
     private String subject;
     //TODO: this is not a content, it should be part of the message    
