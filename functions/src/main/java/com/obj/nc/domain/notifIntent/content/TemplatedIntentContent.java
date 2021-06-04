@@ -35,11 +35,12 @@ public class TemplatedIntentContent extends IntentContent {
 	private String messageBodyTemplateFileName;
 
 	private String subjectResourceKey;	
-	private List<Attachement> attachments;
 	
 	//leave empty if based on recipients settings
 	private List<Locale> messageBodyLocales;
-	
+
+	private List<Attachement> attachments;
+
 	//model should be provided when creating message from intent
 //	private List<MODEL_TYPE> model;
 	
