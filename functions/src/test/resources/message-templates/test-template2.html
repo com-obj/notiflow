@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
     <body>
-    <p th:text="${name}">
+    <p th:text="${model.name}">
       Hello, Peter Static!
     </p>
     
@@ -16,10 +16,10 @@
         </tr>
     </thead>
     <tbody>
-	<tr th:if="${parts.empty}">
+	<tr th:if="${model.parts.isEmpty()}">
             <td colspan="2"> No parts available </td>
         </tr>
-     <tr th:each="part : ${parts}">
+     <tr th:each="part : ${model.parts}">
             <td><span th:text="${part.field1}"> Title </span></td>
             <td><span th:text="${part.field2}"> Author </span></td>
      </tr>

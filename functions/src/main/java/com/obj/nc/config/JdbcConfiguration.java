@@ -19,8 +19,10 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.converters.ContentToPgObjectConverter;
+import com.obj.nc.repositories.converters.IntentContentToPgObjectConverter;
 import com.obj.nc.repositories.converters.JsonNodeToPgObjectConverter;
 import com.obj.nc.repositories.converters.PgObjectToContentConverter;
+import com.obj.nc.repositories.converters.PgObjectToIntentContentConverter;
 import com.obj.nc.repositories.converters.PgObjectToJsonNodeConverter;
 import com.obj.nc.repositories.converters.PgObjectToUUIDArrayConverter;
 import com.obj.nc.repositories.converters.UUIDArrayToPgObjectConverter;
@@ -46,7 +48,10 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     	
     	converters.add(new ContentToPgObjectConverter());
     	converters.add(new PgObjectToContentConverter());
-    	
+
+    	converters.add(new IntentContentToPgObjectConverter());
+    	converters.add(new PgObjectToIntentContentConverter());
+
     	return new JdbcCustomConversions(converters);
     }
     

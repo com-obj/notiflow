@@ -10,4 +10,5 @@ public class TestModel {
 	String name;
 	
 	List<TestChildModel> parts = new ArrayList<>();
+
 }

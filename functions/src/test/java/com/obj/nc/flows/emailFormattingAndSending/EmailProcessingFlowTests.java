@@ -31,7 +31,7 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailWithTemplatedContent;
+import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
@@ -51,7 +51,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     void testSendMultiLocaleMessagesTypeMerge() throws Exception {
         // given
         properties.setMultiLocalesMergeStrategy(MERGE);
-        EmailWithTemplatedContent<?> inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", EmailWithTemplatedContent.class);
+        EmailMessageTemplated<?> inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", EmailMessageTemplated.class);
         emailSendingFlow.formatAndSend(inputMessage);
         // when
         boolean success = greenMail.waitForIncomingEmail(5000L, 1);
@@ -79,7 +79,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     void testSendMultiLocaleMessagesTypeMessagePerLocale() {
         // given
         properties.setMultiLocalesMergeStrategy(MESSAGE_PER_LOCALE);
-        EmailWithTemplatedContent<?> inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", EmailWithTemplatedContent.class);
+        EmailMessageTemplated<?> inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", EmailMessageTemplated.class);
         emailSendingFlow.formatAndSend(inputMessage);
         // when
         boolean success = greenMail.waitForIncomingEmail(10000L, 2);
@@ -121,7 +121,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         // given
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/teamplate_message.json";
-		EmailWithTemplatedContent inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailWithTemplatedContent.class);
+		EmailMessageTemplated inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessageTemplated.class);
         
         //when
         EmailMessage emailSent = emailSendingFlow.formatAndSend(inputMessage).get(1, TimeUnit.SECONDS);

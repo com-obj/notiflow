@@ -1,0 +1,33 @@
+{
+	"type": "INTENT",
+	"header": {
+		"eventIds": [
+			"0c3f159f-103e-49fd-8eb1-f4b6de481acb"
+		],
+		"flow-id": "static-routing-pipeline"
+	},
+	"body": {
+		"body": "Text",
+		"subject": "Subject",
+		"attachments": [
+			{
+				"name": "name.extension",
+				"file-name": "src/test/resources/intents/0_ba_job_post.json"
+			},
+			{
+				"name": "name.extension",
+				"file-name": "src/test/resources/intents/0_ba_job_post.json"
+			}
+		]
+	},
+	"recievingEndpoints": [
+		{
+			"@type": "EMAIL",
+			"email": "john.doe@objectify.sk"
+		},
+		{
+			"@type": "SMS",
+			"phone": "0918186997"
+		}
+	]
+}

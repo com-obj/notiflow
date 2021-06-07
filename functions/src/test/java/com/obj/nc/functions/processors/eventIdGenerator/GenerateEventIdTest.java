@@ -7,19 +7,19 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import com.obj.nc.domain.headers.Header;
-import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmstMessage;
 
 class GenerateEventIdTest {
 
 	@Test
 	void test() {
 		//GIVEN
-		SimpleTextMessage sms = new SimpleTextMessage();
+		SmstMessage sms = new SmstMessage();
 
 		//WHEN
 		GenerateEventIdProcessingFunction function = new GenerateEventIdProcessingFunction();
 
-		SimpleTextMessage outputNotificationIntent = (SimpleTextMessage)function.apply(sms);
+		SmstMessage outputNotificationIntent = (SmstMessage)function.apply(sms);
 
 		//THEN
 		Header header = outputNotificationIntent.getHeader();

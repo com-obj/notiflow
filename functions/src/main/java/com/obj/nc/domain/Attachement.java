@@ -16,4 +16,7 @@ public class Attachement {
 	@JsonProperty("file-URI")
     URI fileURI;
 	
+	@JsonProperty("file-name")
+    String filePathAndName;
+	
 }

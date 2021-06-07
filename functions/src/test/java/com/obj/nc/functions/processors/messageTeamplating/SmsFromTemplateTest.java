@@ -14,8 +14,8 @@ import org.springframework.test.context.ActiveProfiles;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.message.SimpleTextMessage;
-import com.obj.nc.domain.message.SmsWithTemplatedContent;
+import com.obj.nc.domain.message.SmstMessage;
+import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.messageTemplating.SmsTemplateFormatter;
 import com.obj.nc.utils.JsonUtils;
@@ -31,10 +31,10 @@ class SmsFromTemplateTest extends BaseIntegrationTest {
 	void createSimpleHtmlEmailFromTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/txt_template_message.json";
-		SmsWithTemplatedContent msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, SmsWithTemplatedContent.class);
+		SmsMessageTemplated msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, SmsMessageTemplated.class);
 		
 		//WHEN
-		List<SimpleTextMessage> htmlMessages = template2Sms.apply(msg);
+		List<SmstMessage> htmlMessages = template2Sms.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
@@ -49,10 +49,10 @@ class SmsFromTemplateTest extends BaseIntegrationTest {
 	void createHtmlEmailFromPojoModelAndTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/txt_template_message_pojo_model.json";
-		SmsWithTemplatedContent msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, SmsWithTemplatedContent.class);
+		SmsMessageTemplated msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, SmsMessageTemplated.class);
 		
 		//WHEN
-		List<SimpleTextMessage> htmlMessages = template2Sms.apply(msg);
+		List<SmstMessage> htmlMessages = template2Sms.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
@@ -68,10 +68,10 @@ class SmsFromTemplateTest extends BaseIntegrationTest {
 	void createI18NHtmlEmailFromTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/txt_template_message_en_de.json";
-		SmsWithTemplatedContent msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, SmsWithTemplatedContent.class);
+		SmsMessageTemplated msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, SmsMessageTemplated.class);
 		
 		//WHEN
-		List<SimpleTextMessage> htmlMessages = template2Sms.apply(msg);
+		List<SmstMessage> htmlMessages = template2Sms.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(2);

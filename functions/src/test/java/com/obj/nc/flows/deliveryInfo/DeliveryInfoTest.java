@@ -29,12 +29,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.config.SpringIntegration;
-import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmstMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlow;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
@@ -52,7 +50,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 	
 	@Autowired private GenerateEventIdProcessingFunction generateEventId;
     @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
-    @Autowired private MessagesFromNotificationIntentProcessingFunction<EmailContent> generateMessagesFromIntent;
+    @Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromIntent;
     @Autowired private DeliveryInfoRepository deliveryInfoRepo;
     @Autowired private JdbcTemplate jdbcTemplate;
     @Autowired private EmailProcessingFlow emailSendingFlow;
@@ -67,12 +65,12 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Test
     void testDeliveryInfosCreateAndPersisted() {
         // GIVEN
-        String INPUT_JSON_FILE = "events/ba_job_post.json";
-        NotificationIntent<EmailContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        String INPUT_JSON_FILE = "intents/ba_job_post.json";
+        NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
-        notificationIntent = (NotificationIntent<EmailContent>)generateEventId.apply(notificationIntent);
+        notificationIntent = (NotificationIntent)generateEventId.apply(notificationIntent);
         UUID eventId = notificationIntent.getHeader().getEventIds().get(0);
-        notificationIntent = (NotificationIntent<EmailContent>)resolveRecipients.apply(notificationIntent);
+        notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
         
         //WHEN
         deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(notificationIntent);
@@ -91,7 +89,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         });
         
         //WHEN
-        List<Message<EmailContent>> messages = (List<Message<EmailContent>>)generateMessagesFromIntent.apply(notificationIntent);
+        List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);
         
         messages.forEach(msg -> {
             deliveryInfoFlow.createAndPersistSentDeliveryInfo(msg);
@@ -144,8 +142,8 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     void testDeliveryInfosCreateAndPersistedForFailedDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
     	UUID eventId = UUID.randomUUID();
-    	SimpleTextMessage failedMessage = createTestSMS(eventId, "09050123456");
-    	org.springframework.messaging.Message<SimpleTextMessage> failedSpringMessage = MessageBuilder.withPayload(failedMessage).build();
+    	SmstMessage failedMessage = createTestSMS(eventId, "09050123456");
+    	org.springframework.messaging.Message<SmstMessage> failedSpringMessage = MessageBuilder.withPayload(failedMessage).build();
     	
     	JsonNode messageJson = jsonConverterForSpringMessages.valueToTree(failedSpringMessage);
     	
@@ -178,7 +176,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     void testDeliveryInfosCreateAndPersistedForProcessingDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
     	UUID eventId = UUID.randomUUID();
-    	SimpleTextMessage msg = createTestSMS(eventId, "09050123456");
+    	SmstMessage msg = createTestSMS(eventId, "09050123456");
     	        
         //WHEN
         List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(msg).get(1, TimeUnit.SECONDS);
@@ -196,8 +194,8 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         checkSingleDelInfoExistsForEvent(eventId);
     }
 
-	private SimpleTextMessage createTestSMS(UUID eventId, String telNumber) {
-		SimpleTextMessage msg = new SimpleTextMessage();
+	private SmstMessage createTestSMS(UUID eventId, String telNumber) {
+		SmstMessage msg = new SmstMessage();
     	msg.getHeader().setEventIds(Arrays.asList(eventId));
     	msg.addRecievingEndpoints(new SmsEndpoint(telNumber));
 		return msg;
@@ -212,7 +210,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     void testDeliveryInfosCreateAndPersistedForSentDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
     	UUID eventId = UUID.randomUUID();
-    	SimpleTextMessage msg = createTestSMS(eventId, "09050123456");
+    	SmstMessage msg = createTestSMS(eventId, "09050123456");
     	        
         //WHEN
         List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistSentDeliveryInfo(msg).get(1, TimeUnit.SECONDS);
@@ -230,7 +228,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     }
 
 
-	private void assertEnpointPersistedNotDuplicated(NotificationIntent<EmailContent> notificationIntent) {
+	private void assertEnpointPersistedNotDuplicated(NotificationIntent notificationIntent) {
 		List<Map<String, Object>> persistedEndpoints = jdbcTemplate.queryForList("select * from nc_endpoint");
         assertThat(persistedEndpoints, CoreMatchers.notNullValue());
         Assertions.assertThat(persistedEndpoints.size()).isEqualTo(3);

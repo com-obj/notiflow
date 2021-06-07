@@ -15,9 +15,9 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailWithTemplatedContent;
+import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.MailChimpMessage;
-import com.obj.nc.domain.message.SmsWithTemplatedContent;
+import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.functions.processors.messageBuilder.MessageByRecipientTokenizer;
 
 import lombok.extern.log4j.Log4j2;
@@ -47,8 +47,8 @@ public class MessageProcessingFlowConfig {
 				)
 				.routeToRecipients(spec -> spec.
 						recipient(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof EmailMessage).
-						recipient(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID, m-> m instanceof EmailWithTemplatedContent).
-						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof SmsWithTemplatedContent).
+						recipient(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID, m-> m instanceof EmailMessageTemplated).
+						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof SmsMessageTemplated).
 						recipient(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof MailChimpMessage).
 						defaultOutputToParentFlow()
 				)

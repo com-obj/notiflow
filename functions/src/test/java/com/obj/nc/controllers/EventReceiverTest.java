@@ -218,7 +218,7 @@ class EventReceiverTest extends BaseIntegrationTest {
     @Test
     void testJsonSchemaPresentValidEvent() throws Exception {
         // given
-        String validJobPostEvent = JsonUtils.readJsonStringFromClassPathResource("generic_events/job_body.json");
+        String validJobPostEvent = JsonUtils.readJsonStringFromClassPathResource("custom_events/job_body.json");
         
         //when
         ResultActions resp = mockMvc
@@ -236,7 +236,7 @@ class EventReceiverTest extends BaseIntegrationTest {
     @Test
     void testJsonSchemaPresentInvalidEvent() throws Exception {
         // given
-        String jobPostEventWithoutDescription = JsonUtils.readJsonStringFromClassPathResource("generic_events/job_body_no_text.json");
+        String jobPostEventWithoutDescription = JsonUtils.readJsonStringFromClassPathResource("custom_events/job_body_no_text.json");
         
         //when
         ResultActions resp = mockMvc
@@ -257,7 +257,7 @@ class EventReceiverTest extends BaseIntegrationTest {
     @Test
     void testInvalidPayloadType() throws Exception {
         // given
-        String validJobPostEvent = JsonUtils.readJsonStringFromClassPathResource("generic_events/job_body.json");
+        String validJobPostEvent = JsonUtils.readJsonStringFromClassPathResource("custom_events/job_body.json");
         
         //when
         ResultActions resp = mockMvc
@@ -278,7 +278,7 @@ class EventReceiverTest extends BaseIntegrationTest {
     @Test
     void testJsonSchemaAbsent() throws Exception {
         // given
-        String validJobPostEvent = JsonUtils.readJsonStringFromClassPathResource("generic_events/job_body.json");
+        String validJobPostEvent = JsonUtils.readJsonStringFromClassPathResource("custom_events/job_body.json");
         
         //when
         ResultActions resp = mockMvc

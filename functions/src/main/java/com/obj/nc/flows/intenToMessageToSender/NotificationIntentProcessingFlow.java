@@ -13,6 +13,6 @@ import com.obj.nc.flows.errorHandling.ErrorHandlingFlowConfig;
 public interface NotificationIntentProcessingFlow {
 
 	@Gateway(requestChannel=INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
-	public void processNotificationIntent(NotificationIntent<?> intent);
+	public void processNotificationIntent(NotificationIntent intent);
 	
 }

@@ -3,15 +3,10 @@ package com.obj.nc.functions.processors.messageBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.content.Content;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
@@ -19,17 +14,16 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
 @Component
 @AllArgsConstructor
 @Log4j2
 @DocumentProcessingInfo("GenerateMessagesFromIntent")
-public class MessagesFromNotificationIntentProcessingFunction<CONTENT_TYPE extends Content> extends ProcessorFunctionAdapter<NotificationIntent<CONTENT_TYPE>, List<Message<CONTENT_TYPE>>> {
+public class MessagesFromNotificationIntentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent, List<? extends Message<?>>> {
 
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent<CONTENT_TYPE> notificationIntent) {
+	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent notificationIntent) {
 
 		if (notificationIntent.getRecievingEndpoints().isEmpty()) {
 			return Optional.of(new PayloadValidationException(
@@ -40,55 +34,24 @@ public class MessagesFromNotificationIntentProcessingFunction<CONTENT_TYPE exten
 	}
 
 	@Override
-	protected List<Message<CONTENT_TYPE>> execute(NotificationIntent<CONTENT_TYPE> notificationIntent) {
+	protected List<? extends Message<?>> execute(NotificationIntent notificationIntent) {
 		log.debug("Create messages for {}",  notificationIntent);
-
-		List<Message<CONTENT_TYPE>> messages = new ArrayList<>();
+		
+		// TODO different settings can apply here based on delivery options like if we are outside business hours, convert to email. otherwise convert to SMS
+		List<Message<?>> messages = new ArrayList<>();
+		
 
 		for (RecievingEndpoint recievingEndpoint: notificationIntent.getRecievingEndpoints()) {
-
-			Message<CONTENT_TYPE> msg = createBasedOnContentType(notificationIntent.getBody().getClass());
+			
+			Message<?> msg = (Message<?>) notificationIntent.createMessage(recievingEndpoint);
 			
 			msg.addRecievingEndpoints(recievingEndpoint);
 
 			msg.setAttributes(notificationIntent.getAttributes());
-			msg.setBody(notificationIntent.getBody());
 			messages.add(msg);
 		}
 
 		return messages;
-	}
-	
-	// TODO: was based on endpoint type, but didn't work, refactor if required
-	@SneakyThrows
-	protected <T extends Message<?>> T createBasedOnContentType(Class<?> contentType) {
-		List<Class<? extends Message<?>>> messageClasses =  findMessageSublasses();
-
-		for (Class<? extends Message<?>> msgClass: messageClasses) {
-			Message<?> msg = msgClass.newInstance();
-			
-			if (contentType.isInstance(msg.getBody())) {
-				return (T) msg;
-			}
-						
-		}
-		
-		throw new IllegalArgumentException("Cannot infere message type from content type: " + contentType.getName());
-	}
-
-	@SneakyThrows
-	private List<Class<? extends Message<?>>> findMessageSublasses() {
-		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
-		provider.addIncludeFilter(new AssignableTypeFilter(Message.class));
-
-		List<Class<? extends Message<?>>> messageSubtypes = new ArrayList<>();
-		Set<BeanDefinition> components = provider.findCandidateComponents("com/obj/nc");		
-		for (BeanDefinition component : components)
-		{
-		    Class<? extends Message<?>> cls = (Class<? extends Message<?>>)Class.forName(component.getBeanClassName());
-		    messageSubtypes.add(cls);
-		}
-		return messageSubtypes;
 	}
 
 }

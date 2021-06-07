@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmstMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
 
@@ -25,7 +25,7 @@ public class SmsTemplateFormatter extends BaseTemplateFormatter<TemplateWithMode
 
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message<TemplateWithModelContent<?>> message) {
-		Content content = message.getBody();
+		MessageContent content = message.getBody();
 		
 		if (!(content instanceof  TemplateWithModelContent)) {
 			return Optional.of(new PayloadValidationException("SmsTemplateFormatter cannot format message because its content is not of type TemplateWithJsonModelSmsContent. Instead is " +  content.getClass().getSimpleName()));
@@ -35,7 +35,7 @@ public class SmsTemplateFormatter extends BaseTemplateFormatter<TemplateWithMode
 	}
 
 	protected Message<SimpleTextContent> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelContent<?>> payload) {		
-		SimpleTextMessage smsMessage = new SimpleTextMessage();
+		SmstMessage smsMessage = new SmstMessage();
 
 		smsMessage.getBody().setText(formatedContent);
 		

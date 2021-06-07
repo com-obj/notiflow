@@ -1,5 +1,5 @@
 {
-  "type" : "MAILCHIMP_CONTENT",
+  "@class" : "com.obj.nc.domain.content.mailchimp.MailchimpContent",
   "attributes" : { },
   "originalEvent" : {
     "type" : "JOB_POST",
