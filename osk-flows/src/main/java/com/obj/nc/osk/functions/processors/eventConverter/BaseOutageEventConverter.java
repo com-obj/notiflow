@@ -134,7 +134,7 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutages);
 		Map<CustomerInfo, List<ServiceOutageInfo>> outageInfosPerCustomer = outageInfos
 				.stream()
-				.collect(Collectors.groupingBy(ServiceOutageInfo::getCustomer));
+				.collect(Collectors.groupingBy(ServiceOutageInfo::getCustomer, LinkedHashMap::new, Collectors.toList()));
 		
 		int customerCount = outageInfosPerCustomer.keySet().size();
 		salesMessageContent.setModel(new SalesEventModel(outageStart, outageEnd, outageInfosPerCustomer, customerCount));
@@ -154,7 +154,7 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		List<ServiceOutageInfo> outageInfos = convertToServiceOutages(serviceOutages);
 		Map<CustomerInfo, List<ServiceOutageInfo>> outageInfosPerCustomer = outageInfos
 				.stream()
-				.collect(Collectors.groupingBy(ServiceOutageInfo::getCustomer));
+				.collect(Collectors.groupingBy(ServiceOutageInfo::getCustomer, LinkedHashMap::new, Collectors.toList()));
 		
 		int customerCount = outageInfosPerCustomer.keySet().size();
 		salesAgentMessageContent.setModel(new SalesAgentEventModel(outageStart, outageEnd, outageInfos, customerCount));
