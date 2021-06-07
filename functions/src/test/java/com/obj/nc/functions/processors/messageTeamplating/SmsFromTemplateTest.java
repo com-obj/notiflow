@@ -14,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmstMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.messageTemplating.SmsTemplateFormatter;
@@ -34,7 +34,7 @@ class SmsFromTemplateTest extends BaseIntegrationTest {
 		SmsMessageTemplated msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, SmsMessageTemplated.class);
 		
 		//WHEN
-		List<SimpleTextMessage> htmlMessages = template2Sms.apply(msg);
+		List<SmstMessage> htmlMessages = template2Sms.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
@@ -52,7 +52,7 @@ class SmsFromTemplateTest extends BaseIntegrationTest {
 		SmsMessageTemplated msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, SmsMessageTemplated.class);
 		
 		//WHEN
-		List<SimpleTextMessage> htmlMessages = template2Sms.apply(msg);
+		List<SmstMessage> htmlMessages = template2Sms.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(1);
@@ -71,7 +71,7 @@ class SmsFromTemplateTest extends BaseIntegrationTest {
 		SmsMessageTemplated msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, SmsMessageTemplated.class);
 		
 		//WHEN
-		List<SimpleTextMessage> htmlMessages = template2Sms.apply(msg);
+		List<SmstMessage> htmlMessages = template2Sms.apply(msg);
 		
 		//THEN
 		assertThat(htmlMessages.size()).isEqualTo(2);

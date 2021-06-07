@@ -27,7 +27,7 @@ import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.EmailWithTestModeDiggest;
 import com.obj.nc.domain.message.MailChimpMessage;
-import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmstMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 
@@ -43,7 +43,7 @@ import lombok.extern.log4j.Log4j2;
 @JsonSubTypes({ 
 	@Type(value = NotificationIntent.class, name = NotificationIntent.JSON_TYPE_IDENTIFIER),
 	@Type(value = EmailMessage.class, name = EmailMessage.JSON_TYPE_IDENTIFIER),
-	@Type(value = SimpleTextMessage.class, name = SimpleTextMessage.JSON_TYPE_IDENTIFIER),
+	@Type(value = SmstMessage.class, name = SmstMessage.JSON_TYPE_IDENTIFIER),
 	@Type(value = MailChimpMessage.class, name = MailChimpMessage.JSON_TYPE_IDENTIFIER),
 	@Type(value = EmailMessageTemplated.class, name = EmailMessageTemplated.JSON_TYPE_IDENTIFIER),
 	@Type(value = EmailWithTestModeDiggest.class, name = EmailWithTestModeDiggest.JSON_TYPE_IDENTIFIER),

@@ -19,7 +19,7 @@ import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmstMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
 
@@ -74,7 +74,7 @@ public class NotificationIntent extends BasePayload<IntentContent> {
 		} 
 		
 		if (msgContent instanceof SimpleTextContent) {
-			SimpleTextMessage sms = new SimpleTextMessage();
+			SmstMessage sms = new SmstMessage();
 			sms.setBody((SimpleTextContent)msgContent);
 			
 			return sms;

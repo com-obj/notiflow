@@ -13,11 +13,11 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
-public class SimpleTextMessage extends Message<SimpleTextContent/*, SmsEndpoint*/> {
+public class SmstMessage extends Message<SimpleTextContent/*, SmsEndpoint*/> {
 
 	public static final String JSON_TYPE_IDENTIFIER = "SMS_MESSAGE";
 	
-	public SimpleTextMessage() {
+	public SmstMessage() {
 		setBody(new SimpleTextContent());
 	}
 	

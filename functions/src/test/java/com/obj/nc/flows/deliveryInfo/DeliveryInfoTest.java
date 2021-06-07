@@ -32,7 +32,7 @@ import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmstMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlow;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
@@ -142,8 +142,8 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     void testDeliveryInfosCreateAndPersistedForFailedDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
     	UUID eventId = UUID.randomUUID();
-    	SimpleTextMessage failedMessage = createTestSMS(eventId, "09050123456");
-    	org.springframework.messaging.Message<SimpleTextMessage> failedSpringMessage = MessageBuilder.withPayload(failedMessage).build();
+    	SmstMessage failedMessage = createTestSMS(eventId, "09050123456");
+    	org.springframework.messaging.Message<SmstMessage> failedSpringMessage = MessageBuilder.withPayload(failedMessage).build();
     	
     	JsonNode messageJson = jsonConverterForSpringMessages.valueToTree(failedSpringMessage);
     	
@@ -176,7 +176,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     void testDeliveryInfosCreateAndPersistedForProcessingDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
     	UUID eventId = UUID.randomUUID();
-    	SimpleTextMessage msg = createTestSMS(eventId, "09050123456");
+    	SmstMessage msg = createTestSMS(eventId, "09050123456");
     	        
         //WHEN
         List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(msg).get(1, TimeUnit.SECONDS);
@@ -194,8 +194,8 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         checkSingleDelInfoExistsForEvent(eventId);
     }
 
-	private SimpleTextMessage createTestSMS(UUID eventId, String telNumber) {
-		SimpleTextMessage msg = new SimpleTextMessage();
+	private SmstMessage createTestSMS(UUID eventId, String telNumber) {
+		SmstMessage msg = new SmstMessage();
     	msg.getHeader().setEventIds(Arrays.asList(eventId));
     	msg.addRecievingEndpoints(new SmsEndpoint(telNumber));
 		return msg;
@@ -210,7 +210,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     void testDeliveryInfosCreateAndPersistedForSentDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
     	UUID eventId = UUID.randomUUID();
-    	SimpleTextMessage msg = createTestSMS(eventId, "09050123456");
+    	SmstMessage msg = createTestSMS(eventId, "09050123456");
     	        
         //WHEN
         List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistSentDeliveryInfo(msg).get(1, TimeUnit.SECONDS);

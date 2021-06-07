@@ -16,7 +16,7 @@ import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmstMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
@@ -96,7 +96,7 @@ class MessagesFromIntentTest {
 		//AND THEN
 		assertThat(result.size()).isEqualTo(2);
 		
-		SimpleTextMessage message = findMessageWithEnpoint(result, "0918186997");
+		SmstMessage message = findMessageWithEnpoint(result, "0918186997");
 		
 		List<? extends RecievingEndpoint> recievingEndpoints = message.getRecievingEndpoints();
 		assertThat(recievingEndpoints.size()).isEqualTo(1);

@@ -33,7 +33,7 @@ import com.obj.nc.config.InjectorConfiguration;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmstMessage;
 import com.obj.nc.osk.exception.SmsClientException;
 import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfig;
 import com.obj.nc.osk.functions.processors.sms.config.OskSmsSenderConfigProperties;
@@ -65,7 +65,7 @@ class OskSmsSenderTest extends BaseIntegrationTest {
     void testSendSms() {
         // GIVEN
         String MESSAGE_PATH = "smsNotificationMessages/message.json";
-        SimpleTextMessage inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_PATH, SimpleTextMessage.class);
+        SmstMessage inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_PATH, SmstMessage.class);
         
         // MOCK SERVER
         OskSendSmsResponseDto sendSmsResponseExpected = JsonUtils.readObjectFromClassPathResource("smsRestClient/sms-response-success.json", OskSendSmsResponseDto.class);
@@ -86,7 +86,7 @@ class OskSmsSenderTest extends BaseIntegrationTest {
     void testCreateRequest() {
         // GIVEN
         String MESSAGE_PATH = "smsNotificationMessages/message.json";
-        SimpleTextMessage inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_PATH, SimpleTextMessage.class);
+        SmstMessage inputMessage = JsonUtils.readObjectFromClassPathResource(MESSAGE_PATH, SmstMessage.class);
 
         OskSendSmsRequestDto oskSendSmsRequestDto = smsSender.convertMessageToRequest(inputMessage);
 
