@@ -129,7 +129,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     void testMessagesContainTrackingPxImage() throws Exception {
         // given
         properties.setMultiLocalesMergeStrategy(MERGE);
-        EmailWithTemplatedContent<?> inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", EmailWithTemplatedContent.class);
+        EmailMessageTemplated<?> inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", EmailMessageTemplated.class);
         emailSendingFlow.formatAndSend(inputMessage);
         // when
         boolean success = greenMail.waitForIncomingEmail(5000L, 1);
