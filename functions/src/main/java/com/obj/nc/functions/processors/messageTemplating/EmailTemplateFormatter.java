@@ -3,7 +3,6 @@ package com.obj.nc.functions.processors.messageTemplating;
 import java.util.Locale;
 import java.util.Optional;
 
-import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.functions.processors.messageTemplating.config.EmailTrackingConfigProperties;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
