@@ -1,8 +1,5 @@
 package com.obj.nc.controllers;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -32,6 +29,9 @@ import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.EndpointsRepository;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
@@ -127,5 +127,35 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 			.andExpect(jsonPath("$[0].endpoint.endpointId").value(CoreMatchers.is("jancuzy@gmail.com")))
 			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL")));
     }
+	
+	@Test
+	void testReadMessageDeliveryInfoUpdate() throws Exception {
+		//GIVEN
+		EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
+		endpointRepo.persistEnpointIfNotExists(email1);
+		
+		//AND
+		UUID messageId = UUID.randomUUID();
+		DeliveryInfo info = DeliveryInfo.builder()
+				.endpointId(email1.getEndpointId()).eventId(UUID.randomUUID()).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).messageId(messageId).build();
+		
+		deliveryRepo.save(info);
+		
+		//WHEN TEST REST
+		ResultActions resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/delivery-info/messages/read/{messageId}",messageId.toString())
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		//THEN
+		resp
+				.andExpect(status().is2xxSuccessful())
+				.andExpect(content().string("redirect:/nc-internal-resources/images/px.png"));
+		
+		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageId(messageId);
+		assertThat(infosOfMessage).hasSize(1);
+		assertThat(infosOfMessage.get(0).getStatus()).isEqualTo(DELIVERY_STATUS.READ);
+	}
 
 }

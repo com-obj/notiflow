@@ -3,6 +3,11 @@ package com.obj.nc.functions.processors.messageTemplating;
 import java.util.Locale;
 import java.util.Optional;
 
+import com.obj.nc.config.NcAppConfigProperties;
+import com.obj.nc.functions.processors.messageTemplating.config.EmailTrackingConfigProperties;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
@@ -19,9 +24,13 @@ import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigu
 @Component
 @DocumentProcessingInfo("EmailFormatter")
 public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithModelEmailContent<?>, EmailContent> {
-
-	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {
+	
+	private final EmailTrackingConfigProperties emailTrackingConfigProperties;
+	
+	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config,
+								  EmailTrackingConfigProperties emailTrackingConfigProperties) {
 		super(templateEngine, config);
+		this.emailTrackingConfigProperties = emailTrackingConfigProperties;
 	}
 	
 	@Override
@@ -43,6 +52,13 @@ public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithMo
 		
 		TemplateWithModelEmailContent<?> emailFromTemplate = payload.getBody();
 		emailContent.setSubject(emailFromTemplate.getSubjectLocalised(locale));
+		
+		if (emailTrackingConfigProperties.getRead().isEnabled()) {
+			Document html = Jsoup.parse(formatedContent);
+			Element img = html.body().appendElement("img");
+			img.attr("src", emailTrackingConfigProperties.getRead().getUrl() + "/" + payload.getId());
+			formatedContent = html.html();
+		}
 		emailContent.setText(formatedContent);
 		
 		return htmlMessage;
