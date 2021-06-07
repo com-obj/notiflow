@@ -31,10 +31,12 @@ public class ThymeleafConfiguration {
 
 	private static final String EMAIL_TEMPLATE_ENCODING = "UTF-8";
 	
+	public static final String MESSAGE_SOURCE_FOR_TEMPLATES_BEAN_NAME = "nc.emailTemplateFormatter.messageSource";
+	
 	@Autowired private ThymeleafConfigProperties config;
     @Autowired private SpringTemplateEngine templateEngine;
 
-	@Bean(name = "nc.emailTemplateFormatter.messageSource")
+	@Bean(name = MESSAGE_SOURCE_FOR_TEMPLATES_BEAN_NAME)
 	public ReloadableResourceBundleMessageSource emailMessageSource() {
 		log.info("Configuring i18n message source to be have basename (path end file name prefix) " + config.getMessagesDirAndBaseName());
 		

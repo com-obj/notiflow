@@ -5,10 +5,11 @@
       	"flow-id":"static-routing-pipeline"
    },
    "body":{
- 		"type": "EMAIL_FROM_TEAMPLATE_JSON_CONTENT",
+ 		"@class": "com.obj.nc.domain.content.email.TemplateWithModelEmailContent",
         "templateFileName":"test-template.html",
         "subject":"Subject",
         "model": {
+        	"@class":"com.obj.nc.domain.BaseJSONObject",
           	"name":"John Doe",
            	"parts": ["part1","part2"]
          }

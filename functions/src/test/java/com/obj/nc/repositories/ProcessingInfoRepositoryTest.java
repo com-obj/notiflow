@@ -65,7 +65,7 @@ public class ProcessingInfoRepositoryTest {
 	}
 
 	private ProcessingInfo createSimpleProcessingInfo() {
-		String INPUT_JSON_FILE = "events/direct_message.json";
+		String INPUT_JSON_FILE = "intents/direct_message.json";
 		String content = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
 
 		ProcessingInfo info = ProcessingInfo.builder()

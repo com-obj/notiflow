@@ -29,8 +29,6 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.IsTypedJson;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
@@ -38,6 +36,7 @@ import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
@@ -60,7 +59,7 @@ public class ProcessingInfoGeneratorTest {
 	@Autowired GenericEventRepository eventRepository;
 	@Autowired private GenerateEventIdProcessingFunction generateEventId;
     @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
-    @Autowired private MessagesFromNotificationIntentProcessingFunction<EmailContent> generateMessagesFromIntent;
+    @Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromIntent;
     @Autowired private EmailSender functionSend;
     @Autowired private JdbcTemplate jdbcTemplate;
     @Autowired private ProcessingInfoRepository procInfoRepo;
@@ -78,18 +77,18 @@ public class ProcessingInfoGeneratorTest {
 	@SuppressWarnings("unchecked")
 	void testOneToNProcessor() {
 		//GIVEN
-		String INPUT_JSON_FILE = "events/direct_message.json";
+		String INPUT_JSON_FILE = "intents/direct_message.json";
 
-		NotificationIntent<EmailContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
-		notificationIntent = (NotificationIntent<EmailContent>)generateEventId.apply(notificationIntent);
+		notificationIntent = (NotificationIntent)generateEventId.apply(notificationIntent);
 		//WHEN
-		List<Message<EmailContent>> result = generateMessagesFromIntent.apply(notificationIntent);
+		List<EmailMessage> result = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);
 		
 		//THEN
 		assertThat(result.size()).isEqualTo(3);
 		
-		Message<EmailContent> message = result.get(0);
+		Message<?> message = result.get(0);
 		Header header = message.getHeader();
 		assertThat(header.getFlowId()).isEqualTo(notificationIntent.getHeader().getFlowId());
 		assertThat(header.getAttributes())
@@ -103,7 +102,7 @@ public class ProcessingInfoGeneratorTest {
     @Test
     void testPersistPIForNewIntent() {
         // given
-        NotificationIntent<SimpleTextContent> notificationIntent = createWithSimpleMessage("test-config", "Hi there!!");
+        NotificationIntent notificationIntent = createWithSimpleMessage("test-config", "Hi there!!");
         String notificationIntentJson = notificationIntent.toJSONString();
         HasHeader payloadWithEventId = generateEventId.apply(notificationIntent);
 
@@ -138,13 +137,10 @@ public class ProcessingInfoGeneratorTest {
     }
     
 
-	public static NotificationIntent<SimpleTextContent> createWithSimpleMessage(String flowId, String message) {
-		NotificationIntent<SimpleTextContent> notificationIntent = new NotificationIntent<SimpleTextContent>();
+	public static NotificationIntent createWithSimpleMessage(String flowId, String message) {
+		NotificationIntent notificationIntent = new NotificationIntent();
 		notificationIntent.getHeader().setFlowId(flowId);
-		notificationIntent.setBody(
-				SimpleTextContent.builder()
-				.text(message)
-				.build());
+		notificationIntent.setBody(IntentContent.createStaticContent("some subject", message));
 		
 		return notificationIntent;
 	}
@@ -211,12 +207,12 @@ public class ProcessingInfoGeneratorTest {
 	@SuppressWarnings("unchecked")
     void testPersistPIForMessageFromIntentStep() {
         // given
-        String INPUT_JSON_FILE = "events/ba_job_post.json";
-        NotificationIntent<EmailContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        notificationIntent = (NotificationIntent<EmailContent>)generateEventId.apply(notificationIntent);
+        String INPUT_JSON_FILE = "intents/ba_job_post.json";
+        NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        notificationIntent = (NotificationIntent)generateEventId.apply(notificationIntent);
         UUID[] originalEventIDs = notificationIntent.getProcessingInfo().getEventIds();
-        notificationIntent = (NotificationIntent<EmailContent>) resolveRecipients.apply(notificationIntent);
-        List<Message<EmailContent>> messages = generateMessagesFromIntent.apply(notificationIntent);
+        notificationIntent = (NotificationIntent) resolveRecipients.apply(notificationIntent);
+        List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);
 
         // ProcessingInfo persistence is done using aspect and in an async way
 
@@ -232,7 +228,7 @@ public class ProcessingInfoGeneratorTest {
         Assertions.assertThat(persistedPIs.size()).isEqualTo(3);
         
         ProcessingInfo persistedPI = persistedPIs.iterator().next();
-        Message<EmailContent> message = messages.iterator().next();
+        Message<?> message = messages.iterator().next();
 
         Assertions.assertThat(persistedPI.getEventIds()[0]).isEqualTo(eventId);
         Assertions.assertThat(persistedPI.getPayloadJsonStart()).contains(notificationIntent.getBody().toJSONString());
@@ -247,7 +243,7 @@ public class ProcessingInfoGeneratorTest {
 
     }
 
-	private void assertMessagesHaveOriginalEventId(UUID[] originalEventIDs, List<Message<EmailContent>> messages) {
+	private void assertMessagesHaveOriginalEventId(UUID[] originalEventIDs, List<EmailMessage> messages) {
 		messages.forEach(message -> {
         	
             Assertions.assertThat(
@@ -266,13 +262,13 @@ public class ProcessingInfoGeneratorTest {
 	@Test
     void testPersistPIForSendMessage() {
         // given
-        String INPUT_JSON_FILE = "events/ba_job_post.json";
-        NotificationIntent<EmailContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        notificationIntent = (NotificationIntent<EmailContent>)generateEventId.apply(notificationIntent);
+        String INPUT_JSON_FILE = "intents/ba_job_post.json";
+        NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        notificationIntent = (NotificationIntent)generateEventId.apply(notificationIntent);
         UUID[] originalEventIDs = notificationIntent.getProcessingInfo().getEventIds();
         UUID eventId = originalEventIDs[0];
-        notificationIntent = (NotificationIntent<EmailContent>)resolveRecipients.apply(notificationIntent);
-        List<Message<EmailContent>> messages = generateMessagesFromIntent.apply(notificationIntent);                      
+        notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
+        List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);                      
         
         Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "GenerateMessagesFromIntent").size()>0);
         

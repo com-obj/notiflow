@@ -6,7 +6,7 @@ import java.util.Optional;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SimpleTextMessage;
+import com.obj.nc.domain.message.SmstMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class SmsMessageAggregationStrategy extends BasePayloadAggregationStrateg
 				.reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		
-		SimpleTextMessage outputMessage = new SimpleTextMessage();
+		SmstMessage outputMessage = new SmstMessage();
 		outputMessage.setBody(aggregatedSmsContent);
 		return outputMessage;
 	}

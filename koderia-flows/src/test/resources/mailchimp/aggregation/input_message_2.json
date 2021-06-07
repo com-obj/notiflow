@@ -1,7 +1,7 @@
 {
 	"type": "MAILCHIMP_MESSAGE",
 	"body": {
-		"type": "MAILCHIMP_CONTENT",
+		"@class": "com.obj.nc.domain.content.mailchimp.MailchimpContent",
 		"originalEvent": {
 			"type": "JOB_POST",
 			"data": {

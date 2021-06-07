@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.message.EmailMessage;
@@ -36,7 +36,7 @@ public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithMo
 	
 	@Override
 	public Optional<PayloadValidationException> checkPreCondition(Message<TemplateWithModelEmailContent<?>> message) {
-		Content content = message.getBody();
+		MessageContent content = message.getBody();
 		
 		if (!(content instanceof  TemplateWithModelEmailContent)) {
 			return Optional.of(new PayloadValidationException("EmailTemplateFormatter cannot format message because its content is not of type TemplateWithModelEmailContent. Instead is " +  content.getClass().getSimpleName()));

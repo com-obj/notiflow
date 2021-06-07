@@ -3,7 +3,7 @@ package com.obj.nc.functions.processors.messageAggregator.aggregations;
 import java.util.List;
 import java.util.Optional;
 
-import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -15,7 +15,7 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
  * @author ja
  *
  */
-public abstract class BasePayloadAggregationStrategy<CONTENT_TYPE extends Content> extends ProcessorFunctionAdapter<List<Message<CONTENT_TYPE>>, Object> {
+public abstract class BasePayloadAggregationStrategy<CONTENT_TYPE extends MessageContent> extends ProcessorFunctionAdapter<List<Message<CONTENT_TYPE>>, Object> {
 	
 	/**
 	 * Process the given list of payloads. Implementations are free to return as few or as many payloads

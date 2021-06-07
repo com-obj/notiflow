@@ -5,9 +5,10 @@
       	"flow-id":"static-routing-pipeline"
    },
    "body":{
-  		"type": "SMS_FROM_TEMPLATE_MESSAGE_CONTENT",
+  		"@class": "com.obj.nc.domain.content.TemplateWithModelContent",
         "templateFileName":"test-template.txt",
-         "model": {
+        "model": {
+         	"@class":"com.obj.nc.domain.BaseJSONObject",          	          	
           	"name":"John Doe",
           	"parts": ["part1","part2"]
          }

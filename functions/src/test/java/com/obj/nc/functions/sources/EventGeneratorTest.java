@@ -21,8 +21,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.FileSystemUtils;
 
 import com.obj.nc.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfigProperties;
 import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
@@ -34,7 +34,7 @@ import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
 @ContextConfiguration(classes = EventGeneratorTestConfig.class)
 class EventGeneratorTest {
 
-    private static final String EVENTS_DIR = "src/test/resources/events/";
+    private static final String INTENTS_DIR = "src/test/resources/intents/";
     private static final String EVENT_QUEUE_DIR = "src/test/resources/eventsQueue/";
     private static final String EVENT_FILE_NAME = "ba_job_post.json";
     private static final String FIRST_QUEUED_EVENT_FILE_NAME = "0_ba_job_post.json";
@@ -54,7 +54,7 @@ class EventGeneratorTest {
         }
 
         // copy event file to queue dir
-        Files.copy(Paths.get(EVENTS_DIR + EVENT_FILE_NAME),
+        Files.copy(Paths.get(INTENTS_DIR + EVENT_FILE_NAME),
                 Paths.get(EVENT_QUEUE_DIR + EVENT_FILE_NAME),
                 StandardCopyOption.REPLACE_EXISTING);
     }
@@ -71,13 +71,13 @@ class EventGeneratorTest {
         config.setFileName(EVENT_FILE_NAME);
 
         // when
-        NotificationIntent<EmailContent> notificationIntentFromFile = (NotificationIntent<EmailContent>)generateEvent.get();
+        NotificationIntent notificationIntentFromFile = (NotificationIntent)generateEvent.get();
 
         // then
         Assertions.assertThat(notificationIntentFromFile).isNotNull();
         
-        EmailContent emailContent = notificationIntentFromFile.getBody();
-        Assertions.assertThat(emailContent.getText()).isEqualTo("We are looking for a Business Intelligence (BI) Developer to create...");
+        IntentContent emailContent = notificationIntentFromFile.getBody();
+        Assertions.assertThat(emailContent.getBody()).isEqualTo("We are looking for a Business Intelligence (BI) Developer to create...");
         Assertions.assertThat(emailContent.getSubject()).isEqualTo("Business Intelligence (BI) Developer");
         Assertions.assertThat(((Map<?, ?>) notificationIntentFromFile.getAttributes().get("originalEvent"))).hasSize(2);
         Assertions.assertThat(notificationIntentFromFile.getRecievingEndpoints()).isEmpty();
@@ -124,7 +124,7 @@ class EventGeneratorTest {
     @Test
     void readEventOnlyDirSpecifiedFirstEventAlphabetically() throws IOException {
         // copy first event file (alphabetically) to queue dir
-        Files.copy(Paths.get(EVENTS_DIR + FIRST_QUEUED_EVENT_FILE_NAME),
+        Files.copy(Paths.get(INTENTS_DIR + FIRST_QUEUED_EVENT_FILE_NAME),
                 Paths.get(EVENT_QUEUE_DIR + FIRST_QUEUED_EVENT_FILE_NAME),
                 StandardCopyOption.REPLACE_EXISTING);
 
@@ -133,10 +133,10 @@ class EventGeneratorTest {
         config.setFileName(null);
 
         // when
-        NotificationIntent<EmailContent> notificationIntentFromFile = (NotificationIntent<EmailContent>)generateEvent.get();
+        NotificationIntent notificationIntentFromFile = (NotificationIntent)generateEvent.get();
 
         // then
-        EmailContent emailContent = notificationIntentFromFile.getBody();
+        IntentContent emailContent = notificationIntentFromFile.getBody();
         Assertions.assertThat(emailContent.getSubject()).isEqualTo("First event in queue");
     }
 
@@ -149,7 +149,7 @@ class EventGeneratorTest {
         // when - then
         Assertions.assertThat(Files.exists(Paths.get(EVENT_QUEUE_DIR + EVENT_FILE_NAME))).isTrue();
 
-        NotificationIntent<EmailContent> notificationIntentFromFile = (NotificationIntent<EmailContent>)generateEvent.get();
+        NotificationIntent notificationIntentFromFile = (NotificationIntent)generateEvent.get();
 
         Assertions.assertThat(Files.exists(Paths.get(EVENT_QUEUE_DIR + EVENT_FILE_NAME))).isFalse();
     }

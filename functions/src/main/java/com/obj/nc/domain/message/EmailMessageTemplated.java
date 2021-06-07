@@ -16,11 +16,11 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
 @NoArgsConstructor
-public class EmailWithTemplatedContent<BODY_TYPE extends TemplateWithModelEmailContent<?>> extends Message<BODY_TYPE/*, EmailEndpoint*/> {
+public class EmailMessageTemplated<MODEL_TYPE> extends Message<TemplateWithModelEmailContent<MODEL_TYPE>/*, EmailEndpoint*/> {
 
 	public static final String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_TEMPLATED_CONTENT";
 	
-	public EmailWithTemplatedContent(BODY_TYPE content) {
+	public EmailMessageTemplated(TemplateWithModelEmailContent<MODEL_TYPE> content) {
 		setBody(content);
 	}
 	

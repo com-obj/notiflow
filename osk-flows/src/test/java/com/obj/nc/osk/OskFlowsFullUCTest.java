@@ -40,8 +40,8 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.controllers.DeliveryInfoRestController;
 import com.obj.nc.controllers.DeliveryInfoRestController.EndpointDeliveryInfoDto;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.controllers.EventReceiverRestController;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.osk.domain.IncidentTicketOutageEndEventDto;
 import com.obj.nc.osk.domain.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.functions.processors.sms.OskSmsSenderRestImpl;
@@ -242,14 +242,14 @@ public class OskFlowsFullUCTest extends BaseIntegrationTest {
     }
 
 	private void createRestCallExpectationsForOutageStartSms() {
-		//TODO: toto je asi vcelku brittle,.. nemyslim, ze viem garantovat poradie
+		//toto je asi vcelku brittle,.. nemyslim, ze viem garantovat poradie
 		createRestCallExpectation("0918186997", "Vážený zákazník,", "sme zaznamenali výpadok, ktorý môže mať dopad na využívanie Vašich služieb od Orangeu.", "VPS", "0918186997", "VPS sifrovana");
 		createRestCallExpectation("+421918186997", "Vážený zákazník,", "sme zaznamenali výpadok, ktorý môže mať dopad na využívanie Vašich služieb od Orangeu.", "VPS", "0918186997", "VPS sifrovana");
 		createRestCallExpectation("0918186998", "Vážený zákazník,", "sme zaznamenali výpadok, ktorý môže mať dopad na využívanie Vašich služieb od Orangeu.", "VPS sifrovana", "VPS sifrovana/nesifrovana");
 	}
 	
 	private void createRestCallExpectationsForOutageEndSms() {
-		//TODO: toto je asi vcelku brittle,.. nemyslim, ze viem garantovat poradie
+		//toto je asi vcelku brittle,.. nemyslim, ze viem garantovat poradie
 		createRestCallExpectation("0918186997", "Vážený zákazník, už avizovaný výpadok z", "ktorý mohol mať dopad", "bol odstránený", "VPS", "VPS sifrovana");
 		createRestCallExpectation("+421918186997", "Vážený zákazník, už avizovaný výpadok z", "ktorý mohol mať dopad", "bol odstránený", "VPS", "VPS sifrovana");
 		createRestCallExpectation("0918186998", "Vážený zákazník, už avizovaný výpadok z", "ktorý mohol mať dopad", "bol odstránený", "VPS sifrovana", "VPS sifrovana/nesifrovana");

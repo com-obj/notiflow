@@ -14,7 +14,7 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailWithTemplatedContent;
+import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.utils.JsonUtils;
 
@@ -28,7 +28,7 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 	void createSimpleHtmlEmailFromTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/teamplate_message.json";
-		EmailWithTemplatedContent msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailWithTemplatedContent.class);
+		EmailMessageTemplated msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessageTemplated.class);
 		
 		//WHEN
 		List<EmailMessage> htmlMessages = template2Html.apply(msg);
@@ -47,7 +47,7 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 	void createHtmlEmailFromPojoModelAndTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/teamplate_message_pojo_model.json";
-		EmailWithTemplatedContent msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailWithTemplatedContent.class);
+		EmailMessageTemplated msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessageTemplated.class);
 		
 		//WHEN
 		List<EmailMessage> htmlMessages = template2Html.apply(msg);
@@ -67,7 +67,7 @@ class EmailFromTemplateTest extends BaseIntegrationTest {
 	void createI18NHtmlEmailFromTemplate() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/teamplate_message_en_de.json";
-		EmailWithTemplatedContent msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailWithTemplatedContent.class);
+		EmailMessageTemplated msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessageTemplated.class);
 		
 		//WHEN
 		List<EmailMessage> htmlMessages = template2Html.apply(msg);

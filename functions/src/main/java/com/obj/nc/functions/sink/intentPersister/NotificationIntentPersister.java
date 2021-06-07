@@ -13,14 +13,14 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @AllArgsConstructor
 @Log4j2
-public class NotificationIntentPersister extends SinkConsumerAdapter<NotificationIntent<?>> {
+public class NotificationIntentPersister extends SinkConsumerAdapter<NotificationIntent> {
 
     @Autowired
     private NotificationIntentRepository intentRepo;
 
 
 	@Override
-	protected void execute(NotificationIntent<?> deliveryInfo) {
+	protected void execute(NotificationIntent deliveryInfo) {
 		intentRepo.save(deliveryInfo);
 	}
 

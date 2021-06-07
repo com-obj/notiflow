@@ -3,7 +3,6 @@ package com.obj.nc.flows.testmode.email.functions.processors;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 
@@ -28,7 +27,6 @@ public class TestModeDiggestModel {
 			return;
 		}
 		
-		//TODO: replace <Body> with lowercase
 		String bodyPartHtml = StringUtils.substringBetween(emailContent.getText(), "<body>", "</body>");
 		emailContent.setText("<div>" + bodyPartHtml + "</div>");
 	}

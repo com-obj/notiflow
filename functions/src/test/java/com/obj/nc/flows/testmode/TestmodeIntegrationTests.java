@@ -50,9 +50,9 @@ import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailWithTemplatedContent;
-import com.obj.nc.domain.message.SimpleTextMessage;
-import com.obj.nc.domain.message.SmsWithTemplatedContent;
+import com.obj.nc.domain.message.EmailMessageTemplated;
+import com.obj.nc.domain.message.SmstMessage;
+import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig;
 import com.obj.nc.flows.testmode.email.config.TestModeGreenMailProperties;
@@ -174,8 +174,8 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     @Test
     void testSendEmailAndSmsDigestInOneEmail() {
         // GIVEN
-    	EmailWithTemplatedContent<?> inputEmail = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", EmailWithTemplatedContent.class);
-    	SmsWithTemplatedContent<?> inputSms = JsonUtils.readObjectFromClassPathResource("messages/templated/txt_template_message_en_de.json", SmsWithTemplatedContent.class);
+    	EmailMessageTemplated<?> inputEmail = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", EmailMessageTemplated.class);
+    	SmsMessageTemplated<?> inputSms = JsonUtils.readObjectFromClassPathResource("messages/templated/txt_template_message_en_de.json", SmsMessageTemplated.class);
     
         //AND GIVEN RECEIVED EMAILs
         emailProcessingInputChannel.send(new GenericMessage<>(inputEmail));
@@ -187,7 +187,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         // AND RECEIVED SMSs
         smsProcessingInputChannel.send(new GenericMessage<>(inputSms));
         await().atMost(10, TimeUnit.SECONDS).until(() -> smsSourceSupplier.getReceivedCount() >= 1);
-        List<SimpleTextMessage> receivedSmsMessages = Stream.generate(smsSourceSupplier).limit(10).filter(Objects::nonNull).collect(Collectors.toList());
+        List<SmstMessage> receivedSmsMessages = Stream.generate(smsSourceSupplier).limit(10).filter(Objects::nonNull).collect(Collectors.toList());
         Assertions.assertThat(receivedSmsMessages).hasSize(2);
         MessageSource<?> smsMessageSource = () -> new GenericMessage<>(receivedSmsMessages);
     
