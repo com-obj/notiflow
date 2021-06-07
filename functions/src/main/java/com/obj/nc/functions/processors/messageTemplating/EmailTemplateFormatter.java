@@ -1,5 +1,6 @@
 package com.obj.nc.functions.processors.messageTemplating;
 
+import java.net.URI;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
@@ -55,7 +57,10 @@ public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithMo
 		if (emailTrackingConfigProperties.getRead().isEnabled()) {
 			Document html = Jsoup.parse(formatedContent);
 			Element img = html.body().appendElement("img");
-			img.attr("src", emailTrackingConfigProperties.getRead().getUrl() + "/" + payload.getId());
+			URI readMessageCallbackUri = UriComponentsBuilder
+					.fromHttpUrl(emailTrackingConfigProperties.getRead().getUrl())
+					.build(payload.getMessageId());
+			img.attr("src", readMessageCallbackUri.toString());
 			formatedContent = html.html();
 		}
 		emailContent.setText(formatedContent);
