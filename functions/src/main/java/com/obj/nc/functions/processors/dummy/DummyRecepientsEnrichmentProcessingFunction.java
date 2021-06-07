@@ -19,16 +19,16 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 @Log4j2
 @DocumentProcessingInfo("DummyRecepientsEnrichment")
-public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent<?>, NotificationIntent<?>> {
+public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent, NotificationIntent> {
 
 	
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent<?> notificationIntent) {
+	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent notificationIntent) {
 		return Optional.empty();
 	}
 
 	@Override
-	protected NotificationIntent<?> execute(NotificationIntent<?> notificationIntent) {
+	protected NotificationIntent execute(NotificationIntent notificationIntent) {
 		// find recipients based on technologies
 		Person person1 = new Person("John Doe");
 		Person person2 = new Person("John Dudly");

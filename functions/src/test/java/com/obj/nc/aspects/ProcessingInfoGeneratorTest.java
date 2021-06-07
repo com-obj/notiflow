@@ -79,9 +79,9 @@ public class ProcessingInfoGeneratorTest {
 		//GIVEN
 		String INPUT_JSON_FILE = "intents/direct_message.json";
 
-		NotificationIntent<IntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
-		notificationIntent = (NotificationIntent<IntentContent>)generateEventId.apply(notificationIntent);
+		notificationIntent = (NotificationIntent)generateEventId.apply(notificationIntent);
 		//WHEN
 		List<EmailMessage> result = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);
 		
@@ -102,7 +102,7 @@ public class ProcessingInfoGeneratorTest {
     @Test
     void testPersistPIForNewIntent() {
         // given
-        NotificationIntent<IntentContent> notificationIntent = createWithSimpleMessage("test-config", "Hi there!!");
+        NotificationIntent notificationIntent = createWithSimpleMessage("test-config", "Hi there!!");
         String notificationIntentJson = notificationIntent.toJSONString();
         HasHeader payloadWithEventId = generateEventId.apply(notificationIntent);
 
@@ -137,8 +137,8 @@ public class ProcessingInfoGeneratorTest {
     }
     
 
-	public static NotificationIntent<IntentContent> createWithSimpleMessage(String flowId, String message) {
-		NotificationIntent<IntentContent> notificationIntent = new NotificationIntent<IntentContent>();
+	public static NotificationIntent createWithSimpleMessage(String flowId, String message) {
+		NotificationIntent notificationIntent = new NotificationIntent();
 		notificationIntent.getHeader().setFlowId(flowId);
 		notificationIntent.setBody(IntentContent.createStaticContent("some subject", message));
 		
@@ -208,10 +208,10 @@ public class ProcessingInfoGeneratorTest {
     void testPersistPIForMessageFromIntentStep() {
         // given
         String INPUT_JSON_FILE = "intents/ba_job_post.json";
-        NotificationIntent<IntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        notificationIntent = (NotificationIntent<IntentContent>)generateEventId.apply(notificationIntent);
+        NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        notificationIntent = (NotificationIntent)generateEventId.apply(notificationIntent);
         UUID[] originalEventIDs = notificationIntent.getProcessingInfo().getEventIds();
-        notificationIntent = (NotificationIntent<IntentContent>) resolveRecipients.apply(notificationIntent);
+        notificationIntent = (NotificationIntent) resolveRecipients.apply(notificationIntent);
         List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);
 
         // ProcessingInfo persistence is done using aspect and in an async way
@@ -263,11 +263,11 @@ public class ProcessingInfoGeneratorTest {
     void testPersistPIForSendMessage() {
         // given
         String INPUT_JSON_FILE = "intents/ba_job_post.json";
-        NotificationIntent<IntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        notificationIntent = (NotificationIntent<IntentContent>)generateEventId.apply(notificationIntent);
+        NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        notificationIntent = (NotificationIntent)generateEventId.apply(notificationIntent);
         UUID[] originalEventIDs = notificationIntent.getProcessingInfo().getEventIds();
         UUID eventId = originalEventIDs[0];
-        notificationIntent = (NotificationIntent<IntentContent>)resolveRecipients.apply(notificationIntent);
+        notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
         List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);                      
         
         Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "GenerateMessagesFromIntent").size()>0);

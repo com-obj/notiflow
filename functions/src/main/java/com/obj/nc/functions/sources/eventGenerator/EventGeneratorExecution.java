@@ -23,20 +23,20 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @RequiredArgsConstructor
 @Log4j2
-public class EventGeneratorExecution implements Supplier<NotificationIntent<?>> {
+public class EventGeneratorExecution implements Supplier<NotificationIntent> {
 
     @Autowired
     @NotNull
     private EventGeneratorConfigProperties eventGeneratorConfigProperties;
 
     @Override
-    public NotificationIntent<?> get() {
+    public NotificationIntent get() {
         return readNotificationIntentsFromFile();
     }
 
     private int eventFileIndex = 0;
 
-    public NotificationIntent<?> readNotificationIntentsFromFile()  {
+    public NotificationIntent readNotificationIntentsFromFile()  {
         try {
             Path eventFile = null;
 
@@ -64,7 +64,7 @@ public class EventGeneratorExecution implements Supplier<NotificationIntent<?>> 
                 }
             }
 
-            NotificationIntent<?> notificationIntent = JsonUtils.readObjectFromJSONFile(eventFile,NotificationIntent.class);
+            NotificationIntent notificationIntent = JsonUtils.readObjectFromJSONFile(eventFile,NotificationIntent.class);
 
             Files.delete(eventFile);
 

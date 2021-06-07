@@ -53,7 +53,7 @@ import lombok.extern.log4j.Log4j2;
  *
  * @param <BODY_TYPE>
  */
-public class NotificationIntent<BODY_TYPE extends IntentContent> extends BasePayload<BODY_TYPE> {
+public class NotificationIntent extends BasePayload<IntentContent> {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "INTENT";
 	
@@ -62,7 +62,7 @@ public class NotificationIntent<BODY_TYPE extends IntentContent> extends BasePay
 	public String getPayloadTypeName() {
 		return JSON_TYPE_IDENTIFIER;
 	}
-
+	
 	public Message<?> createMessage(RecievingEndpoint endpointsForOneSubject) {
 		MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
 

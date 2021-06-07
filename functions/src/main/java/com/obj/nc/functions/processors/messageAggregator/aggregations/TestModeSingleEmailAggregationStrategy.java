@@ -9,13 +9,13 @@ import org.thymeleaf.util.StringUtils;
 
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.message.EmailWithTestModeDiggest;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.flows.testmode.TestModeProperties;
-import com.obj.nc.flows.testmode.email.functions.processors.TestModeDiggestMailContent;
 import com.obj.nc.flows.testmode.email.functions.processors.TestModeDiggestModel;
 
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregati
         
         digestModel.getSmsContents().forEach(smsContent -> smsContent.setText(StringUtils.replace(smsContent.getText(), "\n", "<br>")));
         
-        TestModeDiggestMailContent resultMail = new TestModeDiggestMailContent();
+        TemplateWithModelEmailContent<TestModeDiggestModel> resultMail = new TemplateWithModelEmailContent<TestModeDiggestModel>();
         resultMail.setSubject("Notifications digest while running test mode");
         resultMail.setTemplateFileName("test-mode-digest.html");
         resultMail.setRequiredLocales(Arrays.asList(new Locale("en")));

@@ -3,9 +3,10 @@ package com.obj.nc.domain.message;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.flows.testmode.email.functions.processors.TestModeDiggestMailContent;
+import com.obj.nc.flows.testmode.email.functions.processors.TestModeDiggestModel;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,11 +17,11 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
 @NoArgsConstructor
-public class EmailWithTestModeDiggest extends Message<TestModeDiggestMailContent/*, EmailEndpoint*/> {
+public class EmailWithTestModeDiggest extends Message<TemplateWithModelEmailContent<TestModeDiggestModel>/*, EmailEndpoint*/> {
 
 	public static final String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CUSTOM_CONTENT";
 	
-	public EmailWithTestModeDiggest(TestModeDiggestMailContent content) {
+	public EmailWithTestModeDiggest(TemplateWithModelEmailContent<TestModeDiggestModel> content) {
 		setBody(content);
 	}
 	

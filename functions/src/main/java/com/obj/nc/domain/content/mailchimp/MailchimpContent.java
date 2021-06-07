@@ -3,7 +3,6 @@ package com.obj.nc.domain.content.mailchimp;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpAttachmentDto;
 import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpMergeVariableDto;
@@ -20,11 +19,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-@JsonTypeName(MailchimpContent.JSON_TYPE_IDENTIFIER)
 @Builder
 public class MailchimpContent extends MessageContent {
-    
-    public final static String JSON_TYPE_IDENTIFIER = "MAILCHIMP_CONTENT";
     
     @EqualsAndHashCode.Include
     private MailchimpData originalEvent;
@@ -44,10 +40,5 @@ public class MailchimpContent extends MessageContent {
     @Builder.Default
     private List<MailchimpMergeVariableDto> globalMergeVariables = new ArrayList<>();
     private String mergeLanguage;
-    
-    @Override
-    public String getContentTypeName() {
-    	return JSON_TYPE_IDENTIFIER;
-    }
     
 }

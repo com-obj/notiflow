@@ -61,7 +61,7 @@ public class OskSmsSenderRestImpl extends ProcessorFunctionAdapter<SimpleTextMes
         }
 
         if (!(payload.getBody() instanceof SimpleTextContent)) {
-            return Optional.of(new PayloadValidationException(String.format("Sms sender can only send message with content of type %s", SimpleTextContent.JSON_TYPE_IDENTIFIER)));
+            return Optional.of(new PayloadValidationException(String.format("Sms sender can only send message with content of type %s", payload.getBody().getClass())));
         }
 
         return Optional.empty();

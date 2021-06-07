@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -27,12 +28,10 @@ import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.osk.domain.IncidentTicketOutageEndEventDto;
 import com.obj.nc.osk.domain.IncidentTicketOutageStartEventDto;
-import com.obj.nc.osk.functions.content.CustEmailTemplate;
-import com.obj.nc.osk.functions.content.CustSmsTemplate;
-import com.obj.nc.osk.functions.content.SalesEmailTemplate;
 import com.obj.nc.osk.functions.model.CustEventModel;
 import com.obj.nc.osk.functions.model.CustomerInfo;
 import com.obj.nc.osk.functions.model.SalesAgentEventModel;
+import com.obj.nc.osk.functions.model.SalesEventModel;
 import com.obj.nc.osk.functions.model.ServiceOutageInfo;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
@@ -68,38 +67,44 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertCustomerNotificationIntents(result);
     	
     	//THEN check if all ending emails have outage end (and start)
-    	List<CustEmailTemplate> emails = extractEmails(result);
-    	assertThat(emails.size()).isEqualTo(3);
+    	List<TemplateWithModelEmailContent<?>> emails = extractEmails(result);
+    	assertThat(emails.size()).isEqualTo(6); //3 customer contancts (2 customers), 2 sales mails, 1 agent
 
-		for (CustEmailTemplate email: emails) {
-			CustEventModel anyModel = email.getModel();
-			assertThat(anyModel.getTimeStart()).isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T20:00:00.000Z"));
-			assertThat(anyModel.getTimeEnd()).isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T22:00:00.000Z"));
+		for (TemplateWithModelEmailContent<?> email: emails) {
+			assertThat(email.getModel())
+				.extracting("timeStart")
+				.isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T20:00:00.000Z"));
+			assertThat(email.getModel())
+				.extracting("timeEnd")
+				.isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T22:00:00.000Z"));
 		}
        	
     	//THEN check if all ending smss have outage end (and start)
-    	List<CustSmsTemplate> smss = extractSmss(result);   	
-    	assertThat(smss.size()).isEqualTo(2);
+    	List<TemplateWithModelContent<?>> smss = extractSmss(result);   	
+    	assertThat(smss.size()).isEqualTo(2); // two customers contacts
 
-    	for (CustSmsTemplate sms: smss) {
-			CustEventModel smsModel = sms.getModel();
-	       	assertThat(smsModel.getTimeStart()).isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T20:00:00.000Z"));
-	       	assertThat(smsModel.getTimeEnd()).isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T22:00:00.000Z"));
+    	for (TemplateWithModelContent<?> sms: smss) {
+	       	assertThat(sms.getModel())
+	       		.extracting("timeStart")
+	       		.isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T20:00:00.000Z"));
+	       	assertThat(sms.getModel())
+	       		.extracting("timeEnd")
+	       		.isEqualTo(JsonUtils.convertJsonDateStringToDate("2021-01-01T22:00:00.000Z"));
     	}
     }
 
-	private List<CustEmailTemplate> extractEmails(List<Message<?>> result) {
-		List<CustEmailTemplate> contents = result.stream()
-    		.filter(e-> e.getBody() instanceof CustEmailTemplate)
-    		.map(e-> ((CustEmailTemplate)e.getBody()))
+	private List<TemplateWithModelEmailContent<?>> extractEmails(List<Message<?>> result) {
+		List<TemplateWithModelEmailContent<?>> contents = result.stream()
+    		.filter(e-> e.getBody().getClass().equals(TemplateWithModelEmailContent.class))
+    		.map(e-> ((TemplateWithModelEmailContent<?>)e.getBody()))
     		.collect(Collectors.toList());
 		return contents;
 	}
 	
-	private List<CustSmsTemplate> extractSmss(List<Message<?>> result) {
-		List<CustSmsTemplate> contents = result.stream()
-    		.filter(e-> e.getBody() instanceof CustSmsTemplate)
-    		.map(e-> ((CustSmsTemplate)e.getBody()))
+	private List<TemplateWithModelContent<?>> extractSmss(List<Message<?>> result) {
+		List<TemplateWithModelContent<?>> contents = result.stream()
+    		.filter(e-> e.getBody().getClass().equals(TemplateWithModelContent.class))
+    		.map(e-> ((TemplateWithModelContent<?>)e.getBody()))
     		.collect(Collectors.toList());
 		return contents;
 	}
@@ -126,7 +131,12 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(smsEp.getRecipient().getName()).isEqualTo("Jan Cuzy");
     	assertThat(smsEp.getPhone()).contains("918186997");
     	
-    	CustEmailTemplate msgContentEmail =(CustEmailTemplate)nisForCuzy.stream().map(ni->ni.getBody()).filter(c -> c instanceof CustEmailTemplate).findFirst().get();
+    	TemplateWithModelEmailContent<CustEventModel> msgContentEmail =
+    			(TemplateWithModelEmailContent<CustEventModel>)nisForCuzy.stream()
+    				.map(ni->ni.getBody())
+    				.filter(c -> c instanceof TemplateWithModelEmailContent)
+    				.findFirst()
+    				.get();
     	assertThat(msgContentEmail.getModel().getTimeStart()).isNotNull();
     	
     	//THEN check outage infos
@@ -142,7 +152,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	assertThat(context.selectSingleNode(".[@customerAddress='Martinengova 4881/36 811 02 Bratislava']")).isNotNull();
     	
     	//THEN check sms content - should be the same as email
-    	CustSmsTemplate msgContentSms =(CustSmsTemplate)nisForCuzy.stream().map(ni->ni.getBody()).filter(c -> c instanceof CustSmsTemplate).findFirst().get();
+    	TemplateWithModelContent<CustEventModel> msgContentSms =(TemplateWithModelContent<CustEventModel>)nisForCuzy.stream().map(ni->ni.getBody()).filter(c -> c instanceof TemplateWithModelContent).findFirst().get();
     	
     	outageInfos = msgContentSms.getModel().getServices();
     	assertThat(outageInfos.size()).isEqualTo(2);
@@ -178,7 +188,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	
     	assertThat(endpoints.iterator().next().getRecipient().getName()).isEqualTo("Adrian Slavkovsky");
     	
-    	SalesEmailTemplate msgContent = (SalesEmailTemplate)notificationIntentForSlavkovsky.getBody();
+    	TemplateWithModelEmailContent<SalesEventModel> msgContent = (TemplateWithModelEmailContent<SalesEventModel>)notificationIntentForSlavkovsky.getBody();
     	assertThat(msgContent.getModel().getTimeStart()).isNotNull();
     	
     	Map<CustomerInfo, List<ServiceOutageInfo>> outageInfos = msgContent.getModel().getServicesPerCustomer();

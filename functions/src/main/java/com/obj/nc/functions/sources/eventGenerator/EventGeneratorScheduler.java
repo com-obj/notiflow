@@ -18,7 +18,7 @@ public class EventGeneratorScheduler {
 
     @Scheduled(fixedDelay = 1000, initialDelay = 1000)
     public void generateEventAndAddToFlux() {
-        NotificationIntent<?> notificationIntent = sourceMicroService.getSourceSupplier().get();
+        NotificationIntent notificationIntent = sourceMicroService.getSourceSupplier().get();
         sourceMicroService.onNext(notificationIntent);
     }
 

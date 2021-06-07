@@ -19,7 +19,6 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SimpleTextMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageTeamplating.domain.TestModel;
 import com.obj.nc.utils.JsonUtils;
@@ -32,10 +31,10 @@ class MessagesFromIntentTest {
 	void createMessagesFromEvent() {
 		//GIVEN
 		String INPUT_JSON_FILE = "intents/direct_message.json";
-		NotificationIntent<IntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
 		GenerateEventIdProcessingFunction generateEventfunction = new GenerateEventIdProcessingFunction();
-		notificationIntent = (NotificationIntent<IntentContent>)generateEventfunction.apply(notificationIntent);
+		notificationIntent = (NotificationIntent)generateEventfunction.apply(notificationIntent);
 		
 		//WHEN
 		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
@@ -63,10 +62,10 @@ class MessagesFromIntentTest {
 	void createMessagesFromEventAttachements() {
 		//GIVEN
 		String INPUT_JSON_FILE = "intents/direct_message_attachements.json";
-		NotificationIntent<IntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 
 		GenerateEventIdProcessingFunction generateEventFunc = new GenerateEventIdProcessingFunction();
-		notificationIntent = (NotificationIntent<IntentContent>)generateEventFunc.apply(notificationIntent);
+		notificationIntent = (NotificationIntent)generateEventFunc.apply(notificationIntent);
 		
 		//WHEN
 		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
@@ -88,7 +87,7 @@ class MessagesFromIntentTest {
 	void createMessagesFromEventDifferentChannels() {
 		//GIVEN
 		String INPUT_JSON_FILE = "intents/direct_message_different_channels.json";
-		NotificationIntent<IntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 		
 		//WHEN
 		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();
@@ -121,7 +120,7 @@ class MessagesFromIntentTest {
 	void createTemplatedMessagesFromEventDifferentChannels() {
 		//GIVEN
 		String INPUT_JSON_FILE = "intents/teamplate_message_en_de.json";
-		NotificationIntent<IntentContent> notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 		
 		//WHEN
 		MessagesFromNotificationIntentProcessingFunction createMessagesFunction = new MessagesFromNotificationIntentProcessingFunction();

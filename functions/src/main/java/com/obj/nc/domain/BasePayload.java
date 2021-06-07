@@ -62,7 +62,7 @@ public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements H
 	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
 	protected Header header = new Header();
 	
-	@Column("payload_json")
+	@Column("payload_json")	
 	protected BODY_TYPE body;
 	
 	//Ak je body sucastou message tak recievingEndpoints.size() = 1

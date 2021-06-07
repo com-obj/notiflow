@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.http.MediaType;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.MessageContent;
 
@@ -20,11 +19,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-@JsonTypeName(EmailContent.JSON_TYPE_IDENTIFIER)
 public class EmailContent extends MessageContent {
 	
-	public final static String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CONTENT";
-
 	public static final String TEXT_CONCAT_DELIMITER = "\n\n";
 	public static final String SUBJECT_CONCAT_DELIMITER = ", ";
 
@@ -42,10 +38,5 @@ public class EmailContent extends MessageContent {
 	@Builder.Default
 	private List<Attachement> attachments = new ArrayList();
 	
-	@Override
-	public String getContentTypeName() {
-		return JSON_TYPE_IDENTIFIER;
-	}
-
 	
 }

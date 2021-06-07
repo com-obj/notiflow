@@ -71,7 +71,7 @@ class EventGeneratorTest {
         config.setFileName(EVENT_FILE_NAME);
 
         // when
-        NotificationIntent<IntentContent> notificationIntentFromFile = (NotificationIntent<IntentContent>)generateEvent.get();
+        NotificationIntent notificationIntentFromFile = (NotificationIntent)generateEvent.get();
 
         // then
         Assertions.assertThat(notificationIntentFromFile).isNotNull();
@@ -133,7 +133,7 @@ class EventGeneratorTest {
         config.setFileName(null);
 
         // when
-        NotificationIntent<IntentContent> notificationIntentFromFile = (NotificationIntent<IntentContent>)generateEvent.get();
+        NotificationIntent notificationIntentFromFile = (NotificationIntent)generateEvent.get();
 
         // then
         IntentContent emailContent = notificationIntentFromFile.getBody();
@@ -149,7 +149,7 @@ class EventGeneratorTest {
         // when - then
         Assertions.assertThat(Files.exists(Paths.get(EVENT_QUEUE_DIR + EVENT_FILE_NAME))).isTrue();
 
-        NotificationIntent<IntentContent> notificationIntentFromFile = (NotificationIntent<IntentContent>)generateEvent.get();
+        NotificationIntent notificationIntentFromFile = (NotificationIntent)generateEvent.get();
 
         Assertions.assertThat(Files.exists(Paths.get(EVENT_QUEUE_DIR + EVENT_FILE_NAME))).isFalse();
     }

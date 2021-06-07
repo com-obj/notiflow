@@ -5,7 +5,7 @@
       	"flow-id":"static-routing-pipeline"
    },
    "body":{
-  		"type": "TEMPLATE_WITH_MODEL_CONTENT",
+  		"@class": "com.obj.nc.domain.content.TemplateWithModelContent",
         "templateFileName":"test-template2.txt",
         "model": {
           	"@class":"com.obj.nc.functions.processors.messageTeamplating.domain.TestModel",
