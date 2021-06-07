@@ -9,6 +9,7 @@
         "templateFileName":"test-template-i18n.txt",
         "requiredLocales": ["en_US","de"],
         "model": {
+        	"@class":"com.obj.nc.domain.BaseJSONObject",          	
           	"name":"John Doe"
         }
       },

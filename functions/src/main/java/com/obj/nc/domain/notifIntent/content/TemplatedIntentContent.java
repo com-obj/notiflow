@@ -21,7 +21,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 @JsonTypeName(TemplatedIntentContent.JSON_TYPE_IDENTIFIER)
 public class TemplatedIntentContent<MODEL_TYPE> extends IntentContent {
 	

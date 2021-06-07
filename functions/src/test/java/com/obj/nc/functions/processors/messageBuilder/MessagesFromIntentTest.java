@@ -14,10 +14,10 @@ import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailWithTemplatedContent;
+import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SimpleTextMessage;
-import com.obj.nc.domain.message.SmsWithTemplatedContent;
+import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
@@ -130,7 +130,7 @@ class MessagesFromIntentTest {
 		//AND THEN
 		assertThat(result.size()).isEqualTo(2);
 		
-		SmsWithTemplatedContent<TemplateWithModelContent<TestModel>> message = findMessageWithEnpoint(result, "0908186997");
+		SmsMessageTemplated<TestModel> message = findMessageWithEnpoint(result, "0908186997");
 		
 		List<? extends RecievingEndpoint> recievingEndpoints = message.getRecievingEndpoints();
 		assertThat(recievingEndpoints.size()).isEqualTo(1);
@@ -145,7 +145,7 @@ class MessagesFromIntentTest {
 		assertThat(model.getName()).isEqualTo("John Doe");
 		
 		//AND THEN
-		EmailWithTemplatedContent<TemplateWithModelEmailContent<TestModel>> mail = findMessageWithEnpoint(result, "john.doe@objectify.sk");
+		EmailMessageTemplated<TestModel> mail = findMessageWithEnpoint(result, "john.doe@objectify.sk");
 		
 		TemplateWithModelEmailContent<TestModel> emailContent = mail.getBody();
 		assertThat(smsContent.getTemplateFileName()).isEqualTo("test-template2.txt");

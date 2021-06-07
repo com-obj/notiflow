@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -13,15 +16,13 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 public abstract class TemplateWithModelContent<MODEL_TYPE> extends MessageContent {
 	
 	@NonNull
-	@EqualsAndHashCode.Include
 	private String templateFileName;
 	
-	@NonNull
-	@EqualsAndHashCode.Include
+	@JsonTypeInfo(use = Id.CLASS)
 	private MODEL_TYPE model;
 	
 	private List<Locale> requiredLocales = new ArrayList<>();

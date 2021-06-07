@@ -9,7 +9,7 @@
         "templateFileName":"test-template2.html",
         "subject":"Subject",
         "model": {
-          	"@class":"com.obj.nc.functions.processors.messageTeamplating.domain.TestMode",
+          	"@class":"com.obj.nc.functions.processors.messageTeamplating.domain.TestModel",
           	"name":"John Doe",
            	"parts": [
            		{"field1":"val11","field2":"val12"},

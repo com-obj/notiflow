@@ -18,20 +18,21 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.BaseIntegrationTest;
 import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.message.EmailWithTemplatedContent;
+import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.osk.domain.IncidentTicketOutageEndEventDto;
 import com.obj.nc.osk.domain.IncidentTicketOutageStartEventDto;
 import com.obj.nc.osk.functions.content.CustEmailTemplate;
 import com.obj.nc.osk.functions.content.CustSmsTemplate;
-import com.obj.nc.osk.functions.content.SalesAgentsEmailTemplate;
 import com.obj.nc.osk.functions.content.SalesEmailTemplate;
 import com.obj.nc.osk.functions.model.CustEventModel;
 import com.obj.nc.osk.functions.model.CustomerInfo;
+import com.obj.nc.osk.functions.model.SalesAgentEventModel;
 import com.obj.nc.osk.functions.model.ServiceOutageInfo;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
@@ -209,7 +210,7 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	
     	//THEN check events for agent
     	JXPathContext context = JXPathContext.newContext(result);
-		List<EmailWithTemplatedContent<?>> notificationIntentsForAgent = context.selectNodes("//recievingEndpoints[@endpointId='sales@objectify.sk']/..");
+		List<EmailMessageTemplated<?>> notificationIntentsForAgent = context.selectNodes("//recievingEndpoints[@endpointId='sales@objectify.sk']/..");
     	
     	assertThat(notificationIntentsForAgent.size()).isEqualTo(1);
     	
@@ -219,8 +220,8 @@ public class NotificationEventConverterProcessingFunctionTest extends BaseIntegr
     	
     	assertThat(endpoints.iterator().next().getRecipient()).isNull(); //Pre sales agentov nemam person
     	
-    	EmailWithTemplatedContent<SalesAgentsEmailTemplate> notificationIntentForAgent = (EmailWithTemplatedContent<SalesAgentsEmailTemplate>)notificationIntentsForAgent.iterator().next();
-    	SalesAgentsEmailTemplate msgContent = notificationIntentForAgent.getBody();
+    	EmailMessageTemplated<SalesAgentEventModel> notificationIntentForAgent = (EmailMessageTemplated<SalesAgentEventModel>)notificationIntentsForAgent.iterator().next();
+    	TemplateWithModelEmailContent<SalesAgentEventModel> msgContent = notificationIntentForAgent.getBody();
     	assertThat(msgContent.getModel().getTimeStart()).isNotNull();
     	
     	//THEN check outage infos

@@ -16,6 +16,7 @@
             "subject":"Subject",
             "requiredLocales": ["en_US","de"],
             "model": {
+            	"@class":"com.obj.nc.domain.BaseJSONObject",          	
             	"name":"John Doe"
             }
    },

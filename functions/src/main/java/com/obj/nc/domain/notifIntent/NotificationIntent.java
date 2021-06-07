@@ -6,7 +6,6 @@ import org.springframework.data.relational.core.mapping.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.content.MessageContent;
-import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
@@ -15,11 +14,11 @@ import com.obj.nc.domain.content.sms.TemplateWithModelSmsContent;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailWithTemplatedContent;
+import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SimpleTextMessage;
-import com.obj.nc.domain.message.SmsWithTemplatedContent;
+import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
 
 import lombok.Data;
@@ -72,9 +71,9 @@ public class NotificationIntent<BODY_TYPE extends IntentContent> extends BasePay
 			return email;
 		} 
 		
-		if (msgContent instanceof TemplateWithModelEmailContent<?>) {
-			EmailWithTemplatedContent<TemplateWithModelEmailContent<?>> email = new EmailWithTemplatedContent<>();
-			email.setBody((TemplateWithModelEmailContent<?>)msgContent);
+		if (msgContent instanceof TemplateWithModelEmailContent) {
+			EmailMessageTemplated<?> email = new EmailMessageTemplated<>();
+			email.setBody((TemplateWithModelEmailContent)msgContent);
 			
 			return email;
 		} 
@@ -86,9 +85,9 @@ public class NotificationIntent<BODY_TYPE extends IntentContent> extends BasePay
 			return sms;
 		} 
 		
-		if (msgContent instanceof TemplateWithModelSmsContent<?>) {
-			SmsWithTemplatedContent<TemplateWithModelContent<?>> sms = new SmsWithTemplatedContent<>();
-			sms.setBody((TemplateWithModelSmsContent<?>)msgContent);
+		if (msgContent instanceof TemplateWithModelSmsContent) {
+			SmsMessageTemplated<?> sms = new SmsMessageTemplated<>();
+			sms.setBody((TemplateWithModelSmsContent)msgContent);
 			
 			return sms;
 		} 

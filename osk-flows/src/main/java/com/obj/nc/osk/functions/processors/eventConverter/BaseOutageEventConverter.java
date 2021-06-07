@@ -1,6 +1,14 @@
 package com.obj.nc.osk.functions.processors.eventConverter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -11,9 +19,9 @@ import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.message.EmailWithTemplatedContent;
+import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SmsWithTemplatedContent;
+import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.osk.domain.IncidentTicketNotificationContactDto;
@@ -210,11 +218,11 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 //		return notificationIntent;
 //	}
 	
-	private <CONTENT_TYPE extends TemplateWithModelEmailContent<?>> EmailWithTemplatedContent<CONTENT_TYPE> createEmailNotification(
-			CONTENT_TYPE messageContent,
+	private <MODEL_TYPE> EmailMessageTemplated<MODEL_TYPE> createEmailNotification(
+			TemplateWithModelEmailContent<MODEL_TYPE> messageContent,
 			Set<EmailEndpoint> endpoints) {
 				
-		EmailWithTemplatedContent<CONTENT_TYPE> notification = new EmailWithTemplatedContent<>();
+		EmailMessageTemplated<MODEL_TYPE> notification = new EmailMessageTemplated<>();
 		notification.setBody(messageContent);
 		
 		notification.setRecievingEndpoints(Lists.newArrayList(endpoints));
@@ -222,11 +230,11 @@ public abstract class BaseOutageEventConverter extends ProcessorFunctionAdapter<
 		return notification;
 	}	
 	
-	private SmsWithTemplatedContent<CustSmsTemplate> createSmsNotification(
+	private SmsMessageTemplated<CustEventModel> createSmsNotification(
 			CustSmsTemplate messageContent,
 			Set<SmsEndpoint> endpoints) {
 				
-		SmsWithTemplatedContent<CustSmsTemplate> notification = new SmsWithTemplatedContent<>();
+		SmsMessageTemplated<CustEventModel> notification = new SmsMessageTemplated<>();
 		notification.setBody(messageContent);
 		
 		notification.setRecievingEndpoints(Lists.newArrayList(endpoints));
