@@ -11,8 +11,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.obj.nc.domain.content.MessageContent;
+import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
-import com.obj.nc.domain.content.sms.TemplateWithModelSmsContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
@@ -57,7 +57,7 @@ public class TemplatedIntentContent<MODEL_TYPE> extends IntentContent {
 			
 			return emailContent;
 		} else if (endpoint instanceof SmsEndpoint) {
-			TemplateWithModelSmsContent smsContent = new TemplateWithModelSmsContent();
+			TemplateWithModelContent<MODEL_TYPE> smsContent = new TemplateWithModelContent<MODEL_TYPE>();
 				
 			smsContent.setTemplateFileName(getTemplateFileName());
 			smsContent.setRequiredLocales(getLocales());

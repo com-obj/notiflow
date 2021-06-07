@@ -5,7 +5,7 @@
       	"flow-id":"static-routing-pipeline"
    },
    "body":{
- 		"type": "EMAIL_FROM_TEAMPLATE_JSON_CONTENT",
+ 		"type": "TEMPLATE_WITH_MODEL_CONTENT_EMAIL",
         "templateFileName":"test-template.html",
         "subject":"Subject",
         "model": {

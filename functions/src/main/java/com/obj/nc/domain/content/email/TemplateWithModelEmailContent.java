@@ -28,7 +28,7 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 public class TemplateWithModelEmailContent<MODEL_TYPE> extends TemplateWithModelContent<MODEL_TYPE>  {
 	
-	public final static String JSON_TYPE_IDENTIFIER = "EMAIL_FROM_TEAMPLATE_POJO_CONTENT";
+	public final static String JSON_TYPE_IDENTIFIER = "TEMPLATE_WITH_MODEL_CONTENT_EMAIL";
 	
 	private String subjectResourceKey;
 	

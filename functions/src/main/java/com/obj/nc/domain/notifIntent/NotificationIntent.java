@@ -6,13 +6,15 @@ import org.springframework.data.relational.core.mapping.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.content.MessageContent;
+import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.content.sms.TemplateWithModelSmsContent;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.MailChimpMessage;
@@ -71,13 +73,6 @@ public class NotificationIntent<BODY_TYPE extends IntentContent> extends BasePay
 			return email;
 		} 
 		
-		if (msgContent instanceof TemplateWithModelEmailContent) {
-			EmailMessageTemplated<?> email = new EmailMessageTemplated<>();
-			email.setBody((TemplateWithModelEmailContent)msgContent);
-			
-			return email;
-		} 
-				
 		if (msgContent instanceof SimpleTextContent) {
 			SimpleTextMessage sms = new SimpleTextMessage();
 			sms.setBody((SimpleTextContent)msgContent);
@@ -85,9 +80,16 @@ public class NotificationIntent<BODY_TYPE extends IntentContent> extends BasePay
 			return sms;
 		} 
 		
-		if (msgContent instanceof TemplateWithModelSmsContent) {
+		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof EmailEndpoint) {
+			EmailMessageTemplated<?> email = new EmailMessageTemplated<>();
+			email.setBody((TemplateWithModelEmailContent)msgContent);
+			
+			return email;
+		} 
+		
+		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof SmsEndpoint) {
 			SmsMessageTemplated<?> sms = new SmsMessageTemplated<>();
-			sms.setBody((TemplateWithModelSmsContent)msgContent);
+			sms.setBody((TemplateWithModelContent)msgContent);
 			
 			return sms;
 		} 
