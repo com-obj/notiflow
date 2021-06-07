@@ -60,16 +60,6 @@ public class DeliveryInfoRestController {
 		return findDeliveryInfosByEventId(event.getId().toString());
     }
 
-	@GetMapping(value = "/messages/read/{messageId}", consumes="application/json", produces="application/json")
-	public String trackMessageRead(@PathVariable(value = "messageId", required = true) String messageId) {
-		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByMessageId(UUID.fromString(messageId));
-		
-		deliveryInfos.stream().peek(deliveryInfo -> deliveryInfo.setStatus(DELIVERY_STATUS.READ))
-				.forEach(deliveryInfo -> deliveryRepo.save(deliveryInfo));
-		
-		return "redirect:/nc-internal-resources/images/px.png";
-	}
-
 	@Data
 	@Builder
 	public static class EndpointDeliveryInfoDto {
