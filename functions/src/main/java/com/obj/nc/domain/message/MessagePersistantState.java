@@ -1,8 +1,10 @@
 package com.obj.nc.domain.message;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -39,6 +41,9 @@ public class MessagePersistantState implements Persistable<UUID>{
 	
 	private String messageClass;
 	
+	@Column("endpoint_ids")
+	private List<String> endpointIds;
+	
 	@Override
 	@JsonIgnore
 	@Transient
@@ -57,4 +62,13 @@ public class MessagePersistantState implements Persistable<UUID>{
 		
 		return msg;
 	}
+	
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	@SneakyThrows
+	public <T extends Message> T toMessage(List<RecievingEndpoint> endpoints) {
+		T msg = toMessage();
+		msg.setRecievingEndpoints(endpoints);
+		return msg;
+	}
+	
 }

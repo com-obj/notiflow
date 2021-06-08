@@ -1,21 +1,19 @@
 package com.obj.nc.controllers;
 
+import java.net.URI;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.obj.nc.domain.message.MessagePersistantState;
+import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
+import com.obj.nc.repositories.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -34,10 +32,11 @@ import lombok.Data;
 @RequestMapping("/delivery-info")
 public class DeliveryInfoRestController {
 	
-	
 	@Autowired private DeliveryInfoRepository deliveryRepo;
+	@Autowired private MessageRepository messageRepo;
 	@Autowired private EndpointsRepository endpointRepo;
 	@Autowired private GenericEventRepository eventRepo;
+	@Autowired private DeliveryInfoFlow deliveryInfoFlow;
 	
 	@GetMapping(value = "/events/{eventId}", consumes="application/json", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
@@ -66,7 +65,18 @@ public class DeliveryInfoRestController {
 		
 		return findDeliveryInfosByEventId(event.getId().toString());
     }
-
+	
+	@PutMapping(value = "/messages/read/{messageId}")
+	public ResponseEntity<Void> trackMessageRead(@PathVariable(value = "messageId", required = true) String messageId) {
+		Optional<MessagePersistantState> message = messageRepo.findById(UUID.fromString(messageId));
+		
+		message.ifPresent(messagePersistantState -> {
+			List<RecievingEndpoint> messageEndpoints = endpointRepo.findByIds(message.get().getEndpointIds().toArray(new String[0]));
+			deliveryInfoFlow.createAndPersistReadDeliveryInfo(messagePersistantState.toMessage(messageEndpoints));
+		});
+		
+		return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/resources/images/px.png")).build();
+	}
 
 	@Data
 	@Builder

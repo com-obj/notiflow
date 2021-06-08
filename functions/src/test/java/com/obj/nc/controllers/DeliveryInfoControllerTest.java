@@ -1,21 +1,24 @@
 package com.obj.nc.controllers;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.MessagePersistantState;
+import com.obj.nc.repositories.MessageRepository;
 import org.assertj.core.api.Assertions;
+import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -33,6 +36,10 @@ import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.EndpointsRepository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -40,6 +47,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     
     
 	@Autowired private DeliveryInfoRepository deliveryRepo;
+	@Autowired private MessageRepository messageRepo;
 	@Autowired private EndpointsRepository endpointRepo;
 	@Autowired protected MockMvc mockMvc;
 	@Autowired private DeliveryInfoRestController controller;
@@ -127,5 +135,50 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 			.andExpect(jsonPath("$[0].endpoint.endpointId").value(CoreMatchers.is("jancuzy@gmail.com")))
 			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL")));
     }
+	
+	@Test
+	void testReadMessageDeliveryInfoUpdate() throws Exception {
+		//GIVEN
+		EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
+		endpointRepo.persistEnpointIfNotExists(email1);
+		
+		//AND
+		EmailMessage emailMessage = new EmailMessage();
+		emailMessage.setRecievingEndpoints(Arrays.asList(email1));
+		emailMessage.getHeader().setEventIds(Arrays.asList(UUID.randomUUID()));
+		MessagePersistantState emailMessagePersisted = messageRepo.save(emailMessage.toPersistantState());
+		
+		DeliveryInfo info = DeliveryInfo.builder()
+				.endpointId(email1.getEndpointId()).eventId(UUID.randomUUID()).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).messageId(emailMessagePersisted.getId()).build();
+		
+		deliveryRepo.save(info);
+		
+		//WHEN TEST REST
+		ResultActions resp = mockMvc
+				.perform(MockMvcRequestBuilders.put("/delivery-info/messages/read/{messageId}", emailMessagePersisted.getId().toString())
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		//THEN REDIRECT TO IMAGE
+		resp
+				.andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("/resources/images/px.png"));
+		
+		//AND IMAGE IS FOUND
+		resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/resources/images/px.png"))
+				.andExpect(status().is2xxSuccessful())
+				.andExpect(content().contentType(MediaType.IMAGE_PNG));
+		
+		//AND READ STATUS IS JOURNALED
+		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
+			List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdOrderByProcessedOn(emailMessagePersisted.getId());
+			return infosOfMessage.size() >= 2;
+		});
+		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdOrderByProcessedOn(emailMessagePersisted.getId());
+		assertThat(infosOfMessage).hasSize(2);
+		assertThat(infosOfMessage.get(1).getStatus()).isEqualTo(DELIVERY_STATUS.READ);
+	}
 
 }

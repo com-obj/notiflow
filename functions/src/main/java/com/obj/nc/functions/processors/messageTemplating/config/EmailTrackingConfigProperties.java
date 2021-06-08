@@ -13,10 +13,7 @@ public class EmailTrackingConfigProperties {
     
     @Data
     public static class ReadConfigProperties {
-        
         private boolean enabled = false;
-        private String url;
-        
     }
     
 }

@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
@@ -33,6 +34,7 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 			.id(getId())
 			.messageClass(getClass().getName())
 			.timeCreated(getTimeCreated())
+			.endpointIds(getRecievingEndpoints().stream().map(RecievingEndpoint::getEndpointId).collect(Collectors.toList()))
 			.build();		 
 	}
 	

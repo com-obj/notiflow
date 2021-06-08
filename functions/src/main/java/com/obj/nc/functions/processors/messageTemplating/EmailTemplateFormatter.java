@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Locale;
 import java.util.Optional;
 
+import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.functions.processors.messageTemplating.config.EmailTrackingConfigProperties;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -27,11 +28,13 @@ import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfigu
 public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithModelEmailContent<?>, EmailContent> {
 	
 	private final EmailTrackingConfigProperties emailTrackingConfigProperties;
+	private final NcAppConfigProperties ncAppConfigProperties;
 	
-	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config,
-								  EmailTrackingConfigProperties emailTrackingConfigProperties) {
+	public EmailTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config, EmailTrackingConfigProperties emailTrackingConfigProperties, 
+								  NcAppConfigProperties ncAppConfigProperties) {
 		super(templateEngine, config);
 		this.emailTrackingConfigProperties = emailTrackingConfigProperties;
+		this.ncAppConfigProperties = ncAppConfigProperties;
 	}
 	
 	@Override
@@ -58,7 +61,8 @@ public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithMo
 			Document html = Jsoup.parse(formatedContent);
 			Element img = html.body().appendElement("img");
 			URI readMessageCallbackUri = UriComponentsBuilder
-					.fromHttpUrl(emailTrackingConfigProperties.getRead().getUrl())
+					.fromHttpUrl(ncAppConfigProperties.getUrl())
+					.path("/delivery-info/messages/read/{messageId}")
 					.build(payload.getMessageId());
 			img.attr("src", readMessageCallbackUri.toString());
 			formatedContent = html.html();
