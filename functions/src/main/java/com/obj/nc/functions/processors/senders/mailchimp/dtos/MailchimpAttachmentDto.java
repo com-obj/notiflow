@@ -1,14 +1,10 @@
 package com.obj.nc.functions.processors.senders.mailchimp.dtos;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.FileNameMap;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.obj.nc.utils.FileUtils;
+import org.apache.commons.codec.binary.Base64InputStream;
 import org.springframework.core.io.FileSystemResource;
 
 import com.obj.nc.domain.Attachement;
@@ -17,6 +13,8 @@ import lombok.Data;
 
 @Data
 public class MailchimpAttachmentDto {
+	
+	public static final long MAX_ATTACHMENT_SIZE = 25 * (1 << 20);
 
 	private String type;
 	private String name;
@@ -34,26 +32,22 @@ public class MailchimpAttachmentDto {
 
 		FileSystemResource file;
 		if (attachement.getFilePathAndName()!=null) {
-			file = new FileSystemResource(new File(attachement.getFilePathAndName()));
+			file = FileUtils.newFileSystemResource(attachement.getFilePathAndName());
 		} else {
-			file = new FileSystemResource(new File(attachement.getFileURI()));			
+			file = FileUtils.newFileSystemResource(attachement.getFileURI());		
 		}
-		FileNameMap fileNameMap = URLConnection.getFileNameMap();
-		String mimeType = fileNameMap.getContentTypeFor(file.getFilename());
-		dto.setType(mimeType);
-
-		//TODO: implement in stream fashion. This could be very demanding on memory
-		byte[] attachmentBytes = new byte[0];
-		try {
-			attachmentBytes = Files.readAllBytes(file.getFile().toPath());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		
+		long fileSize = FileUtils.fileSize(file);
+		if (fileSize > MAX_ATTACHMENT_SIZE) {
+			throw new RuntimeException(String.format("Maximum file size exceeded. Maximum=%dMB, actual=%dMB", MAX_ATTACHMENT_SIZE/(1 << 20), fileSize/(1 << 20)));
 		}
-
-		String base64StringAttachment = Base64.getEncoder().encodeToString(attachmentBytes);
-		dto.setContent(base64StringAttachment);
-
+		
+		dto.setType(FileUtils.mimeType(file).getType());
+		
+		Base64InputStream base64InputStream = FileUtils.base64InputStream(file);
+		dto.setContent(FileUtils.inputStreamToString(base64InputStream));
+		
 		return dto;
 	}
-
+	
 }
