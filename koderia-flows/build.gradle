@@ -19,11 +19,6 @@ ext {
 
 dependencies {
     implementation project(':functions')
-    testImplementation 'io.rest-assured:rest-assured:4.2.0'
-    testImplementation 'io.rest-assured:json-path:4.2.0'
-    testImplementation 'io.rest-assured:xml-path:4.2.0'
-    testImplementation 'io.rest-assured:rest-assured-common:4.2.0'
-    testImplementation 'io.rest-assured:spring-mock-mvc:4.2.0'
     testImplementation(testFixtures(project(":functions")))
 }
 
