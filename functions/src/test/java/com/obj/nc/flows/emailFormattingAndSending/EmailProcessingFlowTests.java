@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import javax.mail.internet.MimeMessage;
 
+import com.obj.nc.config.NcAppConfigProperties;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.apache.commons.text.StringEscapeUtils;
 import org.hamcrest.CoreMatchers;
@@ -46,6 +47,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
 
     @Autowired private EmailProcessingFlowProperties properties;
     @Autowired private EmailProcessingFlow emailSendingFlow;
+    @Autowired private NcAppConfigProperties ncAppConfigProperties;
     
     @BeforeEach
     void setupGreenMail() throws FolderException {
@@ -144,8 +146,8 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         Document contentAsDocument = Jsoup.parse(receivedMessageContent);
     
         List<Element> imgs = contentAsDocument.body().children().stream().filter(element -> element.is("img")).collect(Collectors.toList());
-        assertThat(imgs.get(0).attr("src"), startsWith("http://localhost:8080/delivery-info/messages/read/"));
-        assertThat(imgs.get(1).attr("src"), startsWith("http://localhost:8080/delivery-info/messages/read/"));
+        assertThat(imgs.get(0).attr("src"), startsWith(ncAppConfigProperties.getUrl()+"/delivery-info/messages/read/"));
+        assertThat(imgs.get(1).attr("src"), startsWith(ncAppConfigProperties.getUrl()+"/delivery-info/messages/read/"));
     }
 
     
