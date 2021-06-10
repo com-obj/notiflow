@@ -69,12 +69,7 @@ public class DeliveryInfoRestController {
 	@PutMapping(value = "/messages/read/{messageId}")
 	public ResponseEntity<Void> trackMessageRead(@PathVariable(value = "messageId", required = true) String messageId) {
 		Optional<MessagePersistantState> message = messageRepo.findById(UUID.fromString(messageId));
-		
-		message.ifPresent(messagePersistantState -> {
-			List<RecievingEndpoint> messageEndpoints = endpointRepo.findByIds(message.get().getEndpointIds().toArray(new String[0]));
-			deliveryInfoFlow.createAndPersistReadDeliveryInfo(messagePersistantState.toMessage(messageEndpoints));
-		});
-		
+		message.ifPresent(messagePersistantState -> deliveryInfoFlow.createAndPersistReadDeliveryInfo(messagePersistantState.toMessage()));
 		return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/resources/images/px.png")).build();
 	}
 

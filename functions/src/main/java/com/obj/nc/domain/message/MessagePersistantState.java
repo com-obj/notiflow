@@ -4,7 +4,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import com.obj.nc.Get;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.repositories.EndpointsRepository;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -60,15 +62,14 @@ public class MessagePersistantState implements Persistable<UUID>{
 		msg.setId(getId());
 		msg.setTimeCreated(getTimeCreated());
 		
+		List<RecievingEndpoint> endpoints = findReceivingEndpoints();
+		msg.setRecievingEndpoints(endpoints);
+		
 		return msg;
 	}
 	
-	@SuppressWarnings({"rawtypes", "unchecked"})
-	@SneakyThrows
-	public <T extends Message> T toMessage(List<RecievingEndpoint> endpoints) {
-		T msg = toMessage();
-		msg.setRecievingEndpoints(endpoints);
-		return msg;
+	private List<RecievingEndpoint> findReceivingEndpoints() {
+		return Get.getBean(EndpointsRepository.class).findByIds(getEndpointIds().toArray(new String[0]));
 	}
 	
 }
