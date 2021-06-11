@@ -9,11 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("nc.functions.email-tracking")
 public class EmailTrackingConfigProperties {
     
-    private ReadConfigProperties read = new ReadConfigProperties();
-    
-    @Data
-    public static class ReadConfigProperties {
-        private boolean enabled = false;
-    }
+    private boolean enabled = false;
     
 }

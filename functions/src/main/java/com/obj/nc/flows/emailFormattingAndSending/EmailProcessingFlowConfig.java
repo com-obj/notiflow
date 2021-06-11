@@ -3,8 +3,13 @@ package com.obj.nc.flows.emailFormattingAndSending;
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
 
+import com.obj.nc.domain.content.MessageContent;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.functions.processors.messageTemplating.config.EmailTrackingConfigProperties;
+import com.obj.nc.functions.processors.messageTracking.EmailReadTrackingDecorator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
@@ -26,6 +31,8 @@ public class EmailProcessingFlowConfig {
 	
 	private final EmailSender emailSender;
 	private final EmailTemplateFormatter emailFormatter;
+	private final EmailReadTrackingDecorator emailReadTrackingDecorator;
+	private final EmailTrackingConfigProperties emailTrackingConfigProperties;
 	private final EmailProcessingFlowProperties properties;
 	private final MessagePersister messagePersister;
 	private final ThreadPoolTaskScheduler executor;
@@ -39,6 +46,9 @@ public class EmailProcessingFlowConfig {
 	
 	public final static String EMAIL_FORMATING_FLOW_ID = "EMAIL_FORMATING_FLOW_ID";
 	public final static String EMAIL_FORMATING_INPUT_CHANNEL_ID = EMAIL_FORMATING_FLOW_ID + "_INPUT";
+	
+	public final static String EMAIL_TRACKING_DECORATION_FLOW_ID = "EMAIL_TRACKING_DECORATION_FLOW_ID";
+	public final static String EMAIL_TRACKING_DECORATION_INPUT_CHANNEL_ID = EMAIL_TRACKING_DECORATION_FLOW_ID + "_INPUT";
 
 	@Bean(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID)
 	public MessageChannel emailProcessingInputChangel() {
@@ -70,13 +80,16 @@ public class EmailProcessingFlowConfig {
 								m -> 
 									((Message<?>) m).getBody() instanceof TemplateWithModelContent
 								)
+						.recipient(
+								EMAIL_TRACKING_DECORATION_INPUT_CHANNEL_ID,
+								m -> 
+									((Message<?>) m).getBody() instanceof EmailContent 
+								)
 						.defaultOutputChannel(
 								EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID)
 				)
 				.get();
 	}
-	
-
 	
 	@Bean(EMAIL_SENDING_FLOW_ID)
 	public IntegrationFlow emaiSendingFlowDefinition() {
@@ -103,14 +116,40 @@ public class EmailProcessingFlowConfig {
 							.filter(m-> MERGE.equals(properties.getMultiLocalesMergeStrategy()))
 							.handle(emailFormatter)
 							.handle(multiLocalesAggregationStrategy())
-							.channel(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID))
+							.routeToRecipients(r -> r.recipient(EMAIL_TRACKING_DECORATION_INPUT_CHANNEL_ID)))
 					//format and split if multilanguage
 					.subscribe(mesagePerLocaleFlow -> mesagePerLocaleFlow
 							.filter(m-> !MERGE.equals(properties.getMultiLocalesMergeStrategy()))
 							.split(emailFormatter)
-							.channel(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID))	
+							.routeToRecipients(r -> r.recipient(EMAIL_TRACKING_DECORATION_INPUT_CHANNEL_ID)))	
 				);
 
+	}
+	
+	@Bean(EMAIL_TRACKING_DECORATION_FLOW_ID)
+	public IntegrationFlow emaiTrackingDecorationFlowDefinition() {
+		return flow -> flow
+			.publishSubscribeChannel(executor, subscription -> subscription.id(EMAIL_TRACKING_DECORATION_INPUT_CHANNEL_ID)
+
+				.subscribe(decoratingFlow -> decoratingFlow
+						.filter(m -> {
+							MessageContent msgBody = ((Message<?>) m).getBody();
+							return emailTrackingConfigProperties.isEnabled() 
+									&& msgBody instanceof EmailContent 
+									&& MediaType.TEXT_HTML_VALUE.equals(((EmailContent) msgBody).getContentType());
+						})
+						.handle(emailReadTrackingDecorator)
+						.channel(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID))
+
+				.subscribe(skipDecoratingFlow -> skipDecoratingFlow
+						.filter(m -> {
+							MessageContent msgBody = ((Message<?>) m).getBody();
+							return !emailTrackingConfigProperties.isEnabled()
+									|| !(msgBody instanceof EmailContent)
+									|| !MediaType.TEXT_HTML_VALUE.equals(((EmailContent) msgBody).getContentType());
+						})
+						.channel(EMAIL_SENDING_FLOW_INPUT_CHANNEL_ID))
+			);
 	}
 	
 	@Bean

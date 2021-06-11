@@ -41,7 +41,7 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest
 @SpringBootTest(properties = {
-        "nc.functions.email-tracking.read.enabled=true"
+        "nc.functions.email-tracking.enabled=true"
 })
 class EmailProcessingFlowTests extends BaseIntegrationTest {
 
@@ -146,8 +146,8 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         Document contentAsDocument = Jsoup.parse(receivedMessageContent);
     
         List<Element> imgs = contentAsDocument.body().children().stream().filter(element -> element.is("img")).collect(Collectors.toList());
+        assertThat(imgs, hasSize(1));
         assertThat(imgs.get(0).attr("src"), startsWith(ncAppConfigProperties.getUrl()+"/delivery-info/messages/read/"));
-        assertThat(imgs.get(1).attr("src"), startsWith(ncAppConfigProperties.getUrl()+"/delivery-info/messages/read/"));
     }
 
     
