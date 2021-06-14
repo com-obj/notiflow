@@ -14,6 +14,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
@@ -105,8 +106,8 @@ class MailchimpSenderProcessorFunctionTest {
         inputMessage.setRecievingEndpoints(Arrays.asList(
                 new MailchimpEndpoint() {
                     @Override
-                    public String getEndpointId() {
-                        return "TEST";
+                    public UUID getId() {
+                        return UUID.randomUUID();
                     }
 
                     @Override
@@ -115,7 +116,7 @@ class MailchimpSenderProcessorFunctionTest {
                     }
 
 					@Override
-					public void setEndpointId(String endpointId) {
+					public void setId(UUID endpointId) {
 					}
                 }
         ));

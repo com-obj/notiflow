@@ -48,7 +48,7 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 			
 			for (UUID eventId: eventIds) {
 				DeliveryInfo info = DeliveryInfo.builder()
-						.endpointId(endpoint.getEndpointId())
+						.endpointId(endpoint.getId())
 						.eventId(eventId)
 						.status(DELIVERY_STATUS.FAILED)
 						.failedPayloadId(failedPayload.getId())

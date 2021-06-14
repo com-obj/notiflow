@@ -11,7 +11,7 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
 	
 	List<DeliveryInfo> findByEventIdOrderByProcessedOn(UUID eventId);
 	
-	List<DeliveryInfo> findByEndpointIdOrderByProcessedOn(String endpointId);
+	List<DeliveryInfo> findByEndpointIdOrderByProcessedOn(UUID endpointId);
 	
 	List<DeliveryInfo> findByMessageIdOrderByProcessedOn(UUID messageId);
 
