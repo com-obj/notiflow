@@ -1,6 +1,7 @@
 plugins {
 	id 'nc.java-common-conventions'
 	id 'nc.java-test-fixtures'
+	id 'org.flywaydb.flyway' version '7.8.2'
 }
 
 group = 'com.obj.nc.functions'
@@ -24,6 +25,12 @@ bootJar {
 
 jar {
 	enabled = true
+}
+
+flyway {
+	url = 'jdbc:postgresql://localhost:25432/nc'
+	user = 'nc'
+	password = 'ZMss4o9mdBLV'
 }
 
 
