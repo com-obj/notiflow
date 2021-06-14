@@ -26,6 +26,7 @@ import javax.validation.constraints.NotNull;
 @Table("nc_message")
 public class MessagePersistantState implements Persistable<UUID>{
 	
+
 	@Id
 	@EqualsAndHashCode.Include
 	private UUID id;
