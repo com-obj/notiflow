@@ -7,10 +7,9 @@ import java.util.UUID;
 import com.obj.nc.Get;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.repositories.EndpointsRepository;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
@@ -21,28 +20,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.headers.Header;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.SneakyThrows;
-
 @Data
 @Table("nc_message")
-@Builder
 public class MessagePersistantState implements Persistable<UUID>{
-	
-	@PersistenceConstructor
-	// @Value("null") on receivingEndpoints is needed @Transient to work properly when using lombok's @Builder
-	public MessagePersistantState(UUID id, Instant timeCreated, Header header, MessageContent body, String messageClass,
-								  List<String> endpointIds, @Value("null") List<RecievingEndpoint> receivingEndpoints) {
-		this.id = id;
-		this.timeCreated = timeCreated;
-		this.header = header;
-		this.body = body;
-		this.messageClass = messageClass;
-		this.endpointIds = endpointIds;
-		this.receivingEndpoints = receivingEndpoints;
-	}
 	
 	@Id
 	@EqualsAndHashCode.Include

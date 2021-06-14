@@ -28,14 +28,14 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 	}
 		
 	public MessagePersistantState toPersistantState() {
-		return MessagePersistantState.builder()
-			.body(getBody())
-			.header(getHeader())
-			.id(getId())
-			.messageClass(getClass().getName())
-			.timeCreated(getTimeCreated())
-			.endpointIds(getRecievingEndpoints().stream().map(RecievingEndpoint::getEndpointId).collect(Collectors.toList()))
-			.build();		 
+		MessagePersistantState persistantState = new MessagePersistantState();
+		persistantState.setBody(getBody());
+		persistantState.setHeader(getHeader());
+		persistantState.setId(getId());
+		persistantState.setMessageClass(getClass().getName());
+		persistantState.setTimeCreated(getTimeCreated());
+		persistantState.setEndpointIds(getRecievingEndpoints().stream().map(RecievingEndpoint::getEndpointId).collect(Collectors.toList()));
+		return persistantState;
 	}
 	
 }
