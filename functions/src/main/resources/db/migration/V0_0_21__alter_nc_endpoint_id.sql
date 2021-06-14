@@ -12,3 +12,5 @@ update nc_message as nm set endpoint_ids = array(select ep.id from nc_endpoint e
 alter table nc_delivery_info rename column endpoint_id to endpoint_name;
 alter table nc_delivery_info add column endpoint_id uuid;
 update nc_delivery_info as di set endpoint_id = ep.id from nc_endpoint ep where di.endpoint_name = ep.endpoint_name and di.endpoint_id is null;
+
+alter table nc_endpoint drop column endpoint_name;
