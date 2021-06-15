@@ -7,7 +7,7 @@ alter table nc_endpoint add constraint nc_endpoint_endpoint_id_unique_key unique
 
 alter table nc_message rename column endpoint_ids to endpoint_names;
 alter table nc_message add column endpoint_ids uuid[];
-update nc_message as msg set endpoint_ids = array(select ep.id from nc_endpoint ep where ep.endpoint_name = any(msg.endpoint_names)) where endpoint_ids is null;
+update nc_message as msg set endpoint_ids = array(select ep.id from nc_endpoint ep where ep.endpoint_name = any(msg.endpoint_names)) where msg.endpoint_ids is null;
 alter table nc_message drop column endpoint_names;
 
 alter table nc_delivery_info rename column endpoint_id to endpoint_name;
