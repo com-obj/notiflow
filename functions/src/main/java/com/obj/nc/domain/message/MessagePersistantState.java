@@ -1,8 +1,13 @@
 package com.obj.nc.domain.message;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
+import com.obj.nc.Get;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.repositories.EndpointsRepository;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -15,17 +20,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.headers.Header;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
-
 @Data
 @Table("nc_message")
-@Builder
 public class MessagePersistantState implements Persistable<UUID>{
-
+	
 	@Id
 	@EqualsAndHashCode.Include
 	private UUID id;
@@ -38,6 +36,13 @@ public class MessagePersistantState implements Persistable<UUID>{
 	private MessageContent body;
 	
 	private String messageClass;
+	
+	@Column("endpoint_ids")
+	private List<String> endpointIds;
+	
+	@JsonIgnore
+	@Transient
+	private List<RecievingEndpoint> receivingEndpoints;
 	
 	@Override
 	@JsonIgnore
@@ -55,6 +60,17 @@ public class MessagePersistantState implements Persistable<UUID>{
 		msg.setId(getId());
 		msg.setTimeCreated(getTimeCreated());
 		
+		List<RecievingEndpoint> endpoints = findReceivingEndpoints();
+		msg.setRecievingEndpoints(endpoints);
+		
 		return msg;
 	}
+	
+	private List<RecievingEndpoint> findReceivingEndpoints() {
+		if (receivingEndpoints == null) {
+			receivingEndpoints = Get.getBean(EndpointsRepository.class).findByIds(getEndpointIds().toArray(new String[0]));
+		}
+		return receivingEndpoints;
+	}
+	
 }

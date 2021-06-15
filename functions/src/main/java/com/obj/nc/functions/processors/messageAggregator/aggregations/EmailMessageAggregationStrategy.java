@@ -13,8 +13,10 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
 
 @Log4j2
+@Component
 public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrategy<EmailContent> {
 	
 	public static final String SUBJECT_CONCAT_DELIMITER = " / ";

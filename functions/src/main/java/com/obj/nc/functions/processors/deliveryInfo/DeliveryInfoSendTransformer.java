@@ -46,6 +46,7 @@ public class DeliveryInfoSendTransformer extends ProcessorFunctionAdapter<Delive
 			DeliveryInfo info = DeliveryInfo.builder()
 				.endpointId(sendResult.getRecievingEndpoint().getEndpointId())
 				.eventId(eventId)
+				.messageId(sendResult.getMessageId())
 				.status(sendResult.getStatus())
 				.build();
 			

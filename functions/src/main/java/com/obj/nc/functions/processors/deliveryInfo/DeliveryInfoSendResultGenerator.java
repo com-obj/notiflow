@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.obj.nc.domain.HasEventIds;
+import com.obj.nc.domain.HasMessageId;
 import com.obj.nc.domain.HasRecievingEndpoints;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -29,8 +30,14 @@ public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionA
 				eventIds = ((HasEventIds) payload).getEventIds().toArray(new UUID[0]);
 			}
 			
+			UUID messageId = null;
+			if (payload instanceof HasMessageId) {
+				messageId = ((HasMessageId) payload).getMessageId();
+			}
+			
 			DeliveryInfoSendResult info = DeliveryInfoSendResult.builder()
 					.eventIds(eventIds)
+					.messageId(messageId)
 					.status(status)
 					.recievingEndpoint(endpoint)
 					.processedOn(Instant.now())

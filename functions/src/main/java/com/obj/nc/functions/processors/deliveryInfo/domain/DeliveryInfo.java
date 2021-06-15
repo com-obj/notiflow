@@ -31,7 +31,7 @@ public class DeliveryInfo implements Persistable<UUID> {
 	
 	//Order of elements in this enum is important. Final state should be last
 	public static enum DELIVERY_STATUS {
-		PROCESSING, SENT, DELIVERED, FAILED
+		PROCESSING, SENT, DELIVERED, READ, FAILED
 	}
 
 	@Id
@@ -54,6 +54,8 @@ public class DeliveryInfo implements Persistable<UUID> {
 	private String endpointId;
 	
 	private UUID failedPayloadId;
+	
+	private UUID messageId;
 
 	@Override
 	public boolean isNew() {
