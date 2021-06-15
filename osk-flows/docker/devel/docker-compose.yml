@@ -2,7 +2,7 @@ version: '2'
 
 services:
   nc-postgres:
-    image: postgres:13.3
+    image: postgres:11.9
 #    restart: always
     environment:
       POSTGRES_DB: nc

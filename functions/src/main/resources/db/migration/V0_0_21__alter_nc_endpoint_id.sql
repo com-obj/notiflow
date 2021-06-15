@@ -1,6 +1,8 @@
 alter table nc_endpoint drop constraint con_pk_endpoint_name;
 alter table nc_endpoint rename column endpoint_id to endpoint_name;
 
+create extension if not exists pgcrypto;
+
 alter table nc_endpoint add column id uuid not null default gen_random_uuid();
 alter table nc_endpoint add constraint nc_endpoint_pkey primary key (id);
 alter table nc_endpoint add constraint nc_endpoint_endpoint_id_unique_key unique (endpoint_name);
