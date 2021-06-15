@@ -88,7 +88,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         deliveryInfos.forEach(info -> {
         	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.PROCESSING);
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn(finalNotificationIntent.getRecievingEndpoints().stream().map(RecievingEndpoint::getId).collect(Collectors.toList()));
+        	Assertions.assertThat(info.getEndpointId()).isIn(extractReceivingEndpointIds(finalNotificationIntent));
         });
         
         //WHEN
@@ -111,7 +111,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         Assertions.assertThat(deliveredInfos.size()).isEqualTo(3);
         deliveryInfos.forEach(info -> {
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn(finalNotificationIntent.getRecievingEndpoints().stream().map(RecievingEndpoint::getId).collect(Collectors.toList()));
+        	Assertions.assertThat(info.getEndpointId()).isIn(extractReceivingEndpointIds(finalNotificationIntent));
         });
     }
     
@@ -243,5 +243,9 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
             assertThat(persistedEndpoints.get(i).get("endpoint_type"), CoreMatchers.equalTo(recievingEndpoints.get(i).getEndpointType()));
         }
 	}
+	
+    private List<UUID> extractReceivingEndpointIds(NotificationIntent finalNotificationIntent) {
+        return finalNotificationIntent.getRecievingEndpoints().stream().map(RecievingEndpoint::getId).collect(Collectors.toList());
+    }
 
 }
