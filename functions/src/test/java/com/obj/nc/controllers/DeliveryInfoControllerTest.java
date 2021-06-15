@@ -149,7 +149,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		MessagePersistantState emailMessagePersisted = messageRepo.save(emailMessage.toPersistantState());
 		
 		DeliveryInfo info = DeliveryInfo.builder()
-				.endpointId(email1.getEndpointId()).eventId(UUID.randomUUID()).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).messageId(emailMessagePersisted.getId()).build();
+				.endpointId(email1.getId()).eventId(UUID.randomUUID()).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).messageId(emailMessagePersisted.getId()).build();
 		
 		deliveryRepo.save(info);
 		
