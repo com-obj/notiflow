@@ -6,6 +6,8 @@ definitions:
          name: 'Run tests'
          script:
            - gradle test -Dspring.profiles.active=bitbucket --stacktrace --info
+         services:
+           - postgres
          caches:
            - gradle
 
