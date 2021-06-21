@@ -1,7 +1,7 @@
 package com.obj.nc.repositories;
 
-import com.obj.nc.BaseIntegrationTest;
-import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;

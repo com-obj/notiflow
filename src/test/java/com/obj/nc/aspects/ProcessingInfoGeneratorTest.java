@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.headers.HasHeader;

@@ -15,7 +15,7 @@ import org.springframework.messaging.Message;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obj.nc.SystemPropertyActiveProfileResolver;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
 
