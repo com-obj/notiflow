@@ -51,7 +51,7 @@ public class DeliveryInfo implements Persistable<UUID> {
 	private UUID eventId;
 	
 	@NotNull
-	private String endpointId;
+	private UUID endpointId;
 	
 	private UUID failedPayloadId;
 	

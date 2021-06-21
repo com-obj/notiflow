@@ -31,7 +31,7 @@ public class DeliveryInfoRepositoryTest {
 	@Test
 	public void testPersistingSingleInfo() {
 		DeliveryInfo deliveryInfo = DeliveryInfo.builder()
-				.endpointId("jancuzy@gmail.com")
+				.endpointId(UUID.randomUUID())
 				.eventId(UUID.randomUUID())
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
@@ -48,21 +48,21 @@ public class DeliveryInfoRepositoryTest {
 	public void testFindByEventId() {
 		UUID eventId = UUID.randomUUID();
 		DeliveryInfo deliveryInfo1 = DeliveryInfo.builder()
-				.endpointId("jancuzy@gmail.com")
+				.endpointId(UUID.randomUUID())
 				.eventId(eventId)
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
 		DeliveryInfo deliveryInfo2 = DeliveryInfo.builder()
-				.endpointId("cuzy@gmail.com")
+				.endpointId(UUID.randomUUID())
 				.eventId(eventId)
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
 		DeliveryInfo deliveryInfo3 = DeliveryInfo.builder()
-				.endpointId("xxx@gmail.com")
+				.endpointId(UUID.randomUUID())
 				.eventId(UUID.randomUUID())
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
@@ -79,22 +79,23 @@ public class DeliveryInfoRepositoryTest {
 	
 	@Test
 	public void testFindByEndpointId() {
+		UUID endpointId = UUID.randomUUID();
 		DeliveryInfo deliveryInfo1 = DeliveryInfo.builder()
-				.endpointId("jancuzy@gmail.com")
+				.endpointId(endpointId)
 				.eventId(UUID.randomUUID())
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
 		DeliveryInfo deliveryInfo2 = DeliveryInfo.builder()
-				.endpointId("jancuzy@gmail.com")
+				.endpointId(endpointId)
 				.eventId(UUID.randomUUID())
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
 		DeliveryInfo deliveryInfo3 = DeliveryInfo.builder()
-				.endpointId("xxx@gmail.com")
+				.endpointId(UUID.randomUUID())
 				.eventId(UUID.randomUUID())
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
@@ -104,7 +105,7 @@ public class DeliveryInfoRepositoryTest {
 		deliveryInfoRepo.save(deliveryInfo2);
 		deliveryInfoRepo.save(deliveryInfo3);
 		
-		List<DeliveryInfo> infosInDb = deliveryInfoRepo.findByEndpointIdOrderByProcessedOn("jancuzy@gmail.com");
+		List<DeliveryInfo> infosInDb = deliveryInfoRepo.findByEndpointIdOrderByProcessedOn(endpointId);
 		
 		Assertions.assertThat(infosInDb.size()).isEqualTo(2);
 	}

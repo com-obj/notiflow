@@ -20,10 +20,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.headers.Header;
 
+import javax.validation.constraints.NotNull;
+
 @Data
 @Table("nc_message")
 public class MessagePersistantState implements Persistable<UUID>{
 	
+
 	@Id
 	@EqualsAndHashCode.Include
 	private UUID id;
@@ -37,8 +40,8 @@ public class MessagePersistantState implements Persistable<UUID>{
 	
 	private String messageClass;
 	
-	@Column("endpoint_ids")
-	private List<String> endpointIds;
+	@NotNull
+	private UUID[] endpointIds;
 	
 	@JsonIgnore
 	@Transient
@@ -68,7 +71,7 @@ public class MessagePersistantState implements Persistable<UUID>{
 	
 	private List<RecievingEndpoint> findReceivingEndpoints() {
 		if (receivingEndpoints == null) {
-			receivingEndpoints = Get.getBean(EndpointsRepository.class).findByIds(getEndpointIds().toArray(new String[0]));
+			receivingEndpoints = Get.getBean(EndpointsRepository.class).findByIds(getEndpointIds());
 		}
 		return receivingEndpoints;
 	}

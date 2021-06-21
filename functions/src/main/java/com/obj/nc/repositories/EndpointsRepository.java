@@ -2,10 +2,10 @@ package com.obj.nc.repositories;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+import com.obj.nc.repositories.converters.PgObjectToUUIDArrayConverter;
+import com.obj.nc.repositories.converters.UUIDArrayToPgObjectConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -35,10 +35,10 @@ public class EndpointsRepository {
 
         String inserEndpointIfNotExistsSQL = 
         		"insert into nc_endpoint "
-                + "(endpoint_id, endpoint_type) "
+                + "(id, endpoint_name, endpoint_type) "
                 + "values "
-                + "(?, ?) "
-                + "ON CONFLICT ON CONSTRAINT con_pk_endpoint_name DO NOTHING";
+                + "(?, ?, ?) "
+                + "ON CONFLICT ON CONSTRAINT nc_endpoint_endpoint_id_unique_key DO NOTHING";
         try  {
             jdbcTemplate.batchUpdate(
                     inserEndpointIfNotExistsSQL,
@@ -46,8 +46,9 @@ public class EndpointsRepository {
 
                         public void setValues(PreparedStatement ps, int i) throws SQLException {
                             RecievingEndpoint endpoint = ednpoints.get(i);
-                            ps.setString(1, endpoint.getEndpointId());
-                            ps.setString(2, endpoint.getEndpointType());
+                            ps.setObject(1, endpoint.getId());
+                            ps.setString(2, endpoint.getEndpointId());
+                            ps.setString(3, endpoint.getEndpointType());
                         }
 
                         public int getBatchSize() {
@@ -61,11 +62,11 @@ public class EndpointsRepository {
         }
     }
     
-    public List<RecievingEndpoint> findByIds(String ... endpointIds) {
+    public List<RecievingEndpoint> findByIds(UUID ... endpointIds) {
     	String query = 
-        		"select endpoint_id, endpoint_type "
+        		"select id, endpoint_name, endpoint_type "
                 + "from nc_endpoint "
-                + "where endpoint_id in (%s)";  	
+                + "where id in (%s)";  	
     	String inSql = String.join(",", Collections.nCopies(endpointIds.length, "?"));
     	query = String.format(query, inSql);
     	
@@ -74,9 +75,13 @@ public class EndpointsRepository {
         	    	  String epType = rs.getString("endpoint_type");
         	    	  
         	    	  if (EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
-        	    		  return new EmailEndpoint(rs.getString("endpoint_id"));
+                          EmailEndpoint emailEndpoint = new EmailEndpoint(rs.getString("endpoint_name"));
+                          emailEndpoint.setId((UUID)rs.getObject("id"));
+                          return emailEndpoint;
         	    	  } else if (SmsEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
-        	    		  return new SmsEndpoint(rs.getString("endpoint_id"));
+                          SmsEndpoint smsEndpoint = new SmsEndpoint(rs.getString("endpoint_name"));
+                          smsEndpoint.setId((UUID)rs.getObject("id"));
+                          return smsEndpoint;
         	    	  } else {
         	    		  throw new RuntimeException("Uknown endpoint type for EndpointsRepository: "+ epType);
         	    	  }

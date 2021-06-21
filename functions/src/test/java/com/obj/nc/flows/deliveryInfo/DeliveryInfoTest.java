@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
@@ -82,10 +83,12 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         List<DeliveryInfo> deliveryInfos = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
         
         Assertions.assertThat(deliveryInfos.size()).isEqualTo(3);
+        
+        final NotificationIntent finalNotificationIntent = notificationIntent;
         deliveryInfos.forEach(info -> {
         	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.PROCESSING);
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn("john.doe@objectify.sk","john.dudly@objectify.sk", "all@objectify.sk");
+        	Assertions.assertThat(info.getEndpointId()).isIn(extractReceivingEndpointIds(finalNotificationIntent));
         });
         
         //WHEN
@@ -108,7 +111,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         Assertions.assertThat(deliveredInfos.size()).isEqualTo(3);
         deliveryInfos.forEach(info -> {
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn("john.doe@objectify.sk","john.dudly@objectify.sk", "all@objectify.sk");
+        	Assertions.assertThat(info.getEndpointId()).isIn(extractReceivingEndpointIds(finalNotificationIntent));
         });
     }
     
@@ -116,8 +119,9 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     void testDeliveryInfosCreateAndPersistedForFailedDelivery() throws InterruptedException, ExecutionException, TimeoutException {
         // GIVEN    	
     	EmailMessage email = new EmailMessage();
+        EmailEndpoint wrongEmail = EmailEndpoint.builder().email("wrong email").build();
         email.addRecievingEndpoints(
-        		EmailEndpoint.builder().email("wrong email").build());
+                wrongEmail);
         UUID eventId = UUID.randomUUID();
         email.getHeader().addEventId(eventId);
         
@@ -133,7 +137,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         deliveryInfos.forEach(info -> {
         	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.FAILED);
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn("wrong email");
+        	Assertions.assertThat(info.getEndpointId()).isIn(wrongEmail.getId());
         	Assertions.assertThat(info.getFailedPayloadId()).isNotNull();
         });
     }
@@ -164,7 +168,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         delInfo.forEach(info -> {
         	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.FAILED);
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn("09050123456");
+        	Assertions.assertThat(info.getEndpointId()).isIn(failedMessage.getRecievingEndpoints().get(0).getId());
         	Assertions.assertThat(info.getFailedPayloadId()).isNotNull();
         });
         
@@ -187,7 +191,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         delInfo.forEach(info -> {
         	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.PROCESSING);
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn("09050123456");
+        	Assertions.assertThat(info.getEndpointId()).isIn(msg.getRecievingEndpoints().get(0).getId());
         });
         
         //THEN check infos in DB
@@ -220,7 +224,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         delInfo.forEach(info -> {
         	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn("09050123456");
+        	Assertions.assertThat(info.getEndpointId()).isIn(msg.getRecievingEndpoints().get(0).getId());
         });
         
         //THEN check infos in DB
@@ -235,9 +239,13 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 
         for (int i = 0; i < persistedEndpoints.size(); i++) {
             List<EmailEndpoint> recievingEndpoints = (List<EmailEndpoint>)notificationIntent.getRecievingEndpoints();
-            assertThat(persistedEndpoints.get(i).get("endpoint_id"), CoreMatchers.equalTo(((EmailEndpoint) recievingEndpoints.get(i)).getEmail()));
+            assertThat(persistedEndpoints.get(i).get("endpoint_name"), CoreMatchers.equalTo(((EmailEndpoint) recievingEndpoints.get(i)).getEmail()));
             assertThat(persistedEndpoints.get(i).get("endpoint_type"), CoreMatchers.equalTo(recievingEndpoints.get(i).getEndpointType()));
         }
 	}
+	
+    private List<UUID> extractReceivingEndpointIds(NotificationIntent finalNotificationIntent) {
+        return finalNotificationIntent.getRecievingEndpoints().stream().map(RecievingEndpoint::getId).collect(Collectors.toList());
+    }
 
 }

@@ -68,17 +68,17 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	UUID eventId = UUID.randomUUID();
 
     	DeliveryInfo info1 = DeliveryInfo.builder()
-    			.endpointId(email1.getEndpointId()).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+    			.endpointId(email1.getId()).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	DeliveryInfo info2 = DeliveryInfo.builder()
-    			.endpointId(email1.getEndpointId()).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
+    			.endpointId(email1.getId()).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
 
 
     	DeliveryInfo info3 = DeliveryInfo.builder()
-    			.endpointId(sms1.getEndpointId()).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+    			.endpointId(sms1.getId()).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	Thread.sleep(10); // to have different processedOn
 
     	DeliveryInfo info4 = DeliveryInfo.builder()
-    			.endpointId(sms1.getEndpointId()).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
+    			.endpointId(sms1.getId()).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
  
     	deliveryRepo.saveAll( Arrays.asList(info1, info2, info3, info4) );
     	
@@ -91,14 +91,14 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 
     	Instant now = Instant.now();
 
-    	Assertions.assertThat(infoForEmail.endpointId).isEqualTo("jancuzy@gmail.com");
+    	Assertions.assertThat(infoForEmail.endpointId).isEqualTo(email1.getId());
 		Assertions.assertThat(infoForEmail.getStatusReachedAt()).isCloseTo(now, Assertions.within(1, ChronoUnit.MINUTES));
     	Assertions.assertThat(infoForEmail.getCurrentStatus()).isEqualTo(DELIVERY_STATUS.SENT);
     	infos.remove(infoForEmail);
     	
     	
     	EndpointDeliveryInfoDto infoForSms = infos.iterator().next();
-    	Assertions.assertThat(infoForSms.endpointId).isEqualTo("0908111111");
+    	Assertions.assertThat(infoForSms.endpointId).isEqualTo(sms1.getId());
     	Assertions.assertThat(infoForSms.getStatusReachedAt()).isCloseTo(now, Assertions.within(1, ChronoUnit.MINUTES));
     	Assertions.assertThat(infoForSms.getCurrentStatus()).isEqualTo(DELIVERY_STATUS.SENT);
     	
@@ -113,9 +113,9 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	//AND
     	UUID eventId = UUID.randomUUID();
     	DeliveryInfo info1 = DeliveryInfo.builder()
-    			.endpointId(email1.getEndpointId()).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+    			.endpointId(email1.getId()).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	DeliveryInfo info2 = DeliveryInfo.builder()
-    			.endpointId(email1.getEndpointId()).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
+    			.endpointId(email1.getId()).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
 
     	deliveryRepo.saveAll( Arrays.asList(info1, info2) );
     	
@@ -149,7 +149,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		MessagePersistantState emailMessagePersisted = messageRepo.save(emailMessage.toPersistantState());
 		
 		DeliveryInfo info = DeliveryInfo.builder()
-				.endpointId(email1.getEndpointId()).eventId(UUID.randomUUID()).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).messageId(emailMessagePersisted.getId()).build();
+				.endpointId(email1.getId()).eventId(UUID.randomUUID()).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).messageId(emailMessagePersisted.getId()).build();
 		
 		deliveryRepo.save(info);
 		

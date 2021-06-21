@@ -1,5 +1,6 @@
 package com.obj.nc.domain.endpoints;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,6 +11,8 @@ import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
 @JsonSubTypes({ 
@@ -27,6 +30,8 @@ public abstract class RecievingEndpoint {
 	 * Je mozne, ze niektore setting by mali byt aj pre Recipienta tj. take ktore su platne nezavisle od kanala. Zatial ale sa budem tvarit, ze ak aj take budu
 	 * prekopiruju(zmerguju) sa k danemu enpointu
 	 */
+	@Id
+	private UUID id = UUID.randomUUID();
 	private DeliveryOptions deliveryOptions;
 	private Recipient recipient;
 	

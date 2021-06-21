@@ -46,10 +46,10 @@ public class DeliveryInfoRestController {
 
 		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
 		
-		List<String> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
-		List<RecievingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new String[0]));
-		Map<String, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
-		endpoints.forEach(re-> endpointsById.get(re.getEndpointId()).setEndpoint(re));
+		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
+		List<RecievingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
+		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
+		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
 		
 		return infoDtos;
     }
@@ -79,7 +79,7 @@ public class DeliveryInfoRestController {
 		
 		@JsonIgnore
 		@Transient
-		String endpointId;
+		UUID endpointId;
 		
 		RecievingEndpoint endpoint;
 		
@@ -89,7 +89,7 @@ public class DeliveryInfoRestController {
 		public static List<EndpointDeliveryInfoDto> createFrom(List<DeliveryInfo> deliveryInfos) {
 			List<EndpointDeliveryInfoDto> result = new ArrayList<>();
 			
-			Map<String, List<DeliveryInfo>> ep2Infos = deliveryInfos.stream().collect(
+			Map<UUID, List<DeliveryInfo>> ep2Infos = deliveryInfos.stream().collect(
 					Collectors.groupingBy(
 							DeliveryInfo::getEndpointId,
 							HashMap::new,
@@ -98,7 +98,7 @@ public class DeliveryInfoRestController {
 				)
 			);
 			
-			for (String endpointId: ep2Infos.keySet()) {
+			for (UUID endpointId: ep2Infos.keySet()) {
 				List<DeliveryInfo> infos = ep2Infos.get(endpointId);
 				orderByProcessedTimeDescStatus(infos);
 				DeliveryInfo lastInfo = infos.get(infos.size()-1);
