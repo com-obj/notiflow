@@ -5,7 +5,7 @@ definitions:
      - step: &test
          name: 'Run tests'
          script:
-           - gradle test --stacktrace --info
+           - gradle test -Dspring.profiles.active=bitbucket --stacktrace --info
          caches:
            - gradle
 

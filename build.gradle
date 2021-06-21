@@ -13,9 +13,11 @@ if (versioning.info.tag && !versioning.info.dirty) {
 	version = extractVersionFromTag(versioning.info.tag, false)
 	println 'Commit tagged and no uncommited changes. CREATING FINAL VERSION ' + version
 }
-else {
+else if (versioning.info.lastTag) {
 	version = extractVersionFromTag(versioning.info.lastTag, true)
 	println 'Commit not tagged or not all changes commited. CREATING SNAPSHOT VERSION ' + version
+} else {
+	println 'Cannot create new version, because no tagged commit was found.'
 }
 
 dependencies {
