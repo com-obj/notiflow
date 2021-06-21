@@ -1,7 +1,0 @@
-{
-  "type" : "JOB_POST",
-  "data" : {
-    "technologies" : ["Microsoft Power BI"],
-    "type": "Analytik"
-  }
-}
