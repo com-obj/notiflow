@@ -2,59 +2,20 @@ image: gradle:6.8.2
 
 definitions: 
    steps:
-     - run-tests: &run-tests
-       - step: 
-           name: Run tests
-           caches:
-             - gradle
-             - maven
-             - docker
-           services:
-             - postgres
-           script:
-             - gradle test -Dspring.profiles.active=bitbucket --stacktrace --info
-           after-script:
-             - pipe: atlassian/checkstyle-report:0.2.0
-           artifacts: 
-             - osk-flows/build/reports/tests/**
-             - koderia-flows/build/reports/tests/**
-             - functions/build/reports/tests/**
-     - build-jar: &build-jar
-       - step:
-           name: Build FAT Jar
-           caches:
-             - gradle
-             - maven
-           script:
-             - gradle build -x test --stacktrace --info   
-           artifacts:
-             - osk-flows/dist/**
-             - koderia-flows/build/libs/**
-     - deploy-snaphost-2-BB: &deploy-2-BB
-       - step: 
-           name: Deploy snapshot to Bitbucket downloads
-           script:
-             - pipe: atlassian/bitbucket-upload-file:0.3.2
-               variables:
-                 BITBUCKET_USERNAME: $BITBUCKET_USERNAME
-                 BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
-                 FILENAME: "osk-flows/dist/*.jar"
-             - pipe: atlassian/bitbucket-upload-file:0.3.2
-               variables:
-                 BITBUCKET_USERNAME: $BITBUCKET_USERNAME
-                 BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
-                 FILENAME: "koderia-flows/build/libs/*.jar"
-           artifacts:
-             - osk-flows/dist/**
-             - koderia-flows/build/libs/**
-     - deploy-2-gcr: &deploy-2-gcr
-       - step:
-           name: Deploy Docker Image to GCR
-           caches:
-             - gradle
-             - maven
-           script:
-             - gradle jib -x build -Djib.to.tags=$BITBUCKET_TAG --info
+     - step: &test
+         name: 'Run tests'
+         script:
+           - gradle test --stacktrace --info
+         caches:
+           - gradle
+
+     - step: &release-nexus
+         name: 'Release artifacts to https://infra.objectify.sk/maven/#browse/browse:maven-releases:objectify'
+         script:
+           - gradle publish --stacktrace --info
+         caches:
+           - gradle
+
    services: 
      postgres: 
        image: postgres 
@@ -63,26 +24,16 @@ definitions:
          POSTGRES_USER: 'nc'
          POSTGRES_PASSWORD: 'ZMss4o9mdBLV'
 
-
-
 pipelines:
-  branches: 
-    develop:
-      - <<: *run-tests
+  branches:
     master:
-      - <<: *run-tests
+      - step: *release-nexus # publication of SNAPSHOT release
+    develop:
+      - step: *test
     release/*:
-      - <<: *run-tests
-      - <<: *build-jar
-      - <<: *deploy-2-BB
-      - <<: *deploy-2-gcr
+      - step: *release-nexus # publication of SNAPSHOT release
     hotfix/*:
-      - <<: *run-tests
-      - <<: *build-jar
-      - <<: *deploy-2-BB
-      - <<: *deploy-2-gcr            
+      - step: *release-nexus # publication of SNAPSHOT release      
   tags:
     v*:
-      - <<: *build-jar
-      - <<: *deploy-2-BB
-      - <<: *deploy-2-gcr
+      - step: *release-nexus # publication of FINAL release
