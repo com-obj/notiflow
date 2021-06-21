@@ -29,6 +29,7 @@ definitions:
 pipelines:
   branches:
     master:
+      - step: *test
       - step: *release-nexus # publication of SNAPSHOT release
     develop:
       - step: *test
