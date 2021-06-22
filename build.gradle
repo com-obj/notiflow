@@ -12,12 +12,9 @@ sourceCompatibility = '1.8'
 if (versioning.info.tag && !versioning.info.dirty) {
 	version = extractVersionFromTag(versioning.info.tag, false)
 	println 'Commit tagged and no uncommited changes. CREATING FINAL VERSION ' + version
-}
-else if (versioning.info.lastTag) {
+} else {
 	version = extractVersionFromTag(versioning.info.lastTag, true)
 	println 'Commit not tagged or not all changes commited. CREATING SNAPSHOT VERSION ' + version
-} else {
-	println 'Cannot create new version, because no tagged commit was found.'
 }
 
 dependencies {
@@ -114,7 +111,11 @@ publishing {
 
 def extractVersionFromTag(tagLabel, snapshot) {
 	def matcher = tagLabel =~ /v(\d+).(\d+).(\d+)/
-	
+
+	if (matcher.size() == 0) {
+		return null;
+	}
+
 	if (matcher[0].size() != 4) println("Tag " +  tagLabel + " is not in form of v9.9.9. Matched: " + matcher[0])
 
 	if (snapshot) {
