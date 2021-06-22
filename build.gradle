@@ -111,11 +111,6 @@ publishing {
 
 def extractVersionFromTag(tagLabel, snapshot) {
 	def matcher = tagLabel =~ /v(\d+).(\d+).(\d+)/
-
-	if (matcher.size() == 0) {
-		return null;
-	}
-
 	if (matcher[0].size() != 4) println("Tag " +  tagLabel + " is not in form of v9.9.9. Matched: " + matcher[0])
 
 	if (snapshot) {
