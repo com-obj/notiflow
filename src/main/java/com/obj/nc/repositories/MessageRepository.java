@@ -1,6 +1,7 @@
 package com.obj.nc.repositories;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.repository.CrudRepository;
@@ -13,4 +14,6 @@ public interface MessageRepository extends CrudRepository<MessagePersistantState
 
 	
 	List<MessagePersistantState> findByIdIn(List<UUID> intentIds);
+	
+	Optional<MessagePersistantState> findFirstByTimeConsumedIsNullOrderByTimeCreatedAsc();
 }

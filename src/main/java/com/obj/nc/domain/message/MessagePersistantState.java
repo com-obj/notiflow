@@ -32,6 +32,7 @@ public class MessagePersistantState implements Persistable<UUID>{
 	private UUID id;
 	@CreatedDate
 	private Instant timeCreated;
+	private Instant timeConsumed;
 	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
 	private Header header;
 	
@@ -62,6 +63,7 @@ public class MessagePersistantState implements Persistable<UUID>{
 		msg.setHeader(getHeader());
 		msg.setId(getId());
 		msg.setTimeCreated(getTimeCreated());
+		msg.setTimeConsumed(getTimeConsumed());
 		
 		List<RecievingEndpoint> endpoints = findReceivingEndpoints();
 		msg.setRecievingEndpoints(endpoints);

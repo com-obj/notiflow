@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.time.Instant;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -17,7 +18,10 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
 public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayload<BODY_TYPE> implements HasMessageId {
-		
+	
+	//processing started, only if timeConsumed = null processing will be started
+	private Instant timeConsumed;
+	
 	@JsonIgnore
 	public abstract Class<? extends RecievingEndpoint> getRecievingEndpointType();
 	
@@ -34,6 +38,7 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		persistantState.setId(getId());
 		persistantState.setMessageClass(getClass().getName());
 		persistantState.setTimeCreated(getTimeCreated());
+		persistantState.setTimeConsumed(getTimeConsumed());
 		persistantState.setEndpointIds(getRecievingEndpoints().stream().map(RecievingEndpoint::getId).toArray(UUID[]::new));
 		return persistantState;	 
 	}
