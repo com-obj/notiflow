@@ -10,9 +10,11 @@ group = 'objectify'
 sourceCompatibility = '1.8'
 
 if (versioning.info.tag && !versioning.info.dirty) {
+	
 	version = extractVersionFromTag(versioning.info.tag, false)
 	println 'Commit tagged and no uncommited changes. CREATING FINAL VERSION ' + version
-} else {
+}
+else {
 	version = extractVersionFromTag(versioning.info.lastTag, true)
 	println 'Commit not tagged or not all changes commited. CREATING SNAPSHOT VERSION ' + version
 }
