@@ -33,7 +33,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 	@Test
 	public void testPersistingSingleMessage() {
 		//GIVEN
-		String INPUT_JSON_FILE = "messages/email_message.json";
+		String INPUT_JSON_FILE = "messages/email/email_message.json";
 		EmailMessage email = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 		email.getHeader().setFlowId("default-flow");
 		UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
@@ -54,7 +54,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 	@Test
 	public void testFindByIdInContainingIntentsId() {
 		//GIVEN
-		String INPUT_JSON_FILE = "messages/email_message.json";
+		String INPUT_JSON_FILE = "messages/email/email_message.json";
 		EmailMessage emailMsg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 		emailMsg.getHeader().setFlowId("default-flow");
 		UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
@@ -72,7 +72,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 	@Test
 	public void testFindByIdInNotContainingIntentsId() {
 		//GIVEN
-		String INPUT_JSON_FILE = "messages/email_message.json";
+		String INPUT_JSON_FILE = "messages/email/email_message.json";
 		EmailMessage emailMsg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 		emailMsg.getHeader().setFlowId("default-flow");
 		UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};

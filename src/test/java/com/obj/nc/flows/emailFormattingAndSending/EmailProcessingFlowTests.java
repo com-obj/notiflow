@@ -91,7 +91,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     void testSendNonTemplatedEmailMessage() {
         // given
         properties.setMultiLocalesMergeStrategy(MERGE);
-        EmailMessage inputMessage = JsonUtils.readObjectFromClassPathResource("messages/simple_email_message.json", EmailMessage.class);
+        EmailMessage inputMessage = JsonUtils.readObjectFromClassPathResource("messages/email/simple_email_message.json", EmailMessage.class);
         emailSendingFlow.sendEmail(inputMessage);
         // when
         boolean success = greenMail.waitForIncomingEmail(5000L, 1);
@@ -105,7 +105,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     @Test
     void testSendEmailGateway() throws InterruptedException, ExecutionException, TimeoutException {
         // given
-        EmailMessage inputMessage = JsonUtils.readObjectFromClassPathResource("messages/simple_email_message.json", EmailMessage.class);
+        EmailMessage inputMessage = JsonUtils.readObjectFromClassPathResource("messages/email/simple_email_message.json", EmailMessage.class);
         
         //when
         EmailMessage emailSent = emailSendingFlow.sendEmail(inputMessage).get(1, TimeUnit.SECONDS);

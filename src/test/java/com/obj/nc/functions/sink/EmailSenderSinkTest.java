@@ -57,7 +57,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     @Test
     void sendSingleMail() throws MessagingException, IOException {
         //GIVEN
-        String INPUT_JSON_FILE = "messages/email_message.json";
+        String INPUT_JSON_FILE = "messages/email/email_message.json";
         EmailMessage message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
         UUID originalProcessingId = message.getProcessingInfo().getProcessingId();
 
@@ -83,7 +83,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     @Test
     void sendMailToManyRecipients() {
         //GIVEN
-        String INPUT_JSON_FILE = "messages/e_email_message_2_many.json";
+        String INPUT_JSON_FILE = "messages/email/e_email_message_2_many.json";
         EmailMessage message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 
         //WHEN -THEN
@@ -97,7 +97,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     @Test
     void sendEmailToNonEmailEnpoint() {
         //GIVEN
-        String INPUT_JSON_FILE = "messages/e_email_message_2_push_endpoint.json";
+        String INPUT_JSON_FILE = "messages/email/e_email_message_2_push_endpoint.json";
         EmailMessage message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 
         //WHEN -THEN
@@ -111,7 +111,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     @Test
     void sendMailWithAttachments() {
         //GIVEN
-        String INPUT_JSON_FILE = "messages/email_message_attachments.json";
+        String INPUT_JSON_FILE = "messages/email/email_message_attachments.json";
         EmailMessage inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 
         EmailContent emailContent = inputMessage.getBody();
