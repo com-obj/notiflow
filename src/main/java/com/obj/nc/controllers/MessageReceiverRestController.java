@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Validated
 @RestController
-@RequestMapping("/events")
+@RequestMapping("/messages")
 public class MessageReceiverRestController {
 
 	@Autowired
@@ -23,7 +23,7 @@ public class MessageReceiverRestController {
 	@Autowired
 	private SimpleJsonValidator simpleJsonValidator;
 	
-	@PostMapping( consumes="application/json", produces="application/json")
+	@PostMapping(consumes="application/json", produces="application/json")
     public MessageReceiverResponse persistMessage(
     		@RequestBody(required = true) String messageJsonString, 
     		@RequestParam(value = "flowId", required = false) String flowId,
