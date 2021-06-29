@@ -6,8 +6,11 @@ import java.util.UUID;
 import org.springframework.data.repository.CrudRepository;
 
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 
 public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUID> {
+	
+	List<DeliveryInfo> findByEventIdAndStatusOrderByProcessedOn(UUID eventId, DELIVERY_STATUS status);
 	
 	List<DeliveryInfo> findByEventIdOrderByProcessedOn(UUID eventId);
 	

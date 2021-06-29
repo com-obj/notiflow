@@ -3,7 +3,6 @@ package com.obj.nc.flows.notificationIntentProcessing;
 import java.time.Duration;
 import java.util.UUID;
 
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,7 @@ public class NotificationIntentProcessingTest extends BaseIntegrationTest {
         intentFlow.processNotificationIntent(notificationIntent);
 
         //THEN check processing deliveryInfo
-        Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()==3);        
+        awaitSent(eventId, 3, Duration.ofSeconds(5));
     }
 
 }

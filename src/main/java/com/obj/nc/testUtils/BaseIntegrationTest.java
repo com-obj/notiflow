@@ -1,17 +1,19 @@
 package com.obj.nc.testUtils;
 
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import com.obj.nc.Get;
 import org.assertj.core.api.Assertions;
+import org.awaitility.Awaitility;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -20,16 +22,23 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.obj.nc.Get;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
+import com.obj.nc.repositories.DeliveryInfoRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public abstract class BaseIntegrationTest implements ApplicationContextAware {
 
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
     
     @Autowired Get get;
+    @Autowired DeliveryInfoRepository deliveryInfoRepo;
     
     public static void purgeNotifTables(@Autowired JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
@@ -139,6 +148,17 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     	
     	return null;
 	}
+    
+    //In most cases it is overkill to wait for sent,.. but otherwise test finish before execution finishes resulting in shutdown exceptions (tests are green)
+    public void awaitSent(UUID eventId, int messageCount, Duration maxTime) {
+    	
+    	Awaitility.await().atMost(maxTime).until(() -> {
+    		List<DeliveryInfo> infos = deliveryInfoRepo.findByEventIdAndStatusOrderByProcessedOn(eventId, DELIVERY_STATUS.SENT);
+    		log.info(infos);
+    		
+    		return infos.size()==messageCount;
+    	});    
+    }
     
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
