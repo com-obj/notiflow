@@ -32,7 +32,7 @@ public class MessageReceiverRestController {
 		JsonNode messageJson = simpleJsonValidator.apply(messageJsonString);
 		Message<?> message = JsonUtils.readObjectFromJSON(messageJson, Message.class);
 		
-		message.overrideFlowIdIfApplicable(flowId);
+		message.setFlowIdOrDefault(flowId);
 		message.overrideExternalIdIfApplicable(externalId);
 
     	try {

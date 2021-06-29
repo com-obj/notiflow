@@ -14,6 +14,8 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_ID;
+
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
@@ -44,10 +46,15 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		return persistantState;	 
 	}
 	
-	public void overrideFlowIdIfApplicable(String flowId) {
+	public void setFlowIdOrDefault(String flowId) {
+		if (header.getFlowId() == null) {
+			header.setFlowId(MESSAGE_PROCESSING_FLOW_ID);
+		}
+		
 		if (flowId == null) {
 			return;
 		}
+		
 		header.setFlowId(flowId);
 	}
 	
@@ -55,6 +62,7 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		if (externalId == null) {
 			return;
 		}
+		
 		this.externalId = externalId;
 	}
 	
