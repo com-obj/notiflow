@@ -1,11 +1,13 @@
 package com.obj.nc.domain.message;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.HasMessageId;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 
+import com.obj.nc.utils.JsonUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -46,15 +48,16 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		return persistantState;	 
 	}
 	
-	public void setFlowIdOrDefault(String flowId) {
-		if (header.getFlowId() == null) {
-			header.setFlowId(MESSAGE_PROCESSING_FLOW_ID);
-		}
-		
+	public static Message<?> from(JsonNode messageJson) {
+		Message<?> message = JsonUtils.readObjectFromJSON(messageJson, Message.class);
+		message.getHeader().setFlowId(messageJson.get("flowId") != null ? messageJson.get("flowId").textValue() : MESSAGE_PROCESSING_FLOW_ID);
+		return message;
+	}
+	
+	public void overrideFlowIdIfApplicable(String flowId) {
 		if (flowId == null) {
 			return;
 		}
-		
 		header.setFlowId(flowId);
 	}
 	
@@ -62,7 +65,6 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		if (externalId == null) {
 			return;
 		}
-		
 		this.externalId = externalId;
 	}
 	

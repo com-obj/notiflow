@@ -6,7 +6,6 @@ import com.obj.nc.domain.message.MessageReceiverResponse;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.eventValidator.SimpleJsonValidator;
 import com.obj.nc.functions.sink.inputPersister.MessagePersisterConsumer;
-import com.obj.nc.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.relational.core.conversion.DbActionExecutionException;
@@ -18,10 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/messages")
 public class MessageReceiverRestController {
 
-	@Autowired
-	private MessagePersisterConsumer persister;
-	@Autowired
-	private SimpleJsonValidator simpleJsonValidator;
+	@Autowired private MessagePersisterConsumer persister;
+	@Autowired private SimpleJsonValidator simpleJsonValidator;
 	
 	@PostMapping(consumes="application/json", produces="application/json")
     public MessageReceiverResponse persistMessage(
@@ -30,9 +27,9 @@ public class MessageReceiverRestController {
     		@RequestParam(value = "externalId", required = false) String externalId) {
 		
 		JsonNode messageJson = simpleJsonValidator.apply(messageJsonString);
-		Message<?> message = JsonUtils.readObjectFromJSON(messageJson, Message.class);
+		Message<?> message = Message.from(messageJson);
 		
-		message.setFlowIdOrDefault(flowId);
+		message.overrideFlowIdIfApplicable(flowId);
 		message.overrideExternalIdIfApplicable(externalId);
 
     	try {
