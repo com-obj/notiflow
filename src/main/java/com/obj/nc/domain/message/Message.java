@@ -21,6 +21,7 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 	
 	//processing started, only if timeConsumed = null processing will be started
 	private Instant timeConsumed;
+	private String externalId;
 	
 	@JsonIgnore
 	public abstract Class<? extends RecievingEndpoint> getRecievingEndpointType();
@@ -41,6 +42,20 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		persistantState.setTimeConsumed(getTimeConsumed());
 		persistantState.setEndpointIds(getRecievingEndpoints().stream().map(RecievingEndpoint::getId).toArray(UUID[]::new));
 		return persistantState;	 
+	}
+	
+	public void overrideFlowIdIfApplicable(String flowId) {
+		if (flowId == null) {
+			return;
+		}
+		header.setFlowId(flowId);
+	}
+	
+	public void overrideExternalIdIfApplicable(String externalId) {
+		if (externalId == null) {
+			return;
+		}
+		this.externalId = externalId;
 	}
 	
 }

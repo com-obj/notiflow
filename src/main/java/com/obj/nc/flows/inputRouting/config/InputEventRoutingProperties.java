@@ -1,4 +1,4 @@
-package com.obj.nc.flows.inputEventRouting.config;
+package com.obj.nc.flows.inputRouting.config;
 
 import java.util.Map;
 
@@ -20,7 +20,7 @@ public class InputEventRoutingProperties {
 
     private int pollPeriodInMiliSeconds=1000;
     
-    private RoutingType type;
+    private RoutingType type = RoutingType.FLOW_ID;
     
     /*if type = PAYLOAD_TYPE. Map<son @type value, channel name>*/
     private Map<String,String> typeChannelMapping;

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.domain.event.EventRecieverResponce;
+import com.obj.nc.domain.event.EventReceiverResponse;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
@@ -31,7 +31,7 @@ public class EventReceiverRestController {
 	private GenericEventJsonSchemaValidator jsonSchemaValidator;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
-    public EventRecieverResponce persistGenericEvent(
+    public EventReceiverResponse persistGenericEvent(
     		@RequestBody(required = true) String eventJsonString, 
     		@RequestParam(value = "flowId", required = false) String flowId,
     		@RequestParam(value = "externalId", required = false) String externalId,
@@ -56,7 +56,7 @@ public class EventReceiverRestController {
     		}
     	}
 
-    	return EventRecieverResponce.from(event.getId());
+    	return EventReceiverResponse.from(event.getId());
     }
 
 }

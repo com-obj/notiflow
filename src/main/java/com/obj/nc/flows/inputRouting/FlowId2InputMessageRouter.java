@@ -1,4 +1,4 @@
-package com.obj.nc.flows.inputEventRouting;
+package com.obj.nc.flows.inputRouting;
 
 import java.util.Arrays;
 import java.util.Collection;

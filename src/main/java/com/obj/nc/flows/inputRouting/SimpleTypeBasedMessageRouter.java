@@ -1,4 +1,4 @@
-package com.obj.nc.flows.inputEventRouting;
+package com.obj.nc.flows.inputRouting;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.Get;
 import com.obj.nc.domain.HasJsonPayload;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.flows.inputEventRouting.config.InputEventRoutingProperties;
+import com.obj.nc.flows.inputRouting.config.InputEventRoutingProperties;
 
 import lombok.extern.log4j.Log4j2;
 
