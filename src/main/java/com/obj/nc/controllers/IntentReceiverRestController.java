@@ -2,6 +2,7 @@ package com.obj.nc.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.message.MessageReceiverResponse;
+import com.obj.nc.domain.notifIntent.IntentReceiverResponse;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.eventValidator.SimpleJsonValidator;
@@ -21,7 +22,7 @@ public class IntentReceiverRestController {
 	@Autowired private SimpleJsonValidator simpleJsonValidator;
 	
 	@PostMapping(consumes="application/json", produces="application/json")
-    public MessageReceiverResponse persistMessage(
+    public IntentReceiverResponse persistIntent(
     		@RequestBody(required = true) String intentJsonString, 
     		@RequestParam(value = "flowId", required = false) String flowId,
     		@RequestParam(value = "externalId", required = false) String externalId) {
@@ -40,7 +41,7 @@ public class IntentReceiverRestController {
     		}
     	}
 
-    	return MessageReceiverResponse.from(intent.getId());
+    	return IntentReceiverResponse.from(intent.getId());
     }
 
 }
