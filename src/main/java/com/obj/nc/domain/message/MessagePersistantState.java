@@ -48,6 +48,8 @@ public class MessagePersistantState implements Persistable<UUID>{
 	@Transient
 	private List<RecievingEndpoint> receivingEndpoints;
 	
+	private String externalId;
+	
 	@Override
 	@JsonIgnore
 	@Transient
@@ -64,6 +66,7 @@ public class MessagePersistantState implements Persistable<UUID>{
 		msg.setId(getId());
 		msg.setTimeCreated(getTimeCreated());
 		msg.setTimeConsumed(getTimeConsumed());
+		msg.setExternalId(getExternalId());
 		
 		List<RecievingEndpoint> endpoints = findReceivingEndpoints();
 		msg.setRecievingEndpoints(endpoints);

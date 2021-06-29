@@ -1,0 +1,19 @@
+{
+	"type": "EMAIL_MESSAGE",
+	"externalId": "EXTERNAL_ID",
+	"flowId": "FLOW_ID",
+	"body": {
+		"text": "New position on koderia.sk 1",
+		"subject": "New position 1"
+	},
+	"recievingEndpoints": [
+		{
+			"@type": "EMAIL",
+			"recipient": {
+				"type": "PERSON",
+				"name": "John Doe"
+			},
+			"email": "john.doe@objectify.sk"
+		}
+	]
+}
