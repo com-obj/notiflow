@@ -130,7 +130,7 @@ class MessageReceiverTest extends BaseIntegrationTest {
     }
     
     @Test
-    void testPersistPIForEventWithFlowId() throws Exception {
+    void testPersistPIForMessageWithFlowId() throws Exception {
         // given
         String INPUT_JSON_FILE = "messages/email/email_message_with_flow_id.json";
         String eventJson = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
@@ -154,7 +154,7 @@ class MessageReceiverTest extends BaseIntegrationTest {
     }
     
     @Test
-    void testPersistPIForEventWithExternalId() throws Exception {
+    void testPersistPIForMessageWithExternalId() throws Exception {
         // given
         String INPUT_JSON_FILE = "messages/email/email_message_with_external_id.json";
         String eventJson = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
