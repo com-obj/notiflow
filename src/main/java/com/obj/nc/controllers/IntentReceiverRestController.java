@@ -1,11 +1,11 @@
 package com.obj.nc.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessageReceiverResponse;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.eventValidator.SimpleJsonValidator;
-import com.obj.nc.functions.sink.messagePersister.MessagePersister;
+import com.obj.nc.functions.sink.intentPersister.NotificationIntentPersister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.relational.core.conversion.DbActionExecutionException;
@@ -14,33 +14,33 @@ import org.springframework.web.bind.annotation.*;
 
 @Validated
 @RestController
-@RequestMapping("/messages")
-public class MessageReceiverRestController {
+@RequestMapping("/intents")
+public class IntentReceiverRestController {
 
-	@Autowired private MessagePersister persister;
+	@Autowired private NotificationIntentPersister persister;
 	@Autowired private SimpleJsonValidator simpleJsonValidator;
 	
 	@PostMapping(consumes="application/json", produces="application/json")
     public MessageReceiverResponse persistMessage(
-    		@RequestBody(required = true) String messageJsonString, 
+    		@RequestBody(required = true) String intentJsonString, 
     		@RequestParam(value = "flowId", required = false) String flowId,
     		@RequestParam(value = "externalId", required = false) String externalId) {
 		
-		JsonNode messageJson = simpleJsonValidator.apply(messageJsonString);
-		Message<?> message = Message.from(messageJson);
+		JsonNode intentJson = simpleJsonValidator.apply(intentJsonString);
+		NotificationIntent intent = NotificationIntent.from(intentJson);
 		
-		message.overrideFlowIdIfApplicable(flowId);
-		message.overrideExternalIdIfApplicable(externalId);
+		intent.overrideFlowIdIfApplicable(flowId);
+		intent.overrideExternalIdIfApplicable(externalId);
 
     	try {
-    		persister.accept(message);
+    		persister.accept(intent);
     	} catch (DbActionExecutionException e) {
     		if (DuplicateKeyException.class.equals(e.getCause().getClass())) {
-    			throw new PayloadValidationException("Duplicate external ID detected. Payload rejected: " + messageJson);
+    			throw new PayloadValidationException("Duplicate external ID detected. Payload rejected: " + intentJson);
     		}
     	}
 
-    	return MessageReceiverResponse.from(message.getId());
+    	return MessageReceiverResponse.from(intent.getId());
     }
 
 }

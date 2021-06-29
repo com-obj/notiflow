@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.event.EventReceiverResponse;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
+import com.obj.nc.functions.sink.eventPersister.GenericEventPersister;
 
 @Validated
 @RestController
@@ -24,7 +24,7 @@ import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 public class EventReceiverRestController {
 
 	@Autowired
-	private GenericEventPersisterConsumer persister;
+	private GenericEventPersister persister;
 	@Autowired
 	private SimpleJsonValidator simpleJsonValidator;
 	@Autowired

@@ -41,7 +41,7 @@ import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessing
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
 import com.obj.nc.functions.processors.senders.EmailSender;
-import com.obj.nc.functions.sources.genericEvents.GenericEventsSupplier;
+import com.obj.nc.functions.sources.genericEvent.GenericEventsSupplier;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.ProcessingInfoRepository;
 import com.obj.nc.utils.JsonUtils;

@@ -1,5 +1,7 @@
 package com.obj.nc.domain.notifIntent;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.utils.JsonUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -29,6 +31,10 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
+import java.time.Instant;
+
+import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_ID;
+
 @Data
 @NoArgsConstructor
 @ToString(callSuper = false)
@@ -56,6 +62,9 @@ import lombok.extern.log4j.Log4j2;
 public class NotificationIntent extends BasePayload<IntentContent> {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "INTENT";
+	
+	private String externalId;
+	private Instant timeConsumed;
 	
 	@Override
 	@JsonIgnore
@@ -105,6 +114,25 @@ public class NotificationIntent extends BasePayload<IntentContent> {
 		throw new NotImplementedException("Add additional cases");
 
 	}
-
+	
+	public static NotificationIntent from(JsonNode messageJson) {
+		NotificationIntent intent = JsonUtils.readObjectFromJSON(messageJson, NotificationIntent.class);
+		intent.getHeader().setFlowId(messageJson.get("flowId") != null ? messageJson.get("flowId").textValue() : MESSAGE_PROCESSING_FLOW_ID);
+		return intent;
+	}
+	
+	public void overrideFlowIdIfApplicable(String flowId) {
+		if (flowId == null) {
+			return;
+		}
+		header.setFlowId(flowId);
+	}
+	
+	public void overrideExternalIdIfApplicable(String externalId) {
+		if (externalId == null) {
+			return;
+		}
+		this.externalId = externalId;
+	}
 	
 }

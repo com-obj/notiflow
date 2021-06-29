@@ -29,7 +29,7 @@ import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
+import com.obj.nc.functions.sink.eventPersister.GenericEventPersister;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.Data;
@@ -41,7 +41,7 @@ import lombok.NoArgsConstructor;
 		"nc.flows.input-evet-routing.type=FLOW_ID"})
 public class FlowIDInputEventRoutingIntegrationTests extends BaseIntegrationTest {
 	
-	@Autowired private GenericEventPersisterConsumer persister;
+	@Autowired private GenericEventPersister persister;
 	@Qualifier("TEST_FLOW_INPUT")
 	@Autowired private PollableChannel flowInputChannel;
 	

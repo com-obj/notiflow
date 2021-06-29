@@ -11,7 +11,7 @@ import org.springframework.integration.dsl.Pollers;
 
 import com.obj.nc.flows.inputRouting.FlowId2InputMessageRouter;
 import com.obj.nc.flows.inputRouting.SimpleTypeBasedMessageRouter;
-import com.obj.nc.functions.sources.genericEvents.GenericEventsSupplier;
+import com.obj.nc.functions.sources.genericEvent.GenericEventsSupplier;
 
 @Configuration
 public class InputEventRoutingFlowConfig {

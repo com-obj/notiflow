@@ -1,4 +1,4 @@
-package com.obj.nc.functions.sink.inputPersister;
+package com.obj.nc.functions.sink.eventPersister;
 
 import java.util.Optional;
 
@@ -16,7 +16,7 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @AllArgsConstructor
 @Log4j2
-public class GenericEventPersisterConsumer extends SinkConsumerAdapter<GenericEvent> {
+public class GenericEventPersister extends SinkConsumerAdapter<GenericEvent> {
     
     @Autowired 
     private GenericEventRepository genericEventRepository;

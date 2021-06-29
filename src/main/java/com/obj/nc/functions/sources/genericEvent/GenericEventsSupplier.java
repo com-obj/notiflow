@@ -1,4 +1,4 @@
-package com.obj.nc.functions.sources.genericEvents;
+package com.obj.nc.functions.sources.genericEvent;
 
 import java.time.Instant;
 import java.util.Optional;
