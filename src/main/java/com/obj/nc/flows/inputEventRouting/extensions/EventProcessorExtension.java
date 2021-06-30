@@ -13,7 +13,7 @@ import com.obj.nc.exceptions.PayloadValidationException;
  *
  * @param <RESULT_TYPE>
  */
-public interface GenericEventProcessorExtension<RESULT_TYPE extends BasePayload<?>> {
+public interface EventProcessorExtension<RESULT_TYPE extends BasePayload<?>> {
 	
 	public Optional<PayloadValidationException> checkPreCondition(GenericEvent payload);
 

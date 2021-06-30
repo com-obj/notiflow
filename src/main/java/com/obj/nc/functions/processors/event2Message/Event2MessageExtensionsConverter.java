@@ -13,7 +13,7 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.flows.inputEventRouting.extensions.GenericEvent2MessageProcessorExtension;
-import com.obj.nc.flows.inputEventRouting.extensions.GenericEventProcessorExtension;
+import com.obj.nc.flows.inputEventRouting.extensions.EventProcessorExtension;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 @Component
@@ -21,7 +21,7 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 public class Event2MessageExtensionsConverter extends ProcessorFunctionAdapter<GenericEvent, List<Message<?>>> {
 	
 	@Autowired(required = false) 
-	private List<GenericEventProcessorExtension<?>> eventProcessors = new ArrayList<>();
+	private List<EventProcessorExtension<?>> eventProcessors = new ArrayList<>();
 	
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(GenericEvent payload) {

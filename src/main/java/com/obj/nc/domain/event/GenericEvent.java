@@ -36,11 +36,13 @@ import lombok.ToString;
 @Builder
 public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayload, HasHeader, AfterLoadCallback<GenericEvent> {
 	
-
+	public static final String DEFUALT_FLOW_ID = "default-flow"; 
+	
 	@Id
 	private UUID id;
 	//TODO: do not duplicate, use from header
-	private String flowId;
+	@Builder.Default
+	private String flowId = DEFUALT_FLOW_ID;
 	
 	private String payloadType;
 	
@@ -59,7 +61,7 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	public static GenericEvent from(JsonNode state) {
 		GenericEvent event = new GenericEvent();
 		event.setPayloadJson(state);
-		event.flowId = state.get("flowId")!=null?state.get("flowId").textValue():"default-flow";
+		event.flowId = state.get("flowId")!=null?state.get("flowId").textValue():DEFUALT_FLOW_ID;
 		event.externalId = state.get("externalId")!=null?state.get("externalId").textValue():null;
 		event.payloadType = state.get("payloadType")!=null?state.get("payloadType").textValue():null;
 		

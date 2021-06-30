@@ -79,7 +79,6 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
     	
         GenericEvent event = GenericEvent.builder()
         		.id(UUID.randomUUID())
-        		.flowId(UUID.randomUUID().toString())
         		.payloadJson(JsonUtils.writeObjectToJSONNode(pyload))
         		.build();
         
