@@ -114,14 +114,14 @@ publishing {
 }
 
 def extractVersionFromTag(tagLabel, snapshot) {
-	def matcher = tagLabel =~ /v(\d+).(\d+).(\d+)/
+	def matcher = tagLabel =~ /v(\d+).(\d+).(\d+)(.*)/
 		
 	if (matcher.size() == 0) return "0.0.1" + (snapshot ? "-SNAPSHOT" : "")
-	if (matcher[0].size() != 4) println("Tag " +  tagLabel + " is not in form of v9.9.9. Matched: " + matcher[0])
+	if (matcher[0].size() < 4) println("Tag " +  tagLabel + " is not in form of v9.9.9 (v9.9.9-rc.9). Matched: " + matcher[0])
 
 	if (snapshot) {
 		return matcher[0][1] + "." + matcher[0][2] + "." + (matcher[0][3].toInteger() + 1) + "-SNAPSHOT"
 	} else {
-		return matcher[0][1] + "." + matcher[0][2] + "." + matcher[0][3]
+		return matcher[0][1] + "." + matcher[0][2] + "." + matcher[0][3] + matcher[0][4]
 	}
 }

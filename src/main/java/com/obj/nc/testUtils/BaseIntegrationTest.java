@@ -38,7 +38,8 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
     
     @Autowired Get get;
-    @Autowired DeliveryInfoRepository deliveryInfoRepo;
+    @Autowired(required = false) //not all tests require, some might not be @SpringBootTests 
+    DeliveryInfoRepository deliveryInfoRepo;
     
     public static void purgeNotifTables(@Autowired JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
