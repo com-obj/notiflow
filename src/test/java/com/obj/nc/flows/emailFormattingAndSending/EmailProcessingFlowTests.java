@@ -2,8 +2,11 @@ package com.obj.nc.flows.emailFormattingAndSending;
 
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MESSAGE_PER_LOCALE;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.startsWith;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -13,18 +16,20 @@ import java.util.stream.Collectors;
 
 import javax.mail.internet.MimeMessage;
 
-import com.obj.nc.config.NcAppConfigProperties;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.apache.commons.text.StringEscapeUtils;
 import org.hamcrest.CoreMatchers;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -32,14 +37,16 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 
+
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
-@SpringIntegrationTest
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest(properties = {
         "nc.functions.email-tracking.enabled=true"
 })
@@ -49,9 +56,14 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     @Autowired private EmailProcessingFlow emailSendingFlow;
     @Autowired private NcAppConfigProperties ncAppConfigProperties;
     
+	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
+	@Autowired private SourcePollingChannelAdapter pollableSource;
+    
     @BeforeEach
     void setupGreenMail() throws FolderException {
         greenMail.purgeEmailFromAllMailboxes();
+        
+    	pollableSource.start();
     }
     
     @Test
@@ -150,6 +162,10 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         assertThat(imgs.get(0).attr("src"), startsWith(ncAppConfigProperties.getUrl()+"/delivery-info/messages/read/"));
     }
 
+    @AfterEach
+    public void stopSourcePolling() {
+    	pollableSource.stop();
+    }
     
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)

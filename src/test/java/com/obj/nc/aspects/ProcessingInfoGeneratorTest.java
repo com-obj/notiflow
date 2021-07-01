@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -45,6 +46,8 @@ import com.obj.nc.functions.sources.genericEvents.GenericEventsSupplier;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.ProcessingInfoRepository;
 import com.obj.nc.utils.JsonUtils;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,6 +55,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 public class ProcessingInfoGeneratorTest {
 	

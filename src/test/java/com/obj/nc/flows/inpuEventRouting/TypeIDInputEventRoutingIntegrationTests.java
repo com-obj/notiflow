@@ -3,12 +3,14 @@ package com.obj.nc.flows.inpuEventRouting;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 
 import javax.mail.MessagingException;
+import javax.validation.Valid;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -52,6 +54,9 @@ public class TypeIDInputEventRoutingIntegrationTests extends BaseIntegrationTest
 	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 	@Autowired private SourcePollingChannelAdapter pollableSource;
 	
+	@Value("${nc.flows.input-evet-routing.type-channel-mapping.TYPE_1}")
+	private String value;
+	
     @BeforeEach
     public void startSourcePolling() {
     	pollableSource.start();
@@ -63,7 +68,6 @@ public class TypeIDInputEventRoutingIntegrationTests extends BaseIntegrationTest
     
     @Test
     void testGenericEventRouting() throws MessagingException {
-  	
     	//WHEN
         GenericEvent event = GenericEvent.from(JsonUtils.readJsonNodeFromClassPathResource("events/generic_event_with_type_info1.json"));    
         persister.accept(event);

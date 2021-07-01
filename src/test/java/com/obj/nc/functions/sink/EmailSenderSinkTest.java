@@ -1,5 +1,7 @@
 package com.obj.nc.functions.sink;
 
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
@@ -34,6 +37,7 @@ import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 class EmailSenderSinkTest extends BaseIntegrationTest {
 
