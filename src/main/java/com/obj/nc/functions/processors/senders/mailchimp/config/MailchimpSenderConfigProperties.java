@@ -4,10 +4,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-<<<<<<< HEAD:src/main/java/com/obj/nc/functions/processors/senders/mailchimp/MailchimpSenderConfigProperties.java
-import lombok.Data;
-=======
->>>>>>> develop:src/main/java/com/obj/nc/functions/processors/senders/mailchimp/config/MailchimpSenderConfigProperties.java
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;

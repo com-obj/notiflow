@@ -1,23 +1,29 @@
 package com.obj.nc.repositories;
 
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.utils.JsonUtils;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
+
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.MessagePersistantState;
+import com.obj.nc.utils.JsonUtils;
+
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 public class MessageRepositoryTest extends BaseIntegrationTest {
 	
@@ -32,36 +38,35 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 	public void testPersistingSingleMessage() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/email_message.json";
-		Message notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
-		notificationIntent.getHeader().setFlowId("default-flow");
+		EmailMessage email = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
+		email.getHeader().setFlowId("default-flow");
 		UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
-		notificationIntent.getHeader().setEventIdsAsArray(eventIds);
+		email.getHeader().setEventIdsAsArray(eventIds);
 		
-		messageRepository.save(notificationIntent);
+		messageRepository.save(email.toPersistantState());
 		
-		Optional<Message> oIntentInDB = messageRepository.findById(notificationIntent.getId());
+		Optional<MessagePersistantState> oEmailInDB = messageRepository.findById(email.getId());
 		
-		Assertions.assertThat(oIntentInDB.isPresent()).isTrue();
-		Message intentInDB = oIntentInDB.get();
-		Assertions.assertThat(intentInDB.getPayloadTypeName()).isEqualTo("MESSAGE"); 
-		Assertions.assertThat(intentInDB.getTimeCreated()).isNotNull();
-		Assertions.assertThat(intentInDB.getHeader().getFlowId()).isEqualTo("default-flow");
-		Assertions.assertThat(intentInDB.getHeader().getEventIdsAsArray()).isEqualTo(eventIds);
-		Assertions.assertThat(intentInDB.getBody().toJSONString()).contains("john.doe@objectify.sk");
+		Assertions.assertThat(oEmailInDB.isPresent()).isTrue();
+		EmailMessage emailInDB = oEmailInDB.get().toMessage();
+		Assertions.assertThat(emailInDB.getPayloadTypeName()).isEqualTo("EMAIL_MESSAGE"); 
+		Assertions.assertThat(emailInDB.getTimeCreated()).isNotNull();
+		Assertions.assertThat(emailInDB.getHeader().getFlowId()).isEqualTo("default-flow");
+		Assertions.assertThat(emailInDB.getHeader().getEventIdsAsArray()).isEqualTo(eventIds);
 	}
 	
 	@Test
 	public void testFindByIdInContainingIntentsId() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/email_message.json";
-		Message notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
-		notificationIntent.getHeader().setFlowId("default-flow");
+		EmailMessage emailMsg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
+		emailMsg.getHeader().setFlowId("default-flow");
 		UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
-		notificationIntent.getHeader().setEventIdsAsArray(eventIds);
-		notificationIntent.setId(UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b"));
-		messageRepository.save(notificationIntent);
+		emailMsg.getHeader().setEventIdsAsArray(eventIds);
+		emailMsg.setId(UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b"));
+		messageRepository.save(emailMsg.toPersistantState());
 		// WHEN
-		List<Message> oIntentInDB = messageRepository.findByIdIn(Arrays.asList(
+		List<MessagePersistantState> oIntentInDB = messageRepository.findByIdIn(Arrays.asList(
 				UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981a"),
 				UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b")));
 		// THEN
@@ -72,14 +77,14 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 	public void testFindByIdInNotContainingIntentsId() {
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/email_message.json";
-		Message notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, Message.class);
-		notificationIntent.getHeader().setFlowId("default-flow");
+		EmailMessage emailMsg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
+		emailMsg.getHeader().setFlowId("default-flow");
 		UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
-		notificationIntent.getHeader().setEventIdsAsArray(eventIds);
-		notificationIntent.setId(UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b"));
-		messageRepository.save(notificationIntent);
+		emailMsg.getHeader().setEventIdsAsArray(eventIds);
+		emailMsg.setId(UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b"));
+		messageRepository.save(emailMsg.toPersistantState());
 		// WHEN
-		List<Message> oIntentInDB = messageRepository.findByIdIn(Arrays.asList(
+		List<MessagePersistantState> oIntentInDB = messageRepository.findByIdIn(Arrays.asList(
 				UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981c")));
 		// THEN
 		Assertions.assertThat(oIntentInDB.isEmpty()).isTrue();

@@ -1,43 +1,30 @@
 {
-  "type" : "MESSAGE",
-  "attributes" : { },
-  "header" : {
-    "attributes" : { },
-    "id" : "8b5904d9-486c-4892-ba38-3a02701f1b31",
-    "eventIds" : [
-      "23e201b5-d7fa-4231-a520-51190b5c50da"
-    ],
-    "configuration-name" : "static-routing-pipeline"
-  },
-  "body" : {
-    "attributes" : { },
-    "message" : {
-        "attributes": {},
-        "text": "New position on koderia.sk 1",
-        "subject": "New position 1",
-        "attachments" : [ ]
-    },
-    "recievingEndpoints" : [ {
-      "@type" : "EMAIL",
-      "deliveryOptions" : null,
-      "recipient" : {
-        "type" : "PERSON",
-        "name" : "John Doe"
-      },
-      "email" : "john.doe@objectify.sk"
-    }, {
-      "@type":"EMAIL",
-      "deliveryOptions": null,
-      "recipient" : {
-        "type" : "PERSON",
-        "name" : "John Dudly"
-      },
-      "email":"john.dudly@objectify.sk"
-    }],
-    "deliveryOptions" : {
-      "aggregationType" : "ONCE_A_WEEK",
-      "schedulingType" : "NOT_BEFORE",
-      "schedulingValue" : "18:00"
-    }
-  }
+	"type": "EMAIL_MESSAGE",
+	"header": {
+		"eventIds": [
+			"23e201b5-d7fa-4231-a520-51190b5c50da"
+		]
+	},
+	"body": {
+		"text": "New position on koderia.sk 1",
+		"subject": "New position 1"
+	},
+	"recievingEndpoints": [
+		{
+			"@type": "EMAIL",
+			"recipient": {
+				"type": "PERSON",
+				"name": "John Doe"
+			},
+			"email": "john.doe@objectify.sk"
+		},
+		{
+			"@type": "EMAIL",
+			"recipient": {
+				"type": "PERSON",
+				"name": "John Dudly"
+			},
+			"email": "john.dudly@objectify.sk"
+		}
+	]
 }

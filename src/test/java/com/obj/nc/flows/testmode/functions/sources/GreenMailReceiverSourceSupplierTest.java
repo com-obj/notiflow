@@ -29,10 +29,6 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-<<<<<<< HEAD:src/test/java/com/obj/nc/flows/testmode/functions/sources/GreenMailReceiverSourceSupplierTest.java
-import com.obj.nc.domain.Body;
-=======
->>>>>>> develop:functions/src/test/java/com/obj/nc/flows/testmode/functions/sources/GreenMailReceiverSourceSupplierTest.java
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.EmailMessage;

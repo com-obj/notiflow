@@ -1,6 +1,6 @@
 
-Name: [(${name})]
+Name: [(${model.name})]
 Parts:
-[# th:each="part : ${parts}" ]
+[# th:each="part : ${model.parts}" ]
     [(${part.field1})], [(${part.field2})]
 [/]

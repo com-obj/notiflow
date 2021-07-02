@@ -21,10 +21,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.FileSystemUtils;
 
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-<<<<<<< HEAD:src/test/java/com/obj/nc/functions/sources/EventGeneratorTest.java
-import com.obj.nc.domain.content.email.EmailContent;
-=======
->>>>>>> develop:functions/src/test/java/com/obj/nc/functions/sources/EventGeneratorTest.java
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.exceptions.PayloadValidationException;

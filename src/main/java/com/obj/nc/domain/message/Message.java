@@ -2,74 +2,41 @@ package com.obj.nc.domain.message;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.endpoints.SmsEndpoint;
-import com.obj.nc.domain.headers.HasHeader;
-import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.domain.HasMessageId;
+import com.obj.nc.domain.IsNotification;
+import com.obj.nc.domain.content.MessageContent;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.relational.core.mapping.Table;
+
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
-@Table("nc_message")
-public class Message extends BasePayload implements HasHeader {
+public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayload<BODY_TYPE> implements HasMessageId, IsNotification {
+		
+	@JsonIgnore
+	public abstract Class<? extends RecievingEndpoint> getRecievingEndpointType();
 	
-	public static final String JSON_TYPE_IDENTIFIER = "MESSAGE";
-	
-	public static Message createAsEmail() {
-		Message msg = new Message();
-		msg.getBody().setMessage(new EmailContent());
-		return msg;
-	}
-	
-	//TODO: refactor as some factory or something else
-	public static Message createAsSms() {
-		Message msg = new Message();
-		msg.getBody().setMessage(new SimpleTextContent());
-		return msg;
-	}
-
+	@JsonIgnore
 	@Override
-	@JsonIgnore
-	public String getPayloadTypeName() {
-		return JSON_TYPE_IDENTIFIER;
+	public UUID getMessageId() {
+		return getId();
 	}
-
-	@JsonIgnore
-	@Transient
-	public boolean isEmailMessage() {
-		if (this.getBody().getRecievingEndpoints().size()!=1) {
-			throw new PayloadValidationException("Message should have only single endpoint");
-		}
 		
-		return this.getBody().getRecievingEndpoints().iterator().next() instanceof EmailEndpoint;
+	public MessagePersistantState toPersistantState() {
+		MessagePersistantState persistantState = new MessagePersistantState();
+		persistantState.setBody(getBody());
+		persistantState.setHeader(getHeader());
+		persistantState.setId(getId());
+		persistantState.setMessageClass(getClass().getName());
+		persistantState.setTimeCreated(getTimeCreated());
+		persistantState.setEndpointIds(getRecievingEndpoints().stream().map(RecievingEndpoint::getId).toArray(UUID[]::new));
+		return persistantState;	 
 	}
 	
-	@JsonIgnore
-	@Transient
-	public boolean isSmsMessage() {
-		if (this.getBody().getRecievingEndpoints().size()!=1) {
-			throw new PayloadValidationException("Message should have only single endpoint");
-		}
-		
-		return this.getBody().getRecievingEndpoints().iterator().next() instanceof SmsEndpoint;
-	}
-	
-	@JsonIgnore
-	@Transient
-	public boolean isMailchimpMessage() {
-		if (this.getBody().getRecievingEndpoints().size()!=1) {
-			throw new PayloadValidationException("Message should have only single endpoint");
-		}
-		
-		return this.getBody().getRecievingEndpoints().iterator().next() instanceof MailchimpEndpoint;
-	}
 }

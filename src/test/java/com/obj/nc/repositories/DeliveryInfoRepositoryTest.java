@@ -13,13 +13,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-<<<<<<< HEAD:src/test/java/com/obj/nc/repositories/DeliveryInfoRepositoryTest.java
-import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo;
-import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo.DELIVERY_STATUS;
-=======
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
->>>>>>> develop:functions/src/test/java/com/obj/nc/repositories/DeliveryInfoRepositoryTest.java
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @DataJdbcTest

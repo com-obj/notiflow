@@ -12,7 +12,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import com.obj.nc.Get;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.springframework.beans.BeansException;
@@ -33,10 +32,7 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
-<<<<<<< HEAD:src/main/java/com/obj/nc/testUtils/BaseIntegrationTest.java
-=======
 @Log4j2
->>>>>>> develop:functions/src/testFixtures/java/com/obj/nc/BaseIntegrationTest.java
 public abstract class BaseIntegrationTest implements ApplicationContextAware {
 
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));

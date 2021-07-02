@@ -1,37 +1,20 @@
 {
-  "type" : "MESSAGE",
-  "attributes" : { },
-  "header" : {
-    "attributes" : { },
-    "eventIds" : [ ],
-    "processingInfo" : null,
-    "eventIdsAsArray" : [ ],
-    "flow-id" : null
-  },
-  "body" : {
-    "attributes" : { },
-    "message" : {
-      "type" : "EMAIL_MESSAGE_CONTENT",
-      "attributes" : { },
-      "subject" : "New position 1 / New position 2 / New position 3",
-      "text" : "New position on koderia.sk 1\n\nNew position on koderia.sk 2\n\nNew position on koderia.sk 3",
-      "contentType" : "text/plain",
-      "attachments" : [ ]
-    },
-    "recievingEndpoints" : [ {
-      "@type" : "EMAIL",
-      "deliveryOptions" : null,
-      "recipient" : {
-        "type" : "PERSON",
-        "name" : "John Doe"
-      },
-      "email" : "john.doe@objectify.sk",
-      "endpointId" : "john.doe@objectify.sk"
-    } ],
-    "deliveryOptions" : {
-      "aggregationType" : "ONCE_A_WEEK",
-      "schedulingType" : "NOT_BEFORE",
-      "schedulingValue" : "18:00"
-    }
-  }
+	"type": "EMAIL_MESSAGE",
+	"body": {
+		"subject": "New position 1 / New position 2 / New position 3",
+		"text": "New position on koderia.sk 1\n\nNew position on koderia.sk 2\n\nNew position on koderia.sk 3",
+		"contentType": "text/plain"
+	},
+	"recievingEndpoints": [
+		{
+			"@type": "EMAIL",
+			"recipient": {
+				"type": "PERSON",
+				"name": "John Doe"
+			},
+			"email": "john.doe@objectify.sk",
+			"endpointId": "john.doe@objectify.sk"
+		}
+	]
 }
+

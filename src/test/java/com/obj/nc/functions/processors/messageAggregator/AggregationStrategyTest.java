@@ -17,11 +17,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-<<<<<<< HEAD:src/test/java/com/obj/nc/functions/processors/messageAggregator/AggregationStrategyTest.java
-=======
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.EmailMessage;
->>>>>>> develop:functions/src/test/java/com/obj/nc/functions/processors/messageAggregator/AggregationStrategyTest.java
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageAggregator.AggregationStrategyTest.MessageAggregatorTestConfig;

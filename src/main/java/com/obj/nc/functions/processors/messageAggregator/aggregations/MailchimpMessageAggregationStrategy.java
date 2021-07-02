@@ -1,31 +1,35 @@
 package com.obj.nc.functions.processors.messageAggregator.aggregations;
 
-import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.content.mailchimp.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
+import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpAttachmentDto;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpMergeVariableDto;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpTemplateContentDto;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Log4j2
 @RequiredArgsConstructor
-public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationStrategy {
+public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationStrategy<MailchimpContent> {
 	
 	private final MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 	
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(List<? extends BasePayload> payloads) {
+	protected Optional<PayloadValidationException> checkPreCondition(List<Message<MailchimpContent>> payloads) {
 		Optional<PayloadValidationException> exception = checkContentTypes(payloads, MailchimpContent.class);
-		if (exception.isPresent()) {
-			return exception;
-		}
-		
-		exception = checkDeliveryOptions(payloads);
 		if (exception.isPresent()) {
 			return exception;
 		}
@@ -34,7 +38,7 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 	}
 	
 	@Override
-	protected Optional<PayloadValidationException> checkReceivingEndpoints(List<? extends BasePayload> payloads) {
+	protected Optional<PayloadValidationException> checkReceivingEndpoints(List<Message<MailchimpContent>> payloads) {
 		Optional<PayloadValidationException> exception = checkEndpointTypes(payloads, MailchimpEndpoint.class);
 		if (exception.isPresent()) {
 			return exception;
@@ -44,73 +48,71 @@ public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationS
 	}
 	
 	@Override
-	public Object merge(List<? extends BasePayload> payloads) {
+	public Object merge(List<Message<MailchimpContent>> payloads) {
 		if (payloads.isEmpty()) return null;
 		
 		MailchimpContent aggregatedMailchimpContent = payloads
 				.stream()
-				.map(BasePayload::<MailchimpContent>getContentTyped)
+				.map(Message::getBody)
 				.reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		
-		//TODO: ked bude refactorovany header a ostatne veci tak tuto spravit novu message a neprepisovat existujucu
-		Message outputMessage = (Message) payloads.get(0);
-		outputMessage.getBody().setMessage(aggregatedMailchimpContent);
+		MailChimpMessage outputMessage = new MailChimpMessage();
+		outputMessage.setBody(aggregatedMailchimpContent);
 		return outputMessage;
 	}
 	
 	private MailchimpContent concatContents(MailchimpContent one, MailchimpContent other) {
-		MailchimpContent concated = new MailchimpContent();
-		concated.setTemplateName(mailchimpSenderConfigProperties.getAggregatedMessageTemplateName());
+		MailchimpContent aggregatedContent = new MailchimpContent();
+		aggregatedContent.setTemplateName(mailchimpSenderConfigProperties.getAggregatedMessageTemplateName());
 		
-		List<MailchimpTemplateContent> templateContent = new ArrayList<>(one.getTemplateContent());
+		List<MailchimpTemplateContentDto> templateContent = new ArrayList<>(one.getTemplateContent());
 		templateContent.addAll(other.getTemplateContent());
-		concated.setTemplateContent(templateContent);
+		aggregatedContent.setTemplateContent(templateContent);
 		
-		MailchimpMessage mailchimpMessage = new MailchimpMessage();
-		mailchimpMessage.setTo(one.getMessage().getTo());
-		mailchimpMessage.setSubject(mailchimpSenderConfigProperties.getAggregatedMessageSubject());
+		aggregatedContent.setRecipients(one.getRecipients());
+		aggregatedContent.setSubject(mailchimpSenderConfigProperties.getAggregatedMessageSubject());
 		
-		ArrayList<MailchimpAttachment> attachments = new ArrayList<>(one.getMessage().getAttachments());
-		attachments.addAll(other.getMessage().getAttachments());
-		mailchimpMessage.setAttachments(attachments);
+		ArrayList<MailchimpAttachmentDto> dtos = new ArrayList<>(one.getAttachments());
+		dtos.addAll(other.getAttachments());
+		aggregatedContent.setAttachments(dtos);
 		
-		mailchimpMessage.setFromEmail(one.getMessage().getFromEmail());
-		mailchimpMessage.setFromName(one.getMessage().getFromName());
-		mailchimpMessage.setMergeLanguage(one.getMessage().getMergeLanguage());
+		aggregatedContent.setSenderName(one.getSenderName());
+		aggregatedContent.setSenderEmail(one.getSenderEmail());
 		
-		Map<String, List<MailchimpData>> globalMergeCategoryValues = new HashMap<>();
+		Map<String, List<Object>> globalMergeCategoryValues = new HashMap<>();
 		mailchimpSenderConfigProperties.getMessageTypes().forEach(type -> globalMergeCategoryValues.put(type, new ArrayList<>()));
 		
-		one.getMessage().getGlobalMergeVars().forEach(mergeVar -> {
-			if (mergeVar.getContent() instanceof AggregatedMailchimpData) {
-				globalMergeCategoryValues.get(mergeVar.getName()).addAll(((AggregatedMailchimpData) mergeVar.getContent()).getData());
-			} else {
-				globalMergeCategoryValues.get(mergeVar.getName()).add(mergeVar.getContent());
-			}
-		});
-		other.getMessage().getGlobalMergeVars().forEach(mergeVar -> {
-			if (mergeVar.getContent() instanceof AggregatedMailchimpData) {
-				globalMergeCategoryValues.get(mergeVar.getName()).addAll(((AggregatedMailchimpData) mergeVar.getContent()).getData());
-			} else {
-				globalMergeCategoryValues.get(mergeVar.getName()).add(mergeVar.getContent());
-			}
-		});
-		mailchimpMessage.setGlobalMergeVars(globalMergeCategoryValues.entrySet().stream().map(this::mapMergeVar).collect(Collectors.toList()));
-		concated.setMessage(mailchimpMessage);
-		return concated;
+		aggregateGlobalMergeVariables(one, globalMergeCategoryValues);
+		aggregateGlobalMergeVariables(other, globalMergeCategoryValues);
+		aggregatedContent.setGlobalMergeVariables(globalMergeCategoryValues.entrySet().stream().map(this::mapMergeVar)
+				.collect(Collectors.toList()));
+		
+		return aggregatedContent;
 	}
 	
-	protected MailchimpMergeVariable mapMergeVar(Map.Entry<String, List<MailchimpData>> entry) {
-		MailchimpMergeVariable mergeVar = new MailchimpMergeVariable();
+	protected MailchimpMergeVariableDto mapMergeVar(Map.Entry<String, List<Object>> entry) {
+		MailchimpMergeVariableDto mergeVar = new MailchimpMergeVariableDto();
 		mergeVar.setName(entry.getKey());
 		
 		AggregatedMailchimpData data = new AggregatedMailchimpData();
+		data.setSubject(mailchimpSenderConfigProperties.getAggregatedMessageSubject());
 		data.setType(AggregatedMailchimpData.JSON_TYPE_NAME);
 		data.setData(entry.getValue());
 		
 		mergeVar.setContent(data);
 		return mergeVar;
+	}
+	
+	private void aggregateGlobalMergeVariables(MailchimpContent content, Map<String, List<Object>> globalMergeCategoryValues) {
+		content.getGlobalMergeVariables().forEach(mergeVar -> {
+			if (mergeVar.getContent() instanceof AggregatedMailchimpData) {
+				AggregatedMailchimpData aggregatedMailchimpData = (AggregatedMailchimpData) mergeVar.getContent();
+				globalMergeCategoryValues.get(mergeVar.getName()).addAll(aggregatedMailchimpData.getData());
+			} else {
+				globalMergeCategoryValues.get(mergeVar.getName()).add(mergeVar.getContent());
+			}
+		});
 	}
 
 }

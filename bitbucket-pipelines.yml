@@ -1,37 +1,5 @@
 image: gradle:6.8.2
 
-<<<<<<< HEAD
-definitions:
-  steps:
-    - step: &test
-        name: 'Run tests'
-        script:
-          - gradle test -Dspring.profiles.active=bitbucket --stacktrace --info
-        services:
-          - postgres
-        caches:
-          - gradle
-
-    - step: &release-nexus
-        name: 'Release artifacts to https://infra.objectify.sk/maven/#browse/browse:maven-releases:objectify'
-        script:
-          - gradle publish --stacktrace --info
-        caches:
-          - gradle
-
-  services:
-    postgres:
-      image: postgres
-      variables:
-        POSTGRES_DB: 'nc'
-        POSTGRES_USER: 'nc'
-        POSTGRES_PASSWORD: 'ZMss4o9mdBLV'
-
-pipelines:
-  branches:
-    master:
-      - step: *test
-=======
 definitions: 
    steps:
      - step: &test
@@ -63,7 +31,6 @@ definitions:
 pipelines:
   branches:
     master:
->>>>>>> develop
       - step: *release-nexus # publication of SNAPSHOT release
     develop:
       - step: *test
