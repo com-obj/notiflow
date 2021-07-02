@@ -25,8 +25,14 @@ public class GenericEventPersisterConsumer extends SinkConsumerAdapter<GenericEv
 		if (payload == null) {
 			return Optional.of(new PayloadValidationException("Could not persist FailedPaylod because its null. Payload: " + payload));
 		}
+		if (payload.getId()==null) {
+			return Optional.of(new PayloadValidationException("Could not persist FailedPaylod because Id is null. Payload: " + payload));
+		}		
 		if (payload.getFlowId()==null) {
 			return Optional.of(new PayloadValidationException("Could not persist FailedPaylod because flowId is null. Payload: " + payload));
+		}
+		if (payload.getPayloadJson()==null) {
+			return Optional.of(new PayloadValidationException("Could not persist FailedPaylod because payload is null. Payload: " + payload));
 		}
 
 		return Optional.empty();

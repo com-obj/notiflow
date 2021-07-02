@@ -47,6 +47,8 @@ git describe --tags
 #Get last tag
 git describe --tags --abbrev=0		
 
+#Get all remote tags
+git ls-remote --tags
 
 #Creating production version (should be on release branch or master)
 git commit -a -m "some commit message"

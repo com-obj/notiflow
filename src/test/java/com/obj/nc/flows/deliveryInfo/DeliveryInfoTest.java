@@ -1,5 +1,6 @@
 package com.obj.nc.flows.deliveryInfo;
 
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.Duration;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -33,7 +35,7 @@ import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.SmstMessage;
+import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlow;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
@@ -41,17 +43,18 @@ import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 public class DeliveryInfoTest extends BaseIntegrationTest {
 	
 	@Autowired private GenerateEventIdProcessingFunction generateEventId;
     @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
-    @Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromIntent;
+    @Autowired private MessagesFromIntentGenerator generateMessagesFromIntent;
     @Autowired private DeliveryInfoRepository deliveryInfoRepo;
     @Autowired private JdbcTemplate jdbcTemplate;
     @Autowired private EmailProcessingFlow emailSendingFlow;
@@ -146,8 +149,8 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     void testDeliveryInfosCreateAndPersistedForFailedDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
     	UUID eventId = UUID.randomUUID();
-    	SmstMessage failedMessage = createTestSMS(eventId, "09050123456");
-    	org.springframework.messaging.Message<SmstMessage> failedSpringMessage = MessageBuilder.withPayload(failedMessage).build();
+    	SmsMessage failedMessage = createTestSMS(eventId, "09050123456");
+    	org.springframework.messaging.Message<SmsMessage> failedSpringMessage = MessageBuilder.withPayload(failedMessage).build();
     	
     	JsonNode messageJson = jsonConverterForSpringMessages.valueToTree(failedSpringMessage);
     	
@@ -180,7 +183,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     void testDeliveryInfosCreateAndPersistedForProcessingDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
     	UUID eventId = UUID.randomUUID();
-    	SmstMessage msg = createTestSMS(eventId, "09050123456");
+    	SmsMessage msg = createTestSMS(eventId, "09050123456");
     	        
         //WHEN
         List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(msg).get(1, TimeUnit.SECONDS);
@@ -198,8 +201,8 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         checkSingleDelInfoExistsForEvent(eventId);
     }
 
-	private SmstMessage createTestSMS(UUID eventId, String telNumber) {
-		SmstMessage msg = new SmstMessage();
+	private SmsMessage createTestSMS(UUID eventId, String telNumber) {
+		SmsMessage msg = new SmsMessage();
     	msg.getHeader().setEventIds(Arrays.asList(eventId));
     	msg.addRecievingEndpoints(new SmsEndpoint(telNumber));
 		return msg;
@@ -214,7 +217,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     void testDeliveryInfosCreateAndPersistedForSentDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
     	UUID eventId = UUID.randomUUID();
-    	SmstMessage msg = createTestSMS(eventId, "09050123456");
+    	SmsMessage msg = createTestSMS(eventId, "09050123456");
     	        
         //WHEN
         List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistSentDeliveryInfo(msg).get(1, TimeUnit.SECONDS);

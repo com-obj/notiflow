@@ -11,7 +11,7 @@ import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SmstMessage;
+import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
 
@@ -35,7 +35,7 @@ public class SmsTemplateFormatter extends BaseTemplateFormatter<TemplateWithMode
 	}
 
 	protected Message<SimpleTextContent> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelContent<?>> payload) {		
-		SmstMessage smsMessage = new SmstMessage();
+		SmsMessage smsMessage = new SmsMessage();
 
 		smsMessage.getBody().setText(formatedContent);
 		

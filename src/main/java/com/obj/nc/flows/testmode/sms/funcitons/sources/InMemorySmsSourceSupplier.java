@@ -8,32 +8,32 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
-import com.obj.nc.domain.message.SmstMessage;
+import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
 
 @Component
 @ConditionalOnMissingBean(type = "SmsSender")
-public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<SmstMessage> {
+public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<SmsMessage> {
 	
 	public static final String ORIGINAL_RECIPIENTS_PHONE_ATTR_NAME = "ORIGINAL_RECIPIENTS_PHONE_NUM";
 	public static final String ORIGINAL_RECIPIENTS_NAME_ATTR_NAME = "ORIGINAL_RECIPIENTS_NAME";
 
 	
-	private LinkedList<SmstMessage> recieved = new LinkedList<SmstMessage>();
+	private LinkedList<SmsMessage> recieved = new LinkedList<SmsMessage>();
 
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(SmstMessage payload) {
+	protected Optional<PayloadValidationException> checkPreCondition(SmsMessage payload) {
 		return Optional.empty();
 	}
 
 	@Override
-	protected SmstMessage execute() {
+	protected SmsMessage execute() {
 		if (recieved.isEmpty()) {
 			return null;
 		}
 		
-		SmstMessage sms= recieved.getFirst();
+		SmsMessage sms= recieved.getFirst();
 		
 		SimpleTextContent content =sms.getBody();
 		
@@ -49,7 +49,7 @@ public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<SmstMessage
 		return sms;
 	}
 	
-	public void recieve(SmstMessage msg) {
+	public void recieve(SmsMessage msg) {
 		recieved.addLast(msg);
 	}
 	

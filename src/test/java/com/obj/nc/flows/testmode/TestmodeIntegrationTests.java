@@ -51,7 +51,7 @@ import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
-import com.obj.nc.domain.message.SmstMessage;
+import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig;
@@ -187,7 +187,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         // AND RECEIVED SMSs
         smsProcessingInputChannel.send(new GenericMessage<>(inputSms));
         await().atMost(10, TimeUnit.SECONDS).until(() -> smsSourceSupplier.getReceivedCount() >= 1);
-        List<SmstMessage> receivedSmsMessages = Stream.generate(smsSourceSupplier).limit(10).filter(Objects::nonNull).collect(Collectors.toList());
+        List<SmsMessage> receivedSmsMessages = Stream.generate(smsSourceSupplier).limit(10).filter(Objects::nonNull).collect(Collectors.toList());
         Assertions.assertThat(receivedSmsMessages).hasSize(2);
         MessageSource<?> smsMessageSource = () -> new GenericMessage<>(receivedSmsMessages);
     
