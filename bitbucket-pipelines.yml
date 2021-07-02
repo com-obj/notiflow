@@ -10,6 +10,8 @@ definitions:
            - postgres
          caches:
            - gradle
+         artifacts:
+           - ./**/build/reports/tests/test/**
 
      - step: &release-nexus
          name: 'Release artifacts to https://infra.objectify.sk/maven/#browse/browse:maven-releases:objectify'
