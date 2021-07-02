@@ -25,11 +25,16 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+<<<<<<< HEAD:src/test/java/com/obj/nc/flows/inpuEventRouting/FlowIDInputEventRoutingIntegrationTests.java
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+=======
+>>>>>>> develop:functions/src/test/java/com/obj/nc/flows/inpuEventRouting/FlowIDInputEventRoutingIntegrationTests.java
 import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.Data;
@@ -37,8 +42,7 @@ import lombok.NoArgsConstructor;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest(properties = {
-		"nc.flows.input-evet-routing.type=FLOW_ID"})
+@SpringBootTest
 public class FlowIDInputEventRoutingIntegrationTests extends BaseIntegrationTest {
 	
 	@Autowired private GenericEventPersisterConsumer persister;

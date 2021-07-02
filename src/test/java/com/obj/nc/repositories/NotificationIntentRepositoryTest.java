@@ -1,5 +1,7 @@
 package com.obj.nc.repositories;
 
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -19,6 +22,7 @@ import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	
@@ -30,9 +34,9 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	}
 	
 	@Test
-	public void testPersistingSingleEvent() {
+	public void testPersistingSingleIntent() {
 		//GIVEN
-		 String INPUT_JSON_FILE = "events/ba_job_post.json";
+		 String INPUT_JSON_FILE = "intents/ba_job_post.json";
 	     NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 	     notificationIntent.getHeader().setFlowId("default-flow");
 	     UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
@@ -44,17 +48,18 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	     
 	     Assertions.assertThat(oIntentInDB.isPresent()).isTrue();
 	     NotificationIntent intentInDB = oIntentInDB.get();
-	     Assertions.assertThat(intentInDB.getPayloadTypeName()).isEqualTo("EVENT"); 
+	     Assertions.assertThat(intentInDB.getPayloadTypeName()).isEqualTo("INTENT"); 
 	     Assertions.assertThat(intentInDB.getTimeCreated()).isNotNull();
 	     Assertions.assertThat(intentInDB.getHeader().getFlowId()).isEqualTo("default-flow");
 	     Assertions.assertThat(intentInDB.getHeader().getEventIdsAsArray()).isEqualTo(eventIds);
-	     Assertions.assertThat(intentInDB.getBody().toJSONString()).contains("Business Intelligence (BI) Developer");
+	     Assertions.assertThat(intentInDB.getBody().getSubject()).contains("Business Intelligence (BI) Developer");
+	     Assertions.assertThat(intentInDB.getBody().getBody()).contains("We are looking for a Business Intelligence (BI) Developer to create...");	    
 	}
 	
 	@Test
 	public void testFindByIdInContainingIntentsId() {
 		//GIVEN
-		String INPUT_JSON_FILE = "events/ba_job_post.json";
+		String INPUT_JSON_FILE = "intents/ba_job_post.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 		notificationIntent.getHeader().setFlowId("default-flow");
 		UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
@@ -72,7 +77,7 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	@Test
 	public void testFindByIdInNotContainingIntentsId() {
 		//GIVEN
-		String INPUT_JSON_FILE = "events/ba_job_post.json";
+		String INPUT_JSON_FILE = "intents/ba_job_post.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 		notificationIntent.getHeader().setFlowId("default-flow");
 		UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};

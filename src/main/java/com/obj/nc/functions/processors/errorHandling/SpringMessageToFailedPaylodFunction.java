@@ -26,7 +26,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class SpringMessageToFailedPaylodFunction extends ProcessorFunctionAdapter<ErrorMessage, FailedPaylod> {
 	
-	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
+	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
 	
 	@Override
 	protected FailedPaylod execute(ErrorMessage errorMessage) {	

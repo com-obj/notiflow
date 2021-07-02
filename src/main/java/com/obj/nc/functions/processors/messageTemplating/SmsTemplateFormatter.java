@@ -7,24 +7,25 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.content.Content;
+import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
 
 @Component
 @DocumentProcessingInfo("SmsFormatter")
-public class SmsTemplateFormatter extends BaseTemplateFormatter {
+public class SmsTemplateFormatter extends BaseTemplateFormatter<TemplateWithModelContent<?>, SimpleTextContent> {
 
 	public SmsTemplateFormatter(TemplateEngine templateEngine, ThymeleafConfiguration config) {
 		super(templateEngine, config);
 	}
 
 	@Override
-	public Optional<PayloadValidationException> checkPreCondition(Message message) {
-		Content content = message.getBody().getMessage();
+	public Optional<PayloadValidationException> checkPreCondition(Message<TemplateWithModelContent<?>> message) {
+		MessageContent content = message.getBody();
 		
 		if (!(content instanceof  TemplateWithModelContent)) {
 			return Optional.of(new PayloadValidationException("SmsTemplateFormatter cannot format message because its content is not of type TemplateWithJsonModelSmsContent. Instead is " +  content.getClass().getSimpleName()));
@@ -33,11 +34,10 @@ public class SmsTemplateFormatter extends BaseTemplateFormatter {
 		return Optional.empty();
 	}
 
-	protected Message createMessageWithFormattedContent(String formatedContent, Locale locale,  Message payload) {		
-		Message smsMessage = Message.createAsSms();
+	protected Message<SimpleTextContent> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelContent<?>> payload) {		
+		SmsMessage smsMessage = new SmsMessage();
 
-		SimpleTextContent smsContent = smsMessage.getContentTyped();
-		smsContent.setText(formatedContent);
+		smsMessage.getBody().setText(formatedContent);
 		
 		return smsMessage;
 	}

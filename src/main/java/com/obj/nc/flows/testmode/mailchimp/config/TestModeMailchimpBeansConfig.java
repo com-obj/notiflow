@@ -1,18 +1,18 @@
 package com.obj.nc.flows.testmode.mailchimp.config;
 
-import com.obj.nc.flows.testmode.mailchimp.functions.InMemoryMailchimpSourceSupplier;
-import com.obj.nc.flows.testmode.mailchimp.functions.TestModeMailchimpSender;
-import com.obj.nc.functions.processors.senders.MailchimpSender;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import com.obj.nc.flows.testmode.mailchimp.functions.InMemoryMailchimpSourceSupplier;
+import com.obj.nc.flows.testmode.mailchimp.functions.TestModeMailchimpSender;
+import com.obj.nc.functions.processors.senders.MailchimpSender;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
+
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-@ConditionalOnBean(MailchimpSender.class)
 public class TestModeMailchimpBeansConfig {
 	
     /**
@@ -23,8 +23,11 @@ public class TestModeMailchimpBeansConfig {
      */
     @Bean
     @Primary
-    public MailchimpSender testModeMailchimpSender() {
-        return new TestModeMailchimpSender(testModeMailchimpReciever(), realMailchimpSender());
+    public MailchimpSender testModeMailchimpSender(MailchimpSenderConfigProperties properties) {
+        return new TestModeMailchimpSender(
+        		properties, 
+        		testModeMailchimpReciever(), 
+        		realMailchimpSender());
     }
     
     @Bean

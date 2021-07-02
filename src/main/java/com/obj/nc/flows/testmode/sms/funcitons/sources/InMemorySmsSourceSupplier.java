@@ -8,36 +8,37 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
 
 @Component
 @ConditionalOnMissingBean(type = "SmsSender")
-public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<Message> {
+public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<SmsMessage> {
 	
 	public static final String ORIGINAL_RECIPIENTS_PHONE_ATTR_NAME = "ORIGINAL_RECIPIENTS_PHONE_NUM";
 	public static final String ORIGINAL_RECIPIENTS_NAME_ATTR_NAME = "ORIGINAL_RECIPIENTS_NAME";
 
 	
-	private LinkedList<Message> recieved = new LinkedList<Message>();
+	private LinkedList<SmsMessage> recieved = new LinkedList<SmsMessage>();
 
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
+	protected Optional<PayloadValidationException> checkPreCondition(SmsMessage payload) {
 		return Optional.empty();
 	}
 
 	@Override
-	protected Message execute() {
+	protected SmsMessage execute() {
 		if (recieved.isEmpty()) {
 			return null;
 		}
 		
-		Message sms= recieved.getFirst();
+		SmsMessage sms= recieved.getFirst();
 		
-		SmsEndpoint recipient = (SmsEndpoint)sms.getBody().getRecievingEndpoints().iterator().next();
+		SimpleTextContent content =sms.getBody();
 		
-		SimpleTextContent content =sms.getContentTyped();
+		SmsEndpoint recipient = (SmsEndpoint)sms.getRecievingEndpoints().iterator().next();		
+
 		content.setAttributeValue(ORIGINAL_RECIPIENTS_PHONE_ATTR_NAME, recipient.getPhone());
 		if (recipient.getRecipient()!=null) {
 			content.setAttributeValue(ORIGINAL_RECIPIENTS_NAME_ATTR_NAME, recipient.getRecipient().getName());
@@ -48,7 +49,7 @@ public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<Message> {
 		return sms;
 	}
 	
-	public void recieve(Message msg) {
+	public void recieve(SmsMessage msg) {
 		recieved.addLast(msg);
 	}
 	

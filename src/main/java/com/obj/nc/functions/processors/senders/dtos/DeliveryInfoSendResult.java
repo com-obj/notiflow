@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
-import com.obj.nc.functions.sink.deliveryInfoPersister.domain.DeliveryInfo.DELIVERY_STATUS;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,6 +42,8 @@ public class DeliveryInfoSendResult implements HasHeader {
 	@NotNull
 //	@NotEmpty
 	private UUID[] eventIds;
+	
+	private UUID messageId;
 	
 	@NotNull
 	private RecievingEndpoint recievingEndpoint;

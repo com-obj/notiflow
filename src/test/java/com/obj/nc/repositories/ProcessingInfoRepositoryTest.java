@@ -1,5 +1,6 @@
 package com.obj.nc.repositories;
 
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.Instant;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
@@ -20,6 +22,7 @@ import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 public class ProcessingInfoRepositoryTest {
 
@@ -65,7 +68,7 @@ public class ProcessingInfoRepositoryTest {
 	}
 
 	private ProcessingInfo createSimpleProcessingInfo() {
-		String INPUT_JSON_FILE = "events/direct_message.json";
+		String INPUT_JSON_FILE = "intents/direct_message.json";
 		String content = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
 
 		ProcessingInfo info = ProcessingInfo.builder()

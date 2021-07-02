@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-@ConditionalOnBean(MailchimpSender.class)
 @Log4j2
 public class TestModeMailchimpFlowConfig {
 	

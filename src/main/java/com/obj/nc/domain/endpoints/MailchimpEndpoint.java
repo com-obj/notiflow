@@ -8,6 +8,7 @@ import lombok.NonNull;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor
+//could be potentially EmailEndpoint but endpoint type is important for intent->message translation and correct message subtyping
 public class MailchimpEndpoint extends RecievingEndpoint {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "MAILCHIMP";

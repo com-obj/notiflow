@@ -1,22 +1,8 @@
 package com.obj.nc.functions.processors.senders.mailchimp;
 
-import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpContentDto;
-import com.obj.nc.domain.content.mailchimp.MailchimpRecipient;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-
-import com.obj.nc.functions.processors.senders.mailchimp.model.MailchimpResponseDto;
-import com.obj.nc.functions.processors.senders.MailchimpSender;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import static com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig.MAILCHIMP_RESPONSE_FIELD;
+import static com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig.MAILCHIMP_REST_TEMPLATE;
+import static com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfig.SEND_TEMPLATE_PATH;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,27 +10,45 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderConfig.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.message.MailChimpMessage;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+import com.obj.nc.functions.processors.senders.MailchimpSender;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpRecipientDto;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpSendTemplateRequest;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpSendTemplateResponse;
 
 @DocumentProcessingInfo("SendMailchimpMessage")
-public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<Message, Message> implements MailchimpSender {
+public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<MailChimpMessage, MailChimpMessage> implements MailchimpSender {
 	
 	@Qualifier(MAILCHIMP_REST_TEMPLATE)
 	@Autowired private RestTemplate restTemplate;
 	@Autowired private MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(Message payload) {
+	protected Optional<PayloadValidationException> checkPreCondition(MailChimpMessage payload) {
 		if (payload == null) {
 			return Optional.of(new PayloadValidationException("Message must not be null"));
 		}
 		
-		if (payload.getContentTyped() == null) {
+		MailchimpContent content = payload.getBody();
+		if (content == null) {
 			return Optional.of(new PayloadValidationException("Message content must not be null"));
 		}
 		
-		boolean hasNoneOrTooMuchEndpoints = payload.getBody().getRecievingEndpoints().size() != 1;
-		boolean containsNonEmailEndpoint = payload.getBody().getRecievingEndpoints().stream()
+		boolean hasNoneOrTooMuchEndpoints = payload.getRecievingEndpoints().size() != 1;
+		boolean containsNonEmailEndpoint = payload.getRecievingEndpoints().stream()
 				.anyMatch(endpoint -> !MailchimpEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType()));
 		
 		if (hasNoneOrTooMuchEndpoints || containsNonEmailEndpoint) {
@@ -55,20 +59,19 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 	}
 
 	@Override
-	protected Message execute(Message payload) {
-		MailchimpContent content = payload.getContentTyped();
+	protected MailChimpMessage execute(MailChimpMessage payload) {
+		MailchimpContent content = payload.getBody();
+		content.setRecipients(mapRecipient(payload.getRecievingEndpoints().get(0)));
 		
-		MailchimpContentDto dto = MailchimpContentDto.from(content, mailchimpSenderConfigProperties.getAuthKey());
-		dto.getMessage().setTo(mapRecipient(payload.getBody().getRecievingEndpoints().get(0)));
-		
-		List<MailchimpResponseDto> mailchimpResponseDtos = doSendMessage(dto);
-		payload.getBody().setAttributeValue(MAILCHIMP_RESPONSE_FIELD, mailchimpResponseDtos);
+		MailchimpSendTemplateRequest dto = MailchimpSendTemplateRequest.from(content, mailchimpSenderConfigProperties.getAuthKey());
+		List<MailchimpSendTemplateResponse> mailchimpSendTemplateResponses = doSendMessage(dto);
+		payload.getBody().setAttributeValue(MAILCHIMP_RESPONSE_FIELD, mailchimpSendTemplateResponses);
 		
 		return payload;
 	}
 	
-	public List<MailchimpResponseDto> doSendMessage(MailchimpContentDto contentDto) {
-		ResponseEntity<MailchimpResponseDto[]> responseEntity = restTemplate.postForEntity(SEND_TEMPLATE_PATH, contentDto, MailchimpResponseDto[].class);
+	public List<MailchimpSendTemplateResponse> doSendMessage(MailchimpSendTemplateRequest contentDto) {
+		ResponseEntity<MailchimpSendTemplateResponse[]> responseEntity = restTemplate.postForEntity(SEND_TEMPLATE_PATH, contentDto, MailchimpSendTemplateResponse[].class);
 		
 		if (responseEntity.getBody() == null) {
 			throw new RestClientException("Response body must not be null");
@@ -81,19 +84,19 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 		return restTemplate;
 	}
 	
-	public List<MailchimpRecipient> mapRecipient(RecievingEndpoint endpoint) {
-		List<MailchimpRecipient> recipientInList = new ArrayList<>();
-		
+	public List<MailchimpRecipientDto> mapRecipient(RecievingEndpoint endpoint) {
+		List<MailchimpRecipientDto> recipientInList = new ArrayList<>();
+
 		if (!MailchimpEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType())) {
 			throw new UnsupportedOperationException("Mapper can only map MailChimpEndpoint endpoint");
 		}
-		
-		MailchimpRecipient recipient = new MailchimpRecipient();
-		
+
+		MailchimpRecipientDto recipient = new MailchimpRecipientDto();
+
 		MailchimpEndpoint mailChimpEndpoint = (MailchimpEndpoint) endpoint;
 		recipient.setName(mailChimpEndpoint.getRecipient().getName());
 		recipient.setEmail(mailChimpEndpoint.getEmail());
-		
+
 		recipientInList.add(recipient);
 		return recipientInList;
 	}

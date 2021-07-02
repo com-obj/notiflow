@@ -1,5 +1,7 @@
 package com.obj.nc.flows.errorHandling;
 
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +22,7 @@ import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.config.EnableIntegrationManagement;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -34,6 +38,7 @@ import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.controllers.ErrorHandlingRestController;
+import com.obj.nc.flows.errorHandling.ErrorHandlingTests.TestModeTestConfiguration.TestFlow1;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
 import com.obj.nc.repositories.FailedPayloadRepository;
 
@@ -43,13 +48,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
+@SpringBootTest(properties = "test-flow-gateway=true") //this is strange, if I don't make TestFlow1 conditional, some unrelated test fail because they don't see testInputChannel1
 public class ErrorHandlingTests {
 
 	@Autowired FailedPayloadRepository failedPayloadRepo;
 	@Autowired TestFlow1 testFlow1;
 	@Autowired ErrorHandlingRestController errorHandlingController;
-	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
+	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
 	
 	private static boolean processingFinished;
 	
@@ -107,19 +113,22 @@ public class ErrorHandlingTests {
             		.get();
         }
         
-        @Bean
+        @Bean(name = "testInputChannel1")
         public MessageChannel testInputChannel1() {
         	return new PublishSubscribeChannel();
         }
+        
+        @MessagingGateway(name = "TestFlow1", errorChannel = ErrorHandlingFlowConfig.ERROR_CHANNEL_NAME)
+        @ConditionalOnProperty(value = "test-flow-gateway", havingValue = "true")
+        public static interface TestFlow1 {
+        	
+        	@Gateway(requestChannel = "testInputChannel1")
+        	Future<TestPayload> execute(TestPayload payload);
+        	
+        }
+
     }
     
-    @MessagingGateway(name = "TestFlow1", errorChannel = ErrorHandlingFlowConfig.ERROR_CHANNEL_NAME)
-    public interface TestFlow1 {
-    	
-    	@Gateway(requestChannel = "testInputChannel1")
-    	Future<TestPayload> execute(TestPayload payload);
-    	
-    }
     
     @Data
     @AllArgsConstructor

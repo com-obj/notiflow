@@ -1,0 +1,32 @@
+{
+	"type": "INTENT",
+	"header": {
+		"eventIds": [
+			"0c3f159f-103e-49fd-8eb1-f4b6de481acb"
+		]
+	},
+	"body": {
+		"body": "Text",
+		"subject": "Subject",
+		"attachments": [
+			{
+				"name": "name.extension",
+				"file-URI": "http://domain/location/name.extension"
+			},
+			{
+				"name": "name.extension",
+				"file-URI": "http://domain/location/name.extension"
+			}
+		]
+	},
+	"recievingEndpoints": [
+		{
+			"@type": "EMAIL",
+			"email": "john.doe@objectify.sk"
+		},
+		{
+			"@type": "EMAIL",
+			"email": "john.dudly@objectify.sk"
+		}
+	]
+}

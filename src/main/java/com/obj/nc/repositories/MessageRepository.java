@@ -1,13 +1,16 @@
 package com.obj.nc.repositories;
 
-import com.obj.nc.domain.message.Message;
-import org.springframework.data.repository.CrudRepository;
-
 import java.util.List;
 import java.util.UUID;
 
-public interface MessageRepository extends CrudRepository<Message, UUID> {
+import org.springframework.data.repository.CrudRepository;
 
-	List<Message> findByIdIn(List<UUID> intentIds);
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.MessagePersistantState;
 
+public interface MessageRepository extends CrudRepository<MessagePersistantState, UUID> {
+
+	
+	List<MessagePersistantState> findByIdIn(List<UUID> intentIds);
 }

@@ -1,5 +1,6 @@
 package com.obj.nc.repositories;
 
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.messaging.Message;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -25,11 +27,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 public class FailedPaylodRepositoryTest {
 
 	@Autowired FailedPayloadRepository failedPaylaodRepo;
-	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
+	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
 	
 	@Test
 	public void testPersistingSingleInfo() {

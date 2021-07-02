@@ -1,6 +1,6 @@
 package com.obj.nc.flows.testmode;
 
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
 import static com.obj.nc.flows.testmode.sms.config.TestModeSmsFlowConfig.TEST_MODE_SMS_SOURCE_BEAN_NAME;
@@ -49,7 +49,10 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.EmailMessageTemplated;
+import com.obj.nc.domain.message.SmsMessage;
+import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig;
 import com.obj.nc.flows.testmode.email.config.TestModeGreenMailProperties;
@@ -70,7 +73,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
 	@Autowired private GreenMail testModeEmailsReciver;
     
-    @Qualifier(EMAIL_FROMAT_AND_SEND_INPUT_CHANNEL_ID)
+    @Qualifier(EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID)
     @Autowired private MessageChannel emailProcessingInputChannel;
     @Qualifier(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID)
     @Autowired private MessageChannel smsProcessingInputChannel;
@@ -113,9 +116,9 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     	
     	
         // GIVEN
-        Message message1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", Message.class);
-        Message message2 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message2.json", Message.class);
-        Message message3 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message3.json", Message.class);
+    	EmailMessage message1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", EmailMessage.class);
+    	EmailMessage message2 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message2.json", EmailMessage.class);
+    	EmailMessage message3 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message3.json", EmailMessage.class);
         
         //WHEN
         emailSender.apply(message1);
@@ -128,7 +131,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         MimeMessage[] inputMimeMessages = testModeEmailsReciver.getReceivedMessages();
         Assertions.assertThat(inputMimeMessages.length).isEqualTo(3);
 
-        List<Message> messages = greenMailReceiverSourceSupplier.get();
+        List<EmailMessage> messages = greenMailReceiverSourceSupplier.get();
 //        List<Message> messages = messagesWrapped.getMessages();
 
         // WHEN Simulate further aggregation processing
@@ -149,9 +152,9 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         System.out.println(GreenMailUtil.getWholeMessage(msg));
         
         
-        EmailContent aggregated1 = message1.getContentTyped();
-        EmailContent aggregated2 = message2.getContentTyped();
-        EmailContent aggregated3 = message3.getContentTyped();
+        EmailContent aggregated1 = message1.getBody();
+        EmailContent aggregated2 = message2.getBody();
+        EmailContent aggregated3 = message3.getBody();
         Assertions.assertThat(msg.getSubject()).isEqualTo("Notifications digest while running test mode");
 
         Assertions.assertThat(GreenMailUtil.getBody(msg)).contains(
@@ -171,20 +174,20 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     @Test
     void testSendEmailAndSmsDigestInOneEmail() {
         // GIVEN
-        Message inputEmail = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", Message.class);
-        Message inputSms = JsonUtils.readObjectFromClassPathResource("messages/templated/txt_template_message_en_de.json", Message.class);
+    	EmailMessageTemplated<?> inputEmail = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", EmailMessageTemplated.class);
+    	SmsMessageTemplated<?> inputSms = JsonUtils.readObjectFromClassPathResource("messages/templated/txt_template_message_en_de.json", SmsMessageTemplated.class);
     
         //AND GIVEN RECEIVED EMAILs
         emailProcessingInputChannel.send(new GenericMessage<>(inputEmail));
         testModeEmailsReciver.waitForIncomingEmail(1);
-        List<Message> receivedEmailMessages = greenMailReceiverSourceSupplier.get();
+        List<EmailMessage> receivedEmailMessages = greenMailReceiverSourceSupplier.get();
         Assertions.assertThat(receivedEmailMessages).hasSize(1);
         MessageSource<?> emailMessageSource = () -> new GenericMessage<>(receivedEmailMessages);
     
         // AND RECEIVED SMSs
         smsProcessingInputChannel.send(new GenericMessage<>(inputSms));
         await().atMost(10, TimeUnit.SECONDS).until(() -> smsSourceSupplier.getReceivedCount() >= 1);
-        List<Message> receivedSmsMessages = Stream.generate(smsSourceSupplier).limit(10).filter(Objects::nonNull).collect(Collectors.toList());
+        List<SmsMessage> receivedSmsMessages = Stream.generate(smsSourceSupplier).limit(10).filter(Objects::nonNull).collect(Collectors.toList());
         Assertions.assertThat(receivedSmsMessages).hasSize(2);
         MessageSource<?> smsMessageSource = () -> new GenericMessage<>(receivedSmsMessages);
     

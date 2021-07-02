@@ -1,7 +1,7 @@
 package com.obj.nc.controllers;
 
-import java.util.Optional;
-
+import com.obj.nc.functions.processors.eventValidator.GenericEventJsonSchemaValidator;
+import com.obj.nc.functions.processors.eventValidator.SimpleJsonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.relational.core.conversion.DbActionExecutionException;
@@ -17,7 +17,6 @@ import com.obj.nc.domain.event.EventRecieverResponce;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
-import com.obj.nc.utils.JsonUtils;
 
 @Validated
 @RestController
@@ -26,18 +25,28 @@ public class EventReceiverRestController {
 
 	@Autowired
 	private GenericEventPersisterConsumer persister;
+	@Autowired
+	private SimpleJsonValidator simpleJsonValidator;
+	@Autowired
+	private GenericEventJsonSchemaValidator jsonSchemaValidator;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
-    public EventRecieverResponce emitJobPostEvent(
+    public EventRecieverResponce persistGenericEvent(
     		@RequestBody(required = true) String eventJsonString, 
     		@RequestParam(value = "flowId", required = false) String flowId,
-    		@RequestParam(value = "externalId", required = false) String externalId) {
-    	
-     	JsonNode eventJson = checkIfJsonValidAndReturn(eventJsonString);
-     	
-    	GenericEvent event = GenericEvent.from(eventJson);
+    		@RequestParam(value = "externalId", required = false) String externalId,
+			@RequestParam(value = "payloadType", required = false) String payloadType) {
+		
+		JsonNode eventJson = simpleJsonValidator.apply(eventJsonString);
+		
+		GenericEvent event = GenericEvent.from(eventJson);
     	event.overrideFlowIdIfApplicable(flowId);
     	event.overrideExternalIdIfApplicable(externalId);
+    	event.overridePayloadTypeIfApplicable(payloadType);
+		
+		if (payloadType != null) {
+			event = jsonSchemaValidator.apply(event);
+		}
 
     	try {
     		persister.accept(event);
@@ -49,15 +58,5 @@ public class EventReceiverRestController {
 
     	return EventRecieverResponce.from(event.getId());
     }
-
-	private JsonNode checkIfJsonValidAndReturn(String eventJson) {
-		Optional<String> jsonProblems = JsonUtils.checkValidAndGetError(eventJson);
-    	if (jsonProblems.isPresent()) {
-    		throw new PayloadValidationException(jsonProblems.get());
-    	}
-    	
-    	return JsonUtils.readJsonNodeFromJSONString(eventJson);
-	}
-
 
 }
