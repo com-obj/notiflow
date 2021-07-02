@@ -40,7 +40,7 @@ public class ExtensionsBasedEventConvertor extends ProcessorFunctionAdapter<Gene
 		
 		for (InputEventConverterExtension<? extends IsNotification> p: eventProcessors) {
 			Optional<PayloadValidationException> errors = p.canHandle(payload);
-			if (errors.isEmpty()) {
+			if (!errors.isPresent()) {
 				matchingProcessors.add(p);
 				continue;
 			} 
