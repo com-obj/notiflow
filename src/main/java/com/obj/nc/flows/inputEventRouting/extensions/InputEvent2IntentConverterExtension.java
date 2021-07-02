@@ -2,6 +2,6 @@ package com.obj.nc.flows.inputEventRouting.extensions;
 
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 
-public interface GenericEvent2InventProcessorExtension extends EventProcessorExtension<NotificationIntent> {
+public interface InputEvent2IntentConverterExtension extends InputEventConverterExtension<NotificationIntent> {
 	
 }

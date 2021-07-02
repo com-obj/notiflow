@@ -5,6 +5,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
@@ -19,7 +20,7 @@ import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SmstMessage;
+import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
 
@@ -53,7 +54,7 @@ import lombok.extern.log4j.Log4j2;
  *
  * @param <BODY_TYPE>
  */
-public class NotificationIntent extends BasePayload<IntentContent> {
+public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "INTENT";
 	
@@ -61,6 +62,13 @@ public class NotificationIntent extends BasePayload<IntentContent> {
 	@JsonIgnore
 	public String getPayloadTypeName() {
 		return JSON_TYPE_IDENTIFIER;
+	}
+	
+	public static NotificationIntent createWithStaticContent(String subject, String body, RecievingEndpoint ... endpoints) {
+		NotificationIntent intent = new NotificationIntent();	
+		intent.setBody(IntentContent.createStaticContent(subject,body));
+		intent.addRecievingEndpoints(endpoints);
+		return intent;
 	}
 	
 	public Message<?> createMessage(RecievingEndpoint endpointsForOneSubject) {
@@ -74,7 +82,7 @@ public class NotificationIntent extends BasePayload<IntentContent> {
 		} 
 		
 		if (msgContent instanceof SimpleTextContent) {
-			SmstMessage sms = new SmstMessage();
+			SmsMessage sms = new SmsMessage();
 			sms.setBody((SimpleTextContent)msgContent);
 			
 			return sms;
@@ -105,6 +113,7 @@ public class NotificationIntent extends BasePayload<IntentContent> {
 		throw new NotImplementedException("Add additional cases");
 
 	}
+
 
 	
 }

@@ -20,7 +20,7 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 @Log4j2
 @DocumentProcessingInfo("GenerateMessagesFromIntent")
-public class MessagesFromNotificationIntentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent, List<? extends Message<?>>> {
+public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<NotificationIntent, List<? extends Message<?>>> {
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent notificationIntent) {

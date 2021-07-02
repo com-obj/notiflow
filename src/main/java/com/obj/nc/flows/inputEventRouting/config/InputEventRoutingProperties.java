@@ -20,6 +20,6 @@ public class InputEventRoutingProperties {
     private Map<String,String> typeChannelMapping;
     
     /*if type = PAYLOAD_TYPE. */
-    private String typeProperyName = "@type";
+    private String typeProperyName = "@routing-type";
 
 }

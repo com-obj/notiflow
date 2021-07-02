@@ -40,7 +40,7 @@ import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromNotificationIntentProcessingFunction;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sources.genericEvents.GenericEventsSupplier;
 import com.obj.nc.repositories.GenericEventRepository;
@@ -63,7 +63,7 @@ public class ProcessingInfoGeneratorTest {
 	@Autowired GenericEventRepository eventRepository;
 	@Autowired private GenerateEventIdProcessingFunction generateEventId;
     @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
-    @Autowired private MessagesFromNotificationIntentProcessingFunction generateMessagesFromIntent;
+    @Autowired private MessagesFromIntentGenerator generateMessagesFromIntent;
     @Autowired private EmailSender functionSend;
     @Autowired private JdbcTemplate jdbcTemplate;
     @Autowired private ProcessingInfoRepository procInfoRepo;

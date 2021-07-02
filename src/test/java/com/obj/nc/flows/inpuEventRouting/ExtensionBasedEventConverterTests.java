@@ -31,12 +31,16 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.flows.inputEventRouting.extensions.GenericEvent2MessageProcessorExtension;
+import com.obj.nc.flows.inputEventRouting.extensions.InputEventConverterExtension;
+import com.obj.nc.flows.inputEventRouting.extensions.InputEvent2IntentConverterExtension;
+import com.obj.nc.flows.inputEventRouting.extensions.InputEvent2MessageConverterExtension;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
@@ -86,7 +90,8 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
         persister.accept(event);
              
         //THEN
-        awaitSent(event.getId(), 1, Duration.ofSeconds(5));
+        //one EmailMessage and one Intent resulting into second and third EmailMessage should be generated
+        awaitSent(event.getId(), 3, Duration.ofSeconds(5));
     }
     
     @AfterEach
@@ -95,18 +100,19 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
     }
 
     @TestConfiguration
-    public static class EventToMessageExtensionConfiguration {
+    public static class EventConvertionExtensionConfiguration {
 
         @Bean
-        public GenericEvent2MessageProcessorExtension event2Message() {
-            return new GenericEvent2MessageProcessorExtension () {
+        public InputEvent2MessageConverterExtension event2Message() {
+            return new InputEvent2MessageConverterExtension () {
 
 				@Override
-				public Optional<PayloadValidationException> checkPreCondition(GenericEvent payload) {
-					if (!(payload.getPayloadAsPojo() instanceof TestPayload)) {
-						return Optional.of(new PayloadValidationException("No test payload"));
+				public Optional<PayloadValidationException> canHandle(GenericEvent payload) {
+					if (payload.getPayloadAsPojo() instanceof TestPayload) {
+						return Optional.empty();
 					}
-					return Optional.empty();
+					
+					return Optional.of(new PayloadValidationException("No test payload"));					
 				}
 
 				@Override
@@ -119,6 +125,34 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 					List<com.obj.nc.domain.message.Message<?>> msg = Arrays.asList(email1);
 
 					return msg;
+				}            	
+            };
+        }
+        
+        @Bean
+        public InputEvent2IntentConverterExtension event2Intent() {
+            return new InputEvent2IntentConverterExtension () {
+
+				@Override
+				public Optional<PayloadValidationException> canHandle(GenericEvent payload) {
+					if (payload.getPayloadAsPojo() instanceof TestPayload) {
+						return Optional.empty();
+					}
+					
+					return Optional.of(new PayloadValidationException("No test payload"));					
+				}
+
+				@Override
+				public List<NotificationIntent> convertEvent(GenericEvent event) {
+					NotificationIntent email1Intent = NotificationIntent.createWithStaticContent(
+							"Subject", 
+							"Text", 
+							EmailEndpoint.builder().email("test@objectify.sk").build(),
+							EmailEndpoint.builder().email("test2@objectify.sk").build()
+					);
+					List<NotificationIntent> intents = Arrays.asList(email1Intent);
+
+					return intents;
 				}            	
             };
         }
