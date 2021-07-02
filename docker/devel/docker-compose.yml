@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  nc-postgres:
+    image: postgres:11.9
+#    restart: always
+    environment:
+      POSTGRES_DB: nc
+      POSTGRES_USER: nc
+      POSTGRES_PASSWORD: ZMss4o9mdBLV
+    expose:
+      - 5432
+    ports:
+      - 25432:5432
