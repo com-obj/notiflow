@@ -1,16 +1,21 @@
 package com.obj.nc.controllers;
 
 import com.jayway.jsonpath.JsonPath;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.message.MessagePersistantState;
+import com.obj.nc.repositories.MessageRepository;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
+import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -18,6 +23,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,7 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @DirtiesContext
 class MessageReceiverTest extends BaseIntegrationTest {
-	@Autowired protected MockMvc mockMvc;
+    @Autowired private MessageRepository messageRepository;
+	@Autowired private MockMvc mockMvc;
 
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
@@ -55,6 +65,17 @@ class MessageReceiverTest extends BaseIntegrationTest {
         
         String messageId = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.ncMessageId");
         Assertions.assertThat(messageId).isNotNull();
+    
+        //and then
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
+            Optional<MessagePersistantState> message = messageRepository.findById(UUID.fromString(messageId));
+            return message.isPresent();
+        });
+    
+        Optional<MessagePersistantState> message = messageRepository.findById(UUID.fromString(messageId));
+        Assertions.assertThat(message.isPresent()).isTrue();
+        Assertions.assertThat(message.get().getBody()).isInstanceOf(EmailContent.class);
+        Assertions.assertThat(((EmailContent) message.get().getBody()).getContentType()).isEqualTo(MediaType.TEXT_HTML_VALUE);
     }
     
     @Test
