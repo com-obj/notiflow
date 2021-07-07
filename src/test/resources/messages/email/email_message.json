@@ -1,0 +1,14 @@
+{
+  "subject" : "SUBJECT",
+  "html" : "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Notification center test mode digest email</title>\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n  </head>\n    <body>\n    \t<p>\n    \t\t<span>This is digest of messages which would have been send to recipients if you would not run notification center in the test mode</span>\n    \t</p>\n    \t\n    \t<h3>Emails</h3>\n\t\t    <table border=\"1\" cellpadding=\"5\" style=\"border-collapse:collapse; border: 1px solid gray;\">\t\t\n\t\t\t    <thead>\n\t\t\t        <tr>\n\t\t\t            <th>Recipient</th>\n\t\t\t            <th>Subject</th>\n\t\t\t            <th>Message</th>\n\t\t\t            <th>Attachments</th>\n\t\t\t        </tr>\n\t\t\t    </thead>\n\t\t\t    <tbody>\n\t\t\t     \t<tr>\n\t\t\t            <td><span>hahn@orange.sk</span></td>\n\t\t\t            <td><span>Informácia o možnom výpadku služieb.</span></td>\n\t\t\t            <td>                     \t\t\n\t\t\t            \t\t<span style=\"white-space: pre\"><div>\n<p>Milý kolega,</p>\n<p>\n\t<span style=\"font-weight:bold\">01.01.2021 o 21:00</span>\n\t<span> došlo k výpadku, ktorý môže mať dopad na zákazníkov a ich služby:</span>\n</p>    </body>\n</html>",
+  "to" : [
+    {
+      "email" : "john.doe@objectify.sk",
+      "name" : "John Doe"
+    },
+    {
+      "email" : "john.dudly@objectify.sk",
+      "name" : "John Dudly"
+    }
+  ]
+}
