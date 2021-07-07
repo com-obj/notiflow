@@ -17,7 +17,7 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-@DocumentProcessingInfo("extensionsBasedEventConvertor")
+@DocumentProcessingInfo("ExtensionsBasedEventConvertor")
 @AllArgsConstructor
 @Log4j2
 public class ExtensionsBasedEventConvertor extends ProcessorFunctionAdapter<GenericEvent, List<IsNotification>> {
