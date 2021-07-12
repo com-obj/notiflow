@@ -3,6 +3,7 @@ package com.obj.nc.domain.event;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.obj.nc.exceptions.PayloadValidationException;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -34,7 +35,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Table("nc_event")
 @Builder
-public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayload, HasHeader, AfterLoadCallback<GenericEvent> {
+public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayload, HasHeader/*, AfterLoadCallback<GenericEvent>*/ {
 	
 	public static final String DEFUALT_FLOW_ID = "default-flow"; 
 	
@@ -73,8 +74,16 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	}
 	
 	public void syncHeaderFields() {
+		if (flowId == null) {
+			throw new PayloadValidationException("FlowId of GenericEvent must not be null");
+		}
 		getHeader().setFlowId(flowId);
-		getHeader().addEventId(id);
+		if (id == null) {
+			throw new PayloadValidationException("Id of GenericEvent must not be null");
+		}
+		if (!getHeader().getEventIds().contains(id)) {
+			getHeader().addEventId(id);
+		}
 	}
 	
 	public String getFlowId() {
@@ -125,12 +134,12 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	public <T extends IsTypedJson> T getPayloadAsPojo() {
 		return (T)JsonUtils.readObjectFromJSON(payloadJson, IsTypedJson.class);
 	}
-
+/*
 	@Override
 	//TODO: need to register
 	public GenericEvent onAfterLoad(GenericEvent aggregate) {
 		aggregate.syncHeaderFields();
 		return aggregate;
 	}
-	
+*/
 }

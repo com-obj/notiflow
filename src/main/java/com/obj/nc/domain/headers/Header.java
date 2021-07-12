@@ -55,29 +55,10 @@ public class Header extends BaseJSONObject implements HasFlowId, HasEventIds, Ha
 		BeanUtils.copyProperties(header, this);
 	}
 
-	public Header merge(Header other) {
-		Header merged = new Header();
-
-		merged.setAttributes(this.getAttributes());
-		other.getAttributes().forEach((key, value) -> merged.getAttributes().putIfAbsent(key, value));
-
-		merged.flowId = other.flowId;
-
-		merged.eventIds = other.eventIds;
-		merged.eventIds.addAll(other.getEventIds());
-
-		return merged;
-	}
-
-	public String eventIdsAsJSONString() {
-		return JsonUtils.writeObjectToJSONString(eventIds);
-	}
-
 	@JsonIgnore
 	@Column("event_ids")
 	public void setEventIdsAsArray(UUID[] eventIds) {
-		this.eventIds.clear();
-		this.eventIds.addAll(Arrays.asList(eventIds));
+		setEventIds(Arrays.asList(eventIds));
 	}
 	
 	public void setEventIds(List<UUID> eventIds) {
