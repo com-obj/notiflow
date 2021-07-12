@@ -1,5 +1,6 @@
 package com.obj.nc.config;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.obj.nc.security.model.AuthenticationError;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -59,6 +60,8 @@ public class SpringMvcConfig {
     public ObjectMapper objectMapper() {       
         ObjectMapper mapper = new ObjectMapper();
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return mapper;
     }
 }
