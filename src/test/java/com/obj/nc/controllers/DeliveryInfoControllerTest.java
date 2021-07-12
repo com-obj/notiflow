@@ -1,18 +1,23 @@
 package com.obj.nc.controllers;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import com.jayway.jsonpath.JsonPath;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistantState;
 import com.obj.nc.repositories.MessageRepository;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,14 +135,18 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
         		.andDo(MockMvcResultHandlers.print());
         
         //THEN
-        resp
+		
+		resp
         	.andExpect(status().is2xxSuccessful())
 			.andExpect(jsonPath("$[0].currentStatus").value(CoreMatchers.is("SENT")))
-			.andExpect(jsonPath("$[0].statusReachedAt").value(CoreMatchers.notNullValue()))
 			.andExpect(jsonPath("$[0].endpoint.email").value(CoreMatchers.is("jancuzy@gmail.com")))
 			.andExpect(jsonPath("$[0].endpoint.endpointId").value(CoreMatchers.is("jancuzy@gmail.com")))
-			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL")));
-    }
+			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL"))).andReturn();
+	
+		String statusReachedAt = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$[0].statusReachedAt");
+		SimpleDateFormat ISO8601DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.mmm'Z'");
+		Assertions.assertThat(ISO8601DATEFORMAT.parse(statusReachedAt)).isNotNull();
+	}
 	
 	@Test
 	void testReadMessageDeliveryInfoUpdate() throws Exception {
