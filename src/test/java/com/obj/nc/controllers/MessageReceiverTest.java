@@ -24,9 +24,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -68,14 +71,23 @@ class MessageReceiverTest extends BaseIntegrationTest {
     
         //and then
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
-            Optional<MessagePersistantState> message = messageRepository.findById(UUID.fromString(messageId));
-            return message.isPresent();
+            List<MessagePersistantState> messages = StreamSupport
+                    .stream(messageRepository.findAll().spliterator(), false)
+                    .collect(Collectors.toList());
+            return messages.size() >= 2;
         });
     
-        Optional<MessagePersistantState> message = messageRepository.findById(UUID.fromString(messageId));
-        Assertions.assertThat(message.isPresent()).isTrue();
-        Assertions.assertThat(message.get().getBody()).isInstanceOf(EmailContent.class);
-        Assertions.assertThat(((EmailContent) message.get().getBody()).getContentType()).isEqualTo(MediaType.TEXT_HTML_VALUE);
+        List<MessagePersistantState> messages = StreamSupport
+                .stream(messageRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+        
+        Assertions.assertThat(messages).hasSize(2);
+        
+        Assertions.assertThat(messages.get(0).getBody()).isInstanceOf(EmailContent.class);
+        Assertions.assertThat(((EmailContent) messages.get(0).getBody()).getContentType()).isEqualTo(MediaType.TEXT_HTML_VALUE);
+        
+        Assertions.assertThat(messages.get(1).getBody()).isInstanceOf(EmailContent.class);
+        Assertions.assertThat(((EmailContent) messages.get(1).getBody()).getContentType()).isEqualTo(MediaType.TEXT_HTML_VALUE);
     }
     
     @Test
