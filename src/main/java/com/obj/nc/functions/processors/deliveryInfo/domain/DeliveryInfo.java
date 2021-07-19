@@ -47,7 +47,6 @@ public class DeliveryInfo implements Persistable<UUID> {
 	@Getter
 	private Instant processedOn;
 	
-	@NotNull
 	private UUID eventId;
 	
 	@NotNull
