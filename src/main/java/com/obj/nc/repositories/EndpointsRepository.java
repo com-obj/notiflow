@@ -1,6 +1,7 @@
 package com.obj.nc.repositories;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -70,27 +71,28 @@ public class EndpointsRepository {
     	String inSql = String.join(",", Collections.nCopies(endpointIds.length, "?"));
     	query = String.format(query, inSql);
     	
-    	List<RecievingEndpoint> endpoints = jdbcTemplate.query(query,
-        		(rs, rowNum) -> {
-        	    	  String epType = rs.getString("endpoint_type");
-        	    	  
-        	    	  if (EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
-                          EmailEndpoint emailEndpoint = new EmailEndpoint(rs.getString("endpoint_name"));
-                          emailEndpoint.setId((UUID)rs.getObject("id"));
-                          return emailEndpoint;
-        	    	  } else if (SmsEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
-                          SmsEndpoint smsEndpoint = new SmsEndpoint(rs.getString("endpoint_name"));
-                          smsEndpoint.setId((UUID)rs.getObject("id"));
-                          return smsEndpoint;
-        	    	  } else {
-        	    		  throw new RuntimeException("Uknown endpoint type for EndpointsRepository: "+ epType);
-        	    	  }
-
-        	   } 
-        	, (Object[])endpointIds
-        );
+        return jdbcTemplate.query(query, EndpointsRepository::mapRow, (Object[])endpointIds);
+    }
+    
+    public List<RecievingEndpoint> findAll() {
+        String query = "select id, endpoint_name, endpoint_type from nc_endpoint ";
+        return jdbcTemplate.query(query, EndpointsRepository::mapRow);
+    }
+    
+    private static RecievingEndpoint mapRow(ResultSet rs, int rowNum) throws SQLException {
+        String epType = rs.getString("endpoint_type");
         
-        return endpoints;
+        if (EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
+            EmailEndpoint emailEndpoint = new EmailEndpoint(rs.getString("endpoint_name"));
+            emailEndpoint.setId((UUID) rs.getObject("id"));
+            return emailEndpoint;
+        } else if (SmsEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
+            SmsEndpoint smsEndpoint = new SmsEndpoint(rs.getString("endpoint_name"));
+            smsEndpoint.setId((UUID) rs.getObject("id"));
+            return smsEndpoint;
+        } else {
+            throw new RuntimeException("Uknown endpoint type for EndpointsRepository: " + epType);
+        }
     }
     
     public void persistEnpointIfNotExists(RecievingEndpoint ednpoint) {
