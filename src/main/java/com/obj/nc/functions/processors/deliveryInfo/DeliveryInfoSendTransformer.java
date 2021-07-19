@@ -41,17 +41,25 @@ public class DeliveryInfoSendTransformer extends ProcessorFunctionAdapter<Delive
 	private List<DeliveryInfo> createFromSendResults(DeliveryInfoSendResult sendResult) {
 		List<DeliveryInfo> resultInfos = new ArrayList<>();
 		
-		for (UUID eventId: sendResult.getEventIds()) {
-
+		UUID[] eventIds = sendResult.getEventIds();
+		
+		if (eventIds.length == 0) {
 			DeliveryInfo info = DeliveryInfo.builder()
-				.endpointId(sendResult.getRecievingEndpoint().getId())
-				.eventId(eventId)
-				.messageId(sendResult.getMessageId())
-				.status(sendResult.getStatus())
-				.build();
-			
+					.endpointId(sendResult.getRecievingEndpoint().getId())
+					.messageId(sendResult.getMessageId())
+					.status(sendResult.getStatus())
+					.build();
 			resultInfos.add(info);
-
+		} else {
+			for (UUID eventId: eventIds) {
+				DeliveryInfo info = DeliveryInfo.builder()
+						.endpointId(sendResult.getRecievingEndpoint().getId())
+						.eventId(eventId)
+						.messageId(sendResult.getMessageId())
+						.status(sendResult.getStatus())
+						.build();
+				resultInfos.add(info);
+			}
 		}
 		return resultInfos;
 	}
