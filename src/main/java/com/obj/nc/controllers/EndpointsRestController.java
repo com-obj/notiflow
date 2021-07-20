@@ -10,14 +10,13 @@ import com.obj.nc.repositories.EndpointsRepository;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.*;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toCollection;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -31,8 +30,21 @@ public class EndpointsRestController {
     private final EndpointsRepository endpointRepository;
     private final DeliveryInfoRepository deliveryInfoRepository;
     
-    @GetMapping(value = "/all", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public List<EndpointDto> findAllEndpoints() {
+    @GetMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public List<EndpointDto> findEndpointsWithMessageTypeInDateRange(
+            @RequestParam(value = "startAt", required = false) /*@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) */Instant startAt, 
+            @RequestParam(value = "endAt", required = false)/* @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)*/ Instant endAt,
+            @RequestParam(value = "messageType", required = false) String messageType,
+            @RequestParam(value = "deliveryStatus", required = false) DELIVERY_STATUS deliveryStatus) {
+        
+        return findAllEndpoints().stream()
+                .filter(endpoint -> endpoint.hasMessageInDateRange(startAt, endAt))
+                .filter(endpoint -> endpoint.matchesMessageType(messageType))
+                .filter(endpoint -> endpoint.hasMessageWithDeliveryStatus(deliveryStatus))
+                .collect(toList());
+    }
+    
+    private List<EndpointDto> findAllEndpoints() {
         List<RecievingEndpoint> receivingEndpoints = endpointRepository.findAll();
         
         List<EndpointDto> endpointDtos = EndpointDto.from(receivingEndpoints);
@@ -44,33 +56,6 @@ public class EndpointsRestController {
                 });
         
         return endpointDtos;
-    }
-    
-    @GetMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public List<EndpointDto> findEndpointsWithMessageTypeInDateRange(
-            @RequestParam(value = "startAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant startAtParam, 
-            @RequestParam(value = "endAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant endAtParam,
-            @RequestParam(value = "messageType", required = false) String messageTypeParam,
-            @RequestParam(value = "deliveryStatus", required = false) DELIVERY_STATUS statusParam) {
-        
-        Instant startAt = startAtParam == null ? Instant.MIN : startAtParam;
-        Instant endAt = endAtParam == null ? Instant.MAX : endAtParam;
-        
-        return findAllEndpoints().stream()
-                .filter(endpoint -> endpointMatchesMessageType(endpoint, messageTypeParam))
-                .filter(endpoint -> endpointHasMessageMatchingConditions(endpoint, startAt, endAt, statusParam))
-                .collect(Collectors.toList());
-    }
-    
-    private boolean endpointMatchesMessageType(EndpointDto endpoint, String messageType) {
-        return messageType == null || messageType.equals(endpoint.getType());
-    }
-    
-    private boolean endpointHasMessageMatchingConditions(EndpointDto endpoint, Instant startAt, Instant endAt, DELIVERY_STATUS status) {
-        return endpoint.getInfosPerStatus().stream()
-                .filter(infosPerStatus -> status == null || status.equals(infosPerStatus.getStatus()))
-                .flatMap(infosPerStatus -> infosPerStatus.getDeliveryInfos().stream())
-                .anyMatch(deliveryInfo -> startAt.isBefore(deliveryInfo.getProcessedOn()) && endAt.isAfter(deliveryInfo.getProcessedOn()));
     }
     
     @Data
@@ -90,7 +75,34 @@ public class EndpointsRestController {
                                 .type(receivingEndpoint.getEndpointType())
                                 .build()
                     )
-                    .collect(Collectors.toList());
+                    .collect(toList());
+        }
+    
+        public boolean hasMessageInDateRange(Instant startAt, Instant endAt) {
+            List<DeliveryInfo> deliveryInfos = getInfosPerStatus().stream()
+                    .flatMap(infosPerStatus -> infosPerStatus.getDeliveryInfos().stream())
+                    .collect(toList());
+            
+            boolean afterStart = startAt == null;
+            afterStart |= startAt != null && deliveryInfos.stream()
+                    .anyMatch(deliveryInfo -> startAt.isBefore(deliveryInfo.getProcessedOn()));
+    
+            boolean beforeEnd = endAt == null;
+            beforeEnd |= endAt != null && deliveryInfos.stream()
+                    .anyMatch(deliveryInfo -> endAt.isAfter(deliveryInfo.getProcessedOn()));
+        
+            return afterStart && beforeEnd;
+        }
+    
+        public boolean matchesMessageType(String messageType) {
+            return messageType == null || messageType.equals(getType());
+        }
+    
+        public boolean hasMessageWithDeliveryStatus(DELIVERY_STATUS status) {
+            boolean matchesStatus = status == null;
+            matchesStatus |= status != null && getInfosPerStatus().stream()
+                    .anyMatch(infosPerStatus -> status.equals(infosPerStatus.getStatus()));
+            return matchesStatus;
         }
     }
     
@@ -119,7 +131,7 @@ public class EndpointsRestController {
                                 .deliveryInfos(infosByStatusEntry.getValue())
                                 .build()
                     )
-                    .collect(Collectors.toList());
+                    .collect(toList());
         }
     
         private static Map<DELIVERY_STATUS, List<DeliveryInfo>> groupLastInfosByStatus(Map<UUID, LinkedList<DeliveryInfo>> infosByMessage) {
@@ -140,6 +152,7 @@ public class EndpointsRestController {
     
         private static Map<UUID, LinkedList<DeliveryInfo>> groupInfosByMessage(List<DeliveryInfo> deliveryInfos) {
             return deliveryInfos.stream()
+                    .filter(deliveryInfo -> deliveryInfo.getMessageId() != null)
                     .collect(groupingBy(DeliveryInfo::getMessageId, LinkedHashMap::new, toCollection(LinkedList::new)));
         }
     }
