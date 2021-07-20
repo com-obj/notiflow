@@ -75,7 +75,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
     	
     	//WHEN TEST REST
         ResultActions resp = mockMvc
-        		.perform(MockMvcRequestBuilders.get("/endpoints")
+        		.perform(MockMvcRequestBuilders.get("/endpoints/all")
                 .contentType(APPLICATION_JSON_UTF8)
         		.accept(APPLICATION_JSON_UTF8))
         		.andDo(MockMvcResultHandlers.print());
@@ -105,7 +105,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		
 		//WHEN
 		ResultActions resp = mockMvc
-				.perform(MockMvcRequestBuilders.get("/endpoints")
+				.perform(MockMvcRequestBuilders.get("/endpoints/all")
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
@@ -113,9 +113,8 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//THEN
 		resp
 				.andExpect(status().is2xxSuccessful())
-				
-				.andExpect(jsonPath("$[0].messagesPerStatus[0].status").value(CoreMatchers.is("SENT")))
-				.andExpect(jsonPath("$[0].messagesPerStatus[0].count").value(CoreMatchers.is(1)));
+				.andExpect(jsonPath("$[0].infosPerStatus[0].status").value(CoreMatchers.is("SENT")))
+				.andExpect(jsonPath("$[0].infosPerStatus[0].count").value(CoreMatchers.is(1)));
 				
 		List<EndpointsRestController.EndpointDto> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$");
 		assertThat(endpoints).hasSize(1);
