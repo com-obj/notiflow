@@ -32,8 +32,8 @@ public class EndpointsRestController {
     
     @GetMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public List<EndpointDto> findEndpointsWithMessageTypeInDateRange(
-            @RequestParam(value = "startAt", required = false) /*@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) */Instant startAt, 
-            @RequestParam(value = "endAt", required = false)/* @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)*/ Instant endAt,
+            @RequestParam(value = "startAt", required = false) Instant startAt, 
+            @RequestParam(value = "endAt", required = false) Instant endAt,
             @RequestParam(value = "messageType", required = false) String messageType,
             @RequestParam(value = "deliveryStatus", required = false) DELIVERY_STATUS deliveryStatus) {
         
