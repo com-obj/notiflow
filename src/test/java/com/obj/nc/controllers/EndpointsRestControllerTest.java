@@ -190,6 +190,142 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		assertThat(endpoints).hasSize(1);
 	}
 	
+	@Test
+	void testFilterDateRangeEndpointsStartAndEnd() throws Exception {
+		//GIVEN
+		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
+		endpointRepository.persistEnpointIfNotExists(email);
+		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
+		endpointRepository.persistEnpointIfNotExists(phone);
+		
+		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
+				.id(UUID.randomUUID())
+				.endpointId(email.getId())
+				.status(DELIVERY_STATUS.SENT)
+				.messageId(UUID.randomUUID())
+				.build();
+		
+		DeliveryInfo phoneDeliveryInfo = DeliveryInfo.builder()
+				.id(UUID.randomUUID())
+				.endpointId(phone.getId())
+				.status(DELIVERY_STATUS.PROCESSING)
+				.messageId(UUID.randomUUID())
+				.build();
+		deliveryInfoRepository.saveAll(asList(emailDeliveryInfo, phoneDeliveryInfo));
+		
+		//WHEN
+		ResultActions resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.param("startAt", Instant.now().minusSeconds(60).toString())
+						.param("endAt", Instant.now().plusSeconds(60).toString())
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		//THEN
+		resp
+				.andExpect(status().is2xxSuccessful())
+				
+				.andExpect(jsonPath("$[0].type").value(CoreMatchers.is("EMAIL")))
+				.andExpect(jsonPath("$[0].name").value(CoreMatchers.is("john.doe@objectify.sk")))
+				
+				.andExpect(jsonPath("$[1].type").value(CoreMatchers.is("SMS")))
+				.andExpect(jsonPath("$[1].name").value(CoreMatchers.is("+999999999999")));
+		
+		List<EndpointsRestController.EndpointDto> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$");
+		assertThat(endpoints).hasSize(2);
+	}
+	
+	@Test
+	void testFilterDateRangeEndpointsStartOnly() throws Exception {
+		//GIVEN
+		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
+		endpointRepository.persistEnpointIfNotExists(email);
+		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
+		endpointRepository.persistEnpointIfNotExists(phone);
+		
+		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
+				.id(UUID.randomUUID())
+				.endpointId(email.getId())
+				.status(DELIVERY_STATUS.SENT)
+				.messageId(UUID.randomUUID())
+				.build();
+		
+		DeliveryInfo phoneDeliveryInfo = DeliveryInfo.builder()
+				.id(UUID.randomUUID())
+				.endpointId(phone.getId())
+				.status(DELIVERY_STATUS.PROCESSING)
+				.messageId(UUID.randomUUID())
+				.build();
+		deliveryInfoRepository.saveAll(asList(emailDeliveryInfo, phoneDeliveryInfo));
+		
+		//WHEN
+		ResultActions resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.param("startAt", Instant.now().minusSeconds(60).toString())
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		//THEN
+		resp
+				.andExpect(status().is2xxSuccessful())
+				
+				.andExpect(jsonPath("$[0].type").value(CoreMatchers.is("EMAIL")))
+				.andExpect(jsonPath("$[0].name").value(CoreMatchers.is("john.doe@objectify.sk")))
+				
+				.andExpect(jsonPath("$[1].type").value(CoreMatchers.is("SMS")))
+				.andExpect(jsonPath("$[1].name").value(CoreMatchers.is("+999999999999")));
+		
+		List<EndpointsRestController.EndpointDto> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$");
+		assertThat(endpoints).hasSize(2);
+	}
+	
+	@Test
+	void testFilterDateRangeEndpointsEndOnly() throws Exception {
+		//GIVEN
+		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
+		endpointRepository.persistEnpointIfNotExists(email);
+		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
+		endpointRepository.persistEnpointIfNotExists(phone);
+		
+		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
+				.id(UUID.randomUUID())
+				.endpointId(email.getId())
+				.status(DELIVERY_STATUS.SENT)
+				.messageId(UUID.randomUUID())
+				.build();
+		
+		DeliveryInfo phoneDeliveryInfo = DeliveryInfo.builder()
+				.id(UUID.randomUUID())
+				.endpointId(phone.getId())
+				.status(DELIVERY_STATUS.PROCESSING)
+				.messageId(UUID.randomUUID())
+				.build();
+		deliveryInfoRepository.saveAll(asList(emailDeliveryInfo, phoneDeliveryInfo));
+		
+		//WHEN
+		ResultActions resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.param("endAt", Instant.now().plusSeconds(60).toString())
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		//THEN
+		resp
+				.andExpect(status().is2xxSuccessful())
+				
+				.andExpect(jsonPath("$[0].type").value(CoreMatchers.is("EMAIL")))
+				.andExpect(jsonPath("$[0].name").value(CoreMatchers.is("john.doe@objectify.sk")))
+				
+				.andExpect(jsonPath("$[1].type").value(CoreMatchers.is("SMS")))
+				.andExpect(jsonPath("$[1].name").value(CoreMatchers.is("+999999999999")));
+		
+		List<EndpointsRestController.EndpointDto> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$");
+		assertThat(endpoints).hasSize(2);
+	}
+	
 	private void awaitDeliveryInfos() {
 		Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> messageRepository.findAll().iterator().next() != null);
 		MessagePersistantState sentMessage = messageRepository.findAll().iterator().next();
