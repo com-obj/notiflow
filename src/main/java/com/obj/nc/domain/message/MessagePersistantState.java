@@ -71,7 +71,7 @@ public class MessagePersistantState implements Persistable<UUID>{
 	
 	private List<RecievingEndpoint> findReceivingEndpoints() {
 		if (receivingEndpoints == null) {
-			receivingEndpoints = Get.getBean(EndpointsRepository.class).findByIds(getEndpointIds());
+			receivingEndpoints = Get.getBean(EndpointsRepository.class).findEndpointsByIds(getEndpointIds());
 		}
 		return receivingEndpoints;
 	}

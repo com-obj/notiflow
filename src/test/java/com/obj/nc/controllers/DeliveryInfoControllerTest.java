@@ -1,23 +1,21 @@
 package com.obj.nc.controllers;
 
-import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import com.jayway.jsonpath.JsonPath;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistantState;
+import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.MessageRepository;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +38,6 @@ import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.repositories.DeliveryInfoRepository;
-import com.obj.nc.repositories.EndpointsRepository;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,7 +67,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
     	SmsEndpoint sms1 = SmsEndpoint.builder().phone("0908111111").build();
-    	endpointRepo.persistEnpointIfNotExists(email1, sms1);
+    	endpointRepo.persistEndpointsIfNotExists(email1, sms1);
     	
     	//AND
     	UUID eventId = UUID.randomUUID();
@@ -91,7 +88,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	deliveryRepo.saveAll( Arrays.asList(info1, info2, info3, info4) );
     	
     	//WHEN
-    	List<EndpointDeliveryInfoDto> infos = controller.findDeliveryInfosByEventId(eventId.toString());
+    	List<EndpointDeliveryInfoDto> infos = controller.findDeliveryInfosByEventId(eventId.toString(), null);
     	
     	//THEN
     	Assertions.assertThat(infos.size()).isEqualTo(2);
@@ -116,7 +113,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     void testFindDeliveryInfosRest() throws Exception {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
-    	endpointRepo.persistEnpointIfNotExists(email1);
+    	endpointRepo.persistEndpointIfNotExists(email1);
     	
     	//AND
     	UUID eventId = UUID.randomUUID();
@@ -152,7 +149,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 	void testReadMessageDeliveryInfoUpdate() throws Exception {
 		//GIVEN
 		EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
-		endpointRepo.persistEnpointIfNotExists(email1);
+		endpointRepo.persistEndpointIfNotExists(email1);
 		
 		//AND
 		EmailMessage emailMessage = new EmailMessage();

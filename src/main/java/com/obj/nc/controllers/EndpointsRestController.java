@@ -10,6 +10,7 @@ import com.obj.nc.repositories.EndpointsRepository;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,20 +33,21 @@ public class EndpointsRestController {
     
     @GetMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public List<EndpointDto> findEndpointsWithMessageTypeInDateRange(
-            @RequestParam(value = "startAt", required = false) Instant startAt, 
+            @RequestParam(value = "startAt", required = false) Instant startAt,
             @RequestParam(value = "endAt", required = false) Instant endAt,
             @RequestParam(value = "messageType", required = false) String messageType,
-            @RequestParam(value = "deliveryStatus", required = false) DELIVERY_STATUS deliveryStatus) {
+            @RequestParam(value = "deliveryStatus", required = false) DELIVERY_STATUS deliveryStatus,
+            Pageable pageable) {
         
-        return findAllEndpoints().stream()
+        return findAllEndpoints(pageable).stream()
                 .filter(endpoint -> endpoint.hasMessageInDateRange(startAt, endAt))
                 .filter(endpoint -> endpoint.matchesMessageType(messageType))
                 .filter(endpoint -> endpoint.hasMessageWithDeliveryStatus(deliveryStatus))
                 .collect(toList());
     }
     
-    private List<EndpointDto> findAllEndpoints() {
-        List<RecievingEndpoint> receivingEndpoints = endpointRepository.findAll();
+    private List<EndpointDto> findAllEndpoints(Pageable pageable) {
+        List<RecievingEndpoint> receivingEndpoints = endpointRepository.findAllEndpoints(pageable);
         
         List<EndpointDto> endpointDtos = EndpointDto.from(receivingEndpoints);
         endpointDtos.forEach(

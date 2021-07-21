@@ -7,9 +7,11 @@ import java.util.stream.Collectors;
 
 import com.obj.nc.domain.message.MessagePersistantState;
 import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
+import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +23,6 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.repositories.DeliveryInfoRepository;
-import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.GenericEventRepository;
 
 import lombok.Builder;
@@ -40,14 +41,15 @@ public class DeliveryInfoRestController {
 	
 	@GetMapping(value = "/events/{eventId}", consumes="application/json", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
-    		@PathVariable (value = "eventId", required = true) String eventId) {
+    		@PathVariable (value = "eventId", required = true) String eventId,
+			Pageable pageable) {
 
 		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByEventIdOrderByProcessedOn(UUID.fromString(eventId));
 
 		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
 		
 		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
-		List<RecievingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
+		List<RecievingEndpoint> endpoints = endpointRepo.findEndpointsByIds(pageable, endpointIds);
 		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
 		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
 		
@@ -56,14 +58,15 @@ public class DeliveryInfoRestController {
 	
 	@GetMapping(value = "/events/ext/{extEventId}", consumes="application/json", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByExtId(
-    		@PathVariable (value = "extEventId", required = true) String extEventId) {
+    		@PathVariable (value = "extEventId", required = true) String extEventId,
+			Pageable pageable) {
 
 		GenericEvent event = eventRepo.findByExternalId(extEventId);
 		if (event == null) {
 			throw new IllegalArgumentException("Event with " +  extEventId +" external ID not found");
 		}
 		
-		return findDeliveryInfosByEventId(event.getId().toString());
+		return findDeliveryInfosByEventId(event.getId().toString(), pageable);
     }
 	
 	@PutMapping(value = "/messages/read/{messageId}")

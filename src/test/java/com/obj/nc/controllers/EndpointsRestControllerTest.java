@@ -20,7 +20,6 @@ import com.obj.nc.utils.JsonUtils;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,9 +71,9 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
     void testFindAllEndpoints() throws Exception {
     	//GIVEN
     	EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointRepository.persistEnpointIfNotExists(email);
+		endpointRepository.persistEndpointIfNotExists(email);
 		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-    	endpointRepository.persistEnpointIfNotExists(phone);
+    	endpointRepository.persistEndpointIfNotExists(phone);
     	
     	//WHEN TEST REST
         ResultActions resp = mockMvc
@@ -128,9 +126,9 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	void testFilterMessageTypeEndpoints() throws Exception {
 		//GIVEN
 		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointRepository.persistEnpointIfNotExists(email);
+		endpointRepository.persistEndpointIfNotExists(email);
 		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointRepository.persistEnpointIfNotExists(phone);
+		endpointRepository.persistEndpointIfNotExists(phone);
 		
 		//WHEN
 		ResultActions resp = mockMvc
@@ -154,9 +152,9 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	void testFilterDeliveryStatusEndpoints() throws Exception {
 		//GIVEN
 		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointRepository.persistEnpointIfNotExists(email);
+		endpointRepository.persistEndpointIfNotExists(email);
 		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointRepository.persistEnpointIfNotExists(phone);
+		endpointRepository.persistEndpointIfNotExists(phone);
 		
 		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
 				.id(UUID.randomUUID())
@@ -194,9 +192,9 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	void testFilterDateRangeEndpointsStartAndEnd() throws Exception {
 		//GIVEN
 		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointRepository.persistEnpointIfNotExists(email);
+		endpointRepository.persistEndpointIfNotExists(email);
 		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointRepository.persistEnpointIfNotExists(phone);
+		endpointRepository.persistEndpointIfNotExists(phone);
 		
 		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
 				.id(UUID.randomUUID())
@@ -240,9 +238,9 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	void testFilterDateRangeEndpointsStartOnly() throws Exception {
 		//GIVEN
 		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointRepository.persistEnpointIfNotExists(email);
+		endpointRepository.persistEndpointIfNotExists(email);
 		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointRepository.persistEnpointIfNotExists(phone);
+		endpointRepository.persistEndpointIfNotExists(phone);
 		
 		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
 				.id(UUID.randomUUID())
@@ -285,9 +283,9 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	void testFilterDateRangeEndpointsEndOnly() throws Exception {
 		//GIVEN
 		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointRepository.persistEnpointIfNotExists(email);
+		endpointRepository.persistEndpointIfNotExists(email);
 		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointRepository.persistEnpointIfNotExists(phone);
+		endpointRepository.persistEndpointIfNotExists(phone);
 		
 		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
 				.id(UUID.randomUUID())
