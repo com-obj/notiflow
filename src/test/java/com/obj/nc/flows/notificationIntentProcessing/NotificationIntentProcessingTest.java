@@ -23,7 +23,6 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlow;
-import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.GenericEventRepositoryTest;
 import com.obj.nc.testUtils.BaseIntegrationTest;
