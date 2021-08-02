@@ -40,7 +40,6 @@ public class ProcessingInfoRepositoryTest {
 	}
 	
 	@Test
-	@Disabled
 	public void testFindByEventIdsAndStepName() {
 		//GIVEN
 		ProcessingInfo transientInfo = createSimpleProcessingInfo();

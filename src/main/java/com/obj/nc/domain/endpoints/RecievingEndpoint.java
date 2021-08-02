@@ -1,5 +1,7 @@
 package com.obj.nc.domain.endpoints;
 
+import java.util.UUID;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -10,9 +12,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
 @JsonSubTypes({ 
@@ -23,6 +24,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @Table("nc_endpoint")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public abstract class RecievingEndpoint {
 	
 	/**
@@ -31,6 +33,7 @@ public abstract class RecievingEndpoint {
 	 * prekopiruju(zmerguju) sa k danemu enpointu
 	 */
 	@Id
+	@EqualsAndHashCode.Include
 	private UUID id = UUID.randomUUID();
 	private DeliveryOptions deliveryOptions;
 	private Recipient recipient;

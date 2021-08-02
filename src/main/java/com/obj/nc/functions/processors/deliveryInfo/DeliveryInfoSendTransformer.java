@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
@@ -26,7 +27,8 @@ public class DeliveryInfoSendTransformer extends ProcessorFunctionAdapter<Delive
 
 	@Override
 	protected List<DeliveryInfo> execute(DeliveryInfoSendResult deliveryInfo) {
-		endpointsRepo.persistEnpointIfNotExists(deliveryInfo.getRecievingEndpoint());
+		RecievingEndpoint persistedEndpoints = endpointsRepo.persistEnpointIfNotExists(deliveryInfo.getRecievingEndpoint());
+		deliveryInfo.setRecievingEndpoint(persistedEndpoints);
 		
 		List<DeliveryInfo> infos = createFromSendResults(deliveryInfo);
 				

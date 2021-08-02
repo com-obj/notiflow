@@ -71,7 +71,7 @@ public class ProcessingInfoGeneratorTest {
     @BeforeEach
     void setUp() {
         jdbcTemplate.execute("truncate table nc_processing_info");
-        jdbcTemplate.execute("truncate table nc_endpoint");
+        jdbcTemplate.execute("truncate table nc_endpoint cascade");
         
     	JsonUtils.resetObjectMapper();
     	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);

@@ -22,6 +22,7 @@ import lombok.extern.log4j.Log4j2;
  * @author ja
  *
  */
+@Deprecated
 public class GenerateEventIdProcessingFunction
 		extends ProcessorFunctionAdapter<HasHeader, HasHeader> {
 
