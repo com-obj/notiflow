@@ -40,16 +40,12 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
                         "   ep.id = di.endpoint_id ");
         
         Map<String, Object> parameters = appendQueryFilters(queryBuilder, startAt, endAt, QueryUtils.toLikeFilter(endpointType));
-        appendPagination(queryBuilder, pageable);
+        appendQueryPagination(queryBuilder, pageable);
     
         List<RecievingEndpoint> result = jdbcTemplate.query(queryBuilder.toString(), parameters, new ReceivingEndpointRowMapper());
     
         long totalCount = countAllEndpoints(startAt, endAt, endpointType);
         return new PageImpl<>(result, pageable, totalCount);
-    }
-    
-    private void appendPagination(StringBuilder queryBuilder, Pageable pageable) {
-        queryBuilder.append(" ").append(QueryUtils.toPaginationString(pageable)).append(";");
     }
     
     private long countAllEndpoints(Instant startAt,
@@ -89,6 +85,10 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
         }
         
         return parameters;
+    }
+    
+    private void appendQueryPagination(StringBuilder queryBuilder, Pageable pageable) {
+        queryBuilder.append(" ").append(QueryUtils.toPaginationString(pageable)).append(";");
     }
 
 }

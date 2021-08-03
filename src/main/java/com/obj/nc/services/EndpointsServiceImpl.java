@@ -14,7 +14,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import static com.obj.nc.domain.dto.EndpointDto.*;
 import static java.util.Arrays.asList;
 
 @Service
@@ -35,12 +34,12 @@ public class EndpointsServiceImpl implements EndpointsService {
     @Override
     public Page<EndpointDto> findAllEndpoints(Instant startAt,
                                               Instant endAt,
-                                              EndpointType endpointType,
+                                              EndpointDto.EndpointType endpointType,
                                               Pageable pageable) {
         Page<RecievingEndpoint> endpointsPage = endpointsRepository.findAllEndpoints(startAt, endAt, endpointType, pageable);
         
         return endpointsPage
-                .map(receivingEndpoint -> from(
+                .map(receivingEndpoint -> EndpointDto.from(
                         receivingEndpoint, 
                         countMessagesSentToEndpoint(receivingEndpoint)));
     }

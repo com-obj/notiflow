@@ -71,13 +71,9 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
     @Test
     void testFindAllEndpoints() throws Exception {
     	//GIVEN
-    	EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointsService.persistEndpointIfNotExists(email);
-		
-		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointsService.persistEndpointIfNotExists(phone);
-    	
-    	//WHEN TEST REST
+		persistTestEndpoints();
+	
+		//WHEN TEST REST
         ResultActions resp = mockMvc
         		.perform(MockMvcRequestBuilders.get("/endpoints")
                 .contentType(APPLICATION_JSON_UTF8)
@@ -120,25 +116,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	@Test
 	void testFilterDateRangeEndpointsStartAndEnd() throws Exception {
 		//GIVEN
-		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointsService.persistEndpointIfNotExists(email);
-		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointsService.persistEndpointIfNotExists(phone);
-		
-		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
-				.id(UUID.randomUUID())
-				.endpointId(email.getId())
-				.status(DELIVERY_STATUS.SENT)
-				.messageId(UUID.randomUUID())
-				.build();
-		
-		DeliveryInfo phoneDeliveryInfo = DeliveryInfo.builder()
-				.id(UUID.randomUUID())
-				.endpointId(phone.getId())
-				.status(DELIVERY_STATUS.PROCESSING)
-				.messageId(UUID.randomUUID())
-				.build();
-		deliveryInfoRepository.saveAll(asList(emailDeliveryInfo, phoneDeliveryInfo));
+		persistTestEndpointsAndTestDeliveryInfos();
 		
 		//WHEN
 		ResultActions resp = mockMvc
@@ -162,25 +140,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	@Test
 	void testFilterDateRangeEndpointsStartOnly() throws Exception {
 		//GIVEN
-		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointsService.persistEndpointIfNotExists(email);
-		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointsService.persistEndpointIfNotExists(phone);
-		
-		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
-				.id(UUID.randomUUID())
-				.endpointId(email.getId())
-				.status(DELIVERY_STATUS.SENT)
-				.messageId(UUID.randomUUID())
-				.build();
-		
-		DeliveryInfo phoneDeliveryInfo = DeliveryInfo.builder()
-				.id(UUID.randomUUID())
-				.endpointId(phone.getId())
-				.status(DELIVERY_STATUS.PROCESSING)
-				.messageId(UUID.randomUUID())
-				.build();
-		deliveryInfoRepository.saveAll(asList(emailDeliveryInfo, phoneDeliveryInfo));
+		persistTestEndpointsAndTestDeliveryInfos();
 		
 		//WHEN
 		ResultActions resp = mockMvc
@@ -203,25 +163,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	@Test
 	void testFilterDateRangeEndpointsEndOnly() throws Exception {
 		//GIVEN
-		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointsService.persistEndpointIfNotExists(email);
-		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointsService.persistEndpointIfNotExists(phone);
-		
-		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
-				.id(UUID.randomUUID())
-				.endpointId(email.getId())
-				.status(DELIVERY_STATUS.SENT)
-				.messageId(UUID.randomUUID())
-				.build();
-		
-		DeliveryInfo phoneDeliveryInfo = DeliveryInfo.builder()
-				.id(UUID.randomUUID())
-				.endpointId(phone.getId())
-				.status(DELIVERY_STATUS.PROCESSING)
-				.messageId(UUID.randomUUID())
-				.build();
-		deliveryInfoRepository.saveAll(asList(emailDeliveryInfo, phoneDeliveryInfo));
+		persistTestEndpointsAndTestDeliveryInfos();
 		
 		//WHEN
 		ResultActions resp = mockMvc
@@ -244,10 +186,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	@Test
 	void testFilterEndpointTypeSMS() throws Exception {
 		//GIVEN
-		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointsService.persistEndpointIfNotExists(email);
-		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointsService.persistEndpointIfNotExists(phone);
+		persistTestEndpoints();
 		
 		//WHEN
 		ResultActions resp = mockMvc
@@ -269,10 +208,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	@Test
 	void testFilterInvalidEndpointType() throws Exception {
 		//GIVEN
-		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointsService.persistEndpointIfNotExists(email);
-		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointsService.persistEndpointIfNotExists(phone);
+		persistTestEndpoints();
 		
 		//WHEN
 		ResultActions resp = mockMvc
@@ -339,6 +275,36 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		
 		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(9);
+	}
+	
+	private void persistTestEndpoints() {
+		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
+		endpointsService.persistEndpointIfNotExists(email);
+		
+		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
+		endpointsService.persistEndpointIfNotExists(phone);
+	}
+	
+	private void persistTestEndpointsAndTestDeliveryInfos() {
+		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
+		endpointsService.persistEndpointIfNotExists(email);
+		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
+		endpointsService.persistEndpointIfNotExists(phone);
+		
+		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
+				.id(UUID.randomUUID())
+				.endpointId(email.getId())
+				.status(DELIVERY_STATUS.SENT)
+				.messageId(UUID.randomUUID())
+				.build();
+		
+		DeliveryInfo phoneDeliveryInfo = DeliveryInfo.builder()
+				.id(UUID.randomUUID())
+				.endpointId(phone.getId())
+				.status(DELIVERY_STATUS.PROCESSING)
+				.messageId(UUID.randomUUID())
+				.build();
+		deliveryInfoRepository.saveAll(asList(emailDeliveryInfo, phoneDeliveryInfo));
 	}
 	
 	private void assertContainsEndpoint(List<LinkedHashMap<?, ?>> endpoints, String endpointType, String endpointName) {
