@@ -1,14 +1,21 @@
 package com.obj.nc.repositories;
 
+import static java.sql.Timestamp.from;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.obj.nc.repositories.converters.PgObjectToUUIDArrayConverter;
-import com.obj.nc.repositories.converters.UUIDArrayToPgObjectConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -38,27 +45,21 @@ public class EndpointsRepository {
     /**
      * 
      * @param toPersist
-     * @return client must user returned list because IDs of endoints can be different to those provided in input parameter
+     * @return client must use returned list because IDs of endpoints can be different to those provided in input parameter
      */
-    public List<RecievingEndpoint> persistEnpointIfNotExists(List<RecievingEndpoint> toPersist) {
+    public <T extends RecievingEndpoint> List<T> persistEnpointIfNotExists(List<T> toPersist) {
         try  {
-        	List<RecievingEndpoint> persited = findExistingEndpointsByNameId(toPersist);
-    	
-	    	List<RecievingEndpoint> toInsert = new ArrayList<RecievingEndpoint>();
-	    	for (RecievingEndpoint endPoint: toPersist) {
-	    		if (persited.stream().anyMatch(e -> e.getEndpointId().equals(endPoint.getEndpointId()))) {
-	    			continue;
-	    		}
-	    		
-	    		toInsert.add(endPoint);	    		
-	    	}
+        	NewAndExistingEndpoints newAndExisting = findNewAndExisting(toPersist);
 	
 	        String inserEndpointIfNotExistsSQL = 
 	        		"insert into nc_endpoint "
-	                + "(id, endpoint_name, endpoint_type) "
+	                + "(id, endpoint_name, endpoint_type, time_created) "
 	                + "values "
-	                + "(?, ?, ?) ";
+	                + "(?, ?, ?, ?) ";
 
+	        List<RecievingEndpoint> toInsert = newAndExisting.newEndpoints;
+	        List<T> persited = (List<T>)newAndExisting.existingEndpoints;
+	        
             jdbcTemplate.batchUpdate(
                     inserEndpointIfNotExistsSQL,
                     new BatchPreparedStatementSetter() {
@@ -68,8 +69,9 @@ public class EndpointsRepository {
                             ps.setObject(1, endpoint.getId());
                             ps.setString(2, endpoint.getEndpointId());
                             ps.setString(3, endpoint.getEndpointType());
+                            ps.setTimestamp(4, from(Instant.now()));
                             
-                            persited.add(endpoint);
+                            persited.add((T)endpoint);
                         }
 
                         public int getBatchSize() {
@@ -85,6 +87,37 @@ public class EndpointsRepository {
         }
     }
 
+
+	private <T extends RecievingEndpoint> NewAndExistingEndpoints findNewAndExisting(List<T> toPersist) {
+		NewAndExistingEndpoints newAndExisting = new NewAndExistingEndpoints();
+		
+		List<T> existing = findExistingEndpointsByNameId(toPersist);    	
+		for (RecievingEndpoint endPoint: toPersist) {
+			if (!endPoint.isNew()) {
+				newAndExisting.existingEndpoints.add(endPoint);
+				continue;
+			}
+
+			Optional<T> existingEndp = existing
+					.stream()
+					.filter(e -> e.getEndpointId().equals(endPoint.getEndpointId()))
+					.findFirst();
+			if (existingEndp.isPresent()) {
+				newAndExisting.existingEndpoints.add(existingEndp.get());
+				continue;
+			}
+				    		    		
+			newAndExisting.newEndpoints.add(endPoint);
+		}
+		return newAndExisting;
+	}
+    
+    private static class NewAndExistingEndpoints {
+    	public List<RecievingEndpoint> existingEndpoints = new ArrayList<RecievingEndpoint>();
+    	public List<RecievingEndpoint> newEndpoints = new ArrayList<RecievingEndpoint>();
+    }
+    
+
     public Map<String, RecievingEndpoint> persistEnpointIfNotExistsMappedToNameId(List<RecievingEndpoint> toPersist) {
     	List<RecievingEndpoint> persited = persistEnpointIfNotExists(toPersist);
     	
@@ -92,12 +125,20 @@ public class EndpointsRepository {
     }
 
     
-	public List<RecievingEndpoint> findExistingEndpointsByNameId(List<RecievingEndpoint> ednpoints) {
+	public <T extends RecievingEndpoint> List<T> findExistingEndpointsByNameId(List<T> ednpoints) {
 		List<String> namesList = ednpoints.stream()
                 .map(RecievingEndpoint::getEndpointId)
                 .collect(Collectors.toList());
 		
-    	List<RecievingEndpoint> existing = findByNameIds(namesList.toArray(new String[0]));
+    	List<T> existing = (List<T>)findByNameIds(namesList.toArray(new String[0]));
+    	
+    	return existing;
+	}
+	
+	public <T extends RecievingEndpoint> List<T> findExistingEndpointsByIsNewFlag(List<T> ednpoints) {
+		List<T> existing = ednpoints.stream()
+                .filter(e -> !e.isNew())
+                .collect(Collectors.toList());
     	
     	return existing;
 	}
@@ -120,6 +161,10 @@ public class EndpointsRepository {
     }
     
     public List<RecievingEndpoint> findByNameIds(String ... endpointNames) {
+    	if (endpointNames.length==0) {
+    		return new ArrayList<RecievingEndpoint>();
+    	}
+    	
     	String query = 
         		"select id, endpoint_name, endpoint_type "
                 + "from nc_endpoint "

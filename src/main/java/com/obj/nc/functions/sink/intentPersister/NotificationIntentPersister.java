@@ -18,10 +18,9 @@ public class NotificationIntentPersister extends SinkConsumerAdapter<Notificatio
     @Autowired
     private NotificationIntentRepository intentRepo;
 
-
-	@Override
-	protected void execute(NotificationIntent deliveryInfo) {
-		intentRepo.save(deliveryInfo);
+    @Override
+	protected void execute(NotificationIntent notifIntent) {
+		intentRepo.save(notifIntent);
 	}
 
 

@@ -1,5 +1,6 @@
 package com.obj.nc.domain.message;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -12,9 +13,11 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.conversion.MutableAggregateChange;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.relational.core.mapping.event.BeforeSaveCallback;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.content.MessageContent;
@@ -24,7 +27,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Table("nc_message")
-public class MessagePersistantState implements Persistable<UUID>{
+public class MessagePersistantState implements Persistable<UUID> {
 	
 
 	@Id
@@ -69,9 +72,9 @@ public class MessagePersistantState implements Persistable<UUID>{
 		return msg;
 	}
 	
-	private List<RecievingEndpoint> findReceivingEndpoints() {
+	public List<RecievingEndpoint> findReceivingEndpoints() {
 		if (receivingEndpoints == null) {
-			receivingEndpoints = Get.getBean(EndpointsRepository.class).findByIds(getEndpointIds());
+			receivingEndpoints = Get.getEndpointsRepo().findByIds(getEndpointIds());
 		}
 		return receivingEndpoints;
 	}

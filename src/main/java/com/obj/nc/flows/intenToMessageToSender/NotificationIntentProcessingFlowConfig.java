@@ -18,6 +18,7 @@ import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
+import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
 import com.obj.nc.functions.sink.intentPersister.NotificationIntentPersister;
 
@@ -29,6 +30,7 @@ public class NotificationIntentProcessingFlowConfig {
 		
 	@Autowired private MessagesFromIntentGenerator generateMessagesFromIntent;
 	@Autowired private NotificationIntentPersister notificationIntentPersister;
+	@Autowired private EndpointPersister endpointPersister; 
 	
 	public final static String INTENT_PROCESSING_FLOW_ID = "INTENT_PROCESSING_FLOW_ID";
 	public final static String INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID = INTENT_PROCESSING_FLOW_ID + "_INPUT";
@@ -42,6 +44,7 @@ public class NotificationIntentProcessingFlowConfig {
 	public IntegrationFlow intentProcessingFlowDefinition() {
 		return IntegrationFlows
 				.from(intentProcessingInputChangel())
+				.handle(endpointPersister)
 				.wireTap( flowConfig->
 					flowConfig.handle(notificationIntentPersister))
 				.transform(generateMessagesFromIntent)

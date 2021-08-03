@@ -19,6 +19,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.obj.nc.Get;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
@@ -80,6 +82,11 @@ public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements H
 				   Iterables.filter(endpoints, RecievingEndpoint.class));
 		
 		this.setRecievingEndpoints(typedEndpoints);
+	}
+	
+	public void ensureEnpointsPersisted() {		
+		List<? extends RecievingEndpoint> persistedEndpoints = Get.getEndpointsRepo().persistEnpointIfNotExists(getRecievingEndpoints());
+		setRecievingEndpoints(persistedEndpoints);
 	}
 	
 	@Override

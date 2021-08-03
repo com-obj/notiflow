@@ -6,6 +6,8 @@ import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProp
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.functions.processors.messageTemplating.config.EmailTrackingConfigProperties;
 import com.obj.nc.functions.processors.messageTracking.EmailReadTrackingDecorator;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -17,10 +19,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessageAggregationStrategy;
+import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
-import com.obj.nc.functions.sink.messagePersister.MessagePersister;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +37,7 @@ public class EmailProcessingFlowConfig {
 	private final EmailTrackingConfigProperties emailTrackingConfigProperties;
 	private final EmailProcessingFlowProperties properties;
 	private final MessagePersister messagePersister;
+	private final  EndpointPersister endpointPersister; 
 	private final ThreadPoolTaskScheduler executor;
 	private final EmailMessageAggregationStrategy emailMessageAggregationStrategy;
 	
@@ -95,7 +99,8 @@ public class EmailProcessingFlowConfig {
 	@Bean(EMAIL_SEND_FLOW_ID)
 	public IntegrationFlow emailSendFlowDefinition() {
 		return flow -> flow
-				.wireTap(flowConfig -> flowConfig.handle(messagePersister))
+				.handle(endpointPersister)
+				.handle(messagePersister)
 				.handle(emailSender)
 				.wireTap(flowConfig -> flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID))
 				.channel(emailSendOutputChannel());

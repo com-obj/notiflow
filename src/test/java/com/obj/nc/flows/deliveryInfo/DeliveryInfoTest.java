@@ -42,7 +42,7 @@ import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
-import com.obj.nc.functions.sink.messagePersister.MessagePersister;
+import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.FailedPayloadRepository;
@@ -87,6 +87,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         notificationIntent.getHeader().addEventId(eventId);
         
         notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
+        notificationIntent.ensureEnpointsPersisted();
         
         //WHEN
         deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(notificationIntent);
@@ -111,7 +112,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         
         
         messages.forEach(msg -> {
-        	messagePersister.accept(msg);
+        	msg = (EmailMessage) messagePersister.apply(msg);
         	
             deliveryInfoFlow.createAndPersistSentDeliveryInfo(msg);
         });
