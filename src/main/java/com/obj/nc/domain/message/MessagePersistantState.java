@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.obj.nc.Get;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.repositories.EndpointsRepository;
+import com.obj.nc.services.EndpointsService;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -71,7 +72,7 @@ public class MessagePersistantState implements Persistable<UUID>{
 	
 	private List<RecievingEndpoint> findReceivingEndpoints() {
 		if (receivingEndpoints == null) {
-			receivingEndpoints = Get.getBean(EndpointsRepository.class).findEndpointsByIds(getEndpointIds());
+			receivingEndpoints = Get.getBean(EndpointsService.class).findEndpointsByIds(null, getEndpointIds());
 		}
 		return receivingEndpoints;
 	}

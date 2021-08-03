@@ -12,13 +12,12 @@ import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.repositories.DeliveryInfoRepository;
-import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.MessageRepository;
+import com.obj.nc.services.EndpointsService;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 import org.awaitility.Awaitility;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -35,7 +34,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
@@ -49,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class EndpointsRestControllerTest extends BaseIntegrationTest {
 	
-	@Autowired private EndpointsRepository endpointRepository;
+	@Autowired private EndpointsService endpointsService;
 	@Autowired private DeliveryInfoRepository deliveryInfoRepository;
 	@Autowired private MessageRepository messageRepository;
 	@Autowired private MockMvc mockMvc;
@@ -71,9 +72,10 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
     void testFindAllEndpoints() throws Exception {
     	//GIVEN
     	EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointRepository.persistEndpointIfNotExists(email);
+		endpointsService.persistEndpointIfNotExists(email);
+		
 		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-    	endpointRepository.persistEndpointIfNotExists(phone);
+		endpointsService.persistEndpointIfNotExists(phone);
     	
     	//WHEN TEST REST
         ResultActions resp = mockMvc
@@ -84,22 +86,16 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
         
         //THEN
 		resp
-        	.andExpect(status().is2xxSuccessful())
-				
-			.andExpect(jsonPath("$[0].id").value(CoreMatchers.is(email.getId().toString())))
-			.andExpect(jsonPath("$[0].type").value(CoreMatchers.is("EMAIL")))
-			.andExpect(jsonPath("$[0].name").value(CoreMatchers.is("john.doe@objectify.sk")))
-				
-			.andExpect(jsonPath("$[1].id").value(CoreMatchers.is(phone.getId().toString())))
-			.andExpect(jsonPath("$[1].type").value(CoreMatchers.is("SMS")))
-			.andExpect(jsonPath("$[1].name").value(CoreMatchers.is("+999999999999")));
+        	.andExpect(status().is2xxSuccessful());
 	
-		List<EndpointsRestController.EndpointDto> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$");
+		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(2);
+		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk");
+		assertContainsEndpoint(endpoints, "SMS", "+999999999999");
 	}
 	
 	@Test
-	void testCountMessagesPerStatus() throws Exception {
+	void testCountSentMessages() throws Exception {
 		//GIVEN
 		EmailMessage message = JsonUtils.readObjectFromClassPathResource("messages/simple_email_message.json", EmailMessage.class);
 		messageProcessingFlow.processMessage(message);
@@ -114,87 +110,20 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		
 		//THEN
 		resp
-				.andExpect(status().is2xxSuccessful())
-				.andExpect(jsonPath("$[0].infosPerStatus[0].status").value(CoreMatchers.is("SENT")))
-				.andExpect(jsonPath("$[0].infosPerStatus[0].count").value(CoreMatchers.is(1)));
-				
-		List<EndpointsRestController.EndpointDto> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$");
+				.andExpect(status().is2xxSuccessful());
+		
+		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(1);
-	}
-	
-	@Test
-	void testFilterMessageTypeEndpoints() throws Exception {
-		//GIVEN
-		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointRepository.persistEndpointIfNotExists(email);
-		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointRepository.persistEndpointIfNotExists(phone);
-		
-		//WHEN
-		ResultActions resp = mockMvc
-				.perform(MockMvcRequestBuilders.get("/endpoints")
-						.param("messageType", "SMS")
-						.contentType(APPLICATION_JSON_UTF8)
-						.accept(APPLICATION_JSON_UTF8))
-				.andDo(MockMvcResultHandlers.print());
-		
-		//THEN
-		resp
-				.andExpect(status().is2xxSuccessful())
-				.andExpect(jsonPath("$[0].name").value(CoreMatchers.is("+999999999999")))
-				.andExpect(jsonPath("$[0].type").value(CoreMatchers.is("SMS")));
-		
-		List<EndpointsRestController.EndpointDto> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$");
-		assertThat(endpoints).hasSize(1);
-	}
-	
-	@Test
-	void testFilterDeliveryStatusEndpoints() throws Exception {
-		//GIVEN
-		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointRepository.persistEndpointIfNotExists(email);
-		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointRepository.persistEndpointIfNotExists(phone);
-		
-		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
-				.id(UUID.randomUUID())
-				.endpointId(email.getId())
-				.status(DELIVERY_STATUS.SENT)
-				.messageId(UUID.randomUUID())
-				.build();
-		DeliveryInfo phoneDeliveryInfo = DeliveryInfo.builder()
-				.id(UUID.randomUUID())
-				.endpointId(phone.getId())
-				.status(DELIVERY_STATUS.PROCESSING)
-				.messageId(UUID.randomUUID())
-				.build();
-		deliveryInfoRepository.saveAll(asList(emailDeliveryInfo, phoneDeliveryInfo));
-		
-		//WHEN
-		ResultActions resp = mockMvc
-				.perform(MockMvcRequestBuilders.get("/endpoints")
-						.param("deliveryStatus", "SENT")
-						.contentType(APPLICATION_JSON_UTF8)
-						.accept(APPLICATION_JSON_UTF8))
-				.andDo(MockMvcResultHandlers.print());
-		
-		//THEN
-		resp
-				.andExpect(status().is2xxSuccessful())
-				.andExpect(jsonPath("$[0].name").value(CoreMatchers.is("john.doe@objectify.sk")))
-				.andExpect(jsonPath("$[0].type").value(CoreMatchers.is("EMAIL")));
-		
-		List<EndpointsRestController.EndpointDto> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$");
-		assertThat(endpoints).hasSize(1);
+		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk");
 	}
 	
 	@Test
 	void testFilterDateRangeEndpointsStartAndEnd() throws Exception {
 		//GIVEN
 		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointRepository.persistEndpointIfNotExists(email);
+		endpointsService.persistEndpointIfNotExists(email);
 		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointRepository.persistEndpointIfNotExists(phone);
+		endpointsService.persistEndpointIfNotExists(phone);
 		
 		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
 				.id(UUID.randomUUID())
@@ -222,25 +151,21 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		
 		//THEN
 		resp
-				.andExpect(status().is2xxSuccessful())
-				
-				.andExpect(jsonPath("$[0].type").value(CoreMatchers.is("EMAIL")))
-				.andExpect(jsonPath("$[0].name").value(CoreMatchers.is("john.doe@objectify.sk")))
-				
-				.andExpect(jsonPath("$[1].type").value(CoreMatchers.is("SMS")))
-				.andExpect(jsonPath("$[1].name").value(CoreMatchers.is("+999999999999")));
+				.andExpect(status().is2xxSuccessful());
 		
-		List<EndpointsRestController.EndpointDto> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$");
+		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(2);
+		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk");
+		assertContainsEndpoint(endpoints, "SMS", "+999999999999");
 	}
 	
 	@Test
 	void testFilterDateRangeEndpointsStartOnly() throws Exception {
 		//GIVEN
 		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointRepository.persistEndpointIfNotExists(email);
+		endpointsService.persistEndpointIfNotExists(email);
 		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointRepository.persistEndpointIfNotExists(phone);
+		endpointsService.persistEndpointIfNotExists(phone);
 		
 		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
 				.id(UUID.randomUUID())
@@ -267,25 +192,21 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		
 		//THEN
 		resp
-				.andExpect(status().is2xxSuccessful())
-				
-				.andExpect(jsonPath("$[0].type").value(CoreMatchers.is("EMAIL")))
-				.andExpect(jsonPath("$[0].name").value(CoreMatchers.is("john.doe@objectify.sk")))
-				
-				.andExpect(jsonPath("$[1].type").value(CoreMatchers.is("SMS")))
-				.andExpect(jsonPath("$[1].name").value(CoreMatchers.is("+999999999999")));
+				.andExpect(status().is2xxSuccessful());
 		
-		List<EndpointsRestController.EndpointDto> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$");
+		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(2);
+		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk");
+		assertContainsEndpoint(endpoints, "SMS", "+999999999999");
 	}
 	
 	@Test
 	void testFilterDateRangeEndpointsEndOnly() throws Exception {
 		//GIVEN
 		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointRepository.persistEndpointIfNotExists(email);
+		endpointsService.persistEndpointIfNotExists(email);
 		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointRepository.persistEndpointIfNotExists(phone);
+		endpointsService.persistEndpointIfNotExists(phone);
 		
 		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
 				.id(UUID.randomUUID())
@@ -312,22 +233,131 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		
 		//THEN
 		resp
-				.andExpect(status().is2xxSuccessful())
-				
-				.andExpect(jsonPath("$[0].type").value(CoreMatchers.is("EMAIL")))
-				.andExpect(jsonPath("$[0].name").value(CoreMatchers.is("john.doe@objectify.sk")))
-				
-				.andExpect(jsonPath("$[1].type").value(CoreMatchers.is("SMS")))
-				.andExpect(jsonPath("$[1].name").value(CoreMatchers.is("+999999999999")));
+				.andExpect(status().is2xxSuccessful());
 		
-		List<EndpointsRestController.EndpointDto> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$");
+		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(2);
+		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk");
+		assertContainsEndpoint(endpoints, "SMS", "+999999999999");
+	}
+	
+	@Test
+	void testFilterEndpointTypeSMS() throws Exception {
+		//GIVEN
+		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
+		endpointsService.persistEndpointIfNotExists(email);
+		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
+		endpointsService.persistEndpointIfNotExists(phone);
+		
+		//WHEN
+		ResultActions resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.param("endpointType", "SMS")
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		//THEN
+		resp
+				.andExpect(status().is2xxSuccessful());
+		
+		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+		assertThat(endpoints).hasSize(1);
+		assertContainsEndpoint(endpoints, "SMS", "+999999999999");
+	}
+	
+	@Test
+	void testFilterInvalidEndpointType() throws Exception {
+		//GIVEN
+		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
+		endpointsService.persistEndpointIfNotExists(email);
+		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
+		endpointsService.persistEndpointIfNotExists(phone);
+		
+		//WHEN
+		ResultActions resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.param("endpointType", "INVALID123")
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		//THEN
+		resp
+				.andExpect(status().is5xxServerError());
+	}
+	
+	@Test
+	void testGetPage0Size20() throws Exception {
+		// GIVEN
+		persistNEmailEndpoints(19);
+		
+		//WHEN
+		ResultActions resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.param("page", "0")
+						.param("size", "20")
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+		assertThat(endpoints).hasSize(19);
+	}
+	
+	@Test
+	void testGetPage0Size10() throws Exception {
+    	// GIVEN
+		persistNEmailEndpoints(19);
+		
+		//WHEN
+		ResultActions resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.param("page", "0")
+						.param("size", "10")
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+		assertThat(endpoints).hasSize(10);
+	}
+	
+	@Test
+	void testGetPage1Size10() throws Exception {
+		// GIVEN
+		persistNEmailEndpoints(19);
+		
+		//WHEN
+		ResultActions resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.param("page", "1")
+						.param("size", "10")
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+		assertThat(endpoints).hasSize(9);
+	}
+	
+	private void assertContainsEndpoint(List<LinkedHashMap<?, ?>> endpoints, String endpointType, String endpointName) {
+		Optional<LinkedHashMap<?, ?>> emailDto = endpoints.stream().filter(endpoint -> endpointType.equals(endpoint.get("type"))).findFirst();
+		assertThat(emailDto.get().get("name")).isEqualTo(endpointName);
 	}
 	
 	private void awaitDeliveryInfos() {
 		Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> messageRepository.findAll().iterator().next() != null);
 		MessagePersistantState sentMessage = messageRepository.findAll().iterator().next();
 		Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepository.findByMessageIdOrderByProcessedOn(sentMessage.getId()).size() == 2);
+	}
+	
+	private void persistNEmailEndpoints(int n) {
+		for (int i = 0; i < n; i++) {
+			String name = "john.doe";
+			EmailEndpoint email = EmailEndpoint.builder().email(name + i + "@objectify.sk").build();
+			endpointsService.persistEndpointIfNotExists(email);
+		}
 	}
 	
 }

@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 import com.jayway.jsonpath.JsonPath;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistantState;
-import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.MessageRepository;
+import com.obj.nc.services.EndpointsService;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
@@ -53,7 +53,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     
 	@Autowired private DeliveryInfoRepository deliveryRepo;
 	@Autowired private MessageRepository messageRepo;
-	@Autowired private EndpointsRepository endpointRepo;
+	@Autowired private EndpointsService endpointService;
 	@Autowired protected MockMvc mockMvc;
 	@Autowired private DeliveryInfoRestController controller;
 
@@ -66,8 +66,9 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     void testFindDeliveryInfos() throws Exception {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
-    	SmsEndpoint sms1 = SmsEndpoint.builder().phone("0908111111").build();
-    	endpointRepo.persistEndpointsIfNotExists(email1, sms1);
+		endpointService.persistEndpointIfNotExists(email1);
+		SmsEndpoint sms1 = SmsEndpoint.builder().phone("0908111111").build();
+    	endpointService.persistEndpointIfNotExists(sms1);
     	
     	//AND
     	UUID eventId = UUID.randomUUID();
@@ -113,7 +114,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     void testFindDeliveryInfosRest() throws Exception {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
-    	endpointRepo.persistEndpointIfNotExists(email1);
+    	endpointService.persistEndpointIfNotExists(email1);
     	
     	//AND
     	UUID eventId = UUID.randomUUID();
@@ -149,7 +150,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 	void testReadMessageDeliveryInfoUpdate() throws Exception {
 		//GIVEN
 		EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
-		endpointRepo.persistEndpointIfNotExists(email1);
+		endpointService.persistEndpointIfNotExists(email1);
 		
 		//AND
 		EmailMessage emailMessage = new EmailMessage();
