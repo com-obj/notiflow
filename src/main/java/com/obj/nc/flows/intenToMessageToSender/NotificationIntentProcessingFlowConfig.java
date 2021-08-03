@@ -19,8 +19,8 @@ import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.intentPersister.NotificationIntentPersister;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
-import com.obj.nc.functions.sink.intentPersister.NotificationIntentPersister;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -45,8 +45,7 @@ public class NotificationIntentProcessingFlowConfig {
 		return IntegrationFlows
 				.from(intentProcessingInputChangel())
 				.handle(endpointPersister)
-				.wireTap( flowConfig->
-					flowConfig.handle(notificationIntentPersister))
+				.handle(notificationIntentPersister)				
 				.transform(generateMessagesFromIntent)
 				.split()
 				.wireTap( flowConfig -> 

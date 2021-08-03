@@ -11,10 +11,14 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BaseJSONObject;
+import com.obj.nc.domain.refIntegrity.Reference;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.ProcessingInfoRepository;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
@@ -33,7 +37,7 @@ import lombok.extern.log4j.Log4j2;
 @EqualsAndHashCode(of = "processingId")
 @Table("nc_processing_info")
 @ToString
-public class ProcessingInfo {
+public class ProcessingInfo implements Persistable<UUID> {
 	@NotNull
 	@Id
 	private UUID processingId;
@@ -42,6 +46,9 @@ public class ProcessingInfo {
 	private Integer version;
 	
 	@NotNull
+	//@Reference(ProcessingInfoRepository.class)
+	//Processing info are persisted in async manner. The invalid reference might be result of wrong order, not wrong processing
+	//in future we might implement something like deferred which would postpone the check to later evaluation
 	private UUID prevProcessingId;
 	
 	@NotNull
@@ -57,6 +64,7 @@ public class ProcessingInfo {
 	private long stepDurationMs;
 	
 	@NotEmpty
+	@Reference(GenericEventRepository.class)
 	private UUID[] eventIds;
 	
 	@JsonIgnore
@@ -116,6 +124,17 @@ public class ProcessingInfo {
 		
 //		calculateDiffToPreviosVersion();
 		log.debug("Processing finished for step {}. Took {} ms", getStepName(), getStepDurationMs());
+	}
+
+	@Override
+	public UUID getId() {		
+		return processingId;
+	}
+
+	@Override
+	public boolean isNew() {
+		//Processing info is append only
+		return true;
 	}
 
 	

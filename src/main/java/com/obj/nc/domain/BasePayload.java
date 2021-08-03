@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.obj.nc.Get;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
@@ -32,6 +31,8 @@ import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.refIntegrity.Reference;
+import com.obj.nc.repositories.GenericEventRepository;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -104,6 +105,7 @@ public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements H
 	@Override
 	@JsonIgnore
 	@Transient
+	@Reference(GenericEventRepository.class)
 	public List<UUID> getEventIds() {
 		return getHeader().getEventIds();
 	}

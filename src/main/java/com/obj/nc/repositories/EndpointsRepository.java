@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
+import com.obj.nc.domain.refIntegrity.EntityExistanceChecker;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -37,7 +38,7 @@ import lombok.extern.log4j.Log4j2;
  */
 @Service
 @Log4j2
-public class EndpointsRepository {
+public class EndpointsRepository implements EntityExistanceChecker<UUID> {
 	
     @Autowired
     private JdbcTemplate jdbcTemplate;     
@@ -216,6 +217,12 @@ public class EndpointsRepository {
     public Map<String, RecievingEndpoint> persistEnpointIfNotExistsMappedToNameId(RecievingEndpoint ... ednpoints) {
     	return persistEnpointIfNotExistsMappedToNameId(Arrays.asList(ednpoints));
     }
+
+
+	@Override
+	public boolean existsById(UUID id) {
+		return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM nc_endpoint WHERE id = ?)", Boolean.class, id);		
+	}
 
 
 
