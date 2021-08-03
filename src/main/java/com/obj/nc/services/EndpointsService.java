@@ -20,7 +20,6 @@ public interface EndpointsService {
                                        EndpointType endpointType, 
                                        Pageable pageable);
     
-    List<RecievingEndpoint> findEndpointsByIds(Pageable pageable,
-                                               UUID... endpointIds);
+    List<RecievingEndpoint> findEndpointsByIds(UUID... endpointIds);
     
 }

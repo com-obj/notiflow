@@ -89,7 +89,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	deliveryRepo.saveAll( Arrays.asList(info1, info2, info3, info4) );
     	
     	//WHEN
-    	List<EndpointDeliveryInfoDto> infos = controller.findDeliveryInfosByEventId(eventId.toString(), null);
+    	List<EndpointDeliveryInfoDto> infos = controller.findDeliveryInfosByEventId(eventId.toString());
     	
     	//THEN
     	Assertions.assertThat(infos.size()).isEqualTo(2);

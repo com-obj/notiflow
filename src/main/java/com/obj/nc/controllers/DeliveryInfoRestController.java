@@ -41,15 +41,14 @@ public class DeliveryInfoRestController {
 	
 	@GetMapping(value = "/events/{eventId}", consumes="application/json", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
-    		@PathVariable (value = "eventId", required = true) String eventId,
-			Pageable pageable) {
+    		@PathVariable (value = "eventId", required = true) String eventId) {
 
 		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByEventIdOrderByProcessedOn(UUID.fromString(eventId));
 
 		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
 		
 		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
-		List<RecievingEndpoint> endpoints = endpointRepo.findEndpointsByIds(endpointIds, pageable);
+		List<RecievingEndpoint> endpoints = endpointRepo.findEndpointsByIds(endpointIds);
 		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
 		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
 		
@@ -58,15 +57,14 @@ public class DeliveryInfoRestController {
 	
 	@GetMapping(value = "/events/ext/{extEventId}", consumes="application/json", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByExtId(
-    		@PathVariable (value = "extEventId", required = true) String extEventId,
-			Pageable pageable) {
+    		@PathVariable (value = "extEventId", required = true) String extEventId) {
 
 		GenericEvent event = eventRepo.findByExternalId(extEventId);
 		if (event == null) {
 			throw new IllegalArgumentException("Event with " +  extEventId +" external ID not found");
 		}
 		
-		return findDeliveryInfosByEventId(event.getId().toString(), pageable);
+		return findDeliveryInfosByEventId(event.getId().toString());
     }
 	
 	@PutMapping(value = "/messages/read/{messageId}")

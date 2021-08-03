@@ -46,8 +46,8 @@ public class EndpointsServiceImpl implements EndpointsService {
     }
     
     @Override
-    public List<RecievingEndpoint> findEndpointsByIds(Pageable pageable, UUID... endpointIds) {
-        return endpointsRepository.findEndpointsByIds(asList(endpointIds), pageable);
+    public List<RecievingEndpoint> findEndpointsByIds(UUID... endpointIds) {
+        return endpointsRepository.findEndpointsByIds(asList(endpointIds));
     }
     
     private long countMessagesSentToEndpoint(RecievingEndpoint receivingEndpoint) {

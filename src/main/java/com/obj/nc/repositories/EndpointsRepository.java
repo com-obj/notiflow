@@ -32,7 +32,6 @@ public interface EndpointsRepository extends PagingAndSortingRepository<Recievin
     @Query(value = "select id, endpoint_name, endpoint_type " + 
                    "from nc_endpoint " +
                    "where id in (:endpoint_ids)", rowMapperClass = ReceivingEndpointRowMapper.class)
-    List<RecievingEndpoint> findEndpointsByIds(@Param("endpoint_ids") List<UUID> endpointIds,
-                                               Pageable pageable);
+    List<RecievingEndpoint> findEndpointsByIds(@Param("endpoint_ids") List<UUID> endpointIds);
     
 }
