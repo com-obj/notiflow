@@ -149,5 +149,47 @@ public class DeliveryInfoRepositoryTest {
 		
 		Assertions.assertThat(infosInDb.size()).isEqualTo(2);
 	}
+	
+	@Test
+	public void testSaveWrongReferences() {
+		//GIVEN
+		DeliveryInfo deliveryInfo1 = DeliveryInfo.builder()
+				.endpointId(UUID.randomUUID())
+				.status(DELIVERY_STATUS.SENT)
+				.id(UUID.randomUUID())
+				.build();
+		// WHEN
+		Assertions.assertThatThrownBy(
+				() -> deliveryInfoRepo.save(deliveryInfo1))
+			.isInstanceOf(RuntimeException.class)
+			.hasMessageContaining("which cannot be found in the DB")
+			.hasMessageContaining("endpointId");
+		
+		//GIVEN
+		DeliveryInfo deliveryInfo2 = DeliveryInfo.builder()
+				.eventId(UUID.randomUUID())
+				.status(DELIVERY_STATUS.SENT)
+				.id(UUID.randomUUID())
+				.build();
+		// WHEN
+		Assertions.assertThatThrownBy(
+				() -> deliveryInfoRepo.save(deliveryInfo2))
+			.isInstanceOf(RuntimeException.class)
+			.hasMessageContaining("which cannot be found in the DB")
+			.hasMessageContaining("eventId");
+		
+		//GIVEN
+		DeliveryInfo deliveryInfo3 = DeliveryInfo.builder()
+				.messageId(UUID.randomUUID())
+				.status(DELIVERY_STATUS.SENT)
+				.id(UUID.randomUUID())
+				.build();
+		// WHEN
+		Assertions.assertThatThrownBy(
+				() -> deliveryInfoRepo.save(deliveryInfo3))
+			.isInstanceOf(RuntimeException.class)
+			.hasMessageContaining("which cannot be found in the DB")
+			.hasMessageContaining("messageId");
+	}
 
 }
