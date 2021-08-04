@@ -26,7 +26,7 @@ public class EndpointsRestController {
     public Page<EndpointDto> findAllEndpoints(
             @RequestParam(value = "startAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant startAt,
             @RequestParam(value = "endAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant endAt,
-            @RequestParam(value = "endpointType", required = false) EndpointType endpointType,
+            @RequestParam(value = "endpointType", required = false, defaultValue = "ANY") EndpointType endpointType,
             Pageable pageable) {
         return endpointsService.findAllEndpoints(startAt, endAt, endpointType, pageable);
     }

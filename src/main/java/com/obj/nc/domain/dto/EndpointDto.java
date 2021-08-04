@@ -13,19 +13,19 @@ public class EndpointDto {
     private final UUID uuid;
     private final String name;
     private final EndpointType type;
-    private final long sentMessages;
+    private final long sentMessagesCount;
     
-    public static EndpointDto from(RecievingEndpoint receivingEndpoint, long sentMessages) {
+    public static EndpointDto from(RecievingEndpoint receivingEndpoint, long sentMessagesCount) {
         return EndpointDto.builder()
                 .uuid(receivingEndpoint.getId())
                 .name(receivingEndpoint.getEndpointId())
                 .type(EndpointType.valueOf(receivingEndpoint.getEndpointType()))
-                .sentMessages(sentMessages)
+                .sentMessagesCount(sentMessagesCount)
                 .build();
     }
     
     public enum EndpointType {
-        EMAIL, SMS, MAILCHIMP
+        EMAIL, SMS, MAILCHIMP, ANY
     }
     
 }

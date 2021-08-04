@@ -86,8 +86,8 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	
 		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(2);
-		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk");
-		assertContainsEndpoint(endpoints, "SMS", "+999999999999");
+		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk", 0);
+		assertContainsEndpoint(endpoints, "SMS", "+999999999999", 0);
 	}
 	
 	@Test
@@ -110,7 +110,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		
 		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(1);
-		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk");
+		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk", 1);
 	}
 	
 	@Test
@@ -133,8 +133,8 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		
 		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(2);
-		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk");
-		assertContainsEndpoint(endpoints, "SMS", "+999999999999");
+		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk", 1);
+		assertContainsEndpoint(endpoints, "SMS", "+999999999999", 0);
 	}
 	
 	@Test
@@ -156,8 +156,8 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		
 		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(2);
-		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk");
-		assertContainsEndpoint(endpoints, "SMS", "+999999999999");
+		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk", 1);
+		assertContainsEndpoint(endpoints, "SMS", "+999999999999", 0);
 	}
 	
 	@Test
@@ -179,8 +179,8 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		
 		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(2);
-		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk");
-		assertContainsEndpoint(endpoints, "SMS", "+999999999999");
+		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk", 1);
+		assertContainsEndpoint(endpoints, "SMS", "+999999999999", 0);
 	}
 	
 	@Test
@@ -202,7 +202,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		
 		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(1);
-		assertContainsEndpoint(endpoints, "SMS", "+999999999999");
+		assertContainsEndpoint(endpoints, "SMS", "+999999999999", 0);
 	}
 	
 	@Test
@@ -307,9 +307,10 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		deliveryInfoRepository.saveAll(asList(emailDeliveryInfo, phoneDeliveryInfo));
 	}
 	
-	private void assertContainsEndpoint(List<LinkedHashMap<?, ?>> endpoints, String endpointType, String endpointName) {
+	private void assertContainsEndpoint(List<LinkedHashMap<?, ?>> endpoints, String endpointType, String endpointName, long sentMessagesCount) {
 		Optional<LinkedHashMap<?, ?>> emailDto = endpoints.stream().filter(endpoint -> endpointType.equals(endpoint.get("type"))).findFirst();
 		assertThat(emailDto.get().get("name")).isEqualTo(endpointName);
+		assertThat(Long.valueOf(emailDto.get().get("sentMessagesCount").toString())).isEqualTo(sentMessagesCount);
 	}
 	
 	private void awaitDeliveryInfos() {
