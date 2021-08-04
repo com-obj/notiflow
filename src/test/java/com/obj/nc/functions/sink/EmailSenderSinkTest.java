@@ -27,6 +27,7 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoSendGenerator;
@@ -34,6 +35,8 @@ import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.processors.senders.config.EmailSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.GenericEventRepositoryTest;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -45,6 +48,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     @Autowired private EmailSender functionSend;
     @Autowired private DeliveryInfoSendGenerator delInfoGenerator;
     @Autowired private EmailSenderConfigProperties settings;
+    @Autowired private GenericEventRepository eventRepo;
     
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
@@ -61,9 +65,12 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     @Test
     void sendSingleMail() throws MessagingException, IOException {
         //GIVEN
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId1 = eventRepo.save(event).getId();
+    	
         String INPUT_JSON_FILE = "messages/email_message.json";
         EmailMessage message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
-        UUID originalProcessingId = message.getProcessingInfo().getProcessingId();
+        message.getHeader().addEventId(eventId1);
 
         //WHEN
         message = functionSend.apply(message);

@@ -56,14 +56,14 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     @Autowired private EmailProcessingFlow emailSendingFlow;
     @Autowired private NcAppConfigProperties ncAppConfigProperties;
     
-	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-	@Autowired private SourcePollingChannelAdapter pollableSource;
+//	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
+//	@Autowired private SourcePollingChannelAdapter pollableSource;
     
     @BeforeEach
     void setupGreenMail() throws FolderException {
         greenMail.purgeEmailFromAllMailboxes();
         
-    	pollableSource.start();
+//    	pollableSource.start();
     }
     
     @Test
@@ -120,7 +120,8 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         EmailMessage inputMessage = JsonUtils.readObjectFromClassPathResource("messages/simple_email_message.json", EmailMessage.class);
         
         //when
-        EmailMessage emailSent = emailSendingFlow.sendEmail(inputMessage).get(1, TimeUnit.SECONDS);
+        EmailMessage emailSent = emailSendingFlow.sendEmail(inputMessage)
+        		.get(1, TimeUnit.SECONDS);
         // then
         assertThat(emailSent, CoreMatchers.notNullValue());
     }
@@ -162,11 +163,11 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         assertThat(imgs.get(0).attr("src"), startsWith(ncAppConfigProperties.getUrl()+"/delivery-info/messages/read/"));
     }
 
-    @AfterEach
-    public void stopSourcePolling() {
-    	pollableSource.stop();
-    }
-    
+//    @AfterEach
+//    public void stopSourcePolling() {
+//    	pollableSource.stop();
+//    }
+//    
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
             .withConfiguration(

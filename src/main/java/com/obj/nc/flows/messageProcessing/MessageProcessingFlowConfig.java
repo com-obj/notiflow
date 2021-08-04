@@ -17,7 +17,9 @@ import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
+import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.messageBuilder.MessageByRecipientTokenizer;
+import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -26,6 +28,9 @@ import lombok.extern.log4j.Log4j2;
 public class MessageProcessingFlowConfig {
 		
 	@Autowired MessageByRecipientTokenizer<?> messageByRecipientTokenizer;
+	@Autowired MessagePersister messagePersister;
+	@Autowired EndpointPersister endpointPersister;
+	
 	
 	public final static String MESSAGE_PROCESSING_FLOW_ID = "MESSAGE_PROCESSING_FLOW_ID";
 	public final static String MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID = MESSAGE_PROCESSING_FLOW_ID + "_INPUT";
@@ -41,6 +46,8 @@ public class MessageProcessingFlowConfig {
 				.from(messageProcessingInputChannel())
 				.transform(messageByRecipientTokenizer)
 				.split()
+				.handle(endpointPersister)
+				.handle(messagePersister) //need to persist, otherwise delivery info will have invalid reference
 				.wireTap( flowConfig -> 
 					flowConfig.channel(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 				)

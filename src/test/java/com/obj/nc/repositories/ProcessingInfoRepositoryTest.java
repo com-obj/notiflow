@@ -18,6 +18,7 @@ import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.utils.JsonUtils;
 
@@ -27,6 +28,7 @@ import com.obj.nc.utils.JsonUtils;
 public class ProcessingInfoRepositoryTest {
 
 	@Autowired ProcessingInfoRepository infoRepository;
+	@Autowired GenericEventRepository eventRepo;
 	
 	@Test
 	public void testPersistingSingleInfo() {
@@ -37,10 +39,9 @@ public class ProcessingInfoRepositoryTest {
 		Optional<ProcessingInfo> infoInDb = infoRepository.findById(info.getProcessingId());
 		
 		Assertions.assertThat(infoInDb.isPresent()).isTrue();
-	}
+	}	
 	
 	@Test
-	@Disabled
 	public void testFindByEventIdsAndStepName() {
 		//GIVEN
 		ProcessingInfo transientInfo = createSimpleProcessingInfo();
@@ -53,6 +54,27 @@ public class ProcessingInfoRepositoryTest {
 		ProcessingInfo persistedPI = infosInDb.iterator().next();
 		
        assertCurrentIsExpected(transientInfo, persistedPI);
+	}
+	
+	@Test
+	public void testPersistingInvalidReference() {
+		// WHEN
+		final ProcessingInfo info2 = ProcessingInfo.builder()
+				.processingId(UUID.randomUUID())
+				.prevProcessingId(null)
+				.stepName("stepName")
+				.stepIndex(1)
+				.timeProcessingStart(Instant.now())
+				.timeProcessingEnd(Instant.now())
+				.stepDurationMs(0)
+				.eventIds(new UUID[] {UUID.randomUUID()})
+				.build();
+		
+		// THEN
+		Assertions.assertThatThrownBy(
+				() -> infoRepository.save(info2))
+			.isInstanceOf(RuntimeException.class)
+			.hasMessageContaining("which cannot be found in the DB");
 	}
 
 	public static void assertCurrentIsExpected( ProcessingInfo current, ProcessingInfo expected) {
@@ -68,12 +90,17 @@ public class ProcessingInfoRepositoryTest {
 	}
 
 	private ProcessingInfo createSimpleProcessingInfo() {
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId1 = eventRepo.save(event).getId();
+		GenericEvent event2 = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId2 = eventRepo.save(event2).getId();
+		
 		String INPUT_JSON_FILE = "intents/direct_message.json";
 		String content = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
 
 		ProcessingInfo info = ProcessingInfo.builder()
 				.processingId(UUID.randomUUID())
-				.prevProcessingId(UUID.randomUUID())
+				.prevProcessingId(null)
 				.stepName("stepName")
 				.stepIndex(1)
 				.timeProcessingStart(Instant.now())
@@ -81,7 +108,7 @@ public class ProcessingInfoRepositoryTest {
 				.stepDurationMs(0)
 				.payloadJsonStart(content)
 				.payloadJsonEnd(content)
-				.eventIds(new UUID[] {UUID.randomUUID(), UUID.randomUUID()})
+				.eventIds(new UUID[] {eventId1, eventId2})
 				.build();
 		return info;
 	}

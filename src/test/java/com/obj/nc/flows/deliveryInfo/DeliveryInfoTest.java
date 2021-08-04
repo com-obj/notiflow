@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
@@ -29,11 +28,11 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
+import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
@@ -42,9 +41,16 @@ import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
-import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
+import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.repositories.DeliveryInfoRepository;
+import com.obj.nc.repositories.EndpointsRepository;
+import com.obj.nc.repositories.FailedPayloadRepository;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.GenericEventRepositoryTest;
+import com.obj.nc.repositories.MessageRepository;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -52,13 +58,17 @@ import com.obj.nc.utils.JsonUtils;
 @SpringBootTest
 public class DeliveryInfoTest extends BaseIntegrationTest {
 	
-	@Autowired private GenerateEventIdProcessingFunction generateEventId;
     @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
     @Autowired private MessagesFromIntentGenerator generateMessagesFromIntent;
+    @Autowired private MessagePersister messagePersister;
     @Autowired private DeliveryInfoRepository deliveryInfoRepo;
     @Autowired private JdbcTemplate jdbcTemplate;
     @Autowired private EmailProcessingFlow emailSendingFlow;
     @Autowired private DeliveryInfoFlow deliveryInfoFlow;
+    @Autowired private GenericEventRepository eventRepo;
+    @Autowired private EndpointsRepository endpointRepo;
+	@Autowired private MessageRepository messageRepo;
+	@Autowired private FailedPayloadRepository failedPayloadRepo;
 	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForSpringMessages;    
  	
     @BeforeEach
@@ -69,12 +79,15 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Test
     void testDeliveryInfosCreateAndPersisted() {
         // GIVEN
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId = eventRepo.save(event).getId();
+		
         String INPUT_JSON_FILE = "intents/ba_job_post.json";
         NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-
-        notificationIntent = (NotificationIntent)generateEventId.apply(notificationIntent);
-        UUID eventId = notificationIntent.getHeader().getEventIds().get(0);
+        notificationIntent.getHeader().addEventId(eventId);
+        
         notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
+        notificationIntent.ensureEnpointsPersisted();
         
         //WHEN
         deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(notificationIntent);
@@ -97,7 +110,10 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         //WHEN
         List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);
         
+        
         messages.forEach(msg -> {
+        	msg = (EmailMessage) messagePersister.apply(msg);
+        	
             deliveryInfoFlow.createAndPersistSentDeliveryInfo(msg);
         });
         
@@ -120,13 +136,18 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     
     @Test
     void testDeliveryInfosCreateAndPersistedForFailedDelivery() throws InterruptedException, ExecutionException, TimeoutException {
-        // GIVEN    	
+        // GIVEN    	        
+    	final EmailEndpoint wrongEmail = endpointRepo.persistEnpointIfNotExists(
+    			EmailEndpoint.builder().email("wrong email").build()
+    	);
+        
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId = eventRepo.save(event).getId();
+		
     	EmailMessage email = new EmailMessage();
-        EmailEndpoint wrongEmail = EmailEndpoint.builder().email("wrong email").build();
-        email.addRecievingEndpoints(
-                wrongEmail);
-        UUID eventId = UUID.randomUUID();
+        email.addRecievingEndpoints(wrongEmail);
         email.getHeader().addEventId(eventId);
+        messageRepo.save(email.toPersistantState());
         
         //WHEN
         emailSendingFlow.sendEmail(email);
@@ -148,8 +169,14 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Test
     void testDeliveryInfosCreateAndPersistedForFailedDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
-    	UUID eventId = UUID.randomUUID();
-    	SmsMessage failedMessage = createTestSMS(eventId, "09050123456");
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId = eventRepo.save(event).getId();
+		
+		SmsEndpoint smsEndpoint = endpointRepo.persistEnpointIfNotExists(new SmsEndpoint("09050123456"));  
+		
+		//AND GIVEN
+    	SmsMessage failedMessage = createTestSMS(eventId, smsEndpoint);
+    	messageRepo.save(failedMessage.toPersistantState());
     	org.springframework.messaging.Message<SmsMessage> failedSpringMessage = MessageBuilder.withPayload(failedMessage).build();
     	
     	JsonNode messageJson = jsonConverterForSpringMessages.valueToTree(failedSpringMessage);
@@ -161,6 +188,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         		.id(UUID.randomUUID())
         		.messageJson(messageJson)
         		.build();
+    	failedPayloadRepo.save(failedPaylod);
         
         //WHEN
         List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistFailedDeliveryInfo(failedPaylod).get(1, TimeUnit.SECONDS);
@@ -182,8 +210,13 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Test
     void testDeliveryInfosCreateAndPersistedForProcessingDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
-    	UUID eventId = UUID.randomUUID();
-    	SmsMessage msg = createTestSMS(eventId, "09050123456");
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId = eventRepo.save(event).getId();
+		
+		//AND GIVEN
+		SmsEndpoint smsEndpoint = endpointRepo.persistEnpointIfNotExists(new SmsEndpoint("09050123456"));  
+    	SmsMessage msg = createTestSMS(eventId, smsEndpoint);
+    	messageRepo.save(msg.toPersistantState());
     	        
         //WHEN
         List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(msg).get(1, TimeUnit.SECONDS);
@@ -201,10 +234,11 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         checkSingleDelInfoExistsForEvent(eventId);
     }
 
-	private SmsMessage createTestSMS(UUID eventId, String telNumber) {
+	private SmsMessage createTestSMS(UUID eventId, SmsEndpoint telNumber) {
 		SmsMessage msg = new SmsMessage();
     	msg.getHeader().setEventIds(Arrays.asList(eventId));
-    	msg.addRecievingEndpoints(new SmsEndpoint(telNumber));
+    	
+    	msg.addRecievingEndpoints(telNumber);
 		return msg;
 	}
 
@@ -216,8 +250,13 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Test
     void testDeliveryInfosCreateAndPersistedForSentDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
-    	UUID eventId = UUID.randomUUID();
-    	SmsMessage msg = createTestSMS(eventId, "09050123456");
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId = eventRepo.save(event).getId();
+		
+		//AND GIVEN
+		SmsEndpoint smsEndpoint = endpointRepo.persistEnpointIfNotExists(new SmsEndpoint("09050123456"));  
+    	SmsMessage msg = createTestSMS(eventId, smsEndpoint);
+    	messageRepo.save(msg.toPersistantState());
     	        
         //WHEN
         List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistSentDeliveryInfo(msg).get(1, TimeUnit.SECONDS);
