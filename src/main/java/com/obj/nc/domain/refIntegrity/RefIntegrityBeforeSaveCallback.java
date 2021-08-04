@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.conversion.MutableAggregateChange;
 import org.springframework.data.relational.core.mapping.event.BeforeSaveCallback;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import com.obj.nc.Get;
 
 @Component
+@ConditionalOnProperty(name="nc.app.check-reference-integrity", havingValue = "true")
 public class RefIntegrityBeforeSaveCallback implements BeforeSaveCallback<Persistable<UUID>> {
 
 	@Override
