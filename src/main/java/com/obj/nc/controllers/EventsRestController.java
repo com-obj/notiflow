@@ -2,15 +2,16 @@ package com.obj.nc.controllers;
 
 import com.obj.nc.functions.processors.eventValidator.GenericEventJsonSchemaValidator;
 import com.obj.nc.functions.processors.eventValidator.SimpleJsonValidator;
+import com.obj.nc.services.EventsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.relational.core.conversion.DbActionExecutionException;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.event.EventRecieverResponce;
@@ -18,17 +19,20 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 
+import java.time.Instant;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Validated
 @RestController
 @RequestMapping("/events")
-public class EventReceiverRestController {
+@RequiredArgsConstructor
+public class EventsRestController {
 
-	@Autowired
-	private GenericEventPersisterConsumer persister;
-	@Autowired
-	private SimpleJsonValidator simpleJsonValidator;
-	@Autowired
-	private GenericEventJsonSchemaValidator jsonSchemaValidator;
+	private final GenericEventPersisterConsumer persister;
+	private final SimpleJsonValidator simpleJsonValidator;
+	private final GenericEventJsonSchemaValidator jsonSchemaValidator;
+	private final EventsService eventsService;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
     public EventRecieverResponce persistGenericEvent(
@@ -58,5 +62,13 @@ public class EventReceiverRestController {
 
     	return EventRecieverResponce.from(event.getId());
     }
+	
+	@GetMapping(produces = APPLICATION_JSON_VALUE)
+	public Page<GenericEvent> findAllEvents(
+			@RequestParam(value = "consumedFrom", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedFrom,
+			@RequestParam(value = "consumedTo", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedTo,
+			Pageable pageable) {
+		return eventsService.findAllEvents(consumedFrom, consumedTo, pageable);
+	}
 
 }
