@@ -43,8 +43,8 @@ component [noti-flow] as mainFlow {
         [MessageReceiver]<<REST API>>
         [DeliveryInfo]<<REST API>>
 
-        EventReceiver --[hidden] MessageReceiver
-        MessageReceiver --[hidden] DeliveryInfo
+        EventReceiver --[hidden] DeliveryInfo
+        DeliveryInfo --[hidden] MessageReceiver
     }
 
     package standard-flow {
@@ -53,18 +53,13 @@ component [noti-flow] as mainFlow {
 
         InputEventRouting --> InputEventExtensionConverting: (GenericEvent)
 
-        together {
+        [MessageProcessingFlow]
+        [NotificationIntentProcessingFlow]
 
-            [MessageProcessingFlow]
-            [NotificationIntentProcessingFlow]
+        InputEventExtensionConverting -> NotificationIntentProcessingFlow: (NotificationIntent)
+        InputEventExtensionConverting --> MessageProcessingFlow: (Message)
 
-            MessageProcessingFlow -[hidden]> NotificationIntentProcessingFlow
-        }
-
-        InputEventExtensionConverting ---> MessageProcessingFlow: (Message)
-        InputEventExtensionConverting ---> NotificationIntentProcessingFlow: (NotificationIntent)
-
-    component Sending {
+        component Sending {
             [EmailProcessingFlow]
             [SmsProcessingFlow]
             [MailchimpProcessingFlow]
@@ -73,14 +68,14 @@ component [noti-flow] as mainFlow {
             SmsProcessingFlow -[hidden]> MailchimpProcessingFlow
         }
 
-        NotificationIntentProcessingFlow ---> Sending: (Message)
+        NotificationIntentProcessingFlow --> MessageProcessingFlow: (Message)
         MessageProcessingFlow ---> Sending: (Message)
 
-        [DeliveryInfoFlow] as DeliveryInfoFlow
-        MessageProcessingFlow -> DeliveryInfoFlow: <<processing DI>>
-        NotificationIntentProcessingFlow -> DeliveryInfoFlow: <<processing DI>>
+        [DeliveryInfoFlow] as DeliveryInfoFlow1
+        [DeliveryInfoFlow] as DeliveryInfoFlow2
+        MessageProcessingFlow -> DeliveryInfoFlow1: <<processing DI>>
 
-        Sending -u-> DeliveryInfoFlow: <<send DI>>
+        Sending -d-> DeliveryInfoFlow2: <<send DI>>
 
 
     }
@@ -89,29 +84,16 @@ component [noti-flow] as mainFlow {
         MessageProcessingFlow -- processMessageInt
 
         interface "createAndPersistReadDeliveryInfo" as readDIInt
-        DeliveryInfoFlow - readDIInt
+        DeliveryInfoFlow1 -- readDIInt
 
-/'
-    package test-mode {
-        [TestModeEmailsFlow]
-        [TestModeMailchimpFlow]
-        [TestModeSmsFlow]
-        [TestModeFlow]
-    }
-
-    TestModeEmailsFlow --> TestModeFlow: (Message)
-    TestModeSmsFlow --> TestModeFlow: (Message)
-    TestModeMailchimpFlow --> TestModeFlow: (Message) 
-
-    '/
 }
 
-interface "URL: rest/events" as restEventInt
-EventReceiver - restEventInt
-interface "URL: rest/messages (SendEmailMessageRequest)" as restMessagesInt
-MessageReceiver - restMessagesInt
-interface "URL: rest/delivery-info/messages/read/{messageId}" as restDIReadInt
-DeliveryInfo - restDIReadInt
+    interface "URL: rest/events" as restEventInt
+    EventReceiver - restEventInt
+    interface "URL: rest/messages (SendEmailMessageRequest)" as restMessagesInt
+    MessageReceiver - restMessagesInt
+    interface "URL: rest/delivery-info/messages/read/{messageId}" as restDIReadInt
+    DeliveryInfo - restDIReadInt
 
     EventReceiver -u-> nc_event: <<put>>
     InputEventRouting .> nc_event: <<get>>

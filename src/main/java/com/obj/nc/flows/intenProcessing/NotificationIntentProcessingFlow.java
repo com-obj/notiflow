@@ -1,7 +1,7 @@
-package com.obj.nc.flows.intenToMessageToSender;
+package com.obj.nc.flows.intenProcessing;
 
 
-import static com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.intenProcessing.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
