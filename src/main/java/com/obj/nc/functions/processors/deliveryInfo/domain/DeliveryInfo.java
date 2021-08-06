@@ -11,6 +11,12 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
+import com.obj.nc.domain.refIntegrity.Reference;
+import com.obj.nc.repositories.EndpointsRepository;
+import com.obj.nc.repositories.FailedPayloadRepository;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.MessageRepository;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -47,13 +53,17 @@ public class DeliveryInfo implements Persistable<UUID> {
 	@Getter
 	private Instant processedOn;
 	
+	@Reference(GenericEventRepository.class)
 	private UUID eventId;
 	
 	@NotNull
+	@Reference(EndpointsRepository.class)
 	private UUID endpointId;
 	
+	@Reference(FailedPayloadRepository.class)
 	private UUID failedPayloadId;
 	
+	@Reference(MessageRepository.class)
 	private UUID messageId;
 
 	@Override

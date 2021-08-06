@@ -19,7 +19,6 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageTeamplating.domain.TestModel;
 import com.obj.nc.utils.JsonUtils;
 
@@ -32,9 +31,6 @@ class MessagesFromIntentTest {
 		//GIVEN
 		String INPUT_JSON_FILE = "intents/direct_message.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-
-		GenerateEventIdProcessingFunction generateEventfunction = new GenerateEventIdProcessingFunction();
-		notificationIntent = (NotificationIntent)generateEventfunction.apply(notificationIntent);
 		
 		//WHEN
 		MessagesFromIntentGenerator createMessagesFunction = new MessagesFromIntentGenerator();
@@ -63,9 +59,6 @@ class MessagesFromIntentTest {
 		//GIVEN
 		String INPUT_JSON_FILE = "intents/direct_message_attachements.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-
-		GenerateEventIdProcessingFunction generateEventFunc = new GenerateEventIdProcessingFunction();
-		notificationIntent = (NotificationIntent)generateEventFunc.apply(notificationIntent);
 		
 		//WHEN
 		MessagesFromIntentGenerator createMessagesFunction = new MessagesFromIntentGenerator();

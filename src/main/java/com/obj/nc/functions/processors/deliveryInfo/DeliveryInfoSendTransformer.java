@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
@@ -20,14 +21,14 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class DeliveryInfoSendTransformer extends ProcessorFunctionAdapter<DeliveryInfoSendResult, List<DeliveryInfo>> {
 
-    @Autowired
-    private EndpointsRepository endpointsRepo;
-
+//    @Autowired
+//    private EndpointsRepository endpointsRepo;
 
 	@Override
 	protected List<DeliveryInfo> execute(DeliveryInfoSendResult deliveryInfo) {
-		endpointsRepo.persistEnpointIfNotExists(deliveryInfo.getRecievingEndpoint());
-		
+//		RecievingEndpoint persistedEndpoints = endpointsRepo.persistEnpointIfNotExists(deliveryInfo.getRecievingEndpoint());
+//		deliveryInfo.setRecievingEndpoint(persistedEndpoints);
+//		
 		List<DeliveryInfo> infos = createFromSendResults(deliveryInfo);
 				
 		infos.forEach(info -> {

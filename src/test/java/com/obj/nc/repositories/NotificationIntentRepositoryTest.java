@@ -18,6 +18,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.utils.JsonUtils;
 
@@ -27,6 +30,7 @@ import com.obj.nc.utils.JsonUtils;
 public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	
 	@Autowired NotificationIntentRepository intentRepository;
+	@Autowired GenericEventRepository eventRepo;
 	
 	@BeforeEach
 	void setUp(@Autowired JdbcTemplate jdbcTemplate) {
@@ -39,8 +43,13 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 		 String INPUT_JSON_FILE = "intents/ba_job_post.json";
 	     NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 	     notificationIntent.getHeader().setFlowId("default-flow");
-	     UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
-	     notificationIntent.getHeader().setEventIdsAsArray(eventIds);
+	     
+	     GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+	     GenericEvent event2 = GenericEventRepositoryTest.createDirectMessageEvent();
+		 UUID[] eventIds = new UUID[]{
+					eventRepo.save(event).getId(), 
+					eventRepo.save(event2).getId()};
+		 notificationIntent.getHeader().setEventIdsAsArray(eventIds);	     
  		
 	     intentRepository.save(notificationIntent);
 	     
@@ -62,8 +71,6 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 		String INPUT_JSON_FILE = "intents/ba_job_post.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 		notificationIntent.getHeader().setFlowId("default-flow");
-		UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
-		notificationIntent.getHeader().setEventIdsAsArray(eventIds);
 		notificationIntent.setId(UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b"));
 		intentRepository.save(notificationIntent);
 		// WHEN
@@ -80,8 +87,6 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 		String INPUT_JSON_FILE = "intents/ba_job_post.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 		notificationIntent.getHeader().setFlowId("default-flow");
-		UUID[] eventIds = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
-		notificationIntent.getHeader().setEventIdsAsArray(eventIds);
 		notificationIntent.setId(UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b"));
 		intentRepository.save(notificationIntent);
 		// WHEN
@@ -89,6 +94,36 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 				UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981c")));
 		// THEN
 		Assertions.assertThat(oIntentInDB.isEmpty()).isTrue();
+	}
+	
+	@Test
+	public void testIntentReferencingNonExistingEnpoindAndEventFails() {
+		//GIVEN
+		String INPUT_JSON_FILE = "intents/ba_job_post.json";
+		
+		//Intent nuklada zatial do db endpointIds,.. ked sa prida toto odkomentovat
+//		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);			
+//		notificationIntent.setId(UUID.randomUUID());
+//		notificationIntent.addRecievingEndpoints(EmailEndpoint.builder().email("test@test.sk").build());
+//		
+//		// WHEN
+//		Assertions.assertThatThrownBy(
+//				() -> intentRepository.save(notificationIntent))
+//			.isInstanceOf(RuntimeException.class)
+//			.hasMessageContaining("which cannot be found in the DB")
+//			.hasMessageContaining("endpointIds");
+		
+		//GIVEN
+		final NotificationIntent notificationIntent2 = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);				
+		notificationIntent2.setId(UUID.randomUUID());
+		notificationIntent2.getHeader().addEventId(UUID.randomUUID());
+		
+		// WHEN
+		Assertions.assertThatThrownBy(
+				() -> intentRepository.save(notificationIntent2))
+			.isInstanceOf(RuntimeException.class)
+			.hasMessageContaining("which cannot be found in the DB")
+			.hasMessageContaining("getEventIds");
 	}
 	
 }

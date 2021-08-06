@@ -2,7 +2,10 @@ package com.obj.nc.controllers;
 
 import com.jayway.jsonpath.JsonPath;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.message.MessagePersistantState;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.MessageRepository;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;

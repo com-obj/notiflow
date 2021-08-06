@@ -17,7 +17,10 @@ import org.springframework.test.context.ActiveProfiles;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.GenericEventRepositoryTest;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
@@ -28,6 +31,7 @@ import com.obj.nc.utils.JsonUtils;
 public class MessageProcessingTest extends BaseIntegrationTest {
 
 	@Autowired private MessageProcessingFlow msgFlow; 
+	@Autowired private GenericEventRepository eventRepo; 
 	    
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
@@ -45,9 +49,12 @@ public class MessageProcessingTest extends BaseIntegrationTest {
     @Test
     void testSendMessage() {
         // given
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId = eventRepo.save(event).getId();
+		
         String INPUT_JSON_FILE = "messages/e_email_message_2_many.json";
         EmailMessage msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
-        UUID eventId = msg.getHeader().getEventIds().get(0);
+        msg.getHeader().addEventId(eventId);
 
         // when
         msgFlow.processMessage(msg);

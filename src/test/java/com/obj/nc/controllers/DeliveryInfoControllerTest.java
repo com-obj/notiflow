@@ -7,6 +7,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -36,11 +37,15 @@ import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.controllers.DeliveryInfoRestController.EndpointDeliveryInfoDto;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
+import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.EndpointsRepository;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.GenericEventRepositoryTest;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,6 +64,8 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 	@Autowired private EndpointsRepository endpointRepo;
 	@Autowired protected MockMvc mockMvc;
 	@Autowired private DeliveryInfoRestController controller;
+	@Autowired GenericEventRepository eventRepo;
+	
 
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
@@ -70,23 +77,27 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
     	SmsEndpoint sms1 = SmsEndpoint.builder().phone("0908111111").build();
-    	endpointRepo.persistEnpointIfNotExists(email1, sms1);
+    	Map<String, RecievingEndpoint> endpoints = endpointRepo.persistEnpointIfNotExistsMappedToNameId(email1, sms1);
+    	UUID emailEndPointId = endpoints.get("jancuzy@gmail.com").getId();
+    	UUID smsEndPointId = endpoints.get("0908111111").getId();
     	
     	//AND
-    	UUID eventId = UUID.randomUUID();
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId = eventRepo.save(event).getId();
 
+    	//AND
     	DeliveryInfo info1 = DeliveryInfo.builder()
-    			.endpointId(email1.getId()).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+    			.endpointId(emailEndPointId).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	DeliveryInfo info2 = DeliveryInfo.builder()
-    			.endpointId(email1.getId()).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
+    			.endpointId(emailEndPointId).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
 
 
     	DeliveryInfo info3 = DeliveryInfo.builder()
-    			.endpointId(sms1.getId()).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+    			.endpointId(smsEndPointId).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	Thread.sleep(10); // to have different processedOn
 
     	DeliveryInfo info4 = DeliveryInfo.builder()
-    			.endpointId(sms1.getId()).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
+    			.endpointId(smsEndPointId).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
  
     	deliveryRepo.saveAll( Arrays.asList(info1, info2, info3, info4) );
     	
@@ -99,14 +110,14 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 
     	Instant now = Instant.now();
 
-    	Assertions.assertThat(infoForEmail.endpointId).isEqualTo(email1.getId());
+    	Assertions.assertThat(infoForEmail.endpointId).isEqualTo(emailEndPointId);
 		Assertions.assertThat(infoForEmail.getStatusReachedAt()).isCloseTo(now, Assertions.within(1, ChronoUnit.MINUTES));
     	Assertions.assertThat(infoForEmail.getCurrentStatus()).isEqualTo(DELIVERY_STATUS.SENT);
     	infos.remove(infoForEmail);
     	
     	
     	EndpointDeliveryInfoDto infoForSms = infos.iterator().next();
-    	Assertions.assertThat(infoForSms.endpointId).isEqualTo(sms1.getId());
+    	Assertions.assertThat(infoForSms.endpointId).isEqualTo(smsEndPointId);
     	Assertions.assertThat(infoForSms.getStatusReachedAt()).isCloseTo(now, Assertions.within(1, ChronoUnit.MINUTES));
     	Assertions.assertThat(infoForSms.getCurrentStatus()).isEqualTo(DELIVERY_STATUS.SENT);
     	
@@ -116,14 +127,17 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     void testFindDeliveryInfosRest() throws Exception {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
-    	endpointRepo.persistEnpointIfNotExists(email1);
+    	UUID emailEndpointId = endpointRepo.persistEnpointIfNotExists(email1).getId();
     	
     	//AND
-    	UUID eventId = UUID.randomUUID();
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId = eventRepo.save(event).getId();
+
+    	//AND
     	DeliveryInfo info1 = DeliveryInfo.builder()
-    			.endpointId(email1.getId()).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+    			.endpointId(emailEndpointId).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	DeliveryInfo info2 = DeliveryInfo.builder()
-    			.endpointId(email1.getId()).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
+    			.endpointId(emailEndpointId).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
 
     	deliveryRepo.saveAll( Arrays.asList(info1, info2) );
     	
@@ -152,17 +166,26 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 	void testReadMessageDeliveryInfoUpdate() throws Exception {
 		//GIVEN
 		EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
-		endpointRepo.persistEnpointIfNotExists(email1);
+		email1 = endpointRepo.persistEnpointIfNotExists(email1);
+		
+    	//AND
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId = eventRepo.save(event).getId();
 		
 		//AND
 		EmailMessage emailMessage = new EmailMessage();
 		emailMessage.setRecievingEndpoints(Arrays.asList(email1));
-		emailMessage.getHeader().setEventIds(Arrays.asList(UUID.randomUUID()));
+		emailMessage.getHeader().setEventIds(Arrays.asList(eventId));
 		MessagePersistantState emailMessagePersisted = messageRepo.save(emailMessage.toPersistantState());
 		
+		//AND
 		DeliveryInfo info = DeliveryInfo.builder()
-				.endpointId(email1.getId()).eventId(UUID.randomUUID()).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).messageId(emailMessagePersisted.getId()).build();
-		
+				.endpointId(email1.getId())
+				.eventId(eventId)
+				.status(DELIVERY_STATUS.SENT)
+				.id(UUID.randomUUID())
+				.messageId(emailMessagePersisted.getId())
+				.build();		
 		deliveryRepo.save(info);
 		
 		//WHEN TEST REST

@@ -27,6 +27,17 @@ public class GenericEventRepositoryTest {
 	@Test
 	public void testPersistingSingleEvent() {
 		//GIVEN
+		GenericEvent event = createDirectMessageEvent();
+		
+		eventRepository.save(event);
+		
+		Optional<GenericEvent> savedEvent = eventRepository.findById(event.getId());
+		
+		Assertions.assertThat(savedEvent.isPresent()).isTrue();
+
+	}
+
+	public static GenericEvent createDirectMessageEvent() {
 		String INPUT_JSON_FILE = "intents/direct_message.json";
 		String content = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
 		
@@ -37,12 +48,6 @@ public class GenericEventRepositoryTest {
 				.payloadJson(JsonUtils.readJsonNodeFromJSONString(content))
 				.timeConsumed(Instant.now())
 				.build();
-		
-		eventRepository.save(event);
-		
-		Optional<GenericEvent> savedEvent = eventRepository.findById(event.getId());
-		
-		Assertions.assertThat(savedEvent.isPresent()).isTrue();
-
+		return event;
 	}
 }
