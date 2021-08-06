@@ -302,8 +302,6 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         
     }
     
-//    -----------------------------------------------------
-    
     @Test
     void testFindAllEvents() throws Exception {
         //GIVEN
