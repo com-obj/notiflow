@@ -1,0 +1,135 @@
+@startuml
+!theme cerulean-outline
+
+
+skinparam component {
+    BackgroundColor<<user defined>> LightGray
+    BorderColor<<user defined>> Gray
+    FontColor<<user defined>> Black
+    ArrowColor<<get>> #FF6655
+
+    FontColor DarkSlateGray
+    FontName Courier
+    FontSize 15
+
+    FontSize<<PUB/SUB>> 12
+}
+
+
+
+    
+database "PostgreSQL" {
+    component nc_event [
+        nc_event
+        --
+        (GenericEvent)
+    ]
+}
+
+database "Topic/Channels" {
+
+    component CUSTOM_CHANNEL<<User defined>> [
+        CUSTOM_CHANNEL
+        --
+        (GenericEvent)
+    ]
+
+}
+
+component [noti-flow] as mainFlow {
+
+    package rest-api {
+        [EventReceiver]<<REST API>>
+        [MessageReceiver]<<REST API>>
+        [DeliveryInfo]<<REST API>>
+
+        EventReceiver --[hidden] MessageReceiver
+        MessageReceiver --[hidden] DeliveryInfo
+    }
+
+    package standard-flow {
+        [InputEventRouting]
+        [InputEventExtensionConverting]
+
+        InputEventRouting --> InputEventExtensionConverting: (GenericEvent)
+
+        together {
+
+            [MessageProcessingFlow]
+            [NotificationIntentProcessingFlow]
+
+            MessageProcessingFlow -[hidden]> NotificationIntentProcessingFlow
+        }
+
+        InputEventExtensionConverting ---> MessageProcessingFlow: (Message)
+        InputEventExtensionConverting ---> NotificationIntentProcessingFlow: (NotificationIntent)
+
+    component Sending {
+            [EmailProcessingFlow]
+            [SmsProcessingFlow]
+            [MailchimpProcessingFlow]
+
+            EmailProcessingFlow -[hidden]> SmsProcessingFlow
+            SmsProcessingFlow -[hidden]> MailchimpProcessingFlow
+        }
+
+        NotificationIntentProcessingFlow ---> Sending: (Message)
+        MessageProcessingFlow ---> Sending: (Message)
+
+        [DeliveryInfoFlow] as DeliveryInfoFlow
+        MessageProcessingFlow -> DeliveryInfoFlow: <<processing DI>>
+        NotificationIntentProcessingFlow -> DeliveryInfoFlow: <<processing DI>>
+
+        Sending -u-> DeliveryInfoFlow: <<send DI>>
+
+
+    }
+
+        interface "processMessage" as processMessageInt
+        MessageProcessingFlow -- processMessageInt
+
+        interface "createAndPersistReadDeliveryInfo" as readDIInt
+        DeliveryInfoFlow - readDIInt
+
+/'
+    package error-handling {
+        [ErrorHandlingFlow]
+        ErrorHandlingFlow .> errorChannel: <<get>>
+    }
+
+    package test-mode {
+        [TestModeEmailsFlow]
+        [TestModeMailchimpFlow]
+        [TestModeSmsFlow]
+        [TestModeFlow]
+    }
+
+    TestModeEmailsFlow --> TestModeFlow: (Message)
+    TestModeSmsFlow --> TestModeFlow: (Message)
+    TestModeMailchimpFlow --> TestModeFlow: (Message) 
+
+    '/
+}
+
+interface "URL: rest/events" as restEventInt
+EventReceiver - restEventInt
+interface "URL: rest/messages (SendEmailMessageRequest)" as restMessagesInt
+MessageReceiver - restMessagesInt
+interface "URL: rest/delivery-info/messages/read/{messageId}" as restDIReadInt
+DeliveryInfo - restDIReadInt
+
+    EventReceiver -u-> nc_event: <<put>>
+    InputEventRouting .> nc_event: <<get>>
+    InputEventRouting -u-> CUSTOM_CHANNEL: <<put>> (GenericEvent)
+
+
+
+
+
+
+MessageReceiver --> processMessageInt: (EmailMessage)
+DeliveryInfo --> readDIInt: (HasRecievingEndpoints)
+
+
+
+@enduml

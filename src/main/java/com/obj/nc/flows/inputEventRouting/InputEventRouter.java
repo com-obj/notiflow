@@ -22,7 +22,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 /**
- * Conversion from custom input event to anything which NC can handle might be very specific. This router enables to customize this the event->intent or event->message conversion
+ * Conversion from custom input event to anything which NC can handle might be very specific. This router enables to customise the event->intent or event->message conversion
  * It can be done it three ways
  * 1) register a bean implementing GenericEventProcessorExtension - this way you don't need to do anything related to spring integration 
  * 2) configure via application.properties flowId to channel name mapping
@@ -33,6 +33,7 @@ import lombok.extern.log4j.Log4j2;
 public class InputEventRouter extends AbstractMessageRouter {
 	
 	@Autowired private InputEventRoutingProperties props;
+	
 	@Qualifier(InputEventExtensionConvertingFlowConfig.EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT_CHANNEL_ID)
 	@Autowired private MessageChannel extensionBasedConversionInputChannel;
 	
