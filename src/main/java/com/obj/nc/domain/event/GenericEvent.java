@@ -122,6 +122,7 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isNew() {
 		return timeCreated == null;
 	}
