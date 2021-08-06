@@ -56,7 +56,7 @@ component [noti-flow] as mainFlow {
     package rest-api {
         [ErrorHandling]<<REST API>>    
 
-        ErrorHandling -> nc_failed_payload: <<get>> (FailedPaylod)   
+        ErrorHandling .> nc_failed_payload: <<get>> (FailedPaylod)   
         ErrorHandling --> FAILED_STEP
     }
 

@@ -1,5 +1,7 @@
 @startuml
 
+!theme cerulean-outline
+
 skinparam component {
     backgroundColor<<user defined>> LightGray
 }
@@ -25,21 +27,21 @@ database "Topic/Channels" {
 }
 
 node "InputEventExtensionConverting" {
-  [extensionsBasedEventConvertor] ..> [EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT] : read (GenericEvent)
-  [splitter]
-  [messageOrIntentRouter]
-  [InputEventConverterExtension]
-  [converter 1]<<user defined>>
-  [converter N]<<user defined>>
+    [extensionsBasedEventConvertor] ..> [EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT] : read (GenericEvent)
+    [splitter]
+    [messageOrIntentRouter]
+    [InputEventConverterExtension]
+    [converter 1]<<user defined>>
+    [converter N]<<user defined>>
 
-  extensionsBasedEventConvertor .up.> InputEventConverterExtension: convertEvent (GenericEvent) 
-  [converter 1] -[bold]-> InputEventConverterExtension: implements
-  [converter N] .[bold].> InputEventConverterExtension: implements
-  extensionsBasedEventConvertor .> splitter: (List<IsNotification>)
-  splitter .> messageOrIntentRouter: (IsNotification)
+    extensionsBasedEventConvertor -up-> InputEventConverterExtension: convertEvent (GenericEvent) 
+    [converter 1] -[bold]-> InputEventConverterExtension: implements
+    [converter N] .[bold].> InputEventConverterExtension: implements
+    extensionsBasedEventConvertor -> splitter: (List<IsNotification>)
+    splitter -> messageOrIntentRouter: (IsNotification)
 
-  messageOrIntentRouter .> MESSAGE_PROCESSING_FLOW_ID_INPUT: write(Message)
-  messageOrIntentRouter .> INTENT_PROCESSING_FLOW_ID_INPUT: write(NotificationIntent)
+    messageOrIntentRouter -> MESSAGE_PROCESSING_FLOW_ID_INPUT: write(Message)
+    messageOrIntentRouter -> INTENT_PROCESSING_FLOW_ID_INPUT: write(NotificationIntent)
 
     note top of messageOrIntentRouter 
     IF payload instanceof  

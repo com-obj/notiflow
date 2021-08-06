@@ -1,5 +1,7 @@
 @startuml
 
+!theme cerulean-outline
+
 skinparam component {
     backgroundColor<<user defined>> LightGray
 }
@@ -9,7 +11,7 @@ database "PostgreSQL" {
 }
 
 () "URL: rest/events" - [EventReceiverRestController]
-EventReceiverRestController .r.> nc_event : write (GenericEvent)
+EventReceiverRestController -r-> nc_event : write (GenericEvent)
 
 
 database "Topic/Channels" {
@@ -22,7 +24,7 @@ node "InputEventRouting" {
   [genericEventSupplier] ..> nc_event : read (GenericEvent)
   [inputEventRouter]
 
-  genericEventSupplier .> inputEventRouter: (GenericEvent)
+  genericEventSupplier -> inputEventRouter: (GenericEvent)
 
   note top of inputEventRouter 
     CHANEL = flowId + "_INPUT"    
@@ -34,8 +36,8 @@ node "InputEventRouting" {
     CHANEL = EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT
   end note  
 
-  inputEventRouter ..> CUSTOM_CHANNEL : write (GenericEvent)
-  inputEventRouter ..> EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT : write (GenericEvent)
+  inputEventRouter --> CUSTOM_CHANNEL : write (GenericEvent)
+  inputEventRouter --> EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT : write (GenericEvent)
 }
 
 
