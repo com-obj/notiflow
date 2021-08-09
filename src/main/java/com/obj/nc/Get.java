@@ -9,6 +9,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import com.obj.nc.repositories.EndpointsRepository;
+
 /**
  * This is spring component to give spring a hint in configuration ordering. As component it should be staticaly usable because that
  * way clients can run into problems with ordering
@@ -38,6 +40,11 @@ public class Get {
     public static JdbcTemplate getJdbc() {
     	return getBean(JdbcTemplate.class);
     }
+    
+    public static EndpointsRepository getEndpointsRepo() {
+    	return getBean(EndpointsRepository.class);
+    }
+    
 	public static ApplicationContext getApplicationContext() {
 		return instance.applicationContext;
 	}

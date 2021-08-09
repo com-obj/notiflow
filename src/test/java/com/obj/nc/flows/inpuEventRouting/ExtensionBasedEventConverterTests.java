@@ -147,8 +147,8 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 					NotificationIntent email1Intent = NotificationIntent.createWithStaticContent(
 							"Subject", 
 							"Text", 
-							EmailEndpoint.builder().email("test@objectify.sk").build(),
-							EmailEndpoint.builder().email("test2@objectify.sk").build()
+							EmailEndpoint.builder().email("test2@objectify.sk").build(),
+							EmailEndpoint.builder().email("test3@objectify.sk").build()
 					);
 					List<NotificationIntent> intents = Arrays.asList(email1Intent);
 

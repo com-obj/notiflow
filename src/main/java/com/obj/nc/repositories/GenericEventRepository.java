@@ -5,8 +5,9 @@ import java.util.UUID;
 import org.springframework.data.repository.CrudRepository;
 
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.refIntegrity.EntityExistanceChecker;
 
-public interface GenericEventRepository extends CrudRepository<GenericEvent, UUID> {
+public interface GenericEventRepository extends CrudRepository<GenericEvent, UUID>, EntityExistanceChecker<UUID> {
 	
 	public GenericEvent findFirstByTimeConsumedIsNullOrderByTimeCreatedAsc();
 	

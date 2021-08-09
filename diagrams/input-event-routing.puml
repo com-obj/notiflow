@@ -1,0 +1,54 @@
+@startuml
+
+!theme cerulean-outline
+
+skinparam component {
+    backgroundColor<<user defined>> LightGray
+}
+
+database "PostgreSQL" {
+    [nc_event]
+}
+
+() "URL: rest/events" - [EventReceiverRestController]
+EventReceiverRestController -r-> nc_event : write (GenericEvent)
+
+
+database "Topic/Channels" {
+
+    [CUSTOM_CHANNEL]<<user defined>>
+    [EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT]<<PUB/SUB>> 
+}
+
+node "InputEventRouting" {
+  [genericEventSupplier] ..> nc_event : read (GenericEvent)
+  [inputEventRouter]
+
+  genericEventSupplier -> inputEventRouter: (GenericEvent)
+
+  note top of inputEventRouter 
+    CHANEL = flowId + "_INPUT"    
+    ..OR..
+    CHANEL = type-channel-mapping.get( 
+        payload.type-property-name.value() 
+    )
+    ..OR..
+    CHANEL = EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT
+  end note  
+
+  inputEventRouter --> CUSTOM_CHANNEL : write (GenericEvent)
+  inputEventRouter --> EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT : write (GenericEvent)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+@enduml

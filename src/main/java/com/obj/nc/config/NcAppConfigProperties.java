@@ -10,5 +10,6 @@ import org.springframework.context.annotation.Configuration;
 public class NcAppConfigProperties {
     
     private String url;
+    private boolean checkReferenceIntegrity = false;
     
 }
