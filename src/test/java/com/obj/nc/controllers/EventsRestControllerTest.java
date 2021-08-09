@@ -1,9 +1,14 @@
 package com.obj.nc.controllers;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
@@ -15,7 +20,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -33,7 +37,7 @@ import com.obj.nc.utils.JsonUtils;
 @AutoConfigureMockMvc
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
-class EventReceiverTest extends BaseIntegrationTest {
+class EventsRestControllerTest extends BaseIntegrationTest {
     
     
 	@Autowired private GenericEventRepository genericEventRepository;
@@ -66,7 +70,7 @@ class EventReceiverTest extends BaseIntegrationTest {
         String eventId = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.ncEventId");
         GenericEvent genericEvent = genericEventRepository.findById(UUID.fromString(eventId)).get();
         
-        Assertions.assertThat(genericEvent).isNotNull();
+        assertThat(genericEvent).isNotNull();
     }
     
     @Test
@@ -127,8 +131,8 @@ class EventReceiverTest extends BaseIntegrationTest {
         String eventId = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.ncEventId");
         GenericEvent genericEvent = genericEventRepository.findById(UUID.fromString(eventId)).get();
         
-        Assertions.assertThat(genericEvent.getExternalId()).isEqualTo("EXTERNAL_ID_OVERRIDE");
-        Assertions.assertThat(genericEvent.getFlowId()).isEqualTo("FLOW_ID_OVERRIDE");
+        assertThat(genericEvent.getExternalId()).isEqualTo("EXTERNAL_ID_OVERRIDE");
+        assertThat(genericEvent.getFlowId()).isEqualTo("FLOW_ID_OVERRIDE");
     }
     
     @Test
@@ -152,7 +156,7 @@ class EventReceiverTest extends BaseIntegrationTest {
         String eventId = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.ncEventId");
         GenericEvent genericEvent = genericEventRepository.findById(UUID.fromString(eventId)).get();
         
-        Assertions.assertThat(genericEvent.getFlowId()).isEqualTo("FLOW_ID");
+        assertThat(genericEvent.getFlowId()).isEqualTo("FLOW_ID");
     }
     
     @Test
@@ -176,7 +180,7 @@ class EventReceiverTest extends BaseIntegrationTest {
         String eventId = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.ncEventId");
         GenericEvent genericEvent = genericEventRepository.findById(UUID.fromString(eventId)).get();
         
-        Assertions.assertThat(genericEvent.getExternalId()).isEqualTo("EXTERNAL_ID");
+        assertThat(genericEvent.getExternalId()).isEqualTo("EXTERNAL_ID");
     }
     
     @Test
@@ -297,6 +301,156 @@ class EventReceiverTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$").value(CoreMatchers.startsWith("java.io.FileNotFoundException: class path resource")));
         
     }
+    
+    @Test
+    void testFindAllEvents() throws Exception {
+        //GIVEN
+        persistNTestEvents(5);
+        
+        //WHEN TEST REST
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/events")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        
+        //THEN
+        resp
+                .andExpect(status().is2xxSuccessful());
+        
+        List<LinkedHashMap<?, ?>> events = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+        assertThat(events).hasSize(5);
+    }
+    
+    @Test
+    void testFilterTimeConsumedRangeEventsStartAndEnd() throws Exception {
+        //GIVEN
+        persistNTestEvents(5);
 
- 
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/events")
+                        .param("consumedFrom", Instant.now().minus(20, ChronoUnit.MINUTES).toString())
+                        .param("consumedTo", Instant.now().plus(150, ChronoUnit.MINUTES).toString())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+
+        //THEN
+        resp
+                .andExpect(status().is2xxSuccessful());
+    
+        List<LinkedHashMap<?, ?>> events = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+        assertThat(events).hasSize(3);
+    }
+
+    @Test
+    void testFilterTimeConsumedRangeEventsStartOnly() throws Exception {
+        //GIVEN
+        persistNTestEvents(5);
+
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/events")
+                        .param("consumedFrom", Instant.now().plus(150, ChronoUnit.MINUTES).toString())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+
+        //THEN
+        resp
+                .andExpect(status().is2xxSuccessful());
+    
+        List<LinkedHashMap<?, ?>> events = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+        assertThat(events).hasSize(2);
+    }
+    
+    @Test
+    void testFilterTimeConsumedRangeEventsEndOnly() throws Exception {
+        //GIVEN
+        persistNTestEvents(5);
+        
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/events")
+                        .param("consumedTo", Instant.now().plus(150, ChronoUnit.MINUTES).toString())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        
+        //THEN
+        resp
+                .andExpect(status().is2xxSuccessful());
+        
+        List<LinkedHashMap<?, ?>> events = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+        assertThat(events).hasSize(3);
+    }
+
+
+    @Test
+    void testGetPage0Size20() throws Exception {
+        // GIVEN
+        persistNTestEvents(19);
+
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/events")
+                        .param("page", "0")
+                        .param("size", "20")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+    
+        List<LinkedHashMap<?, ?>> events = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+        assertThat(events).hasSize(19);
+    }
+
+    @Test
+    void testGetPage0Size10() throws Exception {
+        // GIVEN
+        persistNTestEvents(19);
+
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/events")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+    
+        List<LinkedHashMap<?, ?>> events = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+        assertThat(events).hasSize(10);
+    }
+
+    @Test
+    void testGetPage1Size10() throws Exception {
+        // GIVEN
+        persistNTestEvents(19);
+
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/events")
+                        .param("page", "1")
+                        .param("size", "10")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+    
+        List<LinkedHashMap<?, ?>> events = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+        assertThat(events).hasSize(9);
+    }
+    
+    private void persistNTestEvents(long n) {
+        for (long i = 0; i < n; i++) {
+            GenericEvent event = GenericEvent.builder()
+                    .id(UUID.randomUUID())
+                    .flowId("default-flow")
+                    .payloadJson(JsonUtils.readJsonNodeFromJSONString("{}"))
+                    .timeConsumed(Instant.now().plus(i * 60, ChronoUnit.MINUTES))
+                    .build();
+            genericEventRepository.save(event);
+        }
+    }
+    
 }
