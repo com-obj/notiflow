@@ -1,10 +1,6 @@
-package com.obj.nc.flows.intenToMessageToSender;
+package com.obj.nc.flows.intenProcessing;
 
-import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -14,10 +10,6 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailMessageTemplated;
-import com.obj.nc.domain.message.MailChimpMessage;
-import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.intentPersister.NotificationIntentPersister;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
@@ -48,16 +40,7 @@ public class NotificationIntentProcessingFlowConfig {
 				.handle(notificationIntentPersister)				
 				.transform(generateMessagesFromIntent)
 				.split()
-				.wireTap( flowConfig -> 
-					flowConfig.channel(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
-				)
-				.routeToRecipients(spec -> spec.
-						recipient(EMAIL_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof EmailMessage).
-						recipient(EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof EmailMessageTemplated).
-						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof SmsMessageTemplated).
-						recipient(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof MailChimpMessage).
-						defaultOutputToParentFlow()
-				)
+				.channel(MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 				.get();
 	}
 	

@@ -25,7 +25,7 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.flows.intenToMessageToSender.NotificationIntentProcessingFlow;
+import com.obj.nc.flows.intenProcessing.NotificationIntentProcessingFlow;
 import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.GenericEventRepositoryTest;

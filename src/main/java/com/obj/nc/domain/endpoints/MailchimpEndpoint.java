@@ -4,10 +4,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor
+@RequiredArgsConstructor
 //could be potentially EmailEndpoint but endpoint type is important for intent->message translation and correct message subtyping
 public class MailchimpEndpoint extends RecievingEndpoint {
 	

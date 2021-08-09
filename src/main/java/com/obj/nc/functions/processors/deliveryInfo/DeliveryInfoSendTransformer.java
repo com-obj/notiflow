@@ -21,14 +21,8 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class DeliveryInfoSendTransformer extends ProcessorFunctionAdapter<DeliveryInfoSendResult, List<DeliveryInfo>> {
 
-//    @Autowired
-//    private EndpointsRepository endpointsRepo;
-
 	@Override
 	protected List<DeliveryInfo> execute(DeliveryInfoSendResult deliveryInfo) {
-//		RecievingEndpoint persistedEndpoints = endpointsRepo.persistEnpointIfNotExists(deliveryInfo.getRecievingEndpoint());
-//		deliveryInfo.setRecievingEndpoint(persistedEndpoints);
-//		
 		List<DeliveryInfo> infos = createFromSendResults(deliveryInfo);
 				
 		infos.forEach(info -> {

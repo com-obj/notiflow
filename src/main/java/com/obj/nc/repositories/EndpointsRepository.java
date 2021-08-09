@@ -23,6 +23,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.refIntegrity.EntityExistanceChecker;
@@ -196,6 +197,10 @@ public class EndpointsRepository implements EntityExistanceChecker<UUID> {
                  SmsEndpoint smsEndpoint = new SmsEndpoint(rs.getString("endpoint_name"));
                  smsEndpoint.setId((UUID)rs.getObject("id"));
                  return smsEndpoint;
+	    	  } else if (MailchimpEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
+	    		  MailchimpEndpoint mailChimpEndpoint = new MailchimpEndpoint(rs.getString("endpoint_name"));
+	              mailChimpEndpoint.setId((UUID)rs.getObject("id"));
+	              return mailChimpEndpoint;
 	    	  } else {
 	    		  throw new RuntimeException("Uknown endpoint type for EndpointsRepository: "+ epType);
 	    	  }
