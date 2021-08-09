@@ -15,37 +15,7 @@ skinparam component {
     FontSize<<PUB/SUB>> 12
 }
 
-
-
-    
-database "PostgreSQL" {
-    component nc_event [
-        nc_event
-        --
-        (GenericEvent)
-    ]
-}
-
-database "Topic/Channels" {
-
-    component CUSTOM_CHANNEL<<User defined>> [
-        CUSTOM_CHANNEL
-        --
-        (GenericEvent)
-    ]
-
-}
-
 component [noti-flow] as mainFlow {
-
-    package rest-api {
-        [EventReceiver]<<REST API>>
-        [MessageReceiver]<<REST API>>
-        [DeliveryInfo]<<REST API>>
-
-        EventReceiver --[hidden] DeliveryInfo
-        DeliveryInfo --[hidden] MessageReceiver
-    }
 
     package standard-flow {
         [InputEventRouting]
@@ -66,47 +36,46 @@ component [noti-flow] as mainFlow {
 
             EmailProcessingFlow -[hidden]> SmsProcessingFlow
             SmsProcessingFlow -[hidden]> MailchimpProcessingFlow
+
+            interface "sendEmail (EmailMessage)" as sendEmail
+            EmailProcessingFlow -l- sendEmail
+            interface "formatAndSend (EmailMessageTemplated)" as formatAndSendEmail
+            EmailProcessingFlow -- formatAndSendEmail
         }
 
         NotificationIntentProcessingFlow --> MessageProcessingFlow: (Message)
         MessageProcessingFlow ---> Sending: (Message)
 
         [DeliveryInfoFlow] as DeliveryInfoFlow1
-        [DeliveryInfoFlow] as DeliveryInfoFlow2
+        [DeliveryInfoFlow] as DeliveryInfoFlow
         MessageProcessingFlow -> DeliveryInfoFlow1: <<processing DI>>
 
-        Sending -d-> DeliveryInfoFlow2: <<send DI>>
+        Sending ---> DeliveryInfoFlow: <<send DI>>
 
+        interface "processMessage (Message)" as processMessageInt        
+        MessageProcessingFlow -l- processMessageInt
 
+        interface "processNotificationIntent (NotificationIntent)" as processNotificationIntent
+        NotificationIntentProcessingFlow -u- processNotificationIntent
     }
 
-        interface "processMessage" as processMessageInt
-        MessageProcessingFlow -- processMessageInt
+    package rest-api {
+        [EventReceiver]<<REST API>>
+        interface "URL: rest/events" as restEventInt
+        restEventInt - EventReceiver
 
-        interface "createAndPersistReadDeliveryInfo" as readDIInt
-        DeliveryInfoFlow1 -- readDIInt
+        [MessageReceiver]<<REST API>>
+        interface "URL: rest/messages (SendEmailMessageRequest)" as restMessagesInt
+        restMessagesInt -u- MessageReceiver
+
+
+        EventReceiver --[hidden] MessageReceiver
+
+        MessageReceiver --> processMessageInt: (EmailMessage)
+    }
+
+    EventReceiver -[dotted]> InputEventRouting: indirect
 
 }
-
-    interface "URL: rest/events" as restEventInt
-    EventReceiver - restEventInt
-    interface "URL: rest/messages (SendEmailMessageRequest)" as restMessagesInt
-    MessageReceiver - restMessagesInt
-    interface "URL: rest/delivery-info/messages/read/{messageId}" as restDIReadInt
-    DeliveryInfo - restDIReadInt
-
-    EventReceiver -u-> nc_event: <<put>>
-    InputEventRouting .> nc_event: <<get>>
-    InputEventRouting -u-> CUSTOM_CHANNEL: <<put>> (GenericEvent)
-
-
-
-
-
-
-MessageReceiver --> processMessageInt: (EmailMessage)
-DeliveryInfo --> readDIInt: (HasRecievingEndpoints)
-
-
 
 @enduml

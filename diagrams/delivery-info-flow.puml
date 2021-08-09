@@ -1,5 +1,7 @@
 @startuml
 
+!theme cerulean-outline
+
 left to right direction
 
 skinparam component {
@@ -42,17 +44,17 @@ database "Topic/Channels" {
     
 }
 
-node "DeliveryInfoFlow" {
+component "DeliveryInfoFlow" {
     component deliveryInfoFailedFlow {        
         [deliveryInfoFailedGenerator]
         [deliveryInfoPersister] as dip_failed
 
-        deliveryInfoFailedGenerator .> dip_failed: (List<DeliveryInfo>)
+        deliveryInfoFailedGenerator -> dip_failed: (List<DeliveryInfo>)
 
-        deliveryInfoFailedGenerator ..> DELIVERY_INFO_FAILED_FLOW_ID_INPUT: read (FailedPaylod)
-        dip_failed .....> DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID: write (List<DeliveryInfo>)
+        deliveryInfoFailedGenerator ..> DELIVERY_INFO_FAILED_FLOW_ID_INPUT: (FailedPaylod)
+        dip_failed -----> DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID: (List<DeliveryInfo>)
 
-        dip_failed .u.> nc_delivery_info: write (List<DeliveryInfo>)
+        dip_failed -u-> nc_delivery_info: (List<DeliveryInfo>)
     }
 
     component deliveryInfoSendFlow {
@@ -61,14 +63,14 @@ node "DeliveryInfoFlow" {
         [deliveryTransformer] as dt_send
         [deliveryInfoPersister] as dip_send
 
-        deliveryInfoSendGenerator .l.> dips_send: (List<DeliveryInfoSendResult>)
-        dips_send .l.> dt_send: (DeliveryInfoSendResult)
-        dt_send .l.> dip_send: (List<DeliveryInfo>)
+        deliveryInfoSendGenerator -l-> dips_send: (List<DeliveryInfoSendResult>)
+        dips_send -l-> dt_send: (DeliveryInfoSendResult)
+        dt_send -l-> dip_send: (List<DeliveryInfo>)
 
-        deliveryInfoSendGenerator ..> DELIVERY_INFO_SEND_FLOW_ID_INPUT: read (HasRecievingEndpoints)
-        dip_send .....> DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID: write (List<DeliveryInfo>)
+        deliveryInfoSendGenerator ..> DELIVERY_INFO_SEND_FLOW_ID_INPUT: (HasRecievingEndpoints)
+        dip_send -----> DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID: (List<DeliveryInfo>)
     
-        dip_send .u.> nc_delivery_info: write (List<DeliveryInfo>)
+        dip_send -u-> nc_delivery_info: (List<DeliveryInfo>)
     }
 
     component deliveryInfoProcessingFlow {
@@ -77,14 +79,14 @@ node "DeliveryInfoFlow" {
         [deliveryTransformer] as dt_processing
         [deliveryInfoPersister] as dip_processing
 
-        deliveryInfoProcessingGenerator .l.> dips_processing: (List<DeliveryInfoSendResult>)
-        dips_processing .l.> dt_processing: (DeliveryInfoSendResult)
-        dt_processing .l.> dip_processing: (List<DeliveryInfo>)
+        deliveryInfoProcessingGenerator -l-> dips_processing: (List<DeliveryInfoSendResult>)
+        dips_processing -l-> dt_processing: (DeliveryInfoSendResult)
+        dt_processing -l-> dip_processing: (List<DeliveryInfo>)
 
-        deliveryInfoProcessingGenerator ..> DELIVERY_INFO_PROCESSING_FLOW_ID_INPUT: read (HasRecievingEndpoints)
-        dip_processing .....> DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID: write (List<DeliveryInfo>)
+        deliveryInfoProcessingGenerator ..> DELIVERY_INFO_PROCESSING_FLOW_ID_INPUT: (HasRecievingEndpoints)
+        dip_processing -----> DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID: (List<DeliveryInfo>)
     
-        dip_processing .u.> nc_delivery_info: write (List<DeliveryInfo>)
+        dip_processing -u-> nc_delivery_info: (List<DeliveryInfo>)
     }
 
     component deliveryInfoReadFlow {
@@ -93,14 +95,14 @@ node "DeliveryInfoFlow" {
         [deliveryTransformer] as dt_read
         [deliveryInfoPersister] as dip_read
 
-        deliveryInfoReadGenerator .> dips_read: (List<DeliveryInfoSendResult>)
-        dips_read .> dt_read: (DeliveryInfoSendResult)
-        dt_read .> dip_read: (List<DeliveryInfo>)
+        deliveryInfoReadGenerator -> dips_read: (List<DeliveryInfoSendResult>)
+        dips_read -> dt_read: (DeliveryInfoSendResult)
+        dt_read -> dip_read: (List<DeliveryInfo>)
 
-        deliveryInfoReadGenerator ..> DELIVERY_INFO_READ_FLOW_ID_INPUT: read (HasRecievingEndpoints)
-        dip_read .....> DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID: write (List<DeliveryInfo>)
+        deliveryInfoReadGenerator ..> DELIVERY_INFO_READ_FLOW_ID_INPUT: (HasRecievingEndpoints)
+        dip_read -----> DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID: (List<DeliveryInfo>)
     
-        dip_read .u.> nc_delivery_info: write (List<DeliveryInfo>)
+        dip_read -u-> nc_delivery_info: (List<DeliveryInfo>)
     }
 }
 

@@ -11,7 +11,7 @@ database "PostgreSQL" {
 }
 
 () "URL: rest/events" - [EventReceiverRestController]
-EventReceiverRestController -r-> nc_event : write (GenericEvent)
+EventReceiverRestController -r-> nc_event : (GenericEvent)
 
 
 database "Topic/Channels" {
@@ -20,8 +20,8 @@ database "Topic/Channels" {
     [EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT]<<PUB/SUB>> 
 }
 
-node "InputEventRouting" {
-  [genericEventSupplier] ..> nc_event : read (GenericEvent)
+component "InputEventRouting" {
+  [genericEventSupplier] ..> nc_event : (GenericEvent)
   [inputEventRouter]
 
   genericEventSupplier -> inputEventRouter: (GenericEvent)
@@ -36,8 +36,8 @@ node "InputEventRouting" {
     CHANEL = EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT
   end note  
 
-  inputEventRouter --> CUSTOM_CHANNEL : write (GenericEvent)
-  inputEventRouter --> EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT : write (GenericEvent)
+  inputEventRouter --> CUSTOM_CHANNEL : (GenericEvent)
+  inputEventRouter --> EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT : (GenericEvent)
 }
 
 

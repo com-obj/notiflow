@@ -28,7 +28,7 @@ database "Topic/Channels" {
 
 }
 
-node "NotificationIntentProcessingFlow" {
+component "NotificationIntentProcessingFlow" {
     [endpointPersister]
     [notificationIntentPersister]
     [splitter]

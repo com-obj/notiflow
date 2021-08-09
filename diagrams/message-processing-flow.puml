@@ -45,7 +45,7 @@ database "Topic/Channels" {
     ]
 }
 
-node "MessageProcessingFlow" {
+component "MessageProcessingFlow" {
     [messageByRecipientTokenizer]
     [splitter]
     [endpointPersister]
