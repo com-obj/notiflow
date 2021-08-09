@@ -12,8 +12,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import static java.util.Arrays.asList;
-
 @Service
 @RequiredArgsConstructor
 public class EndpointsServiceImpl implements EndpointsService {
@@ -22,10 +20,7 @@ public class EndpointsServiceImpl implements EndpointsService {
     
     @Override
     public void persistEndpointIfNotExists(RecievingEndpoint endpoint) {
-        endpointsRepository.persistEndpointIfNotExists(
-                endpoint.getId(),
-                endpoint.getEndpointId(),
-                endpoint.getEndpointType());
+        endpointsRepository.persistEnpointIfNotExists(endpoint);
     }
     
     @Override
@@ -38,7 +33,7 @@ public class EndpointsServiceImpl implements EndpointsService {
     
     @Override
     public List<RecievingEndpoint> findEndpointsByIds(UUID... endpointIds) {
-        return endpointsRepository.findEndpointsByIds(asList(endpointIds));
+        return endpointsRepository.findByIds(endpointIds);
     }
     
 }

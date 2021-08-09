@@ -8,9 +8,8 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistantState;
+import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.MessageRepository;
 import com.obj.nc.services.EndpointsService;
@@ -37,12 +36,11 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static java.util.Arrays.asList;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
@@ -134,7 +132,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(2);
 		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk", 1);
-		assertContainsEndpoint(endpoints, "SMS", "+999999999999", 0);
+		assertContainsEndpoint(endpoints, "SMS", "0908186997", 1);
 	}
 	
 	@Test
@@ -157,7 +155,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(2);
 		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk", 1);
-		assertContainsEndpoint(endpoints, "SMS", "+999999999999", 0);
+		assertContainsEndpoint(endpoints, "SMS", "0908186997", 1);
 	}
 	
 	@Test
@@ -180,7 +178,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(2);
 		assertContainsEndpoint(endpoints, "EMAIL", "john.doe@objectify.sk", 1);
-		assertContainsEndpoint(endpoints, "SMS", "+999999999999", 0);
+		assertContainsEndpoint(endpoints, "SMS", "0908186997", 1);
 	}
 	
 	@Test
@@ -286,25 +284,13 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	}
 	
 	private void persistTestEndpointsAndTestDeliveryInfos() {
-		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointsService.persistEndpointIfNotExists(email);
-		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointsService.persistEndpointIfNotExists(phone);
+		EmailMessage emailMessage = JsonUtils.readObjectFromClassPathResource("messages/simple_email_message.json", EmailMessage.class);
+		messageProcessingFlow.processMessage(emailMessage);
+		Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepository.countByEndpointIdAndStatus(emailMessage.getRecievingEndpoints().get(0).getId(), SENT) == 1L);
 		
-		DeliveryInfo emailDeliveryInfo = DeliveryInfo.builder()
-				.id(UUID.randomUUID())
-				.endpointId(email.getId())
-				.status(DELIVERY_STATUS.SENT)
-				.messageId(UUID.randomUUID())
-				.build();
-		
-		DeliveryInfo phoneDeliveryInfo = DeliveryInfo.builder()
-				.id(UUID.randomUUID())
-				.endpointId(phone.getId())
-				.status(DELIVERY_STATUS.PROCESSING)
-				.messageId(UUID.randomUUID())
-				.build();
-		deliveryInfoRepository.saveAll(asList(emailDeliveryInfo, phoneDeliveryInfo));
+		SmsMessageTemplated smsMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/txt_template_message.json", SmsMessageTemplated.class);
+		messageProcessingFlow.processMessage(smsMessage);
+		Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepository.countByEndpointIdAndStatus(((SmsEndpoint) smsMessage.getRecievingEndpoints().get(0)).getId(), SENT) == 1L);
 	}
 	
 	private void assertContainsEndpoint(List<LinkedHashMap<?, ?>> endpoints, String endpointType, String endpointName, long sentMessagesCount) {

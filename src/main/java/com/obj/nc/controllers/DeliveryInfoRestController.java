@@ -48,7 +48,7 @@ public class DeliveryInfoRestController {
 		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
 		
 		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
-		List<RecievingEndpoint> endpoints = endpointRepo.findEndpointsByIds(endpointIds);
+		List<RecievingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
 		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
 		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
 		
