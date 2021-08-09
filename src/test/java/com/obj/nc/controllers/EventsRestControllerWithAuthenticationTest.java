@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "nc.jwt.signature-secret=testSecret"
 })
 @DirtiesContext
-class EventReceiverWithAuthenticationTest extends BaseIntegrationTest {
+class EventsRestControllerWithAuthenticationTest extends BaseIntegrationTest {
     
 	@Autowired protected MockMvc mockMvc;
 	@Autowired private JwtTokenUtil jwtTokenUtil;

@@ -3,6 +3,7 @@ package com.obj.nc.domain.event;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.exceptions.PayloadValidationException;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -57,6 +58,7 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	private Instant timeConsumed;
 	
 	@Transient
+	@JsonIgnore
 	protected Header header;
 	
 	public static GenericEvent from(JsonNode state) {
@@ -120,6 +122,7 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isNew() {
 		return timeCreated == null;
 	}
@@ -131,6 +134,7 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 		return header;
 	}
 	
+	@JsonIgnore
 	public <T extends IsTypedJson> T getPayloadAsPojo() {
 		return (T)JsonUtils.readObjectFromJSON(payloadJson, IsTypedJson.class);
 	}
