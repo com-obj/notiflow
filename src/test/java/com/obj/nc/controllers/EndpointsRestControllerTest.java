@@ -11,8 +11,8 @@ import com.obj.nc.domain.message.MessagePersistantState;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
 import com.obj.nc.repositories.DeliveryInfoRepository;
+import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.MessageRepository;
-import com.obj.nc.services.EndpointsService;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
@@ -48,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class EndpointsRestControllerTest extends BaseIntegrationTest {
 	
-	@Autowired private EndpointsService endpointsService;
+	@Autowired private EndpointsRepository endpointsRepository;
 	@Autowired private DeliveryInfoRepository deliveryInfoRepository;
 	@Autowired private MessageRepository messageRepository;
 	@Autowired private MockMvc mockMvc;
@@ -277,10 +277,10 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	
 	private void persistTestEndpoints() {
 		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-		endpointsService.persistEndpointIfNotExists(email);
+		endpointsRepository.persistEnpointIfNotExists(email);
 		
 		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
-		endpointsService.persistEndpointIfNotExists(phone);
+		endpointsRepository.persistEnpointIfNotExists(phone);
 	}
 	
 	private void persistTestEndpointsAndTestDeliveryInfos() {
@@ -309,7 +309,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		for (int i = 0; i < n; i++) {
 			String name = "john.doe";
 			EmailEndpoint email = EmailEndpoint.builder().email(name + i + "@objectify.sk").build();
-			endpointsService.persistEndpointIfNotExists(email);
+			endpointsRepository.persistEnpointIfNotExists(email);
 		}
 	}
 	
