@@ -2,11 +2,11 @@ package com.obj.nc.controllers;
 
 import com.obj.nc.functions.processors.eventValidator.GenericEventJsonSchemaValidator;
 import com.obj.nc.functions.processors.eventValidator.SimpleJsonValidator;
-import com.obj.nc.services.EventsService;
+import com.obj.nc.repositories.GenericEventRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.relational.core.conversion.DbActionExecutionException;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,7 +19,8 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
 
-import java.time.Instant;
+import java.time.*;
+import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -32,7 +33,7 @@ public class EventsRestController {
 	private final GenericEventPersisterConsumer persister;
 	private final SimpleJsonValidator simpleJsonValidator;
 	private final GenericEventJsonSchemaValidator jsonSchemaValidator;
-	private final EventsService eventsService;
+	private final GenericEventRepository eventsRepository;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
     public EventRecieverResponce persistGenericEvent(
@@ -68,7 +69,18 @@ public class EventsRestController {
 			@RequestParam(value = "consumedFrom", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedFrom,
 			@RequestParam(value = "consumedTo", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedTo,
 			Pageable pageable) {
-		return eventsService.findAllEvents(consumedFrom, consumedTo, pageable);
+		
+		if (consumedFrom == null) {
+			consumedFrom = OffsetDateTime.of(LocalDate.of(2000, 1, 1), LocalTime.NOON, ZoneOffset.UTC).toInstant();
+		}
+		
+		if (consumedTo == null) {
+			consumedTo = OffsetDateTime.of(LocalDate.of(9999, 1, 1), LocalTime.NOON, ZoneOffset.UTC).toInstant();
+		}
+		
+		List<GenericEvent> events = eventsRepository.findAllByTimeConsumedBetween(consumedFrom, consumedTo, pageable);
+		long eventsTotalCount = eventsRepository.countAllByTimeConsumedBetween(consumedFrom, consumedTo);
+		return new PageImpl<>(events, pageable, eventsTotalCount);
 	}
 
 }

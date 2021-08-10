@@ -7,9 +7,11 @@ import java.util.stream.Collectors;
 
 import com.obj.nc.domain.message.MessagePersistantState;
 import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
+import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +23,6 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.repositories.DeliveryInfoRepository;
-import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.GenericEventRepository;
 
 import lombok.Builder;
