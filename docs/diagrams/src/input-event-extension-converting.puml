@@ -2,6 +2,7 @@
 
 !theme cerulean-outline
 
+skinparam backgroundcolor White
 skinparam component {
     backgroundColor<<user defined>> LightGray
 }
@@ -26,8 +27,8 @@ database "Topic/Channels" {
     ]
 }
 
-node "InputEventExtensionConverting" {
-    [extensionsBasedEventConvertor] ..> [EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT] : read (GenericEvent)
+component "InputEventExtensionConverting" {
+    [extensionsBasedEventConvertor] ..> [EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT] : (GenericEvent)
     [splitter]
     [messageOrIntentRouter]
     [InputEventConverterExtension]
@@ -40,8 +41,8 @@ node "InputEventExtensionConverting" {
     extensionsBasedEventConvertor -> splitter: (List<IsNotification>)
     splitter -> messageOrIntentRouter: (IsNotification)
 
-    messageOrIntentRouter -> MESSAGE_PROCESSING_FLOW_ID_INPUT: write(Message)
-    messageOrIntentRouter -> INTENT_PROCESSING_FLOW_ID_INPUT: write(NotificationIntent)
+    messageOrIntentRouter -> MESSAGE_PROCESSING_FLOW_ID_INPUT: (Message)
+    messageOrIntentRouter -> INTENT_PROCESSING_FLOW_ID_INPUT: (NotificationIntent)
 
     note top of messageOrIntentRouter 
     IF payload instanceof  

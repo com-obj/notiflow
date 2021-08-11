@@ -1,7 +1,7 @@
 @startuml
 !theme cerulean-outline
 
-
+skinparam backgroundcolor White
 skinparam component {
     BackgroundColor<<user defined>> LightGray
     BorderColor<<user defined>> Gray
