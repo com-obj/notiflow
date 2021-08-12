@@ -14,7 +14,7 @@ import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConf
 @MessagingGateway(errorChannel = ErrorHandlingFlowConfig.ERROR_CHANNEL_NAME)
 public interface EmailProcessingFlow {
 
-	@Gateway(requestChannel=EMAIL_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID, replyChannel = EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID)
+	@Gateway(requestChannel=EMAIL_SEND_FLOW_INPUT_CHANNEL_ID, replyChannel = EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID)
     Future<EmailMessage> sendEmail(EmailMessage msg);
 	
 	@Gateway(requestChannel= EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID, replyChannel = EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID)
