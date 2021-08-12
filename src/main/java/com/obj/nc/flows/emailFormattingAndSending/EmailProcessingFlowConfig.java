@@ -40,7 +40,7 @@ public class EmailProcessingFlowConfig {
 	private final EmailMessageAggregationStrategy emailMessageAggregationStrategy;
 	
 	public final static String EMAIL_FORMAT_AND_SEND_FLOW_ID = "EMAIL_FORMAT_AND_SEND_FLOW_ID";
-	public final static String EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID = EMAIL_FORMAT_AND_SEND_FLOW_ID + "_INPUT";
+	public final static String EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID = EMAIL_FORMAT_AND_SEND_FLOW_ID + "_INPUT";
 	
 	public final static String EMAIL_SEND_FLOW_ID = "EMAIL_SEND_FLOW_ID";
 	public final static String EMAIL_SEND_FLOW_INPUT_CHANNEL_ID = EMAIL_SEND_FLOW_ID + "_INPUT";
@@ -50,7 +50,7 @@ public class EmailProcessingFlowConfig {
 	@Bean(EMAIL_FORMAT_AND_SEND_FLOW_ID)
 	public IntegrationFlow emailFormatAndSendFlowDefinition() {
 		return IntegrationFlows
-				.from(emailFormatAndSendRoutingInputChannel())
+				.from(emailFormatAndSendInputChannel())
 				.routeToRecipients(spec -> spec
 						.<Message<?>>recipient(
 								internalEmailFormatFlowDefinition().getInputChannel(),
@@ -80,7 +80,7 @@ public class EmailProcessingFlowConfig {
 	@Bean(EMAIL_SEND_FLOW_ID)
 	public IntegrationFlow emailSendFlowDefinition() {
 		return IntegrationFlows
-				.from(emailSendRoutingInputChannel())
+				.from(emailSendInputChannel())
 				.routeToRecipients(spec -> spec
 						.recipientFlow((Message<EmailContent> source) -> emailTrackingConfigProperties.isEnabled() 
 										&& MediaType.TEXT_HTML_VALUE.equals(source.getBody().getContentType()),
@@ -101,13 +101,13 @@ public class EmailProcessingFlowConfig {
 				.channel(emailSendOutputChannel());
 	}
 	
-	@Bean(EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID)
-	public MessageChannel emailFormatAndSendRoutingInputChannel() {
+	@Bean(EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID)
+	public MessageChannel emailFormatAndSendInputChannel() {
 		return new PublishSubscribeChannel(executor);
 	}
 	
 	@Bean(EMAIL_SEND_FLOW_INPUT_CHANNEL_ID)
-	public MessageChannel emailSendRoutingInputChannel() {
+	public MessageChannel emailSendInputChannel() {
 		return new PublishSubscribeChannel(executor);
 	}
 	

@@ -1,6 +1,6 @@
 package com.obj.nc.flows.testmode;
 
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
 import static com.obj.nc.flows.testmode.sms.config.TestModeSmsFlowConfig.TEST_MODE_SMS_SOURCE_BEAN_NAME;
@@ -73,7 +73,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
 	@Autowired private GreenMail testModeEmailsReciver;
     
-    @Qualifier(EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID)
+    @Qualifier(EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID)
     @Autowired private MessageChannel emailProcessingInputChannel;
     @Qualifier(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID)
     @Autowired private MessageChannel smsProcessingInputChannel;

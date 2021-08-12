@@ -17,6 +17,6 @@ public interface EmailProcessingFlow {
 	@Gateway(requestChannel=EMAIL_SEND_FLOW_INPUT_CHANNEL_ID, replyChannel = EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID)
     Future<EmailMessage> sendEmail(EmailMessage msg);
 	
-	@Gateway(requestChannel= EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID, replyChannel = EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID)
+	@Gateway(requestChannel= EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID, replyChannel = EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID)
     Future<EmailMessage> formatAndSend(EmailMessageTemplated<?> msg);
 }

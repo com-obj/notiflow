@@ -1,7 +1,7 @@
 package com.obj.nc.flows.messageProcessing;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
@@ -50,7 +50,7 @@ public class MessageProcessingFlowConfig {
 				)
 				.routeToRecipients(spec -> spec.
 						recipient(EMAIL_SEND_FLOW_INPUT_CHANNEL_ID, m-> m instanceof EmailMessage).
-						recipient(EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof EmailMessageTemplated).
+						recipient(EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID, m-> m instanceof EmailMessageTemplated).
 						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof SmsMessageTemplated).
 						recipient(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof MailChimpMessage).
 						defaultOutputToParentFlow()
