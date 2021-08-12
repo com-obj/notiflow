@@ -1,0 +1,86 @@
+@startuml
+
+!theme cerulean-outline
+
+left to right direction
+
+skinparam backgroundcolor White
+skinparam component {
+    backgroundColor<<user defined>> LightGray
+}
+
+database "PostgreSQL" {
+    [nc_message]
+    [nc_endpoint]
+}
+
+database "Topic/Channels" {
+    component EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_ID<<PUB/SUB>>[
+        EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_ID
+        --
+        (EmailMessage/EmailMessageTemplated)
+    ]
+
+    component EMAIL_SEND_ROUTING_FLOW_INPUT_ID<<PUB/SUB>>[
+        EMAIL_SEND_ROUTING_FLOW_INPUT_ID
+        --
+        (EmailMessage)
+    ]
+
+    component EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID<<PUB/SUB>>[
+        EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID
+        --
+        (EmailMessage)
+    ]
+
+    component DELIVERY_INFO_SEND_FLOW_ID_INPUT<<PUB/SUB>>  [
+        DELIVERY_INFO_SEND_FLOW_ID_INPUT
+        --
+        (HasRecievingEndpoints)
+    ]
+
+}
+
+component "EmailSendFlow" {
+    [emailReadTrackingDecorator]
+    [endpointPersister]
+    [messagePersister]
+    [emailSender]
+
+    endpointPersister -l-> messagePersister: (EmailMessage)
+    messagePersister -l--> emailSender: (EmailMessage)
+
+    messagePersister -u-> nc_message: (EmailMessage)
+    endpointPersister -u-> nc_endpoint: (List<RecievingEndpoint>)
+
+    endpointPersister ..> EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_ID : (EmailMessage) 
+    emailSender --> EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID : (EmailMessage) 
+
+}
+
+component "EmailFormatFlow" {
+    [emailFormatter]
+    [emailMessageAggregationStrategy]
+
+    emailFormatter --> emailMessageAggregationStrategy: (EmailMessageTemplated)
+''    emailFormatter -l-> endpointPersister : (EmailMessage)
+''    emailMessageAggregationStrategy -l-> endpointPersister : (EmailMessage)
+
+    emailFormatter --> EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_ID : (EmailMessage) 
+    emailMessageAggregationStrategy --> EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_ID : (EmailMessage) 
+}
+
+component "EmailFormatAndSendFlow" {
+    [formatOrSendRouter]
+
+    formatOrSendRouter -l-> emailFormatter : (EmailMessageTemplated)
+    formatOrSendRouter -l-> EMAIL_SEND_ROUTING_FLOW_INPUT_ID : (EmailMessage)
+
+    formatOrSendRouter ..> EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_ID : (EmailMessage) 
+}
+
+
+
+
+
+@enduml
