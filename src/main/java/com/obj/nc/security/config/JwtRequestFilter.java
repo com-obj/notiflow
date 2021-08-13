@@ -1,5 +1,6 @@
 package com.obj.nc.security.config;
 
+import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.security.exception.UserNotAuthenticatedException;
 import com.obj.nc.security.service.JwtUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	private final JwtUserDetailsService jwtUserDetailsService;
 	private final JwtTokenUtil jwtTokenUtil;
 	private final AntPathMatcher antPathMatcher;
+	private final NcAppConfigProperties ncAppConfigProperties;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -72,8 +74,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	}
 	
 	private boolean isProtectedResource(HttpServletRequest request) {
-		String requestURI = request.getRequestURI();
-		return NOT_PROTECTED_RESOURCES.stream().noneMatch(resource -> antPathMatcher.match(resource, requestURI));
+		return NOT_PROTECTED_RESOURCES.stream()
+				.map(resource -> ncAppConfigProperties.getContextPath() + resource)
+				.noneMatch(resource -> antPathMatcher.match(resource, request.getRequestURI()));
 	}
 
 }
