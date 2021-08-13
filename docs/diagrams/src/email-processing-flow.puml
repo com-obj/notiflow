@@ -93,6 +93,7 @@ component "EmailFormatAndSendFlow" {
 
     interface "formatAndSend (Message)" as formatAndSend        
         formatOrSendRouter -u- formatAndSend
+        
 }
 
 

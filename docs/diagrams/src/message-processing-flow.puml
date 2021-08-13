@@ -75,6 +75,8 @@ component "MessageProcessingFlow" {
     messagePersister -u-> nc_message: write (List<DeliveryInfo>)
     endpointPersister -u-> nc_endpoint: write (List<RecievingEndpoint>)
 
+    interface "processMessage (Message)" as processMessage        
+        messageByRecipientTokenizer -r- processMessage
 }
 
 

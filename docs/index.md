@@ -35,7 +35,17 @@ To achieve this goals notiflow is implemented as
   * set of independend [functions](functions) where each function is performing exactly one thing (event conversion, email sending, formatting, aggregation, .. )
   * notiflow provide default composition of these [functions](functions.md) which are called [flows](flows). 
 
-Both [functions](functions) and [flows](flows) can be added custom functionality is required. It is also possible to customize existing [functions](functions) or [flows](flows) using configuration properties or by providing completely custom implementation 
+![HL](/diagrams/png/noti-flow-HL.png)
+
+Both [functions](functions) and [flows](flows) can be added custom functionality is required. It is also possible to customize existing [functions](functions) or [flows](flows) using configuration properties or by providing completely custom implementation. You can use noti-flow as
+
+  * embeded into your existing application
+    ![HL-embedded](/diagrams/png/noti-flow-HL-embedded.png)
+  * create custom microservice for notification processing
+    ![HL-stand-alone](/diagrams/png/noti-flow-HL-stand-alone.png)
+
+
+
 
 ## Functions <span id="functions"/>
 
@@ -65,5 +75,5 @@ Notiflow ships with monitoring and reporting UI written in ReactJS. It aim is to
 
 For complete documentation and screenshots of UI navigate to [Web UI]() chapter
 
-## Getting started <span id="getting-started"/>
-TODO
+## Let's start <span id="getting-started"/>
+To start using noti-flow in your project, navigate to the [Geting started](#getting-started) section

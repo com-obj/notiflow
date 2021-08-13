@@ -95,7 +95,7 @@ public class EmailProcessingFlowConfig {
 	public IntegrationFlow internalEmailSendFlowDefinition() {
 		return flow -> flow
 				.handle(endpointPersister)
-				.handle(messagePersister)
+				.handle(messagePersister) 
 				.handle(emailSender)
 				.wireTap(flowConfig -> flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID))
 				.channel(emailSendOutputChannel());
