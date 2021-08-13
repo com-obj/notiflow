@@ -4,11 +4,13 @@ import com.obj.nc.security.exception.UserNotAuthenticatedException;
 import com.obj.nc.security.service.JwtUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -26,6 +28,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 	private final JwtUserDetailsService jwtUserDetailsService;
 	private final JwtTokenUtil jwtTokenUtil;
+	private final AntPathMatcher antPathMatcher;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -70,7 +73,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	
 	private boolean isProtectedResource(HttpServletRequest request) {
 		String requestURI = request.getRequestURI();
-		return NOT_PROTECTED_RESOURCES.stream().noneMatch(requestURI::endsWith);
+		return NOT_PROTECTED_RESOURCES.stream().noneMatch(resource -> antPathMatcher.match(resource, requestURI));
 	}
 
 }

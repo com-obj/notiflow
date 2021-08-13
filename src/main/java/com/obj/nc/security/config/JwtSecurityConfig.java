@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
@@ -35,7 +36,8 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
-				.authorizeRequests().antMatchers(Constants.API.AUTHENTICATE).permitAll()
+				.authorizeRequests()
+				.antMatchers(Constants.NOT_PROTECTED_RESOURCES.toArray(new String[0])).permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
