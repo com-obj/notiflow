@@ -9,12 +9,16 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessagePersistantState;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
 import com.obj.nc.repositories.*;
 import com.obj.nc.utils.JsonUtils;
 import lombok.*;
+import org.springframework.integration.history.MessageHistory;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,20 +40,14 @@ public class InitDummyDataRestController {
     private final EndpointsRepository endpointsRepository;
     private final MessageRepository messageRepository;
     private final DeliveryInfoRepository deliveryInfoRepository;
+    private final FailedPayloadRepository failedPayloadRepository;
     
     @GetMapping
     public void initDummyData() {
         GenericEvent event = persistEvent();
         List<RecievingEndpoint> receivingEndpoints = persistReceivingEndpoints();
         NotificationIntent notificationIntent = persistNotificationIntent(event, receivingEndpoints);
-        
-        List<Message<?>> messages = Lists
-                .newArrayList(messageRepository.saveAll(persistMessages(notificationIntent)))
-                .stream()
-                .map(MessagePersistantState::toMessage)
-                .map(message -> (Message<?>) message)
-                .collect(Collectors.toList());
-        
+        List<Message<?>> messages = persistMessages(notificationIntent);
         persistDeliveryInfos(messages);
     }
     
@@ -95,11 +93,19 @@ public class InitDummyDataRestController {
         return notificationIntentRepository.save(intent);
     }
     
-    private List<MessagePersistantState> persistMessages(NotificationIntent notificationIntent) {
-        return messagesFromIntentGenerator
+    private List<Message<?>> persistMessages(NotificationIntent notificationIntent) {
+        List<MessagePersistantState> messages = messagesFromIntentGenerator
                 .apply(notificationIntent)
                 .stream()
                 .map(Message::toPersistantState)
+                .collect(Collectors.toList());
+        
+        List<MessagePersistantState> savedMessages = Lists.newArrayList(messageRepository.saveAll(messages));
+        
+        return savedMessages
+                .stream()
+                .map(MessagePersistantState::toMessage)
+                .map(message -> (Message<?>) message)
                 .collect(Collectors.toList());
     }
     
@@ -120,8 +126,22 @@ public class InitDummyDataRestController {
     }
     
     private void persistDeliveryInfosFailed(Message<?> message) {
-        persistMessageStatus(message, PROCESSING);
         persistMessageStatus(message, FAILED);
+        
+        org.springframework.messaging.Message<?> failedSpringMessage = MessageBuilder
+                .withPayload(message)
+                .build();
+        JsonNode failedMessageJson = JsonUtils.readJsonNodeFromPojo(failedSpringMessage);
+        
+        FailedPaylod failedPayload = FailedPaylod.builder()
+                .id(UUID.randomUUID())
+                .flowId("default-flow")
+                .channelNameForRetry("channel")
+                .messageJson(failedMessageJson)
+                .build();
+        failedPayload.setAttributesFromException(new IllegalArgumentException("illegal argument"));
+        
+        failedPayloadRepository.save(failedPayload);
     }
     
     private void persistMessageStatus(Message<?> message, DELIVERY_STATUS status) {

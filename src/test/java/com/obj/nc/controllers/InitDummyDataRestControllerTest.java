@@ -7,6 +7,7 @@ import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistantState;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.repositories.*;
 import com.obj.nc.testUtils.BaseIntegrationTest;
@@ -16,28 +17,36 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@AutoConfigureMockMvc
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 class InitDummyDataRestControllerTest extends BaseIntegrationTest {
 	
-	@Autowired private InitDummyDataRestController controller;
+	@Autowired private MockMvc mockMvc;
 	@Autowired private GenericEventRepository genericEventRepository;
 	@Autowired private NotificationIntentRepository notificationIntentRepository;
 	@Autowired private EndpointsRepository endpointsRepository;
 	@Autowired private MessageRepository messageRepository;
 	@Autowired private DeliveryInfoRepository deliveryInfoRepository;
+	@Autowired private FailedPayloadRepository failedPayloadRepository;
 
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
@@ -45,21 +54,29 @@ class InitDummyDataRestControllerTest extends BaseIntegrationTest {
     }
     
     @Test
-    void testFindDeliveryInfos() {
+    void testFindDeliveryInfos() throws Exception {
     	// WHEN
-    	controller.initDummyData();
-    	// THEN
+		mockMvc
+				.perform(MockMvcRequestBuilders.get("/init-dummy-data"))
+				.andExpect(status().is2xxSuccessful());
+		
+		await()
+				.atMost(5, TimeUnit.SECONDS)
+				.until(() -> failedPayloadRepository.count() > 0);
+		
 		assertGenericEventPersisted();
 		assertReceivingEndpointsPersisted();
 		assertNotificationIntentPersisted();
 		assertMessagesPersisted();
 		assertDeliveryInfosPersisted();
+		assertFailedPayloadPersisted();
 	}
 	
 	private void assertGenericEventPersisted() {
 		List<GenericEvent> genericEvents = Lists.newArrayList(genericEventRepository.findAll());
 		assertThat(genericEvents).hasSize(1);
 		assertThat(genericEvents.get(0).getFlowId()).isEqualTo("default-flow");
+		
 		DummyEventPayload payload = JsonUtils.readObjectFromJSON(genericEvents.get(0).getPayloadJson(), DummyEventPayload.class);
 		assertThat(payload.getIntField()).isEqualTo(15);
 		assertThat(payload.getStringField()).isEqualTo("simple string");
@@ -68,10 +85,13 @@ class InitDummyDataRestControllerTest extends BaseIntegrationTest {
 	private void assertReceivingEndpointsPersisted() {
 		List<RecievingEndpoint> receivingEndpoints = Lists.newArrayList(endpointsRepository.findAll());
 		assertThat(receivingEndpoints).hasSize(3);
+		
 		RecievingEndpoint johnDoeEmail = receivingEndpoints.get(0);
 		assertThat(johnDoeEmail.getEndpointId()).isEqualTo("john.doe@objectify.sk");
+		
 		RecievingEndpoint johnDudlyEmail = receivingEndpoints.get(1);
 		assertThat(johnDudlyEmail.getEndpointId()).isEqualTo("john.dudly@objectify.sk");
+		
 		RecievingEndpoint phone = receivingEndpoints.get(2);
 		assertThat(phone.getEndpointId()).isEqualTo("0918111111");
 	}
@@ -94,15 +114,20 @@ class InitDummyDataRestControllerTest extends BaseIntegrationTest {
 	
 	private void assertDeliveryInfosPersisted() {
 		List<DeliveryInfo> deliveryInfos = Lists.newArrayList(deliveryInfoRepository.findAll());
-		assertThat(deliveryInfos).hasSize(8);
+		assertThat(deliveryInfos).hasSize(7);
 		assertThat(deliveryInfos.get(0).getStatus()).isEqualTo(PROCESSING);
 		assertThat(deliveryInfos.get(1).getStatus()).isEqualTo(SENT);
 		assertThat(deliveryInfos.get(2).getStatus()).isEqualTo(READ);
 		assertThat(deliveryInfos.get(3).getStatus()).isEqualTo(PROCESSING);
 		assertThat(deliveryInfos.get(4).getStatus()).isEqualTo(SENT);
 		assertThat(deliveryInfos.get(5).getStatus()).isEqualTo(READ);
-		assertThat(deliveryInfos.get(6).getStatus()).isEqualTo(PROCESSING);
-		assertThat(deliveryInfos.get(7).getStatus()).isEqualTo(FAILED);
+		assertThat(deliveryInfos.get(6).getStatus()).isEqualTo(FAILED);
+	}
+	
+	private void assertFailedPayloadPersisted() {
+		List<FailedPaylod> failedPayloads = Lists.newArrayList(failedPayloadRepository.findAll());
+		assertThat(failedPayloads).hasSize(1);
+		assertThat(failedPayloads.get(0).getErrorMessage()).isEqualTo("illegal argument");
 	}
 	
 }
