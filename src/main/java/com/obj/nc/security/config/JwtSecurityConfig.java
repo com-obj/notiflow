@@ -16,8 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import static com.obj.nc.security.config.Constants.DEFAULT_EXCEPTION_MSG;
-import static com.obj.nc.security.config.Constants.EXCEPTION_ATTR_NAME;
+import static com.obj.nc.security.config.Constants.*;
 
 @Configuration
 @RequiredArgsConstructor
@@ -36,7 +35,7 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
 				.authorizeRequests()
-				.antMatchers(Constants.NOT_PROTECTED_RESOURCES.toArray(new String[0])).permitAll()
+				.antMatchers(NOT_PROTECTED_RESOURCES.toArray(new String[0])).permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)

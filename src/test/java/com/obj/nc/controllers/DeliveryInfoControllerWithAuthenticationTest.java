@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -33,10 +34,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
@@ -52,6 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		"nc.jwt.password=testPassword",
 		"nc.jwt.signature-secret=testSecret"
 })
+@DirtiesContext
 class DeliveryInfoControllerWithAuthenticationTest extends BaseIntegrationTest {
     
     
@@ -95,7 +94,7 @@ class DeliveryInfoControllerWithAuthenticationTest extends BaseIntegrationTest {
 		
 		//WHEN TEST REST
 		ResultActions resp = mockMvc
-				.perform(MockMvcRequestBuilders.put("/delivery-info/messages/read/{messageId}", emailMessagePersisted.getId().toString())
+				.perform(MockMvcRequestBuilders.put("/delivery-info/messages/read/{messageId}", Objects.requireNonNull(emailMessagePersisted.getId()).toString())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
@@ -104,6 +103,12 @@ class DeliveryInfoControllerWithAuthenticationTest extends BaseIntegrationTest {
 		resp
 				.andExpect(status().is3xxRedirection())
 				.andExpect(redirectedUrl("/resources/images/px.png"));
+		
+		//AND IMAGE IS FOUND
+		resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/resources/images/px.png"))
+				.andExpect(status().is2xxSuccessful())
+				.andExpect(content().contentType(MediaType.IMAGE_PNG));
 		
 		//AND READ STATUS IS JOURNALED
 		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
