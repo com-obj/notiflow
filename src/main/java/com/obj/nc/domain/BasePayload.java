@@ -53,8 +53,6 @@ import lombok.extern.log4j.Log4j2;
 @ToString(callSuper = true)
 @Log4j2
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-@SuperBuilder
-@NoArgsConstructor
 public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements HasHeader, HasRecievingEndpoints, HasEventIds, HasProcessingInfo, Persistable<UUID> {
 	
 	@Id

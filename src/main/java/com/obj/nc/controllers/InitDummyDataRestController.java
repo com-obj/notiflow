@@ -1,5 +1,6 @@
 package com.obj.nc.controllers;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -9,19 +10,19 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessagePersistantState;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
 import com.obj.nc.repositories.*;
 import com.obj.nc.utils.JsonUtils;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.*;
@@ -52,12 +53,12 @@ public class InitDummyDataRestController {
                 .collect(Collectors.toList());
         
         persistDeliveryInfos(messages);
-        
     }
     
     private GenericEvent persistEvent() {
         return genericEventRepository.save(
                 GenericEvent.builder()
+                        .id(UUID.randomUUID())
                         .flowId("default-flow")
                         .payloadJson(
                                 DummyEventPayload.builder()
@@ -82,14 +83,16 @@ public class InitDummyDataRestController {
                         .phone("0918111111")
                         .build()
         );
-        return Lists.newArrayList(endpointsRepository.saveAll(receivingEndpoints));
+        return Lists.newArrayList(endpointsRepository.persistEnpointIfNotExists(receivingEndpoints));
     }
     
     private NotificationIntent persistNotificationIntent(GenericEvent event,
                                                          List<RecievingEndpoint> receivingEndpoints) {
-        NotificationIntent intent = NotificationIntent.builder()
-                .recievingEndpoints(receivingEndpoints)
-                .build();
+        NotificationIntent intent = NotificationIntent
+                .createWithStaticContent(
+                        "subject", 
+                        "body", 
+                        receivingEndpoints.toArray(new RecievingEndpoint[0]));
         intent.getHeader().addEventId(event.getId());
         return notificationIntentRepository.save(intent);
     }
@@ -103,11 +106,11 @@ public class InitDummyDataRestController {
     }
     
     private void persistDeliveryInfos(List<Message<?>> messages) {
-        for (int i = 0; i < messages.size() / 2; i++) {
+        for (int i = 0; i <= messages.size() / 2; i++) {
             persistDeliveryInfosSuccessAndRead(messages.get(i));
         }
         
-        for (int i = messages.size() / 2; i < messages.size(); i++) {
+        for (int i = messages.size() / 2 + 1; i < messages.size(); i++) {
             persistDeliveryInfosFailed(messages.get(i));
         }
     }
@@ -126,6 +129,7 @@ public class InitDummyDataRestController {
     private void persistMessageStatus(Message<?> message, DELIVERY_STATUS status) {
         deliveryInfoRepository.save(
                 DeliveryInfo.builder()
+                        .id(UUID.randomUUID())
                         .endpointId(message.getRecievingEndpoints().get(0).getId())
                         .eventId(message.getEventIds().get(0))
                         .messageId(message.getMessageId())
@@ -134,9 +138,11 @@ public class InitDummyDataRestController {
         );
     }
     
-    @Value
+    @Data
     @Builder
-    private static class DummyEventPayload {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class DummyEventPayload {
         String stringField;
         int intField;
         

@@ -19,7 +19,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.data.relational.core.mapping.Table;
@@ -30,7 +29,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @Table("nc_intent")
 @Log4j2
-@SuperBuilder
 /**
  * This class represents Intent to deliver *some* kind of information at *some* point in time to recipient. Use this class in case
  * that you cannot tell the details about what/when/how are stored in delivery settings of that recipient. 
