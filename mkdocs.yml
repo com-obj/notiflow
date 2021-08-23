@@ -1,0 +1,23 @@
+site_name: Notiflow
+theme:
+  name: material
+
+# Copyright
+copyright: Copyright &copy; 2021 - 2021 Objectify, s.r.o.
+
+# Page tree
+nav:
+  - Fundamentals: index.md
+  - Features: features.md
+  - Getting started:
+    - Installation: getting-started.md
+    - Guides: guides.md
+  - Architecture and design:
+    - Flows: flows.md
+    - Functions: functions.md
+    - Payloads: entities.md
+  - Web UI: web-ui.md
+  - API Reference: api.md
+  - Releases:
+    - Changelog: changelog.md
+  - License: license.md

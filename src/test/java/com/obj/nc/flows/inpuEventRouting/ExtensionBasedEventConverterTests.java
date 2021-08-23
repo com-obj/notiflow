@@ -118,7 +118,9 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				@Override
 				public List<com.obj.nc.domain.message.Message<?>> convertEvent(GenericEvent event) {					
 					EmailMessage email1 = new EmailMessage();
-					email1.addRecievingEndpoints(EmailEndpoint.builder().email("test@objectify.sk").build());
+					email1.addRecievingEndpoints(
+						EmailEndpoint.builder().email("test@objectify.sk").build()
+					);
 					email1.getBody().setSubject("Subject");
 					email1.getBody().setText("text");
 

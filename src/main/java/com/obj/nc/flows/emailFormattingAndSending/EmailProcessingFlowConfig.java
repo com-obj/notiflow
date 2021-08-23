@@ -3,11 +3,6 @@ package com.obj.nc.flows.emailFormattingAndSending;
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
 
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.functions.processors.messageTemplating.config.EmailTrackingConfigProperties;
-import com.obj.nc.functions.processors.messageTracking.EmailReadTrackingDecorator;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -18,11 +13,14 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import com.obj.nc.domain.content.TemplateWithModelContent;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessageAggregationStrategy;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
+import com.obj.nc.functions.processors.messageTemplating.config.EmailTrackingConfigProperties;
+import com.obj.nc.functions.processors.messageTracking.EmailReadTrackingDecorator;
 import com.obj.nc.functions.processors.senders.EmailSender;
 
 import lombok.RequiredArgsConstructor;
@@ -41,78 +39,75 @@ public class EmailProcessingFlowConfig {
 	private final ThreadPoolTaskScheduler executor;
 	private final EmailMessageAggregationStrategy emailMessageAggregationStrategy;
 	
-	public final static String EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_ID = "EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_ID";
-	public final static String EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID = EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_ID + "_INPUT";
+	public final static String EMAIL_FORMAT_AND_SEND_FLOW_ID = "EMAIL_FORMAT_AND_SEND_FLOW_ID";
+	public final static String EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID = EMAIL_FORMAT_AND_SEND_FLOW_ID + "_INPUT";
 	
-	public final static String EMAIL_FORMAT_FLOW_ID = "EMAIL_FORMAT_FLOW_ID";
-	
-	public final static String EMAIL_SEND_ROUTING_FLOW_ID = "EMAIL_SEND_ROUTING_FLOW_ID";
-	public final static String EMAIL_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID = EMAIL_SEND_ROUTING_FLOW_ID + "_INPUT";
-
 	public final static String EMAIL_SEND_FLOW_ID = "EMAIL_SEND_FLOW_ID";
+	public final static String EMAIL_SEND_FLOW_INPUT_CHANNEL_ID = EMAIL_SEND_FLOW_ID + "_INPUT";
+
 	public final static String EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID = EMAIL_SEND_FLOW_ID + "_OUTPUT";
 	
-	@Bean(EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_ID)
+	@Bean(EMAIL_FORMAT_AND_SEND_FLOW_ID)
 	public IntegrationFlow emailFormatAndSendFlowDefinition() {
 		return IntegrationFlows
-				.from(emailFormatAndSendRoutingInputChannel())
+				.from(emailFormatAndSendInputChannel())
 				.routeToRecipients(spec -> spec
 						.<Message<?>>recipient(
-								emailFormatFlowDefinition().getInputChannel(),
+								internalEmailFormatFlowDefinition().getInputChannel(),
 								m -> m.getBody() instanceof TemplateWithModelContent)
-						.defaultOutputChannel(emailSendRoutingInputChannel()))
+						.defaultOutputChannel(emailSendFlowDefinition().getInputChannel()))
 				.get();
 	}
 	
-	@Bean(EMAIL_FORMAT_FLOW_ID)
-	public IntegrationFlow emailFormatFlowDefinition() {
+	@Bean("INTERNAL_EMAIL_FORMAT_FLOW_ID")
+	public IntegrationFlow internalEmailFormatFlowDefinition() {
 		return flow -> flow
-				.publishSubscribeChannel(executor, subscription  -> subscription
+				.publishSubscribeChannel(subscription  -> subscription
 						//format email and merge if multilanguage
 						.subscribe(aggregateMultilangFlow -> aggregateMultilangFlow
 								.filter(m-> MERGE.equals(properties.getMultiLocalesMergeStrategy()))
 								.handle(emailFormatter)
 								.handle(emailMessageAggregationStrategy)
-								.channel(emailSendRoutingInputChannel()))
+								.channel(emailSendFlowDefinition().getInputChannel()))
 						//format and split if multilanguage
 						.subscribe(mesagePerLocaleFlow -> mesagePerLocaleFlow
 								.filter(m-> !MERGE.equals(properties.getMultiLocalesMergeStrategy()))
 								.split(emailFormatter)
-								.channel(emailSendRoutingInputChannel()))
+								.channel(emailSendFlowDefinition().getInputChannel()))
 				);
 	}
 	
-	@Bean(EMAIL_SEND_ROUTING_FLOW_ID)
-	public IntegrationFlow emailSendRoutingFlowDefinition() {
+	@Bean(EMAIL_SEND_FLOW_ID)
+	public IntegrationFlow emailSendFlowDefinition() {
 		return IntegrationFlows
-				.from(emailSendRoutingInputChannel())
+				.from(emailSendInputChannel())
 				.routeToRecipients(spec -> spec
 						.recipientFlow((Message<EmailContent> source) -> emailTrackingConfigProperties.isEnabled() 
 										&& MediaType.TEXT_HTML_VALUE.equals(source.getBody().getContentType()),
 								trackingSubflow -> trackingSubflow
 										.handle(emailReadTrackingDecorator)
-										.channel(emailSendFlowDefinition().getInputChannel()))
-						.defaultOutputChannel(emailSendFlowDefinition().getInputChannel()))
+										.channel(internalEmailSendFlowDefinition().getInputChannel()))
+						.defaultOutputChannel(internalEmailSendFlowDefinition().getInputChannel()))
 				.get();
 	}
 	
-	@Bean(EMAIL_SEND_FLOW_ID)
-	public IntegrationFlow emailSendFlowDefinition() {
+	@Bean("INTERNAL_EMAIL_SEND_FLOW_ID")
+	public IntegrationFlow internalEmailSendFlowDefinition() {
 		return flow -> flow
 				.handle(endpointPersister)
-				.handle(messagePersister)
+				.handle(messagePersister) 
 				.handle(emailSender)
 				.wireTap(flowConfig -> flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID))
 				.channel(emailSendOutputChannel());
 	}
 	
-	@Bean(EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID)
-	public MessageChannel emailFormatAndSendRoutingInputChannel() {
+	@Bean(EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID)
+	public MessageChannel emailFormatAndSendInputChannel() {
 		return new PublishSubscribeChannel(executor);
 	}
 	
-	@Bean(EMAIL_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID)
-	public MessageChannel emailSendRoutingInputChannel() {
+	@Bean(EMAIL_SEND_FLOW_INPUT_CHANNEL_ID)
+	public MessageChannel emailSendInputChannel() {
 		return new PublishSubscribeChannel(executor);
 	}
 	

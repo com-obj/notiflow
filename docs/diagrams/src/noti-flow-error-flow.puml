@@ -1,7 +1,7 @@
 @startuml
 !theme cerulean-outline
 
-
+skinparam backgroundcolor White
 skinparam component {
     BackgroundColor<<user defined>> LightGray
     BorderColor<<user defined>> Gray
@@ -32,11 +32,8 @@ database "Topic/Channels" {
     ]
 
     note left of errorChannel 
-        In case of exception in any step of any flow, 
-        the failed message is recieved by this channel 
-        with information about which step was the last that failed
-        For this to work in any situation, transaction boundires has to 
-        be on each step of the flow
+        In case of exception in any step of a flow, 
+        the failed message is recieved by this channel. 
     end note  
 
 }

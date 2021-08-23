@@ -2,6 +2,7 @@
 
 !theme cerulean-outline
 
+skinparam backgroundcolor White
 skinparam component {
     backgroundColor<<user defined>> LightGray
 }

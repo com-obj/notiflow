@@ -95,3 +95,25 @@ curl -H "Content-Type: application/json" --data { "username" : "nc", "password" 
 #Example Response
 {"token":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuYyIsImV4cCI6MTYyMTIwODUxNCwiaWF0IjoxNjIxMTkwNTE0fQ.Se6yitIkVvbyVkWZIZk8Vxpr_Gp0L9uONW9ErideekzKlQUfogSfdqVz7LPGAZcZR2JK0OiYsjRSQq5-ziIozw"}
 ```
+
+##Documentation
+notiflow is using MkDocs to generate onlie documentation form .md files. In order to start using MkDocs you need to install Python
+
+```
+pip install mkdocs
+pip install mkdocs-material
+```
+
+##### Commands
+
+* `mkdocs serve` - Start the live-reloading docs server.
+* `mkdocs build` - Build the documentation site.
+* `mkdocs -h` - Print help message and exit.
+
+##### Project layout
+
+    mkdocs.yml    # The configuration file.
+    docs/
+        index.md  # The documentation homepage.
+        ...       # Other markdown pages, images and other files.
+
