@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -34,10 +36,6 @@ import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.GenericEventRepository;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 @Getter
@@ -55,6 +53,8 @@ import lombok.extern.log4j.Log4j2;
 @ToString(callSuper = true)
 @Log4j2
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@SuperBuilder
+@NoArgsConstructor
 public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements HasHeader, HasRecievingEndpoints, HasEventIds, HasProcessingInfo, Persistable<UUID> {
 	
 	@Id

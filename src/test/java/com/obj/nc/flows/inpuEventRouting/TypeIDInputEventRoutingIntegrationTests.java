@@ -3,7 +3,6 @@ package com.obj.nc.flows.inpuEventRouting;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 
 import javax.mail.MessagingException;
-import javax.validation.Valid;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
+import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
@@ -44,7 +43,7 @@ import lombok.NoArgsConstructor;
 		"nc.flows.input-evet-routing.type-channel-mapping.TYPE_2=CHANNEL_2"})
 public class TypeIDInputEventRoutingIntegrationTests extends BaseIntegrationTest {
 	
-	@Autowired private GenericEventPersisterConsumer persister;
+	@Autowired private GenericEventPersister persister;
 	
 	@Qualifier("CHANNEL_1")
 	@Autowired private PollableChannel flowInputChannel1;

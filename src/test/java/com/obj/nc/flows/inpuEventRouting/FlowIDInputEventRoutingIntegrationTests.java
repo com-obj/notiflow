@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
+import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
@@ -40,7 +40,7 @@ import lombok.NoArgsConstructor;
 @SpringBootTest
 public class FlowIDInputEventRoutingIntegrationTests extends BaseIntegrationTest {
 	
-	@Autowired private GenericEventPersisterConsumer persister;
+	@Autowired private GenericEventPersister persister;
 	@Qualifier("TEST_FLOW_INPUT")
 	@Autowired private PollableChannel flowInputChannel;
 	

@@ -1,8 +1,5 @@
 package com.obj.nc.domain.notifIntent;
 
-import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.data.relational.core.mapping.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.IsNotification;
@@ -16,19 +13,16 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailMessageTemplated;
-import com.obj.nc.domain.message.MailChimpMessage;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SmsMessage;
-import com.obj.nc.domain.message.SmsMessageTemplated;
+import com.obj.nc.domain.message.*;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @NoArgsConstructor
@@ -36,6 +30,7 @@ import lombok.extern.log4j.Log4j2;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @Table("nc_intent")
 @Log4j2
+@SuperBuilder
 /**
  * This class represents Intent to deliver *some* kind of information at *some* point in time to recipient. Use this class in case
  * that you cannot tell the details about what/when/how are stored in delivery settings of that recipient. 
