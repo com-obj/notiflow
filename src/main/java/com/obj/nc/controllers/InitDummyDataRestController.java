@@ -1,6 +1,5 @@
 package com.obj.nc.controllers;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -10,7 +9,6 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessagePersistantState;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
@@ -46,7 +44,7 @@ public class InitDummyDataRestController {
         NotificationIntent notificationIntent = persistNotificationIntent(event, receivingEndpoints);
         
         List<Message<?>> messages = Lists
-                .newArrayList(messageRepository.saveAll(createMessages(notificationIntent)))
+                .newArrayList(messageRepository.saveAll(persistMessages(notificationIntent)))
                 .stream()
                 .map(MessagePersistantState::toMessage)
                 .map(message -> (Message<?>) message)
@@ -97,7 +95,7 @@ public class InitDummyDataRestController {
         return notificationIntentRepository.save(intent);
     }
     
-    private List<MessagePersistantState> createMessages(NotificationIntent notificationIntent) {
+    private List<MessagePersistantState> persistMessages(NotificationIntent notificationIntent) {
         return messagesFromIntentGenerator
                 .apply(notificationIntent)
                 .stream()

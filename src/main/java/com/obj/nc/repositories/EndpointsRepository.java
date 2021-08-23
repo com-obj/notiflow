@@ -11,9 +11,8 @@ import java.util.UUID;
 public interface EndpointsRepository extends PagingAndSortingRepository<RecievingEndpoint, UUID>, EndpointsRepositoryCustom {
     
     @Override
-    @Query(value = "SELECT id, endpoint_name, endpoint_type FROM nc_endpoint",
-            rowMapperClass = ReceivingEndpointRowMapper.class
-    )
+    @Query(value = "SELECT id, endpoint_name, endpoint_type FROM nc_endpoint", 
+           rowMapperClass = ReceivingEndpointRowMapper.class)
     List<RecievingEndpoint> findAll();
     
 }
