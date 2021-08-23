@@ -1,10 +1,6 @@
 package com.obj.nc.controllers;
 
-import com.jayway.jsonpath.JsonPath;
-import com.obj.nc.controllers.DeliveryInfoRestController.EndpointDeliveryInfoDto;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistantState;
@@ -13,9 +9,7 @@ import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY
 import com.obj.nc.repositories.*;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +25,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
