@@ -88,7 +88,7 @@ class DeliveryInfoControllerWithAuthenticationTest extends BaseIntegrationTest {
 		
 		//WHEN TEST REST
 		ResultActions resp = mockMvc
-				.perform(MockMvcRequestBuilders.put("/delivery-info/messages/read/{messageId}", Objects.requireNonNull(emailMessagePersisted.getId()).toString())
+				.perform(MockMvcRequestBuilders.put("/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(emailMessagePersisted.getId()).toString())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());

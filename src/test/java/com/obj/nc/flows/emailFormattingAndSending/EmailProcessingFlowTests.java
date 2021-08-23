@@ -4,9 +4,7 @@ import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProp
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MESSAGE_PER_LOCALE;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -160,7 +158,8 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     
         List<Element> imgs = contentAsDocument.body().children().stream().filter(element -> element.is("img")).collect(Collectors.toList());
         assertThat(imgs, hasSize(1));
-        assertThat(imgs.get(0).attr("src"), startsWith(ncAppConfigProperties.getUrl()+"/delivery-info/messages/read/"));
+        assertThat(imgs.get(0).attr("src"), startsWith(ncAppConfigProperties.getUrl()+"/delivery-info/messages/"));
+        assertThat(imgs.get(0).attr("src"), endsWith("/mark-as-read"));
     }
 
 //    @AfterEach

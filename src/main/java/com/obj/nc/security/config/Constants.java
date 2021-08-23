@@ -13,7 +13,7 @@ public interface Constants {
     
     List<String> NOT_PROTECTED_RESOURCES = asList(
             "/authenticate", 
-            "/delivery-info/messages/read/*",
+            "/delivery-info/messages/*/mark-as-read",
             "/resources/images/px.png"
     );
     

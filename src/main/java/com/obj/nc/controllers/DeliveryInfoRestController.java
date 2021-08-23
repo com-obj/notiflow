@@ -67,7 +67,7 @@ public class DeliveryInfoRestController {
 		return findDeliveryInfosByEventId(event.getId().toString());
     }
 	
-	@PutMapping(value = "/messages/read/{messageId}")
+	@PutMapping(value = "/messages/{messageId}/mark-as-read")
 	public ResponseEntity<Void> trackMessageRead(@PathVariable(value = "messageId", required = true) String messageId) {
 		Optional<MessagePersistantState> message = messageRepo.findById(UUID.fromString(messageId));
 		message.ifPresent(messagePersistantState -> deliveryInfoFlow.createAndPersistReadDeliveryInfo(messagePersistantState.toMessage()));
