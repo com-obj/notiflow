@@ -30,9 +30,9 @@ import java.util.UUID;
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.*;
 
 @RestController
-@RequestMapping("/init-dummy-data")
+@RequestMapping("/test-data")
 @RequiredArgsConstructor
-public class InitDummyDataRestController {
+public class TestDataRestController {
     
     private final GenericEventRepository genericEventRepository;
     private final NotificationIntentRepository notificationIntentRepository;
@@ -42,8 +42,8 @@ public class InitDummyDataRestController {
     private final FailedPayloadRepository failedPayloadRepository;
     private final ProcessingInfoRepository processingInfoRepository;
     
-    @GetMapping
-    public void initDummyData() {
+    @GetMapping("/full-event-processing")
+    public void persistFullEventProcessingData() {
         persistEvent();
         persistReceivingEndpoints();
         persistNotificationIntent();
