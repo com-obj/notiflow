@@ -156,20 +156,6 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
         return endpoints;
     }
     
-//    @Override
-//    public List<RecievingEndpoint> findAll() {
-//        String query =
-//                "select id, endpoint_name, endpoint_type "
-//                        + "from nc_endpoint ";
-//        
-//        List<RecievingEndpoint> endpoints = jdbcTemplate.query(
-//                query,
-//                new ReceivingEndpointRowMapper()
-//        );
-//        
-//        return endpoints;
-//    }
-    
     @Override
     public List<RecievingEndpoint> findByNameIds(String ... endpointNames) {
         if (endpointNames.length==0) {

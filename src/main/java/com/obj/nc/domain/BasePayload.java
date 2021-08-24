@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -36,6 +34,10 @@ import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.GenericEventRepository;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 @Getter

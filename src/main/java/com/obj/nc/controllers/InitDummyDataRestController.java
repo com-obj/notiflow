@@ -2,7 +2,6 @@ package com.obj.nc.controllers;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
 import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
@@ -13,35 +12,22 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessagePersistantState;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
 import com.obj.nc.repositories.*;
 import com.obj.nc.utils.JsonUtils;
 import lombok.*;
-import org.springframework.integration.history.MessageHistory;
-import org.springframework.integration.support.MessageBuilder;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.*;
-import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 @RestController
 @RequestMapping("/init-dummy-data")
