@@ -4,11 +4,7 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import com.jayway.jsonpath.JsonPath;
@@ -190,7 +186,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		
 		//WHEN TEST REST
 		ResultActions resp = mockMvc
-				.perform(MockMvcRequestBuilders.put("/delivery-info/messages/read/{messageId}", emailMessagePersisted.getId().toString())
+				.perform(MockMvcRequestBuilders.put("/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(emailMessagePersisted.getId()).toString())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
