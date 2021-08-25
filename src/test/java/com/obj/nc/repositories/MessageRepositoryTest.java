@@ -122,7 +122,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 	}
 	
 
-	public static EmailMessage createTestMessage() {
+	private EmailMessage createTestMessage() {
 		String INPUT_JSON_FILE = "messages/email_message.json";
 		EmailMessage emailMsg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 		emailMsg.ensureEnpointsPersisted();
