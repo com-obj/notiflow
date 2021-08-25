@@ -291,7 +291,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		EmailMessage emailMessage = JsonUtils.readObjectFromClassPathResource("messages/simple_email_message.json", EmailMessage.class);
 		emailMessage.getHeader().addMessageId(emailMessage.getId());
 		endpointsRepository.persistEnpointIfNotExists(emailMessage.getRecievingEndpoints());
-		messageRepository.save(emailMessage.toPersistantState());		// TODO persist endpoints before running this
+		messageRepository.save(emailMessage.toPersistantState());
 		
 		messageProcessingFlow.processMessage(emailMessage);
 		Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepository.countByEndpointIdAndStatus(emailMessage.getRecievingEndpoints().get(0).getId(), SENT) == 1L);
