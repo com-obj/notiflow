@@ -92,6 +92,10 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	void testCountSentMessages() throws Exception {
 		//GIVEN
 		EmailMessage message = JsonUtils.readObjectFromClassPathResource("messages/simple_email_message.json", EmailMessage.class);
+		message.getHeader().addMessageId(message.getId());
+		endpointsRepository.persistEnpointIfNotExists(message.getRecievingEndpoints());
+		messageRepository.save(message.toPersistantState());
+		
 		messageProcessingFlow.processMessage(message);
 		awaitDeliveryInfos();
 		
@@ -285,10 +289,18 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	
 	private void persistTestEndpointsAndTestDeliveryInfos() {
 		EmailMessage emailMessage = JsonUtils.readObjectFromClassPathResource("messages/simple_email_message.json", EmailMessage.class);
+		emailMessage.getHeader().addMessageId(emailMessage.getId());
+		endpointsRepository.persistEnpointIfNotExists(emailMessage.getRecievingEndpoints());
+		messageRepository.save(emailMessage.toPersistantState());		// TODO persist endpoints before running this
+		
 		messageProcessingFlow.processMessage(emailMessage);
 		Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepository.countByEndpointIdAndStatus(emailMessage.getRecievingEndpoints().get(0).getId(), SENT) == 1L);
 		
 		SmsMessageTemplated smsMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/txt_template_message.json", SmsMessageTemplated.class);
+		smsMessage.getHeader().addMessageId(smsMessage.getId());
+		endpointsRepository.persistEnpointIfNotExists(smsMessage.getRecievingEndpoints());
+		messageRepository.save(smsMessage.toPersistantState());
+		
 		messageProcessingFlow.processMessage(smsMessage);
 		Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepository.countByEndpointIdAndStatus(((SmsEndpoint) smsMessage.getRecievingEndpoints().get(0)).getId(), SENT) == 1L);
 	}

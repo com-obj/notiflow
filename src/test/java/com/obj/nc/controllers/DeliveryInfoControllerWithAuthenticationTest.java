@@ -73,7 +73,8 @@ class DeliveryInfoControllerWithAuthenticationTest extends BaseIntegrationTest {
 		//AND
 		EmailMessage emailMessage = new EmailMessage();
 		emailMessage.setRecievingEndpoints(Arrays.asList(email1));
-		emailMessage.getHeader().setEventIds(Arrays.asList(eventId));
+		emailMessage.getHeader().addEventId(eventId);
+		emailMessage.getHeader().addMessageId(emailMessage.getId());
 		MessagePersistantState emailMessagePersisted = messageRepo.save(emailMessage.toPersistantState());
 		
 		//AND

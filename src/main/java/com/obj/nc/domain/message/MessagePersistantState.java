@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
+import com.obj.nc.domain.HasMessageIds;
+import com.obj.nc.repositories.MessageRepository;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -32,7 +34,7 @@ import lombok.SneakyThrows;
 
 @Data
 @Table("nc_message")
-public class MessagePersistantState implements Persistable<UUID>, HasEventIds, HasHeader, HasRecievingEndpoints {
+public class MessagePersistantState implements Persistable<UUID>, HasEventIds, HasMessageIds, HasHeader, HasRecievingEndpoints {
 	
 
 	@Id
@@ -69,6 +71,13 @@ public class MessagePersistantState implements Persistable<UUID>, HasEventIds, H
 	@Reference(GenericEventRepository.class)
 	public List<UUID> getEventIds() {
 		return getHeader().getEventIds();
+	}
+	
+	@Override
+	@JsonIgnore
+	@Transient
+	public List<UUID> getMessageIds() {
+		return getHeader().getMessageIds();
 	}
 	
 	@SuppressWarnings({"rawtypes", "unchecked"})

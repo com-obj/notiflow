@@ -29,32 +29,28 @@ public class DeliveryInfoSendTransformer extends ProcessorFunctionAdapter<Delive
 		return infos;
 	}
 
-
 	private List<DeliveryInfo> createFromSendResults(DeliveryInfoSendResult sendResult) {
 		List<DeliveryInfo> resultInfos = new ArrayList<>();
 		
-		UUID[] eventIds = sendResult.getEventIds();
-		
-		if (eventIds.length == 0) {
+		for (UUID eventId: sendResult.getEventIds()) {
 			DeliveryInfo info = DeliveryInfo.builder()
 					.endpointId(sendResult.getRecievingEndpoint().getId())
-					.messageId(sendResult.getMessageId())
+					.eventId(eventId)
 					.status(sendResult.getStatus())
 					.build();
 			resultInfos.add(info);
-		} else {
-			for (UUID eventId: eventIds) {
-				DeliveryInfo info = DeliveryInfo.builder()
-						.endpointId(sendResult.getRecievingEndpoint().getId())
-						.eventId(eventId)
-						.messageId(sendResult.getMessageId())
-						.status(sendResult.getStatus())
-						.build();
-				resultInfos.add(info);
-			}
 		}
+		
+		for (UUID messageId: sendResult.getMessageIds()) {
+			DeliveryInfo info = DeliveryInfo.builder()
+					.endpointId(sendResult.getRecievingEndpoint().getId())
+					.messageId(messageId)
+					.status(sendResult.getStatus())
+					.build();
+			resultInfos.add(info);
+		}
+		
 		return resultInfos;
 	}
 	
-
 }
