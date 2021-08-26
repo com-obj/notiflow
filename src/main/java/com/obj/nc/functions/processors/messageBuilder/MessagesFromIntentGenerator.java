@@ -48,6 +48,10 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 			msg.addRecievingEndpoints(recievingEndpoint);
 
 			msg.setAttributes(notificationIntent.getAttributes());
+			
+			notificationIntent.getEventIds().forEach(msg::addEventId);
+			notificationIntent.getIntentIds().forEach(msg::addIntentId);
+			
 			messages.add(msg);
 		}
 

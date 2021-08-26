@@ -1,6 +1,13 @@
 package com.obj.nc.domain.notifIntent;
 
+import com.obj.nc.domain.HasEventIds;
+import com.obj.nc.domain.HasIntentIds;
+import com.obj.nc.domain.refIntegrity.Reference;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.NotificationIntentRepository;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -30,6 +37,12 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @ToString(callSuper = false)
@@ -54,9 +67,52 @@ import lombok.extern.log4j.Log4j2;
  *
  * @param <BODY_TYPE>
  */
-public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification {
+public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification, HasEventIds, HasIntentIds {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "INTENT";
+	
+	@NotNull
+	@EqualsAndHashCode.Include
+	@Transient
+	@Reference(GenericEventRepository.class)
+	private List<UUID> eventIds = new ArrayList<>();
+	
+	@NotNull
+	@EqualsAndHashCode.Include
+	@Transient
+	@Reference(NotificationIntentRepository.class)
+	private List<UUID> intentIds = new ArrayList<>();
+	
+	@Override
+	public void addEventId(UUID eventId) {
+		eventIds.add(eventId);
+	}
+	
+	public void addIntentId(UUID intentId) {
+		intentIds.add(intentId);
+	}
+	
+	@JsonIgnore
+	@Column("event_ids")
+	public void setEventIdsAsArray(UUID[] eventIds) {
+		setEventIds(Arrays.asList(eventIds));
+	}
+	
+	@Column("event_ids")
+	public UUID[] getEventIdsAsArray() {
+		return eventIds.toArray(new UUID[0]);
+	}
+	
+	@JsonIgnore
+	@Column("intent_ids")
+	public void setIntentIdsAsArray(UUID[] intentIds) {
+		setIntentIds(Arrays.asList(intentIds));
+	}
+	
+	@Column("intent_ids")
+	public UUID[] getIntentIdsAsArray() {
+		return intentIds.toArray(new UUID[0]);
+	}
 	
 	@Override
 	@JsonIgnore
@@ -114,6 +170,4 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 
 	}
 
-
-	
 }

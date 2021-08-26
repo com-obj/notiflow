@@ -1,6 +1,8 @@
 package com.obj.nc.domain.message;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,6 +10,8 @@ import javax.validation.constraints.NotNull;
 
 import com.obj.nc.domain.HasMessageIds;
 import com.obj.nc.repositories.MessageRepository;
+import com.obj.nc.repositories.NotificationIntentRepository;
+import lombok.Builder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -34,14 +38,15 @@ import lombok.SneakyThrows;
 
 @Data
 @Table("nc_message")
-public class MessagePersistantState implements Persistable<UUID>, HasEventIds, HasMessageIds, HasHeader, HasRecievingEndpoints {
+public class MessagePersistantState implements Persistable<UUID> {
 	
-
 	@Id
 	@EqualsAndHashCode.Include
 	private UUID id;
+	
 	@CreatedDate
 	private Instant timeCreated;
+	
 	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
 	private Header header;
 	
@@ -54,6 +59,18 @@ public class MessagePersistantState implements Persistable<UUID>, HasEventIds, H
 	@Reference(EndpointsRepository.class)
 	private UUID[] endpointIds;
 	
+	@NotNull
+	@Reference(GenericEventRepository.class)
+	private UUID[] eventIds;
+	
+	@NotNull
+	@Reference(NotificationIntentRepository.class)
+	private UUID[] intentIds;
+	
+	@NotNull
+	@Reference(MessageRepository.class)
+	private UUID[] messageIds;
+	
 	@JsonIgnore
 	@Transient
 	private List<RecievingEndpoint> receivingEndpoints;
@@ -63,21 +80,6 @@ public class MessagePersistantState implements Persistable<UUID>, HasEventIds, H
 	@Transient
 	public boolean isNew() {
 		return timeCreated == null;
-	}
-	
-	@Override
-	@JsonIgnore
-	@Transient
-	@Reference(GenericEventRepository.class)
-	public List<UUID> getEventIds() {
-		return getHeader().getEventIds();
-	}
-	
-	@Override
-	@JsonIgnore
-	@Transient
-	public List<UUID> getMessageIds() {
-		return getHeader().getMessageIds();
 	}
 	
 	@SuppressWarnings({"rawtypes", "unchecked"})
@@ -92,6 +94,10 @@ public class MessagePersistantState implements Persistable<UUID>, HasEventIds, H
 		List<RecievingEndpoint> endpoints = findReceivingEndpoints();
 		msg.setRecievingEndpoints(endpoints);
 		
+		msg.setEventIds(Arrays.asList(eventIds));
+		msg.setIntentIds(Arrays.asList(intentIds));
+		msg.setMessageIds(Arrays.asList(messageIds));
+		
 		return msg;
 	}
 	
@@ -100,11 +106,6 @@ public class MessagePersistantState implements Persistable<UUID>, HasEventIds, H
 			receivingEndpoints = Get.getEndpointsRepo().findByIds(getEndpointIds());
 		}
 		return receivingEndpoints;
-	}
-
-	@Override
-	public List<? extends RecievingEndpoint> getRecievingEndpoints() {
-		return findReceivingEndpoints();
 	}
 	
 }

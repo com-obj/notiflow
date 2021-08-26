@@ -7,6 +7,12 @@ import java.util.UUID;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.obj.nc.domain.HasEventIds;
+import com.obj.nc.domain.HasIntentIds;
+import com.obj.nc.domain.HasMessageIds;
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.repositories.MessageRepository;
+import com.obj.nc.repositories.NotificationIntentRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -18,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.ProcessingInfoRepository;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.AllArgsConstructor;
@@ -65,7 +70,18 @@ public class ProcessingInfo implements Persistable<UUID> {
 	
 	@NotEmpty
 	@Reference(GenericEventRepository.class)
-	private UUID[] eventIds;
+	@Builder.Default
+	private UUID[] eventIds = new UUID[0];
+	
+	@NotEmpty
+	@Reference(NotificationIntentRepository.class)
+	@Builder.Default
+	private UUID[] intentIds = new UUID[0];
+	
+	@NotEmpty
+	@Reference(MessageRepository.class)
+	@Builder.Default
+	private UUID[] messageIds = new UUID[0];
 	
 	@JsonIgnore
 	private String payloadJsonStart;
@@ -107,18 +123,32 @@ public class ProcessingInfo implements Persistable<UUID> {
 		ProcessingInfo endProcessinfInfo = createCopy(startProcessingInfo);
 		endHeader.setProcessingInfo(endProcessinfInfo); 
 		
-		endProcessinfInfo.stepFinish(endHeader, endPayload);
+		endProcessinfInfo.stepFinish(endPayload);
 		
 		return endProcessinfInfo;
 	}
 
-	private void stepFinish(Header endHeader, Object endPayload) {
+	private void stepFinish(Object endPayload) {
 		processingId =  BaseJSONObject.generateUUID();
 		
 		timeProcessingEnd = Instant.now();
 		stepDurationMs = ChronoUnit.MILLIS.between(timeProcessingStart, timeProcessingEnd);
 		
-		eventIds = endHeader.getEventIdsAsArray();
+		if (endPayload instanceof GenericEvent) {
+			eventIds = new UUID[]{ ((GenericEvent) endPayload).getId() };
+		}
+		
+		if (endPayload instanceof HasEventIds) {
+			eventIds = ((HasEventIds) endPayload).getEventIds().toArray(new UUID[0]);
+		}
+		
+		if (endPayload instanceof HasIntentIds) {
+			intentIds = ((HasIntentIds) endPayload).getIntentIds().toArray(new UUID[0]);
+		}
+		
+		if (endPayload instanceof HasMessageIds) {
+			messageIds = ((HasMessageIds) endPayload).getMessageIds().toArray(new UUID[0]);
+		}
 		
 		payloadJsonEnd = JsonUtils.writeObjectToJSONString(endPayload); //this make snapshot of its self. has to be the last call
 		

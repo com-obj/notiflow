@@ -92,7 +92,6 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 
         // WHEN
         List<EmailMessage> msgsCauthByTestModeGM = greenMailReceiverSourceSupplier.get();
-        msgsCauthByTestModeGM.forEach(m-> assertThat(m.getHeader().getEventIds()).contains(UUID.fromString("23e201b5-d7fa-4231-a520-51190b5c50da")));
 
         EmailContent emailContentFromTMGM1 = msgsCauthByTestModeGM.get(0).getBody();
         checkRecievedMatchOriginal(origianlMsgForAggreagtion1, emailContentFromTMGM1);

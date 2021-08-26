@@ -1,9 +1,14 @@
 package com.obj.nc.controllers;
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistantState;
+import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.repositories.*;
@@ -12,6 +17,7 @@ import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,8 +36,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.READ;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -53,43 +63,43 @@ class DeliveryInfoControllerWithAuthenticationTest extends BaseIntegrationTest {
 	@Autowired private EndpointsRepository endpointRepo;
 	@Autowired protected MockMvc mockMvc;
 	@Autowired GenericEventRepository eventRepo;
+	@Autowired private MessageProcessingFlow messageProcessingFlow;
 	
-
-    @BeforeEach
+	@RegisterExtension
+	protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+			.withConfiguration(
+					GreenMailConfiguration.aConfig()
+							.withUser("no-reply@objectify.sk", "xxx"))
+			.withPerMethodLifecycle(true);
+	
+	@BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
     	purgeNotifTables(jdbcTemplate);
     }
 	
 	@Test
-	void testReadMessageDeliveryInfoUpdate() throws Exception {
+	void testMarkAsReadMessageDeliveryInfo() throws Exception {
 		//GIVEN
-		EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
+		EmailEndpoint email1 = EmailEndpoint.builder().email("john.doe@gmail.com").build();
 		email1 = endpointRepo.persistEnpointIfNotExists(email1);
-		
-    	//AND
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
-		UUID eventId = eventRepo.save(event).getId();
+		EmailEndpoint email2 = EmailEndpoint.builder().email("john.dudly@gmail.com").build();
+		email2 = endpointRepo.persistEnpointIfNotExists(email2);
 		
 		//AND
 		EmailMessage emailMessage = new EmailMessage();
-		emailMessage.setRecievingEndpoints(Arrays.asList(email1));
-		emailMessage.getHeader().addEventId(eventId);
-		emailMessage.getHeader().addMessageId(emailMessage.getId());
-		MessagePersistantState emailMessagePersisted = messageRepo.save(emailMessage.toPersistantState());
+		emailMessage.setBody(EmailContent.builder().subject("Subject").text("Text").build());
+		emailMessage.setRecievingEndpoints(Arrays.asList(email1, email2));
 		
-		//AND
-		DeliveryInfo info = DeliveryInfo.builder()
-				.endpointId(email1.getId())
-				.eventId(eventId)
-				.status(DELIVERY_STATUS.SENT)
-				.id(UUID.randomUUID())
-				.messageId(emailMessagePersisted.getId())
-				.build();		
-		deliveryRepo.save(info);
+		messageProcessingFlow.processMessage(emailMessage);
+		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) == 2);
+		
+		List<MessagePersistantState> messages = StreamSupport.stream(messageRepo.findAll().spliterator(), false)
+				.filter(message -> !emailMessage.getId().equals(message.getId()))
+				.collect(Collectors.toList());
 		
 		//WHEN TEST REST
 		ResultActions resp = mockMvc
-				.perform(MockMvcRequestBuilders.put("/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(emailMessagePersisted.getId()).toString())
+				.perform(MockMvcRequestBuilders.put("/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(messages.get(0).getId()).toString())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
@@ -106,13 +116,9 @@ class DeliveryInfoControllerWithAuthenticationTest extends BaseIntegrationTest {
 				.andExpect(content().contentType(MediaType.IMAGE_PNG));
 		
 		//AND READ STATUS IS JOURNALED
-		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
-			List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdOrderByProcessedOn(emailMessagePersisted.getId());
-			return infosOfMessage.size() >= 2;
-		});
-		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdOrderByProcessedOn(emailMessagePersisted.getId());
-		assertThat(infosOfMessage).hasSize(2);
-		assertThat(infosOfMessage.get(1).getStatus()).isEqualTo(DELIVERY_STATUS.READ);
+		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), READ) >= 1);
+		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatus(emailMessage.getId(), READ);
+		assertThat(infosOfMessage).hasSize(1);
 	}
 
 }

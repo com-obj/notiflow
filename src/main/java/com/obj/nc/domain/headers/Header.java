@@ -27,21 +27,11 @@ import lombok.extern.log4j.Log4j2;
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Log4j2
-public class Header extends BaseJSONObject implements HasFlowId, HasEventIds, HasProcessingInfo, HasMessageIds {
+public class Header extends BaseJSONObject implements HasFlowId, HasProcessingInfo {
 	
 	@JsonProperty("flow-id")
 	@Column("flow_id")
 	private String flowId;
-
-	@NotNull
-	@Include
-	@Transient
-	private List<UUID> eventIds = new ArrayList<>();
-	
-	@NotNull
-	@Include
-	@Transient
-	private List<UUID> messageIds = new ArrayList<>();
 	
 	@Transient
 	protected ProcessingInfo processingInfo;
@@ -54,36 +44,6 @@ public class Header extends BaseJSONObject implements HasFlowId, HasEventIds, Ha
 		}
 		
 		BeanUtils.copyProperties(header, this);
-	}
-
-	@JsonIgnore
-	@Column("event_ids")
-	public void setEventIdsAsArray(UUID[] eventIds) {
-		setEventIds(Arrays.asList(eventIds));
-	}
-	
-	@JsonIgnore
-	@Column("message_ids")
-	public void setMessageIdsAsArray(UUID[] messageIds) {
-		setMessageIds(Arrays.asList(messageIds));
-	}
-
-	public void addEventId(UUID eventId) {
-		eventIds.add(eventId);
-	}
-	
-	public void addMessageId(UUID messageId) {
-		messageIds.add(messageId);
-	}
-	
-	@Column("event_ids")
-	public UUID[] getEventIdsAsArray() {
-		return eventIds.toArray(new UUID[0]);
-	}
-	
-	@Column("message_ids")
-	public UUID[] getMessageIdsAsArray() {
-		return messageIds.toArray(new UUID[0]);
 	}
 	
 	@JsonIgnore

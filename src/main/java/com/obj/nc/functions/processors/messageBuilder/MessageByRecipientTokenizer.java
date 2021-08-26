@@ -49,6 +49,15 @@ public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> ex
 
 			msgClone.setAttributes(msg.getAttributes());
 			msgClone.setBody(msg.getBody());
+			
+			msgClone.setEventIds(msg.getEventIds());
+			msgClone.setIntentIds(msg.getIntentIds());
+			if (msg.getMessageIds().isEmpty()) {
+				msgClone.addMessageId(msg.getId());
+			} else {
+				msgClone.setMessageIds(msg.getMessageIds());
+			}
+			
 			messages.add(msgClone);
 		}
 

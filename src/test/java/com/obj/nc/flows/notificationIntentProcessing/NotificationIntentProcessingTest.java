@@ -59,7 +59,7 @@ public class NotificationIntentProcessingTest extends BaseIntegrationTest {
 		
         NotificationIntent notificationIntent = readTestIntent();
         
-        notificationIntent.getHeader().addEventId(eventId);
+        notificationIntent.addEventId(eventId);
 
         // when
         intentFlow.processNotificationIntent(notificationIntent);

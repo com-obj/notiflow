@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.obj.nc.domain.HasEventIds;
+import com.obj.nc.domain.HasIntentIds;
 import com.obj.nc.domain.HasMessageIds;
 import com.obj.nc.domain.HasRecievingEndpoints;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
@@ -13,6 +14,7 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
 
+import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult.DeliveryInfoSendResultBuilder;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -25,25 +27,34 @@ public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionA
 		List<DeliveryInfoSendResult> results= new ArrayList<>();
 		
 		for (RecievingEndpoint endpoint: payload.getRecievingEndpoints()) {
-			UUID[] eventIds = null;
-			if (payload instanceof HasEventIds) {
-				eventIds = ((HasEventIds) payload).getEventIds().toArray(new UUID[0]);
-			}
-			
-			UUID[] messageIds = null;
-			if (payload instanceof HasMessageIds) {
-				messageIds = ((HasMessageIds) payload).getMessageIds().toArray(new UUID[0]);
-			}
-			
-			DeliveryInfoSendResult info = DeliveryInfoSendResult.builder()
-					.eventIds(eventIds)
-					.messageIds(messageIds)
+			DeliveryInfoSendResultBuilder infoBuilder = DeliveryInfoSendResult.builder()
 					.status(status)
 					.recievingEndpoint(endpoint)
-					.processedOn(Instant.now())
-					.build();
-			adapt(info);
+					.processedOn(Instant.now());
+					
+			if (payload instanceof HasEventIds) {
+				UUID[] eventIds = ((HasEventIds) payload).getEventIds().toArray(new UUID[0]);
+				infoBuilder = infoBuilder.eventIds(eventIds);
+			} else {
+				infoBuilder = infoBuilder.eventIds(new UUID[0]);
+			}
 			
+			if (payload instanceof HasIntentIds) {
+				UUID[] intentIds = ((HasIntentIds) payload).getIntentIds().toArray(new UUID[0]);
+				infoBuilder = infoBuilder.intentIds(intentIds);
+			} else {
+				infoBuilder = infoBuilder.intentIds(new UUID[0]);
+			}
+			
+			if (payload instanceof HasMessageIds) {
+				UUID[] messageIds = ((HasMessageIds) payload).getMessageIds().toArray(new UUID[0]);
+				infoBuilder = infoBuilder.messageIds(messageIds);
+			} else {
+				infoBuilder = infoBuilder.messageIds(new UUID[0]);
+			}
+			
+			DeliveryInfoSendResult info = infoBuilder.build();
+			adapt(info);
 			results.add(info);
 		}
 		

@@ -72,38 +72,37 @@ public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMes
 
 	@Override
 	public EmailMessage execute(EmailMessage payload) {		
-		EmailEndpoint toEmail = (EmailEndpoint) payload.getRecievingEndpoints().get(0);
-		doSendMessage(toEmail, payload.getBody(), payload.getHeader());
+		doSendMessage(payload);
 		return payload;
 	}
-
-	private void doSendMessage(EmailEndpoint toEmail, EmailContent messageContent, Header header) {
+	
+	private void doSendMessage(EmailMessage payload) {
 		try {
-			MimeMessage message = mailSender.createMimeMessage();	
-			copyHeaderValuesToMimeMessage(header, message);
+			MimeMessage message = mailSender.createMimeMessage();
+			copyHeaderValuesToMimeMessage(payload, message);
 			
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
+			
 			if (settings.getFromMailAddress()!=null) {
 				helper.setFrom(settings.getFromMailAddress());
 			}
-
-			helper.setTo(toEmail.getEmail());
-
-			helper.setSubject(messageContent.getSubject());
-			boolean isHtml = MediaType.TEXT_HTML_VALUE.equals(messageContent.getContentType());
+			
+			helper.setTo(payload.getRecievingEndpoints().get(0).getEmail());
+			
+			helper.setSubject(payload.getBody().getSubject());
+			boolean isHtml = MediaType.TEXT_HTML_VALUE.equals(payload.getBody().getContentType());
 			
 			if (isHtml) {
-				helper.setText(StringEscapeUtils.unescapeHtml4( messageContent.getText() ), true );
+				helper.setText(StringEscapeUtils.unescapeHtml4( payload.getBody().getText() ), true );
 			} else {
-				helper.setText(messageContent.getText() );
+				helper.setText(payload.getBody().getText() );
 			}
 			
-			for (Attachement attachement: messageContent.getAttachments()) {
+			for (Attachement attachement: payload.getBody().getAttachments()) {
 				FileSystemResource file = new FileSystemResource(new File(attachement.getFileURI()));
 				helper.addAttachment(attachement.getName(), file);
 			}
-
+			
 			Instant sendStart = Instant.now();
 			
 			mailSender.send(message);
@@ -114,10 +113,9 @@ public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMes
 			throw new ProcessingException(EmailSender.class, e);
 		}
 	}
-
-
-	private void copyHeaderValuesToMimeMessage(Header header, MimeMessage message) {
-		header.getAttributes().entrySet().forEach(entry-> {
+	
+	private void copyHeaderValuesToMimeMessage(EmailMessage payload, MimeMessage message) {
+		payload.getAttributes().entrySet().forEach(entry-> {
 			try {
 				message.setHeader(NOTIF_CENTER_EMAIL_HEANDER_PREFIX + entry.getKey(), entry.getValue()+"");
 			} catch (MessagingException e) {
@@ -126,10 +124,10 @@ public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMes
 		});
 		
 		try {
-			message.setHeader(EVENT_IDS_EMAIL_HEANDER, JsonUtils.writeObjectToJSONString(header.getEventIds()));
+			message.setHeader(EVENT_IDS_EMAIL_HEANDER, JsonUtils.writeObjectToJSONString(payload.getEventIds()));
 			
-			if (header.getFlowId()!= null) {
-				message.setHeader(FLOW_ID_EMAIL_HEANDER, header.getFlowId());
+			if (payload.getHeader().getFlowId()!= null) {
+				message.setHeader(FLOW_ID_EMAIL_HEANDER, payload.getHeader().getFlowId());
 			}
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);

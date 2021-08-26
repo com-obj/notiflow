@@ -70,7 +70,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     	
         String INPUT_JSON_FILE = "messages/email_message.json";
         EmailMessage message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
-        message.getHeader().addEventId(eventId1);
+        message.addEventId(eventId1);
 
         //WHEN
         message = functionSend.apply(message);
@@ -82,7 +82,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
         Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(message.getRecievingEndpoints().get(0));
-        Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(message.getHeader().getEventIds());
+        Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(message.getEventIds());
 
         //THEN
         MimeMessage[] messages = greenMail.getReceivedMessages();
@@ -170,7 +170,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
         Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(inputMessage.getRecievingEndpoints().get(0));
-        Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(inputMessage.getHeader().getEventIds());
+        Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(inputMessage.getEventIds());
 
         //THEN
         MimeMessage message = greenMail.getReceivedMessages()[0];

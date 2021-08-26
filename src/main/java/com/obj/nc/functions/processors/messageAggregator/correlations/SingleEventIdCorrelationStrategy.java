@@ -12,8 +12,8 @@ public class SingleEventIdCorrelationStrategy implements CorrelationStrategy {
 
 	@Override
 	public Object getCorrelationKey(Message<?> m) {
-		Header header = ((com.obj.nc.domain.message.Message)m.getPayload()).getHeader();
-		Object eventId = header.getEventIds().iterator().next();
+		com.obj.nc.domain.message.Message message = ((com.obj.nc.domain.message.Message)m.getPayload());
+		Object eventId = message.getEventIds().iterator().next();
 		
 		log.info("Correlating message EVENT_ID : "+ eventId);
 		return eventId;

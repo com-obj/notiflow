@@ -56,7 +56,7 @@ import lombok.extern.log4j.Log4j2;
 @ToString(callSuper = true)
 @Log4j2
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements HasHeader, HasRecievingEndpoints, HasEventIds, HasMessageIds, HasProcessingInfo, Persistable<UUID> {
+public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements HasHeader, HasRecievingEndpoints, HasProcessingInfo, Persistable<UUID> {
 	
 	@Id
 	@EqualsAndHashCode.Include
@@ -101,22 +101,6 @@ public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements H
 	@Transient
 	public ProcessingInfo getProcessingInfo() {
 		return getHeader().getProcessingInfo();
-	}
-	
-	@Override
-	@JsonIgnore
-	@Transient
-	@Reference(GenericEventRepository.class)
-	public List<UUID> getEventIds() {
-		return getHeader().getEventIds();
-	}
-	
-	@Override
-	@JsonIgnore
-	@Transient
-	@Reference(MessageRepository.class)
-	public List<UUID> getMessageIds() {
-		return getHeader().getMessageIds();
 	}
 
 	@Transient
