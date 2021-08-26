@@ -43,7 +43,8 @@ public class DeliveryInfoSendResult implements HasHeader {
 //	@NotEmpty
 	private UUID[] eventIds;
 	
-	private UUID messageId;
+	@NotNull
+	private UUID[] messageIds;
 	
 	@NotNull
 	private RecievingEndpoint recievingEndpoint;
