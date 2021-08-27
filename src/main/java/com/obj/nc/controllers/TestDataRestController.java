@@ -176,7 +176,6 @@ public class TestDataRestController {
                 .eventId(UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"))
                 .version(0)
                 .failedPayloadId(null)
-                .messageId(UUID.fromString("5f74929b-2635-4515-9f30-ba79e200e92b"))
                 .endpointId(UUID.fromString("3d02890b-1b53-465c-b8c3-b0a722483a45"))
                 .build();
     
@@ -190,7 +189,6 @@ public class TestDataRestController {
                 .eventId(UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"))
                 .version(0)
                 .failedPayloadId(null)
-                .messageId(UUID.fromString("4e91137e-93aa-4633-b137-3050442d26a5"))
                 .endpointId(UUID.fromString("d2ca2a68-1dc4-4052-a93a-67319449ef5b"))
                 .build();
     
@@ -204,7 +202,6 @@ public class TestDataRestController {
                 .eventId(UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"))
                 .version(0)
                 .failedPayloadId(null)
-                .messageId(UUID.fromString("c3ce484f-f03c-47b1-ae6a-2337ca4f6444"))
                 .endpointId(UUID.fromString("820023cf-7dd0-407f-abfa-0d6453bde6d3"))
                 .build();
     
@@ -218,7 +215,6 @@ public class TestDataRestController {
                 .eventId(UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"))
                 .version(0)
                 .failedPayloadId(null)
-                .messageId(UUID.fromString("5f74929b-2635-4515-9f30-ba79e200e92b"))
                 .endpointId(UUID.fromString("3d02890b-1b53-465c-b8c3-b0a722483a45"))
                 .build();
     
@@ -232,7 +228,6 @@ public class TestDataRestController {
                 .eventId(UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"))
                 .version(0)
                 .failedPayloadId(null)
-                .messageId(UUID.fromString("4e91137e-93aa-4633-b137-3050442d26a5"))
                 .endpointId(UUID.fromString("d2ca2a68-1dc4-4052-a93a-67319449ef5b"))
                 .build();
     
@@ -246,7 +241,6 @@ public class TestDataRestController {
                 .eventId(UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"))
                 .version(0)
                 .failedPayloadId(UUID.fromString("5469855e-450d-4ab5-a64e-4f6ad8f547a3"))
-                .messageId(null)
                 .endpointId(UUID.fromString("820023cf-7dd0-407f-abfa-0d6453bde6d3"))
                 .build();
     
@@ -258,6 +252,7 @@ public class TestDataRestController {
     private void persistProcessingInfos() {
         ProcessingInfo processingInfo = ProcessingInfo.builder()
                 .processingId(UUID.fromString("5ebf5469-6459-471d-93f7-e6a09702fabf"))
+                .eventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") })
                 .prevProcessingId(null)
                 .stepName("InputEventSupplier")
                 .stepIndex(0)
@@ -272,6 +267,7 @@ public class TestDataRestController {
     
         processingInfo = ProcessingInfo.builder()
                 .processingId(UUID.fromString("f8a2f8d9-4299-4c0c-a88c-8f28b542d42b"))
+                .eventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") })
                 .prevProcessingId(UUID.fromString("5ebf5469-6459-471d-93f7-e6a09702fabf"))
                 .stepName("ExtensionsBasedEventConvertor")
                 .stepIndex(1)
@@ -286,6 +282,7 @@ public class TestDataRestController {
     
         processingInfo = ProcessingInfo.builder()
                 .processingId(UUID.fromString("bec5ccb3-b63b-4447-847b-f9317f0bcc51"))
+                .eventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") })
                 .prevProcessingId(UUID.fromString("f8a2f8d9-4299-4c0c-a88c-8f28b542d42b"))
                 .stepName("GenerateMessagesFromIntent")
                 .stepIndex(2)
@@ -300,6 +297,7 @@ public class TestDataRestController {
     
         processingInfo = ProcessingInfo.builder()
                 .processingId(UUID.fromString("32b4f74e-9fed-4319-b817-8c9fc929cda8"))
+                .eventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") })
                 .prevProcessingId(UUID.fromString("f8a2f8d9-4299-4c0c-a88c-8f28b542d42b"))
                 .stepName("GenerateMessagesFromIntent")
                 .stepIndex(2)
@@ -314,6 +312,7 @@ public class TestDataRestController {
     
         processingInfo = ProcessingInfo.builder()
                 .processingId(UUID.fromString("b7cdbb43-20f0-4870-abd7-7449e1d600f0"))
+                .eventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") })
                 .prevProcessingId(UUID.fromString("e353d9c7-bbf4-46a5-92c9-fc2f12d4843f"))
                 .stepName("SendEmail")
                 .stepIndex(4)
@@ -328,6 +327,7 @@ public class TestDataRestController {
     
         processingInfo = ProcessingInfo.builder()
                 .processingId(UUID.fromString("8357b163-f148-4b05-aa23-8a78dd12116f"))
+                .eventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") })
                 .prevProcessingId(UUID.fromString("f8a2f8d9-4299-4c0c-a88c-8f28b542d42b"))
                 .stepName("GenerateMessagesFromIntent")
                 .stepIndex(2)
@@ -342,6 +342,7 @@ public class TestDataRestController {
     
         processingInfo = ProcessingInfo.builder()
                 .processingId(UUID.fromString("932dc60e-b20b-4a59-a1ec-146c2af82070"))
+                .eventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") })
                 .prevProcessingId(UUID.fromString("bec5ccb3-b63b-4447-847b-f9317f0bcc51"))
                 .stepName("MessageByRecipientTokenizer")
                 .stepIndex(3)
@@ -356,6 +357,7 @@ public class TestDataRestController {
     
         processingInfo = ProcessingInfo.builder()
                 .processingId(UUID.fromString("e353d9c7-bbf4-46a5-92c9-fc2f12d4843f"))
+                .eventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") })
                 .prevProcessingId(UUID.fromString("32b4f74e-9fed-4319-b817-8c9fc929cda8"))
                 .stepName("MessageByRecipientTokenizer")
                 .stepIndex(3)
@@ -370,6 +372,7 @@ public class TestDataRestController {
     
         processingInfo = ProcessingInfo.builder()
                 .processingId(UUID.fromString("8d70421d-e984-4a75-833c-5a06050af16f"))
+                .eventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") })
                 .prevProcessingId(UUID.fromString("8357b163-f148-4b05-aa23-8a78dd12116f"))
                 .stepName("MessageByRecipientTokenizer")
                 .stepIndex(3)
@@ -384,6 +387,7 @@ public class TestDataRestController {
     
         processingInfo = ProcessingInfo.builder()
                 .processingId(UUID.fromString("370c0713-ae71-45e4-9a51-2abe7b5b9af8"))
+                .eventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") })
                 .prevProcessingId(UUID.fromString("932dc60e-b20b-4a59-a1ec-146c2af82070"))
                 .stepName("SendEmail")
                 .stepIndex(4)

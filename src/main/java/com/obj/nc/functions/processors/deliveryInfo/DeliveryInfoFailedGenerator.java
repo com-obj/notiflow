@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.obj.nc.domain.HasIntentIds;
+import com.obj.nc.domain.HasMessageIds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
@@ -40,7 +42,8 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 		
 		List<? extends RecievingEndpoint> endpoints = extracteEndpoints(payload);
 		List<UUID> eventIds = extractEventIds(payload);
-		
+		List<UUID> intentIds = extractIntentIds(payload);
+		List<UUID> messageIds = extractMessageIds(payload);
 		
 		List<DeliveryInfo> results= new ArrayList<>();		
 		
@@ -50,6 +53,28 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 				DeliveryInfo info = DeliveryInfo.builder()
 						.endpointId(endpoint.getId())
 						.eventId(eventId)
+						.status(DELIVERY_STATUS.FAILED)
+						.failedPayloadId(failedPayload.getId())
+						.build();
+				
+				results.add(info);
+			}
+			
+			for (UUID intentId: intentIds) {
+				DeliveryInfo info = DeliveryInfo.builder()
+						.endpointId(endpoint.getId())
+						.intentId(intentId)
+						.status(DELIVERY_STATUS.FAILED)
+						.failedPayloadId(failedPayload.getId())
+						.build();
+				
+				results.add(info);
+			}
+			
+			for (UUID messageId: messageIds) {
+				DeliveryInfo info = DeliveryInfo.builder()
+						.endpointId(endpoint.getId())
+						.messageId(messageId)
 						.status(DELIVERY_STATUS.FAILED)
 						.failedPayloadId(failedPayload.getId())
 						.build();
@@ -70,6 +95,26 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 			log.debug("Cannot extract source event IDs from message becaase payload is not of type HasEventIds. Its of type {}", payload.getClass());
 		}
 		return evetIds;
+	}
+	
+	private List<UUID> extractIntentIds(Object payload) {
+		List<UUID> intentIds = new ArrayList<>();
+		if (payload instanceof HasIntentIds) {
+			intentIds = ((HasIntentIds)payload).getIntentIds();
+		} else {
+			log.debug("Cannot extract source intent IDs from message becaase payload is not of type HasIntentIds. Its of type {}", payload.getClass());
+		}
+		return intentIds;
+	}
+	
+	private List<UUID> extractMessageIds(Object payload) {
+		List<UUID> messageIds = new ArrayList<>();
+		if (payload instanceof HasMessageIds) {
+			messageIds = ((HasMessageIds)payload).getMessageIds();
+		} else {
+			log.debug("Cannot extract source message IDs from message becaase payload is not of type HasMessageIds. Its of type {}", payload.getClass());
+		}
+		return messageIds;
 	}
 
 	private List<? extends RecievingEndpoint> extracteEndpoints(Object payload) {

@@ -52,7 +52,8 @@ public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> ex
 			
 			msgClone.setEventIds(msg.getEventIds());
 			msgClone.setIntentIds(msg.getIntentIds());
-			if (msg.getMessageIds().isEmpty()) {
+				
+			if (isInputMessage(msg)) {
 				msgClone.addMessageId(msg.getId());
 			} else {
 				msgClone.setMessageIds(msg.getMessageIds());
@@ -63,4 +64,11 @@ public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> ex
 
 		return messages;
 	}
+	
+	private boolean isInputMessage(Message<CONTENT_TYPE> msg) {
+		return msg.getEventIds().isEmpty()
+				&& msg.getIntentIds().isEmpty()
+				&& msg.getMessageIds().isEmpty();
+	}
+	
 }
