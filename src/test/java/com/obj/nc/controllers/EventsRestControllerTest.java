@@ -11,7 +11,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
-import org.assertj.core.api.Assertions;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -441,6 +443,66 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         assertThat(events).hasSize(9);
     }
     
+    @Test
+    void testFindEventById() throws Exception {
+        // GIVEN
+        GenericEvent event = GenericEvent.builder()
+                .id(UUID.randomUUID())
+                .flowId("default-flow")
+                .payloadJson(JsonUtils.readJsonNodeFromPojo(TestPayload.builder().value("Test").build()))
+                .timeConsumed(Instant.now())
+                .build();
+        genericEventRepository.save(event);
+    
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/events/{eventId}", event.getId().toString())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        
+        // THEN
+        resp
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.id").value(CoreMatchers.is(event.getId().toString())))
+                .andExpect(jsonPath("$.payloadJson.value").value(CoreMatchers.is("Test")));
+    }
+    
+    @Test
+    void testFindEventByIdNotFound() throws Exception {
+        // GIVEN
+        GenericEvent event = GenericEvent.builder()
+                .id(UUID.randomUUID())
+                .flowId("default-flow")
+                .payloadJson(JsonUtils.readJsonNodeFromPojo(TestPayload.builder().value("Test").build()))
+                .timeConsumed(Instant.now())
+                .build();
+        genericEventRepository.save(event);
+    
+        UUID mismatchedId = getMismatchedId(event);
+    
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/events/{eventId}", mismatchedId.toString())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        
+        // THEN
+        resp
+                .andExpect(status().isNotFound());
+    }
+    
+    private UUID getMismatchedId(GenericEvent event) {
+        UUID mismatchedId = UUID.fromString(event.getId().toString());
+        
+        while (event.getId().equals(mismatchedId)) {
+            mismatchedId = UUID.randomUUID();
+        }
+        
+        return mismatchedId;
+    }
+    
     private void persistNTestEvents(long n) {
         for (long i = 0; i < n; i++) {
             GenericEvent event = GenericEvent.builder()
@@ -451,6 +513,12 @@ class EventsRestControllerTest extends BaseIntegrationTest {
                     .build();
             genericEventRepository.save(event);
         }
+    }
+    
+    @Data
+    @Builder
+    private static class TestPayload {
+        String value;
     }
     
 }
