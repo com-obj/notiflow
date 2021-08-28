@@ -4,17 +4,16 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import com.jayway.jsonpath.JsonPath;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessagePersistantState;
-import com.obj.nc.repositories.MessageRepository;
+import com.obj.nc.functions.processors.messageBuilder.MessageByRecipientTokenizer;
+import com.obj.nc.repositories.*;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
@@ -42,12 +41,9 @@ import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-import com.obj.nc.repositories.DeliveryInfoRepository;
-import com.obj.nc.repositories.EndpointsRepository;
-import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.GenericEventRepositoryTest;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -65,6 +61,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 	@Autowired protected MockMvc mockMvc;
 	@Autowired private DeliveryInfoRestController controller;
 	@Autowired GenericEventRepository eventRepo;
+	@Autowired private MessageByRecipientTokenizer<EmailContent> messageByRecipientTokenizer; 
 	
 
     @BeforeEach
@@ -73,7 +70,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     }
     
     @Test
-    void testFindDeliveryInfos() throws Exception {
+    void testFindEventDeliveryInfos() throws Exception {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
     	SmsEndpoint sms1 = SmsEndpoint.builder().phone("0908111111").build();
@@ -89,7 +86,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	DeliveryInfo info1 = DeliveryInfo.builder()
     			.endpointId(emailEndPointId).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	DeliveryInfo info2 = DeliveryInfo.builder()
-    			.endpointId(emailEndPointId).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
+    			.endpointId(emailEndPointId).eventId(eventId).status(SENT).id(UUID.randomUUID()).build();
 
 
     	DeliveryInfo info3 = DeliveryInfo.builder()
@@ -97,7 +94,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	Thread.sleep(10); // to have different processedOn
 
     	DeliveryInfo info4 = DeliveryInfo.builder()
-    			.endpointId(smsEndPointId).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
+    			.endpointId(smsEndPointId).eventId(eventId).status(SENT).id(UUID.randomUUID()).build();
  
     	deliveryRepo.saveAll( Arrays.asList(info1, info2, info3, info4) );
     	
@@ -112,19 +109,19 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 
     	Assertions.assertThat(infoForEmail.endpointId).isEqualTo(emailEndPointId);
 		Assertions.assertThat(infoForEmail.getStatusReachedAt()).isCloseTo(now, Assertions.within(1, ChronoUnit.MINUTES));
-    	Assertions.assertThat(infoForEmail.getCurrentStatus()).isEqualTo(DELIVERY_STATUS.SENT);
+    	Assertions.assertThat(infoForEmail.getCurrentStatus()).isEqualTo(SENT);
     	infos.remove(infoForEmail);
     	
     	
     	EndpointDeliveryInfoDto infoForSms = infos.iterator().next();
     	Assertions.assertThat(infoForSms.endpointId).isEqualTo(smsEndPointId);
     	Assertions.assertThat(infoForSms.getStatusReachedAt()).isCloseTo(now, Assertions.within(1, ChronoUnit.MINUTES));
-    	Assertions.assertThat(infoForSms.getCurrentStatus()).isEqualTo(DELIVERY_STATUS.SENT);
+    	Assertions.assertThat(infoForSms.getCurrentStatus()).isEqualTo(SENT);
     	
     }
     
     @Test
-    void testFindDeliveryInfosRest() throws Exception {
+    void testFindEventDeliveryInfosRest() throws Exception {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
     	UUID emailEndpointId = endpointRepo.persistEnpointIfNotExists(email1).getId();
@@ -137,7 +134,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	DeliveryInfo info1 = DeliveryInfo.builder()
     			.endpointId(emailEndpointId).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	DeliveryInfo info2 = DeliveryInfo.builder()
-    			.endpointId(emailEndpointId).eventId(eventId).status(DELIVERY_STATUS.SENT).id(UUID.randomUUID()).build();
+    			.endpointId(emailEndpointId).eventId(eventId).status(SENT).id(UUID.randomUUID()).build();
 
     	deliveryRepo.saveAll( Arrays.asList(info1, info2) );
     	
@@ -163,7 +160,55 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 	}
 	
 	@Test
-	void testReadMessageDeliveryInfoUpdate() throws Exception {
+	void testFindMessageDeliveryInfos() {
+		// GIVEN
+		EmailEndpoint email1 = EmailEndpoint.builder().email("john.doe@gmail.com").build();
+		endpointRepo.persistEnpointIfNotExists(email1);
+		
+		EmailEndpoint email2 = EmailEndpoint.builder().email("john.dudly@gmail.com").build();
+		endpointRepo.persistEnpointIfNotExists(email2);
+		
+		// save input message delivery info
+		EmailMessage message = new EmailMessage();
+		message.setBody(EmailContent.builder().subject("Subject").text("text").build());
+		message.addRecievingEndpoints(email1, email2);
+		message.getHeader().addMessageId(message.getId());
+		message = messageRepo.save(message.toPersistantState()).toMessage();
+		
+		DeliveryInfo info = DeliveryInfo.builder()
+				.endpointId(message.getRecievingEndpoints().get(0).getId()).messageId(message.getMessageIds().get(0)).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+		deliveryRepo.save(info);
+		
+		// save tokenized messages delivery infos
+		List<Message<EmailContent>> messages = messageByRecipientTokenizer.apply(message);
+		
+		for (Message<EmailContent> msg : messages) {
+			DeliveryInfo info1 = DeliveryInfo.builder()
+					.endpointId(msg.getRecievingEndpoints().get(0).getId()).messageId(message.getMessageIds().get(0)).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+			DeliveryInfo info2 = DeliveryInfo.builder()
+					.endpointId(msg.getRecievingEndpoints().get(0).getId()).messageId(message.getMessageIds().get(0)).status(SENT).id(UUID.randomUUID()).build();
+			deliveryRepo.saveAll( Arrays.asList(info1, info2) );
+		}
+		
+		// WHEN find infos by input message's id
+		List<EndpointDeliveryInfoDto> deliveryInfosByMessageId = controller.findDeliveryInfosByMessageId(message.getId().toString());
+		
+		// THEN should find latest states of tokenized messages
+		assertThat(deliveryInfosByMessageId)
+				.hasSize(2)
+				.allMatch(endpointDeliveryInfoDto -> SENT.equals(endpointDeliveryInfoDto.getCurrentStatus()));
+		
+		assertThat(deliveryInfosByMessageId)
+				.filteredOn(endpointDeliveryInfoDto -> "john.doe@gmail.com".equals(endpointDeliveryInfoDto.getEndpoint().getEndpointId()))
+				.isNotEmpty();
+		
+		assertThat(deliveryInfosByMessageId)
+				.filteredOn(endpointDeliveryInfoDto -> "john.dudly@gmail.com".equals(endpointDeliveryInfoDto.getEndpoint().getEndpointId()))
+				.isNotEmpty();
+	}
+	
+	@Test
+	void testMarkAsReadMessageDeliveryInfo() throws Exception {
 		//GIVEN
 		EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
 		email1 = endpointRepo.persistEnpointIfNotExists(email1);
@@ -175,14 +220,15 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		//AND
 		EmailMessage emailMessage = new EmailMessage();
 		emailMessage.setRecievingEndpoints(Arrays.asList(email1));
-		emailMessage.getHeader().setEventIds(Arrays.asList(eventId));
+		emailMessage.getHeader().addEventId(eventId);
+		emailMessage.getHeader().addMessageId(emailMessage.getId());
 		MessagePersistantState emailMessagePersisted = messageRepo.save(emailMessage.toPersistantState());
 		
 		//AND
 		DeliveryInfo info = DeliveryInfo.builder()
 				.endpointId(email1.getId())
 				.eventId(eventId)
-				.status(DELIVERY_STATUS.SENT)
+				.status(SENT)
 				.id(UUID.randomUUID())
 				.messageId(emailMessagePersisted.getId())
 				.build();		
@@ -190,7 +236,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		
 		//WHEN TEST REST
 		ResultActions resp = mockMvc
-				.perform(MockMvcRequestBuilders.put("/delivery-info/messages/read/{messageId}", emailMessagePersisted.getId().toString())
+				.perform(MockMvcRequestBuilders.put("/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(emailMessagePersisted.getId()).toString())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());

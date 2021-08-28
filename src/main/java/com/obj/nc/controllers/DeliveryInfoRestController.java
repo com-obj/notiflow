@@ -67,11 +67,27 @@ public class DeliveryInfoRestController {
 		return findDeliveryInfosByEventId(event.getId().toString());
     }
 	
-	@PutMapping(value = "/messages/read/{messageId}")
+	@PutMapping(value = "/messages/{messageId}/mark-as-read")
 	public ResponseEntity<Void> trackMessageRead(@PathVariable(value = "messageId", required = true) String messageId) {
 		Optional<MessagePersistantState> message = messageRepo.findById(UUID.fromString(messageId));
 		message.ifPresent(messagePersistantState -> deliveryInfoFlow.createAndPersistReadDeliveryInfo(messagePersistantState.toMessage()));
 		return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/resources/images/px.png")).build();
+	}
+	
+	@GetMapping(value = "/messages/{messageId}", consumes="application/json", produces="application/json")
+	public List<EndpointDeliveryInfoDto> findDeliveryInfosByMessageId(
+			@PathVariable (value = "messageId", required = true) String messageId) {
+		
+		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByMessageIdOrderByProcessedOn(UUID.fromString(messageId));
+		
+		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
+		
+		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
+		List<RecievingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
+		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
+		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
+		
+		return infoDtos;
 	}
 
 	@Data

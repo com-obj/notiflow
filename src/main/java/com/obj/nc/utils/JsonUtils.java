@@ -82,6 +82,11 @@ public class JsonUtils {
 		
 	}
 	
+	public static JsonNode readJsonNodeFromPojo(Object object) {
+		final ObjectMapper objectMapper = getObjectMapper();
+		return objectMapper.valueToTree(object);
+	}
+	
 	public static <T> T readObjectFromJSON(JsonNode json, Class<T> beanType) {
 		try {
 		    final ObjectMapper objectMapper = getObjectMapper();

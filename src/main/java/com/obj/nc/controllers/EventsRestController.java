@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.event.EventRecieverResponce;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
+import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
 
 import java.time.*;
 import java.util.List;
@@ -30,7 +30,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class EventsRestController {
 
-	private final GenericEventPersisterConsumer persister;
+	private final GenericEventPersister persister;
 	private final SimpleJsonValidator simpleJsonValidator;
 	private final GenericEventJsonSchemaValidator jsonSchemaValidator;
 	private final GenericEventRepository eventsRepository;

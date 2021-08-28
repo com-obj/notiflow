@@ -49,7 +49,7 @@ public class EmailReadTrackingDecorator extends ProcessorFunctionAdapter<Message
         Element img = html.body().appendElement("img");
         
         URI readMessageCallbackUri = UriComponentsBuilder.fromHttpUrl(ncAppConfigProperties.getUrl())
-                .path("/delivery-info/messages/read/{messageId}").build(payload.getMessageId());
+                .path("/delivery-info/messages/{messageId}/mark-as-read").build(payload.getMessageIds());
         
         img.attr("src", readMessageCallbackUri.toString());
     

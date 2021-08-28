@@ -41,7 +41,7 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.flows.inputEventRouting.extensions.InputEventConverterExtension;
 import com.obj.nc.flows.inputEventRouting.extensions.InputEvent2IntentConverterExtension;
 import com.obj.nc.flows.inputEventRouting.extensions.InputEvent2MessageConverterExtension;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
+import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
@@ -55,7 +55,7 @@ import lombok.NoArgsConstructor;
 @SpringBootTest
 public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 	
-	@Autowired private GenericEventPersisterConsumer persister;
+	@Autowired private GenericEventPersister persister;
 	
 	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 	@Autowired private SourcePollingChannelAdapter pollableSource;

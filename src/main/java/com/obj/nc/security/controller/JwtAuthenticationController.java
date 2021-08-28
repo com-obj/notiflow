@@ -33,7 +33,7 @@ public class JwtAuthenticationController {
 	private final UserDetailsService jwtInMemoryUserDetailsService;
 	private final NcJwtConfigProperties ncJwtConfigProperties;
 
-	@PostMapping(value = Constants.API.AUTHENTICATE, consumes = MediaType.APPLICATION_JSON_VALUE, 
+	@PostMapping(value = "/authenticate", consumes = MediaType.APPLICATION_JSON_VALUE, 
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
