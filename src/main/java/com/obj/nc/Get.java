@@ -12,8 +12,7 @@ import org.springframework.stereotype.Component;
 import com.obj.nc.repositories.EndpointsRepository;
 
 /**
- * This is spring component to give spring a hint in configuration ordering. As component it should be staticaly usable because that
- * way clients can run into problems with ordering
+ * This is @Component to give spring a hint in configuration ordering. 
  * @author ja
  *
  */

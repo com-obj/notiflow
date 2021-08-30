@@ -97,7 +97,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		messageRepository.save(message.toPersistantState());
 		
 		messageProcessingFlow.processMessage(message);
-		awaitDeliveryInfos();
+		awaitMessageAndDeliveryInfos(2);
 		
 		//WHEN
 		ResultActions resp = mockMvc
@@ -311,10 +311,21 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		assertThat(Long.valueOf(emailDto.get().get("sentMessagesCount").toString())).isEqualTo(sentMessagesCount);
 	}
 	
-	private void awaitDeliveryInfos() {
-		Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> messageRepository.findAll().iterator().next() != null);
-		MessagePersistantState sentMessage = messageRepository.findAll().iterator().next();
-		Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepository.findByMessageIdOrderByProcessedOn(sentMessage.getId()).size() == 2);
+	private void awaitMessageAndDeliveryInfos(int numberToWait) {
+		MessagePersistantState sentMessage = waitForFirstMessage();
+		
+		Awaitility.await().atMost(Duration.ofSeconds(3)).until(
+				() -> deliveryInfoRepository.findByMessageIdOrderByProcessedOn(sentMessage.getId()).size() >= numberToWait
+		);
+	}
+
+	public MessagePersistantState waitForFirstMessage() {
+		Awaitility.await().atMost(Duration.ofSeconds(3)).until(
+				() -> messageRepository.findAll().iterator().next() != null
+		);
+		
+		MessagePersistantState sentMessage = messageRepository.findAll().iterator().next();		
+		return sentMessage;
 	}
 	
 	private void persistNEmailEndpoints(int n) {
