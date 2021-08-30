@@ -33,13 +33,14 @@ public class ProcessingInfoRepositoryTest extends BaseIntegrationTest {
 	
 	@Test
 	public void testPersistingSingleInfo() {
-		ProcessingInfo info = createSimpleProcessingInfo();
+		ProcessingInfo transientInfo = createSimpleProcessingInfo();
 		
-		infoRepository.save(info);
+		infoRepository.save(transientInfo);
 		
-		Optional<ProcessingInfo> infoInDb = infoRepository.findById(info.getProcessingId());
+		Optional<ProcessingInfo> infoInDb = infoRepository.findById(transientInfo.getProcessingId());
 		
 		Assertions.assertThat(infoInDb.isPresent()).isTrue();
+		assertCurrentIsExpected(transientInfo, infoInDb.get());
 	}	
 	
 	@Test
