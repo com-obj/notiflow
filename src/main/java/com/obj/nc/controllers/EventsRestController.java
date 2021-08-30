@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.relational.core.conversion.DbActionExecutionException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +19,7 @@ import com.obj.nc.domain.event.EventRecieverResponce;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.*;
 import java.util.List;
@@ -88,12 +88,10 @@ public class EventsRestController {
 	}
 	
 	@GetMapping(value = "/{eventId}", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<GenericEvent> findEvent(@PathVariable("eventId") String eventId) {
-		Optional<GenericEvent> event = eventsRepository.findById(UUID.fromString(eventId));
-		
-		return event
-				.map(genericEvent -> new ResponseEntity<>(genericEvent, HttpStatus.OK))
-				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+	public GenericEvent findEvent(@PathVariable("eventId") String eventId) {
+		return eventsRepository
+				.findById(UUID.fromString(eventId))
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 
 }

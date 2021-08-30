@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.obj.nc.exceptions.PayloadValidationException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -47,6 +48,11 @@ public class SpringMvcConfig {
     @ExceptionHandler({IllegalArgumentException.class})
     ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler({ResponseStatusException.class})
+    ResponseEntity<String> handleResponseStatusException(ResponseStatusException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.valueOf(e.getRawStatusCode()));
     }
     
     @ExceptionHandler({RuntimeException.class})
