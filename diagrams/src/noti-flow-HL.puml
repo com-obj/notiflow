@@ -1,0 +1,64 @@
+@startuml
+!theme cerulean-outline
+
+skinparam backgroundcolor White
+skinparam component {
+    BackgroundColor<<user defined>> LightGray
+    BorderColor<<user defined>> Gray
+    FontColor<<user defined>> Black
+
+    FontColor DarkSlateGray
+    FontName Courier
+    FontSize 15
+}
+
+component [noti-flow] {
+
+    () "REST-API" as rest
+    () "Java API" as javaApi
+
+    package flows {
+        component customFlow [
+            main-custom-flow
+        ] 
+    }
+
+    package functions {
+        component persistMessage [
+            format-msg-using-template
+        ] 
+
+        component sendEmail [
+            send-email
+        ] 
+
+        component other [
+            ...
+        ] 
+
+        component customFunction<<user defined>> [
+            calculate-recipients
+        ] 
+
+        component customFunction2<<user defined>> [
+            ...
+        ] 
+    }
+
+
+}
+
+javaApi -> customFlow: \t\t\t
+rest --> customFlow
+
+
+customFlow .. persistMessage: consists of
+customFlow .. sendEmail: consists of
+customFlow .. customFunction: consists of
+
+persistMessage -[hidden]- other
+sendEmail -[hidden]- other
+
+customFunction -[hidden]- customFunction2
+
+@enduml

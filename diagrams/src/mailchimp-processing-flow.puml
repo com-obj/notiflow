@@ -1,0 +1,30 @@
+@startuml
+
+!theme cerulean-outline
+
+left to right direction
+
+skinparam backgroundcolor White
+skinparam component {
+    backgroundColor<<user defined>> LightGray
+}
+
+
+database "Topic/Channels" {
+    component MAILCHIMP_PROCESSING_FLOW_ID_INPUT<<PUB/SUB>>[
+        MAILCHIMP_PROCESSING_FLOW_ID_INPUT
+        --
+        (Message)
+    ]
+
+}
+
+component "MessageProcessingFlow" {
+    [mailchimpSender]    
+
+    mailchimpSender ..> MAILCHIMP_PROCESSING_FLOW_ID_INPUT : (Message<TemplateWithModelContent>) 
+
+}
+
+
+@enduml

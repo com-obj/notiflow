@@ -1,0 +1,81 @@
+@startuml
+!theme cerulean-outline
+
+skinparam backgroundcolor White
+skinparam component {
+    BackgroundColor<<user defined>> LightGray
+    BorderColor<<user defined>> Gray
+    FontColor<<user defined>> Black
+    ArrowColor<<get>> #FF6655
+
+    FontColor DarkSlateGray
+    FontName Courier
+    FontSize 15
+
+    FontSize<<PUB/SUB>> 12
+}
+
+component [noti-flow] as mainFlow {
+
+    package standard-flow {
+        [InputEventRouting]
+        [InputEventExtensionConverting]
+
+        InputEventRouting --> InputEventExtensionConverting: (GenericEvent)
+
+        [MessageProcessingFlow]
+        [NotificationIntentProcessingFlow]
+
+        InputEventExtensionConverting -> NotificationIntentProcessingFlow: (NotificationIntent)
+        InputEventExtensionConverting --> MessageProcessingFlow: (Message)
+
+        component Sending {
+            [EmailProcessingFlow]
+            [SmsProcessingFlow]
+            [MailchimpProcessingFlow]
+
+            EmailProcessingFlow -[hidden]> SmsProcessingFlow
+            SmsProcessingFlow -[hidden]> MailchimpProcessingFlow
+
+            interface "sendEmail (EmailMessage)" as sendEmail
+            EmailProcessingFlow -l- sendEmail
+            interface "formatAndSend (EmailMessageTemplated)" as formatAndSendEmail
+            EmailProcessingFlow -- formatAndSendEmail
+        }
+
+        NotificationIntentProcessingFlow --> MessageProcessingFlow: (Message)
+        MessageProcessingFlow ---> Sending: (Message)
+
+        [DeliveryInfoFlow] as DeliveryInfoFlow1
+        [DeliveryInfoFlow] as DeliveryInfoFlow
+        MessageProcessingFlow -> DeliveryInfoFlow1: <<processing DI>>
+
+        Sending ---> DeliveryInfoFlow: <<send DI>>
+
+        interface "processMessage (Message)" as processMessageInt        
+        MessageProcessingFlow -l- processMessageInt
+
+        interface "processNotificationIntent (NotificationIntent)" as processNotificationIntent
+        NotificationIntentProcessingFlow -u- processNotificationIntent
+    }
+
+    package rest-api {
+        [EventReceiver]<<REST API>>
+        interface "URL: rest/events" as restEventInt
+        restEventInt - EventReceiver
+
+        [MessageReceiver]<<REST API>>
+        interface "URL: rest/messages (SendEmailMessageRequest)" as restMessagesInt
+        restMessagesInt -u- MessageReceiver
+
+
+        EventReceiver --[hidden] MessageReceiver
+
+        MessageReceiver --> processMessageInt: (EmailMessage)
+    }
+
+    EventReceiver -[dotted]> InputEventRouting: indirect
+
+}
+
+@enduml

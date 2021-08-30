@@ -1,0 +1,105 @@
+@startuml
+
+!theme cerulean-outline
+
+left to right direction
+
+skinparam backgroundcolor White
+skinparam component {
+    backgroundColor<<user defined>> LightGray
+}
+/'
+database "PostgreSQL" {
+    [nc_message]
+    [nc_endpoint]
+}
+'/
+
+database "Topic/Channels" {
+    component EMAIL_FORMAT_AND_SEND_FLOW_INPUT_ID<<PUB/SUB>>[
+        EMAIL_FORMAT_AND_SEND_FLOW_INPUT_ID
+        --
+        (EmailMessage/EmailMessageTemplated)
+    ]
+
+    component EMAIL_SEND_FLOW_INPUT_ID<<PUB/SUB>>[
+        EMAIL_SEND_FLOW_INPUT_ID
+        --
+        (EmailMessage)
+    ]
+
+    component EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID<<PUB/SUB>>[
+        EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID
+        --
+        (EmailMessage)
+    ]
+
+    component DELIVERY_INFO_SEND_FLOW_ID_INPUT<<PUB/SUB>>  [
+        DELIVERY_INFO_SEND_FLOW_ID_INPUT
+        --
+        (HasRecievingEndpoints)
+    ]
+
+}
+
+component "EmailSendFlow" {
+    [emailReadTrackingDecorator]
+    [endpointPersister]
+    [messagePersister]
+    [emailSender]
+
+    emailReadTrackingDecorator -l-> endpointPersister: (EmailMessage)
+    endpointPersister -l-> messagePersister: (EmailMessage)
+    messagePersister -l-> emailSender: (EmailMessage)
+
+ '   messagePersister --> nc_message: (EmailMessage)
+'  endpointPersister --> nc_endpoint: (List<RecievingEndpoint>)
+
+    emailReadTrackingDecorator ..> EMAIL_SEND_FLOW_INPUT_ID : (EmailMessage) 
+    emailSender --> EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID : (EmailMessage) 
+
+    emailSender --> DELIVERY_INFO_SEND_FLOW_ID_INPUT : (EmailMessage) 
+
+    note bottom of emailReadTrackingDecorator 
+        if (nc.functions.email-tracking.enabled = true 
+            AND contentType = MediaType.TEXT_HTML_VALUE)
+            do
+        else
+            skipp        
+    end note  
+
+    
+    interface "sendEmail (Message)" as sendEmail        
+        emailReadTrackingDecorator -u- sendEmail
+}
+
+
+
+component "EmailFormatAndSendFlow" {
+    [formatOrSendRouter]
+    [emailFormatter]
+    [emailMessageAggregationStrategy]
+
+    emailFormatter --> emailMessageAggregationStrategy: (EmailMessageTemplated)
+
+    formatOrSendRouter .> EMAIL_FORMAT_AND_SEND_FLOW_INPUT_ID : (EmailMessage/EmailMessageTemplated) 
+
+
+
+    formatOrSendRouter -> emailFormatter : (EmailMessageTemplated)
+    formatOrSendRouter -> EMAIL_SEND_FLOW_INPUT_ID : (EmailMessage)
+
+    emailMessageAggregationStrategy -> EMAIL_SEND_FLOW_INPUT_ID : (EmailMessage) 
+
+    interface "formatAndSend (Message)" as formatAndSend        
+        formatOrSendRouter -u- formatAndSend
+        
+}
+
+
+
+
+
+
+
+@enduml
