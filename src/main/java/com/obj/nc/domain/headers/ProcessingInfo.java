@@ -2,6 +2,7 @@ package com.obj.nc.domain.headers;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 import javax.validation.constraints.NotEmpty;
@@ -11,9 +12,10 @@ import com.obj.nc.domain.HasEventIds;
 import com.obj.nc.domain.HasPreviousIntentIds;
 import com.obj.nc.domain.HasPreviousMessageIds;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.repositories.MessageRepository;
 import com.obj.nc.repositories.NotificationIntentRepository;
-import org.assertj.core.util.Arrays;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -77,12 +79,12 @@ public class ProcessingInfo implements Persistable<UUID> {
 	@NotEmpty
 	@Reference(NotificationIntentRepository.class)
 	@Builder.Default
-	private UUID[] previousIntentIds = new UUID[0];
+	private UUID[] intentIds = new UUID[0];
 	
 	@NotEmpty
 	@Reference(MessageRepository.class)
 	@Builder.Default
-	private UUID[] previousMessageIds = new UUID[0];
+	private UUID[] messageIds = new UUID[0];
 	
 	@JsonIgnore
 	private String payloadJsonStart;
@@ -137,18 +139,28 @@ public class ProcessingInfo implements Persistable<UUID> {
 		
 		if (endPayload instanceof GenericEvent) {
 			eventIds = new UUID[]{ ((GenericEvent) endPayload).getId() };
-		}
-		
-		if (endPayload instanceof HasEventIds) {
+		} else if (endPayload instanceof HasEventIds) {
 			eventIds = ((HasEventIds) endPayload).getEventIds().toArray(new UUID[0]);
 		}
 		
 		if (endPayload instanceof HasPreviousIntentIds) {
-			previousIntentIds = ((HasPreviousIntentIds) endPayload).getPreviousIntentIds().toArray(new UUID[0]);
+			List<UUID> payloadIntentIds = ((HasPreviousIntentIds) endPayload).getPreviousIntentIds();
+			
+			if (endPayload instanceof NotificationIntent) {
+				payloadIntentIds.add(((NotificationIntent) endPayload).getId());
+			}
+			
+			intentIds = payloadIntentIds.toArray(new UUID[0]);
 		}
 		
 		if (endPayload instanceof HasPreviousMessageIds) {
-			previousMessageIds = ((HasPreviousMessageIds) endPayload).getPreviousMessageIds().toArray(new UUID[0]);
+			List<UUID> payloadMessageIds = ((HasPreviousMessageIds) endPayload).getPreviousMessageIds();
+			
+			if (endPayload instanceof Message<?>) {
+				payloadMessageIds.add(((Message<?>) endPayload).getId());
+			}
+			
+			messageIds = payloadMessageIds.toArray(new UUID[0]);
 		}
 		
 		payloadJsonEnd = JsonUtils.writeObjectToJSONString(endPayload); //this make snapshot of its self. has to be the last call

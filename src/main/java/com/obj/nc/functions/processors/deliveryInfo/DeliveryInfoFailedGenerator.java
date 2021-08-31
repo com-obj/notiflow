@@ -6,8 +6,9 @@ import java.util.UUID;
 
 import com.obj.nc.domain.HasPreviousIntentIds;
 import com.obj.nc.domain.HasPreviousMessageIds;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.HasEventIds;
@@ -37,7 +38,7 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 	@SneakyThrows
 	protected List<DeliveryInfo> execute(FailedPaylod failedPayload) {
 		
-		Message<?> failedMsg = failedPayloadExtractor.apply(failedPayload);
+		org.springframework.messaging.Message<?> failedMsg = failedPayloadExtractor.apply(failedPayload);
 		Object payload = failedMsg.getPayload();
 		
 		List<? extends RecievingEndpoint> endpoints = extracteEndpoints(payload);
@@ -54,12 +55,22 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 			
 			if (payload instanceof HasPreviousIntentIds) {
 				List<UUID> intentIds = ((HasPreviousIntentIds) payload).getPreviousIntentIds();
+				
+				if (payload instanceof NotificationIntent) {
+					intentIds.add(((NotificationIntent) payload).getId());
+				}
+				
 				intentIds.forEach(intentId ->
 						results.add(failedDeliveryInfoBuilder(failedPayload, endpoint).intentId(intentId).build()));
 			}
 			
 			if (payload instanceof HasPreviousMessageIds) {
 				List<UUID> messageIds = ((HasPreviousMessageIds) payload).getPreviousMessageIds();
+				
+				if (payload instanceof Message<?>) {
+					messageIds.add(((Message<?>) payload).getId());
+				}
+				
 				messageIds.forEach(messageId ->
 						results.add(failedDeliveryInfoBuilder(failedPayload, endpoint).messageId(messageId).build()));
 			}

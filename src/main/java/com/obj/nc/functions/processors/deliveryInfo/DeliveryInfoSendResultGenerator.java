@@ -5,11 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.obj.nc.domain.HasEventIds;
-import com.obj.nc.domain.HasPreviousIntentIds;
-import com.obj.nc.domain.HasPreviousMessageIds;
-import com.obj.nc.domain.HasRecievingEndpoints;
+import com.obj.nc.domain.*;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
@@ -33,22 +32,32 @@ public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionA
 					.processedOn(Instant.now());
 					
 			if (payload instanceof HasEventIds) {
-				UUID[] eventIds = ((HasEventIds) payload).getEventIds().toArray(new UUID[0]);
-				infoBuilder = infoBuilder.eventIds(eventIds);
+				List<UUID> eventIds = ((HasEventIds) payload).getEventIds();
+				infoBuilder = infoBuilder.eventIds(eventIds.toArray(new UUID[0]));
 			} else {
 				infoBuilder = infoBuilder.eventIds(new UUID[0]);
 			}
 			
 			if (payload instanceof HasPreviousIntentIds) {
-				UUID[] intentIds = ((HasPreviousIntentIds) payload).getPreviousIntentIds().toArray(new UUID[0]);
-				infoBuilder = infoBuilder.intentIds(intentIds);
+				List<UUID> intentIds = ((HasPreviousIntentIds) payload).getPreviousIntentIds();
+				
+				if (payload instanceof NotificationIntent) {
+					intentIds.add(((NotificationIntent) payload).getId());
+				}
+				
+				infoBuilder = infoBuilder.intentIds(intentIds.toArray(new UUID[0]));
 			} else {
 				infoBuilder = infoBuilder.intentIds(new UUID[0]);
 			}
 			
 			if (payload instanceof HasPreviousMessageIds) {
-				UUID[] messageIds = ((HasPreviousMessageIds) payload).getPreviousMessageIds().toArray(new UUID[0]);
-				infoBuilder = infoBuilder.messageIds(messageIds);
+				List<UUID> messageIds = ((HasPreviousMessageIds) payload).getPreviousMessageIds();
+				
+				if (payload instanceof Message<?>) {
+					messageIds.add(((Message<?>) payload).getId());
+				}
+				
+				infoBuilder = infoBuilder.messageIds(messageIds.toArray(new UUID[0]));
 			} else {
 				infoBuilder = infoBuilder.messageIds(new UUID[0]);
 			}

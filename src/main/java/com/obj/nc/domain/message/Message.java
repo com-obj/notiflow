@@ -3,16 +3,8 @@ package com.obj.nc.domain.message;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.*;
 import com.obj.nc.domain.content.MessageContent;
-import com.obj.nc.domain.content.TemplateWithModelContent;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 
-import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.MessageRepository;
@@ -21,7 +13,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.ToString;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 
