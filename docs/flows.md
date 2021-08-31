@@ -11,7 +11,7 @@ The default configuration of notiflow cosists of 4 procesing stages
 1. [MessageProcessingFlow](): [Message]() persistance, formatting, ..
 1. [Sending](): Sending different types of messages via dedicated channel
 
-![standard-flow](/diagrams/png/noti-flow-standard-flow.png)
+![standard-flow](diagrams/png/noti-flow-standard-flow.png)
 
 This is high level and simplified view on defualt notiflow message processing. Next section describe individual flows in detail
 
@@ -46,7 +46,7 @@ Which one of these three types is selected by the client depends on the particul
     but still wants to use features like [message delivery guaranties](), [journaling](), [spam preventions](), [statistics]() and others   
 
 ## Input event routing flow <span id="inputEventRoutingFlow"/>
-![standard-flow](/diagrams/png/input-event-routing.png)
+![standard-flow](diagrams/png/input-event-routing.png)
 
 [Input event routing flow](#inputEventRouting) is responsible for
 
@@ -59,7 +59,7 @@ Which one of these three types is selected by the client depends on the particul
 This step is only active if client what to use [event]() as a starting point for notification processing
 
 ## Input event extension converting flow <span id="inputEventExtensionConvertingFlow"/>
-![input-event-extension-converting-flow](/diagrams/png/input-event-extension-converting.png)
+![input-event-extension-converting-flow](diagrams/png/input-event-extension-converting.png)
 
 This [flow]() is a place of common customisation. It main purpose is 
 
@@ -109,7 +109,7 @@ Becuase the payload in event is not know to notiflow, client has to provide cust
 TODO
 
 ## Message processing flow <span id="messageProcessingFlow"/>
-![message-processing-flow](/diagrams/png/message-processing-flow.png)
+![message-processing-flow](diagrams/png/message-processing-flow.png)
 The responsiblity of this flow is to 
 
  * perform journaling for all [messages]() which are about to be send. This includes persistance of [message]() and information about [recipient]() of the message. 
@@ -129,7 +129,7 @@ The responsiblity of this flow is to
 ```
 
 ## Email processing Flow <span id="emailProcessingFlow"/>
-![email-processing-flow](/diagrams/png/email-processing-flow.png)
+![email-processing-flow](diagrams/png/email-processing-flow.png)
 The responsiblity of this flow is to 
 
  * if the [email is templated](), formate it to final [email message]()
@@ -162,20 +162,20 @@ void exampleSendEmail() {
 ```
 
 ## SMS processing Flow <span id="smsProcessingFlow"/>
-![sms-processing-flow](/diagrams/png/sms-processing-flow.png)
+![sms-processing-flow](diagrams/png/sms-processing-flow.png)
 The responsiblity of this flow is to
 
  * format [SMS message]() content (only templated SMS are supported as of now)
  * send [SMS message]()
 
 ## MailChimp processing Flow <span id="mailchimpProcessingFlow"/>
-![mailchimp-processing-flow](/diagrams/png/mailchimp-processing-flow.png)
+![mailchimp-processing-flow](diagrams/png/mailchimp-processing-flow.png)
 The responsiblity of this flow is to
  
  * send Email message using [MailChimp transactional API](https://mailchimp.com/developer/transactional/). Formating of the email is in responsibility of MailChimp
 
 ## Error handling flow
-![delivery-info-flow](/diagrams/png/noti-flow-error-flow.png)
+![delivery-info-flow](diagrams/png/noti-flow-error-flow.png)
 
 In the case of exception in any [function]() participating in a [flow](), the message that caused the error is recieved by this channel with the information about which step was the last that failed. This flow is reposible for
 
@@ -184,7 +184,7 @@ In the case of exception in any [function]() participating in a [flow](), the me
 For this to work in any situation, [transaction boundries]() for steps in flows have to be carefully defined
 
 ## Delivery Info flows <span id="deliveryInfoFlow"/>
-![delivery-info-flow](/diagrams/png/delivery-info-flow.png)
+![delivery-info-flow](diagrams/png/delivery-info-flow.png)
 These flows are responsible for persistance of varios journaling information. They listen on predefined topics and document delivery information for given [event](), [intent]() and [message]()
 
 The infomration is later used in [notiflow UI]() for cstatistics and analytics

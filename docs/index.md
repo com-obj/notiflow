@@ -35,14 +35,14 @@ To achieve this goals notiflow is implemented as
   * set of independent [functions](functions) where each function is performing exactly one thing (event conversion, email sending, formatting, aggregation, .. )
   * notiflow provide default composition of these [functions](functions.md) which are called [flows](flows). 
 
-![HL](/diagrams/png/noti-flow-HL.png)
+![HL](diagrams/png/noti-flow-HL.png)
 
 Both [functions](functions) and [flows](flows) can be added custom functionality is required. It is also possible to customize existing [functions](functions) or [flows](flows) using configuration properties or by providing completely custom implementation. You can use Notiflow as
 
   * embedded into your existing application
-    ![HL-embedded](/diagrams/png/noti-flow-HL-embedded.png)
+    ![HL-embedded](diagrams/png/noti-flow-HL-embedded.png)
   * create custom microservice for notification processing
-    ![HL-stand-alone](/diagrams/png/noti-flow-HL-stand-alone.png)
+    ![HL-stand-alone](diagrams/png/noti-flow-HL-stand-alone.png)
 
 
 ## Functions <span id="functions"/>

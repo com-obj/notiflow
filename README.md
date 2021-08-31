@@ -14,4 +14,4 @@ The main goal of notiflow is to greatly simplify delivery of information message
   * end-user spam prevention
   * message aggregation
 
-To understand in details how notiflow is solving this problems, check our [documentation](index.md)
+To understand in details how notiflow is solving this problems, check our [documentation](https://com-obj.github.io/notiflow/)
