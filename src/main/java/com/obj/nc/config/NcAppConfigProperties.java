@@ -13,7 +13,7 @@ public class NcAppConfigProperties {
     private String url;
     private boolean checkReferenceIntegrity = false;
     
-    @Value("${nc.app.url.context-path}")
+    @Value("${nc.app.url.context-path:/notiflow}")
     private String contextPath;
     
 }

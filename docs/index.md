@@ -2,7 +2,7 @@
 Notiflow is software framework for reliable delivery of email, push notifications and other types of messages. It is written in Java and it uses various Spring modules especially Spring integration. 
 
 * You can find the full list of [features](features.md)
-* To create your first "Hello world" project, check the [Getting started](#getting-started) section
+* To create your first "Hello world" project, check the [Getting started](getting-started.md) section
 * To learn more about the architecture and how it is build, check the [architecture and design](#architecture) section
 
 
@@ -74,4 +74,4 @@ Notiflow ships with monitoring and reporting UI written in ReactJS. It aim is to
 For complete documentation and screenshots of UI navigate to [Web UI]() chapter
 
 ## Let's start <span id="getting-started"/>
-To start using Notiflow in your project, navigate to the [Getting started](#getting-started) section
+To start using Notiflow in your project, navigate to the [Getting started](getting-started.md) section

@@ -1,0 +1,54 @@
+@startuml
+
+!theme cerulean-outline
+
+left to right direction
+
+skinparam backgroundcolor White
+skinparam component {
+    backgroundColor<<user defined>> LightGray
+}
+
+database "PostgreSQL" {
+    [nc_intent]
+    [nc_endpoint]
+}
+
+database "Topic/Channels" {
+    component INTENT_PROCESSING_FLOW_ID_INPUT<<PUB/SUB>>[
+        INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID
+        --
+        (NotificationIntent)
+    ]
+
+    component MESSAGE_PROCESSING_INPUT<<PUB/SUB>>[
+        MESSAGE_PROCESSING_FLOW_ID_INPUT
+        --
+        (Message)
+    ]
+
+}
+
+component "NotificationIntentProcessingFlow" {
+    [endpointPersister]
+    [notificationIntentPersister]
+    [splitter]
+
+    [generateMessagesFromIntent]
+
+
+    endpointPersister -l-> notificationIntentPersister: (NotificationIntent)
+    notificationIntentPersister -l-> generateMessagesFromIntent: (NotificationIntent)
+    generateMessagesFromIntent -l-> splitter: (List<Message>)
+
+    endpointPersister ..> INTENT_PROCESSING_FLOW_ID_INPUT : read (NotificationIntent) 
+    splitter --> MESSAGE_PROCESSING_INPUT: (Message)
+
+   
+    notificationIntentPersister -u-> nc_intent: (List<DeliveryInfo>)
+    endpointPersister -u-> nc_endpoint: (List<RecievingEndpoint>)
+
+}
+
+
+@enduml
