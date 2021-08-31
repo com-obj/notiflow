@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.obj.nc.domain.HasIntentIds;
-import com.obj.nc.domain.HasMessageIds;
+import com.obj.nc.domain.HasPreviousIntentIds;
+import com.obj.nc.domain.HasPreviousMessageIds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
@@ -41,82 +41,42 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 		Object payload = failedMsg.getPayload();
 		
 		List<? extends RecievingEndpoint> endpoints = extracteEndpoints(payload);
-		List<UUID> eventIds = extractEventIds(payload);
-		List<UUID> intentIds = extractIntentIds(payload);
-		List<UUID> messageIds = extractMessageIds(payload);
 		
 		List<DeliveryInfo> results= new ArrayList<>();		
 		
 		for (RecievingEndpoint endpoint: endpoints) {
 			
-			for (UUID eventId: eventIds) {
-				DeliveryInfo info = DeliveryInfo.builder()
-						.endpointId(endpoint.getId())
-						.eventId(eventId)
-						.status(DELIVERY_STATUS.FAILED)
-						.failedPayloadId(failedPayload.getId())
-						.build();
-				
-				results.add(info);
+			if (payload instanceof HasEventIds) {
+				List<UUID> eventIds = ((HasEventIds) payload).getEventIds();
+				eventIds.forEach(eventId -> 
+						results.add(failedDeliveryInfoBuilder(failedPayload, endpoint).eventId(eventId).build()));
 			}
 			
-			for (UUID intentId: intentIds) {
-				DeliveryInfo info = DeliveryInfo.builder()
-						.endpointId(endpoint.getId())
-						.intentId(intentId)
-						.status(DELIVERY_STATUS.FAILED)
-						.failedPayloadId(failedPayload.getId())
-						.build();
-				
-				results.add(info);
+			if (payload instanceof HasPreviousIntentIds) {
+				List<UUID> intentIds = ((HasPreviousIntentIds) payload).getPreviousIntentIds();
+				intentIds.forEach(intentId ->
+						results.add(failedDeliveryInfoBuilder(failedPayload, endpoint).intentId(intentId).build()));
 			}
 			
-			for (UUID messageId: messageIds) {
-				DeliveryInfo info = DeliveryInfo.builder()
-						.endpointId(endpoint.getId())
-						.messageId(messageId)
-						.status(DELIVERY_STATUS.FAILED)
-						.failedPayloadId(failedPayload.getId())
-						.build();
-				
-				results.add(info);
+			if (payload instanceof HasPreviousMessageIds) {
+				List<UUID> messageIds = ((HasPreviousMessageIds) payload).getPreviousMessageIds();
+				messageIds.forEach(messageId ->
+						results.add(failedDeliveryInfoBuilder(failedPayload, endpoint).messageId(messageId).build()));
 			}
 			
 		}
 		
 		return results;
 	}
-
-	private List<UUID> extractEventIds(Object payload) {
-		List<UUID> evetIds = new ArrayList<>();
-		if (payload instanceof HasEventIds) {
-			evetIds = ((HasEventIds)payload).getEventIds();
-		} else {
-			log.debug("Cannot extract source event IDs from message becaase payload is not of type HasEventIds. Its of type {}", payload.getClass());
-		}
-		return evetIds;
+	
+	private DeliveryInfo.DeliveryInfoBuilder failedDeliveryInfoBuilder(FailedPaylod failedPayload, RecievingEndpoint endpoint) {
+		DeliveryInfo.DeliveryInfoBuilder infoBuilder = DeliveryInfo.builder()
+				.endpointId(endpoint.getId())
+				.status(DELIVERY_STATUS.FAILED)
+				.failedPayloadId(failedPayload.getId());
+		return infoBuilder;
 	}
 	
-	private List<UUID> extractIntentIds(Object payload) {
-		List<UUID> intentIds = new ArrayList<>();
-		if (payload instanceof HasIntentIds) {
-			intentIds = ((HasIntentIds)payload).getIntentIds();
-		} else {
-			log.debug("Cannot extract source intent IDs from message becaase payload is not of type HasIntentIds. Its of type {}", payload.getClass());
-		}
-		return intentIds;
-	}
-	
-	private List<UUID> extractMessageIds(Object payload) {
-		List<UUID> messageIds = new ArrayList<>();
-		if (payload instanceof HasMessageIds) {
-			messageIds = ((HasMessageIds)payload).getMessageIds();
-		} else {
-			log.debug("Cannot extract source message IDs from message becaase payload is not of type HasMessageIds. Its of type {}", payload.getClass());
-		}
-		return messageIds;
-	}
-
 	private List<? extends RecievingEndpoint> extracteEndpoints(Object payload) {
 		if (!(payload instanceof HasRecievingEndpoints)) {
 			log.debug("Cannot generate Failed delivery infos from message because payload is not of type HasRecievingEndpoints. Its of type {}", payload.getClass());

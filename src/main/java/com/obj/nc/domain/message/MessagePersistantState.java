@@ -1,17 +1,14 @@
 package com.obj.nc.domain.message;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
-import com.obj.nc.domain.HasMessageIds;
 import com.obj.nc.repositories.MessageRepository;
 import com.obj.nc.repositories.NotificationIntentRepository;
-import lombok.Builder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -22,11 +19,8 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.Get;
-import com.obj.nc.domain.HasEventIds;
-import com.obj.nc.domain.HasRecievingEndpoints;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.EndpointsRepository;
@@ -65,11 +59,11 @@ public class MessagePersistantState implements Persistable<UUID> {
 	
 	@NotNull
 	@Reference(NotificationIntentRepository.class)
-	private UUID[] intentIds;
+	private UUID[] previousIntentIds;
 	
 	@NotNull
 	@Reference(MessageRepository.class)
-	private UUID[] messageIds;
+	private UUID[] previousMessageIds;
 	
 	@JsonIgnore
 	@Transient
@@ -95,8 +89,8 @@ public class MessagePersistantState implements Persistable<UUID> {
 		msg.setRecievingEndpoints(endpoints);
 		
 		msg.setEventIds(Arrays.asList(eventIds));
-		msg.setIntentIds(Arrays.asList(intentIds));
-		msg.setMessageIds(Arrays.asList(messageIds));
+		msg.setPreviousIntentIds(Arrays.asList(previousIntentIds));
+		msg.setPreviousMessageIds(Arrays.asList(previousMessageIds));
 		
 		return msg;
 	}

@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.obj.nc.domain.HasEventIds;
-import com.obj.nc.domain.HasIntentIds;
-import com.obj.nc.domain.HasMessageIds;
+import com.obj.nc.domain.HasPreviousIntentIds;
+import com.obj.nc.domain.HasPreviousMessageIds;
 import com.obj.nc.domain.HasRecievingEndpoints;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -39,15 +39,15 @@ public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionA
 				infoBuilder = infoBuilder.eventIds(new UUID[0]);
 			}
 			
-			if (payload instanceof HasIntentIds) {
-				UUID[] intentIds = ((HasIntentIds) payload).getIntentIds().toArray(new UUID[0]);
+			if (payload instanceof HasPreviousIntentIds) {
+				UUID[] intentIds = ((HasPreviousIntentIds) payload).getPreviousIntentIds().toArray(new UUID[0]);
 				infoBuilder = infoBuilder.intentIds(intentIds);
 			} else {
 				infoBuilder = infoBuilder.intentIds(new UUID[0]);
 			}
 			
-			if (payload instanceof HasMessageIds) {
-				UUID[] messageIds = ((HasMessageIds) payload).getMessageIds().toArray(new UUID[0]);
+			if (payload instanceof HasPreviousMessageIds) {
+				UUID[] messageIds = ((HasPreviousMessageIds) payload).getPreviousMessageIds().toArray(new UUID[0]);
 				infoBuilder = infoBuilder.messageIds(messageIds);
 			} else {
 				infoBuilder = infoBuilder.messageIds(new UUID[0]);

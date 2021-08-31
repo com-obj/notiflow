@@ -43,32 +43,17 @@ public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> ex
 
 		for (RecievingEndpoint recievingEndpoint: msg.getRecievingEndpoints()) {
 
-			Message<CONTENT_TYPE> msgClone = msg.getClass().newInstance();
+			Message<CONTENT_TYPE> msgClone = Message.newMessageFrom(msg.getClass(), msg);
 			
 			msgClone.addRecievingEndpoints(recievingEndpoint);
 
 			msgClone.setAttributes(msg.getAttributes());
 			msgClone.setBody(msg.getBody());
 			
-			msgClone.setEventIds(msg.getEventIds());
-			msgClone.setIntentIds(msg.getIntentIds());
-				
-			if (isInputMessage(msg)) {
-				msgClone.addMessageId(msg.getId());
-			} else {
-				msgClone.setMessageIds(msg.getMessageIds());
-			}
-			
 			messages.add(msgClone);
 		}
 
 		return messages;
-	}
-	
-	private boolean isInputMessage(Message<CONTENT_TYPE> msg) {
-		return msg.getEventIds().isEmpty()
-				&& msg.getIntentIds().isEmpty()
-				&& msg.getMessageIds().isEmpty();
 	}
 	
 }

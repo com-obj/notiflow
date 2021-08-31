@@ -38,8 +38,8 @@ public class CustomProcessingInfoRepositoryImpl implements CustomProcessingInfoR
 	        				.payloadJsonStart(rs.getString("payload_json_start"))
 	        				.payloadJsonEnd(rs.getString("payload_json_end"))
 	        				.eventIds((UUID[])rs.getArray("event_ids").getArray())
-	        				.intentIds((UUID[])rs.getArray("intent_ids").getArray())
-	        				.messageIds((UUID[])rs.getArray("message_ids").getArray())
+	        				.previousIntentIds((UUID[])rs.getArray("intent_ids").getArray())
+	        				.previousMessageIds((UUID[])rs.getArray("message_ids").getArray())
 	        				.build();
         		}
         	);

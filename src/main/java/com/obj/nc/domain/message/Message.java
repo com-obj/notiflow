@@ -3,28 +3,35 @@ package com.obj.nc.domain.message;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.*;
 import com.obj.nc.domain.content.MessageContent;
+import com.obj.nc.domain.content.TemplateWithModelContent;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.sms.SimpleTextContent;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 
+import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.MessageRepository;
 import com.obj.nc.repositories.NotificationIntentRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.SneakyThrows;
 import lombok.ToString;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
-public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayload<BODY_TYPE> implements IsNotification, HasEventIds, HasIntentIds, HasMessageIds {
+public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayload<BODY_TYPE> implements IsNotification, HasEventIds, HasPreviousIntentIds, HasPreviousMessageIds {
 	
 	@NotNull
 	@EqualsAndHashCode.Include
@@ -36,13 +43,32 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 	@EqualsAndHashCode.Include
 	@Transient
 	@Reference(NotificationIntentRepository.class)
-	private List<UUID> intentIds = new ArrayList<>();
+	private List<UUID> previousIntentIds = new ArrayList<>();
 	
 	@NotNull
 	@EqualsAndHashCode.Include
 	@Transient
 	@Reference(MessageRepository.class)
-	private List<UUID> messageIds = new ArrayList<>();
+	private List<UUID> previousMessageIds = new ArrayList<>();
+	
+	@SneakyThrows
+	public static <T extends Message<?>> T newMessageFrom(Class<T> messageType, 
+														  Message<?> ... messages) {
+		if (messages.length == 0) {
+			return null;
+		}
+		
+		T newMessage = messageType.newInstance();
+		
+		for (Message<?> message : messages) {
+			message.getEventIds().forEach(newMessage::addEventId);
+			message.getPreviousIntentIds().forEach(newMessage::addPreviousIntentId);
+			message.getPreviousMessageIds().forEach(newMessage::addPreviousMessageId);
+			newMessage.addPreviousMessageId(message.getId());
+		}
+		
+		return newMessage;
+	}
 		
 	@JsonIgnore
 	public abstract Class<? extends RecievingEndpoint> getRecievingEndpointType();
@@ -53,8 +79,8 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		persistantState.setHeader(getHeader());
 		persistantState.setId(getId());
 		persistantState.setEventIds(eventIds.toArray(new UUID[0]));
-		persistantState.setIntentIds(intentIds.toArray(new UUID[0]));
-		persistantState.setMessageIds(messageIds.toArray(new UUID[0]));
+		persistantState.setPreviousIntentIds(previousIntentIds.toArray(new UUID[0]));
+		persistantState.setPreviousMessageIds(previousMessageIds.toArray(new UUID[0]));
 		persistantState.setMessageClass(getClass().getName());
 		persistantState.setTimeCreated(getTimeCreated());
 		persistantState.setEndpointIds(getRecievingEndpoints().stream().map(RecievingEndpoint::getId).toArray(UUID[]::new));
@@ -65,12 +91,12 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		eventIds.add(eventId);
 	}
 	
-	public void addIntentId(UUID intentId) {
-		intentIds.add(intentId);
+	public void addPreviousIntentId(UUID previousIntentId) {
+		previousIntentIds.add(previousIntentId);
 	}
 	
-	public void addMessageId(UUID messageId) {
-		messageIds.add(messageId);
+	public void addPreviousMessageId(UUID previousMessageId) {
+		previousMessageIds.add(previousMessageId);
 	}
 	
 	@JsonIgnore
@@ -79,31 +105,31 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		setEventIds(Arrays.asList(eventIds));
 	}
 	
+	@JsonIgnore
+	@Column("previous_intent_ids")
+	public void setPreviousIntentIdsAsArray(UUID[] intentIds) {
+		setPreviousIntentIds(Arrays.asList(intentIds));
+	}
+	
+	@JsonIgnore
+	@Column("previous_message_ids")
+	public void setPreviousMessageIdsAsArray(UUID[] messageIds) {
+		setPreviousIntentIds(Arrays.asList(messageIds));
+	}
+	
 	@Column("event_ids")
 	public UUID[] getEventIdsAsArray() {
 		return eventIds.toArray(new UUID[0]);
 	}
 	
-	@JsonIgnore
-	@Column("intent_ids")
-	public void setIntentIdsAsArray(UUID[] intentIds) {
-		setIntentIds(Arrays.asList(intentIds));
+	@Column("previous_intent_ids")
+	public UUID[] getPreviousIntentIdsAsArray() {
+		return previousIntentIds.toArray(new UUID[0]);
 	}
 	
-	@Column("intent_ids")
-	public UUID[] getIntentIdsAsArray() {
-		return intentIds.toArray(new UUID[0]);
-	}
-	
-	@JsonIgnore
-	@Column("message_ids")
-	public void setMessageIdsAsArray(UUID[] messageIds) {
-		setIntentIds(Arrays.asList(messageIds));
-	}
-	
-	@Column("message_ids")
-	public UUID[] getMessageIdsAsArray() {
-		return messageIds.toArray(new UUID[0]);
+	@Column("previous_message_ids")
+	public UUID[] getPreviousMessageIdsAsArray() {
+		return previousMessageIds.toArray(new UUID[0]);
 	}
 	
 }

@@ -1,7 +1,7 @@
 package com.obj.nc.domain.notifIntent;
 
 import com.obj.nc.domain.HasEventIds;
-import com.obj.nc.domain.HasIntentIds;
+import com.obj.nc.domain.HasPreviousIntentIds;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.NotificationIntentRepository;
@@ -67,7 +67,7 @@ import java.util.UUID;
  *
  * @param <BODY_TYPE>
  */
-public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification, HasEventIds, HasIntentIds {
+public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification, HasEventIds, HasPreviousIntentIds {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "INTENT";
 	
@@ -81,15 +81,15 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 	@EqualsAndHashCode.Include
 	@Transient
 	@Reference(NotificationIntentRepository.class)
-	private List<UUID> intentIds = new ArrayList<>();
+	private List<UUID> previousIntentIds = new ArrayList<>();
 	
 	@Override
 	public void addEventId(UUID eventId) {
 		eventIds.add(eventId);
 	}
 	
-	public void addIntentId(UUID intentId) {
-		intentIds.add(intentId);
+	public void addPreviousIntentId(UUID intentId) {
+		previousIntentIds.add(intentId);
 	}
 	
 	@JsonIgnore
@@ -98,20 +98,20 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		setEventIds(Arrays.asList(eventIds));
 	}
 	
+	@JsonIgnore
+	@Column("previous_intent_ids")
+	public void setPreviousIntentIdsAsArray(UUID[] intentIds) {
+		setPreviousIntentIds(Arrays.asList(intentIds));
+	}
+	
 	@Column("event_ids")
 	public UUID[] getEventIdsAsArray() {
 		return eventIds.toArray(new UUID[0]);
 	}
 	
-	@JsonIgnore
-	@Column("intent_ids")
-	public void setIntentIdsAsArray(UUID[] intentIds) {
-		setIntentIds(Arrays.asList(intentIds));
-	}
-	
-	@Column("intent_ids")
-	public UUID[] getIntentIdsAsArray() {
-		return intentIds.toArray(new UUID[0]);
+	@Column("previous_intent_ids")
+	public UUID[] getPreviousIntentIdsAsArray() {
+		return previousIntentIds.toArray(new UUID[0]);
 	}
 	
 	@Override
@@ -133,6 +133,7 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		if (msgContent instanceof EmailContent) {
 			EmailMessage email = new EmailMessage();
 			email.setBody((EmailContent)msgContent);
+			setIds(email);
 			
 			return email;
 		} 
@@ -140,6 +141,7 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		if (msgContent instanceof SimpleTextContent) {
 			SmsMessage sms = new SmsMessage();
 			sms.setBody((SimpleTextContent)msgContent);
+			setIds(sms);
 			
 			return sms;
 		} 
@@ -147,6 +149,7 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof EmailEndpoint) {
 			EmailMessageTemplated<?> email = new EmailMessageTemplated<>();
 			email.setBody((TemplateWithModelEmailContent)msgContent);
+			setIds(email);
 			
 			return email;
 		} 
@@ -154,6 +157,7 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof SmsEndpoint) {
 			SmsMessageTemplated<?> sms = new SmsMessageTemplated<>();
 			sms.setBody((TemplateWithModelContent)msgContent);
+			setIds(sms);
 			
 			return sms;
 		} 
@@ -162,6 +166,7 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		if (endpointsForOneSubject instanceof MailchimpEndpoint) {
 			MailChimpMessage mailChimp = new MailChimpMessage();
 			mailChimp.setBody((MailchimpContent)msgContent);
+			setIds(mailChimp);
 			
 			return mailChimp;
 		}
@@ -169,5 +174,11 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		throw new NotImplementedException("Add additional cases");
 
 	}
-
+	
+	private void setIds(Message<?> message) {
+		message.setEventIds(getEventIds());
+		message.setPreviousIntentIds(getPreviousIntentIds());
+		message.addPreviousIntentId(getId());
+	}
+	
 }

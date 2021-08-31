@@ -49,23 +49,10 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 
 			msg.setAttributes(notificationIntent.getAttributes());
 			
-			notificationIntent.getEventIds().forEach(msg::addEventId);
-			
-			if (isInputIntent(notificationIntent)) {
-				msg.addIntentId(notificationIntent.getId());
-			} else {
-				notificationIntent.getIntentIds().forEach(msg::addIntentId);
-			}
-			
 			messages.add(msg);
 		}
 
 		return messages;
-	}
-	
-	private boolean isInputIntent(NotificationIntent notificationIntent) {
-		return notificationIntent.getEventIds().isEmpty()
-				&& notificationIntent.getIntentIds().isEmpty();
 	}
 	
 }
