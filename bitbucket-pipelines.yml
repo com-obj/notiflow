@@ -1,9 +1,9 @@
 definitions: 
    steps:
      - step: &mirror-to-github
-         name: 'Mirror push to git@github.com:com-obj/example-flows.git'
+         name: 'Mirror push to git@github.com:com-obj/notiflow.git'
          script:
-           - git push --mirror git@github.com:com-obj/example-flows.git
+           - git push --mirror git@github.com:com-obj/notiflow.git
 
 clone:
   depth: full
