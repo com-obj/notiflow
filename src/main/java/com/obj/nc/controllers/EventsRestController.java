@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.relational.core.conversion.DbActionExecutionException;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +19,12 @@ import com.obj.nc.domain.event.EventRecieverResponce;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.*;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -81,6 +85,13 @@ public class EventsRestController {
 		List<GenericEvent> events = eventsRepository.findAllByTimeConsumedBetween(consumedFrom, consumedTo, pageable);
 		long eventsTotalCount = eventsRepository.countAllByTimeConsumedBetween(consumedFrom, consumedTo);
 		return new PageImpl<>(events, pageable, eventsTotalCount);
+	}
+	
+	@GetMapping(value = "/{eventId}", produces = APPLICATION_JSON_VALUE)
+	public GenericEvent findEvent(@PathVariable("eventId") String eventId) {
+		return eventsRepository
+				.findById(UUID.fromString(eventId))
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 
 }

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 
 @Component
-@Profile({"dev"})
-@EnableScheduling
+//@Profile({"dev"})
+//@EnableScheduling
 public class EventGeneratorScheduler {
 
     @Autowired

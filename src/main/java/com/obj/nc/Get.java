@@ -12,9 +12,11 @@ import org.springframework.stereotype.Component;
 import com.obj.nc.repositories.EndpointsRepository;
 
 /**
- * This is spring component to give spring a hint in configuration ordering. As component it should be staticaly usable because that
- * way clients can run into problems with ordering
- * @author ja
+ * This is @Component to give spring a hint in configuration ordering. 
+ * If using this class might cause issues when using with tests. In test, spring can re-initialise the ApplicationContext and invalidates the old one. 
+ * Although this class uses application listeners to be notified about the new ApplicationContext, it doesn't work reliably. Tests needs to make sure to set the new 
+ * ApplicationContext to this class. The simplest way to do this is to extend the test class from BaseIntegrationTest.
+ * @author Jan Cuzy
  *
  */
 @Component

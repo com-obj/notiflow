@@ -20,6 +20,11 @@ definitions:
          caches:
            - gradle
 
+     - step: &mirror-to-github
+         name: 'Mirror push to git@github.com:com-obj/notiflow.git'
+         script:
+           - git push --mirror git@github.com:com-obj/notiflow.git
+
    services: 
      postgres: 
        image: postgres 
@@ -28,16 +33,26 @@ definitions:
          POSTGRES_USER: 'nc'
          POSTGRES_PASSWORD: 'ZMss4o9mdBLV'
 
+clone:
+  depth: full
+
 pipelines:
+  default:
+    - step: *mirror-to-github
   branches:
     master:
       - step: *release-nexus # publication of SNAPSHOT release
+      - step: *mirror-to-github
     develop:
       - step: *test
+      - step: *mirror-to-github
     release/*:
       - step: *release-nexus # publication of SNAPSHOT release
+      - step: *mirror-to-github
     hotfix/*:
       - step: *release-nexus # publication of SNAPSHOT release      
+      - step: *mirror-to-github
   tags:
     v*:
       - step: *release-nexus # publication of FINAL release
+      - step: *mirror-to-github
