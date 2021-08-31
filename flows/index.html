@@ -226,7 +226,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started.md" class="md-nav__link">
+      <a href="../getting-started/" class="md-nav__link">
         Installation
       </a>
     </li>
@@ -238,7 +238,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides.md" class="md-nav__link">
+      <a href="../examples/" class="md-nav__link">
         Guides
       </a>
     </li>
@@ -464,33 +464,18 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../api.md" class="md-nav__link">
-        API Reference
-      </a>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
       
-      <label class="md-nav__link" for="__nav_7">
+      <label class="md-nav__link" for="__nav_6">
         Releases
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Releases" data-md-level="1">
-        <label class="md-nav__title" for="__nav_7">
+        <label class="md-nav__title" for="__nav_6">
           <span class="md-nav__icon md-icon"></span>
           Releases
         </label>
@@ -501,7 +486,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../changelog.md" class="md-nav__link">
+      <a href="../changelog/" class="md-nav__link">
         Changelog
       </a>
     </li>
@@ -740,35 +725,63 @@
 </li>
 </ul>
 <p>Becuase the payload in event is not know to notiflow, client has to provide custom implementation of such conversion. This is done by implementing <a href="">InputEvent2MessageConverterExtension</a> interface. For example</p>
-<pre><code class="language-java">        @Bean
-        public InputEvent2MessageConverterExtension event2Message() {
-            return new InputEvent2MessageConverterExtension () {
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>        <span class="nd">@Bean</span>
+        <span class="kd">public</span> <span class="n">InputEvent2MessageConverterExtension</span> <span class="nf">event2Message</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="n">InputEvent2MessageConverterExtension</span> <span class="p">()</span> <span class="p">{</span>
 
-                @Override
-                public Optional&lt;PayloadValidationException&gt; canHandle(GenericEvent payload) {
-                    if (payload.getPayloadAsPojo() instanceof TestPayload) {
-                        return Optional.empty();
-                    }
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">PayloadValidationException</span><span class="o">&gt;</span> <span class="nf">canHandle</span><span class="p">(</span><span class="n">GenericEvent</span> <span class="n">payload</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">payload</span><span class="p">.</span><span class="na">getPayloadAsPojo</span><span class="p">()</span> <span class="k">instanceof</span> <span class="n">TestPayload</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="k">return</span> <span class="n">Optional</span><span class="p">.</span><span class="na">empty</span><span class="p">();</span>
+                    <span class="p">}</span>
 
-                    return Optional.of(new PayloadValidationException(&quot;No test payload&quot;));                  
-                }
+                    <span class="k">return</span> <span class="n">Optional</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="k">new</span> <span class="n">PayloadValidationException</span><span class="p">(</span><span class="s">&quot;No test payload&quot;</span><span class="p">));</span>                  
+                <span class="p">}</span>
 
-                @Override
-                public List&lt;com.obj.nc.domain.message.Message&lt;?&gt;&gt; convertEvent(GenericEvent event) {                    
-                    EmailMessage email1 = new EmailMessage();
-                    email1.addRecievingEndpoints(
-                        EmailEndpoint.builder().email(&quot;test@objectify.sk&quot;).build()
-                    );
-                    email1.getBody().setSubject(&quot;Subject&quot;);
-                    email1.getBody().setText(&quot;text&quot;);
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">com</span><span class="p">.</span><span class="na">obj</span><span class="p">.</span><span class="na">nc</span><span class="p">.</span><span class="na">domain</span><span class="p">.</span><span class="na">message</span><span class="p">.</span><span class="na">Message</span><span class="o">&lt;?&gt;&gt;</span> <span class="n">convertEvent</span><span class="p">(</span><span class="n">GenericEvent</span> <span class="n">event</span><span class="p">)</span> <span class="p">{</span>                    
+                    <span class="n">EmailMessage</span> <span class="n">email1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">EmailMessage</span><span class="p">();</span>
+                    <span class="n">email1</span><span class="p">.</span><span class="na">addRecievingEndpoints</span><span class="p">(</span>
+                        <span class="n">EmailEndpoint</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">email</span><span class="p">(</span><span class="s">&quot;test@objectify.sk&quot;</span><span class="p">).</span><span class="na">build</span><span class="p">()</span>
+                    <span class="p">);</span>
+                    <span class="n">email1</span><span class="p">.</span><span class="na">getBody</span><span class="p">().</span><span class="na">setSubject</span><span class="p">(</span><span class="s">&quot;Subject&quot;</span><span class="p">);</span>
+                    <span class="n">email1</span><span class="p">.</span><span class="na">getBody</span><span class="p">().</span><span class="na">setText</span><span class="p">(</span><span class="s">&quot;text&quot;</span><span class="p">);</span>
 
-                    List&lt;com.obj.nc.domain.message.Message&lt;?&gt;&gt; msg = Arrays.asList(email1);
+                    <span class="n">List</span><span class="o">&lt;</span><span class="n">com</span><span class="p">.</span><span class="na">obj</span><span class="p">.</span><span class="na">nc</span><span class="p">.</span><span class="na">domain</span><span class="p">.</span><span class="na">message</span><span class="p">.</span><span class="na">Message</span><span class="o">&lt;?&gt;&gt;</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="n">email1</span><span class="p">);</span>
 
-                    return msg;
-                }               
-            };
-        }
-</code></pre>
+                    <span class="k">return</span> <span class="n">msg</span><span class="p">;</span>
+                <span class="p">}</span>               
+            <span class="p">};</span>
+        <span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
 <blockquote>
 <p>InputEvent2MessageConverterExtension implementation has to be registered as Spring @Bean</p>
 </blockquote>
@@ -782,15 +795,23 @@ The responsiblity of this flow is to </p>
 <li>route the <a href="">message</a> to type dependent sender </li>
 </ul>
 <p>This flow has API that allows to interact with it. Example:</p>
-<pre><code class="language-java"> @Autowired private MessageProcessingFlow msgFlow;
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code> <span class="nd">@Autowired</span> <span class="kd">private</span> <span class="n">MessageProcessingFlow</span> <span class="n">msgFlow</span><span class="p">;</span>
 
- void exampleSendMessage()  {
-        EmailMessage msg = ...
+ <span class="kt">void</span> <span class="nf">exampleSendMessage</span><span class="p">()</span>  <span class="p">{</span>
+        <span class="n">EmailMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="p">...</span>
 
-        // when
-        msgFlow.processMessage(msg);
- }
-</code></pre>
+        <span class="c1">// when</span>
+        <span class="n">msgFlow</span><span class="p">.</span><span class="na">processMessage</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
+ <span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
 <h2 id="email-processing-flow">Email processing Flow <span id="emailProcessingFlow"/></h2>
 <p><img alt="email-processing-flow" src="/diagrams/png/email-processing-flow.png" />
 The responsiblity of this flow is to </p>
@@ -801,25 +822,41 @@ The responsiblity of this flow is to </p>
 <li>send <a href="">email</a></li>
 </ul>
 <p>This flow has API that allows to interact with it. Example:</p>
-<pre><code class="language-java"> @Autowired private EmailProcessingFlow emailSendingFlow;
+<p><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code> <span class="nd">@Autowired</span> <span class="kd">private</span> <span class="n">EmailProcessingFlow</span> <span class="n">emailSendingFlow</span><span class="p">;</span>
 
- void exampleSendFormatedEmail()  {
-        EmailMessageTemplated&lt;?&gt; email = ...
-        emailSendingFlow.formatAndSend(email);
-        ...
- }
-</code></pre>
-<p>or </p>
-<pre><code class="language-java">@Autowired private EmailProcessingFlow emailSendingFlow;
+ <span class="kt">void</span> <span class="nf">exampleSendFormatedEmail</span><span class="p">()</span>  <span class="p">{</span>
+        <span class="n">EmailMessageTemplated</span><span class="o">&lt;?&gt;</span> <span class="n">email</span> <span class="o">=</span> <span class="p">...</span>
+        <span class="n">emailSendingFlow</span><span class="p">.</span><span class="na">formatAndSend</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
+        <span class="p">...</span>
+ <span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+or 
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="nd">@Autowired</span> <span class="kd">private</span> <span class="n">EmailProcessingFlow</span> <span class="n">emailSendingFlow</span><span class="p">;</span>
 
-void exampleSendEmail() {
-    EmailMessage email = ...
+<span class="kt">void</span> <span class="nf">exampleSendEmail</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">EmailMessage</span> <span class="n">email</span> <span class="o">=</span> <span class="p">...</span>
 
-    EmailMessage emailSent = emailSendingFlow
-            .sendEmail(email)
-            .get(1, TimeUnit.SECONDS);
-}
-</code></pre>
+    <span class="n">EmailMessage</span> <span class="n">emailSent</span> <span class="o">=</span> <span class="n">emailSendingFlow</span>
+            <span class="p">.</span><span class="na">sendEmail</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+            <span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">TimeUnit</span><span class="p">.</span><span class="na">SECONDS</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+</td></tr></table></p>
 <h2 id="sms-processing-flow">SMS processing Flow <span id="smsProcessingFlow"/></h2>
 <p><img alt="sms-processing-flow" src="/diagrams/png/sms-processing-flow.png" />
 The responsiblity of this flow is to</p>
@@ -870,7 +907,7 @@ These flows are responsible for persistance of varios journaling information. Th
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../features/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Features" rel="prev">
+        <a href="../examples/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Guides" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -879,7 +916,7 @@ These flows are responsible for persistance of varios journaling information. Th
               <span class="md-footer__direction">
                 Previous
               </span>
-              Features
+              Guides
             </div>
           </div>
         </a>
@@ -925,7 +962,7 @@ These flows are responsible for persistance of varios journaling information. Th
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.709b4209.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.709b4209.min.js", "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.2b46852b.min.js"></script>
