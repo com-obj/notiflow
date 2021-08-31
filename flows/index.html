@@ -653,7 +653,7 @@
 <li><a href="">MessageProcessingFlow</a>: <a href="">Message</a> persistance, formatting, ..</li>
 <li><a href="">Sending</a>: Sending different types of messages via dedicated channel</li>
 </ol>
-<p><img alt="standard-flow" src="/diagrams/png/noti-flow-standard-flow.png" /></p>
+<p><img alt="standard-flow" src="../diagrams/png/noti-flow-standard-flow.png" /></p>
 <p>This is high level and simplified view on defualt notiflow message processing. Next section describe individual flows in detail</p>
 <h3 id="notification-processing-variants">Notification processing variants</h3>
 <p>The input to standard-flow (and thus start of input processing) can be done by calling one tree dedicated API enpoints</p>
@@ -697,7 +697,7 @@
 </li>
 </ul>
 <h2 id="input-event-routing-flow">Input event routing flow <span id="inputEventRoutingFlow"/></h2>
-<p><img alt="standard-flow" src="/diagrams/png/input-event-routing.png" /></p>
+<p><img alt="standard-flow" src="../diagrams/png/input-event-routing.png" /></p>
 <p><a href="#inputEventRouting">Input event routing flow</a> is responsible for</p>
 <ul>
 <li>Recieve an <a href="../entities/#inputEvent">event</a> and retun controll to the caller as soon as possible<ul>
@@ -710,7 +710,7 @@
 </ul>
 <p>This step is only active if client what to use <a href="">event</a> as a starting point for notification processing</p>
 <h2 id="input-event-extension-converting-flow">Input event extension converting flow <span id="inputEventExtensionConvertingFlow"/></h2>
-<p><img alt="input-event-extension-converting-flow" src="/diagrams/png/input-event-extension-converting.png" /></p>
+<p><img alt="input-event-extension-converting-flow" src="../diagrams/png/input-event-extension-converting.png" /></p>
 <p>This <a href="">flow</a> is a place of common customisation. It main purpose is </p>
 <ul>
 <li>
@@ -788,7 +788,7 @@
 <h2 id="intent-processing-flow">Intent processing flow <span id="intentProcessingFlow"/></h2>
 <p>TODO</p>
 <h2 id="message-processing-flow">Message processing flow <span id="messageProcessingFlow"/></h2>
-<p><img alt="message-processing-flow" src="/diagrams/png/message-processing-flow.png" />
+<p><img alt="message-processing-flow" src="../diagrams/png/message-processing-flow.png" />
 The responsiblity of this flow is to </p>
 <ul>
 <li>perform journaling for all <a href="">messages</a> which are about to be send. This includes persistance of <a href="">message</a> and information about <a href="">recipient</a> of the message. </li>
@@ -813,7 +813,7 @@ The responsiblity of this flow is to </p>
 </code></pre></div>
 </td></tr></table>
 <h2 id="email-processing-flow">Email processing Flow <span id="emailProcessingFlow"/></h2>
-<p><img alt="email-processing-flow" src="/diagrams/png/email-processing-flow.png" />
+<p><img alt="email-processing-flow" src="../diagrams/png/email-processing-flow.png" />
 The responsiblity of this flow is to </p>
 <ul>
 <li>if the <a href="">email is templated</a>, formate it to final <a href="">email message</a></li>
@@ -858,27 +858,27 @@ or
 </code></pre></div>
 </td></tr></table></p>
 <h2 id="sms-processing-flow">SMS processing Flow <span id="smsProcessingFlow"/></h2>
-<p><img alt="sms-processing-flow" src="/diagrams/png/sms-processing-flow.png" />
+<p><img alt="sms-processing-flow" src="../diagrams/png/sms-processing-flow.png" />
 The responsiblity of this flow is to</p>
 <ul>
 <li>format <a href="">SMS message</a> content (only templated SMS are supported as of now)</li>
 <li>send <a href="">SMS message</a></li>
 </ul>
 <h2 id="mailchimp-processing-flow">MailChimp processing Flow <span id="mailchimpProcessingFlow"/></h2>
-<p><img alt="mailchimp-processing-flow" src="/diagrams/png/mailchimp-processing-flow.png" />
+<p><img alt="mailchimp-processing-flow" src="../diagrams/png/mailchimp-processing-flow.png" />
 The responsiblity of this flow is to</p>
 <ul>
 <li>send Email message using <a href="https://mailchimp.com/developer/transactional/">MailChimp transactional API</a>. Formating of the email is in responsibility of MailChimp</li>
 </ul>
 <h2 id="error-handling-flow">Error handling flow</h2>
-<p><img alt="delivery-info-flow" src="/diagrams/png/noti-flow-error-flow.png" /></p>
+<p><img alt="delivery-info-flow" src="../diagrams/png/noti-flow-error-flow.png" /></p>
 <p>In the case of exception in any <a href="">function</a> participating in a <a href="">flow</a>, the message that caused the error is recieved by this channel with the information about which step was the last that failed. This flow is reposible for</p>
 <ul>
 <li>resurection af the failed message and execution of retry </li>
 </ul>
 <p>For this to work in any situation, <a href="">transaction boundries</a> for steps in flows have to be carefully defined</p>
 <h2 id="delivery-info-flows">Delivery Info flows <span id="deliveryInfoFlow"/></h2>
-<p><img alt="delivery-info-flow" src="/diagrams/png/delivery-info-flow.png" />
+<p><img alt="delivery-info-flow" src="../diagrams/png/delivery-info-flow.png" />
 These flows are responsible for persistance of varios journaling information. They listen on predefined topics and document delivery information for given <a href="">event</a>, <a href="">intent</a> and <a href="">message</a></p>
 <p>The infomration is later used in <a href="">notiflow UI</a> for cstatistics and analytics</p>
 <h2 id="test-mode-flow">Test mode flow <span id="testMode"/></h2>
