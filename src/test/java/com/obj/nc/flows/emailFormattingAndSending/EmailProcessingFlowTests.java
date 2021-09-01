@@ -14,9 +14,6 @@ import java.util.stream.Collectors;
 
 import javax.mail.internet.MimeMessage;
 
-import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
-import com.obj.nc.repositories.EndpointsRepository;
-import com.obj.nc.repositories.MessageRepository;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.apache.commons.text.StringEscapeUtils;
 import org.hamcrest.CoreMatchers;

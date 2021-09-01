@@ -75,20 +75,20 @@ public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMes
 		doSendMessage(payload);
 		return payload;
 	}
-	
+
 	private void doSendMessage(EmailMessage payload) {
 		try {
 			MimeMessage message = mailSender.createMimeMessage();
 			copyHeaderValuesToMimeMessage(payload, message);
 			
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-			
+
 			if (settings.getFromMailAddress()!=null) {
 				helper.setFrom(settings.getFromMailAddress());
 			}
-			
+
 			helper.setTo(payload.getRecievingEndpoints().get(0).getEmail());
-			
+
 			helper.setSubject(payload.getBody().getSubject());
 			boolean isHtml = MediaType.TEXT_HTML_VALUE.equals(payload.getBody().getContentType());
 			
@@ -102,7 +102,7 @@ public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMes
 				FileSystemResource file = new FileSystemResource(new File(attachement.getFileURI()));
 				helper.addAttachment(attachement.getName(), file);
 			}
-			
+
 			Instant sendStart = Instant.now();
 			
 			mailSender.send(message);
@@ -113,7 +113,7 @@ public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMes
 			throw new ProcessingException(EmailSender.class, e);
 		}
 	}
-	
+
 	private void copyHeaderValuesToMimeMessage(EmailMessage payload, MimeMessage message) {
 		payload.getAttributes().entrySet().forEach(entry-> {
 			try {

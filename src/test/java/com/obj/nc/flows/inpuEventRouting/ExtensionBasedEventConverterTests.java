@@ -120,16 +120,16 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				public List<Message<?>> doConvertEvent(GenericEvent event) {
 					EmailMessage email1 = new EmailMessage();
 					email1.addRecievingEndpoints(
-							EmailEndpoint.builder().email("test@objectify.sk").build()
+						EmailEndpoint.builder().email("test@objectify.sk").build()
 					);
 					email1.getBody().setSubject("Subject");
 					email1.getBody().setText("text");
-					
+
 					List<com.obj.nc.domain.message.Message<?>> msg = Arrays.asList(email1);
-					
+
 					return msg;
-				}
-			};
+				}            	
+            };
         }
         
         @Bean
@@ -148,16 +148,16 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				@Override
 				public List<NotificationIntent> doConvertEvent(GenericEvent event) {
 					NotificationIntent email1Intent = NotificationIntent.createWithStaticContent(
-							"Subject",
-							"Text",
+							"Subject", 
+							"Text", 
 							EmailEndpoint.builder().email("test2@objectify.sk").build(),
 							EmailEndpoint.builder().email("test3@objectify.sk").build()
 					);
 					List<NotificationIntent> intents = Arrays.asList(email1Intent);
-					
+
 					return intents;
-				}
-			};
+				}            	
+            };
         }
     }
     

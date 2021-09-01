@@ -34,13 +34,12 @@ import lombok.SneakyThrows;
 @Table("nc_message")
 public class MessagePersistantState implements Persistable<UUID> {
 	
+
 	@Id
 	@EqualsAndHashCode.Include
 	private UUID id;
-	
 	@CreatedDate
 	private Instant timeCreated;
-	
 	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
 	private Header header;
 	

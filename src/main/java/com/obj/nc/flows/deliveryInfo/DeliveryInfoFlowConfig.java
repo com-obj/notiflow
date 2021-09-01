@@ -1,10 +1,6 @@
 package com.obj.nc.flows.deliveryInfo;
 
-import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.deliveryInfo.*;
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
-import com.obj.nc.functions.processors.intentPersister.NotificationIntentPersister;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -12,13 +8,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import lombok.extern.log4j.Log4j2;
-
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
 
 @Configuration
 @Log4j2

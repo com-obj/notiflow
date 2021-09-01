@@ -18,6 +18,8 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
 	
 	List<DeliveryInfo> findByEndpointIdOrderByProcessedOn(UUID endpointId);
 	
+	
+	
 	@Query("select * " +
 			"from nc_delivery_info di " +
 			"where di.message_id = any (" +
@@ -64,5 +66,5 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
 				"select msg_chain.id from msg_chain)")
 	long countByMessageIdAndStatus(@Param("messageId") UUID messageId, 
 								   @Param("status") DELIVERY_STATUS status);
-	
+
 }

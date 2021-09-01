@@ -133,24 +133,28 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		if (msgContent instanceof EmailContent) {
 			EmailMessage email = Message.newTypedMessageFrom(EmailMessage.class, this);
 			email.setBody((EmailContent)msgContent);
+			
 			return email;
 		} 
 		
 		if (msgContent instanceof SimpleTextContent) {
 			SmsMessage sms = Message.newTypedMessageFrom(SmsMessage.class, this);
 			sms.setBody((SimpleTextContent)msgContent);
+			
 			return sms;
 		} 
 		
 		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof EmailEndpoint) {
 			EmailMessageTemplated<?> email = Message.newTypedMessageFrom(EmailMessageTemplated.class, this);
 			email.setBody((TemplateWithModelEmailContent)msgContent);
+			
 			return email;
 		} 
 		
 		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof SmsEndpoint) {
 			SmsMessageTemplated<?> sms = Message.newTypedMessageFrom(SmsMessageTemplated.class, this);
 			sms.setBody((TemplateWithModelContent)msgContent);
+			
 			return sms;
 		} 
 
@@ -158,11 +162,14 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		if (endpointsForOneSubject instanceof MailchimpEndpoint) {
 			MailChimpMessage mailChimp = Message.newTypedMessageFrom(MailChimpMessage.class, this);
 			mailChimp.setBody((MailchimpContent)msgContent);
+			
 			return mailChimp;
 		}
 
 		throw new NotImplementedException("Add additional cases");
 
 	}
+
+
 	
 }

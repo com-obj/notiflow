@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessagePersistantState;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import com.obj.nc.functions.sink.SinkConsumerAdapter;
 import com.obj.nc.repositories.MessageRepository;
 
 import lombok.AllArgsConstructor;

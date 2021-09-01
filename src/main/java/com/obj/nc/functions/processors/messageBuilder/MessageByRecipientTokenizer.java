@@ -49,11 +49,9 @@ public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> ex
 
 			msgClone.setAttributes(msg.getAttributes());
 			msgClone.setBody(msg.getBody());
-			
 			messages.add(msgClone);
 		}
 
 		return messages;
 	}
-	
 }

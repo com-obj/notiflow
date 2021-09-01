@@ -6,7 +6,6 @@ import java.util.Optional;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 
 /**
