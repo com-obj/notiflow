@@ -22,9 +22,11 @@ import com.obj.nc.utils.JsonUtils;
 import lombok.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
+import java.util.Random;
 import java.util.UUID;
 
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.*;
@@ -44,7 +46,7 @@ public class TestDataRestController {
     
     @GetMapping("/full-event-processing")
     public void persistFullEventProcessingData() {
-        persistEvent();
+        persistEvent(UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"), 47L);
         persistReceivingEndpoints();
         persistNotificationIntent();
         persistMessages();
@@ -53,14 +55,20 @@ public class TestDataRestController {
         persistProcessingInfos();
     }
     
-    private void persistEvent() {
+    @GetMapping("/random-events")
+    public void persistRandomEventsData(@RequestParam("count") Long count) {
+        Random random = new Random();
+        random.longs().limit(count).forEach(randomLong -> persistEvent(UUID.randomUUID(), randomLong));
+    }
+    
+    private void persistEvent(UUID uuid, Long num) {
         DummyEventPayload payload = DummyEventPayload.builder()
                 .stringField("simple string")
-                .intField(15)
+                .longField(num)
                 .build();
     
         GenericEvent event = GenericEvent.builder()
-                .id(UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"))
+                .id(uuid)
                 .flowId("default-flow")
                 .payloadJson(payload.toJsonNode())
                 .timeConsumed(Timestamp.valueOf("2021-08-24 09:37:39.366000").toInstant())
@@ -415,7 +423,7 @@ public class TestDataRestController {
     static class DummyEventPayload implements IsTypedJson {
     
         String stringField;
-        int intField;
+        Long longField;
         
         JsonNode toJsonNode() {
             return JsonUtils.readJsonNodeFromPojo(this);
