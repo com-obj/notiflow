@@ -69,8 +69,6 @@ public class DeliveryInfoFlowConfig {
     public IntegrationFlow deliveryInfoSendFlow() {
         return 
         	IntegrationFlows.from(deliveryInfoSendInputChannel())
-				.handle(endpointPersister)
-				.handle(messagePersister) //need to persist, otherwise delivery info will have invalid reference
 				.handle(deliveryInfoSendGenerator)
 				.split()
 				.handle(deliveryTransformer)
@@ -84,14 +82,6 @@ public class DeliveryInfoFlowConfig {
     public IntegrationFlow deliveryInfoProcessingFlow() {
         return 
         	IntegrationFlows.from(deliveryInfoProcessingInputChannel())
-				.handle(endpointPersister)
-				.publishSubscribeChannel(subscription  -> subscription
-						.subscribe(intentFlow -> intentFlow
-								.filter(payload -> payload instanceof NotificationIntent)
-								.handle(intentPersister))
-						.subscribe(messageFlow -> messageFlow
-								.filter(payload -> payload instanceof Message)
-								.handle(messagePersister)))
 				.handle(deliveryInfoProcessingGenerator)
 				.split()
 				.handle(deliveryTransformer)
@@ -105,8 +95,6 @@ public class DeliveryInfoFlowConfig {
 	public IntegrationFlow deliveryInfoReadFlow() {
 		return
 			IntegrationFlows.from(deliveryInfoReadInputChannel())
-				.handle(endpointPersister)
-				.handle(messagePersister) //need to persist, otherwise delivery info will have invalid reference
 				.handle(deliveryInfoReadGenerator)
 				.split()
 				.handle(deliveryTransformer)

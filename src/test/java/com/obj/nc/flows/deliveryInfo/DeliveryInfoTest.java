@@ -252,6 +252,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 		//AND GIVEN
 		SmsEndpoint smsEndpoint = endpointRepo.persistEnpointIfNotExists(new SmsEndpoint("09050123456"));  
     	SmsMessage msg = createTestSMS(eventId, smsEndpoint);
+    	messageRepo.save(msg.toPersistantState());
     	        
         //WHEN
         List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistSentDeliveryInfo(msg).get(1, TimeUnit.SECONDS);

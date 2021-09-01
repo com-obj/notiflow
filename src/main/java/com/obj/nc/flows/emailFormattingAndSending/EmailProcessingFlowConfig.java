@@ -51,6 +51,8 @@ public class EmailProcessingFlowConfig {
 	public IntegrationFlow emailFormatAndSendFlowDefinition() {
 		return IntegrationFlows
 				.from(emailFormatAndSendInputChannel())
+				.handle(endpointPersister)
+				.handle(messagePersister)
 				.routeToRecipients(spec -> spec
 						.<Message<?>>recipient(
 								internalEmailFormatFlowDefinition().getInputChannel(),
@@ -62,8 +64,6 @@ public class EmailProcessingFlowConfig {
 	@Bean("INTERNAL_EMAIL_FORMAT_FLOW_ID")
 	public IntegrationFlow internalEmailFormatFlowDefinition() {
 		return flow -> flow
-				.handle(endpointPersister)
-				.handle(messagePersister)
 				.publishSubscribeChannel(subscription  -> subscription
 						//format email and merge if multilanguage
 						.subscribe(aggregateMultilangFlow -> aggregateMultilangFlow
@@ -73,11 +73,13 @@ public class EmailProcessingFlowConfig {
 								.handle(messagePersister)
 								.aggregate()
 								.handle(emailMessageAggregationStrategy)
+								.handle(messagePersister)
 								.channel(emailSendFlowDefinition().getInputChannel()))
 						//format and split if multilanguage
 						.subscribe(mesagePerLocaleFlow -> mesagePerLocaleFlow
 								.filter(m-> !MERGE.equals(properties.getMultiLocalesMergeStrategy()))
 								.split(emailFormatter)
+								.handle(messagePersister)
 								.channel(emailSendFlowDefinition().getInputChannel()))
 				);
 	}
@@ -86,13 +88,14 @@ public class EmailProcessingFlowConfig {
 	public IntegrationFlow emailSendFlowDefinition() {
 		return IntegrationFlows
 				.from(emailSendInputChannel())
+				.handle(endpointPersister)
+				.handle(messagePersister)
 				.routeToRecipients(spec -> spec
 						.recipientFlow((Message<EmailContent> source) -> emailTrackingConfigProperties.isEnabled() 
 										&& MediaType.TEXT_HTML_VALUE.equals(source.getBody().getContentType()),
 								trackingSubflow -> trackingSubflow
-										.handle(endpointPersister)
-										.handle(messagePersister)
 										.handle(emailReadTrackingDecorator)
+										.handle(messagePersister)
 										.channel(internalEmailSendFlowDefinition().getInputChannel()))
 						.defaultOutputChannel(internalEmailSendFlowDefinition().getInputChannel()))
 				.get();
@@ -101,8 +104,6 @@ public class EmailProcessingFlowConfig {
 	@Bean("INTERNAL_EMAIL_SEND_FLOW_ID")
 	public IntegrationFlow internalEmailSendFlowDefinition() {
 		return flow -> flow
-				.handle(endpointPersister)
-				.handle(messagePersister) 
 				.handle(emailSender)
 				.wireTap(flowConfig -> flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID))
 				.channel(emailSendOutputChannel());

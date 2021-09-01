@@ -293,9 +293,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	
 	private void persistTestEndpointsAndTestDeliveryInfos() {
 		EmailEndpoint email1 = EmailEndpoint.builder().email("john.doe@gmail.com").build();
-		email1 = endpointsRepository.persistEnpointIfNotExists(email1);
 		EmailEndpoint email2 = EmailEndpoint.builder().email("john.dudly@gmail.com").build();
-		email2 = endpointsRepository.persistEnpointIfNotExists(email2);
 		
 		EmailMessage emailMessage = new EmailMessage();
 		emailMessage.setBody(EmailContent.builder().subject("Subject").text("Text").build());
@@ -304,7 +302,6 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
 		
 		SmsEndpoint sms = SmsEndpoint.builder().phone("0908186997").build();
-		sms = endpointsRepository.persistEnpointIfNotExists(sms);
 		
 		SmsMessage smsMessage = new SmsMessage();
 		smsMessage.setBody(SimpleTextContent.builder().text("Text").build());
