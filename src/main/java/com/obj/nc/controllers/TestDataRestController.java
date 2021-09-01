@@ -56,7 +56,7 @@ public class TestDataRestController {
     }
     
     @GetMapping("/random-events")
-    public void persistRandomEventsData(@RequestParam("count") Long count) {
+    public void persistRandomEventsData(@RequestParam(value = "count", defaultValue = "47") Long count) {
         Random random = new Random();
         random.longs().limit(count).forEach(randomLong -> persistEvent(UUID.randomUUID(), randomLong));
     }
