@@ -229,7 +229,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		//WHEN TEST REST
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders
-						.put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(emailMessagePersisted.getId()).toString())
+						.put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(messages.get(0).getId()).toString())
 						.contextPath(ncAppConfigProperties.getContextPath())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))

@@ -5,6 +5,7 @@ import com.obj.nc.domain.*;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.MessageRepository;
@@ -60,6 +61,19 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 			message.getPreviousIntentIds().forEach(newMessage::addPreviousIntentId);
 			newMessage.addPreviousMessageId(message.getId());
 		}
+		
+		return newMessage;
+	}
+	
+	@SneakyThrows
+	public static <T extends Message<?>> T newTypedMessageFrom(Class<T> messageType,
+															   NotificationIntent intent) {
+		T newMessage = messageType.newInstance();
+		
+		newMessage.getHeader().setFlowId(intent.getHeader().getFlowId());
+		
+		intent.getEventIds().forEach(newMessage::addEventId);
+		newMessage.addPreviousIntentId(intent.getId());
 		
 		return newMessage;
 	}

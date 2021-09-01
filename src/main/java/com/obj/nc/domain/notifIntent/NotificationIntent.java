@@ -131,54 +131,38 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
 
 		if (msgContent instanceof EmailContent) {
-			EmailMessage email = new EmailMessage();
+			EmailMessage email = Message.newTypedMessageFrom(EmailMessage.class, this);
 			email.setBody((EmailContent)msgContent);
-			setIds(email);
-			
 			return email;
 		} 
 		
 		if (msgContent instanceof SimpleTextContent) {
-			SmsMessage sms = new SmsMessage();
+			SmsMessage sms = Message.newTypedMessageFrom(SmsMessage.class, this);
 			sms.setBody((SimpleTextContent)msgContent);
-			setIds(sms);
-			
 			return sms;
 		} 
 		
 		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof EmailEndpoint) {
-			EmailMessageTemplated<?> email = new EmailMessageTemplated<>();
+			EmailMessageTemplated<?> email = Message.newTypedMessageFrom(EmailMessageTemplated.class, this);
 			email.setBody((TemplateWithModelEmailContent)msgContent);
-			setIds(email);
-			
 			return email;
 		} 
 		
 		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof SmsEndpoint) {
-			SmsMessageTemplated<?> sms = new SmsMessageTemplated<>();
+			SmsMessageTemplated<?> sms = Message.newTypedMessageFrom(SmsMessageTemplated.class, this);
 			sms.setBody((TemplateWithModelContent)msgContent);
-			setIds(sms);
-			
 			return sms;
 		} 
 
 		
 		if (endpointsForOneSubject instanceof MailchimpEndpoint) {
-			MailChimpMessage mailChimp = new MailChimpMessage();
+			MailChimpMessage mailChimp = Message.newTypedMessageFrom(MailChimpMessage.class, this);
 			mailChimp.setBody((MailchimpContent)msgContent);
-			setIds(mailChimp);
-			
 			return mailChimp;
 		}
 
 		throw new NotImplementedException("Add additional cases");
 
-	}
-	
-	private void setIds(Message<?> message) {
-		message.setEventIds(getEventIds());
-		message.setPreviousIntentIds(getPreviousIntentIds());
-		message.addPreviousIntentId(getId());
 	}
 	
 }
