@@ -62,11 +62,16 @@ public class EmailProcessingFlowConfig {
 	@Bean("INTERNAL_EMAIL_FORMAT_FLOW_ID")
 	public IntegrationFlow internalEmailFormatFlowDefinition() {
 		return flow -> flow
+				.handle(endpointPersister)
+				.handle(messagePersister)
 				.publishSubscribeChannel(subscription  -> subscription
 						//format email and merge if multilanguage
 						.subscribe(aggregateMultilangFlow -> aggregateMultilangFlow
 								.filter(m-> MERGE.equals(properties.getMultiLocalesMergeStrategy()))
 								.handle(emailFormatter)
+								.split()
+								.handle(messagePersister)
+								.aggregate()
 								.handle(emailMessageAggregationStrategy)
 								.channel(emailSendFlowDefinition().getInputChannel()))
 						//format and split if multilanguage
@@ -81,6 +86,8 @@ public class EmailProcessingFlowConfig {
 	public IntegrationFlow emailSendFlowDefinition() {
 		return IntegrationFlows
 				.from(emailSendInputChannel())
+				.handle(endpointPersister)
+				.handle(messagePersister)
 				.routeToRecipients(spec -> spec
 						.recipientFlow((Message<EmailContent> source) -> emailTrackingConfigProperties.isEnabled() 
 										&& MediaType.TEXT_HTML_VALUE.equals(source.getBody().getContentType()),

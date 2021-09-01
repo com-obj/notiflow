@@ -2,6 +2,7 @@ package com.obj.nc.functions.processors.deliveryInfo;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,31 +33,21 @@ public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionA
 					.processedOn(Instant.now());
 					
 			if (payload instanceof HasEventIds) {
-				List<UUID> eventIds = ((HasEventIds) payload).getEventIds();
+				List<UUID> eventIds = new ArrayList<>(((HasEventIds) payload).getEventIds());
 				infoBuilder = infoBuilder.eventIds(eventIds.toArray(new UUID[0]));
 			} else {
 				infoBuilder = infoBuilder.eventIds(new UUID[0]);
 			}
 			
-			if (payload instanceof HasPreviousIntentIds) {
-				List<UUID> intentIds = ((HasPreviousIntentIds) payload).getPreviousIntentIds();
-				
-				if (payload instanceof NotificationIntent) {
-					intentIds.add(((NotificationIntent) payload).getId());
-				}
-				
+			if (payload instanceof NotificationIntent) {
+				List<UUID> intentIds = Arrays.asList(((NotificationIntent) payload).getId());
 				infoBuilder = infoBuilder.intentIds(intentIds.toArray(new UUID[0]));
 			} else {
 				infoBuilder = infoBuilder.intentIds(new UUID[0]);
 			}
 			
-			if (payload instanceof HasPreviousMessageIds) {
-				List<UUID> messageIds = ((HasPreviousMessageIds) payload).getPreviousMessageIds();
-				
-				if (payload instanceof Message<?>) {
-					messageIds.add(((Message<?>) payload).getId());
-				}
-				
+			if (payload instanceof Message<?>) {
+				List<UUID> messageIds = Arrays.asList(((Message<?>) payload).getId());
 				infoBuilder = infoBuilder.messageIds(messageIds.toArray(new UUID[0]));
 			} else {
 				infoBuilder = infoBuilder.messageIds(new UUID[0]);

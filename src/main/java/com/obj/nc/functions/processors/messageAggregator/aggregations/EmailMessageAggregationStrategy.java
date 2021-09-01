@@ -75,7 +75,8 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 				.reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		
-		Message<EmailContent> outputMessage = Message.newMessageFrom(EmailMessage.class, payloads.toArray(new Message[0]));
+		Message<EmailContent> outputMessage = Message.newTypedMessageFrom(EmailMessage.class, payloads.toArray(new Message[0]));
+		outputMessage.setRecievingEndpoints(payloads.get(0).getRecievingEndpoints());
 		outputMessage.setBody(aggregatedEmailContent);
 		return outputMessage;
 	}

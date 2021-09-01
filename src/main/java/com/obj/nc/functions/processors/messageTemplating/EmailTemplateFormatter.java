@@ -35,7 +35,8 @@ public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithMo
 	}
 
 	protected EmailMessage createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelEmailContent<?>> payload) {		
-		EmailMessage htmlMessage = Message.newMessageFrom(EmailMessage.class, payload);
+		EmailMessage htmlMessage = Message.newTypedMessageFrom(EmailMessage.class, payload);
+		htmlMessage.setRecievingEndpoints(payload.getRecievingEndpoints());
 
 		EmailContent emailContent = htmlMessage.getBody();
 		emailContent.setContentType(MediaType.TEXT_HTML_VALUE);

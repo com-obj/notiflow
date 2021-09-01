@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
+import com.obj.nc.repositories.MessageRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -85,6 +87,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
 	@Autowired private TestModeProperties props;
 	@Autowired private MockIntegrationContext mockIntegrationContext;
 	@Autowired private JavaMailSenderImpl javaMailSender;
+	@Autowired private MessageProcessingFlow messageProcessingFlow;
 	
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
@@ -178,14 +181,14 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     	SmsMessageTemplated<?> inputSms = JsonUtils.readObjectFromClassPathResource("messages/templated/txt_template_message_en_de.json", SmsMessageTemplated.class);
     
         //AND GIVEN RECEIVED EMAILs
-        emailProcessingInputChannel.send(new GenericMessage<>(inputEmail));
+        messageProcessingFlow.processMessage(inputEmail);
         testModeEmailsReciver.waitForIncomingEmail(1);
         List<EmailMessage> receivedEmailMessages = greenMailReceiverSourceSupplier.get();
         Assertions.assertThat(receivedEmailMessages).hasSize(1);
         MessageSource<?> emailMessageSource = () -> new GenericMessage<>(receivedEmailMessages);
     
         // AND RECEIVED SMSs
-        smsProcessingInputChannel.send(new GenericMessage<>(inputSms));
+        messageProcessingFlow.processMessage(inputSms);
         await().atMost(10, TimeUnit.SECONDS).until(() -> smsSourceSupplier.getReceivedCount() >= 1);
         List<SmsMessage> receivedSmsMessages = Stream.generate(smsSourceSupplier).limit(10).filter(Objects::nonNull).collect(Collectors.toList());
         Assertions.assertThat(receivedSmsMessages).hasSize(2);

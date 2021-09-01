@@ -1,6 +1,10 @@
 package com.obj.nc.flows.deliveryInfo;
 
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.deliveryInfo.*;
+import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.intentPersister.NotificationIntentPersister;
+import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -8,10 +12,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import lombok.extern.log4j.Log4j2;
+
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
 
 @Configuration
 @Log4j2
@@ -37,6 +44,9 @@ public class DeliveryInfoFlowConfig {
 	@Autowired private DeliveryInfoReadGenerator deliveryInfoReadGenerator;
 	@Autowired private DeliveryInfoFailedGenerator deliveryInfoFailedGenerator;
 	@Autowired private DeliveryInfoProcessingGenerator deliveryInfoProcessingGenerator;
+	@Autowired private EndpointPersister endpointPersister;
+	@Autowired private MessagePersister messagePersister;
+	@Autowired private NotificationIntentPersister intentPersister;
 	@Autowired private ThreadPoolTaskScheduler executor;
 
 	//Default channel for errorMessages used by spring
@@ -59,6 +69,8 @@ public class DeliveryInfoFlowConfig {
     public IntegrationFlow deliveryInfoSendFlow() {
         return 
         	IntegrationFlows.from(deliveryInfoSendInputChannel())
+				.handle(endpointPersister)
+				.handle(messagePersister) //need to persist, otherwise delivery info will have invalid reference
 				.handle(deliveryInfoSendGenerator)
 				.split()
 				.handle(deliveryTransformer)
@@ -72,6 +84,14 @@ public class DeliveryInfoFlowConfig {
     public IntegrationFlow deliveryInfoProcessingFlow() {
         return 
         	IntegrationFlows.from(deliveryInfoProcessingInputChannel())
+				.handle(endpointPersister)
+				.publishSubscribeChannel(subscription  -> subscription
+						.subscribe(intentFlow -> intentFlow
+								.filter(payload -> payload instanceof NotificationIntent)
+								.handle(intentPersister))
+						.subscribe(messageFlow -> messageFlow
+								.filter(payload -> payload instanceof Message)
+								.handle(messagePersister)))
 				.handle(deliveryInfoProcessingGenerator)
 				.split()
 				.handle(deliveryTransformer)
@@ -85,6 +105,8 @@ public class DeliveryInfoFlowConfig {
 	public IntegrationFlow deliveryInfoReadFlow() {
 		return
 			IntegrationFlows.from(deliveryInfoReadInputChannel())
+				.handle(endpointPersister)
+				.handle(messagePersister) //need to persist, otherwise delivery info will have invalid reference
 				.handle(deliveryInfoReadGenerator)
 				.split()
 				.handle(deliveryTransformer)

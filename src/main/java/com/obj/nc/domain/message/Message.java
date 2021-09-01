@@ -43,18 +43,21 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 	private List<UUID> previousMessageIds = new ArrayList<>();
 	
 	@SneakyThrows
-	public static <T extends Message<?>> T newMessageFrom(Class<T> messageType, 
-														  Message<?> ... messages) {
+	public static <T extends Message<?>> T newTypedMessageFrom(Class<T> messageType,
+															   Message<?> ... messages) {
 		if (messages.length == 0) {
 			return null;
 		}
 		
 		T newMessage = messageType.newInstance();
 		
+		if (messages.length == 1) {
+			newMessage.getHeader().setFlowId(messages[0].getHeader().getFlowId());
+		}
+		
 		for (Message<?> message : messages) {
 			message.getEventIds().forEach(newMessage::addEventId);
 			message.getPreviousIntentIds().forEach(newMessage::addPreviousIntentId);
-			message.getPreviousMessageIds().forEach(newMessage::addPreviousMessageId);
 			newMessage.addPreviousMessageId(message.getId());
 		}
 		
