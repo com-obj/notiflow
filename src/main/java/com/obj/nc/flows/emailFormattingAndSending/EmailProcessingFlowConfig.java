@@ -86,12 +86,12 @@ public class EmailProcessingFlowConfig {
 	public IntegrationFlow emailSendFlowDefinition() {
 		return IntegrationFlows
 				.from(emailSendInputChannel())
-				.handle(endpointPersister)
-				.handle(messagePersister)
 				.routeToRecipients(spec -> spec
 						.recipientFlow((Message<EmailContent> source) -> emailTrackingConfigProperties.isEnabled() 
 										&& MediaType.TEXT_HTML_VALUE.equals(source.getBody().getContentType()),
 								trackingSubflow -> trackingSubflow
+										.handle(endpointPersister)
+										.handle(messagePersister)
 										.handle(emailReadTrackingDecorator)
 										.channel(internalEmailSendFlowDefinition().getInputChannel()))
 						.defaultOutputChannel(internalEmailSendFlowDefinition().getInputChannel()))

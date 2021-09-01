@@ -144,7 +144,6 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     	EmailMessage email = new EmailMessage();
         email.addRecievingEndpoints(wrongEmail);
         email.addEventId(eventId);
-        messageRepo.save(email.toPersistantState());
         
         //WHEN
         emailSendingFlow.sendEmail(email);
