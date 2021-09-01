@@ -89,7 +89,9 @@ class DeliveryInfoControllerWithAuthenticationTest extends BaseIntegrationTest {
 		
 		//WHEN TEST REST
 		ResultActions resp = mockMvc
-				.perform(MockMvcRequestBuilders.put("/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(emailMessagePersisted.getId()).toString())
+				.perform(MockMvcRequestBuilders
+						.put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(emailMessagePersisted.getId()).toString())
+						.contextPath(ncAppConfigProperties.getContextPath())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
@@ -97,11 +99,13 @@ class DeliveryInfoControllerWithAuthenticationTest extends BaseIntegrationTest {
 		//THEN REDIRECT TO IMAGE
 		resp
 				.andExpect(status().is3xxRedirection())
-				.andExpect(redirectedUrl("/resources/images/px.png"));
+				.andExpect(redirectedUrl(ncAppConfigProperties.getContextPath() + "/resources/images/px.png"));
 		
 		//AND IMAGE IS FOUND
 		resp = mockMvc
-				.perform(MockMvcRequestBuilders.get("/resources/images/px.png"))
+				.perform(MockMvcRequestBuilders
+						.get(ncAppConfigProperties.getContextPath() +  "/resources/images/px.png")
+						.contextPath(ncAppConfigProperties.getContextPath()))
 				.andExpect(status().is2xxSuccessful())
 				.andExpect(content().contentType(MediaType.IMAGE_PNG));
 		
