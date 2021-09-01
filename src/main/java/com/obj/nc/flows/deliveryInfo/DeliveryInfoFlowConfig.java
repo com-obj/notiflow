@@ -44,9 +44,6 @@ public class DeliveryInfoFlowConfig {
 	@Autowired private DeliveryInfoReadGenerator deliveryInfoReadGenerator;
 	@Autowired private DeliveryInfoFailedGenerator deliveryInfoFailedGenerator;
 	@Autowired private DeliveryInfoProcessingGenerator deliveryInfoProcessingGenerator;
-	@Autowired private EndpointPersister endpointPersister;
-	@Autowired private MessagePersister messagePersister;
-	@Autowired private NotificationIntentPersister intentPersister;
 	@Autowired private ThreadPoolTaskScheduler executor;
 
 	//Default channel for errorMessages used by spring
