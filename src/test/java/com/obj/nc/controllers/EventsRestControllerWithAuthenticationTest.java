@@ -65,7 +65,9 @@ class EventsRestControllerWithAuthenticationTest extends BaseIntegrationTest {
     
         JwtRequest jwtRequest = JwtRequest.builder().username("testUser").password("testPassword").build();
         ResultActions authResponse = mockMvc
-                .perform(MockMvcRequestBuilders.post("/authenticate")
+                .perform(MockMvcRequestBuilders
+                        .post(ncAppConfigProperties.getContextPath() + "/authenticate")
+                        .contextPath(ncAppConfigProperties.getContextPath())
                         .contentType(APPLICATION_JSON_UTF8)
                         .content(jwtRequest.toString())
                         .accept(APPLICATION_JSON_UTF8))

@@ -1,6 +1,8 @@
 site_name: Notiflow
 theme:
   name: material
+  features:
+    - content.code.annotate
 
 # Copyright
 copyright: Copyright &copy; 2021 - 2021 Objectify, s.r.o.
@@ -11,13 +13,23 @@ nav:
   - Features: features.md
   - Getting started:
     - Installation: getting-started.md
-    - Guides: guides.md
+    - Guides: examples.md
   - Architecture and design:
     - Flows: flows.md
     - Functions: functions.md
     - Payloads: entities.md
   - Web UI: web-ui.md
-  - API Reference: api.md
   - Releases:
     - Changelog: changelog.md
   - License: license.md
+  #- API Reference: api.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.keys
+  - pymdownx.tabbed
+  - pymdownx.snippets  
+  - admonition

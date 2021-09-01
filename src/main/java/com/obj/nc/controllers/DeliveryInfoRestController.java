@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.domain.message.MessagePersistantState;
 import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
 import com.obj.nc.repositories.EndpointsRepository;
@@ -27,6 +28,7 @@ import com.obj.nc.repositories.GenericEventRepository;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Validated
 @RestController
@@ -38,6 +40,7 @@ public class DeliveryInfoRestController {
 	@Autowired private EndpointsRepository endpointRepo;
 	@Autowired private GenericEventRepository eventRepo;
 	@Autowired private DeliveryInfoFlow deliveryInfoFlow;
+	@Autowired private NcAppConfigProperties ncAppConfigProperties;
 	
 	@GetMapping(value = "/events/{eventId}", consumes="application/json", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
@@ -71,7 +74,7 @@ public class DeliveryInfoRestController {
 	public ResponseEntity<Void> trackMessageRead(@PathVariable(value = "messageId", required = true) String messageId) {
 		Optional<MessagePersistantState> message = messageRepo.findById(UUID.fromString(messageId));
 		message.ifPresent(messagePersistantState -> deliveryInfoFlow.createAndPersistReadDeliveryInfo(messagePersistantState.toMessage()));
-		return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/resources/images/px.png")).build();
+		return ResponseEntity.status(HttpStatus.FOUND).location(getTrackingPixelImageLocation()).build();
 	}
 	
 	@GetMapping(value = "/messages/{messageId}", consumes="application/json", produces="application/json")
@@ -88,6 +91,14 @@ public class DeliveryInfoRestController {
 		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
 		
 		return infoDtos;
+	}
+	
+	private URI getTrackingPixelImageLocation() {
+		return UriComponentsBuilder
+				.fromPath(ncAppConfigProperties.getContextPath())
+				.path("/resources/images/px.png")
+				.build()
+				.toUri();
 	}
 
 	@Data

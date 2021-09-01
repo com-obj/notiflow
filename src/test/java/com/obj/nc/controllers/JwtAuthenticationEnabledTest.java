@@ -47,12 +47,14 @@ class JwtAuthenticationEnabledTest extends BaseIntegrationTest {
         
         //when
         ResultActions resp = mockMvc
-        		.perform(MockMvcRequestBuilders.post("/authenticate")
-        		.contentType(APPLICATION_JSON_UTF8)
-        		.content(jwtRequest.toString())
-                .accept(APPLICATION_JSON_UTF8))
+        		.perform(MockMvcRequestBuilders
+                        .post(ncAppConfigProperties.getContextPath() + "/authenticate")
+                        .contextPath(ncAppConfigProperties.getContextPath())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content(jwtRequest.toString())
+                        .accept(APPLICATION_JSON_UTF8))
                 .andDo(MockMvcResultHandlers.print());
-        
+
         //then
         resp.andExpect(status().is2xxSuccessful())
 			.andExpect(jsonPath("$.token").value(CoreMatchers.notNullValue()));
@@ -65,7 +67,9 @@ class JwtAuthenticationEnabledTest extends BaseIntegrationTest {
     
         //when
         ResultActions resp = mockMvc
-                .perform(MockMvcRequestBuilders.post("/authenticate")
+                .perform(MockMvcRequestBuilders
+                        .post(ncAppConfigProperties.getContextPath() + "/authenticate")
+                        .contextPath(ncAppConfigProperties.getContextPath())
                         .contentType(APPLICATION_JSON_UTF8)
                         .content(jwtRequest.toString())
                         .accept(APPLICATION_JSON_UTF8))
