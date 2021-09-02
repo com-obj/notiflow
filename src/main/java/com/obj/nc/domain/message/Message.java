@@ -45,6 +45,7 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		}
 		
 		for (Message<?> message : messages) {
+			// TODO: zvazit ukladat ids do Setu namiesto Listu
 			message.getPreviousEventIds()
 					.stream()
 					.filter(eventId -> !newMessage.getPreviousEventIds().contains(eventId))
