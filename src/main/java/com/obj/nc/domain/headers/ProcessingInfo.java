@@ -2,13 +2,15 @@ package com.obj.nc.domain.headers;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import com.obj.nc.domain.HasEventIds;
-import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.HasEventId;
+import com.obj.nc.domain.HasPreviousEventIds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -120,11 +122,16 @@ public class ProcessingInfo implements Persistable<UUID> {
 		timeProcessingEnd = Instant.now();
 		stepDurationMs = ChronoUnit.MILLIS.between(timeProcessingStart, timeProcessingEnd);
 		
-		if (endPayload instanceof GenericEvent) {
-			eventIds = new UUID[]{ ((GenericEvent) endPayload).getId() };
-		} else if (endPayload instanceof HasEventIds) {
-			eventIds = ((HasEventIds) endPayload).getEventIds().toArray(new UUID[0]);
+		List<UUID> endPayloadEventIds = new ArrayList<>();
+		
+		if (endPayload instanceof HasEventId) {
+			endPayloadEventIds.add(((HasEventId) endPayload).getEventId());
+		} else if (endPayload instanceof HasPreviousEventIds) {
+			endPayloadEventIds.addAll(((HasPreviousEventIds) endPayload).getPreviousEventIds());
 		}
+		
+		eventIds = endPayloadEventIds.toArray(new UUID[0]);
+		
 		payloadJsonEnd = JsonUtils.writeObjectToJSONString(endPayload); //this make snapshot of its self. has to be the last call
 		
 //		calculateDiffToPreviosVersion();

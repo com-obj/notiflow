@@ -1,5 +1,6 @@
 package com.obj.nc.controllers;
 
+import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.security.model.JwtRequest;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class JwtAuthenticationEnabledTest extends BaseIntegrationTest {
     
 	@Autowired protected MockMvc mockMvc;
+	@Autowired private NcAppConfigProperties ncAppConfigProperties;
     
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {

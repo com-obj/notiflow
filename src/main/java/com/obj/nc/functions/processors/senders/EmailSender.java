@@ -22,7 +22,6 @@ import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.exceptions.ProcessingException;
@@ -124,7 +123,7 @@ public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMes
 		});
 		
 		try {
-			message.setHeader(EVENT_IDS_EMAIL_HEANDER, JsonUtils.writeObjectToJSONString(payload.getEventIds()));
+			message.setHeader(EVENT_IDS_EMAIL_HEANDER, JsonUtils.writeObjectToJSONString(payload.getPreviousEventIds()));
 			
 			if (payload.getHeader().getFlowId()!= null) {
 				message.setHeader(FLOW_ID_EMAIL_HEANDER, payload.getHeader().getFlowId());

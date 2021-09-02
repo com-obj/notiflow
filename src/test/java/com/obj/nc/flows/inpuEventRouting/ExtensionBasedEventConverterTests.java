@@ -117,7 +117,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				}
 
 				@Override
-				public List<Message<?>> doConvertEvent(GenericEvent event) {
+				public List<Message<?>> convertEvent(GenericEvent event) {
 					EmailMessage email1 = new EmailMessage();
 					email1.addRecievingEndpoints(
 						EmailEndpoint.builder().email("test@objectify.sk").build()
@@ -146,7 +146,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				}
 
 				@Override
-				public List<NotificationIntent> doConvertEvent(GenericEvent event) {
+				public List<NotificationIntent> convertEvent(GenericEvent event) {
 					NotificationIntent email1Intent = NotificationIntent.createWithStaticContent(
 							"Subject", 
 							"Text", 

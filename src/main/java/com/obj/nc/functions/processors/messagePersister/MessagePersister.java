@@ -22,11 +22,6 @@ public class MessagePersister extends ProcessorFunctionAdapter<Message<?>,Messag
 
 	@Override
 	protected Message<?> execute(Message<?> message) {
-		if (messageRepo.findById(message.getId()).isPresent()) {
-			log.info("Message with id {} is already in DB", message.getId());
-			return message;
-		}
-		
 		MessagePersistantState persisted = messageRepo.save(message.toPersistantState());
 		return persisted.toMessage();
 	}

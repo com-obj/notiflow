@@ -174,9 +174,9 @@ public class ProcessingInfoGeneratorTest {
 		
         String INPUT_JSON_FILE = "intents/ba_job_post.json";
         NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        notificationIntent.addEventId(eventId);
+        notificationIntent.addPreviousEventId(eventId);
         
-        UUID[] originalEventIDs = notificationIntent.getEventIdsAsArray();
+        UUID[] originalEventIDs = notificationIntent.getPreviousEventIdsAsArray();
         notificationIntent = (NotificationIntent) resolveRecipients.apply(notificationIntent);
         List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);
 
@@ -216,7 +216,7 @@ public class ProcessingInfoGeneratorTest {
             	.isEqualTo(originalEventIDs);
         	
             Assertions.assertThat(
-            		message.getEventIds())
+            		message.getPreviousEventIds())
             	.isEqualTo(Arrays.asList(
             		message.getHeader().getProcessingInfo().getEventIds())
             );
@@ -232,8 +232,8 @@ public class ProcessingInfoGeneratorTest {
 
         String INPUT_JSON_FILE = "intents/ba_job_post.json";
         NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        notificationIntent.addEventId(eventId);
-        UUID[] originalEventIDs = notificationIntent.getEventIdsAsArray();
+        notificationIntent.addPreviousEventId(eventId);
+        UUID[] originalEventIDs = notificationIntent.getPreviousEventIdsAsArray();
         
         notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
         List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);                      

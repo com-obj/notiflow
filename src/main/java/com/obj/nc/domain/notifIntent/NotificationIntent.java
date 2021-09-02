@@ -1,6 +1,6 @@
 package com.obj.nc.domain.notifIntent;
 
-import com.obj.nc.domain.HasEventIds;
+import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.HasPreviousIntentIds;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.GenericEventRepository;
@@ -67,7 +67,7 @@ import java.util.UUID;
  *
  * @param <BODY_TYPE>
  */
-public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification, HasEventIds, HasPreviousIntentIds {
+public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification, HasPreviousEventIds, HasPreviousIntentIds {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "INTENT";
 	
@@ -75,7 +75,7 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 	@EqualsAndHashCode.Include
 	@Transient
 	@Reference(GenericEventRepository.class)
-	private List<UUID> eventIds = new ArrayList<>();
+	private List<UUID> previousEventIds = new ArrayList<>();
 	
 	@NotNull
 	@EqualsAndHashCode.Include
@@ -84,8 +84,8 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 	private List<UUID> previousIntentIds = new ArrayList<>();
 	
 	@Override
-	public void addEventId(UUID eventId) {
-		eventIds.add(eventId);
+	public void addPreviousEventId(UUID eventId) {
+		previousEventIds.add(eventId);
 	}
 	
 	public void addPreviousIntentId(UUID intentId) {
@@ -93,9 +93,9 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 	}
 	
 	@JsonIgnore
-	@Column("event_ids")
-	public void setEventIdsAsArray(UUID[] eventIds) {
-		setEventIds(Arrays.asList(eventIds));
+	@Column("previous_event_ids")
+	public void setPreviousEventIdsAsArray(UUID[] eventIds) {
+		setPreviousEventIds(Arrays.asList(eventIds));
 	}
 	
 	@JsonIgnore
@@ -104,9 +104,9 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		setPreviousIntentIds(Arrays.asList(intentIds));
 	}
 	
-	@Column("event_ids")
-	public UUID[] getEventIdsAsArray() {
-		return eventIds.toArray(new UUID[0]);
+	@Column("previous_event_ids")
+	public UUID[] getPreviousEventIdsAsArray() {
+		return previousEventIds.toArray(new UUID[0]);
 	}
 	
 	@Column("previous_intent_ids")

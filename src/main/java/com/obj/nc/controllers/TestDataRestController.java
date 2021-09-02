@@ -103,7 +103,7 @@ public class TestDataRestController {
         NotificationIntent intent = NotificationIntent.createWithStaticContent("Subject", "Text");
         intent.setId(UUID.fromString("ee0ee80a-bde8-4bc1-91a2-0abc1cfa39a9"));
         intent.getHeader().setFlowId("default-flow");
-        intent.addEventId(UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"));
+        intent.addPreviousEventId(UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"));
         
         intent = notificationIntentRepository.save(intent);
         intent.setTimeCreated(Timestamp.valueOf("2021-08-24 09:37:39.490000").toInstant());
@@ -116,7 +116,7 @@ public class TestDataRestController {
         message.setHeader(new Header());
         message.setId(UUID.fromString("5f74929b-2635-4515-9f30-ba79e200e92b"));
         message.getHeader().setFlowId("default-flow");
-        message.setEventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") });
+        message.setPreviousEventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") });
         message.setBody(EmailContent.builder().subject("Subject").text("Text").build());
         message.setMessageClass(EmailMessage.class.getName());
         message.setEndpointIds(new UUID[]{ UUID.fromString("3d02890b-1b53-465c-b8c3-b0a722483a45") });
@@ -129,7 +129,7 @@ public class TestDataRestController {
         message.setHeader(new Header());
         message.setId(UUID.fromString("4e91137e-93aa-4633-b137-3050442d26a5"));
         message.getHeader().setFlowId("default-flow");
-        message.setEventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") });
+        message.setPreviousEventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") });
         message.setBody(EmailContent.builder().subject("Subject").text("Text").build());
         message.setMessageClass(EmailMessage.class.getName());
         message.setEndpointIds(new UUID[]{ UUID.fromString("d2ca2a68-1dc4-4052-a93a-67319449ef5b") });
@@ -142,7 +142,7 @@ public class TestDataRestController {
         message.setHeader(new Header());
         message.setId(UUID.fromString("c3ce484f-f03c-47b1-ae6a-2337ca4f6444"));
         message.getHeader().setFlowId("default-flow");
-        message.setEventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") });
+        message.setPreviousEventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") });
         message.setBody(SimpleTextContent.builder().text("Text").build());
         message.setMessageClass(SmsMessage.class.getName());
         message.setEndpointIds(new UUID[]{ UUID.fromString("820023cf-7dd0-407f-abfa-0d6453bde6d3") });

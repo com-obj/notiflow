@@ -11,7 +11,7 @@ import com.obj.nc.domain.notifIntent.NotificationIntent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.obj.nc.domain.HasEventIds;
+import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.HasRecievingEndpoints;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
@@ -47,8 +47,8 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 		
 		for (RecievingEndpoint endpoint: endpoints) {
 			
-			if (payload instanceof HasEventIds) {
-				List<UUID> eventIds = ((HasEventIds) payload).getEventIds();
+			if (payload instanceof HasPreviousEventIds) {
+				List<UUID> eventIds = ((HasPreviousEventIds) payload).getPreviousEventIds();
 				eventIds.forEach(eventId -> 
 						results.add(failedDeliveryInfoBuilder(failedPayload, endpoint).eventId(eventId).build()));
 			}
