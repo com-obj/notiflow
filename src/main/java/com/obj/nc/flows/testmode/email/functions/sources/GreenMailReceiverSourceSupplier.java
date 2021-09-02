@@ -126,7 +126,7 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
 //            deliveryOptions.setAggregationType(DeliveryOptions.AGGREGATION_TYPE.ONCE_A_DAY);
 //            result.setDeliveryOptions(deliveryOptions);
             
-            copyHeaderValues(mimeMessage, result.getHeader());
+            copyHeaderValues(mimeMessage, result);
             
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -135,7 +135,7 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
         return result;
     }
     
-	private void copyHeaderValues(MimeMessage src, Header dest) throws MessagingException {
+	private void copyHeaderValues(MimeMessage src, EmailMessage dest) throws MessagingException {
 		Enumeration<javax.mail.Header> headers = src.getAllHeaders();
 		while  (headers.hasMoreElements()) {
 			javax.mail.Header header =headers.nextElement();
@@ -145,9 +145,9 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
 				List<UUID> eventUUIDs = eventIDs.stream().map(eId-> UUID.fromString(eId)).collect(Collectors.toList());
 				dest.setEventIds(eventUUIDs);
 			} else if (header.getName().equals(EmailSender.FLOW_ID_EMAIL_HEANDER)) {
-				dest.setFlowId(header.getValue());
+				dest.getHeader().setFlowId(header.getValue());
 			} 
-			dest.setAttributeValue(header.getName(), header.getValue());
+			dest.getHeader().setAttributeValue(header.getName(), header.getValue());
 		}
 	}
 

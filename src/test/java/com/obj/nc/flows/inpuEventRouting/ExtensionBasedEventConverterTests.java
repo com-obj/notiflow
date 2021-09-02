@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import javax.mail.MessagingException;
 
+import com.obj.nc.domain.message.Message;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -116,7 +117,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				}
 
 				@Override
-				public List<com.obj.nc.domain.message.Message<?>> convertEvent(GenericEvent event) {					
+				public List<Message<?>> doConvertEvent(GenericEvent event) {
 					EmailMessage email1 = new EmailMessage();
 					email1.addRecievingEndpoints(
 						EmailEndpoint.builder().email("test@objectify.sk").build()
@@ -145,7 +146,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				}
 
 				@Override
-				public List<NotificationIntent> convertEvent(GenericEvent event) {
+				public List<NotificationIntent> doConvertEvent(GenericEvent event) {
 					NotificationIntent email1Intent = NotificationIntent.createWithStaticContent(
 							"Subject", 
 							"Text", 

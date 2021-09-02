@@ -3,6 +3,7 @@ package com.obj.nc.functions.processors.messageAggregator.aggregations;
 import java.util.List;
 import java.util.Optional;
 
+import com.obj.nc.domain.message.EmailMessage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.http.MediaType;
@@ -74,8 +75,8 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 				.reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		
-		//TODO: ked bude refactorovany header a ostatne veci tak tuto spravit novu message a neprepisovat existujucu
-		Message<EmailContent> outputMessage = payloads.get(0);
+		Message<EmailContent> outputMessage = Message.newTypedMessageFrom(EmailMessage.class, payloads.toArray(new Message[0]));
+		outputMessage.setRecievingEndpoints(payloads.get(0).getRecievingEndpoints());
 		outputMessage.setBody(aggregatedEmailContent);
 		return outputMessage;
 	}

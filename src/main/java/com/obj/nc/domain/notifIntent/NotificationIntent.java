@@ -1,6 +1,13 @@
 package com.obj.nc.domain.notifIntent;
 
+import com.obj.nc.domain.HasEventIds;
+import com.obj.nc.domain.HasPreviousIntentIds;
+import com.obj.nc.domain.refIntegrity.Reference;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.NotificationIntentRepository;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -30,6 +37,12 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @ToString(callSuper = false)
@@ -54,9 +67,52 @@ import lombok.extern.log4j.Log4j2;
  *
  * @param <BODY_TYPE>
  */
-public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification {
+public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification, HasEventIds, HasPreviousIntentIds {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "INTENT";
+	
+	@NotNull
+	@EqualsAndHashCode.Include
+	@Transient
+	@Reference(GenericEventRepository.class)
+	private List<UUID> eventIds = new ArrayList<>();
+	
+	@NotNull
+	@EqualsAndHashCode.Include
+	@Transient
+	@Reference(NotificationIntentRepository.class)
+	private List<UUID> previousIntentIds = new ArrayList<>();
+	
+	@Override
+	public void addEventId(UUID eventId) {
+		eventIds.add(eventId);
+	}
+	
+	public void addPreviousIntentId(UUID intentId) {
+		previousIntentIds.add(intentId);
+	}
+	
+	@JsonIgnore
+	@Column("event_ids")
+	public void setEventIdsAsArray(UUID[] eventIds) {
+		setEventIds(Arrays.asList(eventIds));
+	}
+	
+	@JsonIgnore
+	@Column("previous_intent_ids")
+	public void setPreviousIntentIdsAsArray(UUID[] intentIds) {
+		setPreviousIntentIds(Arrays.asList(intentIds));
+	}
+	
+	@Column("event_ids")
+	public UUID[] getEventIdsAsArray() {
+		return eventIds.toArray(new UUID[0]);
+	}
+	
+	@Column("previous_intent_ids")
+	public UUID[] getPreviousIntentIdsAsArray() {
+		return previousIntentIds.toArray(new UUID[0]);
+	}
 	
 	@Override
 	@JsonIgnore
@@ -75,28 +131,28 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
 
 		if (msgContent instanceof EmailContent) {
-			EmailMessage email = new EmailMessage();
+			EmailMessage email = Message.newTypedMessageFrom(EmailMessage.class, this);
 			email.setBody((EmailContent)msgContent);
 			
 			return email;
 		} 
 		
 		if (msgContent instanceof SimpleTextContent) {
-			SmsMessage sms = new SmsMessage();
+			SmsMessage sms = Message.newTypedMessageFrom(SmsMessage.class, this);
 			sms.setBody((SimpleTextContent)msgContent);
 			
 			return sms;
 		} 
 		
 		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof EmailEndpoint) {
-			EmailMessageTemplated<?> email = new EmailMessageTemplated<>();
+			EmailMessageTemplated<?> email = Message.newTypedMessageFrom(EmailMessageTemplated.class, this);
 			email.setBody((TemplateWithModelEmailContent)msgContent);
 			
 			return email;
 		} 
 		
 		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof SmsEndpoint) {
-			SmsMessageTemplated<?> sms = new SmsMessageTemplated<>();
+			SmsMessageTemplated<?> sms = Message.newTypedMessageFrom(SmsMessageTemplated.class, this);
 			sms.setBody((TemplateWithModelContent)msgContent);
 			
 			return sms;
@@ -104,7 +160,7 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 
 		
 		if (endpointsForOneSubject instanceof MailchimpEndpoint) {
-			MailChimpMessage mailChimp = new MailChimpMessage();
+			MailChimpMessage mailChimp = Message.newTypedMessageFrom(MailChimpMessage.class, this);
 			mailChimp.setBody((MailchimpContent)msgContent);
 			
 			return mailChimp;

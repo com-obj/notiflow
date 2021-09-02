@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
@@ -58,7 +59,8 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
 //	@Autowired private SourcePollingChannelAdapter pollableSource;
     
     @BeforeEach
-    void setupGreenMail() throws FolderException {
+    void setupGreenMail(@Autowired JdbcTemplate jdbcTemplate) throws FolderException {
+        purgeNotifTables(jdbcTemplate);
         greenMail.purgeEmailFromAllMailboxes();
         
 //    	pollableSource.start();
@@ -129,7 +131,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         // given
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/teamplate_message.json";
-		EmailMessageTemplated inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessageTemplated.class);
+		EmailMessageTemplated<?> inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessageTemplated.class);
         
         //when
         EmailMessage emailSent = emailSendingFlow.formatAndSend(inputMessage).get(1, TimeUnit.SECONDS);

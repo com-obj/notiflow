@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
+import com.obj.nc.repositories.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
@@ -12,10 +13,6 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.obj.nc.domain.refIntegrity.Reference;
-import com.obj.nc.repositories.EndpointsRepository;
-import com.obj.nc.repositories.FailedPayloadRepository;
-import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.MessageRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,15 +53,18 @@ public class DeliveryInfo implements Persistable<UUID> {
 	@Reference(GenericEventRepository.class)
 	private UUID eventId;
 	
+	@Reference(NotificationIntentRepository.class)
+	private UUID intentId;
+	
+	@Reference(MessageRepository.class)
+	private UUID messageId;
+	
 	@NotNull
 	@Reference(EndpointsRepository.class)
 	private UUID endpointId;
 	
 	@Reference(FailedPayloadRepository.class)
 	private UUID failedPayloadId;
-	
-	@Reference(MessageRepository.class)
-	private UUID messageId;
 
 	@Override
 	public boolean isNew() {

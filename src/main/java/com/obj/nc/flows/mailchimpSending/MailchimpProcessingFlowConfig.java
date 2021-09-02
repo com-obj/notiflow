@@ -1,5 +1,7 @@
 package com.obj.nc.flows.mailchimpSending;
 
+import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.senders.MailchimpSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ public class MailchimpProcessingFlowConfig {
     
     private final MailchimpSender mailchimpSender;
     private final PaylaodLoggerSinkConsumer logConsumer;
+    private final MessagePersister messagePersister;
+    private final EndpointPersister endpointPersister;
     
     @Bean(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID)
     public MessageChannel mailchimpProcessingInputChangel() {
@@ -31,6 +35,8 @@ public class MailchimpProcessingFlowConfig {
     public IntegrationFlow mailchimpProcessingFlowDefinition() {
         return IntegrationFlows
                 .from(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+                .handle(endpointPersister)
+                .handle(messagePersister)
                 .handle(mailchimpSender)
                 .handle(logConsumer, LOG_CONSUMER_HANDLER_METHOD_NAME, c -> c.id(LOG_CONSUMER_HANDLER_ID))
                 .get();

@@ -2,6 +2,7 @@ package com.obj.nc.functions.processors.messageTracking;
 
 import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -42,21 +43,28 @@ public class EmailReadTrackingDecorator extends ProcessorFunctionAdapter<Message
     
     @Override
     protected Message<EmailContent> execute(Message<EmailContent> payload) {
-        EmailContent content = payload.getBody();
+        EmailMessage result = Message.newTypedMessageFrom(EmailMessage.class, payload);
+        result.setRecievingEndpoints(payload.getRecievingEndpoints());
+        result.setAttributes(payload.getAttributes());
+        result.setBody(payload.getBody());
+        
+        EmailContent content = result.getBody();
         String emailText = content.getText();
     
         Document html = Jsoup.parse(emailText);
         Element img = html.body().appendElement("img");
         
-        URI readMessageCallbackUri = UriComponentsBuilder.fromHttpUrl(ncAppConfigProperties.getUrl())
-                .path("/delivery-info/messages/{messageId}/mark-as-read").build(payload.getMessageIds());
+        URI readMessageCallbackUri = UriComponentsBuilder
+                .fromHttpUrl(ncAppConfigProperties.getUrl())
+                .path("/delivery-info/messages/{messageId}/mark-as-read")
+                .build(result.getId());
         
         img.attr("src", readMessageCallbackUri.toString());
     
         emailText = html.html();
         content.setText(emailText);
         
-        return payload;
+        return result;
     }
     
 }

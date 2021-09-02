@@ -41,6 +41,8 @@ public class MessageProcessingFlowConfig {
 	public IntegrationFlow messageProcessingFlowDefinition() {
 		return IntegrationFlows
 				.from(messageProcessingInputChannel())
+				.handle(endpointPersister)
+				.handle(messagePersister)
 				.transform(messageByRecipientTokenizer)
 				.split()
 				.handle(endpointPersister)

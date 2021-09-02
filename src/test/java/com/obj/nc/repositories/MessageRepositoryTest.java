@@ -50,7 +50,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 		UUID[] eventIds = new UUID[]{
 				eventRepo.save(event).getId(), 
 				eventRepo.save(event2).getId()};
-		emailMsg.getHeader().setEventIdsAsArray(eventIds);
+		emailMsg.setEventIds(Arrays.asList(eventIds));
 		
 		messageRepository.save(emailMsg.toPersistantState());
 		
@@ -61,7 +61,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 		Assertions.assertThat(emailInDB.getPayloadTypeName()).isEqualTo("EMAIL_MESSAGE"); 
 		Assertions.assertThat(emailInDB.getTimeCreated()).isNotNull();
 		Assertions.assertThat(emailInDB.getHeader().getFlowId()).isEqualTo("default-flow");
-		Assertions.assertThat(emailInDB.getHeader().getEventIdsAsArray()).isEqualTo(eventIds);
+		Assertions.assertThat(emailInDB.getEventIds()).isEqualTo(Arrays.asList(eventIds));
 	}
 
 	
@@ -98,7 +98,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 		String INPUT_JSON_FILE = "messages/email_message.json";
 		final EmailMessage emailMsg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);				
 		emailMsg.setId(UUID.randomUUID());
-		emailMsg.getHeader().getEventIds().clear();
+		emailMsg.getEventIds().clear();
 		
 		// WHEN
 		Assertions.assertThatThrownBy(
@@ -111,14 +111,15 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 		INPUT_JSON_FILE = "messages/email_message.json";
 		final EmailMessage emailMsg2 = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);				
 		emailMsg2.setId(UUID.randomUUID());
-		emailMsg2.getHeader().addEventId(UUID.randomUUID());
+		emailMsg2.addEventId(UUID.randomUUID());
+		emailMsg2.getRecievingEndpoints().forEach(endpoint -> endpointRepo.persistEnpointIfNotExists(endpoint));
 		
 		// WHEN
 		Assertions.assertThatThrownBy(
 				() -> messageRepository.save(emailMsg2.toPersistantState()))
 			.isInstanceOf(RuntimeException.class)
 			.hasMessageContaining("which cannot be found in the DB")
-			.hasMessageContaining("getEventIds");
+			.hasMessageContaining("eventIds");
 	}
 	
 

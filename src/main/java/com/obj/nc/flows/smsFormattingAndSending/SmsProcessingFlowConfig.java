@@ -39,9 +39,10 @@ public class SmsProcessingFlowConfig {
 	public IntegrationFlow smsProcessingFlowDefinition() {
 		return IntegrationFlows
 				.from(smsProcessingInputChangel())
+				.handle(endpointPersister)
+				.handle(messagePersister)
 				.handle(smsFormatter)
 				.split()
-				.handle(endpointPersister)
 				.handle(messagePersister)
 				.handle(smsSender)
 				.wireTap( flowConfig -> 

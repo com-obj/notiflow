@@ -12,8 +12,8 @@ public class EventIdBasedCorrelationStrategy implements CorrelationStrategy {
 	public Object getCorrelationKey(Message<?> m) {
 		com.obj.nc.domain.message.Message ncMessage = (com.obj.nc.domain.message.Message)m.getPayload();
 
-		log.info("Correlating message {} based on their eventIds {}",m , ncMessage.getHeader().getEventIds());
-		return ncMessage.getHeader().getEventIds();
+		log.info("Correlating message {} based on their eventIds {}",m , ncMessage.getEventIds());
+		return ncMessage.getEventIds();
 	}
 
 }
