@@ -2,6 +2,12 @@ package com.obj.nc.controllers;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -11,42 +17,57 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.restdocs.RestDocsMockMvcConfigurationCustomizer;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.restdocs.cli.CliDocumentation;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentationConfigurer;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.PayloadDocumentation;
+import org.springframework.restdocs.request.PathParametersSnippet;
+import org.springframework.restdocs.request.RequestDocumentation;
+import org.springframework.restdocs.templates.TemplateFormats;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.jayway.jsonpath.JsonPath;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 
+import lombok.Builder;
+import lombok.Data;
+
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@AutoConfigureMockMvc
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
+@AutoConfigureMockMvc
+@AutoConfigureRestDocs(outputDir = "docs/api")
 class EventsRestControllerTest extends BaseIntegrationTest {
-    
-    
+        
 	@Autowired private GenericEventRepository genericEventRepository;
 	@Autowired protected MockMvc mockMvc;
-
+	
     @BeforeEach
-    void setUp(@Autowired JdbcTemplate jdbcTemplate) {
+    void setUp(@Autowired JdbcTemplate jdbcTemplate) {    	
     	purgeNotifTables(jdbcTemplate);
     }
     
@@ -73,6 +94,27 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         GenericEvent genericEvent = genericEventRepository.findById(UUID.fromString(eventId)).get();
         
         assertThat(genericEvent).isNotNull();
+    }
+    
+    @Test
+    void docPersistGenericEvent() throws Exception {
+    	 // given
+        String INPUT_JSON_FILE = "events/generic_event.json";
+        String eventJson = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
+        
+        //when
+        mockMvc
+        		.perform(MockMvcRequestBuilders.post("/events")
+        		.contentType(APPLICATION_JSON_UTF8)
+        		.content(eventJson)
+                .accept(APPLICATION_JSON_UTF8))
+        		.andDo(
+                		document("POST-events",
+                				responseFields( 
+                						fieldWithPath("ncEventId").description("Internal notiflow ID assigned to the event. Can be used for searching")
+                				)
+                		)
+                );
     }
     
     @Test
@@ -469,6 +511,40 @@ class EventsRestControllerTest extends BaseIntegrationTest {
     }
     
     @Test
+    void docFindEventById() throws Exception {
+        // GIVEN
+        GenericEvent event = GenericEvent.builder()
+                .id(UUID.randomUUID())
+                .flowId("default-flow")
+                .payloadJson(JsonUtils.readJsonNodeFromPojo(TestPayloadForDocs.builder().attribute("Your payload. Can be anything").build()))
+                .build();
+        genericEventRepository.save(event);
+    
+        //WHEN
+        mockMvc
+                .perform(RestDocumentationRequestBuilders.get("/events/{eventId}", event.getId().toString())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(
+                		document("GET-events",
+                				pathParameters(
+                						parameterWithName("eventId").description("Internal Notiflow event ID")
+                				),
+                				responseFields( 
+                						fieldWithPath("id").description("Internal notiflow ID assigned to the event"),
+                						fieldWithPath("flowId").description(""),
+                						fieldWithPath("payloadType").description(""),
+                						fieldWithPath("externalId").description(""),
+                						fieldWithPath("timeCreated").description(""),
+                						fieldWithPath("timeConsumed").description(""),
+                						fieldWithPath("payloadJson").description("JSON body of the input event"),
+                						fieldWithPath("payloadJson.attribute").description("JSON attribute as an example. Can be anything")
+                				)
+                		)
+                );
+    }
+    
+    @Test
     void testFindEventByIdNotFound() throws Exception {
         // GIVEN
         GenericEvent event = GenericEvent.builder()
@@ -521,4 +597,28 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         String value;
     }
     
+    @Data
+    @Builder
+    private static class TestPayloadForDocs {
+        String attribute;
+    }
+    
+    
+    @TestConfiguration
+    static class RestDocsConfiguration {
+        @Bean
+        public RestDocsMockMvcConfigurationCustomizer restDocsMockMvcConfigurationCustomizer() {
+            return configurer -> configurer
+            		.snippets()
+            		.withDefaults(
+            				CliDocumentation.curlRequest(),
+            				PayloadDocumentation.requestBody(), 
+            				PayloadDocumentation.responseBody())
+            		.withTemplateFormat(TemplateFormats.markdown())
+            		.and()
+            		.operationPreprocessors()
+            		.withResponseDefaults(Preprocessors.prettyPrint())
+            		.withRequestDefaults(Preprocessors.prettyPrint());
+        }
+    }
 }
