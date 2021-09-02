@@ -6,16 +6,10 @@ import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.endpoints.RecievingEndpoint;
 
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.domain.refIntegrity.Reference;
-import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.MessageRepository;
-import com.obj.nc.repositories.NotificationIntentRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.ToString;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.relational.core.mapping.Column;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -23,24 +17,18 @@ import java.util.*;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
-public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayload<BODY_TYPE> implements IsNotification, HasEventIds, HasPreviousIntentIds, HasPreviousMessageIds {
+public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayload<BODY_TYPE> implements IsNotification, HasPreviousEventIds, HasPreviousIntentIds, HasPreviousMessageIds {
 	
 	@NotNull
 	@EqualsAndHashCode.Include
-	@Transient
-	@Reference(GenericEventRepository.class)
-	private List<UUID> eventIds = new ArrayList<>();
+	private List<UUID> previousEventIds = new ArrayList<>();
 	
 	@NotNull
 	@EqualsAndHashCode.Include
-	@Transient
-	@Reference(NotificationIntentRepository.class)
 	private List<UUID> previousIntentIds = new ArrayList<>();
 	
 	@NotNull
 	@EqualsAndHashCode.Include
-	@Transient
-	@Reference(MessageRepository.class)
 	private List<UUID> previousMessageIds = new ArrayList<>();
 	
 	@SneakyThrows
@@ -57,7 +45,7 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		}
 		
 		for (Message<?> message : messages) {
-			message.getEventIds().forEach(newMessage::addEventId);
+			message.getPreviousEventIds().forEach(newMessage::addPreviousEventId);
 			message.getPreviousIntentIds().forEach(newMessage::addPreviousIntentId);
 			newMessage.addPreviousMessageId(message.getId());
 		}
@@ -72,7 +60,7 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		
 		newMessage.getHeader().setFlowId(intent.getHeader().getFlowId());
 		
-		intent.getEventIds().forEach(newMessage::addEventId);
+		intent.getPreviousEventIds().forEach(newMessage::addPreviousEventId);
 		newMessage.addPreviousIntentId(intent.getId());
 		
 		return newMessage;
@@ -86,7 +74,7 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		persistantState.setBody(getBody());
 		persistantState.setHeader(getHeader());
 		persistantState.setId(getId());
-		persistantState.setEventIds(eventIds.toArray(new UUID[0]));
+		persistantState.setPreviousEventIds(previousEventIds.toArray(new UUID[0]));
 		persistantState.setPreviousIntentIds(previousIntentIds.toArray(new UUID[0]));
 		persistantState.setPreviousMessageIds(previousMessageIds.toArray(new UUID[0]));
 		persistantState.setMessageClass(getClass().getName());
@@ -95,8 +83,8 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		return persistantState;	 
 	}
 	
-	public void addEventId(UUID eventId) {
-		eventIds.add(eventId);
+	public void addPreviousEventId(UUID eventId) {
+		previousEventIds.add(eventId);
 	}
 	
 	public void addPreviousIntentId(UUID previousIntentId) {
@@ -105,39 +93,6 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 	
 	public void addPreviousMessageId(UUID previousMessageId) {
 		previousMessageIds.add(previousMessageId);
-	}
-	
-	@JsonIgnore
-	@Column("event_ids")
-	public void setEventIdsAsArray(UUID[] eventIds) {
-		setEventIds(Arrays.asList(eventIds));
-	}
-	
-	@JsonIgnore
-	@Column("previous_intent_ids")
-	public void setPreviousIntentIdsAsArray(UUID[] intentIds) {
-		setPreviousIntentIds(Arrays.asList(intentIds));
-	}
-	
-	@JsonIgnore
-	@Column("previous_message_ids")
-	public void setPreviousMessageIdsAsArray(UUID[] messageIds) {
-		setPreviousIntentIds(Arrays.asList(messageIds));
-	}
-	
-	@Column("event_ids")
-	public UUID[] getEventIdsAsArray() {
-		return eventIds.toArray(new UUID[0]);
-	}
-	
-	@Column("previous_intent_ids")
-	public UUID[] getPreviousIntentIdsAsArray() {
-		return previousIntentIds.toArray(new UUID[0]);
-	}
-	
-	@Column("previous_message_ids")
-	public UUID[] getPreviousMessageIdsAsArray() {
-		return previousMessageIds.toArray(new UUID[0]);
 	}
 	
 }

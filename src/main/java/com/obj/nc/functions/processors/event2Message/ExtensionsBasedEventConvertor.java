@@ -58,6 +58,8 @@ public class ExtensionsBasedEventConvertor extends ProcessorFunctionAdapter<Gene
 		return 
 				findMatchingEventProcessors(payload).stream()
 					.map(p -> p.convertEvent(payload))
+					.peek(notifications -> notifications
+						.forEach(notification -> notification.addPreviousEventId(payload.getId())))
 					.flatMap(List::stream)
 					.collect(Collectors.toList());
 	}
