@@ -4,6 +4,8 @@ import static org.springframework.integration.dsl.MessageChannels.executor;
 
 import java.util.concurrent.Executors;
 
+import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -38,6 +40,8 @@ public class TestModeFlowConfig {
     @Autowired private PaylaodLoggerSinkConsumer logConsumer;
 
     @Autowired private EmailTemplateFormatter digestEmailFormatter;
+    @Autowired private EndpointPersister endpointPersister;
+    @Autowired private MessagePersister messagePersister;
 
 	public final static String TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME = "tmExecutorChannel";
 	public final static String TEST_MODE_AGGREGATOR_BEAN_NAME = "tmAggregator";
@@ -49,6 +53,8 @@ public class TestModeFlowConfig {
     	
         return IntegrationFlows
         		.from(executor(TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME, Executors.newSingleThreadExecutor()))
+				.handle(endpointPersister)
+				.handle(messagePersister)
         		.aggregate(
         			aggSpec-> aggSpec
         				.correlationStrategy( testModeCorrelationStrategy() )
@@ -60,8 +66,11 @@ public class TestModeFlowConfig {
         				.outputProcessor( testModeMessageAggregator() )
         				.id(TEST_MODE_AGGREGATOR_BEAN_NAME)
         			)
-        		.handle(digestEmailFormatter)
-                .handle(sendEmailRealSmtp)
+				.handle(endpointPersister)
+				.handle(messagePersister)
+				.handle(digestEmailFormatter)
+				.handle(messagePersister)
+				.handle(sendEmailRealSmtp)
                 .handle(logConsumer)
                 .get();
     }
