@@ -49,7 +49,7 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 		 UUID[] eventIds = new UUID[]{
 					eventRepo.save(event).getId(), 
 					eventRepo.save(event2).getId()};
-		 notificationIntent.getHeader().setEventIdsAsArray(eventIds);	     
+		 notificationIntent.setEventIds(Arrays.asList(eventIds));	     
  		
 	     intentRepository.save(notificationIntent);
 	     
@@ -60,7 +60,7 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	     Assertions.assertThat(intentInDB.getPayloadTypeName()).isEqualTo("INTENT"); 
 	     Assertions.assertThat(intentInDB.getTimeCreated()).isNotNull();
 	     Assertions.assertThat(intentInDB.getHeader().getFlowId()).isEqualTo("default-flow");
-	     Assertions.assertThat(intentInDB.getHeader().getEventIdsAsArray()).isEqualTo(eventIds);
+	     Assertions.assertThat(intentInDB.getEventIds()).isEqualTo(Arrays.asList(eventIds));
 	     Assertions.assertThat(intentInDB.getBody().getSubject()).contains("Business Intelligence (BI) Developer");
 	     Assertions.assertThat(intentInDB.getBody().getBody()).contains("We are looking for a Business Intelligence (BI) Developer to create...");	    
 	}
@@ -116,14 +116,14 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 		//GIVEN
 		final NotificationIntent notificationIntent2 = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);				
 		notificationIntent2.setId(UUID.randomUUID());
-		notificationIntent2.getHeader().addEventId(UUID.randomUUID());
+		notificationIntent2.addEventId(UUID.randomUUID());
 		
 		// WHEN
 		Assertions.assertThatThrownBy(
 				() -> intentRepository.save(notificationIntent2))
 			.isInstanceOf(RuntimeException.class)
 			.hasMessageContaining("which cannot be found in the DB")
-			.hasMessageContaining("getEventIds");
+			.hasMessageContaining("eventIds");
 	}
 	
 }

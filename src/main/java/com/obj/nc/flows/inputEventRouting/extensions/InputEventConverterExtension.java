@@ -14,7 +14,7 @@ import com.obj.nc.exceptions.PayloadValidationException;
  *
  * @param <RESULT_TYPE>
  */
-public interface InputEventConverterExtension<RESULT_TYPE extends IsNotification> {
+public abstract class InputEventConverterExtension<RESULT_TYPE extends IsNotification> {
 	
 	/**
 	 * 
@@ -23,7 +23,14 @@ public interface InputEventConverterExtension<RESULT_TYPE extends IsNotification
 	 * 		Optional.emtpy() if this extensions is capable of making payload->RESULT_TYPE transformation
 	 * 		Optional.of(new PayloadValidationException("Error description") if not (error description will be logged)	
 	 */
-	public Optional<PayloadValidationException> canHandle(GenericEvent payload);
-
-	public List<RESULT_TYPE> convertEvent(GenericEvent event);
+	public abstract Optional<PayloadValidationException> canHandle(GenericEvent payload);
+	
+	public final List<RESULT_TYPE> convertEvent(GenericEvent event) {
+		List<RESULT_TYPE> notifications = doConvertEvent(event);
+		notifications.forEach(notification -> notification.addEventId(event.getId()));
+		return notifications;
+	}
+	
+	public abstract List<RESULT_TYPE> doConvertEvent(GenericEvent event);
+	
 }

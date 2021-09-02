@@ -43,24 +43,27 @@ database "Topic/Channels" {
 }
 
 component "EmailSendFlow" {
+    [endpointPersister] as endpointPersister1
+    [messagePersister] as messagePersister1
     [emailReadTrackingDecorator]
-    [endpointPersister]
-    [messagePersister]
+    [endpointPersister] as endpointPersister2
+    [messagePersister] as messagePersister2
     [emailSender]
 
-    emailReadTrackingDecorator -l-> endpointPersister: (EmailMessage)
-    endpointPersister -l-> messagePersister: (EmailMessage)
-    messagePersister -l-> emailSender: (EmailMessage)
+    endpointPersister1 -l-> messagePersister1: (EmailMessage)
+    messagePersister1 -l-> emailReadTrackingDecorator: (EmailMessage)
+    emailReadTrackingDecorator -l-> messagePersister2: (EmailMessage)
+    messagePersister2 -l-> emailSender: (EmailMessage)
 
  '   messagePersister --> nc_message: (EmailMessage)
 '  endpointPersister --> nc_endpoint: (List<RecievingEndpoint>)
 
-    emailReadTrackingDecorator ..> EMAIL_SEND_FLOW_INPUT_ID : (EmailMessage) 
+    endpointPersister1 ..> EMAIL_SEND_FLOW_INPUT_ID : (EmailMessage) 
     emailSender --> EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID : (EmailMessage) 
 
     emailSender --> DELIVERY_INFO_SEND_FLOW_ID_INPUT : (EmailMessage) 
 
-    note bottom of emailReadTrackingDecorator 
+    note left of emailReadTrackingDecorator 
         if (nc.functions.email-tracking.enabled = true 
             AND contentType = MediaType.TEXT_HTML_VALUE)
             do
@@ -70,29 +73,38 @@ component "EmailSendFlow" {
 
     
     interface "sendEmail (Message)" as sendEmail        
-        emailReadTrackingDecorator -u- sendEmail
+        endpointPersister1 -u- sendEmail
 }
 
 
 
 component "EmailFormatAndSendFlow" {
+    [endpointPersister] as endpointPersister3
+    [messagePersister] as messagePersister3
     [formatOrSendRouter]
     [emailFormatter]
+    [messagePersister] as messagePersister4
     [emailMessageAggregationStrategy]
-
-    emailFormatter --> emailMessageAggregationStrategy: (EmailMessageTemplated)
-
-    formatOrSendRouter .> EMAIL_FORMAT_AND_SEND_FLOW_INPUT_ID : (EmailMessage/EmailMessageTemplated) 
+    [messagePersister] as messagePersister5
 
 
+    emailFormatter --> messagePersister4: (EmailMessageTemplated)
+    messagePersister4 --> emailMessageAggregationStrategy: (List<EmailMessageTemplated>)
 
+    endpointPersister3 .> EMAIL_FORMAT_AND_SEND_FLOW_INPUT_ID : (EmailMessage/EmailMessageTemplated) 
+
+
+
+    endpointPersister3 -> messagePersister3 : (EmailMessageTemplated)
+    messagePersister3 -> formatOrSendRouter : (EmailMessageTemplated)
     formatOrSendRouter -> emailFormatter : (EmailMessageTemplated)
     formatOrSendRouter -> EMAIL_SEND_FLOW_INPUT_ID : (EmailMessage)
 
-    emailMessageAggregationStrategy -> EMAIL_SEND_FLOW_INPUT_ID : (EmailMessage) 
+    emailMessageAggregationStrategy -l-> messagePersister5 : (EmailMessage) 
+    messagePersister5 -> EMAIL_SEND_FLOW_INPUT_ID : (EmailMessage) 
 
     interface "formatAndSend (Message)" as formatAndSend        
-        formatOrSendRouter -u- formatAndSend
+        endpointPersister3 -u- formatAndSend
         
 }
 

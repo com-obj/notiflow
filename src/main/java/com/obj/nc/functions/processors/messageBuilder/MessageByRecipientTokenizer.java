@@ -43,7 +43,7 @@ public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> ex
 
 		for (RecievingEndpoint recievingEndpoint: msg.getRecievingEndpoints()) {
 
-			Message<CONTENT_TYPE> msgClone = msg.getClass().newInstance();
+			Message<CONTENT_TYPE> msgClone = Message.newTypedMessageFrom(msg.getClass(), msg);
 			
 			msgClone.addRecievingEndpoints(recievingEndpoint);
 

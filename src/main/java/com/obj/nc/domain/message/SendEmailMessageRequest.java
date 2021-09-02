@@ -40,8 +40,6 @@ public class SendEmailMessageRequest {
         to.stream()
                 .map(Recipient::toReceivingEndpoint)
                 .forEach(message.getRecievingEndpoints()::add);
-        
-        message.getHeader().addMessageId(message.getId());
         return message;
     }
 }

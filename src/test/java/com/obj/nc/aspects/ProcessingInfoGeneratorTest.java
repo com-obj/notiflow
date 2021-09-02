@@ -141,8 +141,8 @@ public class ProcessingInfoGeneratorTest {
 
         // then
         Assertions.assertThat(
-        		eventFromDB.getHeader().getEventIds())
-        	.isEqualTo(Arrays.asList(
+        		eventFromDB.getId())
+        	.isIn(Arrays.asList(
         			eventFromDB.getHeader().getProcessingInfo().getEventIds())
         );
         UUID eventId = eventFromDB.getId();
@@ -174,9 +174,9 @@ public class ProcessingInfoGeneratorTest {
 		
         String INPUT_JSON_FILE = "intents/ba_job_post.json";
         NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        notificationIntent.getHeader().addEventId(eventId);
+        notificationIntent.addEventId(eventId);
         
-        UUID[] originalEventIDs = notificationIntent.getHeader().getEventIdsAsArray();
+        UUID[] originalEventIDs = notificationIntent.getEventIdsAsArray();
         notificationIntent = (NotificationIntent) resolveRecipients.apply(notificationIntent);
         List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);
 
@@ -216,7 +216,7 @@ public class ProcessingInfoGeneratorTest {
             	.isEqualTo(originalEventIDs);
         	
             Assertions.assertThat(
-            		message.getHeader().getEventIds())
+            		message.getEventIds())
             	.isEqualTo(Arrays.asList(
             		message.getHeader().getProcessingInfo().getEventIds())
             );
@@ -232,8 +232,8 @@ public class ProcessingInfoGeneratorTest {
 
         String INPUT_JSON_FILE = "intents/ba_job_post.json";
         NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        notificationIntent.getHeader().addEventId(eventId);
-        UUID[] originalEventIDs = notificationIntent.getHeader().getEventIdsAsArray();
+        notificationIntent.addEventId(eventId);
+        UUID[] originalEventIDs = notificationIntent.getEventIdsAsArray();
         
         notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
         List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);                      

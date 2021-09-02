@@ -3,8 +3,8 @@ package com.obj.nc.domain;
 import java.util.List;
 import java.util.UUID;
 
-public interface HasMessageIds {
+public interface HasPreviousIntentIds {
     
-    List<UUID> getMessageIds();
+    List<UUID> getPreviousIntentIds();
     
 }

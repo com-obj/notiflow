@@ -40,8 +40,10 @@ public class DeliveryInfoSendResult implements HasHeader {
 	private Instant processedOn;
 	
 	@NotNull
-//	@NotEmpty
 	private UUID[] eventIds;
+	
+	@NotNull
+	private UUID[] intentIds;
 	
 	@NotNull
 	private UUID[] messageIds;

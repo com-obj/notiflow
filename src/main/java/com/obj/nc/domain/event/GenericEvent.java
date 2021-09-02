@@ -83,9 +83,6 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 		if (id == null) {
 			throw new PayloadValidationException("Id of GenericEvent must not be null");
 		}
-		if (!getHeader().getEventIds().contains(id)) {
-			getHeader().addEventId(id);
-		}
 	}
 	
 	public String getFlowId() {

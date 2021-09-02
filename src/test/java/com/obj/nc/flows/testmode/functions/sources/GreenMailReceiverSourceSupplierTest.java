@@ -9,6 +9,8 @@ import java.util.UUID;
 
 import javax.mail.internet.MimeMessage;
 
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.repositories.GenericEventRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -52,6 +54,7 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 	@Autowired private TestModeProperties properties;
 	@Autowired private EmailSender emailSenderSinkProcessingFunction;
 	@Autowired private GreenMailReceiverSourceSupplier greenMailReceiverSourceSupplier;
+	@Autowired private GenericEventRepository genericEventRepository;
 	
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
@@ -78,6 +81,13 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
     	EmailMessage origianlMsgForAggreagtion1 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message1.json", EmailMessage.class);
     	EmailMessage origianlMsgForAggreagtion2 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message2.json", EmailMessage.class);
     	EmailMessage origianlMsgForAggreagtion3 = JsonUtils.readObjectFromClassPathResource("messages/testmode/aggregate_input_message3.json", EmailMessage.class);
+    
+    	// persist event for DB references
+        GenericEvent genericEvent = GenericEvent.builder()
+                .id(UUID.fromString("23e201b5-d7fa-4231-a520-51190b5c50da"))
+                .payloadJson(JsonUtils.readJsonNodeFromJSONString(""))
+                .build();
+        genericEventRepository.save(genericEvent);
 
         //WHEN
         emailSenderSinkProcessingFunction.apply(origianlMsgForAggreagtion1);
@@ -92,7 +102,6 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 
         // WHEN
         List<EmailMessage> msgsCauthByTestModeGM = greenMailReceiverSourceSupplier.get();
-        msgsCauthByTestModeGM.forEach(m-> assertThat(m.getHeader().getEventIds()).contains(UUID.fromString("23e201b5-d7fa-4231-a520-51190b5c50da")));
 
         EmailContent emailContentFromTMGM1 = msgsCauthByTestModeGM.get(0).getBody();
         checkRecievedMatchOriginal(origianlMsgForAggreagtion1, emailContentFromTMGM1);
