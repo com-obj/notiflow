@@ -41,8 +41,6 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     @Autowired Get get;
     @Autowired(required = false) //not all tests require, some might not be @SpringBootTests 
     DeliveryInfoRepository deliveryInfoRepo;
-	@Autowired 
-	protected NcAppConfigProperties ncAppConfigProperties;
     
     public static void purgeNotifTables(@Autowired JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
