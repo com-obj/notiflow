@@ -32,8 +32,8 @@ public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionA
 					.recievingEndpoint(endpoint)
 					.processedOn(Instant.now());
 					
-			if (payload instanceof HasEventIds) {
-				List<UUID> eventIds = new ArrayList<>(((HasEventIds) payload).getEventIds());
+			if (payload instanceof HasPreviousEventIds) {
+				List<UUID> eventIds = new ArrayList<>(((HasPreviousEventIds) payload).getPreviousEventIds());
 				infoBuilder = infoBuilder.eventIds(eventIds.toArray(new UUID[0]));
 			} else {
 				infoBuilder = infoBuilder.eventIds(new UUID[0]);

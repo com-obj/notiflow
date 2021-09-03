@@ -54,7 +54,7 @@ public class MessageProcessingTest extends BaseIntegrationTest {
 		
         String INPUT_JSON_FILE = "messages/e_email_message_2_many.json";
         EmailMessage msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
-        msg.addEventId(eventId);
+        msg.addPreviousEventId(eventId);
 
         // when
         msgFlow.processMessage(msg);

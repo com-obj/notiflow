@@ -94,7 +94,8 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 		MailchimpRecipientDto recipient = new MailchimpRecipientDto();
 
 		MailchimpEndpoint mailChimpEndpoint = (MailchimpEndpoint) endpoint;
-		recipient.setName(mailChimpEndpoint.getRecipient().getName());
+		// TODO: uncomment when nc_endpoint table contains recipient data
+//		recipient.setName(mailChimpEndpoint.getRecipient().getName());
 		recipient.setEmail(mailChimpEndpoint.getEmail());
 
 		recipientInList.add(recipient);

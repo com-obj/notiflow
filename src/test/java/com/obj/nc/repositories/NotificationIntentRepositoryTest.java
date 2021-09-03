@@ -18,9 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.utils.JsonUtils;
 
@@ -49,7 +47,7 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 		 UUID[] eventIds = new UUID[]{
 					eventRepo.save(event).getId(), 
 					eventRepo.save(event2).getId()};
-		 notificationIntent.setEventIds(Arrays.asList(eventIds));	     
+		 notificationIntent.setPreviousEventIds(Arrays.asList(eventIds));	     
  		
 	     intentRepository.save(notificationIntent);
 	     
@@ -60,7 +58,7 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	     Assertions.assertThat(intentInDB.getPayloadTypeName()).isEqualTo("INTENT"); 
 	     Assertions.assertThat(intentInDB.getTimeCreated()).isNotNull();
 	     Assertions.assertThat(intentInDB.getHeader().getFlowId()).isEqualTo("default-flow");
-	     Assertions.assertThat(intentInDB.getEventIds()).isEqualTo(Arrays.asList(eventIds));
+	     Assertions.assertThat(intentInDB.getPreviousEventIds()).isEqualTo(Arrays.asList(eventIds));
 	     Assertions.assertThat(intentInDB.getBody().getSubject()).contains("Business Intelligence (BI) Developer");
 	     Assertions.assertThat(intentInDB.getBody().getBody()).contains("We are looking for a Business Intelligence (BI) Developer to create...");	    
 	}
@@ -116,14 +114,14 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 		//GIVEN
 		final NotificationIntent notificationIntent2 = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);				
 		notificationIntent2.setId(UUID.randomUUID());
-		notificationIntent2.addEventId(UUID.randomUUID());
+		notificationIntent2.addPreviousEventId(UUID.randomUUID());
 		
 		// WHEN
 		Assertions.assertThatThrownBy(
 				() -> intentRepository.save(notificationIntent2))
 			.isInstanceOf(RuntimeException.class)
 			.hasMessageContaining("which cannot be found in the DB")
-			.hasMessageContaining("eventIds");
+			.hasMessageContaining("previousEventIds");
 	}
 	
 }

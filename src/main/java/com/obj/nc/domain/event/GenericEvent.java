@@ -4,13 +4,13 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.obj.nc.domain.HasEventId;
 import com.obj.nc.exceptions.PayloadValidationException;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.data.relational.core.mapping.event.AfterLoadCallback;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.HasFlowId;
@@ -36,7 +36,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Table("nc_event")
 @Builder
-public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayload, HasHeader/*, AfterLoadCallback<GenericEvent>*/ {
+public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayload, HasHeader, HasEventId/*, AfterLoadCallback<GenericEvent>*/ {
 	
 	public static final String DEFUALT_FLOW_ID = "default-flow"; 
 	
@@ -135,6 +135,12 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	public <T extends IsTypedJson> T getPayloadAsPojo() {
 		return (T)JsonUtils.readObjectFromJSON(payloadJson, IsTypedJson.class);
 	}
+	
+	@Override
+	public UUID getEventId() {
+		return getId();
+	}
+	
 /*
 	@Override
 	//TODO: need to register

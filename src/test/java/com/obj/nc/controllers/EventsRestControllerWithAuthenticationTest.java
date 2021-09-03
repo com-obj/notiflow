@@ -1,6 +1,7 @@
 package com.obj.nc.controllers;
 
 import com.jayway.jsonpath.JsonPath;
+import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.security.config.JwtTokenUtil;
@@ -51,6 +52,7 @@ class EventsRestControllerWithAuthenticationTest extends BaseIntegrationTest {
 	@Autowired private JwtTokenUtil jwtTokenUtil;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private NcJwtConfigProperties ncJwtConfigProperties;
+    @Autowired private NcAppConfigProperties ncAppConfigProperties;
 
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {

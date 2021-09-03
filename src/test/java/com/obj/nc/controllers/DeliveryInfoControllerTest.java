@@ -13,6 +13,7 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.jayway.jsonpath.JsonPath;
+import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
@@ -70,6 +71,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 	@Autowired private DeliveryInfoRestController controller;
 	@Autowired GenericEventRepository eventRepo;
 	@Autowired private MessageProcessingFlow messageProcessingFlow;
+	@Autowired private NcAppConfigProperties ncAppConfigProperties;
 	
 	@RegisterExtension
 	protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)

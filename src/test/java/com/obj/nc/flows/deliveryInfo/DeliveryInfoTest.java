@@ -80,7 +80,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 		
         String INPUT_JSON_FILE = "intents/ba_job_post.json";
         NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        notificationIntent.addEventId(eventId);
+        notificationIntent.addPreviousEventId(eventId);
         
         notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
         notificationIntent.ensureEnpointsPersisted();
@@ -143,7 +143,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 		
     	EmailMessage email = new EmailMessage();
         email.addRecievingEndpoints(wrongEmail);
-        email.addEventId(eventId);
+        email.addPreviousEventId(eventId);
         
         //WHEN
         emailSendingFlow.sendEmail(email);
@@ -232,7 +232,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 
 	private SmsMessage createTestSMS(UUID eventId, SmsEndpoint telNumber) {
 		SmsMessage msg = new SmsMessage();
-    	msg.setEventIds(Arrays.asList(eventId));
+    	msg.setPreviousEventIds(Arrays.asList(eventId));
     	
     	msg.addRecievingEndpoints(telNumber);
 		return msg;

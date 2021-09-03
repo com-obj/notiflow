@@ -50,7 +50,7 @@ public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregati
         
         List<EmailEndpoint> emailEndpoints = testModeProps.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
         
-        EmailWithTestModeDiggest aggregatedMessage = new EmailWithTestModeDiggest(resultMail);
+        EmailWithTestModeDiggest aggregatedMessage = Message.newTypedMessageFrom(EmailWithTestModeDiggest.class, payloads.toArray(new Message[0]));
         aggregatedMessage.setBody(resultMail); 
         aggregatedMessage.setRecievingEndpoints(emailEndpoints);
         

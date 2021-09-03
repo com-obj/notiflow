@@ -18,7 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistantState;
@@ -50,7 +49,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 		UUID[] eventIds = new UUID[]{
 				eventRepo.save(event).getId(), 
 				eventRepo.save(event2).getId()};
-		emailMsg.setEventIds(Arrays.asList(eventIds));
+		emailMsg.setPreviousEventIds(Arrays.asList(eventIds));
 		
 		messageRepository.save(emailMsg.toPersistantState());
 		
@@ -61,7 +60,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 		Assertions.assertThat(emailInDB.getPayloadTypeName()).isEqualTo("EMAIL_MESSAGE"); 
 		Assertions.assertThat(emailInDB.getTimeCreated()).isNotNull();
 		Assertions.assertThat(emailInDB.getHeader().getFlowId()).isEqualTo("default-flow");
-		Assertions.assertThat(emailInDB.getEventIds()).isEqualTo(Arrays.asList(eventIds));
+		Assertions.assertThat(emailInDB.getPreviousEventIds()).isEqualTo(Arrays.asList(eventIds));
 	}
 
 	
@@ -98,7 +97,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 		String INPUT_JSON_FILE = "messages/email_message.json";
 		final EmailMessage emailMsg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);				
 		emailMsg.setId(UUID.randomUUID());
-		emailMsg.getEventIds().clear();
+		emailMsg.getPreviousEventIds().clear();
 		
 		// WHEN
 		Assertions.assertThatThrownBy(
@@ -111,7 +110,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 		INPUT_JSON_FILE = "messages/email_message.json";
 		final EmailMessage emailMsg2 = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);				
 		emailMsg2.setId(UUID.randomUUID());
-		emailMsg2.addEventId(UUID.randomUUID());
+		emailMsg2.addPreviousEventId(UUID.randomUUID());
 		emailMsg2.getRecievingEndpoints().forEach(endpoint -> endpointRepo.persistEnpointIfNotExists(endpoint));
 		
 		// WHEN
@@ -119,7 +118,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 				() -> messageRepository.save(emailMsg2.toPersistantState()))
 			.isInstanceOf(RuntimeException.class)
 			.hasMessageContaining("which cannot be found in the DB")
-			.hasMessageContaining("eventIds");
+			.hasMessageContaining("previousEventIds");
 	}
 	
 

@@ -28,7 +28,6 @@ import com.icegreen.greenmail.store.StoredMessage;
 import com.icegreen.greenmail.util.GreenMail;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.flows.testmode.TestModeProperties;
@@ -143,7 +142,7 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
 			if (header.getName().equals(EmailSender.EVENT_IDS_EMAIL_HEANDER)) {
 				List<String> eventIDs = JsonUtils.readObjectFromJSONString(header.getValue(), List.class);
 				List<UUID> eventUUIDs = eventIDs.stream().map(eId-> UUID.fromString(eId)).collect(Collectors.toList());
-				dest.setEventIds(eventUUIDs);
+				dest.setPreviousEventIds(eventUUIDs);
 			} else if (header.getName().equals(EmailSender.FLOW_ID_EMAIL_HEANDER)) {
 				dest.getHeader().setFlowId(header.getValue());
 			} 

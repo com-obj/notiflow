@@ -54,7 +54,7 @@ public class MessagePersistantState implements Persistable<UUID> {
 	
 	@NotNull
 	@Reference(GenericEventRepository.class)
-	private UUID[] eventIds;
+	private UUID[] previousEventIds;
 	
 	@NotNull
 	@Reference(NotificationIntentRepository.class)
@@ -87,7 +87,7 @@ public class MessagePersistantState implements Persistable<UUID> {
 		List<RecievingEndpoint> endpoints = findReceivingEndpoints();
 		msg.setRecievingEndpoints(endpoints);
 		
-		msg.setEventIds(Arrays.asList(eventIds));
+		msg.setPreviousEventIds(Arrays.asList(previousEventIds));
 		msg.setPreviousIntentIds(Arrays.asList(previousIntentIds));
 		msg.setPreviousMessageIds(Arrays.asList(previousMessageIds));
 		
