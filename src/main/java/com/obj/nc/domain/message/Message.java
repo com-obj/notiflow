@@ -45,8 +45,17 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		}
 		
 		for (Message<?> message : messages) {
-			message.getPreviousEventIds().forEach(newMessage::addPreviousEventId);
-			message.getPreviousIntentIds().forEach(newMessage::addPreviousIntentId);
+			// TODO: zvazit ukladat ids do Setu namiesto Listu
+			message.getPreviousEventIds()
+					.stream()
+					.filter(eventId -> !newMessage.getPreviousEventIds().contains(eventId))
+					.forEach(newMessage::addPreviousEventId);
+			
+			message.getPreviousIntentIds()
+					.stream()
+					.filter(intentId -> !newMessage.getPreviousIntentIds().contains(intentId))
+					.forEach(newMessage::addPreviousIntentId);
+			
 			newMessage.addPreviousMessageId(message.getId());
 		}
 		
