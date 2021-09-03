@@ -1,7 +1,8 @@
-```
+[source,options="nowrap"]
+----
 {
   "str" : "xxx",
   "num" : 1,
   "@type" : "TYPE_3"
 }
-```
+----

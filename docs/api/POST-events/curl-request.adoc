@@ -1,4 +1,5 @@
-```bash
+[source,bash]
+----
 $ curl 'http://localhost:8080/events' -i -X POST \
     -H 'Content-Type: application/json;charset=UTF-8' \
     -H 'Accept: application/json;charset=UTF-8' \
@@ -7,4 +8,4 @@ $ curl 'http://localhost:8080/events' -i -X POST \
   "num" : 1,
   "@type" : "TYPE_3"
 }'
-```
+----

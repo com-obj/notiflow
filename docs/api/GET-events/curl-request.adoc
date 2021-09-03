@@ -1,0 +1,6 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/events/77e0d489-89c2-4fb3-ada3-d97877f4f7dc' -i -X GET \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -H 'Accept: application/json;charset=UTF-8'
+----

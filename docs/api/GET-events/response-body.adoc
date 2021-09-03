@@ -1,0 +1,16 @@
+[source,options="nowrap"]
+----
+{
+  "id" : "77e0d489-89c2-4fb3-ada3-d97877f4f7dc",
+  "flowId" : "default-flow",
+  "payloadType" : null,
+  "payloadJson" : {
+    "@class" : "com.obj.nc.controllers.EventsRestControllerTest$TestPayloadForDocs",
+    "attribute1" : "Your payload value1. Can be anything",
+    "attribute2" : "Your payload value2. Can be anything"
+  },
+  "externalId" : null,
+  "timeCreated" : "2021-09-02T14:04:20.281Z",
+  "timeConsumed" : null
+}
+----

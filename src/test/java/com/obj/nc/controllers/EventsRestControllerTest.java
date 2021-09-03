@@ -3,8 +3,8 @@ package com.obj.nc.controllers;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -13,14 +13,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.google.common.collect.ObjectArrays;
+import com.jayway.jsonpath.JsonPath;
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import com.obj.nc.utils.JsonUtils;
+
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.restdocs.RestDocsMockMvcConfigurationCustomizer;
@@ -31,27 +41,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.restdocs.cli.CliDocumentation;
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentationConfigurer;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.PayloadDocumentation;
-import org.springframework.restdocs.request.PathParametersSnippet;
-import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.restdocs.templates.TemplateFormats;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
-import com.jayway.jsonpath.JsonPath;
-import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import com.obj.nc.utils.JsonUtils;
 
 import lombok.Builder;
 import lombok.Data;
@@ -63,7 +62,7 @@ import lombok.Data;
 @AutoConfigureRestDocs(outputDir = "docs/api")
 class EventsRestControllerTest extends BaseIntegrationTest {
         
-	@Autowired private GenericEventRepository genericEventRepository;
+        @Autowired private GenericEventRepository genericEventRepository;
 	@Autowired protected MockMvc mockMvc;
 	
     @BeforeEach
@@ -104,18 +103,44 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         
         //when
         mockMvc
-        		.perform(MockMvcRequestBuilders.post("/events")
-        		.contentType(APPLICATION_JSON_UTF8)
-        		.content(eventJson)
+                .perform(MockMvcRequestBuilders.post("/events")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(eventJson)
                 .accept(APPLICATION_JSON_UTF8))
-        		.andDo(
-                		document("POST-events",
-                				responseFields( 
-                						fieldWithPath("ncEventId").description("Internal notiflow ID assigned to the event. Can be used for searching")
-                				)
-                		)
+                .andDo(
+                        document("POST-events",
+                                requestFields(genericEventInputFields),
+                                responseFields( 
+                                        fieldWithPath("ncEventId").description("Internal notiflow ID assigned to the event. Can be used for searching")
+                                )
+                        )
                 );
     }
+
+    FieldDescriptor[] testPayloadFields = new FieldDescriptor[] {
+        fieldWithPath("@class").description("Payload type information as created by @JsonTypeInfo(use = Id.CLASS). Used for payload de-serialization to POJO"),
+        fieldWithPath("attribute1").description("JSON attribute as an example. Can be anything"),
+        fieldWithPath("attribute2").description("JSON attribute as an example. Can be anything")        
+    };
+
+    FieldDescriptor[] genericEventInputFields = new FieldDescriptor[] {
+        fieldWithPath("flowId").description("Optional: Identification of the main flow"),
+        fieldWithPath("payloadType").description("Optional: Identification of payload type. Can be used for routing configuration"),
+        fieldWithPath("externalId").description("Optional: Identification of the event provided by the client. Can be used for search"),
+        fieldWithPath("payloadJson").description("JSON body of the input event")   
+    };
+
+    FieldDescriptor[] genericEventFields = ObjectArrays.concat(
+        genericEventInputFields,
+        new FieldDescriptor[] {
+                fieldWithPath("id").description("Internal notiflow ID assigned to the event"),
+                fieldWithPath("timeCreated").description("Internal notiflow timestamp documenting time of persistance"),
+                fieldWithPath("timeConsumed").description("Internal notiflow timestamp documenting time of beginning of processing"),        
+        },
+        FieldDescriptor.class
+    );
+
+
     
     @Test
     void testDuplicatePersistWithExternalId() throws Exception {
@@ -147,12 +172,12 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         //then
         resp
         	.andExpect(status().is4xxClientError())
-			.andExpect(jsonPath("$").value(CoreMatchers.startsWith("Request not valid becase of invalid payload: Duplicate external ID detected")));
+			.andExpect(jsonPath("$").value(CoreMatchers.startsWith("Request not valid because of invalid payload: Duplicate external ID detected")));
 
     }
     
     @Test
-    void testOverideExternalAndFlowId() throws Exception {
+    void testOverrideExternalAndFlowId() throws Exception {
         // given
         String INPUT_JSON_FILE = "events/generic_event_with_external_and_flow_id.json";
         String eventJson = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
@@ -230,7 +255,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
     @Test
     void testPersistPIForNonParsableJson() throws Exception {
         // given
-        String INPUT_JSON_FILE = "events/generic_event_non_parseabale.json";
+        String INPUT_JSON_FILE = "events/generic_event_non_parsable.json";
         String eventJson = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
         
         //when
@@ -244,7 +269,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         //then
         resp
         	.andExpect(status().is4xxClientError())
-			.andExpect(jsonPath("$").value(CoreMatchers.startsWith("Request not valid becase of invalid payload: Unexpected character")));
+			.andExpect(jsonPath("$").value(CoreMatchers.startsWith("Request not valid because of invalid payload: Unexpected character")));
         
     }
     
@@ -300,7 +325,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         //then
         resp
                 .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$").value(CoreMatchers.startsWith("Request not valid becase of invalid payload: Payload")));
+                .andExpect(jsonPath("$").value(CoreMatchers.startsWith("Request not valid because of invalid payload: Payload")));
         
     }
     
@@ -516,7 +541,11 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         GenericEvent event = GenericEvent.builder()
                 .id(UUID.randomUUID())
                 .flowId("default-flow")
-                .payloadJson(JsonUtils.readJsonNodeFromPojo(TestPayloadForDocs.builder().attribute("Your payload. Can be anything").build()))
+                .payloadJson(JsonUtils.readJsonNodeFromPojo(
+                        TestPayloadForDocs.builder()
+                                .attribute1("Your payload value1. Can be anything")
+                                .attribute2("Your payload value2. Can be anything")
+                                .build()))
                 .build();
         genericEventRepository.save(event);
     
@@ -526,20 +555,11 @@ class EventsRestControllerTest extends BaseIntegrationTest {
                         .contentType(APPLICATION_JSON_UTF8)
                         .accept(APPLICATION_JSON_UTF8))
                 .andDo(
-                		document("GET-events",
-                				pathParameters(
-                						parameterWithName("eventId").description("Internal Notiflow event ID")
-                				),
-                				responseFields( 
-                						fieldWithPath("id").description("Internal notiflow ID assigned to the event"),
-                						fieldWithPath("flowId").description(""),
-                						fieldWithPath("payloadType").description(""),
-                						fieldWithPath("externalId").description(""),
-                						fieldWithPath("timeCreated").description(""),
-                						fieldWithPath("timeConsumed").description(""),
-                						fieldWithPath("payloadJson").description("JSON body of the input event"),
-                						fieldWithPath("payloadJson.attribute").description("JSON attribute as an example. Can be anything")
-                				)
+               		document("GET-events",
+        			pathParameters(
+               				parameterWithName("eventId").description("Internal Notiflow event ID")),
+                			responseFields( genericEventFields ).
+                                        andWithPrefix("payloadJson.",testPayloadFields)
                 		)
                 );
     }
@@ -599,8 +619,10 @@ class EventsRestControllerTest extends BaseIntegrationTest {
     
     @Data
     @Builder
+    @JsonTypeInfo(use = Id.CLASS)
     private static class TestPayloadForDocs {
-        String attribute;
+        String attribute1;
+        String attribute2;
     }
     
     
@@ -608,13 +630,13 @@ class EventsRestControllerTest extends BaseIntegrationTest {
     static class RestDocsConfiguration {
         @Bean
         public RestDocsMockMvcConfigurationCustomizer restDocsMockMvcConfigurationCustomizer() {
-            return configurer -> configurer
+            return customizer -> customizer
             		.snippets()
             		.withDefaults(
             				CliDocumentation.curlRequest(),
+            				CliDocumentation.httpieRequest(),
             				PayloadDocumentation.requestBody(), 
             				PayloadDocumentation.responseBody())
-            		.withTemplateFormat(TemplateFormats.markdown())
             		.and()
             		.operationPreprocessors()
             		.withResponseDefaults(Preprocessors.prettyPrint())
