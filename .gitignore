@@ -65,3 +65,4 @@ Thumbs.db
 !/sdfs_shell/*
 /biuld/
 /bin/
+/docs/api/generated
