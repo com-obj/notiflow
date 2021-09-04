@@ -56,7 +56,7 @@ public class SpringMessageToFailedPaylodFunction extends ProcessorFunctionAdapte
 			
 			return failedPaylod;
 		} catch (Exception e) {
-			log.error("Error ocured in Error handling flow: ", e);
+			log.error("Error ocurred in Error handling flow: ", e);
 			throw new RuntimeException (e);
 		}
 	}

@@ -1,6 +1,0 @@
-[source,options="nowrap"]
-----
-{
-  "ncEventId" : "343a0232-e79f-44b0-9b31-707e8b6e35c0"
-}
-----

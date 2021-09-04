@@ -1,6 +1,0 @@
-[source,bash]
-----
-$ http GET 'http://localhost:8080/events/13f1a585-0f49-4929-8030-117d30f86ec3' \
-    'Content-Type:application/json;charset=UTF-8' \
-    'Accept:application/json;charset=UTF-8'
-----

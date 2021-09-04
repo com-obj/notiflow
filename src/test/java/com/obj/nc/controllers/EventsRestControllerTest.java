@@ -51,6 +51,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import lombok.Builder;
 import lombok.Data;
@@ -98,18 +99,20 @@ class EventsRestControllerTest extends BaseIntegrationTest {
     @Test
     void docPersistGenericEvent() throws Exception {
     	 // given
-        String INPUT_JSON_FILE = "events/generic_event.json";
-        String eventJson = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
+        TestPayloadForDocs testPayloadForDocs = TestPayloadForDocs.builder()
+                .attribute1("Your payload value1. Can be anything")
+                .attribute2("Your payload value2. Can be anything")
+                .build();
         
         //when
         mockMvc
                 .perform(MockMvcRequestBuilders.post("/events")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(eventJson)
+                .content(JsonUtils.writeObjectToJSONString(testPayloadForDocs))
                 .accept(APPLICATION_JSON_UTF8))
                 .andDo(
                         document("POST-events",
-                                requestFields(genericEventInputFields),
+                                requestFields(testPayloadFields),
                                 responseFields( 
                                         fieldWithPath("ncEventId").description("Internal notiflow ID assigned to the event. Can be used for searching")
                                 )
@@ -325,7 +328,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         //then
         resp
                 .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$").value(CoreMatchers.startsWith("Request not valid because of invalid payload: Payload")));
+                .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.startsWith("Request not valid because of invalid payload: Payload")));
         
     }
     
@@ -557,9 +560,10 @@ class EventsRestControllerTest extends BaseIntegrationTest {
                 .andDo(
                		document("GET-events",
         			pathParameters(
-               				parameterWithName("eventId").description("Internal Notiflow event ID")),
-                			responseFields( genericEventFields ).
-                                        andWithPrefix("payloadJson.",testPayloadFields)
+               				parameterWithName("eventId").description("Internal Notiflow event ID")
+                                ),
+                		responseFields( genericEventFields ).
+                                andWithPrefix("payloadJson.",testPayloadFields)
                 		)
                 );
     }

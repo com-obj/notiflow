@@ -71,7 +71,7 @@ public class ProcessingInfoGenerator {
 		try {
 			returnValue = joinPoint.proceed();
 		} catch (Throwable e) {
-			log.trace("Exception ocured in processing step {}", docProcessingInfoAnot.value(), e);
+			log.trace("Exception ocurred in processing step {}", docProcessingInfoAnot.value(), e);
 			throw e;
 		}
 		
@@ -79,7 +79,7 @@ public class ProcessingInfoGenerator {
 		endPayloadAndHeaders = extractPayloads(returnValue);
 		
 		if (startProcessingInfos.size()>1 /*&& endPayloadAndHeaders.size()>1*/) {
-			log.warn("Cannot automaticaly map ProcessingInfo only for 1:1, 1:N cardinalities. Have {}:{} ", startPayloadAndHeaders.size(),endPayloadAndHeaders.size());
+			log.warn("Cannot automatically map ProcessingInfo only for 1:1, 1:N cardinalities. Have {}:{} ", startPayloadAndHeaders.size(),endPayloadAndHeaders.size());
 			return returnValue;
 		}
 		

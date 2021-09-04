@@ -137,16 +137,9 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	}
 	
 	@Override
+	@JsonIgnore
 	public UUID getEventId() {
 		return getId();
 	}
 	
-/*
-	@Override
-	//TODO: need to register
-	public GenericEvent onAfterLoad(GenericEvent aggregate) {
-		aggregate.syncHeaderFields();
-		return aggregate;
-	}
-*/
 }
