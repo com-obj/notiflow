@@ -12,7 +12,7 @@
           	"name":"John Doe"
         }
       },
-   "recievingEndpoints":[
+   "receivingEndpoints":[
    {
         "@type":"SMS",
         "phone":"0908186997",

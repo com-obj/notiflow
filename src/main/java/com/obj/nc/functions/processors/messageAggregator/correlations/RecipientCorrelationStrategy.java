@@ -12,7 +12,7 @@ public class RecipientCorrelationStrategy implements CorrelationStrategy {
 	public Object getCorrelationKey(Message<?> springMessage) {
 		com.obj.nc.domain.message.Message<?> msg = (com.obj.nc.domain.message.Message<?>)springMessage.getPayload();
 		
-		String endpointId = msg.getRecievingEndpoints().iterator().next().getEndpointId();
+		String endpointId = msg.getReceivingEndpoints().iterator().next().getEndpointId();
 		
 		log.info("Correlating message using endpointId: "+ endpointId);
 		return endpointId;

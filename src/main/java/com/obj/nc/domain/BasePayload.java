@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import com.obj.nc.repositories.MessageRepository;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -21,25 +20,22 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.obj.nc.Get;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
-import com.obj.nc.domain.message.EmailWithTestModeDiggest;
+import com.obj.nc.domain.message.EmailWithTestModeDigest;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.domain.refIntegrity.Reference;
-import com.obj.nc.repositories.GenericEventRepository;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.log4j.Log4j2;
 
 @Getter
 @Setter
@@ -50,13 +46,12 @@ import lombok.extern.log4j.Log4j2;
 	@Type(value = SmsMessage.class, name = SmsMessage.JSON_TYPE_IDENTIFIER),
 	@Type(value = MailChimpMessage.class, name = MailChimpMessage.JSON_TYPE_IDENTIFIER),
 	@Type(value = EmailMessageTemplated.class, name = EmailMessageTemplated.JSON_TYPE_IDENTIFIER),
-	@Type(value = EmailWithTestModeDiggest.class, name = EmailWithTestModeDiggest.JSON_TYPE_IDENTIFIER),
+	@Type(value = EmailWithTestModeDigest.class, name = EmailWithTestModeDigest.JSON_TYPE_IDENTIFIER),
 	@Type(value = SmsMessageTemplated.class, name = SmsMessageTemplated.JSON_TYPE_IDENTIFIER),	
 })
 @ToString(callSuper = true)
-@Log4j2
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements HasHeader, HasRecievingEndpoints, HasProcessingInfo, Persistable<UUID> {
+public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements HasHeader, HasReceivingEndpoints, HasProcessingInfo, Persistable<UUID> {
 	
 	@Id
 	@EqualsAndHashCode.Include
@@ -69,32 +64,32 @@ public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements H
 	@Column("payload_json")	
 	protected BODY_TYPE body;
 	
-	//Ak je body sucastou message tak recievingEndpoints.size() = 1
-	private List<? extends RecievingEndpoint> recievingEndpoints = new ArrayList<RecievingEndpoint>();
+	//if body is part of message then receivingEndpoints.size() = 1
+	private List<? extends ReceivingEndpoint> receivingEndpoints = new ArrayList<ReceivingEndpoint>();
 	
-	public BasePayload<BODY_TYPE> addRecievingEndpoints(RecievingEndpoint ... r) {
-		((List<RecievingEndpoint>)this.recievingEndpoints).addAll(Arrays.asList(r));
+	public BasePayload<BODY_TYPE> addReceivingEndpoints(ReceivingEndpoint ... r) {
+		((List<ReceivingEndpoint>)this.receivingEndpoints).addAll(Arrays.asList(r));
 		return this;
 	}
 		
 	@JsonIgnore
 	@Transient
-	public void setRecievingEndpointsSL(List<RecievingEndpoint> endpoints) {
-		List<RecievingEndpoint> typedEndpoints = Lists.newArrayList(
-				   Iterables.filter(endpoints, RecievingEndpoint.class));
+	public void setReceivingEndpointsSL(List<ReceivingEndpoint> endpoints) {
+		List<ReceivingEndpoint> typedEndpoints = Lists.newArrayList(
+				   Iterables.filter(endpoints, ReceivingEndpoint.class));
 		
-		this.setRecievingEndpoints(typedEndpoints);
+		this.setReceivingEndpoints(typedEndpoints);
 	}
 	
-	public void ensureEnpointsPersisted() {		
-		List<? extends RecievingEndpoint> persistedEndpoints = Get.getEndpointsRepo().persistEnpointIfNotExists(getRecievingEndpoints());
-		setRecievingEndpoints(persistedEndpoints);
+	public void ensureEndpointsPersisted() {		
+		List<? extends ReceivingEndpoint> persistedEndpoints = Get.getEndpointsRepo().persistEnpointIfNotExists(getReceivingEndpoints());
+		setReceivingEndpoints(persistedEndpoints);
 	}
 	
 	@Override
 	@Transient
-	public List<? extends RecievingEndpoint> getRecievingEndpoints() {
-		return recievingEndpoints;
+	public List<? extends ReceivingEndpoint> getReceivingEndpoints() {
+		return receivingEndpoints;
 	}
 	
 	@JsonIgnore

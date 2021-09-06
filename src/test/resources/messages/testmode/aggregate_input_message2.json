@@ -4,7 +4,7 @@
 		"text": "New position on koderia.sk 2",
 		"subject": "New position 2"
 	},
-	"recievingEndpoints": [
+	"receivingEndpoints": [
 		{
 			"@type": "EMAIL",
 			"recipient": {

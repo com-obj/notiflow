@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
+import com.obj.nc.flows.errorHandling.domain.FailedPayload;
 import com.obj.nc.functions.processors.errorHandling.FailedPaylodExtractor;
 import com.obj.nc.repositories.FailedPayloadRepository;
 
@@ -33,12 +33,12 @@ public class ErrorHandlingRestController {
     public void resurrect(
     		@RequestBody(required = true) String failedPaylodId) throws JsonProcessingException {
     	
-		Optional<FailedPaylod> oFailedPaylod = failedPaylodRepo.findById(UUID.fromString(failedPaylodId));
+		Optional<FailedPayload> oFailedPaylod = failedPaylodRepo.findById(UUID.fromString(failedPaylodId));
 		if (!oFailedPaylod.isPresent()) {
 			throw new IllegalArgumentException("Failed paylod with " +  failedPaylodId +" ID not found");
 		}
 		
-		FailedPaylod failedPaylod = oFailedPaylod.get();
+		FailedPayload failedPaylod = oFailedPaylod.get();
 		if (failedPaylod.getTimeResurected()!= null) {
 			throw new IllegalArgumentException("Failed paylod with " +  failedPaylodId +" ID has already been resurected. If it failed again use the newly assigned ID");
 		}

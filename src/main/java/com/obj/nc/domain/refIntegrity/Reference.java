@@ -12,6 +12,6 @@ import java.util.UUID;
 @Target({FIELD, METHOD})
 public @interface Reference {
 	
-	Class<? extends EntityExistanceChecker<UUID>> value();
+	Class<? extends EntityExistenceChecker<UUID>> value();
 
 }

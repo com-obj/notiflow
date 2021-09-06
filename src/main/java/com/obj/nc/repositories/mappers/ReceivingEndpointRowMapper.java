@@ -1,19 +1,20 @@
 package com.obj.nc.repositories.mappers;
 
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.domain.endpoints.SmsEndpoint;
-import org.springframework.jdbc.core.RowMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class ReceivingEndpointRowMapper implements RowMapper<RecievingEndpoint> {
+import org.springframework.jdbc.core.RowMapper;
+
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.domain.endpoints.SmsEndpoint;
+
+public class ReceivingEndpointRowMapper implements RowMapper<ReceivingEndpoint> {
     
     @Override
-    public RecievingEndpoint mapRow(ResultSet rs, int i) throws SQLException {
+    public ReceivingEndpoint mapRow(ResultSet rs, int i) throws SQLException {
         String epType = rs.getString("endpoint_type");
     
         if (EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {

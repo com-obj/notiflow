@@ -10,25 +10,25 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
+import com.obj.nc.flows.errorHandling.domain.FailedPayload;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import lombok.SneakyThrows;
 
 @Component
-public class FailedPaylodExtractor extends ProcessorFunctionAdapter<FailedPaylod, Message<?>> {
+public class FailedPaylodExtractor extends ProcessorFunctionAdapter<FailedPayload, Message<?>> {
 
 	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME)
 	private ObjectMapper jsonConverterForMessages;
 	
 	@Override
-	protected Optional<PayloadValidationException> checkPreCondition(FailedPaylod payload) {
+	protected Optional<PayloadValidationException> checkPreCondition(FailedPayload payload) {
 		return super.checkPreCondition(payload);
 	}
 	
 	@Override
 	@SneakyThrows
-	protected Message<?> execute(FailedPaylod failedPaylod) {
+	protected Message<?> execute(FailedPayload failedPaylod) {
 		Message<?> failedMsg = jsonConverterForMessages.treeToValue(failedPaylod.getMessageJson(), Message.class);
 		return failedMsg;
 	}

@@ -24,8 +24,6 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
@@ -37,6 +35,8 @@ import com.obj.nc.functions.processors.senders.config.EmailSenderConfigPropertie
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.GenericEventRepositoryTest;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -81,7 +81,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         DeliveryInfoSendResult delInfo = delInfos.iterator().next();
         Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
-        Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(message.getRecievingEndpoints().get(0));
+        Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(message.getReceivingEndpoints().get(0));
         Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(message.getPreviousEventIds());
 
         //THEN
@@ -169,7 +169,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         
         Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
-        Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(inputMessage.getRecievingEndpoints().get(0));
+        Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(inputMessage.getReceivingEndpoints().get(0));
         Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(inputMessage.getPreviousEventIds());
 
         //THEN

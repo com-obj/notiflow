@@ -37,7 +37,7 @@ public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<SmsMessage>
 		
 		SimpleTextContent content =sms.getBody();
 		
-		SmsEndpoint recipient = (SmsEndpoint)sms.getRecievingEndpoints().iterator().next();		
+		SmsEndpoint recipient = (SmsEndpoint)sms.getReceivingEndpoints().iterator().next();		
 
 		content.setAttributeValue(ORIGINAL_RECIPIENTS_PHONE_ATTR_NAME, recipient.getPhone());
 		if (recipient.getRecipient()!=null) {

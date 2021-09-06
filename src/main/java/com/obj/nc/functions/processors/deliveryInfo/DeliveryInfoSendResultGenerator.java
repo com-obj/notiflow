@@ -6,27 +6,28 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import com.obj.nc.domain.*;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.HasPreviousEventIds;
+import com.obj.nc.domain.HasReceivingEndpoints;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
-
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult.DeliveryInfoSendResultBuilder;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionAdapter<HasRecievingEndpoints, List<DeliveryInfoSendResult>> {
+public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionAdapter<HasReceivingEndpoints, List<DeliveryInfoSendResult>> {
 	
 	private final DELIVERY_STATUS status;
 	
 	@Override
-	protected List<DeliveryInfoSendResult> execute(HasRecievingEndpoints payload) {
+	protected List<DeliveryInfoSendResult> execute(HasReceivingEndpoints payload) {
 		List<DeliveryInfoSendResult> results= new ArrayList<>();
 		
-		for (RecievingEndpoint endpoint: payload.getRecievingEndpoints()) {
+		for (ReceivingEndpoint endpoint: payload.getReceivingEndpoints()) {
 			DeliveryInfoSendResultBuilder infoBuilder = DeliveryInfoSendResult.builder()
 					.status(status)
 					.recievingEndpoint(endpoint)

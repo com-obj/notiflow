@@ -1,6 +1,7 @@
 package com.obj.nc.functions.processors.senders.mailchimp.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 
 @Data

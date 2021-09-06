@@ -16,11 +16,11 @@ import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.MessagePersistantState;
+import com.obj.nc.domain.message.MessagePersistentState;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -51,9 +51,9 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 				eventRepo.save(event2).getId()};
 		emailMsg.setPreviousEventIds(Arrays.asList(eventIds));
 		
-		messageRepository.save(emailMsg.toPersistantState());
+		messageRepository.save(emailMsg.toPersistentState());
 		
-		Optional<MessagePersistantState> oEmailInDB = messageRepository.findById(emailMsg.getId());
+		Optional<MessagePersistentState> oEmailInDB = messageRepository.findById(emailMsg.getId());
 		
 		Assertions.assertThat(oEmailInDB.isPresent()).isTrue();
 		EmailMessage emailInDB = oEmailInDB.get().toMessage();
@@ -69,9 +69,9 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 		EmailMessage emailMsg = createTestMessage();		
 
 		emailMsg.setId(UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b"));
-		messageRepository.save(emailMsg.toPersistantState());
+		messageRepository.save(emailMsg.toPersistentState());
 		// WHEN
-		List<MessagePersistantState> oIntentInDB = messageRepository.findByIdIn(Arrays.asList(
+		List<MessagePersistentState> oIntentInDB = messageRepository.findByIdIn(Arrays.asList(
 				UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981a"),
 				UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b")));
 		// THEN
@@ -83,9 +83,9 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 		EmailMessage emailMsg = createTestMessage();		
 		
 		emailMsg.setId(UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b"));
-		messageRepository.save(emailMsg.toPersistantState());
+		messageRepository.save(emailMsg.toPersistentState());
 		// WHEN
-		List<MessagePersistantState> oIntentInDB = messageRepository.findByIdIn(Arrays.asList(
+		List<MessagePersistentState> oIntentInDB = messageRepository.findByIdIn(Arrays.asList(
 				UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981c")));
 		// THEN
 		Assertions.assertThat(oIntentInDB.isEmpty()).isTrue();
@@ -101,7 +101,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 		
 		// WHEN
 		Assertions.assertThatThrownBy(
-				() -> messageRepository.save(emailMsg.toPersistantState()))
+				() -> messageRepository.save(emailMsg.toPersistentState()))
 			.isInstanceOf(RuntimeException.class)
 			.hasMessageContaining("which cannot be found in the DB")
 			.hasMessageContaining("endpointIds");
@@ -111,11 +111,11 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 		final EmailMessage emailMsg2 = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);				
 		emailMsg2.setId(UUID.randomUUID());
 		emailMsg2.addPreviousEventId(UUID.randomUUID());
-		emailMsg2.getRecievingEndpoints().forEach(endpoint -> endpointRepo.persistEnpointIfNotExists(endpoint));
+		emailMsg2.getReceivingEndpoints().forEach(endpoint -> endpointRepo.persistEnpointIfNotExists(endpoint));
 		
 		// WHEN
 		Assertions.assertThatThrownBy(
-				() -> messageRepository.save(emailMsg2.toPersistantState()))
+				() -> messageRepository.save(emailMsg2.toPersistentState()))
 			.isInstanceOf(RuntimeException.class)
 			.hasMessageContaining("which cannot be found in the DB")
 			.hasMessageContaining("previousEventIds");
@@ -125,7 +125,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 	private EmailMessage createTestMessage() {
 		String INPUT_JSON_FILE = "messages/email_message.json";
 		EmailMessage emailMsg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
-		emailMsg.ensureEnpointsPersisted();
+		emailMsg.ensureEndpointsPersisted();
 		
 		return emailMsg;
 	}

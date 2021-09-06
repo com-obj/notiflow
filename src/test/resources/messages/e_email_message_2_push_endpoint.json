@@ -9,7 +9,7 @@
       "text":"Text",
       "subject":"Subject"
    },
-   "recievingEndpoints":[
+   "receivingEndpoints":[
          {
             "@type":"MAILCHIMP",
             "email" : "john.doe@objectify.sk",

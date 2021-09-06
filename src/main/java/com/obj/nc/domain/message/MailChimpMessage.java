@@ -5,7 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,8 +23,8 @@ public class MailChimpMessage extends Message<MailchimpContent/*, MailchimpEndpo
 	}
 
 	@Override
-	public List<MailchimpEndpoint> getRecievingEndpoints() {
-		return (List<MailchimpEndpoint>) super.getRecievingEndpoints();
+	public List<MailchimpEndpoint> getReceivingEndpoints() {
+		return (List<MailchimpEndpoint>) super.getReceivingEndpoints();
 	}
 	
 	@Override
@@ -35,7 +35,7 @@ public class MailChimpMessage extends Message<MailchimpContent/*, MailchimpEndpo
 	
 	//TODO: refactor as class parameter
 	@JsonIgnore
-	public Class<? extends RecievingEndpoint> getRecievingEndpointType() {
+	public Class<? extends ReceivingEndpoint> getReceivingEndpointType() {
 		return MailchimpEndpoint.class;
 	}
 

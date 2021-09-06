@@ -8,10 +8,7 @@ import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
 
-import lombok.extern.log4j.Log4j2;
-
 @Component
-@Log4j2
 public class EventGeneratorPreCondition implements PreCondition<NotificationIntent> {
 
     @Override

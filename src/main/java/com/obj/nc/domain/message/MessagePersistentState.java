@@ -7,8 +7,6 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
-import com.obj.nc.repositories.MessageRepository;
-import com.obj.nc.repositories.NotificationIntentRepository;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -20,11 +18,13 @@ import org.springframework.data.relational.core.mapping.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.Get;
 import com.obj.nc.domain.content.MessageContent;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.MessageRepository;
+import com.obj.nc.repositories.NotificationIntentRepository;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,7 +32,7 @@ import lombok.SneakyThrows;
 
 @Data
 @Table("nc_message")
-public class MessagePersistantState implements Persistable<UUID> {
+public class MessagePersistentState implements Persistable<UUID> {
 	
 
 	@Id
@@ -66,7 +66,7 @@ public class MessagePersistantState implements Persistable<UUID> {
 	
 	@JsonIgnore
 	@Transient
-	private List<RecievingEndpoint> receivingEndpoints;
+	private List<ReceivingEndpoint> receivingEndpoints;
 	
 	@Override
 	@JsonIgnore
@@ -84,8 +84,8 @@ public class MessagePersistantState implements Persistable<UUID> {
 		msg.setId(getId());
 		msg.setTimeCreated(getTimeCreated());
 		
-		List<RecievingEndpoint> endpoints = findReceivingEndpoints();
-		msg.setRecievingEndpoints(endpoints);
+		List<ReceivingEndpoint> endpoints = findReceivingEndpoints();
+		msg.setReceivingEndpoints(endpoints);
 		
 		msg.setPreviousEventIds(Arrays.asList(previousEventIds));
 		msg.setPreviousIntentIds(Arrays.asList(previousIntentIds));
@@ -94,7 +94,7 @@ public class MessagePersistantState implements Persistable<UUID> {
 		return msg;
 	}
 	
-	public List<RecievingEndpoint> findReceivingEndpoints() {
+	public List<ReceivingEndpoint> findReceivingEndpoints() {
 		if (receivingEndpoints == null) {
 			receivingEndpoints = Get.getEndpointsRepo().findByIds(getEndpointIds());
 		}

@@ -2,33 +2,42 @@ package com.obj.nc.controllers;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.obj.nc.config.NcAppConfigProperties;
-import com.obj.nc.domain.message.MessagePersistantState;
-import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
-import com.obj.nc.repositories.EndpointsRepository;
-import com.obj.nc.repositories.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.config.NcAppConfigProperties;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.message.MessagePersistentState;
+import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.repositories.DeliveryInfoRepository;
+import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.MessageRepository;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Validated
 @RestController
@@ -51,7 +60,7 @@ public class DeliveryInfoRestController {
 		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
 		
 		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
-		List<RecievingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
+		List<ReceivingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
 		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
 		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
 		
@@ -72,7 +81,7 @@ public class DeliveryInfoRestController {
 	
 	@PutMapping(value = "/messages/{messageId}/mark-as-read")
 	public ResponseEntity<Void> trackMessageRead(@PathVariable(value = "messageId", required = true) String messageId) {
-		Optional<MessagePersistantState> message = messageRepo.findById(UUID.fromString(messageId));
+		Optional<MessagePersistentState> message = messageRepo.findById(UUID.fromString(messageId));
 		message.ifPresent(messagePersistantState -> deliveryInfoFlow.createAndPersistReadDeliveryInfo(messagePersistantState.toMessage()));
 		return ResponseEntity.status(HttpStatus.FOUND).location(getTrackingPixelImageLocation()).build();
 	}
@@ -86,7 +95,7 @@ public class DeliveryInfoRestController {
 		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
 		
 		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
-		List<RecievingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
+		List<ReceivingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
 		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
 		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
 		
@@ -109,7 +118,7 @@ public class DeliveryInfoRestController {
 		@Transient
 		UUID endpointId;
 		
-		RecievingEndpoint endpoint;
+		ReceivingEndpoint endpoint;
 		
 		DELIVERY_STATUS currentStatus;
 		Instant statusReachedAt;

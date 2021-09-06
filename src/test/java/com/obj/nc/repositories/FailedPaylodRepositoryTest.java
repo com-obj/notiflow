@@ -17,9 +17,9 @@ import org.springframework.messaging.Message;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.config.SpringIntegration;
-import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
+import com.obj.nc.flows.errorHandling.domain.FailedPayload;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,14 +38,14 @@ public class FailedPaylodRepositoryTest {
 	public void testPersistingSingleInfo() {
 		TestPayload payload = TestPayload.builder().content("some error content").build();
 		Message<TestPayload> msg = MessageBuilder.withPayload(payload).build();
-		FailedPaylod failedPayload = null;
+		FailedPayload failedPayload = null;
 		
 	    Exception e = Assertions.assertThrows(NumberFormatException.class, () -> {
 	        Integer.parseInt("1a");
 	    });
 		
 			
-		failedPayload = FailedPaylod.builder()
+		failedPayload = FailedPayload.builder()
 				.flowId("default-flow-id")
 				.id(UUID.randomUUID())
 				.messageJson( jsonConverterForMessages.valueToTree(msg) )
@@ -55,7 +55,7 @@ public class FailedPaylodRepositoryTest {
 		
 		failedPaylaodRepo.save(failedPayload);
 		
-		Optional<FailedPaylod> oFailedPayloadInDb = failedPaylaodRepo.findById(failedPayload.getId());
+		Optional<FailedPayload> oFailedPayloadInDb = failedPaylaodRepo.findById(failedPayload.getId());
 		
 		assertThat(oFailedPayloadInDb.isPresent()).isTrue();
 		

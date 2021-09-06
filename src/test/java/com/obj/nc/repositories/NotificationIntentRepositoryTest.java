@@ -16,10 +16,10 @@ import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -102,7 +102,7 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 		//Intent nuklada zatial do db endpointIds,.. ked sa prida toto odkomentovat
 //		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);			
 //		notificationIntent.setId(UUID.randomUUID());
-//		notificationIntent.addRecievingEndpoints(EmailEndpoint.builder().email("test@test.sk").build());
+//		notificationIntent.addReceivingEndpoints(EmailEndpoint.builder().email("test@test.sk").build());
 //		
 //		// WHEN
 //		Assertions.assertThatThrownBy(

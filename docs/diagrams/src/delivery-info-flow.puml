@@ -19,17 +19,17 @@ database "Topic/Channels" {
     component DELIVERY_INFO_PROCESSING_FLOW_ID_INPUT<<PUB/SUB>>  [
         DELIVERY_INFO_PROCESSING_FLOW_ID_INPUT
         --
-        (HasRecievingEndpoints)
+        (HasReceivingEndpoints)
     ]
     component DELIVERY_INFO_SEND_FLOW_ID_INPUT<<PUB/SUB>>  [
         DELIVERY_INFO_SEND_FLOW_ID_INPUT
         --
-        (HasRecievingEndpoints)
+        (HasReceivingEndpoints)
     ]
     component DELIVERY_INFO_READ_FLOW_ID_INPUT<<PUB/SUB>>  [
         DELIVERY_INFO_READ_FLOW_ID_INPUT
         --
-        (HasRecievingEndpoints)
+        (HasReceivingEndpoints)
     ]
     component DELIVERY_INFO_FAILED_FLOW_ID_INPUT<<PUB/SUB>> [
         DELIVERY_INFO_FAILED_FLOW_ID_INPUT
@@ -68,7 +68,7 @@ component "DeliveryInfoFlow" {
         dips_send -l-> dt_send: (DeliveryInfoSendResult)
         dt_send -l-> dip_send: (List<DeliveryInfo>)
 
-        deliveryInfoSendGenerator ..> DELIVERY_INFO_SEND_FLOW_ID_INPUT: (HasRecievingEndpoints)
+        deliveryInfoSendGenerator ..> DELIVERY_INFO_SEND_FLOW_ID_INPUT: (HasReceivingEndpoints)
         dip_send -----> DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID: (List<DeliveryInfo>)
     
         dip_send -u-> nc_delivery_info: (List<DeliveryInfo>)
@@ -84,7 +84,7 @@ component "DeliveryInfoFlow" {
         dips_processing -l-> dt_processing: (DeliveryInfoSendResult)
         dt_processing -l-> dip_processing: (List<DeliveryInfo>)
 
-        deliveryInfoProcessingGenerator ..> DELIVERY_INFO_PROCESSING_FLOW_ID_INPUT: (HasRecievingEndpoints)
+        deliveryInfoProcessingGenerator ..> DELIVERY_INFO_PROCESSING_FLOW_ID_INPUT: (HasReceivingEndpoints)
         dip_processing -----> DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID: (List<DeliveryInfo>)
     
         dip_processing -u-> nc_delivery_info: (List<DeliveryInfo>)
@@ -100,7 +100,7 @@ component "DeliveryInfoFlow" {
         dips_read -> dt_read: (DeliveryInfoSendResult)
         dt_read -> dip_read: (List<DeliveryInfo>)
 
-        deliveryInfoReadGenerator ..> DELIVERY_INFO_READ_FLOW_ID_INPUT: (HasRecievingEndpoints)
+        deliveryInfoReadGenerator ..> DELIVERY_INFO_READ_FLOW_ID_INPUT: (HasReceivingEndpoints)
         dip_read -----> DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID: (List<DeliveryInfo>)
     
         dip_read -u-> nc_delivery_info: (List<DeliveryInfo>)

@@ -12,7 +12,7 @@ import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.Message;
@@ -41,10 +41,10 @@ class MessagesFromIntentTest {
 		
 		Message<EmailContent> message = result.get(0);
 		
-		List<? extends RecievingEndpoint> recievingEndpoints = message.getRecievingEndpoints();
-		assertThat(recievingEndpoints.size()).isEqualTo(1);
+		List<? extends ReceivingEndpoint> receivingEndpoints = message.getReceivingEndpoints();
+		assertThat(receivingEndpoints.size()).isEqualTo(1);
 		
-		RecievingEndpoint recipient = recievingEndpoints.get(0);
+		ReceivingEndpoint recipient = receivingEndpoints.get(0);
 		assertThat(recipient).extracting("email").isIn("john.doe@objectify.sk", "john.dudly@objectify.sk", "all@objectify.sk");
 		
         EmailContent emailContent = message.getBody();
@@ -91,8 +91,8 @@ class MessagesFromIntentTest {
 		
 		SmsMessage message = findMessageWithEnpoint(result, "0918186997");
 		
-		List<? extends RecievingEndpoint> recievingEndpoints = message.getRecievingEndpoints();
-		assertThat(recievingEndpoints.size()).isEqualTo(1);
+		List<? extends ReceivingEndpoint> receivingEndpoints = message.getReceivingEndpoints();
+		assertThat(receivingEndpoints.size()).isEqualTo(1);
 				
 		SimpleTextContent smsContent = message.getBody();
 		assertThat(smsContent.getText()).isEqualTo("Text");
@@ -124,8 +124,8 @@ class MessagesFromIntentTest {
 		
 		SmsMessageTemplated<TestModel> message = findMessageWithEnpoint(result, "0908186997");
 		
-		List<? extends RecievingEndpoint> recievingEndpoints = message.getRecievingEndpoints();
-		assertThat(recievingEndpoints.size()).isEqualTo(1);
+		List<? extends ReceivingEndpoint> receivingEndpoints = message.getReceivingEndpoints();
+		assertThat(receivingEndpoints.size()).isEqualTo(1);
 				
 		TemplateWithModelContent<TestModel> smsContent = message.getBody();
 		assertThat(smsContent.getTemplateFileName()).isEqualTo("test-template2.txt");
@@ -161,7 +161,7 @@ class MessagesFromIntentTest {
 	private <T extends Message<?>> T findMessageWithEnpoint(List<Message<?>> result, String endpointName) {
 		T deliveryNullMessage = (T) result
 				.stream()
-				.filter( msg -> msg.getRecievingEndpoints().get(0).getEndpointId().equals(endpointName))
+				.filter( msg -> msg.getReceivingEndpoints().get(0).getEndpointId().equals(endpointName))
 				.collect(Collectors.toList())
 				.get(0);
 		

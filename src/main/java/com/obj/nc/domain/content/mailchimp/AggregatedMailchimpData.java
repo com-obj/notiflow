@@ -1,14 +1,16 @@
 package com.obj.nc.domain.content.mailchimp;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.obj.nc.domain.Attachement;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import static com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData.JSON_TYPE_NAME;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
-import static com.obj.nc.domain.content.mailchimp.AggregatedMailchimpData.JSON_TYPE_NAME;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.obj.nc.domain.Attachement;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)

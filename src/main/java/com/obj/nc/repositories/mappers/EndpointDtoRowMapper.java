@@ -1,11 +1,12 @@
 package com.obj.nc.repositories.mappers;
 
-import com.obj.nc.domain.dto.EndpointDto;
-import org.springframework.jdbc.core.RowMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import com.obj.nc.domain.dto.EndpointDto;
 
 public class EndpointDtoRowMapper implements RowMapper<EndpointDto> {
     

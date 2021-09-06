@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SmsEndpoint extends RecievingEndpoint {
+public class SmsEndpoint extends ReceivingEndpoint {
 
     public static final String JSON_TYPE_IDENTIFIER = "SMS";
 

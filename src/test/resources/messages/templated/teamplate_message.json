@@ -13,7 +13,7 @@
            	"parts": ["part1","part2"]
          }
    },
-   "recievingEndpoints":[
+   "receivingEndpoints":[
       {
          "@type":"EMAIL",
          "email":"john.doe@objectify.sk",

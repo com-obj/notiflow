@@ -5,7 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,8 +23,8 @@ public class EmailMessage extends Message<EmailContent/*, EmailEndpoint*/> {
 	}
 	
 	@Override
-	public List<EmailEndpoint> getRecievingEndpoints() {
-		return (List<EmailEndpoint>) super.getRecievingEndpoints();
+	public List<EmailEndpoint> getReceivingEndpoints() {
+		return (List<EmailEndpoint>) super.getReceivingEndpoints();
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class EmailMessage extends Message<EmailContent/*, EmailEndpoint*/> {
 	
 	//TODO: refactor as class parameter
 	@JsonIgnore
-	public Class<? extends RecievingEndpoint> getRecievingEndpointType() {
+	public Class<? extends ReceivingEndpoint> getReceivingEndpointType() {
 		return EmailEndpoint.class;
 	}
 	

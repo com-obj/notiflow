@@ -10,9 +10,7 @@ import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 @RequiredArgsConstructor
 public class SmsMessageAggregationStrategy extends BasePayloadAggregationStrategy<SimpleTextContent> {
 	

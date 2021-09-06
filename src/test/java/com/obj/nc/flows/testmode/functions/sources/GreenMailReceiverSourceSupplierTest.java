@@ -9,8 +9,6 @@ import java.util.UUID;
 
 import javax.mail.internet.MimeMessage;
 
-import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.repositories.GenericEventRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -29,15 +27,17 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
 import com.obj.nc.flows.testmode.email.functions.sources.GreenMailReceiverSourceSupplier;
 import com.obj.nc.functions.processors.senders.EmailSender;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = {"test"}, resolver = SystemPropertyActiveProfileResolver.class)
@@ -115,14 +115,14 @@ public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 
         EmailMessage emailBodyFromTMGM2 = msgsCauthByTestModeGM.get(2);
         
-        assertThat(emailBodyFromTMGM2.getRecievingEndpoints()).hasSize(1);
+        assertThat(emailBodyFromTMGM2.getReceivingEndpoints()).hasSize(1);
         String recipient = properties.getRecipients().iterator().next();
-        assertThat(((EmailEndpoint) emailBodyFromTMGM2.getRecievingEndpoints().get(0)).getEmail()).isEqualTo(recipient);
+        assertThat(((EmailEndpoint) emailBodyFromTMGM2.getReceivingEndpoints().get(0)).getEmail()).isEqualTo(recipient);
     }
 
 	private void checkRecievedMatchOriginal(EmailMessage origianlMsgForAggreagtion, EmailContent emailContentFromTMGM) {
 		EmailContent originalContent1 = origianlMsgForAggreagtion.getBody();
-        String originalReviever1 = ((EmailEndpoint) origianlMsgForAggreagtion.getRecievingEndpoints().get(0)).getEmail();
+        String originalReviever1 = ((EmailEndpoint) origianlMsgForAggreagtion.getReceivingEndpoints().get(0)).getEmail();
         assertThat(emailContentFromTMGM.getSubject())
         	.contains(originalContent1.getSubject());
         assertThat(emailContentFromTMGM.getAttributeValue(GreenMailReceiverSourceSupplier.ORIGINAL_RECIPIENTS_EMAIL_ATTR_NAME).toString())

@@ -21,7 +21,7 @@ import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.exceptions.ProcessingException;
@@ -53,13 +53,13 @@ public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMes
 			return Optional.of(new PayloadValidationException("EmailContent sender can process only Message with EmailContent content. Message was: " + message));
 		}
 		
-		List<? extends RecievingEndpoint> to = message.getRecievingEndpoints();
+		List<? extends ReceivingEndpoint> to = message.getReceivingEndpoints();
 
 		if (to.size() != 1) {
 			return Optional.of(new PayloadValidationException("EmailContent sender can send to only one recipient. Found more: " + to));
 		}
 
-		RecievingEndpoint endpoint = to.get(0);
+		ReceivingEndpoint endpoint = to.get(0);
 		if (!(endpoint instanceof EmailEndpoint)) {
 			return Optional.of(new PayloadValidationException("EmailContent sender can send to EmailEndpoint endpoints only. Found " + endpoint));
 		}
@@ -86,7 +86,7 @@ public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMes
 				helper.setFrom(settings.getFromMailAddress());
 			}
 
-			helper.setTo(payload.getRecievingEndpoints().get(0).getEmail());
+			helper.setTo(payload.getReceivingEndpoints().get(0).getEmail());
 
 			helper.setSubject(payload.getBody().getSubject());
 			boolean isHtml = MediaType.TEXT_HTML_VALUE.equals(payload.getBody().getContentType());

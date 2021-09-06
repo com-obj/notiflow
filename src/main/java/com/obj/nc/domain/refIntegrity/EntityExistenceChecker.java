@@ -1,6 +1,6 @@
 package com.obj.nc.domain.refIntegrity;
 
-public interface EntityExistanceChecker<ID> {
+public interface EntityExistenceChecker<ID> {
 	
 	boolean existsById(ID id);
 

@@ -89,7 +89,7 @@ Becuase the payload in event is not know to notiflow, client has to provide cust
 				@Override
 				public List<com.obj.nc.domain.message.Message<?>> convertEvent(GenericEvent event) {					
 					EmailMessage email1 = new EmailMessage();
-					email1.addRecievingEndpoints(
+					email1.addReceivingEndpoints(
 						EmailEndpoint.builder().email("test@objectify.sk").build()
 					);
 					email1.getBody().setSubject("Subject");

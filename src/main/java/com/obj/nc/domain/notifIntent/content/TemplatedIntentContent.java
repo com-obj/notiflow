@@ -14,7 +14,7 @@ import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 
 import lombok.Data;
@@ -44,7 +44,7 @@ public class TemplatedIntentContent<MODEL_TYPE> extends IntentContent {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public MessageContent createMessageContent(RecievingEndpoint endpoint) {
+	public MessageContent createMessageContent(ReceivingEndpoint endpoint) {
 		if (endpoint instanceof EmailEndpoint) {
 			TemplateWithModelEmailContent emailContent = TemplateWithModelEmailContent.builder()
 				.subjectResourceKey(getSubjectResourceKey())

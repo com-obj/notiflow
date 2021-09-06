@@ -37,7 +37,7 @@ database "Topic/Channels" {
     component DELIVERY_INFO_SEND_FLOW_ID_INPUT<<PUB/SUB>>  [
         DELIVERY_INFO_SEND_FLOW_ID_INPUT
         --
-        (HasRecievingEndpoints)
+        (HasReceivingEndpoints)
     ]
 
 }

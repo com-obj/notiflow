@@ -6,9 +6,6 @@ import java.util.function.Function;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
 
-import lombok.extern.log4j.Log4j2;
-
-@Log4j2
 public abstract class ProcessorFunction<IN, OUT> implements Function<IN, OUT> {
 
 	@Override

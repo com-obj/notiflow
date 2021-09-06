@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import javax.mail.MessagingException;
 
-import com.obj.nc.domain.message.Message;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,14 +31,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.flows.inputEventRouting.extensions.InputEventConverterExtension;
 import com.obj.nc.flows.inputEventRouting.extensions.InputEvent2IntentConverterExtension;
 import com.obj.nc.flows.inputEventRouting.extensions.InputEvent2MessageConverterExtension;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
@@ -119,7 +117,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				@Override
 				public List<Message<?>> convertEvent(GenericEvent event) {
 					EmailMessage email1 = new EmailMessage();
-					email1.addRecievingEndpoints(
+					email1.addReceivingEndpoints(
 						EmailEndpoint.builder().email("test@objectify.sk").build()
 					);
 					email1.getBody().setSubject("Subject");

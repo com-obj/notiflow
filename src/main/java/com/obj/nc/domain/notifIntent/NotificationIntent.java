@@ -1,10 +1,12 @@
 package com.obj.nc.domain.notifIntent;
 
-import com.obj.nc.domain.HasPreviousEventIds;
-import com.obj.nc.domain.HasPreviousIntentIds;
-import com.obj.nc.domain.refIntegrity.Reference;
-import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.NotificationIntentRepository;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
@@ -12,6 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.HasPreviousIntentIds;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
@@ -21,7 +24,7 @@ import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
@@ -30,25 +33,20 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
+import com.obj.nc.domain.refIntegrity.Reference;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.NotificationIntentRepository;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.extern.log4j.Log4j2;
-
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @ToString(callSuper = false)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @Table("nc_intent")
-@Log4j2
 /**
  * This class represents Intent to deliver *some* kind of information at *some* point in time to recipient. Use this class in case
  * that you cannot tell the details about what/when/how are stored in delivery settings of that recipient. 
@@ -57,7 +55,7 @@ import java.util.UUID;
  * 		His settings are that he wants to be notified using SMS in working hours and by Email outside of working hours.
  * 		In addition his settings are that he want to receive at most 3 email in a week
  * 
- * Create notification intent and let NotiFlow to decide if 
+ * Create notification intent and let Notiflow to decide if 
  * 		SMS should be send immediately 
  * 			OR
  * 		Email should be send immediately
@@ -67,7 +65,7 @@ import java.util.UUID;
  *
  * @param <BODY_TYPE>
  */
-public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification, HasPreviousEventIds, HasPreviousIntentIds {
+public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification, HasPreviousIntentIds {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "INTENT";
 	
@@ -120,14 +118,14 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		return JSON_TYPE_IDENTIFIER;
 	}
 	
-	public static NotificationIntent createWithStaticContent(String subject, String body, RecievingEndpoint ... endpoints) {
+	public static NotificationIntent createWithStaticContent(String subject, String body, ReceivingEndpoint ... endpoints) {
 		NotificationIntent intent = new NotificationIntent();	
 		intent.setBody(IntentContent.createStaticContent(subject,body));
-		intent.addRecievingEndpoints(endpoints);
+		intent.addReceivingEndpoints(endpoints);
 		return intent;
 	}
 	
-	public Message<?> createMessage(RecievingEndpoint endpointsForOneSubject) {
+	public Message<?> createMessage(ReceivingEndpoint endpointsForOneSubject) {
 		MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
 
 		if (msgContent instanceof EmailContent) {

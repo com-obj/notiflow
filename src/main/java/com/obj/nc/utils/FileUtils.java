@@ -1,10 +1,5 @@
 package com.obj.nc.utils;
 
-import io.micrometer.core.instrument.util.IOUtils;
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.util.MimeType;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +7,12 @@ import java.net.FileNameMap;
 import java.net.URI;
 import java.net.URLConnection;
 import java.nio.file.Files;
+
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.util.MimeType;
+
+import io.micrometer.core.instrument.util.IOUtils;
 
 public class FileUtils {
     

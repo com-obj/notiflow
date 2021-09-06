@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @RequiredArgsConstructor
 //could be potentially EmailEndpoint but endpoint type is important for intent->message translation and correct message subtyping
-public class MailchimpEndpoint extends RecievingEndpoint {
+public class MailchimpEndpoint extends ReceivingEndpoint {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "MAILCHIMP";
 	

@@ -3,12 +3,10 @@ package com.obj.nc.flows.inputEventRouting.config;
 import static com.obj.nc.flows.intenProcessing.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -24,10 +22,7 @@ import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.flows.inputEventRouting.extensions.InputEventConverterExtension;
 import com.obj.nc.functions.processors.event2Message.ExtensionsBasedEventConvertor;
 
-import lombok.extern.log4j.Log4j2;
-
 @Configuration
-@Log4j2
 public class InputEventExtensionConvertingFlowConfig {
 		
 	public final static String EVENT_CONVERTING_EXTENSION_FLOW_ID = "EVENT_CONVERTING_EXTENSION_FLOW_ID";

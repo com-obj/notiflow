@@ -17,19 +17,19 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.config.SpringIntegration;
-import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
+import com.obj.nc.flows.errorHandling.domain.FailedPayload;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import lombok.extern.log4j.Log4j2;
 
 @Component
 @Log4j2
-public class SpringMessageToFailedPaylodFunction extends ProcessorFunctionAdapter<ErrorMessage, FailedPaylod> {
+public class SpringMessageToFailedPayloadFunction extends ProcessorFunctionAdapter<ErrorMessage, FailedPayload> {
 	
 	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
 	
 	@Override
-	protected FailedPaylod execute(ErrorMessage errorMessage) {	
+	protected FailedPayload execute(ErrorMessage errorMessage) {	
 		try {
 			MessagingException exMsg =  (MessagingException)errorMessage.getPayload();
 			Throwable exception = exMsg.getCause();
@@ -45,7 +45,7 @@ public class SpringMessageToFailedPaylodFunction extends ProcessorFunctionAdapte
 			
 			JsonNode jsonTree = jsonConverterForMessages.valueToTree(failedMessageForDb);
 			
-			FailedPaylod failedPaylod = FailedPaylod.builder()
+			FailedPayload failedPaylod = FailedPayload.builder()
 					.messageJson( jsonTree )
 					.channelNameForRetry(lastChannelName)
 					.flowId("TODO")

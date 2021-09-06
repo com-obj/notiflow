@@ -12,7 +12,7 @@
           	"parts": ["part1","part2"]
          }
     },
-    "recievingEndpoints":[
+    "receivingEndpoints":[
          {
             "@type":"SMS",
             "phone":"0908186997",

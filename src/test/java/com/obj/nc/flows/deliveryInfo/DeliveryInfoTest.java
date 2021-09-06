@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import com.obj.nc.repositories.*;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
@@ -31,19 +30,26 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlow;
-import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
+import com.obj.nc.flows.errorHandling.domain.FailedPayload;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
+import com.obj.nc.repositories.DeliveryInfoRepository;
+import com.obj.nc.repositories.EndpointsRepository;
+import com.obj.nc.repositories.FailedPayloadRepository;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.GenericEventRepositoryTest;
+import com.obj.nc.repositories.MessageRepository;
+import com.obj.nc.repositories.NotificationIntentRepository;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
@@ -83,7 +89,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         notificationIntent.addPreviousEventId(eventId);
         
         notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
-        notificationIntent.ensureEnpointsPersisted();
+        notificationIntent.ensureEndpointsPersisted();
         intentRepo.save(notificationIntent);
         
         //WHEN
@@ -142,7 +148,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 		UUID eventId = eventRepo.save(event).getId();
 		
     	EmailMessage email = new EmailMessage();
-        email.addRecievingEndpoints(wrongEmail);
+        email.addReceivingEndpoints(wrongEmail);
         email.addPreviousEventId(eventId);
         
         //WHEN
@@ -172,12 +178,12 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 		
 		//AND GIVEN
     	SmsMessage failedMessage = createTestSMS(eventId, smsEndpoint);
-    	messageRepo.save(failedMessage.toPersistantState());
+    	messageRepo.save(failedMessage.toPersistentState());
     	org.springframework.messaging.Message<SmsMessage> failedSpringMessage = MessageBuilder.withPayload(failedMessage).build();
     	
     	JsonNode messageJson = jsonConverterForSpringMessages.valueToTree(failedSpringMessage);
     	
-    	FailedPaylod failedPaylod = FailedPaylod.builder()
+    	FailedPayload failedPaylod = FailedPayload.builder()
         		.errorMessage("Error")
         		.exceptionName("Exception")
         		.flowId("flow_id")
@@ -195,7 +201,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         delInfo.forEach(info -> {
         	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.FAILED);
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn(failedMessage.getRecievingEndpoints().get(0).getId());
+        	Assertions.assertThat(info.getEndpointId()).isIn(failedMessage.getReceivingEndpoints().get(0).getId());
         	Assertions.assertThat(info.getFailedPayloadId()).isNotNull();
         });
         
@@ -212,7 +218,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 		//AND GIVEN
 		SmsEndpoint smsEndpoint = endpointRepo.persistEnpointIfNotExists(new SmsEndpoint("09050123456"));  
     	SmsMessage msg = createTestSMS(eventId, smsEndpoint);
-    	messageRepo.save(msg.toPersistantState());
+    	messageRepo.save(msg.toPersistentState());
     	        
         //WHEN
         List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(msg).get(1, TimeUnit.SECONDS);
@@ -223,7 +229,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         delInfo.forEach(info -> {
         	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.PROCESSING);
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn(msg.getRecievingEndpoints().get(0).getId());
+        	Assertions.assertThat(info.getEndpointId()).isIn(msg.getReceivingEndpoints().get(0).getId());
         });
         
         //THEN check infos in DB
@@ -234,7 +240,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 		SmsMessage msg = new SmsMessage();
     	msg.setPreviousEventIds(Arrays.asList(eventId));
     	
-    	msg.addRecievingEndpoints(telNumber);
+    	msg.addReceivingEndpoints(telNumber);
 		return msg;
 	}
 
@@ -252,7 +258,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 		//AND GIVEN
 		SmsEndpoint smsEndpoint = endpointRepo.persistEnpointIfNotExists(new SmsEndpoint("09050123456"));  
     	SmsMessage msg = createTestSMS(eventId, smsEndpoint);
-    	messageRepo.save(msg.toPersistantState());
+    	messageRepo.save(msg.toPersistentState());
     	        
         //WHEN
         List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistSentDeliveryInfo(msg).get(1, TimeUnit.SECONDS);
@@ -262,7 +268,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         delInfo.forEach(info -> {
         	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn(msg.getRecievingEndpoints().get(0).getId());
+        	Assertions.assertThat(info.getEndpointId()).isIn(msg.getReceivingEndpoints().get(0).getId());
         });
         
         //THEN check infos in DB
@@ -276,14 +282,14 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         Assertions.assertThat(persistedEndpoints.size()).isEqualTo(3);
 
         for (int i = 0; i < persistedEndpoints.size(); i++) {
-            List<EmailEndpoint> recievingEndpoints = (List<EmailEndpoint>)notificationIntent.getRecievingEndpoints();
-            assertThat(persistedEndpoints.get(i).get("endpoint_name"), CoreMatchers.equalTo(((EmailEndpoint) recievingEndpoints.get(i)).getEmail()));
-            assertThat(persistedEndpoints.get(i).get("endpoint_type"), CoreMatchers.equalTo(recievingEndpoints.get(i).getEndpointType()));
+            List<EmailEndpoint> receivingEndpoints = (List<EmailEndpoint>)notificationIntent.getReceivingEndpoints();
+            assertThat(persistedEndpoints.get(i).get("endpoint_name"), CoreMatchers.equalTo(((EmailEndpoint) receivingEndpoints.get(i)).getEmail()));
+            assertThat(persistedEndpoints.get(i).get("endpoint_type"), CoreMatchers.equalTo(receivingEndpoints.get(i).getEndpointType()));
         }
 	}
 	
     private List<UUID> extractReceivingEndpointIds(NotificationIntent finalNotificationIntent) {
-        return finalNotificationIntent.getRecievingEndpoints().stream().map(RecievingEndpoint::getId).collect(Collectors.toList());
+        return finalNotificationIntent.getReceivingEndpoints().stream().map(ReceivingEndpoint::getId).collect(Collectors.toList());
     }
 
 }

@@ -1,14 +1,7 @@
 package com.obj.nc.security.controller;
 
-import com.obj.nc.security.config.Constants;
-import com.obj.nc.security.config.JwtSecurityConfig;
-import com.obj.nc.security.config.JwtTokenUtil;
-import com.obj.nc.security.config.NcJwtConfigProperties;
-import com.obj.nc.security.exception.UserNotAuthenticatedException;
-import com.obj.nc.security.model.JwtRequest;
-import com.obj.nc.security.model.JwtResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import java.util.Objects;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +10,20 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Objects;
+import com.obj.nc.security.config.JwtSecurityConfig;
+import com.obj.nc.security.config.JwtTokenUtil;
+import com.obj.nc.security.config.NcJwtConfigProperties;
+import com.obj.nc.security.exception.UserNotAuthenticatedException;
+import com.obj.nc.security.model.JwtRequest;
+import com.obj.nc.security.model.JwtResponse;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @RestController

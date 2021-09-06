@@ -16,7 +16,7 @@
 	        "body":"Text",
 	        "subject":"Subject"
 	  },
-	  "recievingEndpoints":[
+	  "receivingEndpoints":[
 	     {
 	        "@type":"EMAIL",
 	        "email":"john.doe@objectify.sk"

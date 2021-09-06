@@ -1,14 +1,13 @@
 package com.obj.nc.functions.processors.senders.mailchimp.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-
-import lombok.Data;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.validation.constraints.NotBlank;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Data;
 
 @Data
 public class MailchimpRenderTemplateRequest {

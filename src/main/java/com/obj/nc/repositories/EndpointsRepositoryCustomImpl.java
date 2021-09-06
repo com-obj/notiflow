@@ -1,12 +1,24 @@
 package com.obj.nc.repositories;
 
-import com.obj.nc.domain.dto.EndpointDto;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.repositories.mappers.EndpointDtoRowMapper;
-import com.obj.nc.repositories.mappers.ReceivingEndpointRowMapper;
-import com.obj.nc.utils.QueryUtils;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import static com.obj.nc.domain.dto.EndpointDto.EndpointType.ANY;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
+import static java.sql.Timestamp.from;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,18 +26,15 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import com.obj.nc.domain.dto.EndpointDto;
+import com.obj.nc.domain.dto.EndpointDto.EndpointType;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.repositories.mappers.EndpointDtoRowMapper;
+import com.obj.nc.repositories.mappers.ReceivingEndpointRowMapper;
+import com.obj.nc.utils.QueryUtils;
 
-import static com.obj.nc.domain.dto.EndpointDto.EndpointType;
-import static com.obj.nc.domain.dto.EndpointDto.EndpointType.ANY;
-import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
-import static java.sql.Timestamp.from;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -40,7 +49,7 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
      * @return client must use returned list because IDs of endpoints can be different to those provided in input parameter
      */
     @Override
-    public <T extends RecievingEndpoint> List<T> persistEnpointIfNotExists(List<T> toPersist) {
+    public <T extends ReceivingEndpoint> List<T> persistEnpointIfNotExists(List<T> toPersist) {
         try  {
             NewAndExistingEndpoints newAndExisting = findNewAndExisting(toPersist);
             
@@ -50,7 +59,7 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
                             + "values "
                             + "(?, ?, ?, ?) ";
             
-            List<RecievingEndpoint> toInsert = newAndExisting.newEndpoints;
+            List<ReceivingEndpoint> toInsert = newAndExisting.newEndpoints;
             List<T> persited = (List<T>)newAndExisting.existingEndpoints;
             
             jdbcTemplate.batchUpdate(
@@ -58,7 +67,7 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
                     new BatchPreparedStatementSetter() {
                         
                         public void setValues(PreparedStatement ps, int i) throws SQLException {
-                            RecievingEndpoint endpoint = toInsert.get(i);
+                            ReceivingEndpoint endpoint = toInsert.get(i);
                             ps.setObject(1, endpoint.getId());
                             ps.setString(2, endpoint.getEndpointId());
                             ps.setString(3, endpoint.getEndpointType());
@@ -80,11 +89,11 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
         }
     }
     
-    private <T extends RecievingEndpoint> NewAndExistingEndpoints findNewAndExisting(List<T> toPersist) {
+    private <T extends ReceivingEndpoint> NewAndExistingEndpoints findNewAndExisting(List<T> toPersist) {
         NewAndExistingEndpoints newAndExisting = new NewAndExistingEndpoints();
         
         List<T> existing = findExistingEndpointsByNameId(toPersist);
-        for (RecievingEndpoint endPoint: toPersist) {
+        for (ReceivingEndpoint endPoint: toPersist) {
             if (!endPoint.isNew()) {
                 newAndExisting.existingEndpoints.add(endPoint);
                 continue;
@@ -105,23 +114,23 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
     }
     
     private static class NewAndExistingEndpoints {
-        public List<RecievingEndpoint> existingEndpoints = new ArrayList<RecievingEndpoint>();
-        public List<RecievingEndpoint> newEndpoints = new ArrayList<RecievingEndpoint>();
+        public List<ReceivingEndpoint> existingEndpoints = new ArrayList<ReceivingEndpoint>();
+        public List<ReceivingEndpoint> newEndpoints = new ArrayList<ReceivingEndpoint>();
     }
     
     
     @Override
-    public Map<String, RecievingEndpoint> persistEnpointIfNotExistsMappedToNameId(List<RecievingEndpoint> toPersist) {
-        List<RecievingEndpoint> persited = persistEnpointIfNotExists(toPersist);
+    public Map<String, ReceivingEndpoint> persistEnpointIfNotExistsMappedToNameId(List<ReceivingEndpoint> toPersist) {
+        List<ReceivingEndpoint> persited = persistEnpointIfNotExists(toPersist);
         
-        return persited.stream().collect(Collectors.toMap(RecievingEndpoint::getEndpointId, Function.identity()));
+        return persited.stream().collect(Collectors.toMap(ReceivingEndpoint::getEndpointId, Function.identity()));
     }
     
     
     @Override
-    public <T extends RecievingEndpoint> List<T> findExistingEndpointsByNameId(List<T> ednpoints) {
+    public <T extends ReceivingEndpoint> List<T> findExistingEndpointsByNameId(List<T> ednpoints) {
         List<String> namesList = ednpoints.stream()
-                .map(RecievingEndpoint::getEndpointId)
+                .map(ReceivingEndpoint::getEndpointId)
                 .collect(Collectors.toList());
         
         List<T> existing = (List<T>)findByNameIds(namesList.toArray(new String[0]));
@@ -130,7 +139,7 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
     }
     
     @Override
-    public <T extends RecievingEndpoint> List<T> findExistingEndpointsByIsNewFlag(List<T> ednpoints) {
+    public <T extends ReceivingEndpoint> List<T> findExistingEndpointsByIsNewFlag(List<T> ednpoints) {
         List<T> existing = ednpoints.stream()
                 .filter(e -> !e.isNew())
                 .collect(Collectors.toList());
@@ -139,7 +148,7 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
     }
     
     @Override
-    public List<RecievingEndpoint> findByIds(UUID ... endpointIds) {
+    public List<ReceivingEndpoint> findByIds(UUID ... endpointIds) {
         String query =
                 "select id, endpoint_name, endpoint_type "
                         + "from nc_endpoint "
@@ -147,7 +156,7 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
         String inSql = String.join(",", Collections.nCopies(endpointIds.length, "?"));
         query = String.format(query, inSql);
         
-        List<RecievingEndpoint> endpoints = jdbcTemplate.query(
+        List<ReceivingEndpoint> endpoints = jdbcTemplate.query(
                 query,
                 new ReceivingEndpointRowMapper(),
                 (Object[])endpointIds
@@ -157,9 +166,9 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
     }
     
     @Override
-    public List<RecievingEndpoint> findByNameIds(String ... endpointNames) {
+    public List<ReceivingEndpoint> findByNameIds(String ... endpointNames) {
         if (endpointNames.length==0) {
-            return new ArrayList<RecievingEndpoint>();
+            return new ArrayList<ReceivingEndpoint>();
         }
         
         String query =
@@ -169,7 +178,7 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
         String inSql = String.join(",", Collections.nCopies(endpointNames.length, "?"));
         query = String.format(query, inSql);
         
-        List<RecievingEndpoint> endpoints = jdbcTemplate.query(
+        List<ReceivingEndpoint> endpoints = jdbcTemplate.query(
                 query,
                 new ReceivingEndpointRowMapper(),
                 (Object[])endpointNames
@@ -179,20 +188,20 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
     }
     
     @Override
-    public <T extends RecievingEndpoint> T persistEnpointIfNotExists(T ednpoint) {
-        List<RecievingEndpoint> ednpoints = Arrays.asList(ednpoint);
+    public <T extends ReceivingEndpoint> T persistEnpointIfNotExists(T ednpoint) {
+        List<ReceivingEndpoint> ednpoints = Arrays.asList(ednpoint);
         
-        RecievingEndpoint persisted = persistEnpointIfNotExists(ednpoints).iterator().next();
+        ReceivingEndpoint persisted = persistEnpointIfNotExists(ednpoints).iterator().next();
         return (T)persisted;
     }
     
     @Override
-    public List<RecievingEndpoint> persistEnpointIfNotExists(RecievingEndpoint ... ednpoints) {
+    public List<ReceivingEndpoint> persistEnpointIfNotExists(ReceivingEndpoint ... ednpoints) {
         return persistEnpointIfNotExists(Arrays.asList(ednpoints));
     }
     
     @Override
-    public Map<String, RecievingEndpoint> persistEnpointIfNotExistsMappedToNameId(RecievingEndpoint ... ednpoints) {
+    public Map<String, ReceivingEndpoint> persistEnpointIfNotExistsMappedToNameId(ReceivingEndpoint ... ednpoints) {
         return persistEnpointIfNotExistsMappedToNameId(Arrays.asList(ednpoints));
     }
 

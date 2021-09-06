@@ -10,10 +10,9 @@ import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 
-import com.obj.nc.functions.processors.errorHandling.SpringMessageToFailedPaylodFunction;
+import com.obj.nc.functions.processors.errorHandling.SpringMessageToFailedPayloadFunction;
 import com.obj.nc.functions.sink.failedPaylodPersister.FailedPayloadPersister;
 
-import lombok.extern.log4j.Log4j2;
 
 /**
  * One has to make sure that error in errorHandlingFlow doesn't cause infinite loop. Currently this is achieved by errorChannel not being async and thus 
@@ -22,7 +21,6 @@ import lombok.extern.log4j.Log4j2;
  * @return
  */
 @Configuration
-@Log4j2
 public class ErrorHandlingFlowConfig {
 	
 	public static final String ERROR_CHANNEL_NAME = "errorChannel";
@@ -30,19 +28,19 @@ public class ErrorHandlingFlowConfig {
 	//Default channel for errorMessages used by spring
 	@Qualifier(ERROR_CHANNEL_NAME)
 	@Autowired private PublishSubscribeChannel errorChannel;
-	@Autowired private SpringMessageToFailedPaylodFunction failedPaylodTranformer;
-	@Autowired private FailedPayloadPersister failedPaylodPersister;
+	@Autowired private SpringMessageToFailedPayloadFunction failedPayloadTransformer;
+	@Autowired private FailedPayloadPersister failedPayloadPersister;
 	
 	
     @Bean
-    public IntegrationFlow errorPayloadRecievedFlowConfig() {
+    public IntegrationFlow errorPayloadReceivedFlowConfig() {
         return 
         	IntegrationFlows.from(errorChannel)
-				.handle(failedPaylodTranformer)
+				.handle(failedPayloadTransformer)
 				.wireTap( flowConfig -> 
 					flowConfig.channel(DELIVERY_INFO_FAILED_FLOW_INPUT_CHANNEL_ID)
 				)
-				.handle(failedPaylodPersister)
+				.handle(failedPayloadPersister)
         		.get();
     }
 

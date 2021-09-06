@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.data.annotation.AccessType;
+import org.springframework.data.annotation.Transient;
+
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.Data;
-import org.springframework.data.annotation.AccessType;
-import org.springframework.data.annotation.Transient;
 
 @Data
 @AccessType(AccessType.Type.PROPERTY)

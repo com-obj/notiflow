@@ -20,12 +20,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.FileSystemUtils;
 
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfigProperties;
 import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -80,7 +80,7 @@ class EventGeneratorTest {
         Assertions.assertThat(emailContent.getBody()).isEqualTo("We are looking for a Business Intelligence (BI) Developer to create...");
         Assertions.assertThat(emailContent.getSubject()).isEqualTo("Business Intelligence (BI) Developer");
         Assertions.assertThat(((Map<?, ?>) notificationIntentFromFile.getAttributes().get("originalEvent"))).hasSize(2);
-        Assertions.assertThat(notificationIntentFromFile.getRecievingEndpoints()).isEmpty();
+        Assertions.assertThat(notificationIntentFromFile.getReceivingEndpoints()).isEmpty();
     }
 
     @Test

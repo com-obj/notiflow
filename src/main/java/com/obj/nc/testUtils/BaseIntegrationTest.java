@@ -12,7 +12,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import com.obj.nc.config.NcAppConfigProperties;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.springframework.beans.BeansException;
@@ -143,7 +142,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
 	    		 }
 	    	 }	
 	    	 
-	    	 Assertions.assertThat(false).as("Greenmail didn't recieve mail which would match to " + msgToMatch.toString()).isTrue();
+	    	 Assertions.assertThat(false).as("Greenmail didn't receive mail which would match to " + msgToMatch.toString()).isTrue();
     	} catch (MessagingException e) {
     		throw new RuntimeException(e);
     	}
@@ -164,6 +163,6 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    	get.setApplicationContext(applicationContext);
+    	Get.setApplicationContext(applicationContext);
     }
 }

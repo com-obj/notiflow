@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
-import com.obj.nc.repositories.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
@@ -13,6 +12,11 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.obj.nc.domain.refIntegrity.Reference;
+import com.obj.nc.repositories.EndpointsRepository;
+import com.obj.nc.repositories.FailedPayloadRepository;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.MessageRepository;
+import com.obj.nc.repositories.NotificationIntentRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

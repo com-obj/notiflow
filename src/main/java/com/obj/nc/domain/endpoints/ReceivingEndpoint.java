@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table("nc_endpoint")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public abstract class RecievingEndpoint implements Persistable<UUID> {
+public abstract class ReceivingEndpoint implements Persistable<UUID> {
 	
 	/**
 	 * Kazdy Endpoint (Email, SMS, PUSH) ma nastavene options. Kedy na neho mozes posielat, ci agregovat. 

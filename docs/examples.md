@@ -40,7 +40,7 @@ To start interacting with [email processing flow](flows.md#emailProcessingFlow) 
 		EmailEndpoint emailEndpoint = EmailEndpoint.builder().email(recipient).build();
 		
 		EmailMessage msg = new EmailMessage();
-		msg.addRecievingEndpoints(emailEndpoint);
+		msg.addReceivingEndpoints(emailEndpoint);
 		msg.setBody(body);
 		
 		emailFlow.sendEmail(msg);		
@@ -124,7 +124,7 @@ Last thing is to implement the conversion itself.
 		EmailEndpoint emailEndpoint = EmailEndpoint.builder().email(regEvent.getCustomerEmail()).build();
 		
 		EmailMessage msg = new EmailMessage();
-		msg.addRecievingEndpoints(emailEndpoint);
+		msg.addReceivingEndpoints(emailEndpoint);
 		msg.setBody(body);
 		
 		return Arrays.asList(msg);

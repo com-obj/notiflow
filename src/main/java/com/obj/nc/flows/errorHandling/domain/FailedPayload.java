@@ -28,14 +28,14 @@ import lombok.ToString;
 @NoArgsConstructor
 @Table("nc_failed_payload")
 @Builder
-public class FailedPaylod implements Persistable<UUID>, HasFlowId {
+public class FailedPayload implements Persistable<UUID>, HasFlowId {
 	
 	@Id
 	private UUID id;
 	private String flowId;
-	//sem ukladam celu spring message. Je otazne ci potrebujem robit takuto zavyslost na spring. Ciastocne je to aj nebezpecne lebo v headri mozu byt veci, ktore neviem
-	//zoserializovat. Na druhej strane sa bojim, ze ak dam len payload tak stratim veci ktore mi budu chybat. Mozno by bolo treba ukladat iba payload, spravit novy stlpec
-	//kam budem ukladat whitelistovane atributy z headra
+
+	//this contains the full spring message. I'm not sure If I need this strong dependency. It might be event dangerous because there might be things in header which I cannot serialize.
+	//on the other hand, I'm afraid to loos things in the header which might be important. Maybe we should store payload in one attribute and whitelisted attributes from header in another. 
 	private JsonNode messageJson;
 	
 	private String exceptionName;
@@ -47,7 +47,7 @@ public class FailedPaylod implements Persistable<UUID>, HasFlowId {
 	
 	@CreatedDate
 	private Instant timeCreated;
-	//failed message resurection attempt
+	//failed message resurrection attempt
 	private Instant timeResurected;
 	
 	@Override

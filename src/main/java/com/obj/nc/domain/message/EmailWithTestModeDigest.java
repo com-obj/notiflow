@@ -5,8 +5,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import com.obj.nc.flows.testmode.email.functions.processors.TestModeDiggestModel;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.flows.testmode.email.functions.processors.TestModeDigestModel;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,17 +17,17 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
 @NoArgsConstructor
-public class EmailWithTestModeDiggest extends Message<TemplateWithModelEmailContent<TestModeDiggestModel>/*, EmailEndpoint*/> {
+public class EmailWithTestModeDigest extends Message<TemplateWithModelEmailContent<TestModeDigestModel>/*, EmailEndpoint*/> {
 
 	public static final String JSON_TYPE_IDENTIFIER = "EMAIL_MESSAGE_CUSTOM_CONTENT";
 	
-	public EmailWithTestModeDiggest(TemplateWithModelEmailContent<TestModeDiggestModel> content) {
+	public EmailWithTestModeDigest(TemplateWithModelEmailContent<TestModeDigestModel> content) {
 		setBody(content);
 	}
 	
 	@Override
-	public List<EmailEndpoint> getRecievingEndpoints() {
-		return (List<EmailEndpoint>) super.getRecievingEndpoints();
+	public List<EmailEndpoint> getReceivingEndpoints() {
+		return (List<EmailEndpoint>) super.getReceivingEndpoints();
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class EmailWithTestModeDiggest extends Message<TemplateWithModelEmailCont
 	
 	//TODO: refactor as class parameter
 	@JsonIgnore
-	public Class<? extends RecievingEndpoint> getRecievingEndpointType() {
+	public Class<? extends ReceivingEndpoint> getReceivingEndpointType() {
 		return EmailEndpoint.class;
 	}
 

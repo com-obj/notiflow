@@ -1,5 +1,12 @@
 package com.obj.nc.functions.processors.messageTemplating;
 
+import java.util.Locale;
+import java.util.Optional;
+
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.thymeleaf.TemplateEngine;
+
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.email.EmailContent;
@@ -8,12 +15,6 @@ import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-import org.thymeleaf.TemplateEngine;
-
-import java.util.Locale;
-import java.util.Optional;
 
 @Component
 @DocumentProcessingInfo("EmailFormatter")
@@ -34,16 +35,16 @@ public class EmailTemplateFormatter extends BaseTemplateFormatter<TemplateWithMo
 		return Optional.empty();
 	}
 
-	protected EmailMessage createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelEmailContent<?>> payload) {		
+	protected EmailMessage createMessageWithFormattedContent(String formattedContent, Locale locale,  Message<TemplateWithModelEmailContent<?>> payload) {		
 		EmailMessage htmlMessage = Message.newTypedMessageFrom(EmailMessage.class, payload);
-		htmlMessage.setRecievingEndpoints(payload.getRecievingEndpoints());
+		htmlMessage.setReceivingEndpoints(payload.getReceivingEndpoints());
 
 		EmailContent emailContent = htmlMessage.getBody();
 		emailContent.setContentType(MediaType.TEXT_HTML_VALUE);
 		
 		TemplateWithModelEmailContent<?> emailFromTemplate = payload.getBody();
 		emailContent.setSubject(emailFromTemplate.getSubjectLocalised(locale));
-		emailContent.setText(formatedContent);
+		emailContent.setText(formattedContent);
 		
 		return htmlMessage;
 	}

@@ -5,7 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 
 import lombok.Data;
@@ -26,8 +26,8 @@ public class SmsMessageTemplated<MODEL_TYPE> extends Message<TemplateWithModelCo
 	}
 	
 	@Override
-	public List<SmsEndpoint> getRecievingEndpoints() {
-		return (List<SmsEndpoint>) super.getRecievingEndpoints();
+	public List<SmsEndpoint> getReceivingEndpoints() {
+		return (List<SmsEndpoint>) super.getReceivingEndpoints();
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class SmsMessageTemplated<MODEL_TYPE> extends Message<TemplateWithModelCo
 	
 	//TODO: refactor as class parameter
 	@JsonIgnore
-	public Class<? extends RecievingEndpoint> getRecievingEndpointType() {
+	public Class<? extends ReceivingEndpoint> getReceivingEndpointType() {
 		return EmailEndpoint.class;
 	}
 

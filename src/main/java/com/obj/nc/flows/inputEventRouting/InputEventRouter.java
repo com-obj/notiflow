@@ -22,7 +22,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 /**
- * Conversion from custom input event to anything which NC can handle might be very specific. This router enables to customise the event->intent or event->message conversion
+ * Conversion from custom input event to anything which NC can handle might be very specific. This router enables to customize the event->intent or event->message conversion
  * It can be done it three ways
  * 1) register a bean implementing GenericEventProcessorExtension - this way you don't need to do anything related to spring integration 
  * 2) configure via application.properties flowId to channel name mapping
@@ -67,8 +67,8 @@ public class InputEventRouter extends AbstractMessageRouter {
 			MessageChannel inputChannel = Get.getBean(props.getTypeChannelMapping().get(jsonTypeInfo), MessageChannel.class);
 			return Optional.of(Arrays.asList(inputChannel));
 		} catch (Exception ex) {
-			log.info("Could not extract channel name from payload type and channel mapping. Exprecting property " +  props.getTypeProperyName() + " to contain type info which maps to channel name as defined using  "
-					+ "nc.flows.input-evet-routing.type-channel-mapping which is " + props.getTypeChannelMapping());
+			log.info("Could not extract channel name from payload type and channel mapping. Expecting property " +  props.getTypeProperyName() + " to contain type info which maps to channel name as defined using  "
+					+ "nc.flows.input-event-routing.type-channel-mapping which is " + props.getTypeChannelMapping());
 			return Optional.empty();
 		}
 	}	
@@ -80,7 +80,7 @@ public class InputEventRouter extends AbstractMessageRouter {
 			return Optional.of(Arrays.asList(inputChannel));
 		} catch (Exception ex) {
 			log.info("No chanel with name " + flowId + "_INPUT found. "
-					+ "Adjust the flow name to match you flow input chanel or consider turning input event routing off by deleting nc.flows.input-evet-routing.type property");
+					+ "Adjust the flow name to match you flow input chanel or consider turning input event routing off by deleting nc.flows.input-event-routing.type property");
 
 			return Optional.empty();
 		}
@@ -93,7 +93,7 @@ public class InputEventRouter extends AbstractMessageRouter {
 		
 		HasFlowId payload = (HasFlowId)message.getPayload();
 		
-		if (GenericEvent.DEFUALT_FLOW_ID.equals(payload.getFlowId())) {
+		if (GenericEvent.DEFAULT_FLOW_ID.equals(payload.getFlowId())) {
 			return Optional.empty();
 		}
 		
