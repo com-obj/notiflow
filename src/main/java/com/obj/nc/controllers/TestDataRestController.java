@@ -5,8 +5,11 @@ import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.D
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,7 +63,12 @@ public class TestDataRestController {
     
     @GetMapping("/full-event-processing")
     public void persistFullEventProcessingData() {
-        persistEvent(UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"), 47L);
+        persistEvent(
+                UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"), 
+                47L,
+                Timestamp.valueOf("2021-08-24 09:37:39.366000").toInstant(),
+                Timestamp.valueOf("2021-08-24 09:37:38.413000").toInstant()
+        );
         persistReceivingEndpoints();
         persistNotificationIntent();
         persistMessages();
@@ -72,10 +80,17 @@ public class TestDataRestController {
     @GetMapping("/random-events")
     public void persistRandomEventsData(@RequestParam(value = "count", defaultValue = "47") Long count) {
         Random random = new Random();
-        random.longs().limit(count).forEach(randomLong -> persistEvent(UUID.randomUUID(), randomLong));
+        random.longs().limit(count).forEach(randomLong -> {
+            Instant randomInstant = randomInstantBetween(Instant.now().minus(365, ChronoUnit.DAYS), Instant.now());
+            persistEvent(
+                    UUID.randomUUID(),
+                    randomLong,
+                    randomInstant,
+                    randomInstant.minus(5, ChronoUnit.SECONDS));
+        });
     }
     
-    private void persistEvent(UUID uuid, Long num) {
+    private void persistEvent(UUID uuid, Long num, Instant timeConsumed, Instant timeCreated) {
         DummyEventPayload payload = DummyEventPayload.builder()
                 .stringField("simple string")
                 .longField(num)
@@ -85,11 +100,11 @@ public class TestDataRestController {
                 .id(uuid)
                 .flowId("default-flow")
                 .payloadJson(payload.toJsonNode())
-                .timeConsumed(Timestamp.valueOf("2021-08-24 09:37:39.366000").toInstant())
+                .timeConsumed(timeConsumed)
                 .build();
     
         event = genericEventRepository.save(event);
-        event.setTimeCreated(Timestamp.valueOf("2021-08-24 09:37:38.413000").toInstant());
+        event.setTimeCreated(timeCreated);
         genericEventRepository.save(event);
     }
     
@@ -421,6 +436,15 @@ public class TestDataRestController {
                 .version(0)
                 .build();
         processingInfoRepository.save(processingInfo);
+    }
+    
+    public Instant randomInstantBetween(Instant startInclusive, Instant endExclusive) {
+        long startSeconds = startInclusive.getEpochSecond();
+        long endSeconds = endExclusive.getEpochSecond();
+        long random = ThreadLocalRandom
+                .current()
+                .nextLong(startSeconds, endSeconds);
+        return Instant.ofEpochSecond(random);
     }
     
     @Data
