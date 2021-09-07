@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class TestModeDiggestModel {
+public class TestModeDigestModel {
 	
 	private List<EmailContent> emailContents = new ArrayList<>();
 	private List<SimpleTextContent> smsContents = new ArrayList<>();

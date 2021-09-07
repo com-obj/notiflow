@@ -1,23 +1,29 @@
 package com.obj.nc.domain.message;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.obj.nc.domain.*;
-import com.obj.nc.domain.content.MessageContent;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.HasPreviousIntentIds;
+import com.obj.nc.domain.HasPreviousMessageIds;
+import com.obj.nc.domain.IsNotification;
+import com.obj.nc.domain.content.MessageContent;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.ToString;
 
-import javax.validation.constraints.NotNull;
-import java.util.*;
-
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
-public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayload<BODY_TYPE> implements IsNotification, HasPreviousEventIds, HasPreviousIntentIds, HasPreviousMessageIds {
+public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayload<BODY_TYPE> implements IsNotification, HasPreviousIntentIds, HasPreviousMessageIds {
 	
 	@NotNull
 	@EqualsAndHashCode.Include
@@ -45,7 +51,7 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		}
 		
 		for (Message<?> message : messages) {
-			// TODO: zvazit ukladat ids do Setu namiesto Listu
+			// TODO: consider using Set instead of list
 			message.getPreviousEventIds()
 					.stream()
 					.filter(eventId -> !newMessage.getPreviousEventIds().contains(eventId))
@@ -76,20 +82,20 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 	}
 		
 	@JsonIgnore
-	public abstract Class<? extends RecievingEndpoint> getRecievingEndpointType();
+	public abstract Class<? extends ReceivingEndpoint> getReceivingEndpointType();
 	
-	public MessagePersistantState toPersistantState() {
-		MessagePersistantState persistantState = new MessagePersistantState();
-		persistantState.setBody(getBody());
-		persistantState.setHeader(getHeader());
-		persistantState.setId(getId());
-		persistantState.setPreviousEventIds(previousEventIds.toArray(new UUID[0]));
-		persistantState.setPreviousIntentIds(previousIntentIds.toArray(new UUID[0]));
-		persistantState.setPreviousMessageIds(previousMessageIds.toArray(new UUID[0]));
-		persistantState.setMessageClass(getClass().getName());
-		persistantState.setTimeCreated(getTimeCreated());
-		persistantState.setEndpointIds(getRecievingEndpoints().stream().map(RecievingEndpoint::getId).toArray(UUID[]::new));
-		return persistantState;	 
+	public MessagePersistentState toPersistentState() {
+		MessagePersistentState persistentState = new MessagePersistentState();
+		persistentState.setBody(getBody());
+		persistentState.setHeader(getHeader());
+		persistentState.setId(getId());
+		persistentState.setPreviousEventIds(previousEventIds.toArray(new UUID[0]));
+		persistentState.setPreviousIntentIds(previousIntentIds.toArray(new UUID[0]));
+		persistentState.setPreviousMessageIds(previousMessageIds.toArray(new UUID[0]));
+		persistentState.setMessageClass(getClass().getName());
+		persistentState.setTimeCreated(getTimeCreated());
+		persistentState.setEndpointIds(getReceivingEndpoints().stream().map(ReceivingEndpoint::getId).toArray(UUID[]::new));
+		return persistentState;	 
 	}
 	
 	public void addPreviousEventId(UUID eventId) {

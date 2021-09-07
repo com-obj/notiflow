@@ -13,10 +13,10 @@ import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.headers.Header;
-import com.obj.nc.domain.message.EmailWithTestModeDiggest;
+import com.obj.nc.domain.message.EmailWithTestModeDigest;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.flows.testmode.TestModeProperties;
-import com.obj.nc.flows.testmode.email.functions.processors.TestModeDiggestModel;
+import com.obj.nc.flows.testmode.email.functions.processors.TestModeDigestModel;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +29,7 @@ public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregati
     public Object merge(List<Message<MessageContent>> payloads) {
         if (payloads.isEmpty()) return null;
             
-        TestModeDiggestModel digestModel = new TestModeDiggestModel();
+        TestModeDigestModel digestModel = new TestModeDigestModel();
         payloads.stream()
         		.map(msg -> msg.getBody())
                 .filter(content -> content instanceof EmailContent).map(content -> (EmailContent) content)
@@ -42,7 +42,7 @@ public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregati
         
         digestModel.getSmsContents().forEach(smsContent -> smsContent.setText(StringUtils.replace(smsContent.getText(), "\n", "<br>")));
         
-        TemplateWithModelEmailContent<TestModeDiggestModel> resultMail = new TemplateWithModelEmailContent<TestModeDiggestModel>();
+        TemplateWithModelEmailContent<TestModeDigestModel> resultMail = new TemplateWithModelEmailContent<TestModeDigestModel>();
         resultMail.setSubject("Notifications digest while running test mode");
         resultMail.setTemplateFileName("test-mode-digest.html");
         resultMail.setRequiredLocales(Arrays.asList(new Locale("en")));
@@ -50,11 +50,11 @@ public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregati
         
         List<EmailEndpoint> emailEndpoints = testModeProps.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
         
-        EmailWithTestModeDiggest aggregatedMessage = Message.newTypedMessageFrom(EmailWithTestModeDiggest.class, payloads.toArray(new Message[0]));
+        EmailWithTestModeDigest aggregatedMessage = Message.newTypedMessageFrom(EmailWithTestModeDigest.class, payloads.toArray(new Message[0]));
         aggregatedMessage.setBody(resultMail); 
-        aggregatedMessage.setRecievingEndpoints(emailEndpoints);
+        aggregatedMessage.setReceivingEndpoints(emailEndpoints);
         
-        aggregatedMessage.getHeader().setAttributeValue(Header.SUPRESS_GENERATE_PROC_INFO_PARAM_NAME, true);
+        aggregatedMessage.getHeader().setAttributeValue(Header.SUPPRESS_GENERATE_PROC_INFO_PARAM_NAME, true);
         
         return aggregatedMessage;
     }

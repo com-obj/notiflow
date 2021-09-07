@@ -1,7 +1,14 @@
 package com.obj.nc.security.config;
 
-import com.obj.nc.security.model.AuthenticationError;
-import lombok.RequiredArgsConstructor;
+import static com.obj.nc.security.config.Constants.DEFAULT_EXCEPTION_MSG;
+import static com.obj.nc.security.config.Constants.EXCEPTION_ATTR_NAME;
+import static com.obj.nc.security.config.Constants.NOT_PROTECTED_RESOURCES;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,11 +19,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.http.HttpServletResponse;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import com.obj.nc.security.model.AuthenticationError;
 
-import static com.obj.nc.security.config.Constants.*;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor

@@ -8,10 +8,8 @@ import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
 
 @ReadingConverter
-@Log4j2
 public class PgObjectToContentConverter implements Converter<PGobject, MessageContent> {
     
     private PgObjectToJsonNodeConverter pgObjectToJsonNodeConverter = new PgObjectToJsonNodeConverter();

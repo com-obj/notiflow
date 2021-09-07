@@ -22,8 +22,8 @@ public class SmsMessage extends Message<SimpleTextContent/*, SmsEndpoint*/> {
 	}
 	
 	@Override
-	public List<SmsEndpoint> getRecievingEndpoints() {
-		return (List<SmsEndpoint>) super.getRecievingEndpoints();
+	public List<SmsEndpoint> getReceivingEndpoints() {
+		return (List<SmsEndpoint>) super.getReceivingEndpoints();
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class SmsMessage extends Message<SimpleTextContent/*, SmsEndpoint*/> {
 	
 	//TODO: refactor as class parameter
 	@JsonIgnore
-	public Class<? extends SmsEndpoint> getRecievingEndpointType() {
+	public Class<? extends SmsEndpoint> getReceivingEndpointType() {
 		return SmsEndpoint.class;
 	}
 	

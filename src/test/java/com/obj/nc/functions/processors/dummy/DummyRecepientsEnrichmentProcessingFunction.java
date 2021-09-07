@@ -13,12 +13,10 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 @Component
 @AllArgsConstructor
-@Log4j2
-@DocumentProcessingInfo("DummyRecepientsEnrichment")
+@DocumentProcessingInfo("DummyRecipientsEnrichment")
 public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFunctionAdapter<NotificationIntent, NotificationIntent> {
 
 	
@@ -39,7 +37,7 @@ public class DummyRecepientsEnrichmentProcessingFunction extends ProcessorFuncti
 		EmailEndpoint endpoint2 = EmailEndpoint.createForPerson(person2, "john.dudly@objectify.sk");
 		EmailEndpoint endpoint3 = EmailEndpoint.createForGroup(allObjectifyGroup, "all@objectify.sk");
 
-		notificationIntent.addRecievingEndpoints(endpoint1, endpoint2, endpoint3);
+		notificationIntent.addReceivingEndpoints(endpoint1, endpoint2, endpoint3);
 
 		return notificationIntent;
 	}

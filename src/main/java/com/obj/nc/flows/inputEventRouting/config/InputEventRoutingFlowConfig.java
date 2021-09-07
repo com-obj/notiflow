@@ -12,10 +12,7 @@ import org.springframework.integration.router.AbstractMessageRouter;
 import com.obj.nc.flows.inputEventRouting.InputEventRouter;
 import com.obj.nc.functions.sources.genericEvents.GenericEventsSupplier;
 
-import lombok.extern.log4j.Log4j2;
-
 @Configuration
-@Log4j2
 public class InputEventRoutingFlowConfig {
 		
 	@Autowired private InputEventRoutingProperties routingProps;	

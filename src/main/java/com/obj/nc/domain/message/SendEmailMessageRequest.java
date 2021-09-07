@@ -1,14 +1,13 @@
 package com.obj.nc.domain.message;
 
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.Person;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.util.List;
+
 import org.springframework.http.MediaType;
 
-import java.util.List;
-import java.util.UUID;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.Person;
+
+import lombok.Data;
 
 @Data
 public class SendEmailMessageRequest {
@@ -39,7 +38,7 @@ public class SendEmailMessageRequest {
         
         to.stream()
                 .map(Recipient::toReceivingEndpoint)
-                .forEach(message.getRecievingEndpoints()::add);
+                .forEach(message.getReceivingEndpoints()::add);
         return message;
     }
 }

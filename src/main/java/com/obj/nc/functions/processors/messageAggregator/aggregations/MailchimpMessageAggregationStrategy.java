@@ -19,9 +19,7 @@ import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpMergeVari
 import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpTemplateContentDto;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 @RequiredArgsConstructor
 public class MailchimpMessageAggregationStrategy extends BasePayloadAggregationStrategy<MailchimpContent> {
 	

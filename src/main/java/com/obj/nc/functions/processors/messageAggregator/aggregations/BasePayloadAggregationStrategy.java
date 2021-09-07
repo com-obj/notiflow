@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.obj.nc.domain.content.MessageContent;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -50,12 +50,12 @@ public abstract class BasePayloadAggregationStrategy<CONTENT_TYPE extends Messag
 		}
 		
 		Optional<Message<CONTENT_TYPE>> invalidPayload = payloads.stream()
-				.filter(payload -> !firstPayload.get().getRecievingEndpoints().equals(payload.getRecievingEndpoints()))
+				.filter(payload -> !firstPayload.get().getReceivingEndpoints().equals(payload.getReceivingEndpoints()))
 				.findFirst();
 		
 		return invalidPayload.map(payload -> new PayloadValidationException(
 				String.format("Payload %s has different recipients to other payloads. Is %s", payload,
-						payload.getRecievingEndpoints())));
+						payload.getReceivingEndpoints())));
 	}
 	
 	protected Optional<PayloadValidationException> checkContentTypes(List<Message<CONTENT_TYPE>> payloads, Class<CONTENT_TYPE> clazz) {
@@ -67,9 +67,9 @@ public abstract class BasePayloadAggregationStrategy<CONTENT_TYPE extends Messag
 				String.format("Payload %s has content of invalid type. Is %s", payload, payload.getBody().getClass().getName())));
 	}
 	
-	protected Optional<PayloadValidationException> checkEndpointTypes(List<Message<CONTENT_TYPE>> payloads, Class<? extends RecievingEndpoint> clazz) {
+	protected Optional<PayloadValidationException> checkEndpointTypes(List<Message<CONTENT_TYPE>> payloads, Class<? extends ReceivingEndpoint> clazz) {
 		for (Message<CONTENT_TYPE> payload : payloads) {
-			Optional<? extends RecievingEndpoint> invalidEndpoint = payload.getRecievingEndpoints().stream()
+			Optional<? extends ReceivingEndpoint> invalidEndpoint = payload.getReceivingEndpoints().stream()
 					.filter(endpoint -> !clazz.isInstance(endpoint))
 					.findFirst();
 			

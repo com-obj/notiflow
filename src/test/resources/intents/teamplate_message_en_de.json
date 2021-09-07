@@ -38,7 +38,7 @@
 		]
 		
 	},
-	"recievingEndpoints": [
+	"receivingEndpoints": [
 		{
 			"@type": "EMAIL",
 			"email": "john.doe@objectify.sk"

@@ -1,22 +1,15 @@
 package com.obj.nc.functions.processors.senders.mailchimp.config;
 
-import com.obj.nc.functions.processors.senders.MailchimpSender;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
-
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.*;
+import com.obj.nc.functions.processors.senders.MailchimpSender;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpSenderProcessorFunction;
 
 @Configuration
 public class MailchimpSenderConfig {

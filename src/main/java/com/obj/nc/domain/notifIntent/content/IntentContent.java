@@ -19,7 +19,7 @@ import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 
 import lombok.Data;
@@ -62,7 +62,7 @@ public class IntentContent extends BaseJSONObject {
 		return JSON_TYPE_IDENTIFIER;
 	}
 
-	public MessageContent createMessageContent(RecievingEndpoint endpoint) {
+	public MessageContent createMessageContent(ReceivingEndpoint endpoint) {
 		if (endpoint instanceof EmailEndpoint) {
 			EmailContent emailContent = EmailContent.builder()
 				.text(getBody())

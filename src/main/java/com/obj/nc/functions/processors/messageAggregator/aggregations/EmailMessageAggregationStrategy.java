@@ -3,20 +3,18 @@ package com.obj.nc.functions.processors.messageAggregator.aggregations;
 import java.util.List;
 import java.util.Optional;
 
-import com.obj.nc.domain.message.EmailMessage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 
-import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Component;
 
-@Log4j2
 @Component
 public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrategy<EmailContent> {
 	
@@ -76,33 +74,33 @@ public class EmailMessageAggregationStrategy extends BasePayloadAggregationStrat
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		
 		Message<EmailContent> outputMessage = Message.newTypedMessageFrom(EmailMessage.class, payloads.toArray(new Message[0]));
-		outputMessage.setRecievingEndpoints(payloads.get(0).getRecievingEndpoints());
+		outputMessage.setReceivingEndpoints(payloads.get(0).getReceivingEndpoints());
 		outputMessage.setBody(aggregatedEmailContent);
 		return outputMessage;
 	}
 	
 	private EmailContent concatContents(EmailContent one, EmailContent other) {
-		EmailContent concated = new EmailContent();
-		concated.setSubject(one.getSubject().concat(SUBJECT_CONCAT_DELIMITER).concat(other.getSubject()));
+		EmailContent concatenated = new EmailContent();
+		concatenated.setSubject(one.getSubject().concat(SUBJECT_CONCAT_DELIMITER).concat(other.getSubject()));
 		
-		concated.setContentType(one.getContentType());
-		if (MediaType.TEXT_HTML_VALUE.equals(concated.getContentType())) {
+		concatenated.setContentType(one.getContentType());
+		if (MediaType.TEXT_HTML_VALUE.equals(concatenated.getContentType())) {
 			Document oneAsDocument = Jsoup.parse(one.getText());
 			oneAsDocument.body().append(HTML_TEXT_CONCAT_DELIMITER);
 			
 			Document otherAsDocument = Jsoup.parse(other.getText());
 			otherAsDocument.body().childNodesCopy().forEach(oneAsDocument.body()::appendChild);
 			
-			String concatedTexts = oneAsDocument.html();
-			concated.setText(concatedTexts);
-		} else if (MediaType.TEXT_PLAIN_VALUE.equals(concated.getContentType())) {
-			String concatedTexts = one.getText().concat(PLAIN_TEXT_CONCAT_DELIMITER).concat(other.getText());
-			concated.setText(concatedTexts);
+			String concatenatedTexts = oneAsDocument.html();
+			concatenated.setText(concatenatedTexts);
+		} else if (MediaType.TEXT_PLAIN_VALUE.equals(concatenated.getContentType())) {
+			String concatenatedTexts = one.getText().concat(PLAIN_TEXT_CONCAT_DELIMITER).concat(other.getText());
+			concatenated.setText(concatenatedTexts);
 		}
 		
-		concated.getAttachments().addAll(one.getAttachments());
-		concated.getAttachments().addAll(other.getAttachments());
-		return concated;
+		concatenated.getAttachments().addAll(one.getAttachments());
+		concatenated.getAttachments().addAll(other.getAttachments());
+		return concatenated;
 	}
 
 }

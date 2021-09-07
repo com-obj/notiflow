@@ -12,11 +12,9 @@ import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 @Component
 @AllArgsConstructor
-@Log4j2
 public class DeliveryInfoPersister extends ProcessorFunctionAdapter<List<DeliveryInfo>,List<DeliveryInfo>> {
 
     @Autowired

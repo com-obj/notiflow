@@ -4,10 +4,10 @@ import java.util.UUID;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.obj.nc.domain.refIntegrity.EntityExistanceChecker;
-import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
+import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
+import com.obj.nc.flows.errorHandling.domain.FailedPayload;
 
-public interface FailedPayloadRepository extends CrudRepository<FailedPaylod, UUID>, EntityExistanceChecker<UUID> {
+public interface FailedPayloadRepository extends CrudRepository<FailedPayload, UUID>, EntityExistenceChecker<UUID> {
 	
 
 }

@@ -1,12 +1,8 @@
 package com.obj.nc.flows.testmode.mailchimp.config;
 
-import com.obj.nc.flows.testmode.TestModeProperties;
-import com.obj.nc.flows.testmode.config.TestModeFlowConfig;
-import com.obj.nc.flows.testmode.mailchimp.functions.InMemoryMailchimpSourceSupplier;
-import com.obj.nc.functions.processors.senders.MailchimpSender;
-import lombok.extern.log4j.Log4j2;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,11 +13,12 @@ import org.springframework.integration.dsl.Pollers;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
-import java.util.concurrent.TimeUnit;
+import com.obj.nc.flows.testmode.TestModeProperties;
+import com.obj.nc.flows.testmode.config.TestModeFlowConfig;
+import com.obj.nc.flows.testmode.mailchimp.functions.InMemoryMailchimpSourceSupplier;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-@Log4j2
 public class TestModeMailchimpFlowConfig {
 	
 	@Autowired private TestModeProperties testModeProps;
@@ -32,7 +29,7 @@ public class TestModeMailchimpFlowConfig {
 
     @Bean
     @DependsOn(TestModeFlowConfig.TEST_MODE_AGGREGATE_AND_SEND_FLOW_NAME)
-    public IntegrationFlow testModeProcessRecievedMailchimpMessage() {
+    public IntegrationFlow testModeProcessReceivedMailchimpMessage() {
         return IntegrationFlows
         		.fromSupplier(inMemoryMailchimpSource,
                       config -> config.poller(Pollers.trigger(testModeSourceTrigger()))

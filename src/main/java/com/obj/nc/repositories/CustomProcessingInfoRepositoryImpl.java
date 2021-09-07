@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.obj.nc.domain.headers.ProcessingInfo;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 @AllArgsConstructor
 public class CustomProcessingInfoRepositoryImpl implements CustomProcessingInfoRepository {
 	

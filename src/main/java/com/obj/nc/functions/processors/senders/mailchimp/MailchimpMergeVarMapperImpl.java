@@ -1,12 +1,12 @@
 package com.obj.nc.functions.processors.senders.mailchimp;
 
-import com.obj.nc.domain.content.mailchimp.MailchimpData;
-import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpMergeVariableDto;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
+import com.obj.nc.domain.content.mailchimp.MailchimpData;
+import com.obj.nc.functions.processors.senders.mailchimp.dtos.MailchimpMergeVariableDto;
 
 @Component
 public class MailchimpMergeVarMapperImpl implements MailchimpMergeVarMapper {

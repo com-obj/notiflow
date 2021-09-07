@@ -69,13 +69,13 @@ public abstract class BaseTemplateFormatter<TEMPLATE_TYPE extends TemplateWithMo
 				ctx.setVariable("model", emailFromTemplate.getModel());
 			}
 			
-			final String formatedContent = this.templateEngine.process(emailFromTemplate.getTemplateFileName(), ctx);
+			final String formattedContent = this.templateEngine.process(emailFromTemplate.getTemplateFileName(), ctx);
 			
-			Message<OUTPUT_CONTENT_TYPE> htmlMessage = createMessageWithFormattedContent(formatedContent, locale, payload);
+			Message<OUTPUT_CONTENT_TYPE> htmlMessage = createMessageWithFormattedContent(formattedContent, locale, payload);
 			
 			htmlMessage.setAttributeValue(LOCALE_ATTR_NAME,locale);
 //			htmlMessage.setDeliveryOptions(payload.getDeliveryOptions());
-			htmlMessage.setRecievingEndpoints(payload.getRecievingEndpoints());
+			htmlMessage.setReceivingEndpoints(payload.getReceivingEndpoints());
 			
 			result.add(htmlMessage);
 		}
@@ -84,7 +84,7 @@ public abstract class BaseTemplateFormatter<TEMPLATE_TYPE extends TemplateWithMo
 	}
 
 
-	protected abstract Message<OUTPUT_CONTENT_TYPE> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TEMPLATE_TYPE> payload);
+	protected abstract Message<OUTPUT_CONTENT_TYPE> createMessageWithFormattedContent(String formattedContent, Locale locale,  Message<TEMPLATE_TYPE> payload);
 
 
 }

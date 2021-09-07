@@ -32,7 +32,7 @@ public class RefIntegrityBeforeSaveCallback implements BeforeSaveCallback<Persis
 			List<AccessibleObject> refClassMembers = getMembersWithReferences(entity);
 			
 			for (AccessibleObject refClassMember : refClassMembers) {
-				EntityExistanceChecker<UUID> refChecker = getReferenceChecker(refClassMember);
+				EntityExistenceChecker<UUID> refChecker = getReferenceChecker(refClassMember);
 
 				List<UUID> referenceIds = getReferenceIds(entity, refClassMember);
 
@@ -63,9 +63,9 @@ public class RefIntegrityBeforeSaveCallback implements BeforeSaveCallback<Persis
 		return refClassMembers;
 	}
 
-	public EntityExistanceChecker<UUID> getReferenceChecker(AccessibleObject refClassMember) {
-		Class<? extends EntityExistanceChecker<UUID>> refCheckerClass = refClassMember.getAnnotation(Reference.class).value();
-		EntityExistanceChecker<UUID> refChecker = Get.getApplicationContext().getBean(refCheckerClass);
+	public EntityExistenceChecker<UUID> getReferenceChecker(AccessibleObject refClassMember) {
+		Class<? extends EntityExistenceChecker<UUID>> refCheckerClass = refClassMember.getAnnotation(Reference.class).value();
+		EntityExistenceChecker<UUID> refChecker = Get.getApplicationContext().getBean(refCheckerClass);
 
 		if (refChecker == null) {
 			throw new RuntimeException("Could not find bean with type " + refCheckerClass.getName()

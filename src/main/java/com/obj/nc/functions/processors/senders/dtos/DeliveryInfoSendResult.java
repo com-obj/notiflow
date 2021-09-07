@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
@@ -49,7 +49,7 @@ public class DeliveryInfoSendResult implements HasHeader {
 	private UUID[] messageIds;
 	
 	@NotNull
-	private RecievingEndpoint recievingEndpoint;
+	private ReceivingEndpoint recievingEndpoint;
 
 	private Header header;
 	

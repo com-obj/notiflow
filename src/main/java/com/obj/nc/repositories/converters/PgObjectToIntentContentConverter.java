@@ -8,10 +8,8 @@ import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.utils.JsonUtils;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
 
 @ReadingConverter
-@Log4j2
 public class PgObjectToIntentContentConverter implements Converter<PGobject, IntentContent> {
     
     private PgObjectToJsonNodeConverter pgObjectToJsonNodeConverter = new PgObjectToJsonNodeConverter();

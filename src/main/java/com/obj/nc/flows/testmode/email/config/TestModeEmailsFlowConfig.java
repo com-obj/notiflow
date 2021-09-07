@@ -17,11 +17,8 @@ import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.config.TestModeFlowConfig;
 import com.obj.nc.flows.testmode.email.functions.sources.GreenMailReceiverSourceSupplier;
 
-import lombok.extern.log4j.Log4j2;
-
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-@Log4j2
 public class TestModeEmailsFlowConfig {
 	 
 	@Autowired private TestModeProperties testModeProps;
@@ -32,7 +29,7 @@ public class TestModeEmailsFlowConfig {
 	
     @Bean
     @DependsOn(TestModeFlowConfig.TEST_MODE_AGGREGATE_AND_SEND_FLOW_NAME)
-    public IntegrationFlow testModeProcessRecievedEmailMessage() {
+    public IntegrationFlow testModeProcessReceivedEmailMessage() {
         return IntegrationFlows
         		.fromSupplier(greenMailMessageSource,
                       config -> config.poller(Pollers.trigger(testModeSourceTrigger()))

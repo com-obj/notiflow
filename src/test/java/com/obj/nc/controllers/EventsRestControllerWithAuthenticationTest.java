@@ -1,14 +1,14 @@
 package com.obj.nc.controllers;
 
-import com.jayway.jsonpath.JsonPath;
-import com.obj.nc.config.NcAppConfigProperties;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import com.obj.nc.security.config.JwtTokenUtil;
-import com.obj.nc.security.config.NcJwtConfigProperties;
-import com.obj.nc.security.exception.UserNotAuthenticatedException;
-import com.obj.nc.security.model.JwtRequest;
-import com.obj.nc.utils.JsonUtils;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.security.config.Constants.JWT_TOKEN_PREFIX;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,14 +27,15 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import java.util.ArrayList;
-
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.security.config.Constants.JWT_TOKEN_PREFIX;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.jayway.jsonpath.JsonPath;
+import com.obj.nc.config.NcAppConfigProperties;
+import com.obj.nc.security.config.JwtTokenUtil;
+import com.obj.nc.security.config.NcJwtConfigProperties;
+import com.obj.nc.security.exception.UserNotAuthenticatedException;
+import com.obj.nc.security.model.JwtRequest;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc

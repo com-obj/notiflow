@@ -1,13 +1,17 @@
 package com.obj.nc.controllers;
 
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.SendEmailMessageRequest;
 import com.obj.nc.domain.message.SendMessageResponse;
-import com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlow;
 import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 
 @Validated
 @RestController

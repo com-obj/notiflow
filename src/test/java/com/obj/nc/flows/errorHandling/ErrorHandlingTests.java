@@ -34,13 +34,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.controllers.ErrorHandlingRestController;
 import com.obj.nc.flows.errorHandling.ErrorHandlingTests.TestModeTestConfiguration.TestFlow1;
-import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
+import com.obj.nc.flows.errorHandling.domain.FailedPayload;
 import com.obj.nc.repositories.FailedPayloadRepository;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -69,14 +69,14 @@ public class ErrorHandlingTests {
 	@SuppressWarnings("unchecked")
 	public void testPayloadWithErrorProduced() throws InterruptedException, ExecutionException, TimeoutException, JsonProcessingException {
         //WHEN
-		TestPayload paylod = TestPayload.builder().str("ss").build();
-        Future<TestPayload> result = testFlow1.execute(paylod);
+		TestPayload payload = TestPayload.builder().str("ss").build();
+        Future<TestPayload> result = testFlow1.execute(payload);
  
         //THEN fail documented
 		Awaitility.await().atMost(1000, TimeUnit.SECONDS).until(() -> 
 			failedPayloadRepo.count() > 0);
 		
-		FailedPaylod failed = failedPayloadRepo.findAll().iterator().next();
+		FailedPayload failed = failedPayloadRepo.findAll().iterator().next();
 		
 		//WHEN problem fixed and corrected message saved
 		Message<TestPayload> failedMsg = (Message<TestPayload>)jsonConverterForMessages.treeToValue(failed.getMessageJson(), Message.class);

@@ -12,7 +12,7 @@ import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
@@ -51,7 +51,7 @@ class RecepientsUsingSubscriptionTest {
         // then
         MatcherAssert.assertThat(outputNotificationIntent, Matchers.notNullValue());
 
-        List<? extends RecievingEndpoint> outputEventEndpoints = outputNotificationIntent.getRecievingEndpoints();
+        List<? extends ReceivingEndpoint> outputEventEndpoints = outputNotificationIntent.getReceivingEndpoints();
         MatcherAssert.assertThat(outputEventEndpoints, Matchers.hasSize(3));
         MatcherAssert.assertThat(outputEventEndpoints, Matchers.everyItem(Matchers.instanceOf(EmailEndpoint.class)));
 
@@ -75,7 +75,7 @@ class RecepientsUsingSubscriptionTest {
         NotificationIntent outputNotificationIntent = (NotificationIntent)resolveRecipients.apply(inputNotificationIntent);
 
         // then
-        List<? extends RecievingEndpoint> outputEventEndpoints = outputNotificationIntent.getRecievingEndpoints();
+        List<? extends ReceivingEndpoint> outputEventEndpoints = outputNotificationIntent.getReceivingEndpoints();
         MatcherAssert.assertThat(outputEventEndpoints, Matchers.hasSize(6));
         MatcherAssert.assertThat(outputEventEndpoints, Matchers.everyItem(Matchers.instanceOf(EmailEndpoint.class)));
     }

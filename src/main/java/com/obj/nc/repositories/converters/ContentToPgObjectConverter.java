@@ -7,10 +7,8 @@ import org.springframework.data.convert.WritingConverter;
 import com.obj.nc.domain.content.MessageContent;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
 
 @WritingConverter
-@Log4j2
 public class ContentToPgObjectConverter implements Converter<MessageContent, PGobject> {
     
     private JsonNodeToPgObjectConverter jsonNodeToPgObjectConverter = new JsonNodeToPgObjectConverter();

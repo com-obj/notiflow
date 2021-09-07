@@ -5,10 +5,10 @@ import java.util.UUID;
 
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-import org.springframework.data.repository.query.Param;
 
 public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUID> {
 	

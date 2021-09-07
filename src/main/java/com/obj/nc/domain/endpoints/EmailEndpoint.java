@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EmailEndpoint extends RecievingEndpoint {
+public class EmailEndpoint extends ReceivingEndpoint {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "EMAIL";
 

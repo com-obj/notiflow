@@ -167,7 +167,7 @@ public class ProcessingInfoGenerator {
 		
 		if (input instanceof HasHeader) {
 		    Header header = ((HasHeader)input).getHeader();
-		    if (!header.isSupressGenerateProcessingInfo()) {
+		    if (!header.isSuppressGenerateProcessingInfo()) {
 			    ImmutablePair<Header, Object> headerPayloadPair = new ImmutablePair<>(header, input);
 			    
 			    result.add(headerPayloadPair);

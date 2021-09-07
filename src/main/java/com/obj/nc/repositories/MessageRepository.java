@@ -5,13 +5,11 @@ import java.util.UUID;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessagePersistantState;
-import com.obj.nc.domain.refIntegrity.EntityExistanceChecker;
+import com.obj.nc.domain.message.MessagePersistentState;
+import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
 
-public interface MessageRepository extends CrudRepository<MessagePersistantState, UUID>, EntityExistanceChecker<UUID> {
+public interface MessageRepository extends CrudRepository<MessagePersistentState, UUID>, EntityExistenceChecker<UUID> {
 
 	
-	List<MessagePersistantState> findByIdIn(List<UUID> intentIds);
+	List<MessagePersistentState> findByIdIn(List<UUID> intentIds);
 }

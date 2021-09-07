@@ -14,10 +14,7 @@ import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.intentPersister.NotificationIntentPersister;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
 
-import lombok.extern.log4j.Log4j2;
-
 @Configuration
-@Log4j2
 public class NotificationIntentProcessingFlowConfig {
 		
 	@Autowired private MessagesFromIntentGenerator generateMessagesFromIntent;
@@ -28,14 +25,14 @@ public class NotificationIntentProcessingFlowConfig {
 	public final static String INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID = INTENT_PROCESSING_FLOW_ID + "_INPUT";
 	
 	@Bean(INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID)
-	public MessageChannel intentProcessingInputChangel() {
+	public MessageChannel intentProcessingInputChannel() {
 		return new PublishSubscribeChannel();
 	}
 	
 	@Bean(INTENT_PROCESSING_FLOW_ID)
 	public IntegrationFlow intentProcessingFlowDefinition() {
 		return IntegrationFlows
-				.from(intentProcessingInputChangel())
+				.from(intentProcessingInputChannel())
 				.handle(endpointPersister)
 				.handle(notificationIntentPersister)				
 				.transform(generateMessagesFromIntent)

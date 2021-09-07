@@ -5,8 +5,8 @@ import java.util.UUID;
 import org.springframework.data.repository.CrudRepository;
 
 import com.obj.nc.domain.headers.ProcessingInfo;
-import com.obj.nc.domain.refIntegrity.EntityExistanceChecker;
+import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
 
-public interface ProcessingInfoRepository extends CrudRepository<ProcessingInfo, UUID>, CustomProcessingInfoRepository, EntityExistanceChecker<UUID> {
+public interface ProcessingInfoRepository extends CrudRepository<ProcessingInfo, UUID>, CustomProcessingInfoRepository, EntityExistenceChecker<UUID> {
 
 }

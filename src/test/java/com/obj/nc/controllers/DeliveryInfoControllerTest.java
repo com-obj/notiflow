@@ -1,30 +1,29 @@
 package com.obj.nc.controllers;
 
-import java.sql.Date;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.READ;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.icegreen.greenmail.configuration.GreenMailConfiguration;
-import com.icegreen.greenmail.junit5.GreenMailExtension;
-import com.icegreen.greenmail.util.ServerSetupTest;
-import com.jayway.jsonpath.JsonPath;
-import com.obj.nc.config.NcAppConfigProperties;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessagePersistantState;
-import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
-import com.obj.nc.functions.processors.messageBuilder.MessageByRecipientTokenizer;
-import com.obj.nc.repositories.*;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -40,22 +39,29 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import com.jayway.jsonpath.JsonPath;
+import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.controllers.DeliveryInfoRestController.EndpointDeliveryInfoDto;
+import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.MessagePersistentState;
+import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.READ;
-import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import com.obj.nc.repositories.DeliveryInfoRepository;
+import com.obj.nc.repositories.EndpointsRepository;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.GenericEventRepositoryTest;
+import com.obj.nc.repositories.MessageRepository;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
@@ -90,7 +96,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
     	SmsEndpoint sms1 = SmsEndpoint.builder().phone("0908111111").build();
-    	Map<String, RecievingEndpoint> endpoints = endpointRepo.persistEnpointIfNotExistsMappedToNameId(email1, sms1);
+    	Map<String, ReceivingEndpoint> endpoints = endpointRepo.persistEnpointIfNotExistsMappedToNameId(email1, sms1);
     	UUID emailEndPointId = endpoints.get("jancuzy@gmail.com").getId();
     	UUID smsEndPointId = endpoints.get("0908111111").getId();
     	
@@ -171,8 +177,8 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL"))).andReturn();
 	
 		String statusReachedAt = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$[0].statusReachedAt");
-		SimpleDateFormat ISO8601DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.mmm'Z'");
-		Assertions.assertThat(ISO8601DATEFORMAT.parse(statusReachedAt)).isNotNull();
+		SimpleDateFormat ISO8601_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.mmm'Z'");
+		Assertions.assertThat(ISO8601_DATE_FORMAT.parse(statusReachedAt)).isNotNull();
 	}
 	
 	@Test
@@ -186,7 +192,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		//AND
 		EmailMessage emailMessage = new EmailMessage();
 		emailMessage.setBody(EmailContent.builder().subject("Subject").text("Text").build());
-		emailMessage.setRecievingEndpoints(Arrays.asList(email1, email2));
+		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
 		
 		messageProcessingFlow.processMessage(emailMessage);
 		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
@@ -219,12 +225,12 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		//AND
 		EmailMessage emailMessage = new EmailMessage();
 		emailMessage.setBody(EmailContent.builder().subject("Subject").text("Text").build());
-		emailMessage.setRecievingEndpoints(Arrays.asList(email1, email2));
+		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
 		
 		messageProcessingFlow.processMessage(emailMessage);
 		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
 		
-		List<MessagePersistantState> messages = StreamSupport.stream(messageRepo.findAll().spliterator(), false)
+		List<MessagePersistentState> messages = StreamSupport.stream(messageRepo.findAll().spliterator(), false)
 				.filter(message -> !emailMessage.getId().equals(message.getId()))
 				.collect(Collectors.toList());
 		
@@ -250,7 +256,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 				.andExpect(status().is2xxSuccessful())
 				.andExpect(content().contentType(MediaType.IMAGE_PNG));
 		
-		//AND READ STATUS IS JOURNALED
+		//AND READ STATUS IS JOURNALIZED
 		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), READ) >= 1);
 		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatus(emailMessage.getId(), READ);
 		assertThat(infosOfMessage).hasSize(1);

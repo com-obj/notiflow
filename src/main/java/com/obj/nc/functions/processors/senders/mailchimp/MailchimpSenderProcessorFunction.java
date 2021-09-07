@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.MailChimpMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -47,8 +47,8 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 			return Optional.of(new PayloadValidationException("Message content must not be null"));
 		}
 		
-		boolean hasNoneOrTooMuchEndpoints = payload.getRecievingEndpoints().size() != 1;
-		boolean containsNonEmailEndpoint = payload.getRecievingEndpoints().stream()
+		boolean hasNoneOrTooMuchEndpoints = payload.getReceivingEndpoints().size() != 1;
+		boolean containsNonEmailEndpoint = payload.getReceivingEndpoints().stream()
 				.anyMatch(endpoint -> !MailchimpEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType()));
 		
 		if (hasNoneOrTooMuchEndpoints || containsNonEmailEndpoint) {
@@ -61,7 +61,7 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 	@Override
 	protected MailChimpMessage execute(MailChimpMessage payload) {
 		MailchimpContent content = payload.getBody();
-		content.setRecipients(mapRecipient(payload.getRecievingEndpoints().get(0)));
+		content.setRecipients(mapRecipient(payload.getReceivingEndpoints().get(0)));
 		
 		MailchimpSendTemplateRequest dto = MailchimpSendTemplateRequest.from(content, mailchimpSenderConfigProperties.getAuthKey());
 		List<MailchimpSendTemplateResponse> mailchimpSendTemplateResponses = doSendMessage(dto);
@@ -84,7 +84,7 @@ public class MailchimpSenderProcessorFunction extends ProcessorFunctionAdapter<M
 		return restTemplate;
 	}
 	
-	public List<MailchimpRecipientDto> mapRecipient(RecievingEndpoint endpoint) {
+	public List<MailchimpRecipientDto> mapRecipient(ReceivingEndpoint endpoint) {
 		List<MailchimpRecipientDto> recipientInList = new ArrayList<>();
 
 		if (!MailchimpEndpoint.JSON_TYPE_IDENTIFIER.equals(endpoint.getEndpointType())) {

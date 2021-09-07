@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.MessageContent;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -26,7 +26,7 @@ public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> ex
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(Message<CONTENT_TYPE> notificationIntent) {
 
-		if (notificationIntent.getRecievingEndpoints().isEmpty()) {
+		if (notificationIntent.getReceivingEndpoints().isEmpty()) {
 			return Optional.of(new PayloadValidationException(
 					String.format("NotificationIntent %s has no receiving endpoints defined.", notificationIntent)));
 		}
@@ -41,11 +41,11 @@ public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> ex
 
 		List<Message<CONTENT_TYPE>> messages = new ArrayList<>();
 
-		for (RecievingEndpoint recievingEndpoint: msg.getRecievingEndpoints()) {
+		for (ReceivingEndpoint recievingEndpoint: msg.getReceivingEndpoints()) {
 
 			Message<CONTENT_TYPE> msgClone = Message.newTypedMessageFrom(msg.getClass(), msg);
 			
-			msgClone.addRecievingEndpoints(recievingEndpoint);
+			msgClone.addReceivingEndpoints(recievingEndpoint);
 
 			msgClone.setAttributes(msg.getAttributes());
 			msgClone.setBody(msg.getBody());

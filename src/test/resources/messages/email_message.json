@@ -12,7 +12,7 @@
 		"text": "Text",
 		"subject": "Subject"
 	},
-	"recievingEndpoints": [
+	"receivingEndpoints": [
 		{
 			"@type": "EMAIL",
 			"recipient": {

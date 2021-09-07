@@ -1,10 +1,11 @@
 package com.obj.nc.functions.processors.eventValidator;
 
-import lombok.Data;
+import java.util.Map;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
+import lombok.Data;
 
 @Data
 @Configuration

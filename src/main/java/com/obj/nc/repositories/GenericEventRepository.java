@@ -4,13 +4,13 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import com.obj.nc.domain.refIntegrity.EntityExistanceChecker;
 import org.springframework.data.domain.Pageable;
-
-import com.obj.nc.domain.event.GenericEvent;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface GenericEventRepository extends PagingAndSortingRepository<GenericEvent, UUID>, EntityExistanceChecker<UUID> {
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
+
+public interface GenericEventRepository extends PagingAndSortingRepository<GenericEvent, UUID>, EntityExistenceChecker<UUID> {
 	
 	GenericEvent findFirstByTimeConsumedIsNullOrderByTimeCreatedAsc();
 	

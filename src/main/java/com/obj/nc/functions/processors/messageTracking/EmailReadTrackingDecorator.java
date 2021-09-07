@@ -1,12 +1,8 @@
 package com.obj.nc.functions.processors.messageTracking;
 
-import com.obj.nc.config.NcAppConfigProperties;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import lombok.RequiredArgsConstructor;
+import java.net.URI;
+import java.util.Optional;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,8 +10,14 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
-import java.util.Optional;
+import com.obj.nc.config.NcAppConfigProperties;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -44,7 +46,7 @@ public class EmailReadTrackingDecorator extends ProcessorFunctionAdapter<Message
     @Override
     protected Message<EmailContent> execute(Message<EmailContent> payload) {
         EmailMessage result = Message.newTypedMessageFrom(EmailMessage.class, payload);
-        result.setRecievingEndpoints(payload.getRecievingEndpoints());
+        result.setReceivingEndpoints(payload.getReceivingEndpoints());
         result.setAttributes(payload.getAttributes());
         result.setBody(payload.getBody());
         

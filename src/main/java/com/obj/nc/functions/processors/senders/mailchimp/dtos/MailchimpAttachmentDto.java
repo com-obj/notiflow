@@ -3,11 +3,11 @@ package com.obj.nc.functions.processors.senders.mailchimp.dtos;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.obj.nc.utils.FileUtils;
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.springframework.core.io.FileSystemResource;
 
 import com.obj.nc.domain.Attachement;
+import com.obj.nc.utils.FileUtils;
 
 import lombok.Data;
 

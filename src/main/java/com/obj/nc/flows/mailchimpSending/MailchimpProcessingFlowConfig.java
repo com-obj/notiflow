@@ -1,16 +1,18 @@
 package com.obj.nc.flows.mailchimpSending;
 
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
-import com.obj.nc.functions.processors.senders.MailchimpSender;
-import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
+
+import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.messagePersister.MessagePersister;
+import com.obj.nc.functions.processors.senders.MailchimpSender;
+import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor

@@ -9,11 +9,9 @@ import org.springframework.context.annotation.Configuration;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.sources.SourceMicroService;
 
-import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;
 
 @Configuration
-@Log4j2
 public class EventGeneratorMicroService extends SourceMicroService<NotificationIntent, EventGeneratorSourceSupplier> {
 
     @Autowired

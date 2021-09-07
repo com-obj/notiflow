@@ -15,7 +15,7 @@
            		{"field1":"val21","field2":"val22"}
            	]
       },
-      "recievingEndpoints":[
+      "receivingEndpoints":[
          {
             "@type":"SMS",
             "phone":"0908186997",

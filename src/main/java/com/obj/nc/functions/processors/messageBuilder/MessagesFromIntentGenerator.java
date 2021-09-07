@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -25,7 +25,7 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent notificationIntent) {
 
-		if (notificationIntent.getRecievingEndpoints().isEmpty()) {
+		if (notificationIntent.getReceivingEndpoints().isEmpty()) {
 			return Optional.of(new PayloadValidationException(
 					String.format("NotificationIntent %s has no receiving endpoints defined.", notificationIntent)));
 		}
@@ -41,11 +41,11 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 		List<Message<?>> messages = new ArrayList<>();
 		
 
-		for (RecievingEndpoint recievingEndpoint: notificationIntent.getRecievingEndpoints()) {
+		for (ReceivingEndpoint recievingEndpoint: notificationIntent.getReceivingEndpoints()) {
 			
 			Message<?> msg = (Message<?>) notificationIntent.createMessage(recievingEndpoint);
 			
-			msg.addRecievingEndpoints(recievingEndpoint);
+			msg.addReceivingEndpoints(recievingEndpoint);
 
 			msg.setAttributes(notificationIntent.getAttributes());
 			messages.add(msg);

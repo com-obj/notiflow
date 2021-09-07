@@ -52,11 +52,6 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(List<EmailMessage> messages) {
-		//toto neni na stav, kedy by bolo treba hadzat vynimku.. ked je source prazdy, tak je prazdny. nic sa nedeje
-//        if (payload.getMessages().isEmpty()) {
-//            return Optional.of(new PayloadValidationException("There are no messages to supply"));
-//        }
-
 		if (properties.getRecipients()==null) {
 			return Optional.of(new PayloadValidationException("No recipients defined for nc.flows.test-mode.recipients. Test mode sender cannot send aggregated email"));
 		}
@@ -118,7 +113,7 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
             content.setContentType(contentType);
             //This is most likely not used,.. this mails are aggregated and bundled into separate mail, which will set the recipient from setting again
             List<EmailEndpoint> emailEndpoints = properties.getRecipients().stream().map(rec-> new EmailEndpoint(rec)).collect(Collectors.toList());
-            result.setRecievingEndpoints(emailEndpoints);
+            result.setReceivingEndpoints(emailEndpoints);
 
 
 //            DeliveryOptions deliveryOptions = new DeliveryOptions();
