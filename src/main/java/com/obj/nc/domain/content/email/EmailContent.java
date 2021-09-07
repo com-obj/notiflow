@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.http.MediaType;
 
-import com.obj.nc.domain.Attachement;
+import com.obj.nc.domain.Attachment;
 import com.obj.nc.domain.content.MessageContent;
 
 import lombok.AllArgsConstructor;
@@ -36,7 +36,7 @@ public class EmailContent extends MessageContent {
 
 	@EqualsAndHashCode.Include
 	@Builder.Default
-	private List<Attachement> attachments = new ArrayList();
+	private List<Attachment> attachments = new ArrayList();
 	
 	
 }
