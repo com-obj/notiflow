@@ -1,1 +1,12 @@
-operation::GET-events[]
+//not used, left just in case
+
+= DELIVERY-INFO endpoint
+
+== GET Delivery-info
+operation::delivery-info/GET-delivery-info-events[]
+
+
+
+
+
+

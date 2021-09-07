@@ -165,4 +165,5 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
     	Get.setApplicationContext(applicationContext);
     }
+
 }

@@ -3,17 +3,19 @@ package com.obj.nc.domain.endpoints;
 import java.time.Instant;
 import java.util.UUID;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.payload.PayloadDocumentation;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -57,5 +59,14 @@ public abstract class ReceivingEndpoint implements Persistable<UUID> {
 	public boolean isNew() {
 		return timeCreated == null;
 	}
+
+	public static FieldDescriptor[] fieldDesc = new FieldDescriptor[] {
+		PayloadDocumentation.fieldWithPath("id").description("Internal ID"),
+		PayloadDocumentation.fieldWithPath("deliveryOptions").description("TODO"),
+		PayloadDocumentation.fieldWithPath("recipient").description("Information about real recipient to whom this endpoint belongs to"),
+		PayloadDocumentation.fieldWithPath("endpointId").description("Non technical ID of this endpoint (Email address, Phone number, .."),
+		PayloadDocumentation.fieldWithPath("timeCreated").description("Timestamp of record creation"),		
+		PayloadDocumentation.fieldWithPath("@type").description("Type discriminator of the endpoint type. Will be replaced by @class attribute in the future"),
+	};
 
 }

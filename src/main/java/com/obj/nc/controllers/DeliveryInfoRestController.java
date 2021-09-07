@@ -11,18 +11,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.Transient;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
@@ -35,6 +23,20 @@ import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.MessageRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Transient;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.payload.PayloadDocumentation;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import lombok.Builder;
 import lombok.Data;
@@ -159,6 +161,12 @@ public class DeliveryInfoRestController {
 				return timeBased == 0 ?  statusBased: timeBased;
 			});
 		}
+
+		public static FieldDescriptor[] fieldDesc = new FieldDescriptor[] {
+			PayloadDocumentation.fieldWithPath("currentStatus").description("Delivery status. One of PROCESSING, SENT, DELIVERED, READ, FAILED"),
+			PayloadDocumentation.fieldWithPath("statusReachedAt").description("Time stamp when the status was reached hence when the delivery info was created"),
+			PayloadDocumentation.fieldWithPath("endpoint").description("Endpoint for which this delivery info was calculated")
+		};
 	}
 
 

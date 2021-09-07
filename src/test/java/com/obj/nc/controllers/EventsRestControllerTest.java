@@ -32,18 +32,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.restdocs.RestDocsMockMvcConfigurationCustomizer;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.restdocs.cli.CliDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.payload.FieldDescriptor;
-import org.springframework.restdocs.payload.PayloadDocumentation;
+import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -58,7 +54,8 @@ import lombok.Data;
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 @AutoConfigureMockMvc
-@AutoConfigureRestDocs(outputDir = "docs/api/generated")
+@AutoConfigureRestDocs(outputDir = "docs/api/generated/event")
+@Import(RestDocsConfiguration.class)
 class EventsRestControllerTest extends BaseIntegrationTest {
         
         @Autowired private GenericEventRepository genericEventRepository;
@@ -123,24 +120,6 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         fieldWithPath("attribute1").description("JSON attribute as an example. Can be anything"),
         fieldWithPath("attribute2").description("JSON attribute as an example. Can be anything")        
     };
-
-    FieldDescriptor[] genericEventInputFields = new FieldDescriptor[] {
-        fieldWithPath("flowId").description("Optional: Identification of the main flow"),
-        fieldWithPath("payloadType").description("Optional: Identification of payload type. Can be used for routing configuration"),
-        fieldWithPath("externalId").description("Optional: Identification of the event provided by the client. Can be used for search"),
-        fieldWithPath("payloadJson").description("JSON body of the input event")   
-    };
-
-    FieldDescriptor[] genericEventFields = ObjectArrays.concat(
-        genericEventInputFields,
-        new FieldDescriptor[] {
-                fieldWithPath("id").description("Internal notiflow ID assigned to the event"),
-                fieldWithPath("timeCreated").description("Internal notiflow timestamp documenting time of persistance"),
-                fieldWithPath("timeConsumed").description("Internal notiflow timestamp documenting time of beginning of processing"),        
-        },
-        FieldDescriptor.class
-    );
-
 
     
     @Test
@@ -558,10 +537,9 @@ class EventsRestControllerTest extends BaseIntegrationTest {
                 .andDo(
                		document("GET-events",
         			pathParameters(
-               				parameterWithName("eventId").description("Internal Notiflow event ID")
+                                        parameterWithName("eventId").description("Internal Notiflow event ID")
                                 ),
-                		responseFields( genericEventFields ).
-                                andWithPrefix("payloadJson.",testPayloadFields)
+                		responseFields( GenericEvent.fieldDesc ).andWithPrefix("payloadJson.",testPayloadFields)
                 		)
                 );
     }
@@ -626,23 +604,6 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         String attribute1;
         String attribute2;
     }
-    
-    
-    @TestConfiguration
-    static class RestDocsConfiguration {
-        @Bean
-        public RestDocsMockMvcConfigurationCustomizer restDocsMockMvcConfigurationCustomizer() {
-            return customizer -> customizer
-            		.snippets()
-            		.withDefaults(
-            				CliDocumentation.curlRequest(),
-            				CliDocumentation.httpieRequest(),
-            				PayloadDocumentation.requestBody(), 
-            				PayloadDocumentation.responseBody())
-            		.and()
-            		.operationPreprocessors()
-            		.withResponseDefaults(Preprocessors.prettyPrint())
-            		.withRequestDefaults(Preprocessors.prettyPrint());
-        }
-    }
+
+
 }

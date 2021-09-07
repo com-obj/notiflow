@@ -11,8 +11,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.payload.PayloadDocumentation;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ObjectArrays;
 import com.obj.nc.domain.HasFlowId;
 import com.obj.nc.domain.HasJsonPayload;
 import com.obj.nc.domain.IsTypedJson;
@@ -141,5 +144,22 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	public UUID getEventId() {
 		return getId();
 	}
+
+	public static FieldDescriptor[] inputFieldDesc = new FieldDescriptor[] {
+        PayloadDocumentation.fieldWithPath("flowId").description("Optional: Identification of the main flow"),
+        PayloadDocumentation.fieldWithPath("payloadType").description("Optional: Identification of payload type. Can be used for routing configuration"),
+        PayloadDocumentation.fieldWithPath("externalId").description("Optional: Identification of the event provided by the client. Can be used for search"),
+        PayloadDocumentation.fieldWithPath("payloadJson").description("JSON body of the input event")   
+    };
+
+	public static FieldDescriptor[] fieldDesc = ObjectArrays.concat(
+        inputFieldDesc,
+        new FieldDescriptor[] {
+			PayloadDocumentation.fieldWithPath("id").description("Internal notiflow ID assigned to the event"),
+			PayloadDocumentation.fieldWithPath("timeCreated").description("Internal notiflow timestamp documenting time of persistance"),
+			PayloadDocumentation.fieldWithPath("timeConsumed").description("Internal notiflow timestamp documenting time of beginning of processing"),        
+        },
+        FieldDescriptor.class
+    );
 	
 }
