@@ -20,9 +20,13 @@ database "Topic/Channels" {
 }
 
 component "MessageProcessingFlow" {
+    [endpointPersister]
+    [messagePersister]
     [mailchimpSender]    
 
-    mailchimpSender ..> MAILCHIMP_PROCESSING_FLOW_ID_INPUT : (Message<TemplateWithModelContent>) 
+    endpointPersister -l-> messagePersister: (MailChimpMessage)
+    messagePersister -l-> mailchimpSender: (MailChimpMessage)
+    endpointPersister ..> MAILCHIMP_PROCESSING_FLOW_ID_INPUT : (MailChimpMessage) 
 
 }
 

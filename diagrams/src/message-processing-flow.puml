@@ -9,9 +9,14 @@ skinparam component {
     backgroundColor<<user defined>> LightGray
 }
 
-database "PostgreSQL" {
+database "PostgreSQL" as pg1 {
     [nc_message]
     [nc_endpoint]
+}
+
+database "PostgreSQL" as pg2 {
+    [nc_message] as nc_message2
+    [nc_endpoint] as nc_endpoint2
 }
 
 database "Topic/Channels" {
@@ -47,10 +52,12 @@ database "Topic/Channels" {
 }
 
 component "MessageProcessingFlow" {
+    [endpointPersister] as endpointPersister1
+    [messagePersister] as messagePersister1
     [messageByRecipientTokenizer]
     [splitter]
-    [endpointPersister]
-    [messagePersister]
+    [endpointPersister] as endpointPersister2
+    [messagePersister] as messagePersister2
     [typeBasedRouter]
 
     note top of typeBasedRouter 
@@ -61,22 +68,28 @@ component "MessageProcessingFlow" {
         MailChimpMessage]
     end note  
 
+    endpointPersister1 -l-> messagePersister1 : (Message)
+    messagePersister1 -l-> messageByRecipientTokenizer : (Message)
     messageByRecipientTokenizer -l-> splitter : List<Message>
-    splitter -l-> endpointPersister : (Message)
-    endpointPersister -l-> messagePersister: (Message)
-    messagePersister -l--> typeBasedRouter: (Message)
+    splitter -l-> endpointPersister2 : (Message)
+    endpointPersister2 -l-> messagePersister2: (Message)
+    messagePersister2 -l--> typeBasedRouter: (Message)
 
-    messageByRecipientTokenizer ..> MESSAGE_PROCESSING_FLOW_ID_INPUT : read (Message) 
+    endpointPersister1 ..> MESSAGE_PROCESSING_FLOW_ID_INPUT : read (Message) 
     typeBasedRouter --> EMAIL_SEND_ROUTING_FLOW_ID_INPUT: write (EmailMessage)
     typeBasedRouter --> EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_ID_INPUT: write (EmailMessageTemplated)
     typeBasedRouter --> SMS_PROCESSING_FLOW_ID_INPUT: write (SmsMessageTemplated)
     typeBasedRouter --> MAILCHIMP_PROCESSING_FLOW_ID_INPUT: write (MailChimpMessage)
 
-    messagePersister -u-> nc_message: write (List<DeliveryInfo>)
-    endpointPersister -u-> nc_endpoint: write (List<RecievingEndpoint>)
+    messagePersister2 -u-> nc_message2: write (Message)
+    endpointPersister2 -u-> nc_endpoint2: write (List<RecievingEndpoint>)
+    
+    messagePersister1 -u-> nc_message: write (Message)
+    endpointPersister1 -u-> nc_endpoint: write (List<RecievingEndpoint>)
 
-    interface "processMessage (Message)" as processMessage        
-        messageByRecipientTokenizer -r- processMessage
+
+    interface "processMessage (Message)" as processMessage  
+    processMessage -l-> endpointPersister1
 }
 
 

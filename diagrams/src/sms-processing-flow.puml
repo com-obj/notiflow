@@ -9,9 +9,13 @@ skinparam component {
     backgroundColor<<user defined>> LightGray
 }
 
-database "PostgreSQL" {
+database "PostgreSQL" as pg1 {
     [nc_message]
     [nc_endpoint]
+}
+
+database "PostgreSQL" as pg2 {
+    [nc_message] as nc_message2
 }
 
 database "Topic/Channels" {
@@ -24,29 +28,33 @@ database "Topic/Channels" {
     component DELIVERY_INFO_SEND_FLOW_ID_INPUT<<PUB/SUB>>  [
         DELIVERY_INFO_SEND_FLOW_ID_INPUT
         --
-        (HasRecievingEndpoints)
+        (HasReceivingEndpoints)
     ]
 
 }
 
 component "MessageProcessingFlow" {
+    [endpointPersister] as endpointPersister1
+    [messagePersister] as messagePersister1
     [smsFormatter]
     [splitter]
-    [endpointPersister]
-    [messagePersister]
+    [messagePersister] as messagePersister2
     [smsSender]
-
+    
+    endpointPersister1 -l-> messagePersister1 : (Message<TemplateWithModelContent>)
+    messagePersister1 -l-> smsFormatter : (Message<TemplateWithModelContent>)
     smsFormatter -l-> splitter : (Message<SimpleTextContent>)
-    splitter -l-> endpointPersister : (Message<SimpleTextContent>)
-    endpointPersister -l-> messagePersister: (Message<SimpleTextContent>)
-    messagePersister -l--> smsSender: (Message<SimpleTextContent>)
+    splitter -l-> messagePersister2 : (Message<SimpleTextContent>)
+    messagePersister2 -l--> smsSender: (Message<SimpleTextContent>)
 
-    smsFormatter ..> SMS_PROCESSING_FLOW_ID_INPUT : (Message<TemplateWithModelContent>) 
+    endpointPersister1 ..> SMS_PROCESSING_FLOW_ID_INPUT : (Message<TemplateWithModelContent>) 
 
-    messagePersister -u-> nc_message: (List<DeliveryInfo>)
-    endpointPersister -u-> nc_endpoint: (List<RecievingEndpoint>)
+    messagePersister1 -u-> nc_message: (Message<TemplateWithModelContent>)
+    endpointPersister1 -u-> nc_endpoint: (List<RecievingEndpoint>)
+    
+    messagePersister2 -u-> nc_message2: (Message<SimpleTextContent>)
 
-    smsSender ..> DELIVERY_INFO_SEND_FLOW_ID_INPUT : (Message<TemplateWithModelContent>) 
+    smsSender -> DELIVERY_INFO_SEND_FLOW_ID_INPUT : (Message<SimpleTextContent>) 
 
 }
 
