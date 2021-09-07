@@ -152,7 +152,7 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 		}
 		
 		if (msgContent instanceof TemplatedMailchimpContent) {
-			MailchimpTemplateMessage mailChimp = Message.newTypedMessageFrom(MailchimpTemplateMessage.class, this);
+			TemplatedMailchimpMessage mailChimp = Message.newTypedMessageFrom(TemplatedMailchimpMessage.class, this);
 			mailChimp.setBody((TemplatedMailchimpContent)msgContent);
 			
 			return mailChimp;

@@ -17,9 +17,9 @@ import static com.obj.nc.functions.processors.senders.mailchimp.config.Mailchimp
 
 @Component
 @DocumentProcessingInfo
-public class MailchimpTemplateSender extends BaseMailchimpSender<TemplatedMailchimpContent> {
+public class TemplatedMailchimpMessageSender extends BaseMailchimpSender<TemplatedMailchimpContent> {
     
-    public MailchimpTemplateSender() {
+    public TemplatedMailchimpMessageSender() {
         super(SEND_TEMPLATE_PATH);
     }
     

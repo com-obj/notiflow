@@ -13,10 +13,10 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
-public class MailchimpTemplateMessage extends Message<TemplatedMailchimpContent>  {
+public class TemplatedMailchimpMessage extends Message<TemplatedMailchimpContent>  {
     public static final String JSON_TYPE_IDENTIFIER = "MAILCHIMP_TEMPLATE_MESSAGE";
     
-    public MailchimpTemplateMessage() {
+    public TemplatedMailchimpMessage() {
         setBody(new TemplatedMailchimpContent());
     }
     

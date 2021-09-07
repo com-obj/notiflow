@@ -11,9 +11,9 @@ import static com.obj.nc.functions.processors.senders.mailchimp.config.Mailchimp
 
 @Component
 @DocumentProcessingInfo
-public class MailchimpSender extends BaseMailchimpSender<MailchimpContent> {
+public class MailchimpMessageSender extends BaseMailchimpSender<MailchimpContent> {
     
-    public MailchimpSender() {
+    public MailchimpMessageSender() {
         super(SEND_PATH);
     }
     

@@ -2,7 +2,7 @@ package com.obj.nc.flows.mailchimpSending;
 
 import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpTemplateSender;
+import com.obj.nc.functions.processors.senders.mailchimp.TemplatedMailchimpMessageSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -15,12 +15,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @Configuration
 @RequiredArgsConstructor
-public class MailchimpTemplateProcessingFlowConfig {
+public class TemplatedMailchimpMessageProcessingFlowConfig {
     
     public final static String MAILCHIMP_TEMPLATE_PROCESSING_FLOW_ID = "MAILCHIMP_TEMPLATE_PROCESSING_FLOW_ID";
     public final static String MAILCHIMP_TEMPLATE_PROCESSING_FLOW_INPUT_CHANNEL_ID = MAILCHIMP_TEMPLATE_PROCESSING_FLOW_ID + "_INPUT";
     
-    private final MailchimpTemplateSender mailchimpTemplateSender;
+    private final TemplatedMailchimpMessageSender templatedMailchimpMessageSender;
     private final PaylaodLoggerSinkConsumer logConsumer;
     private final MessagePersister messagePersister;
     private final EndpointPersister endpointPersister;
@@ -37,7 +37,7 @@ public class MailchimpTemplateProcessingFlowConfig {
                 .from(MAILCHIMP_TEMPLATE_PROCESSING_FLOW_INPUT_CHANNEL_ID)
                 .handle(endpointPersister)
                 .handle(messagePersister)
-                .handle(mailchimpTemplateSender)
+                .handle(templatedMailchimpMessageSender)
                 .handle(logConsumer)
                 .get();
     }

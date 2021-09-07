@@ -46,7 +46,7 @@ import lombok.ToString;
 	@Type(value = EmailMessage.class, name = EmailMessage.JSON_TYPE_IDENTIFIER),
 	@Type(value = SmsMessage.class, name = SmsMessage.JSON_TYPE_IDENTIFIER),
 	@Type(value = MailchimpMessage.class, name = MailchimpMessage.JSON_TYPE_IDENTIFIER),
-	@Type(value = MailchimpTemplateMessage.class, name = MailchimpTemplateMessage.JSON_TYPE_IDENTIFIER),
+	@Type(value = TemplatedMailchimpMessage.class, name = TemplatedMailchimpMessage.JSON_TYPE_IDENTIFIER),
 	@Type(value = EmailMessageTemplated.class, name = EmailMessageTemplated.JSON_TYPE_IDENTIFIER),
 	@Type(value = EmailWithTestModeDigest.class, name = EmailWithTestModeDigest.JSON_TYPE_IDENTIFIER),
 	@Type(value = SmsMessageTemplated.class, name = SmsMessageTemplated.JSON_TYPE_IDENTIFIER),	

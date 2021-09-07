@@ -9,7 +9,7 @@ import java.util.Optional;
 import com.obj.nc.domain.Attachment;
 import com.obj.nc.domain.content.mailchimp.TemplatedMailchimpContent;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.message.MailchimpTemplateMessage;
+import com.obj.nc.domain.message.TemplatedMailchimpMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
@@ -19,7 +19,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @RequiredArgsConstructor
-public class MailchimpTemplateMessageAggregationStrategy extends BasePayloadAggregationStrategy<TemplatedMailchimpContent> {
+public class TemplatedMailchimpMessageAggregationStrategy extends BasePayloadAggregationStrategy<TemplatedMailchimpContent> {
 	
 	private final MailchimpSenderConfigProperties mailchimpSenderConfigProperties;
 	
@@ -53,7 +53,7 @@ public class MailchimpTemplateMessageAggregationStrategy extends BasePayloadAggr
 				.reduce(this::concatContents)
 				.orElseThrow(() -> new RuntimeException(String.format("Could not aggregate input messages: %s", payloads)));
 		
-		MailchimpTemplateMessage outputMessage = new MailchimpTemplateMessage();
+		TemplatedMailchimpMessage outputMessage = new TemplatedMailchimpMessage();
 		outputMessage.setBody(aggregatedMailchimpContent);
 		outputMessage.setReceivingEndpoints(payloads.get(0).getReceivingEndpoints());
 		return outputMessage;
