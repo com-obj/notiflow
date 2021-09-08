@@ -1,7 +1,10 @@
 package com.obj.nc.controllers;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.READ;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -9,11 +12,26 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import com.obj.nc.config.NcAppConfigProperties;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.flows.intenProcessing.NotificationIntentProcessingFlow;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
+import com.obj.nc.repositories.DeliveryInfoRepository;
+import com.obj.nc.repositories.EndpointsRepository;
+import com.obj.nc.repositories.NotificationIntentRepository;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,7 +61,19 @@ class EventsRestControllerTest extends BaseIntegrationTest {
     
     
 	@Autowired private GenericEventRepository genericEventRepository;
+	@Autowired private NotificationIntentRepository notificationIntentRepository;
+	@Autowired private EndpointsRepository endpointsRepository;
+	@Autowired private DeliveryInfoRepository deliveryInfoRepository;
+	@Autowired private NotificationIntentProcessingFlow intentProcessingFlow;
+    @Autowired private NcAppConfigProperties ncAppConfigProperties;
 	@Autowired protected MockMvc mockMvc;
+    
+    @RegisterExtension
+    protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+            .withConfiguration(
+                    GreenMailConfiguration.aConfig()
+                            .withUser("no-reply@objectify.sk", "xxx"))
+            .withPerMethodLifecycle(true);
 
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
@@ -491,6 +521,64 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         // THEN
         resp
                 .andExpect(status().isNotFound());
+    }
+    
+    @Test
+    void testFindEventStatsByEventId() throws Exception {
+        // GIVEN
+        GenericEvent event = GenericEvent.builder()
+                .id(UUID.randomUUID())
+                .flowId("default-flow")
+                .payloadJson(JsonUtils.readJsonNodeFromPojo(TestPayload.builder().value("Test").build()))
+                .timeConsumed(Instant.now())
+                .build();
+        event = genericEventRepository.save(event);
+    
+        EmailEndpoint emailEndpoint = EmailEndpoint.builder().email("johndoe@objectify.sk").build();
+        EmailEndpoint emailEndpoint2 = EmailEndpoint.builder().email("invalid email").build();
+    
+        NotificationIntent intent = NotificationIntent.createWithStaticContent("Subject", "Text");
+        intent.getHeader().setFlowId("default-flow");
+        intent.addPreviousEventId(event.getId());
+        intent.addReceivingEndpoints(emailEndpoint);
+        intent.addReceivingEndpoints(emailEndpoint2);
+        
+        intentProcessingFlow.processNotificationIntent(intent);
+        
+        GenericEvent finalEvent = event;
+        await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByEventIdAndStatus(finalEvent.getId(), SENT) >= 1);
+        List<DeliveryInfo> sentInfos = deliveryInfoRepository
+                .findByStatus(SENT)
+                .stream()
+                .filter(sentInfo -> sentInfo.getMessageId() != null)
+                .collect(Collectors.toList());
+    
+        ResultActions resp1 = mockMvc
+                .perform(MockMvcRequestBuilders
+                        .put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
+                        .contextPath(ncAppConfigProperties.getContextPath())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+    
+        await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(sentInfos.get(0).getMessageId(), READ) >= 1);
+        
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/events/{eventId}/stats", event.getId())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        // THEN
+        resp
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.eventsCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.intentsCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.messagesCount").value(CoreMatchers.is(4)))
+                .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(2)))
+                .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(1)));
     }
     
     private UUID getMismatchedId(GenericEvent event) {
