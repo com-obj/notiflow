@@ -2,6 +2,9 @@ package com.obj.nc.domain.message;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.http.MediaType;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -10,6 +13,9 @@ import com.obj.nc.domain.endpoints.Person;
 import lombok.Data;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SendEmailMessageRequest {
     private String subject;
     private String text;
@@ -17,7 +23,10 @@ public class SendEmailMessageRequest {
     private List<Recipient> to;
     
     @Data
-    static class Recipient {
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Recipient {
         private String email;
         private String name;
         
