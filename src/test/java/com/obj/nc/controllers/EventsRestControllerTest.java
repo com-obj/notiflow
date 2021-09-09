@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
@@ -387,7 +388,26 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         List<LinkedHashMap<?, ?>> events = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
         assertThat(events).hasSize(3);
     }
-
+    
+    @Test
+    void testFilterEventsByEventId() throws Exception {
+        //GIVEN
+        List<UUID> eventIds = persistNTestEvents(5);
+    
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/events")
+                        .param("eventId", eventIds.get(0).toString())
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        
+        //THEN
+        resp
+                .andExpect(status().is2xxSuccessful());
+        
+        List<LinkedHashMap<?, ?>> events = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+        assertThat(events).hasSize(1);
+    }
 
     @Test
     void testGetPage0Size20() throws Exception {
@@ -503,7 +523,9 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         return mismatchedId;
     }
     
-    private void persistNTestEvents(long n) {
+    private List<UUID> persistNTestEvents(long n) {
+        List<UUID> eventIds = new ArrayList<>();
+        
         for (long i = 0; i < n; i++) {
             GenericEvent event = GenericEvent.builder()
                     .id(UUID.randomUUID())
@@ -512,7 +534,10 @@ class EventsRestControllerTest extends BaseIntegrationTest {
                     .timeConsumed(Instant.now().plus(i * 60, ChronoUnit.MINUTES))
                     .build();
             genericEventRepository.save(event);
+            eventIds.add(event.getId());
         }
+        
+        return eventIds;
     }
     
     @Data
