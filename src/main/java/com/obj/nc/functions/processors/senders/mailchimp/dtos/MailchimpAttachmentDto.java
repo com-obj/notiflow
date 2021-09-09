@@ -1,12 +1,9 @@
 package com.obj.nc.functions.processors.senders.mailchimp.dtos;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.springframework.core.io.FileSystemResource;
 
-import com.obj.nc.domain.Attachement;
+import com.obj.nc.domain.Attachment;
 import com.obj.nc.utils.FileUtils;
 
 import lombok.Data;
@@ -19,22 +16,16 @@ public class MailchimpAttachmentDto {
 	private String type;
 	private String name;
 	private String content;
-	
-	public static List<MailchimpAttachmentDto> fromAttachements(List<Attachement> attachements) {
-        return attachements.stream()
-                .map(MailchimpAttachmentDto::fromAttachement)
-                .collect(Collectors.toList());
-    }
 
-	public static MailchimpAttachmentDto fromAttachement(Attachement attachement) {
+	public static MailchimpAttachmentDto fromAttachment(Attachment attachment) {
 		MailchimpAttachmentDto dto = new MailchimpAttachmentDto();
-		dto.setName(attachement.getName());
+		dto.setName(attachment.getName());
 
 		FileSystemResource file;
-		if (attachement.getFilePathAndName()!=null) {
-			file = FileUtils.newFileSystemResource(attachement.getFilePathAndName());
+		if (attachment.getFilePathAndName()!=null) {
+			file = FileUtils.newFileSystemResource(attachment.getFilePathAndName());
 		} else {
-			file = FileUtils.newFileSystemResource(attachement.getFileURI());		
+			file = FileUtils.newFileSystemResource(attachment.getFileURI());		
 		}
 		
 		long fileSize = FileUtils.fileSize(file);

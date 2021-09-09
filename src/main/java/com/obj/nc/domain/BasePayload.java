@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import com.obj.nc.domain.message.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -27,7 +28,7 @@ import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.EmailWithTestModeDigest;
-import com.obj.nc.domain.message.MailChimpMessage;
+import com.obj.nc.domain.message.MailchimpMessage;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
@@ -44,7 +45,8 @@ import lombok.ToString;
 	@Type(value = NotificationIntent.class, name = NotificationIntent.JSON_TYPE_IDENTIFIER),
 	@Type(value = EmailMessage.class, name = EmailMessage.JSON_TYPE_IDENTIFIER),
 	@Type(value = SmsMessage.class, name = SmsMessage.JSON_TYPE_IDENTIFIER),
-	@Type(value = MailChimpMessage.class, name = MailChimpMessage.JSON_TYPE_IDENTIFIER),
+	@Type(value = MailchimpMessage.class, name = MailchimpMessage.JSON_TYPE_IDENTIFIER),
+	@Type(value = TemplatedMailchimpMessage.class, name = TemplatedMailchimpMessage.JSON_TYPE_IDENTIFIER),
 	@Type(value = EmailMessageTemplated.class, name = EmailMessageTemplated.JSON_TYPE_IDENTIFIER),
 	@Type(value = EmailWithTestModeDigest.class, name = EmailWithTestModeDigest.JSON_TYPE_IDENTIFIER),
 	@Type(value = SmsMessageTemplated.class, name = SmsMessageTemplated.JSON_TYPE_IDENTIFIER),	

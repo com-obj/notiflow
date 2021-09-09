@@ -9,7 +9,7 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class Attachement {
+public class Attachment {
 
 	String name;
 	
