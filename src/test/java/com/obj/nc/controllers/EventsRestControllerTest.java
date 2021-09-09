@@ -523,64 +523,6 @@ class EventsRestControllerTest extends BaseIntegrationTest {
                 .andExpect(status().isNotFound());
     }
     
-    @Test
-    void testFindEventStatsByEventId() throws Exception {
-        // GIVEN
-        GenericEvent event = GenericEvent.builder()
-                .id(UUID.randomUUID())
-                .flowId("default-flow")
-                .payloadJson(JsonUtils.readJsonNodeFromPojo(TestPayload.builder().value("Test").build()))
-                .timeConsumed(Instant.now())
-                .build();
-        event = genericEventRepository.save(event);
-    
-        EmailEndpoint emailEndpoint = EmailEndpoint.builder().email("johndoe@objectify.sk").build();
-        EmailEndpoint emailEndpoint2 = EmailEndpoint.builder().email("invalid email").build();
-    
-        NotificationIntent intent = NotificationIntent.createWithStaticContent("Subject", "Text");
-        intent.getHeader().setFlowId("default-flow");
-        intent.addPreviousEventId(event.getId());
-        intent.addReceivingEndpoints(emailEndpoint);
-        intent.addReceivingEndpoints(emailEndpoint2);
-        
-        intentProcessingFlow.processNotificationIntent(intent);
-        
-        GenericEvent finalEvent = event;
-        await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByEventIdAndStatus(finalEvent.getId(), SENT) >= 1);
-        List<DeliveryInfo> sentInfos = deliveryInfoRepository
-                .findByStatus(SENT)
-                .stream()
-                .filter(sentInfo -> sentInfo.getMessageId() != null)
-                .collect(Collectors.toList());
-    
-        ResultActions resp1 = mockMvc
-                .perform(MockMvcRequestBuilders
-                        .put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
-                        .contextPath(ncAppConfigProperties.getContextPath())
-                        .contentType(APPLICATION_JSON_UTF8)
-                        .accept(APPLICATION_JSON_UTF8))
-                .andDo(MockMvcResultHandlers.print());
-    
-        await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(sentInfos.get(0).getMessageId(), READ) >= 1);
-        
-        //WHEN
-        ResultActions resp = mockMvc
-                .perform(MockMvcRequestBuilders.get("/events/{eventId}/stats", event.getId())
-                        .contentType(APPLICATION_JSON_UTF8)
-                        .accept(APPLICATION_JSON_UTF8))
-                .andDo(MockMvcResultHandlers.print());
-        // THEN
-        resp
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.eventsCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.intentsCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.messagesCount").value(CoreMatchers.is(4)))
-                .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(2)))
-                .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(1)));
-    }
-    
     private UUID getMismatchedId(GenericEvent event) {
         UUID mismatchedId = UUID.fromString(event.getId().toString());
         

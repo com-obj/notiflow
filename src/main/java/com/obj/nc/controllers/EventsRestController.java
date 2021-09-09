@@ -105,9 +105,4 @@ public class EventsRestController {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 	
-	@GetMapping(value = "/{eventId}/stats", produces = APPLICATION_JSON_VALUE)
-	public GenericEventStats findEventStats(@PathVariable("eventId") String eventId) {
-		return eventsRepository.findEventStatsByEventId(UUID.fromString(eventId));
-	}
-	
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.obj.nc.domain.event.GenericEventStats;
+import com.obj.nc.domain.event.GenericEventWithStats;
 import com.obj.nc.repositories.mappers.EventStatsRowMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -26,6 +27,7 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 	
 	@Query(
 			value = "select " +
+					"	event.*, " +
 					"	count(distinct event.id) as events_count, " +
 					"	count(distinct intent.id) as intents_count, " +
 					"	count(distinct message.id) as messages_count, " +
@@ -45,8 +47,16 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 					"left join " +
 					"	nc_delivery_info di on di.event_id = event.id " +
 					"where " +
-					"	event.id = (:eventId)", 
+					"	(:eventId)::uuid is null or event.id = (:eventId)::uuid " +
+					"group by " +
+					"	event.id, " +
+					"	event.flow_id, " +
+					"	event.external_id, " +
+					"	event.payload_json, " +
+					"	event.time_created, " +
+					"	event.time_consumed, " +
+					"	event.payload_type", 
 			rowMapperClass = EventStatsRowMapper.class)
-	GenericEventStats findEventStatsByEventId(@Param("eventId") UUID eventId);
+	GenericEventWithStats findEventStatsByEventId(@Param("eventId") UUID eventId);
 
 }
