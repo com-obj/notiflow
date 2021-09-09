@@ -52,12 +52,12 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 					"	event.time_created, " +
 					"	event.time_consumed, " +
 					"	event.payload_type " +
-					"offset :pageNum rows fetch next :pageSize rows only", 
+					"offset :offset rows fetch next :pageSize rows only", 
 			rowMapperClass = EventStatsRowMapper.class)
 	List<GenericEventWithStats> findAllEventsWithStats(@Param("consumedFrom") Instant consumedFrom,
 													   @Param("consumedTo") Instant consumedTo,
 													   @Param("eventId") UUID eventId,
-													   @Param("pageNum") long offset,
+													   @Param("offset") long offset,
 													   @Param("pageSize") int pageSize);
 	
 	@Query(
