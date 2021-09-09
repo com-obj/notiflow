@@ -4,10 +4,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import com.obj.nc.domain.event.GenericEventStats;
 import com.obj.nc.domain.event.GenericEventWithStats;
 import com.obj.nc.repositories.mappers.EventStatsRowMapper;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -26,11 +24,13 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 			"where " +
 			"	time_consumed between (:consumedFrom) and (:consumedTo) " +
 			"and " +
-			"	(:eventId)::uuid is null or id = (:eventId)::uuid")
+			"	(:eventId)::uuid is null or id = (:eventId)::uuid " +
+			"offset :offset rows fetch next :pageSize rows only")
 	List<GenericEvent> findAllByTimeConsumedBetween(@Param("consumedFrom") Instant consumedFrom,
 													@Param("consumedTo") Instant consumedTo,
 													@Param("eventId") UUID eventId,
-													Pageable pageable);
+													@Param("offset") long offset,
+													@Param("pageSize") int pageSize);
 	
 	@Query("select count(id) " +
 			"from nc_event " +

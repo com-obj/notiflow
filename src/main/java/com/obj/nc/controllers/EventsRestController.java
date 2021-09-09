@@ -86,7 +86,7 @@ public class EventsRestController {
 											@RequestParam(value = "eventId", required = false) String eventId,
 											Pageable pageable) {
 		UUID eventUUID = eventId == null ? null : UUID.fromString(eventId);
-		List<GenericEvent> events = eventsRepository.findAllByTimeConsumedBetween(consumedFrom, consumedTo, eventUUID, pageable);
+		List<GenericEvent> events = eventsRepository.findAllByTimeConsumedBetween(consumedFrom, consumedTo, eventUUID, pageable.getOffset(), pageable.getPageSize());
 		long eventsTotalCount = eventsRepository.countAllByTimeConsumedBetween(consumedFrom, consumedTo, eventUUID);
 		return new PageImpl<>(events, pageable, eventsTotalCount);
 	}
