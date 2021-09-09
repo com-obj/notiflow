@@ -81,20 +81,24 @@ public class DeliveryInfoRestController {
 	
 	@PutMapping(value = "/messages/{messageId}/mark-as-read")
 	public ResponseEntity<Void> trackMessageRead(@PathVariable(value = "messageId", required = true) String messageId) {
+		ResponseEntity<Void> trackingPixelImageRedirectionResponse = ResponseEntity
+				.status(HttpStatus.FOUND)
+				.location(
+						UriComponentsBuilder
+								.fromPath(ncAppConfigProperties.getContextPath())
+								.path("/resources/images/px.png")
+								.build()
+								.toUri())
+				.build();
+		
 		if (deliveryRepo.countByMessageIdAndStatus(UUID.fromString(messageId), DELIVERY_STATUS.READ) > 0) {
-			return ResponseEntity
-					.status(HttpStatus.FOUND)
-					.location(getTrackingPixelImageLocation())
-					.build();
+			return trackingPixelImageRedirectionResponse;
 		}
 		
 		Optional<MessagePersistentState> message = messageRepo.findById(UUID.fromString(messageId));
 		message.ifPresent(messagePersistantState -> deliveryInfoFlow.createAndPersistReadDeliveryInfo(messagePersistantState.toMessage()));
 		
-		return ResponseEntity
-				.status(HttpStatus.FOUND)
-				.location(getTrackingPixelImageLocation())
-				.build();
+		return trackingPixelImageRedirectionResponse;
 	}
 	
 	@GetMapping(value = "/messages/{messageId}", consumes="application/json", produces="application/json")
@@ -113,14 +117,6 @@ public class DeliveryInfoRestController {
 		return infoDtos;
 	}
 	
-	private URI getTrackingPixelImageLocation() {
-		return UriComponentsBuilder
-				.fromPath(ncAppConfigProperties.getContextPath())
-				.path("/resources/images/px.png")
-				.build()
-				.toUri();
-	}
-
 	@Data
 	@Builder
 	public static class EndpointDeliveryInfoDto {
