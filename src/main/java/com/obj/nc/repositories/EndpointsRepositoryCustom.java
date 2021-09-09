@@ -3,13 +3,14 @@ package com.obj.nc.repositories;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.obj.nc.domain.dto.EndpointDto;
-import com.obj.nc.domain.dto.EndpointDto.EndpointType;
+import com.obj.nc.domain.dto.EndpointTableViewDto;
+import com.obj.nc.domain.dto.EndpointTableViewDto.EndpointType;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
 
@@ -33,9 +34,10 @@ public interface EndpointsRepositoryCustom extends EntityExistenceChecker<UUID> 
     
     Map<String, ReceivingEndpoint> persistEnpointIfNotExistsMappedToNameId(ReceivingEndpoint ... ednpoints);
     
-    Page<EndpointDto> findAllEndpoints(Instant startAt,
-                                       Instant endAt,
-                                       EndpointType endpointType,
-                                       Pageable pageable);
+    Page<EndpointTableViewDto> findAllEndpoints(Instant startAt,
+                                                Instant endAt,
+                                                EndpointType endpointType,
+                                                String eventId,
+                                                Pageable pageable);
     
 }

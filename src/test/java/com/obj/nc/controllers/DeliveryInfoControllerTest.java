@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.obj.nc.utils.DateFormatMatcher;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
@@ -172,13 +173,10 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		resp
         	.andExpect(status().is2xxSuccessful())
 			.andExpect(jsonPath("$[0].currentStatus").value(CoreMatchers.is("SENT")))
+			.andExpect(jsonPath("$[0].statusReachedAt").value(DateFormatMatcher.matchesISO8601()))
 			.andExpect(jsonPath("$[0].endpoint.email").value(CoreMatchers.is("jancuzy@gmail.com")))
 			.andExpect(jsonPath("$[0].endpoint.endpointId").value(CoreMatchers.is("jancuzy@gmail.com")))
 			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL"))).andReturn();
-	
-		String statusReachedAt = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$[0].statusReachedAt");
-		SimpleDateFormat ISO8601_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.mmm'Z'");
-		Assertions.assertThat(ISO8601_DATE_FORMAT.parse(statusReachedAt)).isNotNull();
 	}
 	
 	@Test
