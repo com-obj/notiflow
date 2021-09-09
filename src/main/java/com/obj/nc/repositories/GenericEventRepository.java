@@ -19,29 +19,6 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 	
 	GenericEvent findByExternalId(String externalId);
 	
-	@Query("select * " +
-			"from nc_event " +
-			"where " +
-			"	time_consumed between (:consumedFrom) and (:consumedTo) " +
-			"and " +
-			"	(:eventId)::uuid is null or id = (:eventId)::uuid " +
-			"offset :offset rows fetch next :pageSize rows only")
-	List<GenericEvent> findAllByTimeConsumedBetween(@Param("consumedFrom") Instant consumedFrom,
-													@Param("consumedTo") Instant consumedTo,
-													@Param("eventId") UUID eventId,
-													@Param("offset") long offset,
-													@Param("pageSize") int pageSize);
-	
-	@Query("select count(id) " +
-			"from nc_event " +
-			"where " +
-			"	time_consumed between (:consumedFrom) and (:consumedTo) " +
-			"and " +
-			"	(:eventId)::uuid is null or id = (:eventId)::uuid")
-	long countAllByTimeConsumedBetween(@Param("consumedFrom") Instant consumedFrom,
-									   @Param("consumedTo") Instant consumedTo,
-									   @Param("eventId") UUID eventId);
-	
 	@Query(
 			value = "select " +
 					"	event.*, " +
@@ -64,6 +41,8 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 					"left join " +
 					"	nc_delivery_info di on di.event_id = event.id " +
 					"where " +
+					"	event.time_consumed between (:consumedFrom) and (:consumedTo) " +
+					"and " +
 					"	(:eventId)::uuid is null or event.id = (:eventId)::uuid " +
 					"group by " +
 					"	event.id, " +
@@ -72,8 +51,26 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 					"	event.payload_json, " +
 					"	event.time_created, " +
 					"	event.time_consumed, " +
-					"	event.payload_type", 
+					"	event.payload_type " +
+					"offset :offset rows fetch next :pageSize rows only", 
 			rowMapperClass = EventStatsRowMapper.class)
-	GenericEventWithStats findEventStatsByEventId(@Param("eventId") UUID eventId);
+	List<GenericEventWithStats> findAllEventsWithStats(@Param("consumedFrom") Instant consumedFrom,
+													   @Param("consumedTo") Instant consumedTo,
+													   @Param("eventId") UUID eventId,
+													   @Param("offset") long offset,
+													   @Param("pageSize") int pageSize);
+	
+	@Query(
+			value = "select " +
+					"	count(event.id) " +
+					"from " +
+					"	nc_event event " +
+					"where " +
+					"	event.time_consumed between (:consumedFrom) and (:consumedTo) " +
+					"and " +
+					"	(:eventId)::uuid is null or event.id = (:eventId)::uuid")
+	long countAllEventsWithStats(@Param("consumedFrom") Instant consumedFrom,
+								 @Param("consumedTo") Instant consumedTo,
+								 @Param("eventId") UUID eventId);
 
 }
