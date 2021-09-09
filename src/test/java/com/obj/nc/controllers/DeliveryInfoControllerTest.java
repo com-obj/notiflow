@@ -121,7 +121,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	deliveryRepo.saveAll( Arrays.asList(info1, info2, info3, info4) );
     	
     	//WHEN
-    	List<EndpointDeliveryInfoDto> infos = controller.findDeliveryInfosByEventId(eventId.toString());
+    	List<EndpointDeliveryInfoDto> infos = controller.findDeliveryInfosByEventId(eventId.toString(), null);
     	
     	//THEN
     	Assertions.assertThat(infos.size()).isEqualTo(2);
@@ -259,6 +259,50 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		//AND READ STATUS IS JOURNALIZED
 		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), READ) >= 1);
 		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatus(emailMessage.getId(), READ);
+		assertThat(infosOfMessage).hasSize(1);
+	}
+	
+	@Test
+	void testMarkAsReadMessageDeliveryInfoNotPersistingDuplicates() throws Exception {
+		//GIVEN
+		EmailEndpoint email1 = EmailEndpoint.builder().email("john.doe@gmail.com").build();
+		email1 = endpointRepo.persistEnpointIfNotExists(email1);
+		EmailEndpoint email2 = EmailEndpoint.builder().email("john.dudly@gmail.com").build();
+		email2 = endpointRepo.persistEnpointIfNotExists(email2);
+		
+		//AND
+		EmailMessage emailMessage = new EmailMessage();
+		emailMessage.setBody(EmailContent.builder().subject("Subject").text("Text").build());
+		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
+		
+		messageProcessingFlow.processMessage(emailMessage);
+		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
+		
+		List<DeliveryInfo> sentInfos = deliveryRepo.findByMessageIdAndStatus(emailMessage.getId(), SENT);
+		
+		//WHEN TEST REST
+		ResultActions resp1 = mockMvc
+				.perform(MockMvcRequestBuilders
+						.put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
+						.contextPath(ncAppConfigProperties.getContextPath())
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(sentInfos.get(0).getMessageId(), READ) >= 1);
+		
+		ResultActions resp2 = mockMvc
+				.perform(MockMvcRequestBuilders
+						.put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
+						.contextPath(ncAppConfigProperties.getContextPath())
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		Awaitility.await().atLeast(2, TimeUnit.SECONDS);
+		
+		//AND READ STATUS IS JOURNALIZED ONLY ONCE
+		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatus(sentInfos.get(0).getMessageId(), READ);
 		assertThat(infosOfMessage).hasSize(1);
 	}
 
