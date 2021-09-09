@@ -10,7 +10,6 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
-import com.obj.nc.domain.event.GenericEventStats;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -104,5 +103,5 @@ public class EventsRestController {
 				.findById(UUID.fromString(eventId))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
-	
+
 }

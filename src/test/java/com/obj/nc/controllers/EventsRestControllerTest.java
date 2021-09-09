@@ -1,10 +1,7 @@
 package com.obj.nc.controllers;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.READ;
-import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -12,26 +9,11 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
-import com.icegreen.greenmail.configuration.GreenMailConfiguration;
-import com.icegreen.greenmail.junit5.GreenMailExtension;
-import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.config.NcAppConfigProperties;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.flows.intenProcessing.NotificationIntentProcessingFlow;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
-import com.obj.nc.repositories.DeliveryInfoRepository;
-import com.obj.nc.repositories.EndpointsRepository;
-import com.obj.nc.repositories.NotificationIntentRepository;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,19 +43,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
     
     
 	@Autowired private GenericEventRepository genericEventRepository;
-	@Autowired private NotificationIntentRepository notificationIntentRepository;
-	@Autowired private EndpointsRepository endpointsRepository;
-	@Autowired private DeliveryInfoRepository deliveryInfoRepository;
-	@Autowired private NotificationIntentProcessingFlow intentProcessingFlow;
-    @Autowired private NcAppConfigProperties ncAppConfigProperties;
 	@Autowired protected MockMvc mockMvc;
-    
-    @RegisterExtension
-    protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
-            .withConfiguration(
-                    GreenMailConfiguration.aConfig()
-                            .withUser("no-reply@objectify.sk", "xxx"))
-            .withPerMethodLifecycle(true);
 
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
