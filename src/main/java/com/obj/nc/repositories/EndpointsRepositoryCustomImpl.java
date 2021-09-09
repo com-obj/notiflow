@@ -1,6 +1,6 @@
 package com.obj.nc.repositories;
 
-import static com.obj.nc.domain.dto.EndpointDto.EndpointType.ANY;
+import static com.obj.nc.domain.dto.EndpointTableViewDto.EndpointType.ANY;
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
 import static java.sql.Timestamp.from;
 
@@ -26,8 +26,8 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import com.obj.nc.domain.dto.EndpointDto;
-import com.obj.nc.domain.dto.EndpointDto.EndpointType;
+import com.obj.nc.domain.dto.EndpointTableViewDto;
+import com.obj.nc.domain.dto.EndpointTableViewDto.EndpointType;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.repositories.mappers.EndpointDtoRowMapper;
 import com.obj.nc.repositories.mappers.ReceivingEndpointRowMapper;
@@ -206,10 +206,11 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
     }
 
     @Override
-    public Page<EndpointDto> findAllEndpoints(Instant startAt,
-                                              Instant endAt,
-                                              EndpointType endpointType,
-                                              Pageable pageable) {
+    public Page<EndpointTableViewDto> findAllEndpoints(Instant startAt,
+                                                       Instant endAt,
+                                                       EndpointType endpointType,
+                                                       String eventId,
+                                                       Pageable pageable) {
         StringBuilder queryBuilder = new StringBuilder()
                 .append("SELECT DISTINCT ON (ep.id)" +
                         "   ep.id, " +
@@ -234,23 +235,28 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
                         "        endpoint_id" +
                         "   ) sent " +
                         "ON " +
-                        "   ep.id = sent.endpoint_id ");
+                        "   ep.id = sent.endpoint_id " +
+                        "LEFT JOIN " +
+                        "   nc_message msg " +
+                        "ON " +
+                        "   ep.id = any(msg.endpoint_ids)");
         
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("statusSent", SENT.toString());
-        parameters.putAll(appendQueryFilters(queryBuilder, startAt, endAt, endpointType));
+        parameters.putAll(appendQueryFilters(queryBuilder, startAt, endAt, endpointType, eventId));
         
         appendQueryPagination(queryBuilder, pageable);
     
-        List<EndpointDto> result = namedParameterJdbcTemplate.query(queryBuilder.toString(), parameters, new EndpointDtoRowMapper());
+        List<EndpointTableViewDto> result = namedParameterJdbcTemplate.query(queryBuilder.toString(), parameters, new EndpointDtoRowMapper());
     
-        long totalCount = countAllEndpoints(startAt, endAt, endpointType);
+        long totalCount = countAllEndpoints(startAt, endAt, endpointType, eventId);
         return new PageImpl<>(result, pageable, totalCount);
     }
     
     private long countAllEndpoints(Instant startAt,
                                    Instant endAt,
-                                   EndpointType endpointType) {
+                                   EndpointType endpointType,
+                                   String eventId) {
         StringBuilder queryBuilder = new StringBuilder()
                 .append("SELECT count(DISTINCT ep.id) " +
                         "FROM " +
@@ -271,11 +277,15 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
                         "        endpoint_id" +
                         "   ) sent " +
                         "ON " +
-                        "   ep.id = sent.endpoint_id ");
+                        "   ep.id = sent.endpoint_id " +
+                        "LEFT JOIN " +
+                        "   nc_message msg " +
+                        "ON " +
+                        "   ep.id = any(msg.endpoint_ids)");
     
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("statusSent", SENT.toString());
-        parameters.putAll(appendQueryFilters(queryBuilder, startAt, endAt, endpointType));
+        parameters.putAll(appendQueryFilters(queryBuilder, startAt, endAt, endpointType, eventId));
     
         return namedParameterJdbcTemplate.queryForObject(queryBuilder.toString(), parameters, Long.class);
     }
@@ -283,7 +293,8 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
     private Map<String, Object> appendQueryFilters(StringBuilder queryBuilder,
                                                    Instant startAt,
                                                    Instant endAt,
-                                                   EndpointType endpointType) {
+                                                   EndpointType endpointType,
+                                                   String eventId) {
         Map<String, Object> parameters = new HashMap<>();
         
         if (ANY.equals(endpointType)) {
@@ -301,6 +312,11 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
         if (endAt != null) {
             queryBuilder.append(" AND di.processed_on <= (:endAt)");
             parameters.put("endAt", Timestamp.from(endAt));
+        }
+    
+        if (eventId != null) {
+            queryBuilder.append(" AND (:eventId) = any(msg.previous_event_ids)");
+            parameters.put("eventId", UUID.fromString(eventId));
         }
         
         return parameters;

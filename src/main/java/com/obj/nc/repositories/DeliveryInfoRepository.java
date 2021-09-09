@@ -16,6 +16,10 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
 	
 	List<DeliveryInfo> findByEventIdOrderByProcessedOn(UUID eventId);
 	
+	List<DeliveryInfo> findByStatus(DELIVERY_STATUS status);
+	
+	long countByEventIdAndStatus(UUID eventId, DELIVERY_STATUS status);
+	
 	@Query("select * " +
 			"from nc_delivery_info " +
 			"where event_id = (:eventId) " +
