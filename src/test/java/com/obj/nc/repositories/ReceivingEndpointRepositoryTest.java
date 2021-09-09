@@ -22,7 +22,7 @@ import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
-public class RecievingEndpointRepositoryTest extends BaseIntegrationTest {
+public class ReceivingEndpointRepositoryTest extends BaseIntegrationTest {
 
 	@Autowired EndpointsRepository endpointRepository;
 	

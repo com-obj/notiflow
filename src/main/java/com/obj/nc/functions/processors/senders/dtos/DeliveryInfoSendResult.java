@@ -49,7 +49,7 @@ public class DeliveryInfoSendResult implements HasHeader {
 	private UUID[] messageIds;
 	
 	@NotNull
-	private ReceivingEndpoint recievingEndpoint;
+	private ReceivingEndpoint receivingEndpoint;
 
 	private Header header;
 	

@@ -41,11 +41,11 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 		List<Message<?>> messages = new ArrayList<>();
 		
 
-		for (ReceivingEndpoint recievingEndpoint: notificationIntent.getReceivingEndpoints()) {
+		for (ReceivingEndpoint receivingEndpoint: notificationIntent.getReceivingEndpoints()) {
 			
-			Message<?> msg = (Message<?>) notificationIntent.createMessage(recievingEndpoint);
+			Message<?> msg = (Message<?>) notificationIntent.createMessage(receivingEndpoint);
 			
-			msg.addReceivingEndpoints(recievingEndpoint);
+			msg.addReceivingEndpoints(receivingEndpoint);
 
 			msg.setAttributes(notificationIntent.getAttributes());
 			messages.add(msg);

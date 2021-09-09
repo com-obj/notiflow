@@ -30,7 +30,7 @@ public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionA
 		for (ReceivingEndpoint endpoint: payload.getReceivingEndpoints()) {
 			DeliveryInfoSendResultBuilder infoBuilder = DeliveryInfoSendResult.builder()
 					.status(status)
-					.recievingEndpoint(endpoint)
+					.receivingEndpoint(endpoint)
 					.processedOn(Instant.now());
 					
 			if (payload instanceof HasPreviousEventIds) {

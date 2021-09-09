@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.obj.nc.domain.Attachment;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 
 import com.obj.nc.Get;
-import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 
 import lombok.AllArgsConstructor;
@@ -35,7 +35,7 @@ public class TemplateWithModelEmailContent<MODEL_TYPE> extends TemplateWithModel
 	private String subject;
 
 	@Builder.Default
-	private List<Attachement> attachments = new ArrayList<Attachement>();
+	private List<Attachment> attachments = new ArrayList<Attachment>();
 		
 	public String getSubjectLocalised(Locale locale) {		
 		try {

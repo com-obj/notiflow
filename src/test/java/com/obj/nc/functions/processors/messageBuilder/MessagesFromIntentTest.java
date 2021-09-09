@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.obj.nc.domain.Attachment;
 import org.junit.jupiter.api.Test;
 
-import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
@@ -68,11 +68,11 @@ class MessagesFromIntentTest {
 		EmailMessage deliveryNullMessage = findMessageWithEnpoint(result, "john.doe@objectify.sk");
 		
         EmailContent emailContent = deliveryNullMessage.getBody();
-		List<Attachement> attachements = emailContent.getAttachments();
-		assertThat(attachements).isNotNull();
-		assertThat(attachements.size()).isEqualTo(2);
-		assertThat(attachements).first().extracting("name").isEqualTo("name.extension");
-		assertThat(attachements).first().extracting("fileURI").hasToString("http://domain/location/name.extension");
+		List<Attachment> attachments = emailContent.getAttachments();
+		assertThat(attachments).isNotNull();
+		assertThat(attachments.size()).isEqualTo(2);
+		assertThat(attachments).first().extracting("name").isEqualTo("name.extension");
+		assertThat(attachments).first().extracting("fileURI").hasToString("http://domain/location/name.extension");
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -101,11 +101,11 @@ class MessagesFromIntentTest {
 		EmailMessage mail = findMessageWithEnpoint(result, "john.doe@objectify.sk");
 		
         EmailContent emailContent = mail.getBody();
-		List<Attachement> attachements = emailContent.getAttachments();
-		assertThat(attachements).isNotNull();
-		assertThat(attachements.size()).isEqualTo(2);
-		assertThat(attachements).first().extracting("name").isEqualTo("name.extension");
-		assertThat(attachements).first().extracting("filePathAndName").isEqualTo("src/test/resources/intents/0_ba_job_post.json");
+		List<Attachment> attachments = emailContent.getAttachments();
+		assertThat(attachments).isNotNull();
+		assertThat(attachments.size()).isEqualTo(2);
+		assertThat(attachments).first().extracting("name").isEqualTo("name.extension");
+		assertThat(attachments).first().extracting("filePathAndName").isEqualTo("src/test/resources/intents/0_ba_job_post.json");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -148,11 +148,11 @@ class MessagesFromIntentTest {
 		model = smsContent.getModel();
 		assertThat(model.getName()).isEqualTo("John Doe");
 		
-		List<Attachement> attachements = emailContent.getAttachments();
-		assertThat(attachements).isNotNull();
-		assertThat(attachements.size()).isEqualTo(2);
-		assertThat(attachements).first().extracting("name").isEqualTo("name.extension");
-		assertThat(attachements).first().extracting("filePathAndName").isEqualTo("src/test/resources/intents/0_ba_job_post.json");
+		List<Attachment> attachments = emailContent.getAttachments();
+		assertThat(attachments).isNotNull();
+		assertThat(attachments.size()).isEqualTo(2);
+		assertThat(attachments).first().extracting("name").isEqualTo("name.extension");
+		assertThat(attachments).first().extracting("filePathAndName").isEqualTo("src/test/resources/intents/0_ba_job_post.json");
 	}
 	
 	
