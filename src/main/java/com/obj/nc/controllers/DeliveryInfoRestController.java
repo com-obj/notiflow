@@ -13,14 +13,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -53,9 +50,12 @@ public class DeliveryInfoRestController {
 	
 	@GetMapping(value = "/events/{eventId}", consumes="application/json", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
-    		@PathVariable (value = "eventId", required = true) String eventId) {
+    		@PathVariable (value = "eventId", required = true) String eventId,
+			@RequestParam(value = "endpointId", required = false) String endpointId) {
+		
+		UUID endpointUUID = endpointId == null ? null : UUID.fromString(endpointId);
 
-		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByEventIdOrderByProcessedOn(UUID.fromString(eventId));
+		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByEventIdAndEndpointIdOrderByProcessedOn(UUID.fromString(eventId), endpointUUID);
 
 		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
 		
@@ -69,14 +69,15 @@ public class DeliveryInfoRestController {
 	
 	@GetMapping(value = "/events/ext/{extEventId}", consumes="application/json", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByExtId(
-    		@PathVariable (value = "extEventId", required = true) String extEventId) {
+    		@PathVariable (value = "extEventId", required = true) String extEventId,
+			@RequestParam(value = "endpointId", required = false) String endpointId) {
 
 		GenericEvent event = eventRepo.findByExternalId(extEventId);
 		if (event == null) {
 			throw new IllegalArgumentException("Event with " +  extEventId +" external ID not found");
 		}
 		
-		return findDeliveryInfosByEventId(event.getId().toString());
+		return findDeliveryInfosByEventId(event.getId().toString(), endpointId);
     }
 	
 	@PutMapping(value = "/messages/{messageId}/mark-as-read")

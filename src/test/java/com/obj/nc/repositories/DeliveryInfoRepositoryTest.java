@@ -104,6 +104,52 @@ public class DeliveryInfoRepositoryTest {
 	}
 	
 	@Test
+	public void testFindByEventIdAndEndpointId() {
+		//GIVEN
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId = eventRepo.save(event).getId();
+		
+		GenericEvent event2 = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId2 = eventRepo.save(event2).getId();
+		
+		EmailEndpoint email1 = EmailEndpoint.builder().email("johndoe@gmail.com").build();
+		UUID endpointId1 = endpointRepo.persistEnpointIfNotExists(email1).getId();
+		
+		EmailEndpoint email2 = EmailEndpoint.builder().email("johndudly@gmail.com").build();
+		UUID endpointId2 = endpointRepo.persistEnpointIfNotExists(email2).getId();
+		
+		//AND GIVEN
+		DeliveryInfo deliveryInfo1 = DeliveryInfo.builder()
+				.endpointId(endpointId1)
+				.eventId(eventId)
+				.status(DELIVERY_STATUS.SENT)
+				.id(UUID.randomUUID())
+				.build();
+		
+		DeliveryInfo deliveryInfo2 = DeliveryInfo.builder()
+				.endpointId(endpointId2)
+				.eventId(eventId)
+				.status(DELIVERY_STATUS.SENT)
+				.id(UUID.randomUUID())
+				.build();
+		
+		DeliveryInfo deliveryInfo3 = DeliveryInfo.builder()
+				.endpointId(endpointId2)
+				.eventId(eventId2)
+				.status(DELIVERY_STATUS.SENT)
+				.id(UUID.randomUUID())
+				.build();
+		
+		deliveryInfoRepo.save(deliveryInfo1);
+		deliveryInfoRepo.save(deliveryInfo2);
+		deliveryInfoRepo.save(deliveryInfo3);
+		
+		List<DeliveryInfo> infosInDb = deliveryInfoRepo.findByEventIdAndEndpointIdOrderByProcessedOn(eventId, endpointId1);
+		
+		Assertions.assertThat(infosInDb.size()).isEqualTo(1);
+	}
+	
+	@Test
 	public void testFindByEndpointId() {
 		//GIVEN
 		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
