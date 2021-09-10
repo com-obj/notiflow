@@ -155,7 +155,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         emailSendingFlow.sendEmail(email);
 
         //THEN check processing deliveryInfo
-        Awaitility.await().atMost(Duration.ofSeconds(1)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()==1);
+        Awaitility.await().atMost(Duration.ofSeconds(5)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()>=1);
         
         List<DeliveryInfo> deliveryInfos = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
         

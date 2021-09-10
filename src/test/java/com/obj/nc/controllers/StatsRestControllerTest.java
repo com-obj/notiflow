@@ -54,7 +54,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest
+@SpringBootTest(properties = "spring.integration.channels.error.requireSubscribers=false") // https://docs.spring.io/spring-integration/reference/html/error-handling.html
 class StatsRestControllerTest extends BaseIntegrationTest {
     
 	@Autowired private GenericEventRepository genericEventRepository;
