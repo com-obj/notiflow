@@ -21,6 +21,25 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.obj.nc.utils.DateFormatMatcher;
+import org.assertj.core.api.Assertions;
+import org.awaitility.Awaitility;
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
@@ -45,36 +64,10 @@ import com.obj.nc.repositories.MessageRepository;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 
-import org.assertj.core.api.Assertions;
-import org.awaitility.Awaitility;
-import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
-import org.springframework.integration.test.context.SpringIntegrationTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.restdocs.payload.PayloadDocumentation;
-import org.springframework.restdocs.request.RequestDocumentation;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
-@AutoConfigureRestDocs(outputDir = "docs/api/generated/delivery-info")
-@Import(RestDocsConfiguration.class)
 class DeliveryInfoControllerTest extends BaseIntegrationTest {
     
     
@@ -129,7 +122,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	deliveryRepo.saveAll( Arrays.asList(info1, info2, info3, info4) );
     	
     	//WHEN
-    	List<EndpointDeliveryInfoDto> infos = controller.findDeliveryInfosByEventId(eventId.toString());
+    	List<EndpointDeliveryInfoDto> infos = controller.findDeliveryInfosByEventId(eventId.toString(), null);
     	
     	//THEN
     	Assertions.assertThat(infos.size()).isEqualTo(2);
@@ -149,9 +142,10 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	Assertions.assertThat(infoForSms.getCurrentStatus()).isEqualTo(SENT);
     	
     }
-	
-	private UUID createTestDeliveryInfosForEvent() {
-		//GIVEN
+    
+    @Test
+    void testFindEventDeliveryInfosRest() throws Exception {
+    	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
     	UUID emailEndpointId = endpointRepo.persistEnpointIfNotExists(email1).getId();
     	
@@ -166,12 +160,6 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     			.endpointId(emailEndpointId).eventId(eventId).status(SENT).id(UUID.randomUUID()).build();
 
     	deliveryRepo.saveAll( Arrays.asList(info1, info2) );
-		return eventId;
-	}
-    
-    @Test
-    void testFindEventDeliveryInfosRest() throws Exception {
-    	UUID eventId = createTestDeliveryInfosForEvent();
     	
     	//WHEN TEST REST
         ResultActions resp = mockMvc
@@ -185,39 +173,11 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		resp
         	.andExpect(status().is2xxSuccessful())
 			.andExpect(jsonPath("$[0].currentStatus").value(CoreMatchers.is("SENT")))
+			.andExpect(jsonPath("$[0].statusReachedAt").value(DateFormatMatcher.matchesISO8601()))
 			.andExpect(jsonPath("$[0].endpoint.email").value(CoreMatchers.is("jancuzy@gmail.com")))
 			.andExpect(jsonPath("$[0].endpoint.endpointId").value(CoreMatchers.is("jancuzy@gmail.com")))
 			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL"))).andReturn();
-	
-		String statusReachedAt = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$[0].statusReachedAt");
-		SimpleDateFormat ISO8601_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.mmm'Z'");
-		Assertions.assertThat(ISO8601_DATE_FORMAT.parse(statusReachedAt)).isNotNull();
 	}
-
-
-	@Test
-    void docFindEventDeliveryInfosRest() throws Exception {
-    	UUID eventId = createTestDeliveryInfosForEvent();
-    	
-    	//WHEN TEST REST
-        mockMvc
-        		.perform(RestDocumentationRequestBuilders.get("/delivery-info/events/{eventId}",eventId.toString())
-                .contentType(APPLICATION_JSON_UTF8)
-        		.accept(APPLICATION_JSON_UTF8))
-        		.andDo(MockMvcResultHandlers.print())
-				.andDo(
-                        MockMvcRestDocumentation.document("GET-delivery-info-events",
-							RequestDocumentation.pathParameters(
-								RequestDocumentation.parameterWithName("eventId").description("Internal Notiflow event ID")
-                            ),
-							PayloadDocumentation.responseFields( )
-								.andWithPrefix("[].", EndpointDeliveryInfoDto.fieldDesc)
-								.andWithPrefix("[].endpoint.", EmailEndpoint.fieldDesc )
-                        )
-                );                
-	}
-
-
 	
 	@Test
 	void testFindMessageDeliveryInfos() {
@@ -297,6 +257,50 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		//AND READ STATUS IS JOURNALIZED
 		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), READ) >= 1);
 		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatus(emailMessage.getId(), READ);
+		assertThat(infosOfMessage).hasSize(1);
+	}
+	
+	@Test
+	void testMarkAsReadMessageDeliveryInfoNotPersistingDuplicates() throws Exception {
+		//GIVEN
+		EmailEndpoint email1 = EmailEndpoint.builder().email("john.doe@gmail.com").build();
+		email1 = endpointRepo.persistEnpointIfNotExists(email1);
+		EmailEndpoint email2 = EmailEndpoint.builder().email("john.dudly@gmail.com").build();
+		email2 = endpointRepo.persistEnpointIfNotExists(email2);
+		
+		//AND
+		EmailMessage emailMessage = new EmailMessage();
+		emailMessage.setBody(EmailContent.builder().subject("Subject").text("Text").build());
+		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
+		
+		messageProcessingFlow.processMessage(emailMessage);
+		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
+		
+		List<DeliveryInfo> sentInfos = deliveryRepo.findByMessageIdAndStatus(emailMessage.getId(), SENT);
+		
+		//WHEN TEST REST
+		ResultActions resp1 = mockMvc
+				.perform(MockMvcRequestBuilders
+						.put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
+						.contextPath(ncAppConfigProperties.getContextPath())
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(sentInfos.get(0).getMessageId(), READ) >= 1);
+		
+		ResultActions resp2 = mockMvc
+				.perform(MockMvcRequestBuilders
+						.put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
+						.contextPath(ncAppConfigProperties.getContextPath())
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		Awaitility.await().atLeast(2, TimeUnit.SECONDS);
+		
+		//AND READ STATUS IS JOURNALIZED ONLY ONCE
+		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatus(sentInfos.get(0).getMessageId(), READ);
 		assertThat(infosOfMessage).hasSize(1);
 	}
 

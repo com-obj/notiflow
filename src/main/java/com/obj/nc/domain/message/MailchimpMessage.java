@@ -14,11 +14,11 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
-public class MailChimpMessage extends Message<MailchimpContent/*, MailchimpEndpoint*/> {
+public class MailchimpMessage extends Message<MailchimpContent> {
 
 	public static final String JSON_TYPE_IDENTIFIER = "MAILCHIMP_MESSAGE";
 	
-	public MailChimpMessage() {
+	public MailchimpMessage() {
 		setBody(new MailchimpContent());
 	}
 

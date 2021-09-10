@@ -1,5 +1,12 @@
 package com.obj.nc.domain.notifIntent;
 
+import com.obj.nc.domain.HasPreviousIntentIds;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.mailchimp.TemplatedMailchimpContent;
+import com.obj.nc.domain.message.*;
+import com.obj.nc.domain.refIntegrity.Reference;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.NotificationIntentRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,28 +21,16 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.HasPreviousIntentIds;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailMessageTemplated;
-import com.obj.nc.domain.message.MailChimpMessage;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.SmsMessage;
-import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
-import com.obj.nc.domain.refIntegrity.Reference;
-import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.NotificationIntentRepository;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -154,11 +149,17 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 			sms.setBody((TemplateWithModelContent)msgContent);
 			
 			return sms;
-		} 
-
+		}
 		
-		if (endpointsForOneSubject instanceof MailchimpEndpoint) {
-			MailChimpMessage mailChimp = Message.newTypedMessageFrom(MailChimpMessage.class, this);
+		if (msgContent instanceof TemplatedMailchimpContent) {
+			TemplatedMailchimpMessage mailChimp = Message.newTypedMessageFrom(TemplatedMailchimpMessage.class, this);
+			mailChimp.setBody((TemplatedMailchimpContent)msgContent);
+			
+			return mailChimp;
+		}
+		
+		if (msgContent instanceof MailchimpContent) {
+			MailchimpMessage mailChimp = Message.newTypedMessageFrom(MailchimpMessage.class, this);
 			mailChimp.setBody((MailchimpContent)msgContent);
 			
 			return mailChimp;

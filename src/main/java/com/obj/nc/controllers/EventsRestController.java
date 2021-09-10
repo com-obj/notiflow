@@ -9,7 +9,10 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import com.obj.nc.domain.dto.GenericEventTableViewDto;
+import com.obj.nc.domain.event.GenericEventWithStats;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -79,21 +82,21 @@ public class EventsRestController {
     }
 	
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	public Page<GenericEvent> findAllEvents(
-			@RequestParam(value = "consumedFrom", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedFrom,
-			@RequestParam(value = "consumedTo", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedTo,
-			Pageable pageable) {
+	public Page<GenericEventTableViewDto> findAllEvents(@RequestParam(value = "consumedFrom", required = false, defaultValue = "2000-01-01T12:00:00Z") 
+															@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedFrom,
+														@RequestParam(value = "consumedTo", required = false, defaultValue = "9999-01-01T12:00:00Z") 
+															@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedTo,
+														@RequestParam(value = "eventId", required = false) String eventId,
+														Pageable pageable) {
+		UUID eventUUID = eventId == null ? null : UUID.fromString(eventId);
 		
-		if (consumedFrom == null) {
-			consumedFrom = OffsetDateTime.of(LocalDate.of(2000, 1, 1), LocalTime.NOON, ZoneOffset.UTC).toInstant();
-		}
+		List<GenericEventTableViewDto> events = eventsRepository
+				.findAllEventsWithStats(consumedFrom, consumedTo, eventUUID, pageable.getOffset(), pageable.getPageSize())
+				.stream()
+				.map(GenericEventTableViewDto::from)
+				.collect(Collectors.toList());
 		
-		if (consumedTo == null) {
-			consumedTo = OffsetDateTime.of(LocalDate.of(9999, 1, 1), LocalTime.NOON, ZoneOffset.UTC).toInstant();
-		}
-		
-		List<GenericEvent> events = eventsRepository.findAllByTimeConsumedBetween(consumedFrom, consumedTo, pageable);
-		long eventsTotalCount = eventsRepository.countAllByTimeConsumedBetween(consumedFrom, consumedTo);
+		long eventsTotalCount = eventsRepository.countAllEventsWithStats(consumedFrom, consumedTo, eventUUID);
 		return new PageImpl<>(events, pageable, eventsTotalCount);
 	}
 	

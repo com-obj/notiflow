@@ -4,17 +4,19 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.PROCESSING;
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.utils.JsonUtils;
 import org.awaitility.Awaitility;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -56,6 +58,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	@Autowired private EndpointsRepository endpointsRepository;
 	@Autowired private DeliveryInfoRepository deliveryInfoRepository;
 	@Autowired private MessageRepository messageRepository;
+	@Autowired private GenericEventRepository genericEventRepository;
 	@Autowired private MockMvc mockMvc;
 	@Autowired private MessageProcessingFlow messageProcessingFlow;
 	
@@ -230,6 +233,28 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	}
 	
 	@Test
+	void testFilterEndpointsByEventId() throws Exception {
+		//GIVEN
+		UUID eventId = persistTestEndpointsForEventIdFiltering();
+		
+		//WHEN
+		ResultActions resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.param("eventId", eventId.toString())
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		//THEN
+		resp
+				.andExpect(status().is2xxSuccessful())
+				.andExpect(jsonPath("$.content.size()", Matchers.is(2)));
+		
+		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+		assertContainsEndpoint(endpoints, "john.doe@gmail.com", 0);
+		assertContainsEndpoint(endpoints, "john.dudly@gmail.com", 0);
+	}
+	
+	@Test
 	void testGetPage0Size20() throws Exception {
 		// GIVEN
 		persistNEmailEndpoints(19);
@@ -283,12 +308,51 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		assertThat(endpoints).hasSize(9);
 	}
 	
+	@Test
+	void testFindEndpointById() throws Exception {
+		// given
+		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
+		email = endpointsRepository.persistEnpointIfNotExists(email);
+		
+		// when
+		mockMvc
+				.perform(MockMvcRequestBuilders.get("/endpoints/{endpointId}", email.getId())
+						.accept(APPLICATION_JSON_UTF8))
+				.andExpect(jsonPath("$.id", Matchers.is(email.getId().toString())))
+				.andExpect(jsonPath("$.endpointId", Matchers.is("john.doe@objectify.sk")))
+				.andDo(MockMvcResultHandlers.print());
+	}
+	
 	private void persistTestEndpoints() {
 		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
 		endpointsRepository.persistEnpointIfNotExists(email);
 		
 		SmsEndpoint phone = SmsEndpoint.builder().phone("+999999999999").build();
 		endpointsRepository.persistEnpointIfNotExists(phone);
+	}
+	
+	private UUID persistTestEndpointsForEventIdFiltering() {
+		GenericEvent event = GenericEvent
+				.builder()
+				.id(UUID.randomUUID())
+				.payloadJson(JsonUtils.readJsonNodeFromJSONString(""))
+				.build();
+		event = genericEventRepository.save(event);
+		
+		EmailEndpoint email1 = EmailEndpoint.builder().email("john.doe@gmail.com").build();
+		endpointsRepository.persistEnpointIfNotExists(email1);
+		EmailEndpoint email2 = EmailEndpoint.builder().email("john.dudly@gmail.com").build();
+		endpointsRepository.persistEnpointIfNotExists(email2);
+		EmailEndpoint email3 = EmailEndpoint.builder().email("john.wick@gmail.com").build();
+		endpointsRepository.persistEnpointIfNotExists(email3);
+		
+		EmailMessage emailMessage = new EmailMessage();
+		emailMessage.addPreviousEventId(event.getId());
+		emailMessage.setBody(EmailContent.builder().subject("Subject").text("Text").build());
+		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
+		messageRepository.save(emailMessage.toPersistentState());
+		
+		return event.getId();
 	}
 	
 	private void persistTestEndpointsAndTestDeliveryInfos() {

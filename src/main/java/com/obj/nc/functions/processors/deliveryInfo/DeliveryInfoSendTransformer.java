@@ -34,7 +34,7 @@ public class DeliveryInfoSendTransformer extends ProcessorFunctionAdapter<Delive
 		
 		for (UUID eventId: sendResult.getEventIds()) {
 			DeliveryInfo info = DeliveryInfo.builder()
-					.endpointId(sendResult.getRecievingEndpoint().getId())
+					.endpointId(sendResult.getReceivingEndpoint().getId())
 					.eventId(eventId)
 					.status(sendResult.getStatus())
 					.build();
@@ -43,7 +43,7 @@ public class DeliveryInfoSendTransformer extends ProcessorFunctionAdapter<Delive
 		
 		for (UUID intentId: sendResult.getIntentIds()) {
 			DeliveryInfo info = DeliveryInfo.builder()
-					.endpointId(sendResult.getRecievingEndpoint().getId())
+					.endpointId(sendResult.getReceivingEndpoint().getId())
 					.intentId(intentId)
 					.status(sendResult.getStatus())
 					.build();
@@ -52,7 +52,7 @@ public class DeliveryInfoSendTransformer extends ProcessorFunctionAdapter<Delive
 		
 		for (UUID messageId: sendResult.getMessageIds()) {
 			DeliveryInfo info = DeliveryInfo.builder()
-					.endpointId(sendResult.getRecievingEndpoint().getId())
+					.endpointId(sendResult.getReceivingEndpoint().getId())
 					.messageId(messageId)
 					.status(sendResult.getStatus())
 					.build();

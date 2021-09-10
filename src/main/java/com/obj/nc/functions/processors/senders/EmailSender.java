@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import com.obj.nc.domain.Attachment;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.FileSystemResource;
@@ -18,7 +19,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
@@ -97,9 +97,9 @@ public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMes
 				helper.setText(payload.getBody().getText() );
 			}
 			
-			for (Attachement attachement: payload.getBody().getAttachments()) {
-				FileSystemResource file = new FileSystemResource(new File(attachement.getFileURI()));
-				helper.addAttachment(attachement.getName(), file);
+			for (Attachment attachment : payload.getBody().getAttachments()) {
+				FileSystemResource file = new FileSystemResource(new File(attachment.getFileURI()));
+				helper.addAttachment(attachment.getName(), file);
 			}
 
 			Instant sendStart = Instant.now();

@@ -14,7 +14,7 @@ database "Topic/Channels" {
     component MAILCHIMP_PROCESSING_FLOW_ID_INPUT<<PUB/SUB>>[
         MAILCHIMP_PROCESSING_FLOW_ID_INPUT
         --
-        (Message)
+        (MailChimpMessage)
     ]
 
 }
@@ -22,10 +22,10 @@ database "Topic/Channels" {
 component "MessageProcessingFlow" {
     [endpointPersister]
     [messagePersister]
-    [mailchimpSender]    
+    [mailchimpMessageSender]    
 
     endpointPersister -l-> messagePersister: (MailChimpMessage)
-    messagePersister -l-> mailchimpSender: (MailChimpMessage)
+    messagePersister -l-> mailchimpMessageSender: (MailChimpMessage)
     endpointPersister ..> MAILCHIMP_PROCESSING_FLOW_ID_INPUT : (MailChimpMessage) 
 
 }

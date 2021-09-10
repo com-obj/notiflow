@@ -4,8 +4,10 @@ import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.mailchimpSending.TemplatedMailchimpMessageProcessingFlowConfig.MAILCHIMP_TEMPLATE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
+import com.obj.nc.domain.message.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,10 +15,6 @@ import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailMessageTemplated;
-import com.obj.nc.domain.message.MailChimpMessage;
-import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.messageBuilder.MessageByRecipientTokenizer;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
@@ -54,7 +52,8 @@ public class MessageProcessingFlowConfig {
 						recipient(EMAIL_SEND_FLOW_INPUT_CHANNEL_ID, m-> m instanceof EmailMessage).
 						recipient(EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID, m-> m instanceof EmailMessageTemplated).
 						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof SmsMessageTemplated).
-						recipient(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof MailChimpMessage).
+						recipient(MAILCHIMP_TEMPLATE_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof TemplatedMailchimpMessage).
+						recipient(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof MailchimpMessage).
 						defaultOutputToParentFlow()
 				)
 				.get();
