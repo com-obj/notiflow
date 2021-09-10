@@ -1,5 +1,10 @@
 package com.obj.nc.domain.endpoints;
 
+import com.google.common.collect.ObjectArrays;
+
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.payload.PayloadDocumentation;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -51,5 +56,15 @@ public class EmailEndpoint extends ReceivingEndpoint {
 	public String getEndpointType() {
 		return JSON_TYPE_IDENTIFIER;
 	}
+
+	public static FieldDescriptor[] fieldDesc = ObjectArrays.concat(
+        ReceivingEndpoint.fieldDesc,
+        new FieldDescriptor[] {
+			PayloadDocumentation.fieldWithPath("email").description("Email address"),        
+        },
+        FieldDescriptor.class
+    );
+
+	
 	
 }
