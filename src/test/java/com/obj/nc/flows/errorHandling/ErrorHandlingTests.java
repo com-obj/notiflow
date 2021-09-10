@@ -2,11 +2,15 @@ package com.obj.nc.flows.errorHandling;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.obj.nc.domain.HasReceivingEndpoints;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -138,7 +142,7 @@ public class ErrorHandlingTests {
     @NoArgsConstructor
     @Builder
     @JsonTypeInfo(include = As.PROPERTY, use = Id.CLASS)
-    public static class TestPayload {
+    public static class TestPayload implements HasReceivingEndpoints {
     	
     	private Integer num;
     	private String str;
@@ -147,5 +151,15 @@ public class ErrorHandlingTests {
     		num = Integer.parseInt(str);
     		return this;
     	}
-    }
+	
+		@Override
+		public List<? extends ReceivingEndpoint> getReceivingEndpoints() {
+			return new ArrayList<>();
+		}
+		
+		public void setReceivingEndpoints(List<? extends ReceivingEndpoint> receivingEndpoints) {
+		}
+		
+		
+	}
 }
