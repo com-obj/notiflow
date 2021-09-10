@@ -37,8 +37,6 @@ clone:
   depth: full
 
 pipelines:
-  default:
-    - step: *mirror-to-github
   branches:
     master:
       - step: *release-nexus # publication of SNAPSHOT release
@@ -48,10 +46,8 @@ pipelines:
       - step: *mirror-to-github
     release/*:
       - step: *release-nexus # publication of SNAPSHOT release
-      - step: *mirror-to-github
     hotfix/*:
       - step: *release-nexus # publication of SNAPSHOT release      
-      - step: *mirror-to-github
   tags:
     v*:
       - step: *release-nexus # publication of FINAL release
