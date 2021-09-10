@@ -24,7 +24,7 @@ public class FailedPayloadPersister extends SinkConsumerAdapter<FailedPayload> {
 		try {
 			failedPayloadRepo.save(failedPaylod);
 		} catch (Exception e) {
-			log.error("Error ocured in Error handling flow: ", e);
+			log.error("Error ocurred in Error handling flow: ", e);
 			throw e;
 		}
 	}
