@@ -14,7 +14,19 @@ database "Topic/Channels" {
     component MAILCHIMP_PROCESSING_FLOW_ID_INPUT<<PUB/SUB>>[
         MAILCHIMP_PROCESSING_FLOW_ID_INPUT
         --
-        (MailChimpMessage)
+        (MailchimpMessage)
+    ]
+    
+    component DELIVERY_INFO_SEND_FLOW_ID_INPUT<<PUB/SUB>>  [
+        DELIVERY_INFO_SEND_FLOW_ID_INPUT
+        --
+        (HasReceivingEndpoints)
+    ]
+    
+    component MAILCHIMP_PROCESSING_FLOW_ID_OUTPUT_CHANNEL_ID<<PUB/SUB>>[
+        MAILCHIMP_PROCESSING_FLOW_ID_OUTPUT_CHANNEL_ID
+        --
+        (MailchimpMessage)
     ]
 
 }
@@ -28,6 +40,8 @@ component "MessageProcessingFlow" {
     endpointPersister -l-> messagePersister: (MailChimpMessage)
     messagePersister -l-> readTrackingDecorator: (MailChimpMessage)
     readTrackingDecorator -l-> mailchimpMessageSender: (MailChimpMessage)
+    mailchimpMessageSender ..> DELIVERY_INFO_SEND_FLOW_ID_INPUT: (MailChimpMessage)
+    mailchimpMessageSender ..> MAILCHIMP_PROCESSING_FLOW_ID_OUTPUT_CHANNEL_ID: (MailChimpMessage)
     endpointPersister ..> MAILCHIMP_PROCESSING_FLOW_ID_INPUT : (MailChimpMessage) 
     
     note left of readTrackingDecorator 
