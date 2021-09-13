@@ -45,30 +45,28 @@ database "Topic/Channels" {
 component "EmailSendFlow" {
     [endpointPersister] as endpointPersister1
     [messagePersister] as messagePersister1
-    [emailReadTrackingDecorator]
+    [readTrackingDecorator]
     [endpointPersister] as endpointPersister2
     [messagePersister] as messagePersister2
     [emailSender]
 
     endpointPersister1 -l-> messagePersister1: (EmailMessage)
-    messagePersister1 -l-> emailReadTrackingDecorator: (EmailMessage)
-    emailReadTrackingDecorator -l-> messagePersister2: (EmailMessage)
+    messagePersister1 -l-> readTrackingDecorator: (EmailMessage)
+    readTrackingDecorator -l-> messagePersister2: (EmailMessage)
     messagePersister2 -l-> emailSender: (EmailMessage)
 
- '   messagePersister --> nc_message: (EmailMessage)
-'  endpointPersister --> nc_endpoint: (List<RecievingEndpoint>)
 
     endpointPersister1 ..> EMAIL_SEND_FLOW_INPUT_ID : (EmailMessage) 
     emailSender --> EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID : (EmailMessage) 
 
     emailSender --> DELIVERY_INFO_SEND_FLOW_ID_INPUT : (EmailMessage) 
 
-    note left of emailReadTrackingDecorator 
-        if (nc.functions.email-tracking.enabled = true 
+    note left of readTrackingDecorator 
+        if (nc.functions.tracking.enabled = true 
             AND contentType = MediaType.TEXT_HTML_VALUE)
             do
         else
-            skipp        
+            skip       
     end note  
 
     

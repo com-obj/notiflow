@@ -22,11 +22,21 @@ database "Topic/Channels" {
 component "MessageProcessingFlow" {
     [endpointPersister]
     [messagePersister]
+    [readTrackingDecorator]
     [mailchimpMessageSender]    
 
     endpointPersister -l-> messagePersister: (MailChimpMessage)
-    messagePersister -l-> mailchimpMessageSender: (MailChimpMessage)
+    messagePersister -l-> readTrackingDecorator: (MailChimpMessage)
+    readTrackingDecorator -l-> mailchimpMessageSender: (MailChimpMessage)
     endpointPersister ..> MAILCHIMP_PROCESSING_FLOW_ID_INPUT : (MailChimpMessage) 
+    
+    note left of readTrackingDecorator 
+        if (nc.functions.tracking.enabled = true 
+            AND contentType = MediaType.TEXT_HTML_VALUE)
+            do
+        else
+            skip      
+    end note 
 
 }
 

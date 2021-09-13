@@ -7,8 +7,8 @@ import lombok.Data;
 
 @Data
 @Configuration
-@ConfigurationProperties("nc.functions.email-tracking")
-public class EmailTrackingConfigProperties {
+@ConfigurationProperties("nc.functions.tracking")
+public class TrackingConfigProperties {
     
     private boolean enabled = false;
     

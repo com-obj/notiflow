@@ -11,4 +11,19 @@ public class MailchimpContent extends BaseMailchimpContent {
     
     private String html;
     
+    @Override
+    public boolean hasHtmlText() {
+        return getHtml() != null;
+    }
+    
+    @Override
+    public String getHtmlText() {
+        return getHtml();
+    }
+    
+    @Override
+    public void setHtmlText(String text) {
+        setHtml(text);
+    }
+    
 }

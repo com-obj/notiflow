@@ -3,6 +3,7 @@ package com.obj.nc.functions.processors.messageTracking;
 import java.net.URI;
 import java.util.Optional;
 
+import com.obj.nc.domain.content.TrackableContent;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -21,37 +22,36 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class EmailReadTrackingDecorator extends ProcessorFunctionAdapter<Message<EmailContent>, Message<EmailContent>> {
+public class ReadTrackingDecorator extends ProcessorFunctionAdapter<Message<TrackableContent>, Message<TrackableContent>> {
     
     private final NcAppConfigProperties ncAppConfigProperties;
     
     @Override
-    protected Optional<PayloadValidationException> checkPreCondition(Message<EmailContent> payload) {
+    protected Optional<PayloadValidationException> checkPreCondition(Message<TrackableContent> payload) {
         Optional<PayloadValidationException> exception = super.checkPreCondition(payload);
         if (exception.isPresent()) {
             return exception;
         }
-        if (payload.getBody() == null) {
+        
+        TrackableContent body = payload.getBody();
+        if (body == null) {
             return Optional.of(new PayloadValidationException("Payload must not have null content"));
         }
-        if (!MediaType.TEXT_HTML_VALUE.equals(payload.getBody().getContentType())) {
-            return Optional.of(new PayloadValidationException(String.format("EmailReadTrackingDecorator can only decorate HTML text. Got: %s", payload.getBody().getContentType())));
-        }
-        if (payload.getBody().getText() == null) {
-            return Optional.of(new PayloadValidationException("Payload must not have null content text"));
+        if (!body.hasHtmlText()) {
+            return Optional.of(new PayloadValidationException("ReadTrackingDecorator can only decorate HTML text."));
         }
         return Optional.empty();
     }
     
     @Override
-    protected Message<EmailContent> execute(Message<EmailContent> payload) {
-        EmailMessage result = Message.newTypedMessageFrom(EmailMessage.class, payload);
+    protected Message<TrackableContent> execute(Message<TrackableContent> payload) {
+        Message<TrackableContent> result = Message.newTypedMessageFrom(payload.getClass(), payload);
         result.setReceivingEndpoints(payload.getReceivingEndpoints());
         result.setAttributes(payload.getAttributes());
         result.setBody(payload.getBody());
-        
-        EmailContent content = result.getBody();
-        String emailText = content.getText();
+    
+        TrackableContent content = result.getBody();
+        String emailText = content.getHtmlText();
     
         Document html = Jsoup.parse(emailText);
         Element img = html.body().appendElement("img");
@@ -64,7 +64,7 @@ public class EmailReadTrackingDecorator extends ProcessorFunctionAdapter<Message
         img.attr("src", readMessageCallbackUri.toString());
     
         emailText = html.html();
-        content.setText(emailText);
+        content.setHtmlText(emailText);
         
         return result;
     }

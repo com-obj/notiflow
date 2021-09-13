@@ -3,10 +3,10 @@ package com.obj.nc.domain.content.email;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.obj.nc.domain.content.TrackableContent;
 import org.springframework.http.MediaType;
 
 import com.obj.nc.domain.Attachment;
-import com.obj.nc.domain.content.MessageContent;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class EmailContent extends MessageContent {
+public class EmailContent extends TrackableContent {
 	
 	public static final String TEXT_CONCAT_DELIMITER = "\n\n";
 	public static final String SUBJECT_CONCAT_DELIMITER = ", ";
@@ -38,5 +38,19 @@ public class EmailContent extends MessageContent {
 	@Builder.Default
 	private List<Attachment> attachments = new ArrayList();
 	
+	@Override
+	public boolean hasHtmlText() {
+		return MediaType.TEXT_HTML_VALUE.equals(contentType) && getText() != null;
+	}
+	
+	@Override
+	public String getHtmlText() {
+		return getText();
+	}
+	
+	@Override
+	public void setHtmlText(String text) {
+		setText(text);
+	}
 	
 }
