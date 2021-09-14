@@ -3,6 +3,7 @@ package com.obj.nc.domain.content.email;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TrackableContent;
 import org.springframework.http.MediaType;
 
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class EmailContent extends TrackableContent {
+public class EmailContent extends MessageContent implements TrackableContent {
 	
 	public static final String TEXT_CONCAT_DELIMITER = "\n\n";
 	public static final String SUBJECT_CONCAT_DELIMITER = ", ";

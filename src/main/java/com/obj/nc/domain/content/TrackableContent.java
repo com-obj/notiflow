@@ -1,11 +1,11 @@
 package com.obj.nc.domain.content;
 
-public abstract class TrackableContent extends MessageContent {
+public interface TrackableContent {
     
-    public abstract boolean hasHtmlText();
+    boolean hasHtmlText();
     
-    public abstract String getHtmlText();
+    String getHtmlText();
     
-    public abstract void setHtmlText(String text);
+    void setHtmlText(String text);
     
 }

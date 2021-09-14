@@ -3,37 +3,36 @@ package com.obj.nc.functions.processors.messageTracking;
 import java.net.URI;
 import java.util.Optional;
 
+import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TrackableContent;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.obj.nc.config.NcAppConfigProperties;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
 @RequiredArgsConstructor
-public class ReadTrackingDecorator extends ProcessorFunctionAdapter<Message<TrackableContent>, Message<TrackableContent>> {
+public abstract class BaseReadTrackingDecorator<T extends MessageContent> extends ProcessorFunctionAdapter<Message<T>, Message<T>> {
     
     private final NcAppConfigProperties ncAppConfigProperties;
     
     @Override
-    protected Optional<PayloadValidationException> checkPreCondition(Message<TrackableContent> payload) {
+    protected Optional<PayloadValidationException> checkPreCondition(Message<T> payload) {
         Optional<PayloadValidationException> exception = super.checkPreCondition(payload);
         if (exception.isPresent()) {
             return exception;
         }
+        if (!(payload.getBody() instanceof TrackableContent)) {
+            return Optional.of(new PayloadValidationException("Payload must implement TrackableContent"));
+        }
         
-        TrackableContent body = payload.getBody();
+        TrackableContent body = (TrackableContent) payload.getBody();
         if (body == null) {
             return Optional.of(new PayloadValidationException("Payload must not have null content"));
         }
@@ -44,13 +43,13 @@ public class ReadTrackingDecorator extends ProcessorFunctionAdapter<Message<Trac
     }
     
     @Override
-    protected Message<TrackableContent> execute(Message<TrackableContent> payload) {
-        Message<TrackableContent> result = Message.newTypedMessageFrom(payload.getClass(), payload);
+    protected Message<T> execute(Message<T> payload) {
+        Message<T> result = Message.newTypedMessageFrom(payload.getClass(), payload);
         result.setReceivingEndpoints(payload.getReceivingEndpoints());
         result.setAttributes(payload.getAttributes());
         result.setBody(payload.getBody());
     
-        TrackableContent content = result.getBody();
+        TrackableContent content = (TrackableContent) result.getBody();
         String emailText = content.getHtmlText();
     
         Document html = Jsoup.parse(emailText);

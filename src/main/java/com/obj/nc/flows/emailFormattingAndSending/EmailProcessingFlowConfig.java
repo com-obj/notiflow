@@ -3,6 +3,7 @@ package com.obj.nc.flows.emailFormattingAndSending;
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
 
+import com.obj.nc.functions.processors.messageTracking.EmailReadTrackingDecorator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -20,7 +21,6 @@ import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessa
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.messageTemplating.config.TrackingConfigProperties;
-import com.obj.nc.functions.processors.messageTracking.ReadTrackingDecorator;
 import com.obj.nc.functions.processors.senders.EmailSender;
 
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class EmailProcessingFlowConfig {
 	
 	private final EmailSender emailSender;
 	private final EmailTemplateFormatter emailFormatter;
-	private final ReadTrackingDecorator readTrackingDecorator;
+	private final EmailReadTrackingDecorator readTrackingDecorator;
 	private final TrackingConfigProperties trackingConfigProperties;
 	private final EmailProcessingFlowProperties properties;
 	private final MessagePersister messagePersister;

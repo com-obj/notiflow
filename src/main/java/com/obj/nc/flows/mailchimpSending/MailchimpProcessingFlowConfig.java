@@ -1,13 +1,9 @@
 package com.obj.nc.flows.mailchimpSending;
 
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.messageTemplating.config.TrackingConfigProperties;
-import com.obj.nc.functions.processors.messageTracking.ReadTrackingDecorator;
+import com.obj.nc.functions.processors.messageTracking.MailchimpReadTrackingDecorator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
@@ -31,7 +27,7 @@ public class MailchimpProcessingFlowConfig {
     public static final String MAILCHIMP_PROCESSING_FLOW_OUTPUT_CHANNEL_ID = MAILCHIMP_PROCESSING_FLOW_ID + "_OUTPUT";
     
     private final MailchimpMessageSender mailchimpMessageSender;
-    private final ReadTrackingDecorator readTrackingDecorator;
+    private final MailchimpReadTrackingDecorator readTrackingDecorator;
     private final TrackingConfigProperties trackingConfigProperties;
     private final MessagePersister messagePersister;
     private final EndpointPersister endpointPersister;
