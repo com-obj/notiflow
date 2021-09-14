@@ -136,8 +136,7 @@ publishing {
 			}
 			pom {
 				name = 'Notiflow'
-				description = 'Notiflow is software framework for reliable delivery of email, push notifications and other types of messages.' +
-						' It is written in Java and it uses various Spring modules especially Spring integration.'
+				description = 'Notiflow is software framework for reliable delivery of email, push notifications and other types of messages.'
 				url = 'https://github.com/com-obj/notiflow'
 				licenses {
 					license {
