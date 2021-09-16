@@ -19,6 +19,9 @@ nav:
     - Functions: functions.md
     - Payloads: entities.md
   - Web UI: web-ui.md
+  - API: 
+    - Delivery infos: api/delivery-info_api.md
+    - Events: api/event_api.md
   - Releases:
     - Changelog: changelog.md
   - License: license.md
@@ -33,3 +36,7 @@ markdown_extensions:
   - pymdownx.tabbed
   - pymdownx.snippets  
   - admonition
+
+plugins:
+    - search
+    - macros

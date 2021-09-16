@@ -2,11 +2,15 @@ package com.obj.nc.flows.errorHandling;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.obj.nc.domain.HasReceivingEndpoints;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +53,10 @@ import lombok.NoArgsConstructor;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest(properties = "test-flow-gateway=true") //this is strange, if I don't make TestFlow1 conditional, some unrelated test fail because they don't see testInputChannel1
+@SpringBootTest(properties = {
+		"test-flow-gateway=true", //this is strange, if I don't make TestFlow1 conditional, some unrelated test fail because they don't see testInputChannel1
+		"spring.integration.channels.error.requireSubscribers=false" // https://docs.spring.io/spring-integration/reference/html/error-handling.html
+}) 
 public class ErrorHandlingTests {
 
 	@Autowired FailedPayloadRepository failedPayloadRepo;
@@ -135,7 +142,7 @@ public class ErrorHandlingTests {
     @NoArgsConstructor
     @Builder
     @JsonTypeInfo(include = As.PROPERTY, use = Id.CLASS)
-    public static class TestPayload {
+    public static class TestPayload implements HasReceivingEndpoints {
     	
     	private Integer num;
     	private String str;
@@ -144,5 +151,15 @@ public class ErrorHandlingTests {
     		num = Integer.parseInt(str);
     		return this;
     	}
-    }
+	
+		@Override
+		public List<? extends ReceivingEndpoint> getReceivingEndpoints() {
+			return new ArrayList<>();
+		}
+		
+		public void setReceivingEndpoints(List<? extends ReceivingEndpoint> receivingEndpoints) {
+		}
+		
+		
+	}
 }

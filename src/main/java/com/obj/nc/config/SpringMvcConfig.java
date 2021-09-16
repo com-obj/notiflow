@@ -25,7 +25,7 @@ public class SpringMvcConfig {
 
     @ExceptionHandler({PayloadValidationException.class})
     ResponseEntity<String> handleMethodArgumentNotValidException(PayloadValidationException e) {
-        return new ResponseEntity<>("Request not valid becase of invalid payload: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Request not valid because of invalid payload: " + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
     
     @ExceptionHandler({MethodArgumentNotValidException.class})
@@ -57,7 +57,7 @@ public class SpringMvcConfig {
     
     @ExceptionHandler({RuntimeException.class})
     ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        return new ResponseEntity<>("Unexpected error ocured: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>("Unexpected error ocurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
     @Bean

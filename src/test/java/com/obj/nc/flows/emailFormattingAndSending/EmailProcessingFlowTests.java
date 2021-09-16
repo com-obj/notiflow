@@ -47,7 +47,7 @@ import com.obj.nc.utils.JsonUtils;
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest(properties = {
-        "nc.functions.email-tracking.enabled=true"
+        "nc.functions.tracking.enabled=true"
 })
 class EmailProcessingFlowTests extends BaseIntegrationTest {
 

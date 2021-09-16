@@ -38,5 +38,13 @@ public class MailchimpMessageDto {
     
     @JsonProperty("attachments") 
     private List<MailchimpAttachmentDto> attachments;
+    
+    @JsonProperty("track_opens")
+    @Builder.Default
+    private boolean trackOpens = false;
+    
+    @JsonProperty("track_clicks")
+    @Builder.Default
+    private boolean trackClicks = false;
 
 }

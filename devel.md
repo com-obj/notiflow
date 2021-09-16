@@ -16,17 +16,6 @@ Run tests:
 ./gradlew test
 ```
 
-## IDE Setup
-##### IntelliJ IDEA
-
-* In Import Project > Select the project folder > Import project from external model select *Gradle* and finish the import. 
-* In Preferences > Build, Execution, Deployment > Build Tools > Gradle > Runner select option *Delegate IDE build/run actions to Gradle*. 
-
-##### Eclipse
-
-* In Eclipse Marketplace install plugin [Buildship Gradle Integration](http://marketplace.eclipse.org/content/buildship-gradle-integration).
-* In File > Import select *Existing Gradle Project* and finish the import.
-
 ## Releasing to Nexus via CI/CD pipeline (https://infra.objectify.sk/maven)
 
 CI/CD pipeline builds and tests all commits pushed to the develop, master, release/*, hotfix/* branches. 
@@ -108,6 +97,7 @@ notiflow is using MkDocs to generate online documentation form .md files. In ord
 ```
 pip install mkdocs
 pip install mkdocs-material
+pip install mkdocs-macros-plugin
 ```
 
 ##### Commands
@@ -124,3 +114,12 @@ pip install mkdocs-material
         index.md  # The documentation homepage.
         ...       # Other markdown pages, images and other files.
 
+##### API documentation
+
+API documentation is generated as part of tests run using [spring rest docs](https://docs.spring.io/spring-restdocs/docs/current/reference/html5). Running tests create *.adoc files in the corresponding subdirectory of docs/api/generated folder. This files needs to be rendered as HTML in order to be included into main documentation.This happens automatically because the gradle asciidoctor task depends on test task. If you need to do this step manually, run 
+
+```
+./gradlew asciidoctor -x test --info
+```
+
+Each REST endpoint needs test to be documented. This only ensures generation of adoc snippets. These needs to be put into single html. For this to happen, there needs to be an include statement in the corresponding docs/api/*_api.adoc file.
