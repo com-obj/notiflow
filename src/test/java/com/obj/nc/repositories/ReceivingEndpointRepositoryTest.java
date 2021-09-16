@@ -23,6 +23,7 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 
 import java.util.List;
 
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ public class ReceivingEndpointRepositoryTest extends BaseIntegrationTest {
     }
 	
 	@Test
-	public void testEndpointWithReuse() {
+	public void testEndpointWithEndpointNameReuse() {
     	//GIVEN
     	EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
     	SmsEndpoint sms1 = SmsEndpoint.builder().phone("0908111111").build();
@@ -80,6 +81,41 @@ public class ReceivingEndpointRepositoryTest extends BaseIntegrationTest {
 		Assertions.assertThat(persisted.stream().anyMatch(e-> e.getId().equals(email1.getId()))).isTrue(); //email2 not inserted, service returned email1Id
 		Assertions.assertThat(persisted.stream().anyMatch(e-> e.getId().equals(sms2.getId()))).isTrue(); //sms2 inserted
 
+	}
+	
+	@Test
+	public void testEndpointWithEndpointNameAndTypeNotReuse() {
+		//GIVEN
+		EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
+		SmsEndpoint sms1 = SmsEndpoint.builder().phone("0908111111").build();
+		
+		//WHEN
+		endpointRepository.persistEnpointIfNotExists(email1, sms1);
+		
+		//THEN
+		List<ReceivingEndpoint> endpoints = endpointRepository.findByIds(email1.getId(), sms1.getId());
+		Assertions.assertThat(endpoints.size()).isEqualTo(2);
+		
+		//AND WHEN
+		MailchimpEndpoint mailchimp = MailchimpEndpoint.builder().email("jancuzy@gmail.com").build();
+		SmsEndpoint sms2 = SmsEndpoint.builder().phone("0908111112").build();
+		
+		//WHEN
+		endpointRepository.persistEnpointIfNotExists(mailchimp, sms2);
+		
+		//THEN
+		endpoints = endpointRepository.findByNameIds(mailchimp.getEndpointId(), sms2.getEndpointId());
+		Assertions.assertThat(endpoints.size()).isEqualTo(3);
+		
+		ReceivingEndpoint sms1Persisted = endpointRepository.findByNameIds(sms1.getEndpointId()).iterator().next();
+		Assertions.assertThat(sms1Persisted.getId()).isEqualTo(sms1.getId());
+		ReceivingEndpoint sms2Persisted = endpointRepository.findByNameIds(sms2.getEndpointId()).iterator().next();
+		Assertions.assertThat(sms2Persisted.getId()).isEqualTo(sms2.getId());
+		
+		List<ReceivingEndpoint> mailchimpAndEmailPersisted = endpointRepository.findByNameIds(mailchimp.getEndpointId());
+		Assertions.assertThat(mailchimpAndEmailPersisted.stream().anyMatch(e-> e.getId().equals(email1.getId()))).isTrue();
+		Assertions.assertThat(mailchimpAndEmailPersisted.stream().anyMatch(e-> e.getId().equals(mailchimp.getId()))).isTrue();
+		
 	}
 
 
