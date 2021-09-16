@@ -120,7 +120,8 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
             
             Optional<T> existingEndp = existing
                     .stream()
-                    .filter(e -> e.getEndpointId().equals(endPoint.getEndpointId()))
+                    .filter(e -> e.getEndpointId().equals(endPoint.getEndpointId()) 
+                            && e.getEndpointType().equals(endPoint.getEndpointType()))
                     .findFirst();
             if (existingEndp.isPresent()) {
                 newAndExisting.existingEndpoints.add(existingEndp.get());
