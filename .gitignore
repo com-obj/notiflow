@@ -67,3 +67,12 @@ Thumbs.db
 /bin/
 /docs/api/generated/*
 /site
+/buildSrc/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+/buildSrc/.gradle/noVersion/buildSrc.lock
+/buildSrc/.gradle/buildOutputCleanup/cache.properties
+/buildSrc/.gradle/6.8.2/executionHistory/executionHistory.bin
+/buildSrc/.gradle/6.8.2/executionHistory/executionHistory.lock
+/lombok.config
+/buildSrc/build/tmp/jar/MANIFEST.MF
+/buildSrc/.gradle/buildOutputCleanup/outputFiles.bin
+/buildSrc/build/source-roots/buildSrc/source-roots.txt
