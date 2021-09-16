@@ -1,8 +1,28 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.flows.emailFormattingAndSending;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
 
+import com.obj.nc.functions.processors.messageTracking.EmailReadTrackingDecorator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -19,8 +39,7 @@ import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessageAggregationStrategy;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
-import com.obj.nc.functions.processors.messageTemplating.config.EmailTrackingConfigProperties;
-import com.obj.nc.functions.processors.messageTracking.EmailReadTrackingDecorator;
+import com.obj.nc.functions.processors.messageTemplating.config.TrackingConfigProperties;
 import com.obj.nc.functions.processors.senders.EmailSender;
 
 import lombok.RequiredArgsConstructor;
@@ -31,8 +50,8 @@ public class EmailProcessingFlowConfig {
 	
 	private final EmailSender emailSender;
 	private final EmailTemplateFormatter emailFormatter;
-	private final EmailReadTrackingDecorator emailReadTrackingDecorator;
-	private final EmailTrackingConfigProperties emailTrackingConfigProperties;
+	private final EmailReadTrackingDecorator readTrackingDecorator;
+	private final TrackingConfigProperties trackingConfigProperties;
 	private final EmailProcessingFlowProperties properties;
 	private final MessagePersister messagePersister;
 	private final  EndpointPersister endpointPersister; 
@@ -91,10 +110,10 @@ public class EmailProcessingFlowConfig {
 				.handle(endpointPersister)
 				.handle(messagePersister)
 				.routeToRecipients(spec -> spec
-						.recipientFlow((Message<EmailContent> source) -> emailTrackingConfigProperties.isEnabled() 
+						.recipientFlow((Message<EmailContent> source) -> trackingConfigProperties.isEnabled() 
 										&& MediaType.TEXT_HTML_VALUE.equals(source.getBody().getContentType()),
 								trackingSubflow -> trackingSubflow
-										.handle(emailReadTrackingDecorator)
+										.handle(readTrackingDecorator)
 										.handle(messagePersister)
 										.channel(internalEmailSendFlowDefinition().getInputChannel()))
 						.defaultOutputChannel(internalEmailSendFlowDefinition().getInputChannel()))
