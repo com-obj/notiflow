@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.flows.inpuEventRouting;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
@@ -31,17 +50,16 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.flows.inputEventRouting.extensions.InputEventConverterExtension;
 import com.obj.nc.flows.inputEventRouting.extensions.InputEvent2IntentConverterExtension;
 import com.obj.nc.flows.inputEventRouting.extensions.InputEvent2MessageConverterExtension;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersisterConsumer;
+import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
@@ -55,7 +73,7 @@ import lombok.NoArgsConstructor;
 @SpringBootTest
 public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 	
-	@Autowired private GenericEventPersisterConsumer persister;
+	@Autowired private GenericEventPersister persister;
 	
 	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 	@Autowired private SourcePollingChannelAdapter pollableSource;
@@ -116,9 +134,11 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				}
 
 				@Override
-				public List<com.obj.nc.domain.message.Message<?>> convertEvent(GenericEvent event) {					
+				public List<Message<?>> convertEvent(GenericEvent event) {
 					EmailMessage email1 = new EmailMessage();
-					email1.addRecievingEndpoints(EmailEndpoint.builder().email("test@objectify.sk").build());
+					email1.addReceivingEndpoints(
+						EmailEndpoint.builder().email("test@objectify.sk").build()
+					);
 					email1.getBody().setSubject("Subject");
 					email1.getBody().setText("text");
 
@@ -147,8 +167,8 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 					NotificationIntent email1Intent = NotificationIntent.createWithStaticContent(
 							"Subject", 
 							"Text", 
-							EmailEndpoint.builder().email("test@objectify.sk").build(),
-							EmailEndpoint.builder().email("test2@objectify.sk").build()
+							EmailEndpoint.builder().email("test2@objectify.sk").build(),
+							EmailEndpoint.builder().email("test3@objectify.sk").build()
 					);
 					List<NotificationIntent> intents = Arrays.asList(email1Intent);
 

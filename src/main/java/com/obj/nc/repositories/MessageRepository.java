@@ -1,16 +1,40 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.repositories;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.domain.Pageable;
 
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.MessagePersistantState;
+import com.obj.nc.domain.message.MessagePersistentState;
+import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface MessageRepository extends CrudRepository<MessagePersistantState, UUID> {
-
+public interface MessageRepository extends PagingAndSortingRepository<MessagePersistentState, UUID>, EntityExistenceChecker<UUID> {
 	
-	List<MessagePersistantState> findByIdIn(List<UUID> intentIds);
+	List<MessagePersistentState> findByIdIn(List<UUID> intentIds);
+    
+    List<MessagePersistentState> findAllByTimeCreatedBetween(Instant createdFrom, Instant createdTo, Pageable pageable);
+    
+    long countAllByTimeCreatedBetween(Instant createdFrom, Instant createdTo);
+    
 }

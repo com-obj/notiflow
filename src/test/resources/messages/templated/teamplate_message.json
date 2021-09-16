@@ -1,7 +1,6 @@
 {
    "type":"EMAIL_MESSAGE_TEMPLATED_CONTENT",
    "header":{
-      	"eventIds":["0c3f159f-103e-49fd-8eb1-f4b6de481acb"],
       	"flow-id":"static-routing-pipeline"
    },
    "body":{
@@ -14,7 +13,7 @@
            	"parts": ["part1","part2"]
          }
    },
-   "recievingEndpoints":[
+   "receivingEndpoints":[
       {
          "@type":"EMAIL",
          "email":"john.doe@objectify.sk",

@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.functions.processors.messageBuilder;
 
 import java.util.ArrayList;
@@ -7,7 +26,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -25,7 +44,7 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent notificationIntent) {
 
-		if (notificationIntent.getRecievingEndpoints().isEmpty()) {
+		if (notificationIntent.getReceivingEndpoints().isEmpty()) {
 			return Optional.of(new PayloadValidationException(
 					String.format("NotificationIntent %s has no receiving endpoints defined.", notificationIntent)));
 		}
@@ -41,11 +60,11 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 		List<Message<?>> messages = new ArrayList<>();
 		
 
-		for (RecievingEndpoint recievingEndpoint: notificationIntent.getRecievingEndpoints()) {
+		for (ReceivingEndpoint receivingEndpoint: notificationIntent.getReceivingEndpoints()) {
 			
-			Message<?> msg = (Message<?>) notificationIntent.createMessage(recievingEndpoint);
+			Message<?> msg = (Message<?>) notificationIntent.createMessage(receivingEndpoint);
 			
-			msg.addRecievingEndpoints(recievingEndpoint);
+			msg.addReceivingEndpoints(receivingEndpoint);
 
 			msg.setAttributes(notificationIntent.getAttributes());
 			messages.add(msg);

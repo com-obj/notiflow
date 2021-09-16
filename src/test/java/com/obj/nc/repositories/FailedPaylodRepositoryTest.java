@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.repositories;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
@@ -17,9 +36,9 @@ import org.springframework.messaging.Message;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.config.SpringIntegration;
-import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
+import com.obj.nc.flows.errorHandling.domain.FailedPayload;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,14 +57,14 @@ public class FailedPaylodRepositoryTest {
 	public void testPersistingSingleInfo() {
 		TestPayload payload = TestPayload.builder().content("some error content").build();
 		Message<TestPayload> msg = MessageBuilder.withPayload(payload).build();
-		FailedPaylod failedPayload = null;
+		FailedPayload failedPayload = null;
 		
 	    Exception e = Assertions.assertThrows(NumberFormatException.class, () -> {
 	        Integer.parseInt("1a");
 	    });
 		
 			
-		failedPayload = FailedPaylod.builder()
+		failedPayload = FailedPayload.builder()
 				.flowId("default-flow-id")
 				.id(UUID.randomUUID())
 				.messageJson( jsonConverterForMessages.valueToTree(msg) )
@@ -55,7 +74,7 @@ public class FailedPaylodRepositoryTest {
 		
 		failedPaylaodRepo.save(failedPayload);
 		
-		Optional<FailedPaylod> oFailedPayloadInDb = failedPaylaodRepo.findById(failedPayload.getId());
+		Optional<FailedPayload> oFailedPayloadInDb = failedPaylaodRepo.findById(failedPayload.getId());
 		
 		assertThat(oFailedPayloadInDb.isPresent()).isTrue();
 		

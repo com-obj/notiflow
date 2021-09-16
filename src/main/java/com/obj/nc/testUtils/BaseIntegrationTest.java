@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.testUtils;
 
 import java.nio.charset.Charset;
@@ -142,7 +161,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
 	    		 }
 	    	 }	
 	    	 
-	    	 Assertions.assertThat(false).as("Greenmail didn't recieve mail which would match to " + msgToMatch.toString()).isTrue();
+	    	 Assertions.assertThat(false).as("Greenmail didn't receive mail which would match to " + msgToMatch.toString()).isTrue();
     	} catch (MessagingException e) {
     		throw new RuntimeException(e);
     	}
@@ -163,6 +182,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    	get.setApplicationContext(applicationContext);
+    	Get.setApplicationContext(applicationContext);
     }
+
 }

@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc;
 
 import javax.annotation.PostConstruct;
@@ -9,10 +28,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import com.obj.nc.repositories.EndpointsRepository;
+
 /**
- * This is spring component to give spring a hint in configuration ordering. As component it should be staticaly usable because that
- * way clients can run into problems with ordering
- * @author ja
+ * This is @Component to give spring a hint in configuration ordering. 
+ * If using this class might cause issues when using with tests. In test, spring can re-initialise the ApplicationContext and invalidates the old one. 
+ * Although this class uses application listeners to be notified about the new ApplicationContext, it doesn't work reliably. Tests needs to make sure to set the new 
+ * ApplicationContext to this class. The simplest way to do this is to extend the test class from BaseIntegrationTest.
+ * @author Jan Cuzy
  *
  */
 @Component
@@ -38,6 +61,11 @@ public class Get {
     public static JdbcTemplate getJdbc() {
     	return getBean(JdbcTemplate.class);
     }
+    
+    public static EndpointsRepository getEndpointsRepo() {
+    	return getBean(EndpointsRepository.class);
+    }
+    
 	public static ApplicationContext getApplicationContext() {
 		return instance.applicationContext;
 	}

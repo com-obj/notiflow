@@ -1,17 +1,40 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.domain.event;
 
 import java.time.Instant;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.obj.nc.domain.HasEventId;
 import com.obj.nc.exceptions.PayloadValidationException;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.data.relational.core.mapping.event.AfterLoadCallback;
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.payload.PayloadDocumentation;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ObjectArrays;
 import com.obj.nc.domain.HasFlowId;
 import com.obj.nc.domain.HasJsonPayload;
 import com.obj.nc.domain.IsTypedJson;
@@ -35,15 +58,15 @@ import lombok.ToString;
 @NoArgsConstructor
 @Table("nc_event")
 @Builder
-public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayload, HasHeader/*, AfterLoadCallback<GenericEvent>*/ {
+public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayload, HasHeader, HasEventId/*, AfterLoadCallback<GenericEvent>*/ {
 	
-	public static final String DEFUALT_FLOW_ID = "default-flow"; 
+	public static final String DEFAULT_FLOW_ID = "default-flow"; 
 	
 	@Id
 	private UUID id;
 	//TODO: do not duplicate, use from header
 	@Builder.Default
-	private String flowId = DEFUALT_FLOW_ID;
+	private String flowId = DEFAULT_FLOW_ID;
 	
 	private String payloadType;
 	
@@ -57,12 +80,13 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	private Instant timeConsumed;
 	
 	@Transient
+	@JsonIgnore
 	protected Header header;
 	
 	public static GenericEvent from(JsonNode state) {
 		GenericEvent event = new GenericEvent();
 		event.setPayloadJson(state);
-		event.flowId = state.get("flowId")!=null?state.get("flowId").textValue():DEFUALT_FLOW_ID;
+		event.flowId = state.get("flowId")!=null?state.get("flowId").textValue():DEFAULT_FLOW_ID;
 		event.externalId = state.get("externalId")!=null?state.get("externalId").textValue():null;
 		event.payloadType = state.get("payloadType")!=null?state.get("payloadType").textValue():null;
 		
@@ -80,9 +104,6 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 		getHeader().setFlowId(flowId);
 		if (id == null) {
 			throw new PayloadValidationException("Id of GenericEvent must not be null");
-		}
-		if (!getHeader().getEventIds().contains(id)) {
-			getHeader().addEventId(id);
 		}
 	}
 	
@@ -120,6 +141,7 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isNew() {
 		return timeCreated == null;
 	}
@@ -131,15 +153,32 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 		return header;
 	}
 	
+	@JsonIgnore
 	public <T extends IsTypedJson> T getPayloadAsPojo() {
 		return (T)JsonUtils.readObjectFromJSON(payloadJson, IsTypedJson.class);
 	}
-/*
+	
 	@Override
-	//TODO: need to register
-	public GenericEvent onAfterLoad(GenericEvent aggregate) {
-		aggregate.syncHeaderFields();
-		return aggregate;
+	@JsonIgnore
+	public UUID getEventId() {
+		return getId();
 	}
-*/
+
+	public static FieldDescriptor[] inputFieldDesc = new FieldDescriptor[] {
+        PayloadDocumentation.fieldWithPath("flowId").description("Optional: Identification of the main flow"),
+        PayloadDocumentation.fieldWithPath("payloadType").description("Optional: Identification of payload type. Can be used for routing configuration"),
+        PayloadDocumentation.fieldWithPath("externalId").description("Optional: Identification of the event provided by the client. Can be used for search"),
+        PayloadDocumentation.fieldWithPath("payloadJson").description("JSON body of the input event")   
+    };
+
+	public static FieldDescriptor[] fieldDesc = ObjectArrays.concat(
+        inputFieldDesc,
+        new FieldDescriptor[] {
+			PayloadDocumentation.fieldWithPath("id").description("Internal notiflow ID assigned to the event"),
+			PayloadDocumentation.fieldWithPath("timeCreated").description("Internal notiflow timestamp documenting time of persistance"),
+			PayloadDocumentation.fieldWithPath("timeConsumed").description("Internal notiflow timestamp documenting time of beginning of processing"),        
+        },
+        FieldDescriptor.class
+    );
+	
 }

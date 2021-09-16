@@ -1,28 +1,56 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.controllers;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.obj.nc.domain.message.MessagePersistantState;
-import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
-import com.obj.nc.repositories.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.config.NcAppConfigProperties;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.message.MessagePersistentState;
+import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.MessageRepository;
 
 import lombok.Builder;
 import lombok.Data;
@@ -37,17 +65,21 @@ public class DeliveryInfoRestController {
 	@Autowired private EndpointsRepository endpointRepo;
 	@Autowired private GenericEventRepository eventRepo;
 	@Autowired private DeliveryInfoFlow deliveryInfoFlow;
+	@Autowired private NcAppConfigProperties ncAppConfigProperties;
 	
 	@GetMapping(value = "/events/{eventId}", consumes="application/json", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
-    		@PathVariable (value = "eventId", required = true) String eventId) {
+    		@PathVariable (value = "eventId", required = true) String eventId,
+			@RequestParam(value = "endpointId", required = false) String endpointId) {
+		
+		UUID endpointUUID = endpointId == null ? null : UUID.fromString(endpointId);
 
-		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByEventIdOrderByProcessedOn(UUID.fromString(eventId));
+		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByEventIdAndEndpointIdOrderByProcessedOn(UUID.fromString(eventId), endpointUUID);
 
 		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
 		
 		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
-		List<RecievingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
+		List<ReceivingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
 		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
 		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
 		
@@ -56,23 +88,55 @@ public class DeliveryInfoRestController {
 	
 	@GetMapping(value = "/events/ext/{extEventId}", consumes="application/json", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByExtId(
-    		@PathVariable (value = "extEventId", required = true) String extEventId) {
+    		@PathVariable (value = "extEventId", required = true) String extEventId,
+			@RequestParam(value = "endpointId", required = false) String endpointId) {
 
 		GenericEvent event = eventRepo.findByExternalId(extEventId);
 		if (event == null) {
 			throw new IllegalArgumentException("Event with " +  extEventId +" external ID not found");
 		}
 		
-		return findDeliveryInfosByEventId(event.getId().toString());
+		return findDeliveryInfosByEventId(event.getId().toString(), endpointId);
     }
 	
-	@PutMapping(value = "/messages/read/{messageId}")
+	@PutMapping(value = "/messages/{messageId}/mark-as-read")
 	public ResponseEntity<Void> trackMessageRead(@PathVariable(value = "messageId", required = true) String messageId) {
-		Optional<MessagePersistantState> message = messageRepo.findById(UUID.fromString(messageId));
+		ResponseEntity<Void> trackingPixelImageRedirectionResponse = ResponseEntity
+				.status(HttpStatus.FOUND)
+				.location(
+						UriComponentsBuilder
+								.fromPath(ncAppConfigProperties.getContextPath())
+								.path("/resources/images/px.png")
+								.build()
+								.toUri())
+				.build();
+		
+		if (deliveryRepo.countByMessageIdAndStatus(UUID.fromString(messageId), DELIVERY_STATUS.READ) > 0) {
+			return trackingPixelImageRedirectionResponse;
+		}
+		
+		Optional<MessagePersistentState> message = messageRepo.findById(UUID.fromString(messageId));
 		message.ifPresent(messagePersistantState -> deliveryInfoFlow.createAndPersistReadDeliveryInfo(messagePersistantState.toMessage()));
-		return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/resources/images/px.png")).build();
+		
+		return trackingPixelImageRedirectionResponse;
 	}
-
+	
+	@GetMapping(value = "/messages/{messageId}", consumes="application/json", produces="application/json")
+	public List<EndpointDeliveryInfoDto> findDeliveryInfosByMessageId(
+			@PathVariable (value = "messageId", required = true) String messageId) {
+		
+		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByMessageIdOrderByProcessedOn(UUID.fromString(messageId));
+		
+		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
+		
+		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
+		List<ReceivingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
+		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
+		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
+		
+		return infoDtos;
+	}
+	
 	@Data
 	@Builder
 	public static class EndpointDeliveryInfoDto {
@@ -81,7 +145,7 @@ public class DeliveryInfoRestController {
 		@Transient
 		UUID endpointId;
 		
-		RecievingEndpoint endpoint;
+		ReceivingEndpoint endpoint;
 		
 		DELIVERY_STATUS currentStatus;
 		Instant statusReachedAt;

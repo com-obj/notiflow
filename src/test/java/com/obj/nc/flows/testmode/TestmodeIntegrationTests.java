@@ -1,6 +1,25 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.flows.testmode;
 
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
 import static com.obj.nc.flows.testmode.sms.config.TestModeSmsFlowConfig.TEST_MODE_SMS_SOURCE_BEAN_NAME;
@@ -46,19 +65,20 @@ import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
+import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig;
 import com.obj.nc.flows.testmode.email.config.TestModeGreenMailProperties;
 import com.obj.nc.flows.testmode.email.functions.sources.GreenMailReceiverSourceSupplier;
 import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
 import com.obj.nc.functions.processors.senders.EmailSender;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
@@ -73,7 +93,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
 	@Autowired private GreenMail testModeEmailsReciver;
     
-    @Qualifier(EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_INPUT_CHANNEL_ID)
+    @Qualifier(EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID)
     @Autowired private MessageChannel emailProcessingInputChannel;
     @Qualifier(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID)
     @Autowired private MessageChannel smsProcessingInputChannel;
@@ -85,6 +105,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
 	@Autowired private TestModeProperties props;
 	@Autowired private MockIntegrationContext mockIntegrationContext;
 	@Autowired private JavaMailSenderImpl javaMailSender;
+	@Autowired private MessageProcessingFlow messageProcessingFlow;
 	
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
@@ -178,14 +199,14 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     	SmsMessageTemplated<?> inputSms = JsonUtils.readObjectFromClassPathResource("messages/templated/txt_template_message_en_de.json", SmsMessageTemplated.class);
     
         //AND GIVEN RECEIVED EMAILs
-        emailProcessingInputChannel.send(new GenericMessage<>(inputEmail));
+        messageProcessingFlow.processMessage(inputEmail);
         testModeEmailsReciver.waitForIncomingEmail(1);
         List<EmailMessage> receivedEmailMessages = greenMailReceiverSourceSupplier.get();
         Assertions.assertThat(receivedEmailMessages).hasSize(1);
         MessageSource<?> emailMessageSource = () -> new GenericMessage<>(receivedEmailMessages);
     
         // AND RECEIVED SMSs
-        smsProcessingInputChannel.send(new GenericMessage<>(inputSms));
+        messageProcessingFlow.processMessage(inputSms);
         await().atMost(10, TimeUnit.SECONDS).until(() -> smsSourceSupplier.getReceivedCount() >= 1);
         List<SmsMessage> receivedSmsMessages = Stream.generate(smsSourceSupplier).limit(10).filter(Objects::nonNull).collect(Collectors.toList());
         Assertions.assertThat(receivedSmsMessages).hasSize(2);

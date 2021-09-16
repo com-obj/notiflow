@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.flows.inputEventRouting;
 
 import java.util.Arrays;
@@ -22,7 +41,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 /**
- * Conversion from custom input event to anything which NC can handle might be very specific. This router enables to customize this the event->intent or event->message conversion
+ * Conversion from custom input event to anything which NC can handle might be very specific. This router enables to customize the event->intent or event->message conversion
  * It can be done it three ways
  * 1) register a bean implementing GenericEventProcessorExtension - this way you don't need to do anything related to spring integration 
  * 2) configure via application.properties flowId to channel name mapping
@@ -33,6 +52,7 @@ import lombok.extern.log4j.Log4j2;
 public class InputEventRouter extends AbstractMessageRouter {
 	
 	@Autowired private InputEventRoutingProperties props;
+	
 	@Qualifier(InputEventExtensionConvertingFlowConfig.EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT_CHANNEL_ID)
 	@Autowired private MessageChannel extensionBasedConversionInputChannel;
 	
@@ -66,8 +86,8 @@ public class InputEventRouter extends AbstractMessageRouter {
 			MessageChannel inputChannel = Get.getBean(props.getTypeChannelMapping().get(jsonTypeInfo), MessageChannel.class);
 			return Optional.of(Arrays.asList(inputChannel));
 		} catch (Exception ex) {
-			log.info("Could not extract channel name from payload type and channel mapping. Exprecting property " +  props.getTypeProperyName() + " to contain type info which maps to channel name as defined using  "
-					+ "nc.flows.input-evet-routing.type-channel-mapping which is " + props.getTypeChannelMapping());
+			log.info("Could not extract channel name from payload type and channel mapping. Expecting property " +  props.getTypeProperyName() + " to contain type info which maps to channel name as defined using  "
+					+ "nc.flows.input-event-routing.type-channel-mapping which is " + props.getTypeChannelMapping());
 			return Optional.empty();
 		}
 	}	
@@ -79,7 +99,7 @@ public class InputEventRouter extends AbstractMessageRouter {
 			return Optional.of(Arrays.asList(inputChannel));
 		} catch (Exception ex) {
 			log.info("No chanel with name " + flowId + "_INPUT found. "
-					+ "Adjust the flow name to match you flow input chanel or consider turning input event routing off by deleting nc.flows.input-evet-routing.type property");
+					+ "Adjust the flow name to match you flow input chanel or consider turning input event routing off by deleting nc.flows.input-event-routing.type property");
 
 			return Optional.empty();
 		}
@@ -92,7 +112,7 @@ public class InputEventRouter extends AbstractMessageRouter {
 		
 		HasFlowId payload = (HasFlowId)message.getPayload();
 		
-		if (GenericEvent.DEFUALT_FLOW_ID.equals(payload.getFlowId())) {
+		if (GenericEvent.DEFAULT_FLOW_ID.equals(payload.getFlowId())) {
 			return Optional.empty();
 		}
 		

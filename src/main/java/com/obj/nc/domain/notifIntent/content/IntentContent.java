@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.domain.notifIntent.content;
 
 import java.util.ArrayList;
@@ -6,20 +25,20 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.obj.nc.domain.Attachement;
+import com.obj.nc.domain.Attachment;
 import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 
 import lombok.Data;
@@ -40,7 +59,7 @@ public class IntentContent extends BaseJSONObject {
 	private String body;
 	private String subject;
 
-	private List<Attachement> attachments = new ArrayList<>();
+	private List<Attachment> attachments = new ArrayList<>();
 	
 	private String contentType=MediaType.TEXT_PLAIN_VALUE;
 	
@@ -51,7 +70,7 @@ public class IntentContent extends BaseJSONObject {
 		return newContent;
 	}
 
-	public static IntentContent createStaticContent(String subject, String body, Attachement ...attachments) {
+	public static IntentContent createStaticContent(String subject, String body, Attachment...attachments) {
 		IntentContent newContent = createStaticContent(subject, body);
 		newContent.setAttachments(Arrays.asList(attachments));
 		return newContent;
@@ -62,7 +81,7 @@ public class IntentContent extends BaseJSONObject {
 		return JSON_TYPE_IDENTIFIER;
 	}
 
-	public MessageContent createMessageContent(RecievingEndpoint endpoint) {
+	public MessageContent createMessageContent(ReceivingEndpoint endpoint) {
 		if (endpoint instanceof EmailEndpoint) {
 			EmailContent emailContent = EmailContent.builder()
 				.text(getBody())
@@ -82,7 +101,7 @@ public class IntentContent extends BaseJSONObject {
 			throw new NotImplementedException();
 //			List<MailchimpAttachmentDto> mailchimpAttachmentDtos = MailchimpAttachmentDto.fromAttachements(attachments);
 //			
-//			//TODO: add missing peaces
+//			//TODO: add missing pieces
 //			MailchimpContent smsContent = MailchimpContent.builder()
 //					.subject(getSubject())
 //					.attachments(mailchimpAttachmentDtos)

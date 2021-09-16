@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.flows.testmode.config;
 
 import static org.springframework.integration.dsl.MessageChannels.executor;
@@ -17,10 +36,12 @@ import org.springframework.integration.store.MessageGroup;
 
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
+import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.BasePayloadAggregationStrategy;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.TestModeSingleEmailAggregationStrategy;
 import com.obj.nc.functions.processors.messageAggregator.correlations.EventIdBasedCorrelationStrategy;
+import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
@@ -38,6 +59,8 @@ public class TestModeFlowConfig {
     @Autowired private PaylaodLoggerSinkConsumer logConsumer;
 
     @Autowired private EmailTemplateFormatter digestEmailFormatter;
+    @Autowired private EndpointPersister endpointPersister;
+    @Autowired private MessagePersister messagePersister;
 
 	public final static String TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME = "tmExecutorChannel";
 	public final static String TEST_MODE_AGGREGATOR_BEAN_NAME = "tmAggregator";
@@ -49,6 +72,8 @@ public class TestModeFlowConfig {
     	
         return IntegrationFlows
         		.from(executor(TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME, Executors.newSingleThreadExecutor()))
+				.handle(endpointPersister)
+				.handle(messagePersister)
         		.aggregate(
         			aggSpec-> aggSpec
         				.correlationStrategy( testModeCorrelationStrategy() )
@@ -60,8 +85,11 @@ public class TestModeFlowConfig {
         				.outputProcessor( testModeMessageAggregator() )
         				.id(TEST_MODE_AGGREGATOR_BEAN_NAME)
         			)
-        		.handle(digestEmailFormatter)
-                .handle(sendEmailRealSmtp)
+				.handle(endpointPersister)
+				.handle(messagePersister)
+				.handle(digestEmailFormatter)
+				.handle(messagePersister)
+				.handle(sendEmailRealSmtp)
                 .handle(logConsumer)
                 .get();
     }

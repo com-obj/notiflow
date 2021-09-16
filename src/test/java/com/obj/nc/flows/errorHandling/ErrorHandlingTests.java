@@ -1,12 +1,35 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.flows.errorHandling;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.obj.nc.domain.HasReceivingEndpoints;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,13 +57,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.controllers.ErrorHandlingRestController;
 import com.obj.nc.flows.errorHandling.ErrorHandlingTests.TestModeTestConfiguration.TestFlow1;
-import com.obj.nc.flows.errorHandling.domain.FailedPaylod;
+import com.obj.nc.flows.errorHandling.domain.FailedPayload;
 import com.obj.nc.repositories.FailedPayloadRepository;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,7 +72,10 @@ import lombok.NoArgsConstructor;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest(properties = "test-flow-gateway=true") //this is strange, if I don't make TestFlow1 conditional, some unrelated test fail because they don't see testInputChannel1
+@SpringBootTest(properties = {
+		"test-flow-gateway=true", //this is strange, if I don't make TestFlow1 conditional, some unrelated test fail because they don't see testInputChannel1
+		"spring.integration.channels.error.requireSubscribers=false" // https://docs.spring.io/spring-integration/reference/html/error-handling.html
+}) 
 public class ErrorHandlingTests {
 
 	@Autowired FailedPayloadRepository failedPayloadRepo;
@@ -69,14 +95,14 @@ public class ErrorHandlingTests {
 	@SuppressWarnings("unchecked")
 	public void testPayloadWithErrorProduced() throws InterruptedException, ExecutionException, TimeoutException, JsonProcessingException {
         //WHEN
-		TestPayload paylod = TestPayload.builder().str("ss").build();
-        Future<TestPayload> result = testFlow1.execute(paylod);
+		TestPayload payload = TestPayload.builder().str("ss").build();
+        Future<TestPayload> result = testFlow1.execute(payload);
  
         //THEN fail documented
 		Awaitility.await().atMost(1000, TimeUnit.SECONDS).until(() -> 
 			failedPayloadRepo.count() > 0);
 		
-		FailedPaylod failed = failedPayloadRepo.findAll().iterator().next();
+		FailedPayload failed = failedPayloadRepo.findAll().iterator().next();
 		
 		//WHEN problem fixed and corrected message saved
 		Message<TestPayload> failedMsg = (Message<TestPayload>)jsonConverterForMessages.treeToValue(failed.getMessageJson(), Message.class);
@@ -135,7 +161,7 @@ public class ErrorHandlingTests {
     @NoArgsConstructor
     @Builder
     @JsonTypeInfo(include = As.PROPERTY, use = Id.CLASS)
-    public static class TestPayload {
+    public static class TestPayload implements HasReceivingEndpoints {
     	
     	private Integer num;
     	private String str;
@@ -144,5 +170,15 @@ public class ErrorHandlingTests {
     		num = Integer.parseInt(str);
     		return this;
     	}
-    }
+	
+		@Override
+		public List<? extends ReceivingEndpoint> getReceivingEndpoints() {
+			return new ArrayList<>();
+		}
+		
+		public void setReceivingEndpoints(List<? extends ReceivingEndpoint> receivingEndpoints) {
+		}
+		
+		
+	}
 }

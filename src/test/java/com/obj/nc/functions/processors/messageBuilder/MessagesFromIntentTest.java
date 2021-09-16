@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.functions.processors.messageBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -5,21 +24,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.obj.nc.domain.Attachment;
 import org.junit.jupiter.api.Test;
 
-import com.obj.nc.domain.Attachement;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.functions.processors.eventIdGenerator.GenerateEventIdProcessingFunction;
 import com.obj.nc.functions.processors.messageTeamplating.domain.TestModel;
 import com.obj.nc.utils.JsonUtils;
 
@@ -32,9 +50,6 @@ class MessagesFromIntentTest {
 		//GIVEN
 		String INPUT_JSON_FILE = "intents/direct_message.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-
-		GenerateEventIdProcessingFunction generateEventfunction = new GenerateEventIdProcessingFunction();
-		notificationIntent = (NotificationIntent)generateEventfunction.apply(notificationIntent);
 		
 		//WHEN
 		MessagesFromIntentGenerator createMessagesFunction = new MessagesFromIntentGenerator();
@@ -45,10 +60,10 @@ class MessagesFromIntentTest {
 		
 		Message<EmailContent> message = result.get(0);
 		
-		List<? extends RecievingEndpoint> recievingEndpoints = message.getRecievingEndpoints();
-		assertThat(recievingEndpoints.size()).isEqualTo(1);
+		List<? extends ReceivingEndpoint> receivingEndpoints = message.getReceivingEndpoints();
+		assertThat(receivingEndpoints.size()).isEqualTo(1);
 		
-		RecievingEndpoint recipient = recievingEndpoints.get(0);
+		ReceivingEndpoint recipient = receivingEndpoints.get(0);
 		assertThat(recipient).extracting("email").isIn("john.doe@objectify.sk", "john.dudly@objectify.sk", "all@objectify.sk");
 		
         EmailContent emailContent = message.getBody();
@@ -63,9 +78,6 @@ class MessagesFromIntentTest {
 		//GIVEN
 		String INPUT_JSON_FILE = "intents/direct_message_attachements.json";
 		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-
-		GenerateEventIdProcessingFunction generateEventFunc = new GenerateEventIdProcessingFunction();
-		notificationIntent = (NotificationIntent)generateEventFunc.apply(notificationIntent);
 		
 		//WHEN
 		MessagesFromIntentGenerator createMessagesFunction = new MessagesFromIntentGenerator();
@@ -75,11 +87,11 @@ class MessagesFromIntentTest {
 		EmailMessage deliveryNullMessage = findMessageWithEnpoint(result, "john.doe@objectify.sk");
 		
         EmailContent emailContent = deliveryNullMessage.getBody();
-		List<Attachement> attachements = emailContent.getAttachments();
-		assertThat(attachements).isNotNull();
-		assertThat(attachements.size()).isEqualTo(2);
-		assertThat(attachements).first().extracting("name").isEqualTo("name.extension");
-		assertThat(attachements).first().extracting("fileURI").hasToString("http://domain/location/name.extension");
+		List<Attachment> attachments = emailContent.getAttachments();
+		assertThat(attachments).isNotNull();
+		assertThat(attachments.size()).isEqualTo(2);
+		assertThat(attachments).first().extracting("name").isEqualTo("name.extension");
+		assertThat(attachments).first().extracting("fileURI").hasToString("http://domain/location/name.extension");
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -98,8 +110,8 @@ class MessagesFromIntentTest {
 		
 		SmsMessage message = findMessageWithEnpoint(result, "0918186997");
 		
-		List<? extends RecievingEndpoint> recievingEndpoints = message.getRecievingEndpoints();
-		assertThat(recievingEndpoints.size()).isEqualTo(1);
+		List<? extends ReceivingEndpoint> receivingEndpoints = message.getReceivingEndpoints();
+		assertThat(receivingEndpoints.size()).isEqualTo(1);
 				
 		SimpleTextContent smsContent = message.getBody();
 		assertThat(smsContent.getText()).isEqualTo("Text");
@@ -108,11 +120,11 @@ class MessagesFromIntentTest {
 		EmailMessage mail = findMessageWithEnpoint(result, "john.doe@objectify.sk");
 		
         EmailContent emailContent = mail.getBody();
-		List<Attachement> attachements = emailContent.getAttachments();
-		assertThat(attachements).isNotNull();
-		assertThat(attachements.size()).isEqualTo(2);
-		assertThat(attachements).first().extracting("name").isEqualTo("name.extension");
-		assertThat(attachements).first().extracting("filePathAndName").isEqualTo("src/test/resources/intents/0_ba_job_post.json");
+		List<Attachment> attachments = emailContent.getAttachments();
+		assertThat(attachments).isNotNull();
+		assertThat(attachments.size()).isEqualTo(2);
+		assertThat(attachments).first().extracting("name").isEqualTo("name.extension");
+		assertThat(attachments).first().extracting("filePathAndName").isEqualTo("src/test/resources/intents/0_ba_job_post.json");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -131,8 +143,8 @@ class MessagesFromIntentTest {
 		
 		SmsMessageTemplated<TestModel> message = findMessageWithEnpoint(result, "0908186997");
 		
-		List<? extends RecievingEndpoint> recievingEndpoints = message.getRecievingEndpoints();
-		assertThat(recievingEndpoints.size()).isEqualTo(1);
+		List<? extends ReceivingEndpoint> receivingEndpoints = message.getReceivingEndpoints();
+		assertThat(receivingEndpoints.size()).isEqualTo(1);
 				
 		TemplateWithModelContent<TestModel> smsContent = message.getBody();
 		assertThat(smsContent.getTemplateFileName()).isEqualTo("test-template2.txt");
@@ -155,11 +167,11 @@ class MessagesFromIntentTest {
 		model = smsContent.getModel();
 		assertThat(model.getName()).isEqualTo("John Doe");
 		
-		List<Attachement> attachements = emailContent.getAttachments();
-		assertThat(attachements).isNotNull();
-		assertThat(attachements.size()).isEqualTo(2);
-		assertThat(attachements).first().extracting("name").isEqualTo("name.extension");
-		assertThat(attachements).first().extracting("filePathAndName").isEqualTo("src/test/resources/intents/0_ba_job_post.json");
+		List<Attachment> attachments = emailContent.getAttachments();
+		assertThat(attachments).isNotNull();
+		assertThat(attachments.size()).isEqualTo(2);
+		assertThat(attachments).first().extracting("name").isEqualTo("name.extension");
+		assertThat(attachments).first().extracting("filePathAndName").isEqualTo("src/test/resources/intents/0_ba_job_post.json");
 	}
 	
 	
@@ -168,7 +180,7 @@ class MessagesFromIntentTest {
 	private <T extends Message<?>> T findMessageWithEnpoint(List<Message<?>> result, String endpointName) {
 		T deliveryNullMessage = (T) result
 				.stream()
-				.filter( msg -> msg.getRecievingEndpoints().get(0).getEndpointId().equals(endpointName))
+				.filter( msg -> msg.getReceivingEndpoints().get(0).getEndpointId().equals(endpointName))
 				.collect(Collectors.toList())
 				.get(0);
 		

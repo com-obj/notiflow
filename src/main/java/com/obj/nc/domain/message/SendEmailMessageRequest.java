@@ -1,16 +1,40 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.domain.message;
+
+import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import org.springframework.http.MediaType;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.Person;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.springframework.http.MediaType;
 
-import java.util.List;
-import java.util.UUID;
+import lombok.Data;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SendEmailMessageRequest {
     private String subject;
     private String text;
@@ -18,7 +42,10 @@ public class SendEmailMessageRequest {
     private List<Recipient> to;
     
     @Data
-    static class Recipient {
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Recipient {
         private String email;
         private String name;
         
@@ -39,7 +66,7 @@ public class SendEmailMessageRequest {
         
         to.stream()
                 .map(Recipient::toReceivingEndpoint)
-                .forEach(message.getRecievingEndpoints()::add);
+                .forEach(message.getReceivingEndpoints()::add);
         return message;
     }
 }

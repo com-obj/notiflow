@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.functions.sink;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
@@ -24,9 +43,8 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoSendGenerator;
@@ -34,6 +52,10 @@ import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.processors.senders.config.EmailSenderConfigProperties;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.GenericEventRepositoryTest;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
@@ -45,6 +67,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     @Autowired private EmailSender functionSend;
     @Autowired private DeliveryInfoSendGenerator delInfoGenerator;
     @Autowired private EmailSenderConfigProperties settings;
+    @Autowired private GenericEventRepository eventRepo;
     
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
@@ -61,9 +84,12 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     @Test
     void sendSingleMail() throws MessagingException, IOException {
         //GIVEN
+		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		UUID eventId1 = eventRepo.save(event).getId();
+    	
         String INPUT_JSON_FILE = "messages/email_message.json";
         EmailMessage message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
-        UUID originalProcessingId = message.getProcessingInfo().getProcessingId();
+        message.addPreviousEventId(eventId1);
 
         //WHEN
         message = functionSend.apply(message);
@@ -74,8 +100,8 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         DeliveryInfoSendResult delInfo = delInfos.iterator().next();
         Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
-        Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(message.getRecievingEndpoints().get(0));
-        Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(message.getHeader().getEventIds());
+        Assertions.assertThat(delInfo.getReceivingEndpoint()).isEqualTo(message.getReceivingEndpoints().get(0));
+        Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(message.getPreviousEventIds());
 
         //THEN
         MimeMessage[] messages = greenMail.getReceivedMessages();
@@ -137,7 +163,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         
         Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
-        Assertions.assertThat(delInfo.getRecievingEndpoint().getEndpointId()).isEqualTo("john.doe@objectify.sk");
+        Assertions.assertThat(delInfo.getReceivingEndpoint().getEndpointId()).isEqualTo("john.doe@objectify.sk");
 
         //THEN
         MimeMessage message = greenMail.getReceivedMessages()[0];
@@ -162,8 +188,8 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         
         Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
-        Assertions.assertThat(delInfo.getRecievingEndpoint()).isEqualTo(inputMessage.getRecievingEndpoints().get(0));
-        Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(inputMessage.getHeader().getEventIds());
+        Assertions.assertThat(delInfo.getReceivingEndpoint()).isEqualTo(inputMessage.getReceivingEndpoints().get(0));
+        Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(inputMessage.getPreviousEventIds());
 
         //THEN
         MimeMessage message = greenMail.getReceivedMessages()[0];

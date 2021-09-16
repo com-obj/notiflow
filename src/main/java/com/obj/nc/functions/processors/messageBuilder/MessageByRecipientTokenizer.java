@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.functions.processors.messageBuilder;
 
 import java.util.ArrayList;
@@ -8,7 +27,7 @@ import org.springframework.stereotype.Component;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.MessageContent;
-import com.obj.nc.domain.endpoints.RecievingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
@@ -26,7 +45,7 @@ public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> ex
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(Message<CONTENT_TYPE> notificationIntent) {
 
-		if (notificationIntent.getRecievingEndpoints().isEmpty()) {
+		if (notificationIntent.getReceivingEndpoints().isEmpty()) {
 			return Optional.of(new PayloadValidationException(
 					String.format("NotificationIntent %s has no receiving endpoints defined.", notificationIntent)));
 		}
@@ -41,11 +60,11 @@ public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> ex
 
 		List<Message<CONTENT_TYPE>> messages = new ArrayList<>();
 
-		for (RecievingEndpoint recievingEndpoint: msg.getRecievingEndpoints()) {
+		for (ReceivingEndpoint receivingEndpoint: msg.getReceivingEndpoints()) {
 
-			Message<CONTENT_TYPE> msgClone = msg.getClass().newInstance();
+			Message<CONTENT_TYPE> msgClone = Message.newTypedMessageFrom(msg.getClass(), msg);
 			
-			msgClone.addRecievingEndpoints(recievingEndpoint);
+			msgClone.addReceivingEndpoints(receivingEndpoint);
 
 			msgClone.setAttributes(msg.getAttributes());
 			msgClone.setBody(msg.getBody());

@@ -1,7 +1,33 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.security.config;
 
-import com.obj.nc.security.model.AuthenticationError;
-import lombok.RequiredArgsConstructor;
+import static com.obj.nc.security.config.Constants.DEFAULT_EXCEPTION_MSG;
+import static com.obj.nc.security.config.Constants.EXCEPTION_ATTR_NAME;
+import static com.obj.nc.security.config.Constants.NOT_PROTECTED_RESOURCES;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,12 +38,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.http.HttpServletResponse;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import com.obj.nc.security.model.AuthenticationError;
 
-import static com.obj.nc.security.config.Constants.DEFAULT_EXCEPTION_MSG;
-import static com.obj.nc.security.config.Constants.EXCEPTION_ATTR_NAME;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -35,7 +58,8 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
-				.authorizeRequests().antMatchers(Constants.API.AUTHENTICATE).permitAll()
+				.authorizeRequests()
+				.antMatchers(NOT_PROTECTED_RESOURCES.toArray(new String[0])).permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)

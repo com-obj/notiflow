@@ -1,15 +1,10 @@
 {
 	"type": "EMAIL_MESSAGE",
-	"header": {
-		"eventIds": [
-			"23e201b5-d7fa-4231-a520-51190b5c50da"
-		]
-	},
 	"body": {
 		"text": "New position on koderia.sk 3",
 		"subject": "New position 3"
 	},
-	"recievingEndpoints": [
+	"receivingEndpoints": [
 		{
 			"@type": "EMAIL",
 			"recipient": {

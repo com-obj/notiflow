@@ -1,14 +1,26 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.security.controller;
 
-import com.obj.nc.security.config.Constants;
-import com.obj.nc.security.config.JwtSecurityConfig;
-import com.obj.nc.security.config.JwtTokenUtil;
-import com.obj.nc.security.config.NcJwtConfigProperties;
-import com.obj.nc.security.exception.UserNotAuthenticatedException;
-import com.obj.nc.security.model.JwtRequest;
-import com.obj.nc.security.model.JwtResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import java.util.Objects;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +29,20 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Objects;
+import com.obj.nc.security.config.JwtSecurityConfig;
+import com.obj.nc.security.config.JwtTokenUtil;
+import com.obj.nc.security.config.NcJwtConfigProperties;
+import com.obj.nc.security.exception.UserNotAuthenticatedException;
+import com.obj.nc.security.model.JwtRequest;
+import com.obj.nc.security.model.JwtResponse;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @RestController
@@ -33,7 +56,7 @@ public class JwtAuthenticationController {
 	private final UserDetailsService jwtInMemoryUserDetailsService;
 	private final NcJwtConfigProperties ncJwtConfigProperties;
 
-	@PostMapping(value = Constants.API.AUTHENTICATE, consumes = MediaType.APPLICATION_JSON_VALUE, 
+	@PostMapping(value = "/authenticate", consumes = MediaType.APPLICATION_JSON_VALUE, 
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());

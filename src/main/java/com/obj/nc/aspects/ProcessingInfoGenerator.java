@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.obj.nc.aspects;
 
 import java.util.ArrayList;
@@ -71,7 +90,7 @@ public class ProcessingInfoGenerator {
 		try {
 			returnValue = joinPoint.proceed();
 		} catch (Throwable e) {
-			log.trace("Exception ocured in processing step {}", docProcessingInfoAnot.value(), e);
+			log.trace("Exception ocurred in processing step {}", docProcessingInfoAnot.value(), e);
 			throw e;
 		}
 		
@@ -79,7 +98,7 @@ public class ProcessingInfoGenerator {
 		endPayloadAndHeaders = extractPayloads(returnValue);
 		
 		if (startProcessingInfos.size()>1 /*&& endPayloadAndHeaders.size()>1*/) {
-			log.warn("Cannot automaticaly map ProcessingInfo only for 1:1, 1:N cardinalities. Have {}:{} ", startPayloadAndHeaders.size(),endPayloadAndHeaders.size());
+			log.warn("Cannot automatically map ProcessingInfo only for 1:1, 1:N cardinalities. Have {}:{} ", startPayloadAndHeaders.size(),endPayloadAndHeaders.size());
 			return returnValue;
 		}
 		
@@ -167,7 +186,7 @@ public class ProcessingInfoGenerator {
 		
 		if (input instanceof HasHeader) {
 		    Header header = ((HasHeader)input).getHeader();
-		    if (!header.isSupressGenerateProcessingInfo()) {
+		    if (!header.isSuppressGenerateProcessingInfo()) {
 			    ImmutablePair<Header, Object> headerPayloadPair = new ImmutablePair<>(header, input);
 			    
 			    result.add(headerPayloadPair);
