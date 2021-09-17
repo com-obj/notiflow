@@ -67,7 +67,7 @@ public class DeliveryInfoRestController {
 	@Autowired private DeliveryInfoFlow deliveryInfoFlow;
 	@Autowired private NcAppConfigProperties ncAppConfigProperties;
 	
-	@GetMapping(value = "/events/{eventId}", consumes="application/json", produces="application/json")
+	@GetMapping(value = "/events/{eventId}", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
     		@PathVariable (value = "eventId", required = true) String eventId,
 			@RequestParam(value = "endpointId", required = false) String endpointId) {
@@ -86,7 +86,7 @@ public class DeliveryInfoRestController {
 		return infoDtos;
     }
 	
-	@GetMapping(value = "/events/ext/{extEventId}", consumes="application/json", produces="application/json")
+	@GetMapping(value = "/events/ext/{extEventId}", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByExtId(
     		@PathVariable (value = "extEventId", required = true) String extEventId,
 			@RequestParam(value = "endpointId", required = false) String endpointId) {
@@ -121,7 +121,7 @@ public class DeliveryInfoRestController {
 		return trackingPixelImageRedirectionResponse;
 	}
 	
-	@GetMapping(value = "/messages/{messageId}", consumes="application/json", produces="application/json")
+	@GetMapping(value = "/messages/{messageId}", produces="application/json")
 	public List<EndpointDeliveryInfoDto> findDeliveryInfosByMessageId(
 			@PathVariable (value = "messageId", required = true) String messageId) {
 		
