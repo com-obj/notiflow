@@ -99,7 +99,7 @@ public class DeliveryInfoRestController {
 		return findDeliveryInfosByEventId(event.getId().toString(), endpointId);
     }
 	
-	@PutMapping(value = "/messages/{messageId}/mark-as-read")
+	@GetMapping(value = "/messages/{messageId}/mark-as-read")
 	public ResponseEntity<Void> trackMessageRead(@PathVariable(value = "messageId", required = true) String messageId) {
 		ResponseEntity<Void> trackingPixelImageRedirectionResponse = ResponseEntity
 				.status(HttpStatus.FOUND)

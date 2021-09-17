@@ -8,8 +8,6 @@ definitions:
            - gradle test -Dspring.profiles.active=bitbucket --stacktrace --info
          services:
            - postgres
-         caches:
-           - gradle
          artifacts:
            - ./**/build/reports/tests/test/**
 
