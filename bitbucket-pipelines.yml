@@ -30,5 +30,5 @@ clone:
 pipelines:
   branches:
     develop:
-      - step: *test
+#      - step: *test
       - step: *mirror-to-github
