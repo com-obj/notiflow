@@ -13,13 +13,6 @@ definitions:
          artifacts:
            - ./**/build/reports/tests/test/**
 
-     - step: &release-nexus
-         name: 'Release artifacts to https://infra.objectify.sk/maven/#browse/browse:maven-releases:objectify'
-         script:
-           - gradle publish --stacktrace --info
-         caches:
-           - gradle
-
      - step: &mirror-to-github
          name: 'Mirror push to git@github.com:com-obj/notiflow.git'
          script:
@@ -38,17 +31,6 @@ clone:
 
 pipelines:
   branches:
-    master:
-      - step: *release-nexus # publication of SNAPSHOT release
-      - step: *mirror-to-github
     develop:
       - step: *test
-      - step: *mirror-to-github
-    release/*:
-      - step: *release-nexus # publication of SNAPSHOT release
-    hotfix/*:
-      - step: *release-nexus # publication of SNAPSHOT release      
-  tags:
-    v*:
-      - step: *release-nexus # publication of FINAL release
       - step: *mirror-to-github

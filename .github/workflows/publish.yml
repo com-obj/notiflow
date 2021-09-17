@@ -1,7 +1,7 @@
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: Test and Publish
+name: Publish
 
 on:
   push:
@@ -48,7 +48,11 @@ jobs:
         run: ./gradlew build
       
       - name: Publish to Maven Central
-        run: ./gradlew publish
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+        run: |
+          ./gradlew 
+            -P sonatypeUsername=${{ secrets.SONATYPE_USERNAME }} 
+            -P sonatypePassword=${{ secrets.SONATYPE_PASSWORD }} 
+            -P gpgSigningKey=${{ secrets.GPG_SIGNING_KEY }} 
+            -P gpgSigningPassword=${{ secrets.GPG_SIGNING_PASSWORD }} 
+            publishToSonatype 
+            closeAndReleaseSonatypeStagingRepository
