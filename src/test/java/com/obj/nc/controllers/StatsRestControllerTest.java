@@ -126,7 +126,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
     
         ResultActions resp1 = mockMvc
                 .perform(MockMvcRequestBuilders
-                        .put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
+                        .get(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
                         .contextPath(ncAppConfigProperties.getContextPath())
                         .contentType(APPLICATION_JSON_UTF8)
                         .accept(APPLICATION_JSON_UTF8))

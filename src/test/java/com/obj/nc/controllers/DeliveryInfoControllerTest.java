@@ -254,7 +254,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		//WHEN TEST REST
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders
-						.put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(messages.get(0).getId()).toString())
+						.get(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(messages.get(0).getId()).toString())
 						.contextPath(ncAppConfigProperties.getContextPath())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
@@ -300,7 +300,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		//WHEN TEST REST
 		ResultActions resp1 = mockMvc
 				.perform(MockMvcRequestBuilders
-						.put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
+						.get(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
 						.contextPath(ncAppConfigProperties.getContextPath())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
@@ -310,7 +310,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		
 		ResultActions resp2 = mockMvc
 				.perform(MockMvcRequestBuilders
-						.put(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
+						.get(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
 						.contextPath(ncAppConfigProperties.getContextPath())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))

@@ -6,6 +6,7 @@ plugins {
 	id 'java-library'	
 	id 'signing'
 	id 'io.freefair.lombok' version '5.3.2'
+	id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
 //	id 'org.asciidoctor.jvm.convert' version '3.3.0'
 }
 
@@ -169,21 +170,25 @@ publishing {
 			}
 		}
 	}
+}
+
+nexusPublishing {
 	repositories {
-		maven {
-			url = version.endsWith('-SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-			credentials {
-				username ossrhUsername
-				password ossrhPassword
-			}
+		sonatype {
+			nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+			snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+			username = findProperty('sonatypeUsername')
+			password = findProperty('sonatypePassword')
 		}
 	}
 }
 
 signing {
+	def gpgSigningKey = findProperty('gpgSigningKey')
+	def gpgSigningPassword = findProperty('gpgSigningPassword')
+	useInMemoryPgpKeys(gpgSigningKey, gpgSigningPassword)
 	sign publishing.publications.mavenJava
 }
-
 
 javadoc {
 	if(JavaVersion.current().isJava8Compatible()) {
