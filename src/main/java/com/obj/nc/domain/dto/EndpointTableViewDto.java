@@ -31,7 +31,7 @@ public class EndpointTableViewDto {
     
     private final UUID id;
     private final String name;
-    private final String type;
+    private final EndpointType type;
     private long eventsCount;
     private long intentsCount;
     private long messagesCount;
@@ -49,7 +49,7 @@ public class EndpointTableViewDto {
                 .builder()
                 .id(endpointWithStats.getEndpoint().getId())
                 .name(endpointWithStats.getEndpoint().getEndpointId())
-                .type(endpointWithStats.getEndpoint().getEndpointType())
+                .type(EndpointType.valueOf(endpointWithStats.getEndpoint().getEndpointType()))
                 .eventsCount(endpointWithStats.getStats().getEventsCount())
                 .intentsCount(endpointWithStats.getStats().getIntentsCount())
                 .messagesCount(endpointWithStats.getStats().getMessagesCount())

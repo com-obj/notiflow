@@ -55,7 +55,7 @@ public interface EndpointsRepository extends PagingAndSortingRepository<Receivin
                     "   ep.endpoint_name, " +
                     "   ep.endpoint_type, " +
                     "	count(distinct event_id) as events_count, " +
-//                    "	count(distinct intent_id) as intents_count, " + // TODO uncomment when nc_intent stores endpoint_ids
+//                    "	count(distinct intent.id) as intents_count, " + // TODO uncomment when nc_intent stores endpoint_ids
                     "	count(distinct msg.id) as messages_count, " +
                     "	count(distinct ep.id) as endpoints_count, " +
                     "	count(distinct di.id) filter(where di.status = 'SENT') as messages_sent_count, " +
@@ -69,16 +69,15 @@ public interface EndpointsRepository extends PagingAndSortingRepository<Receivin
                     "	cross join unnest(msg.previous_event_ids) as event_id " +
                     ") msg on ep.id = any ( msg.endpoint_ids ) " +
                     // TODO uncomment when nc_intent stores endpoint_ids
-//                    "left join ( " +
-//                    "	select intent.id, intent.endpoint_ids, intent_id " +
-//                    "	from nc_intent intent " +
-//                    "	cross join unnest(intent.previous_intent_ids) as intent_id " +
-//                    ") intent on ep.id = any ( intent.endpoint_ids ) " +
+//                    "left join " +
+//                    "   nc_intent intent " +
+//                    "on " +
+//                    "   ep.id = any ( intent.endpoint_ids ) " +
                     "left join (" +
                     "   select di.id, di.endpoint_id, di.status " +
                     "   from nc_delivery_info di " +
                     "	where " +
-                    "       processed_on between :processedFrom and :processedTo " +
+                    "       di.processed_on between :processedFrom and :processedTo " +
                     "   and " +
                     "       di.message_id is not null " +
                     ") di on ep.id = di.endpoint_id " +
@@ -107,18 +106,20 @@ public interface EndpointsRepository extends PagingAndSortingRepository<Receivin
                     "left join ( " +
                     "	select msg.id, msg.endpoint_ids, event_id " +
                     "	from nc_message msg " +
-                    "	cross join unnest(previous_event_ids) as event_id " +
+                    "	cross join unnest(msg.previous_event_ids) as event_id " +
                     ") msg on ep.id = any ( msg.endpoint_ids ) " +
                     // TODO uncomment when nc_intent stores endpoint_ids
-//                    "left join ( " +
-//                    "	select intent.id, intent.endpoint_ids, intent_id " +
-//                    "	from nc_intent intent " +
-//                    "	cross join unnest(intent.previous_intent_ids) as intent_id " +
-//                    ") intent on ep.id = any ( intent.endpoint_ids ) " +
+//                    "left join " +
+//                    "   nc_intent intent " +
+//                    "on " +
+//                    "   ep.id = any ( intent.endpoint_ids ) " +
                     "left join (" +
                     "   select di.id, di.endpoint_id, di.status " +
                     "   from nc_delivery_info di " +
-                    "	where processed_on between :processedFrom and :processedTo" +
+                    "	where " +
+                    "       di.processed_on between :processedFrom and :processedTo " +
+                    "   and " +
+                    "       di.message_id is not null " +
                     ") di on ep.id = di.endpoint_id " +
                     "where " +
                     "   (:endpointType::varchar is null or ep.endpoint_type = :endpointType::varchar) " +
