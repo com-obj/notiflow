@@ -60,17 +60,17 @@ public class MessagesRestController {
     
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public Page<MessageTableViewDto> findAllMessages(@RequestParam(value = "createdFrom", required = false, defaultValue = "2000-01-01T12:00:00Z") 
-                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdFrom,
+                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdFrom,
                                                      @RequestParam(value = "createdTo", required = false, defaultValue = "9999-01-01T12:00:00Z") 
-                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdTo,
+                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdTo,
+                                                     @RequestParam(value = "eventId", required = false) String eventId,
                                                      Pageable pageable) {
-        List<MessageTableViewDto> messages = messageRepository
-                .findAllByTimeCreatedBetween(createdFrom, createdTo, pageable)
-                .stream()
-                .map(MessageTableViewDto::from)
-                .collect(Collectors.toList());
+        UUID eventUUID = eventId == null ? null : UUID.fromString(eventId);
         
-        long messagesTotalCount = messageRepository.countAllByTimeCreatedBetween(createdFrom, createdTo);
+        List<MessageTableViewDto> messages = messageRepository
+                .findAllMessages(createdFrom, createdTo, eventUUID, pageable.getOffset(), pageable.getPageSize());
+        
+        long messagesTotalCount = messageRepository.countAllMessages(createdFrom, createdTo, eventUUID);
         return new PageImpl<>(messages, pageable, messagesTotalCount);
     }
     
