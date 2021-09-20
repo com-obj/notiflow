@@ -23,18 +23,46 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.data.domain.Pageable;
+import com.obj.nc.domain.dto.MessageTableViewDto;
 
 import com.obj.nc.domain.message.MessagePersistentState;
 import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 public interface MessageRepository extends PagingAndSortingRepository<MessagePersistentState, UUID>, EntityExistenceChecker<UUID> {
 	
 	List<MessagePersistentState> findByIdIn(List<UUID> intentIds);
     
-    List<MessagePersistentState> findAllByTimeCreatedBetween(Instant createdFrom, Instant createdTo, Pageable pageable);
+    @Query(
+            value = "select " +
+                    "	msg.* " +
+                    "from " +
+                    "	nc_message msg " +
+                    "where " +
+                    "	msg.time_created between (:createdFrom) and (:createdTo) " +
+                    "and " +
+                    "	(:eventId)::uuid is null or (:eventId)::uuid = any ( msg.previous_event_ids ) " +
+                    "offset :offset rows fetch next :pageSize rows only",
+            rowMapperClass = MessageTableViewDto.MessageTableViewDtoRowMapper.class)
+    List<MessageTableViewDto> findAllMessages(@Param("createdFrom") Instant createdFrom,
+                                              @Param("createdTo") Instant createdTo,
+                                              @Param("eventId") UUID eventId,
+                                              @Param("offset") long offset,
+                                              @Param("pageSize") int pageSize);
     
-    long countAllByTimeCreatedBetween(Instant createdFrom, Instant createdTo);
+    @Query(
+            value = "select " +
+                    "	count(msg.id) " +
+                    "from " +
+                    "	nc_message msg " +
+                    "where " +
+                    "	msg.time_created between (:createdFrom) and (:createdTo) " +
+                    "and " +
+                    "	(:eventId)::uuid is null or (:eventId)::uuid = any ( msg.previous_event_ids ) ")
+    long countAllMessages(@Param("createdFrom") Instant createdFrom,
+                          @Param("createdTo") Instant createdTo,
+                          @Param("eventId") UUID eventId);
     
 }

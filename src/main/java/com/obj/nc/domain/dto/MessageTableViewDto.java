@@ -19,10 +19,12 @@
 
 package com.obj.nc.domain.dto;
 
-import com.obj.nc.domain.message.MessagePersistentState;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.jdbc.core.RowMapper;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -37,16 +39,19 @@ public class MessageTableViewDto {
     private UUID[] previousIntentIds;
     private UUID[] previousMessageIds;
     
-    public static MessageTableViewDto from(MessagePersistentState messagePersistentState) {
-        return MessageTableViewDto
-                .builder()
-                .id(messagePersistentState.getId())
-                .timeCreated(messagePersistentState.getTimeCreated())
-                .endpointIds(messagePersistentState.getEndpointIds())
-                .previousEventIds(messagePersistentState.getPreviousEventIds())
-                .previousIntentIds(messagePersistentState.getPreviousIntentIds())
-                .previousMessageIds(messagePersistentState.getPreviousMessageIds())
-                .build();
+    public static class MessageTableViewDtoRowMapper implements RowMapper<MessageTableViewDto> {
+        @Override
+        public MessageTableViewDto mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+            return MessageTableViewDto
+                    .builder()
+                    .id((UUID) resultSet.getObject("id"))
+                    .timeCreated(resultSet.getTimestamp("time_created").toInstant())
+                    .endpointIds((UUID[]) resultSet.getArray("endpoint_ids").getArray())
+                    .previousEventIds((UUID[]) resultSet.getArray("previous_event_ids").getArray())
+                    .previousIntentIds((UUID[]) resultSet.getArray("previous_intent_ids").getArray())
+                    .previousMessageIds((UUID[]) resultSet.getArray("previous_message_ids").getArray())
+                    .build();
+        }
     }
     
 }
