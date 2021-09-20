@@ -23,6 +23,7 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.PROCESSING;
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -146,8 +147,8 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
-						.param("startAt", Instant.now().minusSeconds(60).toString())
-						.param("endAt", Instant.now().plusSeconds(60).toString())
+						.param("processedFrom", Instant.now().minusSeconds(60).toString())
+						.param("processedTo", Instant.now().plusSeconds(60).toString())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
@@ -171,7 +172,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
-						.param("startAt", Instant.now().minusSeconds(60).toString())
+						.param("processedFrom", Instant.now().minusSeconds(60).toString())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
@@ -195,7 +196,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
-						.param("endAt", Instant.now().plusSeconds(60).toString())
+						.param("processedTo", Instant.now().plusSeconds(60).toString())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
@@ -220,7 +221,6 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
 						.param("endpointType", "SMS")
-						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
 		
@@ -231,24 +231,6 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
 		assertThat(endpoints).hasSize(1);
 		assertContainsEndpoint(endpoints, "+999999999999", 0);
-	}
-	
-	@Test
-	void testFilterInvalidEndpointType() throws Exception {
-		//GIVEN
-		persistTestEndpoints();
-		
-		//WHEN
-		ResultActions resp = mockMvc
-				.perform(MockMvcRequestBuilders.get("/endpoints")
-						.param("endpointType", "INVALID123")
-						.contentType(APPLICATION_JSON_UTF8)
-						.accept(APPLICATION_JSON_UTF8))
-				.andDo(MockMvcResultHandlers.print());
-		
-		//THEN
-		resp
-				.andExpect(status().is5xxServerError());
 	}
 	
 	@Test
@@ -328,6 +310,27 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	}
 	
 	@Test
+	void testFilterEndpointsByEndpointId() throws Exception {
+		//GIVEN
+		UUID endpointId = persistTestEndpointsForEndpointIdFiltering();
+		
+		//WHEN
+		ResultActions resp = mockMvc
+				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.param("endpointId", endpointId.toString())
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+		
+		//THEN
+		resp
+				.andExpect(status().is2xxSuccessful())
+				.andExpect(jsonPath("$.content.size()", Matchers.is(1)));
+		
+		List<LinkedHashMap<?, ?>> endpoints = JsonPath.read(resp.andReturn().getResponse().getContentAsString(), "$.content");
+		assertContainsEndpoint(endpoints, "john.doe@gmail.com", 0);
+	}
+	
+	@Test
 	void testFindEndpointById() throws Exception {
 		// given
 		EmailEndpoint email = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
@@ -374,6 +377,16 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		return event.getId();
 	}
 	
+	private UUID persistTestEndpointsForEndpointIdFiltering() {
+		EmailEndpoint email1 = EmailEndpoint.builder().email("john.doe@gmail.com").build();
+		endpointsRepository.persistEnpointIfNotExists(email1);
+		EmailEndpoint email2 = EmailEndpoint.builder().email("john.dudly@gmail.com").build();
+		endpointsRepository.persistEnpointIfNotExists(email2);
+		EmailEndpoint email3 = EmailEndpoint.builder().email("john.wick@gmail.com").build();
+		endpointsRepository.persistEnpointIfNotExists(email3);
+		return email1.getId();
+	}
+	
 	private void persistTestEndpointsAndTestDeliveryInfos() {
 		EmailEndpoint email1 = EmailEndpoint.builder().email("john.doe@gmail.com").build();
 		EmailEndpoint email2 = EmailEndpoint.builder().email("john.dudly@gmail.com").build();
@@ -382,7 +395,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		emailMessage.setBody(EmailContent.builder().subject("Subject").text("Text").build());
 		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
 		messageProcessingFlow.processMessage(emailMessage);
-		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
+		await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
 		
 		SmsEndpoint sms = SmsEndpoint.builder().phone("0908186997").build();
 		
@@ -390,25 +403,25 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		smsMessage.setBody(SimpleTextContent.builder().text("Text").build());
 		smsMessage.setReceivingEndpoints(Arrays.asList(sms));
 		messageProcessingFlow.processMessage(smsMessage);
-		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(smsMessage.getId(), PROCESSING) >= 1);
+		await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(smsMessage.getId(), PROCESSING) >= 1);
 	}
 	
 	private void assertContainsEndpoint(List<LinkedHashMap<?, ?>> endpoints, String endpointName, long sentMessagesCount) {
 		Optional<LinkedHashMap<?, ?>> emailDto = endpoints.stream().filter(endpoint -> endpointName.equals(endpoint.get("name"))).findFirst();
 		assertThat(emailDto).isNotNull();
-		assertThat(Long.valueOf(emailDto.get().get("sentMessagesCount").toString())).isEqualTo(sentMessagesCount);
+		assertThat(Long.valueOf(emailDto.get().get("messagesSentCount").toString())).isEqualTo(sentMessagesCount);
 	}
 	
 	private void awaitMessageAndDeliveryInfos(int numberToWait) {
 		MessagePersistentState sentMessage = waitForFirstMessage();
 		
-		Awaitility.await().atMost(Duration.ofSeconds(3)).until(
+		await().atMost(Duration.ofSeconds(3)).until(
 				() -> deliveryInfoRepository.findByMessageIdOrderByProcessedOn(sentMessage.getId()).size() >= numberToWait
 		);
 	}
 
 	public MessagePersistentState waitForFirstMessage() {
-		Awaitility.await().atMost(Duration.ofSeconds(3)).until(
+		await().atMost(Duration.ofSeconds(3)).until(
 				() -> messageRepository.findAll().iterator().next() != null
 		);
 		

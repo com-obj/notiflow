@@ -19,11 +19,12 @@
 
 package com.obj.nc.controllers;
 
-import com.obj.nc.domain.event.GenericEventStats;
+import com.obj.nc.domain.endpoints.ReceivingEndpointWithStats;
 import com.obj.nc.domain.event.GenericEventWithStats;
+import com.obj.nc.domain.stats.Stats;
+import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.GenericEventRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,9 +45,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class StatsRestController {
 	
 	private final GenericEventRepository eventsRepository;
+	private final EndpointsRepository endpointsRepository;
 	
 	@GetMapping(value = "/events/{eventId}", produces = APPLICATION_JSON_VALUE)
-	public GenericEventStats findEventStats(@PathVariable("eventId") String eventId) {
+	public Stats findEventStats(@PathVariable("eventId") String eventId) {
 		return eventsRepository
 				.findAllEventsWithStats(
 						Instant.parse("2000-01-01T12:00:00Z"), 
@@ -56,6 +58,22 @@ public class StatsRestController {
 				.stream()
 				.findFirst()
 				.map(GenericEventWithStats::getStats)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+	}
+	
+	@GetMapping(value = "/endpoints/{endpointId}", produces = APPLICATION_JSON_VALUE)
+	public Stats findEndpointStats(@PathVariable("endpointId") String endpointId) {
+		return endpointsRepository
+				.findAllEndpointsWithStats(
+						Instant.parse("2000-01-01T12:00:00Z"),
+						Instant.parse("9999-01-01T12:00:00Z"),
+						null,
+						null,
+						UUID.fromString(endpointId),
+						0, 1)
+				.stream()
+				.findFirst()
+				.map(ReceivingEndpointWithStats::getStats)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 	

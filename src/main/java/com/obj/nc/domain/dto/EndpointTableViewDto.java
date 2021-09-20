@@ -21,8 +21,7 @@ package com.obj.nc.domain.dto;
 
 import java.util.UUID;
 
-import com.obj.nc.domain.endpoints.ReceivingEndpoint;
-
+import com.obj.nc.domain.endpoints.ReceivingEndpointWithStats;
 import lombok.Builder;
 import lombok.Data;
 
@@ -30,13 +29,35 @@ import lombok.Data;
 @Builder
 public class EndpointTableViewDto {
     
-    private final UUID uuid;
+    private final UUID id;
     private final String name;
-    private final EndpointType type;
-    private final long sentMessagesCount;
+    private final String type;
+    private long eventsCount;
+    private long intentsCount;
+    private long messagesCount;
+    private long endpointsCount;
+    private long messagesSentCount;
+    private long messagesReadCount;
+    private long messagesFailedCount;
     
     public enum EndpointType {
-        EMAIL, SMS, MAILCHIMP, ANY
+        EMAIL, SMS, MAILCHIMP
+    }
+    
+    public static EndpointTableViewDto from(ReceivingEndpointWithStats endpointWithStats) {
+        return EndpointTableViewDto
+                .builder()
+                .id(endpointWithStats.getEndpoint().getId())
+                .name(endpointWithStats.getEndpoint().getEndpointId())
+                .type(endpointWithStats.getEndpoint().getEndpointType())
+                .eventsCount(endpointWithStats.getStats().getEventsCount())
+                .intentsCount(endpointWithStats.getStats().getIntentsCount())
+                .messagesCount(endpointWithStats.getStats().getMessagesCount())
+                .endpointsCount(endpointWithStats.getStats().getEndpointsCount())
+                .messagesSentCount(endpointWithStats.getStats().getMessagesSentCount())
+                .messagesReadCount(endpointWithStats.getStats().getMessagesReadCount())
+                .messagesFailedCount(endpointWithStats.getStats().getMessagesFailedCount())
+                .build();
     }
     
 }
