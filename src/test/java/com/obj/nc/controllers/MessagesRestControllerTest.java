@@ -25,12 +25,14 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.jayway.jsonpath.JsonPath;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistentState;
 import com.obj.nc.domain.message.SendEmailMessageRequest;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.EndpointsRepository;
+import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.MessageRepository;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
@@ -73,6 +75,7 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private MessageRepository messageRepository;
     @Autowired private EndpointsRepository endpointsRepository;
+    @Autowired private GenericEventRepository genericEventRepository;
     @Autowired private DeliveryInfoRepository deliveryInfoRepository;
     
     @RegisterExtension
@@ -196,6 +199,21 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
     }
     
     @Test
+    void testFindAllMessagesEventIdFilter() throws Exception {
+        // given
+        UUID eventId = persistTestEmailMessages(9);
+    
+        // when - then
+        mockMvc
+                .perform(MockMvcRequestBuilders
+                        .get("/messages")
+                        .param("eventId", eventId.toString())
+                        .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.content.size()", Matchers.is(9)));
+    }
+    
+    @Test
     void testFindAllMessagesPage0Size10() throws Exception {
         // given
         persistTestEmailMessages(19);
@@ -227,9 +245,20 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.content.size()", Matchers.is(9)));
     }
     
-    private void persistTestEmailMessages(long n) {
+    private UUID persistTestEmailMessages(long n) {
+        UUID eventId = UUID.randomUUID();
+    
+        GenericEvent event = GenericEvent.builder()
+                .id(eventId)
+                .flowId("default-flow")
+                .payloadJson(JsonUtils.readJsonNodeFromJSONString("{\"test\": \"test\"}"))
+                .timeConsumed(Instant.now())
+                .build();
+        genericEventRepository.save(event);
+        
         for (long i = 0; i < n; i++) {
             EmailMessage message = new EmailMessage();
+            message.addPreviousEventId(eventId);
             
             message.setBody(
                     EmailContent
@@ -255,6 +284,8 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
                 .await()
                 .atMost(3, TimeUnit.SECONDS)
                 .until(() -> messageRepository.count() >= n);
+        
+        return eventId;
     }
     
 }
