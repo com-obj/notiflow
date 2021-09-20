@@ -114,34 +114,34 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.intentsCount").value(CoreMatchers.is(1)))
                 .andExpect(jsonPath("$.messagesCount").value(CoreMatchers.is(4)))
                 .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(2)))
-                .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(2)))
                 .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(1)));
+                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(0)));
     }
     
-//    @Test
-//    void testFindEndpointStatsByEndpointId() throws Exception {
-//        // GIVEN
-//        persistTestEventProcessing();
-//        List<ReceivingEndpoint> endpoints = endpointsRepository.findAllEndpoints();
-//
-//        //WHEN
-//        ResultActions resp = mockMvc
-//                .perform(MockMvcRequestBuilders.get("/stats/endpoints/{endpointId}", endpoints.get(0).getId())
-//                        .contentType(APPLICATION_JSON_UTF8)
-//                        .accept(APPLICATION_JSON_UTF8))
-//                .andDo(MockMvcResultHandlers.print());
-//        // THEN
-//        resp
-//                .andExpect(status().is2xxSuccessful())
-//                .andExpect(jsonPath("$.eventsCount").value(CoreMatchers.is(1)))
-////                .andExpect(jsonPath("$.intentsCount").value(CoreMatchers.is(1))) // TODO uncomment when nc_intent stores endpoint_ids
-//                .andExpect(jsonPath("$.messagesCount").value(CoreMatchers.is(2)))
-//                .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(1)))
-//                .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
-//                .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
-//                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(0)));
-//    }
+    @Test
+    void testFindEndpointStatsByEndpointId() throws Exception {
+        // GIVEN
+        persistTestEventProcessing();
+        List<ReceivingEndpoint> endpoints = endpointsRepository.findAllEndpoints();
+
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/stats/endpoints/{endpointId}", endpoints.get(0).getId())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        // THEN
+        resp
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.eventsCount").value(CoreMatchers.is(1)))
+//                .andExpect(jsonPath("$.intentsCount").value(CoreMatchers.is(1))) // TODO uncomment when nc_intent stores endpoint_ids
+                .andExpect(jsonPath("$.messagesCount").value(CoreMatchers.is(2)))
+                .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(0)));
+    }
     
     private GenericEvent persistTestEventProcessing() throws Exception {
         GenericEvent event = GenericEvent.builder()
@@ -153,7 +153,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
         event = genericEventRepository.save(event);
         
         EmailEndpoint emailEndpoint = EmailEndpoint.builder().email("johndoe@objectify.sk").build();
-        EmailEndpoint emailEndpoint2 = EmailEndpoint.builder().email("invalid email").build();
+        EmailEndpoint emailEndpoint2 = EmailEndpoint.builder().email("johndudly@objectify.sk").build();
         
         NotificationIntent intent = NotificationIntent.createWithStaticContent("Subject", "Text");
         intent.getHeader().setFlowId("default-flow");

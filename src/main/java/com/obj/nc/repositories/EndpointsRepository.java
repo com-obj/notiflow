@@ -77,7 +77,10 @@ public interface EndpointsRepository extends PagingAndSortingRepository<Receivin
                     "left join (" +
                     "   select di.id, di.endpoint_id, di.status " +
                     "   from nc_delivery_info di " +
-                    "	where processed_on between :processedFrom and :processedTo" +
+                    "	where " +
+                    "       processed_on between :processedFrom and :processedTo " +
+                    "   and " +
+                    "       di.message_id is not null " +
                     ") di on ep.id = di.endpoint_id " +
                     "where " +
                     "   (:endpointType::varchar is null or ep.endpoint_type = :endpointType::varchar) " +
