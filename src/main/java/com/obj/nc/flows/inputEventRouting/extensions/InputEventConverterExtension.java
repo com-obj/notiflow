@@ -25,6 +25,11 @@ import java.util.Optional;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotNull;
+
+import static com.obj.nc.domain.event.GenericEvent.DEFAULT_FLOW_ID;
 
 /**
  * Will need to allow mapping specific instances of this class to flow_id
@@ -41,7 +46,25 @@ public interface InputEventConverterExtension<RESULT_TYPE extends IsNotification
 	 * 		Optional.emtpy() if this extensions is capable of making payload->RESULT_TYPE transformation
 	 * 		Optional.of(new PayloadValidationException("Error description") if not (error description will be logged)	
 	 */
-	Optional<PayloadValidationException> canHandle(GenericEvent payload);
+	default Optional<PayloadValidationException> canHandle(GenericEvent payload) {
+		if (payload == null) {
+			return Optional.of(new PayloadValidationException("GenericEvent must not be null"));
+		}
+		
+		if (payload.getPayloadJson() == null) {
+			return Optional.of(new PayloadValidationException("GenericEvent must contain non-null payload"));
+		}
+		
+		if (!getFlowId().equals(payload.getFlowId())) {
+			return Optional.of(new PayloadValidationException("GenericEvent's flowId must match Converter's flowId"));
+		}
+		
+		return Optional.empty();
+	}
+	
+	default String getFlowId() {
+		return DEFAULT_FLOW_ID;
+	}
 	
 	List<RESULT_TYPE> convertEvent(GenericEvent event);
 	
