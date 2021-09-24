@@ -25,6 +25,7 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.jayway.jsonpath.JsonPath;
 import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.flows.intenProcessing.NotificationIntentProcessingFlow;
@@ -77,6 +78,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class StatsRestControllerTest extends BaseIntegrationTest {
     
 	@Autowired private GenericEventRepository genericEventRepository;
+	@Autowired private EndpointsRepository endpointsRepository;
 	@Autowired private DeliveryInfoRepository deliveryInfoRepository;
 	@Autowired private NotificationIntentProcessingFlow intentProcessingFlow;
     @Autowired private NcAppConfigProperties ncAppConfigProperties;
@@ -97,6 +99,51 @@ class StatsRestControllerTest extends BaseIntegrationTest {
     @Test
     void testFindEventStatsByEventId() throws Exception {
         // GIVEN
+        GenericEvent event = persistTestEventProcessing();
+    
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/stats/events/{eventId}", event.getId())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        // THEN
+        resp
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.eventsCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.intentsCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.messagesCount").value(CoreMatchers.is(4)))
+                .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(2)))
+                .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(2)))
+                .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(0)));
+    }
+    
+    @Test
+    void testFindEndpointStatsByEndpointId() throws Exception {
+        // GIVEN
+        persistTestEventProcessing();
+        List<ReceivingEndpoint> endpoints = endpointsRepository.findAllEndpoints();
+
+        //WHEN
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/stats/endpoints/{endpointId}", endpoints.get(0).getId())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andDo(MockMvcResultHandlers.print());
+        // THEN
+        resp
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.eventsCount").value(CoreMatchers.is(1)))
+//                .andExpect(jsonPath("$.intentsCount").value(CoreMatchers.is(1))) // TODO uncomment when nc_intent stores endpoint_ids
+                .andExpect(jsonPath("$.messagesCount").value(CoreMatchers.is(2)))
+                .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(0)));
+    }
+    
+    private GenericEvent persistTestEventProcessing() throws Exception {
         GenericEvent event = GenericEvent.builder()
                 .id(UUID.randomUUID())
                 .flowId("default-flow")
@@ -104,10 +151,10 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                 .timeConsumed(Instant.now())
                 .build();
         event = genericEventRepository.save(event);
-    
+        
         EmailEndpoint emailEndpoint = EmailEndpoint.builder().email("johndoe@objectify.sk").build();
-        EmailEndpoint emailEndpoint2 = EmailEndpoint.builder().email("invalid email").build();
-    
+        EmailEndpoint emailEndpoint2 = EmailEndpoint.builder().email("johndudly@objectify.sk").build();
+        
         NotificationIntent intent = NotificationIntent.createWithStaticContent("Subject", "Text");
         intent.getHeader().setFlowId("default-flow");
         intent.addPreviousEventId(event.getId());
@@ -123,7 +170,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                 .stream()
                 .filter(sentInfo -> sentInfo.getMessageId() != null)
                 .collect(Collectors.toList());
-    
+        
         ResultActions resp1 = mockMvc
                 .perform(MockMvcRequestBuilders
                         .get(ncAppConfigProperties.getContextPath() + "/delivery-info/messages/{messageId}/mark-as-read", Objects.requireNonNull(sentInfos.get(0).getMessageId()).toString())
@@ -131,25 +178,9 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                         .contentType(APPLICATION_JSON_UTF8)
                         .accept(APPLICATION_JSON_UTF8))
                 .andDo(MockMvcResultHandlers.print());
-    
-        await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(sentInfos.get(0).getMessageId(), READ) >= 1);
         
-        //WHEN
-        ResultActions resp = mockMvc
-                .perform(MockMvcRequestBuilders.get("/stats/events/{eventId}", event.getId())
-                        .contentType(APPLICATION_JSON_UTF8)
-                        .accept(APPLICATION_JSON_UTF8))
-                .andDo(MockMvcResultHandlers.print());
-        // THEN
-        resp
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.eventsCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.intentsCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.messagesCount").value(CoreMatchers.is(4)))
-                .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(2)))
-                .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(1)));
+        await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(sentInfos.get(0).getMessageId(), READ) >= 1);
+        return event;
     }
     
     @Data

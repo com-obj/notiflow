@@ -17,21 +17,21 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.event;
+package com.obj.nc.domain.stats;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class GenericEventStats {
-	
-	private long eventsCount;
-	private long intentsCount;
-	private long messagesCount;
-	private long endpointsCount;
-	private long messagesSentCount;
-	private long messagesReadCount;
-	private long messagesFailedCount;
-	
+public class Stats {
+    
+    private long eventsCount;
+    private long intentsCount;
+    private long messagesCount;
+    private long endpointsCount;
+    private long messagesSentCount;
+    private long messagesReadCount;
+    private long messagesFailedCount;
+    
 }
