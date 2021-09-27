@@ -28,7 +28,7 @@ import lombok.*;
 @NoArgsConstructor
 public abstract class PushEndpoint extends ReceivingEndpoint {
     
-    public abstract Message.Builder getFcmMessageBuilder();
+    public abstract Message.Builder toFcmMessageBuilder();
     
     public static PushEndpoint ofTopic(String topic) {
         return TopicPushEndpoint

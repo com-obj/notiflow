@@ -32,7 +32,7 @@ public class TopicPushEndpoint extends PushEndpoint {
     private String topic;
     
     @Override
-    public Message.Builder getFcmMessageBuilder() {
+    public Message.Builder toFcmMessageBuilder() {
         return Message
                 .builder()
                 .setTopic(topic);

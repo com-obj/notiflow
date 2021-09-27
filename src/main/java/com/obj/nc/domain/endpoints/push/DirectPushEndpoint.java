@@ -32,7 +32,7 @@ public class DirectPushEndpoint extends PushEndpoint {
     private String token;
     
     @Override
-    public Message.Builder getFcmMessageBuilder() {
+    public Message.Builder toFcmMessageBuilder() {
         return Message
                 .builder()
                 .setToken(token);

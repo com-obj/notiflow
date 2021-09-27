@@ -73,7 +73,7 @@ public class PushSender extends ProcessorFunctionAdapter<PushMessage, PushMessag
         Message firebaseMessage = payload
                 .getReceivingEndpoints()
                 .get(0)
-                .getFcmMessageBuilder()
+                .toFcmMessageBuilder()
                 .setNotification(
                         Notification
                                 .builder()
