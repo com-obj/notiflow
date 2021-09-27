@@ -17,56 +17,45 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.event;
+package com.obj.nc.domain.endpoints;
 
 import com.obj.nc.domain.stats.Stats;
-import com.obj.nc.repositories.converters.PgObjectToJsonNodeConverter;
+import com.obj.nc.repositories.mappers.ReceivingEndpointRowMapper;
 import lombok.Builder;
 import lombok.Data;
-import org.postgresql.util.PGobject;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.UUID;
 
 @Data
 @Builder
-public class GenericEventWithStats {
+public class ReceivingEndpointWithStats {
     
-    private GenericEvent event;
+    private ReceivingEndpoint endpoint;
     private Stats stats;
     
-    public static class GenericEventWithStatsRowMapper implements RowMapper<GenericEventWithStats> {
-        
-        private final PgObjectToJsonNodeConverter converter = new PgObjectToJsonNodeConverter();
-        
+    public static class ReceivingEndpointWithStatsRowMapper implements RowMapper<ReceivingEndpointWithStats> {
+    
+        private final ReceivingEndpointRowMapper receivingEndpointRowMapper = new ReceivingEndpointRowMapper();
+    
         @Override
-        public GenericEventWithStats mapRow(ResultSet resultSet, int i) throws SQLException {
-            GenericEvent event = GenericEvent
-                    .builder()
-                    .id((UUID) resultSet.getObject("id"))
-                    .flowId(resultSet.getString("flow_id"))
-                    .externalId(resultSet.getString("external_id"))
-                    .payloadJson(converter.convert((PGobject) resultSet.getObject("payload_json")))
-                    .timeCreated(resultSet.getTimestamp("time_created").toInstant())
-                    .timeConsumed(resultSet.getTimestamp("time_consumed").toInstant())
-                    .payloadType(resultSet.getString("payload_type"))
-                    .build();
-            
+        public ReceivingEndpointWithStats mapRow(ResultSet resultSet, int i) throws SQLException {
+            ReceivingEndpoint endpoint = receivingEndpointRowMapper.mapRow(resultSet, i);
+    
             Stats stats = Stats.builder()
                     .eventsCount(resultSet.getLong("events_count"))
-                    .intentsCount(resultSet.getLong("intents_count"))
+//                    .intentsCount(resultSet.getLong("intents_count"))
                     .messagesCount(resultSet.getLong("messages_count"))
                     .endpointsCount(resultSet.getLong("endpoints_count"))
                     .messagesSentCount(resultSet.getLong("messages_sent_count"))
                     .messagesReadCount(resultSet.getLong("messages_read_count"))
                     .messagesFailedCount(resultSet.getLong("messages_failed_count"))
                     .build();
-            
-            return GenericEventWithStats
+        
+            return ReceivingEndpointWithStats
                     .builder()
-                    .event(event)
+                    .endpoint(endpoint)
                     .stats(stats)
                     .build();
         }

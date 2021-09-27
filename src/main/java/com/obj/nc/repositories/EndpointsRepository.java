@@ -19,10 +19,14 @@
 
 package com.obj.nc.repositories;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.obj.nc.domain.dto.EndpointTableViewDto.EndpointType;
+import com.obj.nc.domain.endpoints.ReceivingEndpointWithStats;
+import com.obj.nc.domain.endpoints.ReceivingEndpointWithStats.ReceivingEndpointWithStatsRowMapper;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -44,5 +48,89 @@ public interface EndpointsRepository extends PagingAndSortingRepository<Receivin
                     "where id = (:endpointId)",
             rowMapperClass = ReceivingEndpointRowMapper.class)
     Optional<ReceivingEndpoint> findEndpointById(@Param("endpointId") UUID endpointId);
+    
+    @Query(
+            value = "select " +
+                    "   ep.id, " +
+                    "   ep.endpoint_name, " +
+                    "   ep.endpoint_type, " +
+                    "	count(distinct event_id) as events_count, " +
+//                    "	count(distinct intent.id) as intents_count, " + // TODO uncomment when nc_intent stores endpoint_ids
+                    "	count(distinct msg.id) as messages_count, " +
+                    "	count(distinct ep.id) as endpoints_count, " +
+                    "	count(distinct di.id) filter(where di.status = 'SENT') as messages_sent_count, " +
+                    "	count(distinct di.id) filter(where di.status = 'READ') as messages_read_count, " +
+                    "	count(distinct di.id) filter(where di.status = 'FAILED') as messages_failed_count " +
+                    "from " +
+                    "	nc_endpoint ep " +
+                    "left join ( " +
+                    "	select msg.id, msg.endpoint_ids, event_id " +
+                    "	from nc_message msg " +
+                    "	cross join unnest(msg.previous_event_ids) as event_id " +
+                    ") msg on ep.id = any ( msg.endpoint_ids ) " +
+                    // TODO uncomment when nc_intent stores endpoint_ids
+//                    "left join " +
+//                    "   nc_intent intent " +
+//                    "on " +
+//                    "   ep.id = any ( intent.endpoint_ids ) " +
+                    "left join (" +
+                    "   select di.id, di.endpoint_id, di.status " +
+                    "   from nc_delivery_info di " +
+                    "	where " +
+                    "       di.processed_on between :processedFrom and :processedTo " +
+                    "   and " +
+                    "       di.message_id is not null " +
+                    ") di on ep.id = di.endpoint_id " +
+                    "where " +
+                    "   (:endpointType::varchar is null or ep.endpoint_type = :endpointType::varchar) " +
+                    "and " +
+                    "   (:eventId::uuid is null or event_id = :eventId::uuid) " +
+                    "and " +
+                    "	(:endpointId::uuid is null or ep.id = :endpointId::uuid) " +
+                    "group by ep.id, ep.endpoint_name , ep.endpoint_type " +
+                    "offset :offset rows fetch next :pageSize rows only",
+            rowMapperClass = ReceivingEndpointWithStatsRowMapper.class)
+    List<ReceivingEndpointWithStats> findAllEndpointsWithStats(@Param("processedFrom") Instant processedFrom, 
+                                                               @Param("processedTo") Instant processedTo, 
+                                                               @Param("endpointType") EndpointType endpointType, 
+                                                               @Param("eventId") UUID eventId, 
+                                                               @Param("endpointId") UUID endpointId, 
+                                                               @Param("offset") long offset, 
+                                                               @Param("pageSize") int pageSize);
+    
+    @Query(
+            value = "select " +
+                    "	count(distinct ep.id) " +
+                    "from " +
+                    "	nc_endpoint ep " +
+                    "left join ( " +
+                    "	select msg.id, msg.endpoint_ids, event_id " +
+                    "	from nc_message msg " +
+                    "	cross join unnest(msg.previous_event_ids) as event_id " +
+                    ") msg on ep.id = any ( msg.endpoint_ids ) " +
+                    // TODO uncomment when nc_intent stores endpoint_ids
+//                    "left join " +
+//                    "   nc_intent intent " +
+//                    "on " +
+//                    "   ep.id = any ( intent.endpoint_ids ) " +
+                    "left join (" +
+                    "   select di.id, di.endpoint_id, di.status " +
+                    "   from nc_delivery_info di " +
+                    "	where " +
+                    "       di.processed_on between :processedFrom and :processedTo " +
+                    "   and " +
+                    "       di.message_id is not null " +
+                    ") di on ep.id = di.endpoint_id " +
+                    "where " +
+                    "   (:endpointType::varchar is null or ep.endpoint_type = :endpointType::varchar) " +
+                    "and " +
+                    "   (:eventId::uuid is null or event_id = :eventId::uuid) " +
+                    "and " +
+                    "	(:endpointId::uuid is null or ep.id = :endpointId::uuid) ")
+    long countAllEndpointsWithStats(@Param("processedFrom") Instant processedFrom, 
+                                    @Param("processedTo") Instant processedTo, 
+                                    @Param("endpointType") EndpointType endpointType,
+                                    @Param("eventId") UUID eventId, 
+                                    @Param("endpointId") UUID endpointId);
     
 }
