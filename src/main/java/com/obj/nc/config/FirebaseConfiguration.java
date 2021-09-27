@@ -22,8 +22,10 @@ package com.obj.nc.config;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
@@ -34,13 +36,14 @@ import java.io.FileInputStream;
 @RequiredArgsConstructor
 public class FirebaseConfiguration {
     
-    private final FirebaseConfigurationProperties properties;
+    private final Properties properties;
     
     @PostConstruct
     public void initialize() {
         if (properties.getServiceAccountFilePath() == null) {
             return;
         }
+        
         try {
             FileInputStream serviceAccount = new FileInputStream(properties.getServiceAccountFilePath());
             FirebaseOptions options = FirebaseOptions
@@ -51,6 +54,15 @@ public class FirebaseConfiguration {
         } catch (Exception e) {
             throw new RuntimeException(String.format("Error initializing Firebase : %s ", e.getMessage()));
         }
+    }
+    
+    @Data
+    @Configuration
+    @ConfigurationProperties("nc.firebase")
+    public static class Properties {
+        
+        private String serviceAccountFilePath;
+        
     }
     
 }
