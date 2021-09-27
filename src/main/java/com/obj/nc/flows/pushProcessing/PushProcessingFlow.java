@@ -26,15 +26,15 @@ import org.springframework.integration.annotation.MessagingGateway;
 
 import java.util.concurrent.Future;
 
-import static com.obj.nc.flows.pushProcessing.PushProcessingFlowConfig.PUSH_SEND_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.pushProcessing.PushProcessingFlowConfig.PUSH_SEND_FLOW_OUTPUT_CHANNEL_ID;
+import static com.obj.nc.flows.pushProcessing.PushProcessingFlowConfig.PUSH_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.pushProcessing.PushProcessingFlowConfig.PUSH_PROCESSING_FLOW_OUTPUT_CHANNEL_ID;
 
 @MessagingGateway(errorChannel = ErrorHandlingFlowConfig.ERROR_CHANNEL_NAME)
 public interface PushProcessingFlow {
 
 	@Gateway(
-            requestChannel = PUSH_SEND_FLOW_INPUT_CHANNEL_ID, 
-            replyChannel = PUSH_SEND_FLOW_OUTPUT_CHANNEL_ID
+            requestChannel = PUSH_PROCESSING_FLOW_INPUT_CHANNEL_ID, 
+            replyChannel = PUSH_PROCESSING_FLOW_OUTPUT_CHANNEL_ID
     )
     Future<PushMessage> sendPushMessage(PushMessage msg);
     

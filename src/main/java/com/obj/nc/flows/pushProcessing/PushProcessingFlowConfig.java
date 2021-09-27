@@ -37,26 +37,26 @@ import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO
 @RequiredArgsConstructor
 public class PushProcessingFlowConfig {
 	
-	public final static String PUSH_SEND_FLOW_ID = "PUSH_SEND_FLOW_ID";
-	public final static String PUSH_SEND_FLOW_INPUT_CHANNEL_ID = PUSH_SEND_FLOW_ID + "_INPUT";
-	public final static String PUSH_SEND_FLOW_OUTPUT_CHANNEL_ID = PUSH_SEND_FLOW_ID + "_OUTPUT";
+	public final static String PUSH_PROCESSING_FLOW_ID = "PUSH_PROCESSING_FLOW_ID";
+	public final static String PUSH_PROCESSING_FLOW_INPUT_CHANNEL_ID = PUSH_PROCESSING_FLOW_ID + "_INPUT";
+	public final static String PUSH_PROCESSING_FLOW_OUTPUT_CHANNEL_ID = PUSH_PROCESSING_FLOW_ID + "_OUTPUT";
 	
 	private final PushSender pushSender;
 	private final MessagePersister messagePersister;
 	private final EndpointPersister endpointPersister; 
 	private final ThreadPoolTaskScheduler executor;
 	
-	@Bean(PUSH_SEND_FLOW_INPUT_CHANNEL_ID)
+	@Bean(PUSH_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel pushSendInputChannel() {
 		return new PublishSubscribeChannel(executor);
 	}
 	
-	@Bean(PUSH_SEND_FLOW_OUTPUT_CHANNEL_ID)
+	@Bean(PUSH_PROCESSING_FLOW_OUTPUT_CHANNEL_ID)
 	public MessageChannel pushSendOutputChannel() {
 		return new PublishSubscribeChannel(executor);
 	}
 	
-	@Bean(PUSH_SEND_FLOW_ID)
+	@Bean(PUSH_PROCESSING_FLOW_ID)
 	public IntegrationFlow pushSendFlow() {
 		return IntegrationFlows
 				.from(pushSendInputChannel())
