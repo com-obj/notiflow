@@ -28,6 +28,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
 
+import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
+import com.obj.nc.domain.endpoints.push.TopicPushEndpoint;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -44,7 +46,9 @@ import lombok.NoArgsConstructor;
 @JsonSubTypes({ 
 	@Type(value = EmailEndpoint.class, name = EmailEndpoint.JSON_TYPE_IDENTIFIER), 
 	@Type(value = MailchimpEndpoint.class, name = MailchimpEndpoint.JSON_TYPE_IDENTIFIER),
-	@Type(value = SmsEndpoint.class, name = SmsEndpoint.JSON_TYPE_IDENTIFIER)
+	@Type(value = SmsEndpoint.class, name = SmsEndpoint.JSON_TYPE_IDENTIFIER),
+	@Type(value = DirectPushEndpoint.class, name = DirectPushEndpoint.JSON_TYPE_IDENTIFIER),
+	@Type(value = TopicPushEndpoint.class, name = TopicPushEndpoint.JSON_TYPE_IDENTIFIER)
 })
 @Data
 @NoArgsConstructor

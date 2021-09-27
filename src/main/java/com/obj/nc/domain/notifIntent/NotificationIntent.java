@@ -22,6 +22,8 @@ package com.obj.nc.domain.notifIntent;
 import com.obj.nc.domain.HasPreviousIntentIds;
 import com.obj.nc.domain.content.mailchimp.MailchimpContent;
 import com.obj.nc.domain.content.mailchimp.TemplatedMailchimpContent;
+import com.obj.nc.domain.content.push.PushContent;
+import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
 import com.obj.nc.domain.message.*;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.GenericEventRepository;
@@ -182,6 +184,13 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 			mailChimp.setBody((MailchimpContent)msgContent);
 			
 			return mailChimp;
+		}
+		
+		if (msgContent instanceof PushContent) {
+			PushMessage push = Message.newTypedMessageFrom(PushMessage.class, this);
+			push.setBody((PushContent)msgContent);
+			
+			return push;
 		}
 
 		throw new NotImplementedException("Add additional cases");
