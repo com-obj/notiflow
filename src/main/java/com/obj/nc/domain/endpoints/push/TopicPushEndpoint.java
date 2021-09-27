@@ -24,8 +24,6 @@ import lombok.*;
 
 @Data
 @EqualsAndHashCode(callSuper=false, of = "topic")
-@RequiredArgsConstructor
-@NoArgsConstructor
 @Builder
 public class TopicPushEndpoint extends PushEndpoint {
     

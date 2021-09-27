@@ -38,6 +38,9 @@ public class FirebaseConfiguration {
     
     @PostConstruct
     public void initialize() {
+        if (properties.getServiceAccountFilePath() == null) {
+            return;
+        }
         try {
             FileInputStream serviceAccount = new FileInputStream(properties.getServiceAccountFilePath());
             FirebaseOptions options = FirebaseOptions

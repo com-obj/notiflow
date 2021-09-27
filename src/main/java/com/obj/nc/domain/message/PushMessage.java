@@ -38,8 +38,8 @@ public class PushMessage extends Message<PushContent> {
     }
     
     @Override
-    public List<? extends PushEndpoint> getReceivingEndpoints() {
-        return (List<? extends PushEndpoint>) super.getReceivingEndpoints();
+    public List<PushEndpoint> getReceivingEndpoints() {
+        return (List<PushEndpoint>) super.getReceivingEndpoints();
     }
     
     @Override

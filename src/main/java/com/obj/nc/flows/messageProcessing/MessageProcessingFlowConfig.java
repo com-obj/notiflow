@@ -24,6 +24,7 @@ import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConf
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.mailchimpSending.TemplatedMailchimpMessageProcessingFlowConfig.MAILCHIMP_TEMPLATE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.pushProcessing.PushProcessingFlowConfig.PUSH_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 import com.obj.nc.domain.message.*;
@@ -73,6 +74,7 @@ public class MessageProcessingFlowConfig {
 						recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof SmsMessageTemplated).
 						recipient(MAILCHIMP_TEMPLATE_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof TemplatedMailchimpMessage).
 						recipient(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID, m-> m instanceof MailchimpMessage).
+						recipient(PUSH_SEND_FLOW_INPUT_CHANNEL_ID, m-> m instanceof PushMessage).
 						defaultOutputToParentFlow()
 				)
 				.get();

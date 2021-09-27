@@ -24,8 +24,6 @@ import lombok.*;
 
 @Data
 @EqualsAndHashCode(callSuper=false, of = "token")
-@RequiredArgsConstructor
-@NoArgsConstructor
 @Builder
 public class DirectPushEndpoint extends PushEndpoint {
     

@@ -30,4 +30,18 @@ public abstract class PushEndpoint extends ReceivingEndpoint {
     
     public abstract Message.Builder getFcmMessageBuilder();
     
+    public static PushEndpoint ofTopic(String topic) {
+        return TopicPushEndpoint
+                .builder()
+                .topic(topic)
+                .build();
+    }
+    
+    public static PushEndpoint ofToken(String token) {
+        return DirectPushEndpoint
+                .builder()
+                .token(token)
+                .build();
+    }
+    
 }

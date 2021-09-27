@@ -19,19 +19,24 @@
 
 package com.obj.nc.functions.processors.senders;
 
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.push.PushContent;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.domain.endpoints.push.PushEndpoint;
 import com.obj.nc.domain.message.PushMessage;
+import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 
 @Log4j2
 @Primary
@@ -40,13 +45,32 @@ import org.springframework.stereotype.Component;
 @DocumentProcessingInfo
 public class PushSender extends ProcessorFunctionAdapter<PushMessage, PushMessage> {
     
-    private final FirebaseApp firebaseApp;
+    @Override
+    protected Optional<PayloadValidationException> checkPreCondition(PushMessage payload) {
+        Optional<PayloadValidationException> exception = super.checkPreCondition(payload);
+        if (exception.isPresent()) {
+            return exception;
+        }
+    
+        List<? extends ReceivingEndpoint> endpoints = payload.getReceivingEndpoints();
+    
+        if (endpoints.size() != 1) {
+            return Optional.of(new PayloadValidationException("PushSender can send to only one recipient. Found more: " + endpoints));
+        }
+    
+        ReceivingEndpoint endpoint = endpoints.get(0);
+        if (!(endpoint instanceof PushEndpoint)) {
+            return Optional.of(new PayloadValidationException("PushSender can send to PushEndpoint endpoints only. Found " + endpoint));
+        }
+        
+        return Optional.empty();
+    }
     
     @Override
     protected PushMessage execute(PushMessage payload) {
         PushContent content = payload.getBody();
         
-        Message pushMsg = payload
+        Message firebaseMessage = payload
                 .getReceivingEndpoints()
                 .get(0)
                 .getFcmMessageBuilder()
@@ -62,8 +86,8 @@ public class PushSender extends ProcessorFunctionAdapter<PushMessage, PushMessag
     
         try {
             String fcmMessageId = FirebaseMessaging
-                    .getInstance(firebaseApp)
-                    .send(pushMsg);
+                    .getInstance()
+                    .send(firebaseMessage);
             
             payload.setAttributeValue("fcmMessageId", fcmMessageId);
         } catch (FirebaseMessagingException e) {
