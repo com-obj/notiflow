@@ -58,6 +58,73 @@ spring.mail.username=john_doe
 spring.mail.password=pwd
 
 ```
+
+## Send Push notification
+This example illustrates how to send push notification to one specific device using [push processing flow](flows.md#pushProcessingFlow). 
+Notiflow uses [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) for sending 
+[Android](https://firebase.google.com/docs/cloud-messaging/android/client), 
+[iOS](https://firebase.google.com/docs/cloud-messaging/ios/client), 
+[Web](https://firebase.google.com/docs/cloud-messaging/js/client) and other push notifications. 
+To set up client applications, please refer to included links. 
+To be able to communicate with FCM, you need to add path to your Firebase service account file to your _application.properties_ file.
+
+```properties
+
+nc.firebase.service-account-file-path=$HOME/.firebase/service-account-key.json
+
+```
+
+Inject _PushProcessingFlow_ bean into your sending service.
+
+
+```java
+
+    @Service
+    @RequiredArgsConstructor
+    public class SendPushService {
+        
+        // inject push processing flow bean
+        private final PushProcessingFlow pushProcessingFlow;
+        
+        public PushMessage createMessage(PushEndpoint endpoint, String subject, String msgText) {
+            
+            PushMessage message = new PushMessage();
+            message.setBody(
+                    PushContent
+                            .builder()
+                            .subject(subject)
+                            .text(msgText)
+                            .build()
+            );
+            message.setReceivingEndpoints(
+                    Collections.singletonList(endpoint)
+            );
+            return message;
+        }
+        
+        public void send(PushMessage message) {
+            pushProcessingFlow.sendPushMessage(message);
+        }
+    
+    }
+
+```
+
+Then you can create message and send it to desired endpoint.
+
+```java
+
+    public void sendDirectPush() {
+        PushEndpoint endpoint = PushEndpoint.ofToken("someAndroidDeviceFCMToken");
+        
+        PushMessage message = pushService
+            .createMessage(endpoint, "Subject", "Hello World!");
+        
+        pushService.send(message);
+    }
+
+```
+
 ## Convert custom application event to Message
 
 Covering custom event is very common use-case for notiflow. This separation of responsibility ensures that client application does its job and only emits application events if something important happens. The processing of such events, with regards to notification of users or 3rd parties, is in the responsibility of notiflow. 
