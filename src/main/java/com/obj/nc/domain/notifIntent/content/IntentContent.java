@@ -25,7 +25,9 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.obj.nc.domain.content.push.PushContent;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
+import com.obj.nc.domain.endpoints.push.PushEndpoint;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.http.MediaType;
 
@@ -109,6 +111,12 @@ public class IntentContent extends BaseJSONObject {
 //					.build();
 //			
 //			return smsContent;
+		} else if (endpoint instanceof PushEndpoint) {
+			return PushContent
+					.builder()
+					.subject(getSubject())
+					.text(getBody())
+					.build();
 		} else {
 			throw new NotImplementedException();
 		}

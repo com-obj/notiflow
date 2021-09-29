@@ -23,6 +23,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
+import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
+import com.obj.nc.domain.endpoints.push.TopicPushEndpoint;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -48,6 +50,20 @@ public class ReceivingEndpointRowMapper implements RowMapper<ReceivingEndpoint> 
             MailchimpEndpoint mailChimpEndpoint = new MailchimpEndpoint(rs.getString("endpoint_name"));
             mailChimpEndpoint.setId((UUID)rs.getObject("id"));
             return mailChimpEndpoint;
+        } else if (DirectPushEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
+            DirectPushEndpoint directPushEndpoint = DirectPushEndpoint
+                    .builder()
+                    .token(rs.getString("endpoint_name"))
+                    .build();
+            directPushEndpoint.setId((UUID)rs.getObject("id"));
+            return directPushEndpoint;
+        } else if (TopicPushEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
+            TopicPushEndpoint topicPushEndpoint = TopicPushEndpoint
+                    .builder()
+                    .topic(rs.getString("endpoint_name"))
+                    .build();
+            topicPushEndpoint.setId((UUID)rs.getObject("id"));
+            return topicPushEndpoint;
         } else {
             throw new RuntimeException("Uknown endpoint type for EndpointsRepository: "+ epType);
         }
