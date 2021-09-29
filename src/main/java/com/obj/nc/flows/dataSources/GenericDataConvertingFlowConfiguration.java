@@ -26,9 +26,10 @@ import com.obj.nc.routers.MessageOrIntentRouter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-
-import static com.obj.nc.flows.inputEventRouting.config.InputEventExtensionConvertingFlowConfig.EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT_CHANNEL_ID;
+import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @Configuration
 @RequiredArgsConstructor
@@ -41,12 +42,18 @@ public class GenericDataConvertingFlowConfiguration {
     private final ExtensionsBasedGenericData2NotificationConverter genericData2NotificationsConverter;
     private final MessageOrIntentRouter messageOrIntentRouter;
     private final GenericEventPersister genericEventPersister;
+    private final ThreadPoolTaskScheduler executor;
+    
+    @Bean(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
+    public PublishSubscribeChannel genericDataConvertingFlowInputChannel() {
+        return new PublishSubscribeChannel(executor);
+    }
     
     @Bean(GENERIC_DATA_CONVERTING_FLOW_ID)
     public IntegrationFlow genericDataConvertingFlow() {
-        return flow -> flow
+        return IntegrationFlows
+                .from(genericDataConvertingFlowInputChannel())
                 .publishSubscribeChannel(spec -> spec
-                        .id(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
                         .subscribe(subFlow -> subFlow
                                 .handle(genericData2EventsConverter)
                                 .split()
@@ -55,7 +62,8 @@ public class GenericDataConvertingFlowConfiguration {
                                 .handle(genericData2NotificationsConverter)
                                 .split()
                                 .route(messageOrIntentRouter))
-                );
+                )
+                .get();
     }
     
 }

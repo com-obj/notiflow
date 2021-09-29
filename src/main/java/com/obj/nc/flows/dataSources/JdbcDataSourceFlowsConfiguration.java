@@ -2,17 +2,16 @@ package com.obj.nc.flows.dataSources;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.dataObject.GenericData;
-import com.obj.nc.flows.dataSources.DataSourceFlowsProperties.ExpiryCheck;
-import com.obj.nc.flows.dataSources.DataSourceFlowsProperties.JdbcDataSource;
-import com.obj.nc.flows.dataSources.DataSourceFlowsProperties.Job;
+import com.obj.nc.flows.dataSources.properties.DataSourceFlowsProperties;
+import com.obj.nc.flows.dataSources.properties.jdbc.ExpiryCheck;
+import com.obj.nc.flows.dataSources.properties.jdbc.JdbcDataSource;
+import com.obj.nc.flows.dataSources.properties.jdbc.Job;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.Transformers;
+import org.springframework.integration.dsl.*;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.integration.jdbc.JdbcPollingChannelAdapter;
 import org.springframework.integration.json.ObjectToJsonTransformer.ResultType;
@@ -30,13 +29,13 @@ import static org.springframework.integration.dsl.Pollers.cron;
 
 @Configuration
 @RequiredArgsConstructor
-public class DataSourceFlowsConfiguration {
+public class JdbcDataSourceFlowsConfiguration {
     
     private final DataSourceFlowsProperties dataSourceFlowsProperties;
     private final IntegrationFlowContext integrationFlowContext;
     
     @PostConstruct
-    public void initCustomDataSources() {
+    public void createJdbcDataSourceFlows() {
         List<CustomDataSource> customDataSources = dataSourceFlowsProperties
                 .getJdbc()
                 .stream()
@@ -84,7 +83,7 @@ public class DataSourceFlowsConfiguration {
         return IntegrationFlows
                 .from(jdbcPollingChannelAdapter, c -> c
                         .poller(cron(jobCron))
-                        .id(createJobFlowId(dataSourceName, jobName).concat("_POLLER")))
+                        .id(createJobPollerId(dataSourceName, jobName)))
                 .transform(Transformers.toJson(ResultType.NODE))
                 .split() // split ArrayNode to JsonNode-s
                 .aggregate() // aggregate JsonNode-s to List<JsonNode>
@@ -100,9 +99,9 @@ public class DataSourceFlowsConfiguration {
     private String createJobQuery(Job job) {
         String query = String.format("select * from %s", job.getTableName());
         
-        ExpiryCheck expiryCheck = job.getExpiryCheck();
-        
-        if (expiryCheck != null) {
+        if (job.isExpiryCheckJob()) {
+            ExpiryCheck expiryCheck = job.getExpiryCheck();
+            
             query = query.concat(String.format(" where %s <= '%s'", 
                     expiryCheck.getColumnName(), 
                     Timestamp.from(Instant.now().plus(expiryCheck.getDaysUntilExpiry(), ChronoUnit.DAYS))));
@@ -112,11 +111,16 @@ public class DataSourceFlowsConfiguration {
     }
     
     private String createJobFlowId(String dataSourceName, String jobName) {
-        return "NC_CUSTOM_DATA_SOURCE_"
+        return "NC_JDBC_DATA_SOURCE_"
                 .concat(dataSourceName)
-                .concat(".")
+                .concat("_")
                 .concat(jobName)
                 .concat("_INTEGRATION_FLOW");
+    }
+    
+    private String createJobPollerId(String dataSourceName, String jobName) {
+        return createJobFlowId(dataSourceName, jobName)
+                .concat("_POLLER");
     }
     
     @Data

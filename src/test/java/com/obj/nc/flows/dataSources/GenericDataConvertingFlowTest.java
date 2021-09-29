@@ -44,10 +44,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.assertj.core.api.AbstractObjectAssert;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,7 +114,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
         // then
         Awaitility
                 .await()
-                .atMost(3, TimeUnit.SECONDS)
+                .atMost(5, TimeUnit.SECONDS)
                 .until(() -> deliveryInfoRepository.countByStatus(SENT) >= 2);
     
         List<DeliveryInfo> infos = deliveryInfoRepository
