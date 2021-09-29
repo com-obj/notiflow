@@ -50,7 +50,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
@@ -90,8 +89,8 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
     	
     	pollableSource.start();    	
     	
-    	JsonUtils.resetObjectMapper();
-    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
+//    	JsonUtils.resetObjectMapper();
+//    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
     }
 	
     @Test
@@ -126,7 +125,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 
 				@Override
 				public Optional<PayloadValidationException> canHandle(GenericEvent payload) {
-					if (payload.getPayloadAsPojo() instanceof TestPayload) {
+					if (payload.getPayloadAsPojo(TestPayload.class) != null) {
 						return Optional.empty();
 					}
 					
@@ -155,7 +154,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 
 				@Override
 				public Optional<PayloadValidationException> canHandle(GenericEvent payload) {
-					if (payload.getPayloadAsPojo() instanceof TestPayload) {
+					if (payload.getPayloadAsPojo(TestPayload.class) != null) {
 						return Optional.empty();
 					}
 					
@@ -182,7 +181,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
     @AllArgsConstructor
     @NoArgsConstructor
     @JsonTypeInfo(use = Id.CLASS)
-    public static class TestPayload implements IsTypedJson {
+    public static class TestPayload {
     	
     	private Integer num;
     	private String str;

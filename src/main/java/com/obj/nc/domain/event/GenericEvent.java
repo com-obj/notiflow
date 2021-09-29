@@ -37,7 +37,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ObjectArrays;
 import com.obj.nc.domain.HasFlowId;
 import com.obj.nc.domain.HasJsonPayload;
-import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.utils.JsonUtils;
@@ -154,8 +153,8 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	}
 	
 	@JsonIgnore
-	public <T extends IsTypedJson> T getPayloadAsPojo() {
-		return (T)JsonUtils.readObjectFromJSON(payloadJson, IsTypedJson.class);
+	public <T> T getPayloadAsPojo(Class<T> pojoClass) {
+		return JsonUtils.readObjectFromJSON(payloadJson, pojoClass);
 	}
 	
 	@Override

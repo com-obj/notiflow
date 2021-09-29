@@ -48,7 +48,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.headers.ProcessingInfo;
@@ -89,8 +88,8 @@ public class ProcessingInfoGeneratorTest {
         jdbcTemplate.execute("truncate table nc_processing_info");
         jdbcTemplate.execute("truncate table nc_endpoint cascade");
         
-    	JsonUtils.resetObjectMapper();
-    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
+//    	JsonUtils.resetObjectMapper();
+//    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
     }
     
 	@Test
@@ -133,7 +132,7 @@ public class ProcessingInfoGeneratorTest {
     @JsonTypeInfo(include = As.PROPERTY, use = Id.NAME)
     @JsonSubTypes({ 
     	@Type(value = TestPayload.class, name = "TYPE_NAME")})
-    public static class TestPayload implements IsTypedJson {
+    public static class TestPayload {
     	
     	private String content;
     }

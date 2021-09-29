@@ -44,7 +44,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
 import com.obj.nc.testUtils.BaseIntegrationTest;
@@ -79,8 +78,8 @@ public class TypeIDInputEventRoutingIntegrationTests extends BaseIntegrationTest
     public void startSourcePolling() {
     	pollableSource.start();
     	
-    	JsonUtils.resetObjectMapper();
-    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
+//    	JsonUtils.resetObjectMapper();
+//    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
     }
 
     
@@ -131,7 +130,7 @@ public class TypeIDInputEventRoutingIntegrationTests extends BaseIntegrationTest
     @JsonSubTypes({ 
     	@Type(value = TestPayload.class, name = "TYPE_1"),
     	@Type(value = TestPayload.class, name = "TYPE_2")})
-    public static class TestPayload implements IsTypedJson {
+    public static class TestPayload {
     	
     	private Integer num;
     	private String str;

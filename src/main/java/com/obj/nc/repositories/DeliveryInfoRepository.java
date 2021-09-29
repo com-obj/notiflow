@@ -35,6 +35,8 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
 	
 	List<DeliveryInfo> findByEventIdOrderByProcessedOn(UUID eventId);
 	
+	long countByStatus(DELIVERY_STATUS status);
+	
 	List<DeliveryInfo> findByStatus(DELIVERY_STATUS status);
 	
 	long countByEventIdAndStatus(UUID eventId, DELIVERY_STATUS status);

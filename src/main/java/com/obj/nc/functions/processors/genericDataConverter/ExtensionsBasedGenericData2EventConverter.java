@@ -19,7 +19,6 @@
 
 package com.obj.nc.functions.processors.genericDataConverter;
 
-import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.converterExtensions.ConverterExtension;
 import com.obj.nc.converterExtensions.genericData.GenericData2EventConverterExtension;
 import com.obj.nc.domain.dataObject.GenericData;
@@ -32,10 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@DocumentProcessingInfo
-@RequiredArgsConstructor(onConstructor_= @Autowired(required = false))
+@RequiredArgsConstructor
 public class ExtensionsBasedGenericData2EventConverter extends BaseExtensionsBasedGenericDataConverter<GenericEvent> {
 	
+	@Autowired(required = false)
 	private final List<GenericData2EventConverterExtension> converters = new ArrayList<>();
 	
 	@Override

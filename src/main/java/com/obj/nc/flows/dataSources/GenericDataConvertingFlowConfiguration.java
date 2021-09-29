@@ -21,6 +21,7 @@ package com.obj.nc.flows.dataSources;
 
 import com.obj.nc.functions.processors.genericDataConverter.ExtensionsBasedGenericData2EventConverter;
 import com.obj.nc.functions.processors.genericDataConverter.ExtensionsBasedGenericData2NotificationConverter;
+import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
 import com.obj.nc.routers.MessageOrIntentRouter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -36,9 +37,10 @@ public class GenericDataConvertingFlowConfiguration {
     public static final String GENERIC_DATA_CONVERTING_FLOW_ID = "GENERIC_DATA_CONVERTING_FLOW_ID";
     public static final String GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID = GENERIC_DATA_CONVERTING_FLOW_ID + "_INPUT";
     
-    private final ExtensionsBasedGenericData2EventConverter genericData2EventConverters;
-    private final ExtensionsBasedGenericData2NotificationConverter genericData2NotificationConverters;
+    private final ExtensionsBasedGenericData2EventConverter genericData2EventsConverter;
+    private final ExtensionsBasedGenericData2NotificationConverter genericData2NotificationsConverter;
     private final MessageOrIntentRouter messageOrIntentRouter;
+    private final GenericEventPersister genericEventPersister;
     
     @Bean(GENERIC_DATA_CONVERTING_FLOW_ID)
     public IntegrationFlow genericDataConvertingFlow() {
@@ -46,10 +48,12 @@ public class GenericDataConvertingFlowConfiguration {
                 .publishSubscribeChannel(spec -> spec
                         .id(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
                         .subscribe(subFlow -> subFlow
-                                .handle(genericData2EventConverters)
-                                .channel(EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT_CHANNEL_ID))
+                                .handle(genericData2EventsConverter)
+                                .split()
+                                .handle(genericEventPersister))
                         .subscribe(subFlow -> subFlow
-                                .handle(genericData2NotificationConverters)
+                                .handle(genericData2NotificationsConverter)
+                                .split()
                                 .route(messageOrIntentRouter))
                 );
     }

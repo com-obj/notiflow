@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
@@ -471,7 +470,7 @@ public class TestDataRestController {
     @NoArgsConstructor
     @AllArgsConstructor
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-    static class DummyEventPayload implements IsTypedJson {
+    static class DummyEventPayload {
     
         String stringField;
         Long longField;

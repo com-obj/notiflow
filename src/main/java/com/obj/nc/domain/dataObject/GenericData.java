@@ -21,14 +21,18 @@ package com.obj.nc.domain.dataObject;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.utils.JsonUtils;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class GenericData {
     
     private List<JsonNode> payloads;
