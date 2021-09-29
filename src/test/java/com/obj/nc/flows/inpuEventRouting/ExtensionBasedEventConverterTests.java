@@ -57,8 +57,8 @@ import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.flows.inputEventRouting.extensions.InputEvent2IntentConverterExtension;
-import com.obj.nc.flows.inputEventRouting.extensions.InputEvent2MessageConverterExtension;
+import com.obj.nc.converterExtensions.genericEvent.InputEvent2IntentConverterExtension;
+import com.obj.nc.converterExtensions.genericEvent.InputEvent2MessageConverterExtension;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
@@ -134,7 +134,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				}
 
 				@Override
-				public List<Message<?>> convertEvent(GenericEvent event) {
+				public List<Message<?>> convert(GenericEvent event) {
 					EmailMessage email1 = new EmailMessage();
 					email1.addReceivingEndpoints(
 						EmailEndpoint.builder().email("test@objectify.sk").build()
@@ -163,7 +163,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				}
 
 				@Override
-				public List<NotificationIntent> convertEvent(GenericEvent event) {
+				public List<NotificationIntent> convert(GenericEvent event) {
 					NotificationIntent email1Intent = NotificationIntent.createWithStaticContent(
 							"Subject", 
 							"Text", 

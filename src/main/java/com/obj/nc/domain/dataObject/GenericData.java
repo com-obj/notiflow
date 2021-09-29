@@ -17,10 +17,27 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.flows.inputEventRouting.extensions;
+package com.obj.nc.domain.dataObject;
 
-import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.utils.JsonUtils;
+import lombok.Builder;
+import lombok.Data;
 
-public interface InputEvent2IntentConverterExtension extends InputEventConverterExtension<NotificationIntent> {
-	
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Data
+@Builder
+public class GenericData {
+    
+    private List<JsonNode> payloads;
+    
+    public <T> List<T> getPayloadsAsPojo(Class<T> pojoClass) {
+        return payloads
+                .stream()
+                .map(node -> JsonUtils.readObjectFromJSON(node, pojoClass))
+                .collect(Collectors.toList());
+    }
+    
 }

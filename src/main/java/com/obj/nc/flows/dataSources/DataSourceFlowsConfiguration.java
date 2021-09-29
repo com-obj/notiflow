@@ -1,22 +1,21 @@
 package com.obj.nc.flows.dataSources;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.flows.dataSources.DataSourcesConfigurationProperties.ExpiryCheck;
-import com.obj.nc.flows.dataSources.DataSourcesConfigurationProperties.JdbcDataSource;
-import com.obj.nc.flows.dataSources.DataSourcesConfigurationProperties.Job;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
+import com.obj.nc.domain.dataObject.GenericData;
+import com.obj.nc.flows.dataSources.DataSourceFlowsProperties.ExpiryCheck;
+import com.obj.nc.flows.dataSources.DataSourceFlowsProperties.JdbcDataSource;
+import com.obj.nc.flows.dataSources.DataSourceFlowsProperties.Job;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.Transformers;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.integration.jdbc.JdbcPollingChannelAdapter;
+import org.springframework.integration.json.ObjectToJsonTransformer.ResultType;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -24,23 +23,21 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.obj.nc.flows.dataSources.GenericDataConvertingFlowConfiguration.GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID;
 import static org.springframework.integration.dsl.Pollers.cron;
 
 @Configuration
 @RequiredArgsConstructor
-@Log4j2
-public class DataSourcesConfiguration {
+public class DataSourceFlowsConfiguration {
     
-    private final DataSourcesConfigurationProperties dataSourcesProperties;
-    private final IntegrationFlowContext flowContext;
-    private final GenericEventPersister genericEventPersister;
+    private final DataSourceFlowsProperties dataSourceFlowsProperties;
+    private final IntegrationFlowContext integrationFlowContext;
     
     @PostConstruct
     public void initCustomDataSources() {
-        List<CustomDataSource> customDataSources = dataSourcesProperties
+        List<CustomDataSource> customDataSources = dataSourceFlowsProperties
                 .getJdbc()
                 .stream()
                 .map(dataSourceProperties -> {
@@ -68,31 +65,35 @@ public class DataSourcesConfiguration {
                                 customDataSource.getDataSource(),
                                 createJobQuery(job));
     
-                        flowContext
-                                .registration(createJobIntegrationFlow(job, jdbcPollingChannelAdapter))
-                                .id(createJobFlowId(job))
+                        integrationFlowContext
+                                .registration(createJobIntegrationFlow(
+                                        jdbcPollingChannelAdapter,
+                                        customDataSource.getProperties().getName(),
+                                        job.getName(),
+                                        job.getCron()))
+                                .id(createJobFlowId(customDataSource.getProperties().getName(), job.getName()))
                                 .register();
                     });
         });
     }
     
-    private IntegrationFlow createJobIntegrationFlow(Job job, JdbcPollingChannelAdapter jdbcPollingChannelAdapter) {
+    private IntegrationFlow createJobIntegrationFlow(JdbcPollingChannelAdapter jdbcPollingChannelAdapter,
+                                                     String dataSourceName,
+                                                     String jobName,
+                                                     String jobCron) {
         return IntegrationFlows
                 .from(jdbcPollingChannelAdapter, c -> c
-                        .poller(cron(job.getCron()))
-                        .id(createJobFlowId(job).concat("_POLLER")))
-                .transform(resultSet -> JsonNodeFactory.instance
-                        .objectNode()
-                        .putPOJO("resultSet", resultSet)
-                        .put("description", job.getDescription())
-                        .put("templatePath", job.getTemplatePath()))
-                .transform(objectNode -> GenericEvent
-                        .builder()
-                        .id(UUID.randomUUID())
-                        .flowId(job.getFullName())
-                        .payloadJson((JsonNode) objectNode)
-                        .build())
-                .handle(genericEventPersister)
+                        .poller(cron(jobCron))
+                        .id(createJobFlowId(dataSourceName, jobName).concat("_POLLER")))
+                .transform(Transformers.toJson(ResultType.NODE))
+                .split() // split ArrayNode to JsonNode-s
+                .aggregate() // aggregate JsonNode-s to List<JsonNode>
+                .<List<JsonNode>, GenericData>transform(nodes -> 
+                        GenericData
+                                .builder()
+                                .payloads(nodes)
+                                .build())
+                .channel(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
                 .get();
     }
     
@@ -110,9 +111,11 @@ public class DataSourcesConfiguration {
         return query;
     }
     
-    private String createJobFlowId(Job job) {
+    private String createJobFlowId(String dataSourceName, String jobName) {
         return "NC_CUSTOM_DATA_SOURCE_"
-                .concat(job.getFullName())
+                .concat(dataSourceName)
+                .concat(".")
+                .concat(jobName)
                 .concat("_INTEGRATION_FLOW");
     }
     

@@ -30,7 +30,7 @@ import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.flows.inputEventRouting.extensions.InputEventConverterExtension;
+import com.obj.nc.converterExtensions.genericEvent.InputEventConverterExtension;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import lombok.AllArgsConstructor;
@@ -59,9 +59,6 @@ public class ExtensionsBasedEventConvertor extends ProcessorFunctionAdapter<Gene
 		
 		for (InputEventConverterExtension<? extends IsNotification> p: eventProcessors) {
 			Optional<PayloadValidationException> errors = p.canHandle(payload);
-			if (!p.getFlowId().equals(payload.getFlowId())) {
-				
-			}
 			if (!errors.isPresent()) {
 				matchingProcessors.add(p);
 				continue;
@@ -79,7 +76,7 @@ public class ExtensionsBasedEventConvertor extends ProcessorFunctionAdapter<Gene
 	protected List<IsNotification> execute(GenericEvent payload) {
 		return 
 				findMatchingEventProcessors(payload).stream()
-					.map(p -> p.convertEvent(payload))
+					.map(p -> p.convert(payload))
 					.peek(notifications -> notifications.stream()
 						.filter(notification -> !notification.getPreviousEventIds().contains(payload.getEventId()))
 						.forEach(notification -> notification.addPreviousEventId(payload.getId())))

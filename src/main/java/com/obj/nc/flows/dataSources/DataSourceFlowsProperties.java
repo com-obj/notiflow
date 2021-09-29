@@ -18,7 +18,7 @@ import java.util.List;
 @Validated
 @Configuration
 @ConfigurationProperties("nc.data-sources")
-public class DataSourcesConfigurationProperties {
+public class DataSourceFlowsProperties {
     
     @UniqueElements
     private List<JdbcDataSource> jdbc = new ArrayList<>();
@@ -36,7 +36,7 @@ public class DataSourcesConfigurationProperties {
     @Data
     @EqualsAndHashCode(of = "name")
     @ToString(of = "name")
-    static class JdbcDataSource {
+    public static class JdbcDataSource {
         @NotEmpty
         private String name;
         @NotEmpty
@@ -52,7 +52,7 @@ public class DataSourcesConfigurationProperties {
     @Data
     @EqualsAndHashCode(of = "name")
     @ToString(of = "name")
-    static class Job {
+    public static class Job {
         @NotEmpty
         private String name;
         private String fullName;
@@ -66,7 +66,7 @@ public class DataSourcesConfigurationProperties {
     }
     
     @Data
-    static class ExpiryCheck {
+    public static class ExpiryCheck {
         @NotEmpty
         private String columnName;
         @NotNull

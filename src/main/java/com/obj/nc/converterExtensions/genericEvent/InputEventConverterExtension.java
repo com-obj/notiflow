@@ -17,10 +17,12 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.flows.inputEventRouting.extensions;
+package com.obj.nc.converterExtensions.genericEvent;
 
-import com.obj.nc.domain.message.Message;
+import com.obj.nc.converterExtensions.ConverterExtension;
+import com.obj.nc.domain.IsNotification;
+import com.obj.nc.domain.event.GenericEvent;
 
-public interface InputEvent2MessageConverterExtension extends InputEventConverterExtension<Message<?>> {
-	
+public interface InputEventConverterExtension<RESULT_TYPE extends IsNotification> 
+		extends ConverterExtension<GenericEvent, RESULT_TYPE> {
 }

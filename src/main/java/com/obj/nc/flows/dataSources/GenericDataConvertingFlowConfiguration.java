@@ -1,0 +1,57 @@
+/*
+ *   Copyright (C) 2021 the original author or authors.
+ *
+ *   This file is part of Notiflow
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.obj.nc.flows.dataSources;
+
+import com.obj.nc.functions.processors.genericDataConverter.ExtensionsBasedGenericData2EventConverter;
+import com.obj.nc.functions.processors.genericDataConverter.ExtensionsBasedGenericData2NotificationConverter;
+import com.obj.nc.routers.MessageOrIntentRouter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.dsl.IntegrationFlow;
+
+import static com.obj.nc.flows.inputEventRouting.config.InputEventExtensionConvertingFlowConfig.EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT_CHANNEL_ID;
+
+@Configuration
+@RequiredArgsConstructor
+public class GenericDataConvertingFlowConfiguration {
+    
+    public static final String GENERIC_DATA_CONVERTING_FLOW_ID = "GENERIC_DATA_CONVERTING_FLOW_ID";
+    public static final String GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID = GENERIC_DATA_CONVERTING_FLOW_ID + "_INPUT";
+    
+    private final ExtensionsBasedGenericData2EventConverter genericData2EventConverters;
+    private final ExtensionsBasedGenericData2NotificationConverter genericData2NotificationConverters;
+    private final MessageOrIntentRouter messageOrIntentRouter;
+    
+    @Bean(GENERIC_DATA_CONVERTING_FLOW_ID)
+    public IntegrationFlow genericDataConvertingFlow() {
+        return flow -> flow
+                .publishSubscribeChannel(spec -> spec
+                        .id(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
+                        .subscribe(subFlow -> subFlow
+                                .handle(genericData2EventConverters)
+                                .channel(EVENT_CONVERTING_EXTENSION_FLOW_ID_INPUT_CHANNEL_ID))
+                        .subscribe(subFlow -> subFlow
+                                .handle(genericData2NotificationConverters)
+                                .route(messageOrIntentRouter))
+                );
+    }
+    
+}

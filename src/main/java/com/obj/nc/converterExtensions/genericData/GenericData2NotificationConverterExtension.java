@@ -17,13 +17,12 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-drop table if exists payload;
+package com.obj.nc.converterExtensions.genericData;
 
-create table payload (
-    expiry_date timestamp not null
-);
+import com.obj.nc.converterExtensions.ConverterExtension;
+import com.obj.nc.domain.IsNotification;
+import com.obj.nc.domain.dataObject.GenericData;
 
-insert into payload (expiry_date)
-values ('2021-08-20 08:44:12.444541'),
-       ('2021-10-20 08:44:12.444541'),
-       ('2021-09-22 08:44:12.444541');
+public interface GenericData2NotificationConverterExtension
+        extends ConverterExtension<GenericData, IsNotification> {
+}
