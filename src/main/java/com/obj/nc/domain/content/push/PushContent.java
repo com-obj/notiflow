@@ -17,28 +17,20 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.config;
+package com.obj.nc.domain.content.push;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import com.obj.nc.domain.content.MessageContent;
+import lombok.*;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-@Configuration
-@ConfigurationProperties(prefix = "postgres")
-public class PostgresConfigurationProperties {
-
-    private String dockerImage;
-
-    private String user;
-
-    private String password;
-
-    private String databaseName;
-
-    private int hostPort;
-
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class PushContent extends MessageContent {
+    
+    private String subject;
+    private String text;
+    private String iconUrl;
+    
 }
