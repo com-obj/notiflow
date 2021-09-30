@@ -1,6 +1,7 @@
 package com.obj.nc.flows.dataSources;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.Get;
 import com.obj.nc.domain.dataObject.GenericData;
 import com.obj.nc.flows.dataSources.properties.DataSourceFlowsProperties;
 import com.obj.nc.flows.dataSources.properties.jdbc.ExpiryCheck;
@@ -33,6 +34,7 @@ public class JdbcDataSourceFlowsConfiguration {
     
     private final DataSourceFlowsProperties dataSourceFlowsProperties;
     private final IntegrationFlowContext integrationFlowContext;
+    private final Get get;
     
     @PostConstruct
     public void createJdbcDataSourceFlows() {
@@ -46,6 +48,8 @@ public class JdbcDataSourceFlowsConfiguration {
                             .username(dataSourceProperties.getUsername())
                             .password(dataSourceProperties.getPassword())
                             .build();
+                    
+                    get.registerBean(createDataSourceId(dataSourceProperties.getName()), DataSource.class);
                     
                     return CustomDataSource
                             .builder()
@@ -109,9 +113,12 @@ public class JdbcDataSourceFlowsConfiguration {
         return query;
     }
     
+    private String createDataSourceId(String dataSourceName) {
+        return "NC_JDBC_DATA_SOURCE_".concat(dataSourceName);
+    }
+    
     private String createJobFlowId(String dataSourceName, String jobName) {
-        return "NC_JDBC_DATA_SOURCE_"
-                .concat(dataSourceName)
+        return createDataSourceId(dataSourceName)
                 .concat("_")
                 .concat(jobName)
                 .concat("_INTEGRATION_FLOW");

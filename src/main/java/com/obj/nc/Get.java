@@ -25,6 +25,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -72,6 +73,13 @@ public class Get {
 	
 	public static boolean isInitalised() {
 		return getApplicationContext() != null;
+	}
+	
+	public void registerBean(String beanName, Class<?> beanClass) {
+		if (applicationContext instanceof GenericApplicationContext) {
+			((GenericApplicationContext) applicationContext)
+					.registerBean(beanName, beanClass);
+		}
 	}
 	
 	//we need all of them.. in tests
