@@ -68,8 +68,7 @@ public class JdbcDataSourceFlowsConfiguration {
                                 .registration(createJobIntegrationFlow(
                                         jdbcPollingChannelAdapter,
                                         customDataSource.getProperties().getName(),
-                                        job.getName(),
-                                        job.getCron()))
+                                        job))
                                 .id(createJobFlowId(customDataSource.getProperties().getName(), job.getName()))
                                 .register();
                     });
@@ -78,12 +77,11 @@ public class JdbcDataSourceFlowsConfiguration {
     
     private IntegrationFlow createJobIntegrationFlow(JdbcPollingChannelAdapter jdbcPollingChannelAdapter,
                                                      String dataSourceName,
-                                                     String jobName,
-                                                     String jobCron) {
+                                                     Job job) {
         return IntegrationFlows
                 .from(jdbcPollingChannelAdapter, c -> c
-                        .poller(cron(jobCron))
-                        .id(createJobPollerId(dataSourceName, jobName)))
+                        .poller(cron(job.getCron()))
+                        .id(createJobPollerId(dataSourceName, job.getName())))
                 .transform(Transformers.toJson(ResultType.NODE))
                 .split() // split ArrayNode to JsonNode-s
                 .aggregate() // aggregate JsonNode-s to List<JsonNode>
@@ -91,19 +89,20 @@ public class JdbcDataSourceFlowsConfiguration {
                         GenericData
                                 .builder()
                                 .payloads(nodes)
+                                .metadata(job.toMetadata())
                                 .build())
                 .channel(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
                 .get();
     }
     
     private String createJobQuery(Job job) {
-        String query = String.format("select * from %s", job.getTableName());
+        String query = String.format("select * from %s", job.getEntityName());
         
         if (job.isExpiryCheckJob()) {
             ExpiryCheck expiryCheck = job.getExpiryCheck();
             
             query = query.concat(String.format(" where %s <= '%s'", 
-                    expiryCheck.getColumnName(), 
+                    expiryCheck.getFieldName(), 
                     Timestamp.from(Instant.now().plus(expiryCheck.getDaysUntilExpiry(), ChronoUnit.DAYS))));
         }
         

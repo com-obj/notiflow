@@ -19,6 +19,7 @@
 
 package com.obj.nc.flows.dataSources.properties.jdbc;
 
+import com.obj.nc.domain.dataObject.GenericData;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -28,12 +29,22 @@ public class Job {
     @NotEmpty
     private String name;
     @NotEmpty
-    private String tableName;
+    private String entityName;
     @NotEmpty
     private String cron;
+    
     private ExpiryCheck expiryCheck;
     
     public boolean isExpiryCheckJob() {
         return expiryCheck != null;
     }
+    
+    public GenericData.Metadata toMetadata() {
+        return GenericData.Metadata
+                .builder()
+                .entityName(entityName)
+                .isExpiryCheck(isExpiryCheckJob())
+                .build();
+    }
+    
 }

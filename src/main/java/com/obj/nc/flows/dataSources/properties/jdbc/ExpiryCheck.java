@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ExpiryCheck {
     @NotEmpty
-    private String columnName;
+    private String fieldName;
     @NotNull
     private long daysUntilExpiry;
 }
