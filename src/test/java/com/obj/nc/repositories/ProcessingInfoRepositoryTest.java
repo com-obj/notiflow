@@ -113,7 +113,7 @@ public class ProcessingInfoRepositoryTest extends BaseIntegrationTest {
 		assertThat(current.getStepName(), CoreMatchers.equalTo(expected.getStepName()));
 		assertThat(current.getPayloadJsonStart(), CoreMatchers.equalTo(expected.getPayloadJsonStart()));
 		assertThat(current.getStepDurationMs() , CoreMatchers.equalTo(expected.getStepDurationMs()));		
-		//diffrent precission in java an postgres
+		//different precission in java an postgres
 		assertThat(current.getTimeProcessingStart().truncatedTo(ChronoUnit.SECONDS) , CoreMatchers.equalTo(expected.getTimeProcessingStart().truncatedTo(ChronoUnit.SECONDS)));		
 		assertThat(current.getTimeProcessingEnd().truncatedTo(ChronoUnit.SECONDS) , CoreMatchers.equalTo(expected.getTimeProcessingEnd().truncatedTo(ChronoUnit.SECONDS)));		
 		

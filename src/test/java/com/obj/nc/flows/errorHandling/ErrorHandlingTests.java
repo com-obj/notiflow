@@ -74,7 +74,6 @@ import lombok.NoArgsConstructor;
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest(properties = {
 		"test-flow-gateway=true", //this is strange, if I don't make TestFlow1 conditional, some unrelated test fail because they don't see testInputChannel1
-		"spring.integration.channels.error.requireSubscribers=false" // https://docs.spring.io/spring-integration/reference/html/error-handling.html
 }) 
 public class ErrorHandlingTests {
 
