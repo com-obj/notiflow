@@ -60,6 +60,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -101,6 +102,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 .builder()
                 .num(3)
                 .str("str")
+                .instant(Instant.now())
                 .build();
     
         GenericData genericData = GenericData
@@ -135,7 +137,8 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 .extracting(message -> message.get().getBody())
                 .asInstanceOf(type(EmailContent.class))
                 .extracting(content -> content.getText())
-                .isEqualTo(text);
+                .asString()
+                .contains(text);
     }
     
     @TestConfiguration
@@ -159,7 +162,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                             EmailEndpoint.builder().email("test@objectify.sk").build()
                     );
                     email1.getBody().setSubject("Subject");
-                    email1.getBody().setText("GenericData2NotificationConverterExtension");
+                    email1.getBody().setText("GenericData2NotificationConverterExtension"+JsonUtils.writeObjectToJSONString(payload.getPayloadsAsPojo(TestPayload.class)));
                     return Arrays.asList(email1);
                 }
             };
@@ -210,7 +213,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                             EmailEndpoint.builder().email("test@objectify.sk").build()
                     );
                     email1.getBody().setSubject("Subject");
-                    email1.getBody().setText("InputEvent2MessageConverterExtension");
+                    email1.getBody().setText("InputEvent2MessageConverterExtension"+JsonUtils.writeObjectToJSONString(event.getPayloadAsPojo(TestPayload.class)));
                 
                     List<com.obj.nc.domain.message.Message<?>> msg = Arrays.asList(email1);
                 
@@ -224,11 +227,12 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
     public static class TestPayload {
         
         private Integer num;
         private String str;
+        private Instant instant;
+        
     }
     
     @RegisterExtension

@@ -7,6 +7,7 @@ import com.obj.nc.flows.dataSources.properties.DataSourceFlowsProperties;
 import com.obj.nc.flows.dataSources.properties.jdbc.ExpiryCheck;
 import com.obj.nc.flows.dataSources.properties.jdbc.JdbcDataSource;
 import com.obj.nc.flows.dataSources.properties.jdbc.Job;
+import com.obj.nc.utils.JsonUtils;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -86,7 +87,7 @@ public class JdbcDataSourceFlowsConfiguration {
                 .from(jdbcPollingChannelAdapter, c -> c
                         .poller(cron(job.getCron()))
                         .id(createJobPollerId(dataSourceName, job.getName())))
-                .transform(Transformers.toJson(ResultType.NODE))
+                .transform(Transformers.toJson(JsonUtils.getJsonObjectMapper(), ResultType.NODE))
                 .split() // split ArrayNode to JsonNode-s
                 .aggregate() // aggregate JsonNode-s to List<JsonNode>
                 .<List<JsonNode>, GenericData>transform(nodes -> 
