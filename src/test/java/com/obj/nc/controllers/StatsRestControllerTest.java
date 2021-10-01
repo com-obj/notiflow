@@ -38,6 +38,7 @@ import com.obj.nc.utils.JsonUtils;
 import lombok.Builder;
 import lombok.Data;
 import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -72,23 +73,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class StatsRestControllerTest extends BaseIntegrationTest {
     
-	@Autowired private GenericEventRepository genericEventRepository;
-	@Autowired private EndpointsRepository endpointsRepository;
-	@Autowired private DeliveryInfoRepository deliveryInfoRepository;
-	@Autowired private NotificationIntentProcessingFlow intentProcessingFlow;
+    @Autowired private GenericEventRepository genericEventRepository;
+    @Autowired private EndpointsRepository endpointsRepository;
+    @Autowired private DeliveryInfoRepository deliveryInfoRepository;
+    @Autowired private NotificationIntentProcessingFlow intentProcessingFlow;
     @Autowired private NcAppConfigProperties ncAppConfigProperties;
-	@Autowired protected MockMvc mockMvc;
+    @Autowired protected MockMvc mockMvc;
     
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
-            .withConfiguration(
-                    GreenMailConfiguration.aConfig()
-                            .withUser("no-reply@objectify.sk", "xxx"))
-            .withPerMethodLifecycle(true);
+        .withConfiguration(
+                GreenMailConfiguration.aConfig()
+                        .withUser("no-reply@objectify.sk", "xxx"))
+        .withPerMethodLifecycle(true);
 
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
     	purgeNotifTables(jdbcTemplate);
+    }
+
+    @AfterEach
+    public void wiatForIntegrationFlowsToFinish() {
+        super.wiatForIntegrationFlowsToFinish(500000);
     }
     
     @Test
@@ -109,9 +115,9 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.intentsCount").value(CoreMatchers.is(1)))
                 .andExpect(jsonPath("$.messagesCount").value(CoreMatchers.is(4)))
                 .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(2)))
-                .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(2)))
+                .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
                 .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(0)));
+                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(1)));
     }
     
     @Test
@@ -148,7 +154,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
         event = genericEventRepository.save(event);
         
         EmailEndpoint emailEndpoint = EmailEndpoint.builder().email("johndoe@objectify.sk").build();
-        EmailEndpoint emailEndpoint2 = EmailEndpoint.builder().email("johndudly@objectify.sk").build();
+        EmailEndpoint emailEndpoint2 = EmailEndpoint.builder().email("invalid email").build();
         
         NotificationIntent intent = NotificationIntent.createWithStaticContent("Subject", "Text");
         intent.getHeader().setFlowId("default-flow");
@@ -158,13 +164,8 @@ class StatsRestControllerTest extends BaseIntegrationTest {
         
         intentProcessingFlow.processNotificationIntent(intent);
         
-        GenericEvent finalEvent = event;
-        await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByEventIdAndStatus(finalEvent.getId(), SENT) >= 1);
-        List<DeliveryInfo> sentInfos = deliveryInfoRepository
-                .findByStatus(SENT)
-                .stream()
-                .filter(sentInfo -> sentInfo.getMessageId() != null)
-                .collect(Collectors.toList());
+        await().atMost(5, TimeUnit.SECONDS).until(() ->  findSentDeliveryInfosForMessage().size() >= 1);
+        List<DeliveryInfo> sentInfos = findSentDeliveryInfosForMessage();
         
         ResultActions resp1 = mockMvc
                 .perform(MockMvcRequestBuilders
@@ -176,6 +177,15 @@ class StatsRestControllerTest extends BaseIntegrationTest {
         
         await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(sentInfos.get(0).getMessageId(), READ) >= 1);
         return event;
+    }
+
+    private List<DeliveryInfo> findSentDeliveryInfosForMessage() {
+        List<DeliveryInfo> sentInfos = deliveryInfoRepository
+            .findByStatus(SENT)
+            .stream()
+            .filter(sentInfo -> sentInfo.getMessageId() != null)
+            .collect(Collectors.toList());
+        return sentInfos;
     }
     
     @Data

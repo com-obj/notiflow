@@ -59,12 +59,23 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 		
 		org.springframework.messaging.Message<?> failedMsg = failedPayloadExtractor.apply(failedPayload);
 		Object payload = failedMsg.getPayload();
+        		
+		List<DeliveryInfo> results= new ArrayList<>();
 		
 		List<? extends ReceivingEndpoint> endpoints = extracteEndpoints(payload);
 		
-		List<DeliveryInfo> results= new ArrayList<>();		
+        if (endpoints.size() == 0) {
+            DeliveryInfo infoBuilder = DeliveryInfo.builder()
+				.status(DELIVERY_STATUS.FAILED)
+				.failedPayloadId(failedPayload.getId())
+                .build();
+            
+            results.add(infoBuilder);
+        }
 		
-		for (ReceivingEndpoint endpoint: endpoints) {
+        //TODO: should we duplicate the deliveryInfosHere for each dimension? Maybe we should introduce LIst<UUID> for intentId, eventId, messageId
+        //or should there be eventId, intentId at all? is it not that it makes sence to only calculate Delivery info for message and endpoint?
+        for (ReceivingEndpoint endpoint: endpoints) {
 			
 			if (payload instanceof HasPreviousEventIds) {
 				List<UUID> eventIds = ((HasPreviousEventIds) payload).getPreviousEventIds();
