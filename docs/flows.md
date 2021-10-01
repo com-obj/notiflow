@@ -174,6 +174,12 @@ The responsiblity of this flow is to
  
  * send Email message using [MailChimp transactional API](https://mailchimp.com/developer/transactional/). Formating of the email is in responsibility of MailChimp
 
+## Push processing Flow <span id="pushProcessingFlow"/>
+![push-processing-flow](diagrams/png/push-processing-flow.png)
+The responsiblity of this flow is to
+
+* send Push notification using [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) to target topic or device
+
 ## Error handling flow
 ![delivery-info-flow](diagrams/png/noti-flow-error-flow.png)
 

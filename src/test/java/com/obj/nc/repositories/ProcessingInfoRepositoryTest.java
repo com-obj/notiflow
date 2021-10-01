@@ -23,16 +23,22 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.assertj.core.api.Assertions;
+
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.obj.nc.domain.event.GenericEvent;
@@ -48,6 +54,7 @@ public class ProcessingInfoRepositoryTest extends BaseIntegrationTest {
 
 	@Autowired ProcessingInfoRepository infoRepository;
 	@Autowired GenericEventRepository eventRepo;
+	@Autowired JdbcTemplate jdbcTemplate;
 	
 	@Test
 	public void testPersistingSingleInfo() {
@@ -58,7 +65,7 @@ public class ProcessingInfoRepositoryTest extends BaseIntegrationTest {
 		Optional<ProcessingInfo> infoInDb = infoRepository.findById(transientInfo.getProcessingId());
 		
 		Assertions.assertThat(infoInDb.isPresent()).isTrue();
-		assertCurrentIsExpected(transientInfo, infoInDb.get());
+		assertCurrentIsExpected(infoInDb.get(), transientInfo);
 	}	
 	
 	@Test
@@ -66,14 +73,16 @@ public class ProcessingInfoRepositoryTest extends BaseIntegrationTest {
 		//GIVEN
 		ProcessingInfo transientInfo = createSimpleProcessingInfo();
 		
+		//IF
 		infoRepository.save(transientInfo);
 		
+		//THEN
 		List<ProcessingInfo> infosInDb = infoRepository.findByAnyEventIdAndStepName(transientInfo.getEventIds()[0], "stepName");
 		
 		Assertions.assertThat(infosInDb.size()).isEqualTo(1);
 		ProcessingInfo persistedPI = infosInDb.iterator().next();
 		
-       assertCurrentIsExpected(transientInfo, persistedPI);
+       assertCurrentIsExpected(persistedPI, transientInfo);
 	}
 	
 	@Test
@@ -103,9 +112,11 @@ public class ProcessingInfoRepositoryTest extends BaseIntegrationTest {
 		assertThat(current.getDiffJson(), CoreMatchers.equalTo(expected.getDiffJson()));
 		assertThat(current.getStepName(), CoreMatchers.equalTo(expected.getStepName()));
 		assertThat(current.getPayloadJsonStart(), CoreMatchers.equalTo(expected.getPayloadJsonStart()));
-		assertThat(current.getStepDurationMs(), CoreMatchers.equalTo(expected.getStepDurationMs()));
-		assertThat(current.getTimeProcessingStart(), CoreMatchers.equalTo(expected.getTimeProcessingStart()));
-		assertThat(current.getTimeProcessingEnd(), CoreMatchers.equalTo(expected.getTimeProcessingEnd()));
+		assertThat(current.getStepDurationMs() , CoreMatchers.equalTo(expected.getStepDurationMs()));		
+		//different precission in java an postgres
+		assertThat(current.getTimeProcessingStart().truncatedTo(ChronoUnit.SECONDS) , CoreMatchers.equalTo(expected.getTimeProcessingStart().truncatedTo(ChronoUnit.SECONDS)));		
+		assertThat(current.getTimeProcessingEnd().truncatedTo(ChronoUnit.SECONDS) , CoreMatchers.equalTo(expected.getTimeProcessingEnd().truncatedTo(ChronoUnit.SECONDS)));		
+		
 		assertThat(current.getEventIds(), CoreMatchers.equalTo(expected.getEventIds()));
 	}
 
