@@ -13,10 +13,13 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.integration.config.IntegrationConverter;
 import org.springframework.integration.dsl.*;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.integration.jdbc.JdbcPollingChannelAdapter;
 import org.springframework.integration.json.ObjectToJsonTransformer.ResultType;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -135,6 +138,17 @@ public class JdbcDataSourceFlowsConfiguration {
     static class CustomDataSource {
         private JdbcDataSource properties;
         private DataSource dataSource;
+    }
+    
+    @Component
+    @IntegrationConverter
+    public static class TimestampToInstantConverter implements Converter<Timestamp, Instant> {
+    
+        @Override
+        public Instant convert(Timestamp source) {
+            return source.toInstant();
+        }
+        
     }
     
 }
