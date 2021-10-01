@@ -224,6 +224,7 @@ public class JsonUtils {
 			objectMapper = new ObjectMapper();
 			objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 			objectMapper.registerModule(new JavaTimeModule());
+			objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		}
 		return objectMapper;
 	}
