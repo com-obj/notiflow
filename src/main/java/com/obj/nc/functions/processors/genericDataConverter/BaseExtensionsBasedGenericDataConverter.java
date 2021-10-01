@@ -37,12 +37,11 @@ public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends Proce
     
     @Override
     protected Optional<PayloadValidationException> checkPreCondition(GenericData genericData) {
-        List<ConverterExtension<GenericData, OUT>> processors = findMatchingConverters(genericData);
-        if (processors.size() > 0) {
-            return Optional.empty();
+        if (genericData == null) {
+            return Optional.of(new PayloadValidationException("GenericData instance must not be null"));
         }
         
-        return Optional.of(new PayloadValidationException("No ConverterExtension is able to handle " + genericData + ". The paylod won't be transformed and thus will not be processed"));
+        return Optional.empty();
     }
     
     private List<ConverterExtension<GenericData, OUT>> findMatchingConverters(GenericData genericData) {
