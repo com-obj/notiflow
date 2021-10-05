@@ -39,10 +39,11 @@ import com.obj.nc.functions.sink.failedPaylodPersister.FailedPayloadPersister;
  * async, spring would put failed message from error handling flow back to the errorChannel
  * @return
  */
-@Configuration
+//@Configuration TODO: uncomment when error handling works
 public class ErrorHandlingFlowConfig {
 	
 	public static final String ERROR_CHANNEL_NAME = "errorChannel";
+/*  TODO: uncomment when error handling works
 	
 	//Default channel for errorMessages used by spring
 	@Qualifier(ERROR_CHANNEL_NAME)
@@ -62,5 +63,6 @@ public class ErrorHandlingFlowConfig {
 				.handle(failedPayloadPersister)
         		.get();
     }
+*/
 
 }
