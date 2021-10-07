@@ -50,6 +50,11 @@ public class SpringMessageToFailedPayloadFunction extends ProcessorFunctionAdapt
 	@Override
 	protected FailedPayload execute(ErrorMessage errorMessage) {	
 		try {
+            if (!(errorMessage.getPayload() instanceof MessagingException)) {
+                log.error(SpringMessageToFailedPayloadFunction.class.getName() + "can only handle errorMessage with payload of type MessagingException. Got: " +errorMessage.getPayload());
+                return null;
+            }
+
 			MessagingException exMsg =  (MessagingException)errorMessage.getPayload();
 			Throwable exception = exMsg.getCause();
 			

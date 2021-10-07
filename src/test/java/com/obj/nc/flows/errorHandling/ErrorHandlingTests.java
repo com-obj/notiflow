@@ -24,6 +24,7 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeoutException;
 import com.obj.nc.domain.HasReceivingEndpoints;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import org.awaitility.Awaitility;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -49,7 +52,9 @@ import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
@@ -59,8 +64,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.controllers.ErrorHandlingRestController;
+import com.obj.nc.flows.errorHandling.ErrorHandlingTests.TestModeTestConfiguration.FailingFailedPayloadPersister;
 import com.obj.nc.flows.errorHandling.ErrorHandlingTests.TestModeTestConfiguration.TestFlow1;
 import com.obj.nc.flows.errorHandling.domain.FailedPayload;
+import com.obj.nc.functions.processors.failedPaylodPersister.FailedPayloadPersister;
 import com.obj.nc.repositories.FailedPayloadRepository;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
@@ -76,11 +83,14 @@ import lombok.NoArgsConstructor;
 		"test-flow-gateway=true", //this is strange, if I don't make TestFlow1 conditional, some unrelated test fail because they don't see testInputChannel1
 }) 
 public class ErrorHandlingTests {
+	
+    private static final String TEST_EXCEPTION_MESSAGE = "test exception message";
 
-	@Autowired FailedPayloadRepository failedPayloadRepo;
+    @Autowired FailedPayloadRepository failedPayloadRepo;
 	@Autowired TestFlow1 testFlow1;
 	@Autowired ErrorHandlingRestController errorHandlingController;
 	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;
+    @Autowired FailedPayloadPersister failedPayloadPersister;
 	
 	private static boolean processingFinished;
 	
@@ -118,10 +128,32 @@ public class ErrorHandlingTests {
 		Awaitility.await().atMost(3, TimeUnit.SECONDS).until(() -> processingFinished == true);
 	}
 	
+	@Test
+	public void testPayloadWithErrorProducedFailingErrorHandlingAndNoCycles() throws InterruptedException, ExecutionException, TimeoutException {
+        //WHEN
+        ((FailingFailedPayloadPersister)failedPayloadPersister).setShouldFail(true);
+
+        //AND WHEN
+		TestPayload payload = TestPayload.builder().str("ss").build();
+ 
+        ExecutionException thrown = Assertions.assertThrows(ExecutionException.class, () -> {
+            //THEN test should failed with nullpoint and should not cycle in error handling
+            Future<TestPayload> result = testFlow1.execute(payload);
+            result.get();
+        });
+
+        Assertions.assertTrue(thrown.getCause() instanceof NullPointerException);
+        Assertions.assertTrue(thrown.getCause().getMessage().equals(TEST_EXCEPTION_MESSAGE) );
+
+ 	}
+
 	
     @TestConfiguration	
     @EnableIntegrationManagement
     public static class TestModeTestConfiguration {
+
+        @Autowired FailedPayloadRepository failedPayloadRepo;
+        @Autowired private ThreadPoolTaskScheduler executor;
 
         @Bean
         public IntegrationFlow errorProducingFlow1() {
@@ -140,7 +172,7 @@ public class ErrorHandlingTests {
         
         @Bean(name = "testInputChannel1")
         public MessageChannel testInputChannel1() {
-        	return new PublishSubscribeChannel();
+        	return new PublishSubscribeChannel(executor);
         }
         
         @MessagingGateway(name = "TestFlow1", errorChannel = ErrorHandlingFlowConfig.ERROR_CHANNEL_NAME)
@@ -150,6 +182,32 @@ public class ErrorHandlingTests {
         	@Gateway(requestChannel = "testInputChannel1")
         	Future<TestPayload> execute(TestPayload payload);
         	
+        }
+
+        @Bean
+        @Primary
+        public FailedPayloadPersister failedPayloadPersister() {
+            return new FailingFailedPayloadPersister(failedPayloadRepo);
+        }
+
+        @Data
+        public static class FailingFailedPayloadPersister extends FailedPayloadPersister {
+
+            private boolean shouldFail = false;
+
+            public FailingFailedPayloadPersister(FailedPayloadRepository failedPayloadRepo) {
+                super(failedPayloadRepo);
+            }
+
+            @Override
+            protected FailedPayload execute(FailedPayload failedPaylod) {
+                if (shouldFail) {
+                    throw new NullPointerException(TEST_EXCEPTION_MESSAGE);
+                }
+
+                return super.execute(failedPaylod);
+            }
+
         }
 
     }

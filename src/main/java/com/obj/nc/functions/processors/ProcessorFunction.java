@@ -46,9 +46,9 @@ public abstract class ProcessorFunction<IN, OUT> implements Function<IN, OUT> {
 			throw error.get();
 		}
 
-        log.debug(this.getClass().getSimpleName() + ".execution START");
+        log.debug(this.getClass().getSimpleName() + ".execution START: {}", input);
 		OUT result = execution().apply(input);    
-        log.debug(this.getClass().getSimpleName() + ".execution END");
+        log.debug(this.getClass().getSimpleName() + ".execution END: {}", result);
 
         return result;
 	}

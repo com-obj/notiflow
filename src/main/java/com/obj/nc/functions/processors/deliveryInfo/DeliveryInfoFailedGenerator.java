@@ -65,12 +65,8 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 		List<? extends ReceivingEndpoint> endpoints = extracteEndpoints(payload);
 		
         if (endpoints.size() == 0) {
-            DeliveryInfo infoBuilder = DeliveryInfo.builder()
-				.status(DELIVERY_STATUS.FAILED)
-				.failedPayloadId(failedPayload.getId())
-                .build();
-            
-            results.add(infoBuilder);
+            log.info("Cannot extract endpoints from fayled payload. Not possible to create failed delivery infos for failed paylod " + failedPayload );
+            return results;
         }
 		
         //TODO: should we duplicate the deliveryInfosHere for each dimension? Maybe we should introduce LIst<UUID> for intentId, eventId, messageId
