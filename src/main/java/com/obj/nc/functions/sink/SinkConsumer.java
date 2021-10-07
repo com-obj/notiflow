@@ -25,17 +25,24 @@ import java.util.function.Consumer;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public abstract class SinkConsumer<IN> implements Consumer<IN> {
 
 	@Override
 	public void accept(IN input) {
+        log.debug(this.getClass().getSimpleName() + ".preCondition START");
 		Optional<PayloadValidationException> error = preCondition().apply(input);
+        log.debug(this.getClass().getSimpleName() + ".preCondition END");
 
 		if (error.isPresent()) {
 			throw error.get();
 		}
 
+        log.debug(this.getClass().getSimpleName() + ".execution START: {}",input);
 		execution().accept(input);
+        log.debug(this.getClass().getSimpleName() + ".execution END");
 	}
 	
 	public abstract PreCondition<IN> preCondition();

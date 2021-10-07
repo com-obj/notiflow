@@ -17,12 +17,13 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.functions.sink.failedPaylodPersister;
+package com.obj.nc.functions.processors.failedPaylodPersister;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.obj.nc.flows.errorHandling.domain.FailedPayload;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.sink.SinkConsumerAdapter;
 import com.obj.nc.repositories.FailedPayloadRepository;
 
@@ -32,16 +33,16 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @AllArgsConstructor
 @Log4j2
-public class FailedPayloadPersister extends SinkConsumerAdapter<FailedPayload> {
+public class FailedPayloadPersister extends ProcessorFunctionAdapter<FailedPayload, FailedPayload> {
 
     @Autowired
     private FailedPayloadRepository failedPayloadRepo;
 
 
 	@Override
-	protected void execute(FailedPayload failedPaylod) {
+	protected FailedPayload execute(FailedPayload failedPaylod) {
 		try {
-			failedPayloadRepo.save(failedPaylod);
+			return failedPayloadRepo.save(failedPaylod);
 		} catch (Exception e) {
 			log.error("Error ocurred in Error handling flow: ", e);
 			throw e;

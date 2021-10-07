@@ -214,7 +214,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     	failedPayloadRepo.save(failedPaylod);
         
         //WHEN
-        List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistFailedDeliveryInfo(failedPaylod).get(1, TimeUnit.SECONDS);
+        List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistFailedDeliveryInfo(failedPaylod);
 
 
         //THEN check infos

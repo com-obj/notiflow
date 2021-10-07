@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -39,6 +40,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.obj.nc.Get;
@@ -59,8 +61,12 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     @Autowired Get get;
     @Autowired(required = false) //not all tests require, some might not be @SpringBootTests 
     DeliveryInfoRepository deliveryInfoRepo;
+    @Autowired ThreadPoolTaskScheduler executor;
+
     
     public static void purgeNotifTables(@Autowired JdbcTemplate jdbcTemplate) {
+        log.info("Purging all tables in test");
+        
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
         jdbcTemplate.batchUpdate("delete from nc_delivery_info");
         jdbcTemplate.batchUpdate("delete from nc_endpoint");        
@@ -184,5 +190,9 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
     	Get.setApplicationContext(applicationContext);
     }
+
+	public void wiatForIntegrationFlowsToFinish(int numberOfSeconds) {
+		Awaitility.await().atMost(Duration.ofSeconds(numberOfSeconds)).until(() -> executor.getActiveCount()==0);   		
+	}
 
 }
