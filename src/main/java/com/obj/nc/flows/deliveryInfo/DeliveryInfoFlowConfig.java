@@ -20,7 +20,6 @@
 package com.obj.nc.flows.deliveryInfo;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -28,6 +27,8 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+import lombok.extern.log4j.Log4j2;
 
 import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoFailedGenerator;
 import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoPersister;
@@ -41,18 +42,20 @@ public class DeliveryInfoFlowConfig {
 	
 	public final static String DELIVERY_INFO_SEND_FLOW_ID = "DELIVERY_INFO_SEND_FLOW_ID";
 	public final static String DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID = DELIVERY_INFO_SEND_FLOW_ID + "_INPUT";
+    public final static String DELIVERY_INFO_SEND_FLOW_OUTPUT_CHANNEL_ID = DELIVERY_INFO_SEND_FLOW_ID + "_OUTPUT";
 	
 	public final static String DELIVERY_INFO_PROCESSING_FLOW_ID = "DELIVERY_INFO_PROCESSING_FLOW_ID";
 	public final static String DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID = DELIVERY_INFO_PROCESSING_FLOW_ID + "_INPUT";
+	public final static String DELIVERY_INFO_PROCESSING_FLOW_OUTPUT_CHANNEL_ID = DELIVERY_INFO_PROCESSING_FLOW_ID + "_OUTPUT";
 	
 	public final static String DELIVERY_INFO_FAILED_FLOW_ID = "DELIVERY_INFO_FAILED_FLOW_ID";
 	public final static String DELIVERY_INFO_FAILED_FLOW_INPUT_CHANNEL_ID = DELIVERY_INFO_FAILED_FLOW_ID + "_INPUT";
+	public final static String DELIVERY_INFO_FAILED_FLOW_OUTPUT_CHANNEL_ID = DELIVERY_INFO_FAILED_FLOW_ID + "_OUTPUT";
 	
 	public final static String DELIVERY_INFO_READ_FLOW_ID = "DELIVERY_INFO_READ_FLOW_ID";
 	public final static String DELIVERY_INFO_READ_FLOW_INPUT_CHANNEL_ID = DELIVERY_INFO_READ_FLOW_ID + "_INPUT";
+    public final static String DELIVERY_INFO_READ_FLOW_OUTPUT_CHANNEL_ID = DELIVERY_INFO_READ_FLOW_ID + "_OUTPUT";
 	
-	public final static String DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID = "DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID";
-
 	@Autowired private DeliveryInfoSendTransformer deliveryTransformer;
 	@Autowired private DeliveryInfoPersister deliveryInfoPersister;
 	@Autowired private DeliveryInfoSendGenerator deliveryInfoSendGenerator;
@@ -61,21 +64,27 @@ public class DeliveryInfoFlowConfig {
 	@Autowired private DeliveryInfoProcessingGenerator deliveryInfoProcessingGenerator;
 	@Autowired private ThreadPoolTaskScheduler executor;
 
-	//Default channel for errorMessages used by spring
-	@Autowired
-	@Qualifier("errorChannel")
-	private PublishSubscribeChannel errorChannel;
-
     @Bean
+    // process error handlind in single thread. In case exception is throw in the error hadnlind it self this prevents potential error handling infinite loog cycles. Check MessagePublishingErrorHandler.handleError
     public IntegrationFlow deliveryInfoFailedFlow() {
         return 
         	IntegrationFlows.from(deliveryInfoFailedInputChannel())
 				.handle(deliveryInfoFailedGenerator)
-//				.split()
 				.handle(deliveryInfoPersister)
-				.channel(DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID)
+				.channel(DELIVERY_INFO_FAILED_FLOW_OUTPUT_CHANNEL_ID)
         		.get();
     }
+
+    @Bean(DELIVERY_INFO_FAILED_FLOW_INPUT_CHANNEL_ID)
+	public MessageChannel deliveryInfoFailedInputChannel() {
+		return new PublishSubscribeChannel();
+	}
+
+    @Bean(DELIVERY_INFO_FAILED_FLOW_OUTPUT_CHANNEL_ID)
+	public MessageChannel deliveryInfoFailedOutputChannel() {
+		return new PublishSubscribeChannel();
+	}
+    ///////////////////////////////////////////////////////////////////////////
     
     @Bean
     public IntegrationFlow deliveryInfoSendFlow() {
@@ -84,11 +93,21 @@ public class DeliveryInfoFlowConfig {
 				.handle(deliveryInfoSendGenerator)
 				.split()
 				.handle(deliveryTransformer)
-//				.split()
 				.handle(deliveryInfoPersister)
-				.channel(DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID)
+				.channel(DELIVERY_INFO_SEND_FLOW_OUTPUT_CHANNEL_ID)
         		.get();
     }
+
+    @Bean(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
+	public MessageChannel deliveryInfoSendInputChannel() {
+		return new PublishSubscribeChannel(executor);
+	}
+
+    @Bean(DELIVERY_INFO_SEND_FLOW_OUTPUT_CHANNEL_ID)
+	public MessageChannel deliveryInfoSendOutputChannel() {
+		return new PublishSubscribeChannel(executor);
+	}
+    ///////////////////////////////////////////////////////////////////////////
     
     @Bean
     public IntegrationFlow deliveryInfoProcessingFlow() {
@@ -97,12 +116,22 @@ public class DeliveryInfoFlowConfig {
 				.handle(deliveryInfoProcessingGenerator)
 				.split()
 				.handle(deliveryTransformer)
-//				.split()
 				.handle(deliveryInfoPersister)
-				.channel(DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID)
+				.channel(DELIVERY_INFO_PROCESSING_FLOW_OUTPUT_CHANNEL_ID)
         		.get();
     }
-	
+
+    @Bean(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+	public MessageChannel deliveryInfoProcessingInputChannel() {
+		return new PublishSubscribeChannel(executor);
+	}
+
+    @Bean(DELIVERY_INFO_PROCESSING_FLOW_OUTPUT_CHANNEL_ID)
+	public MessageChannel deliveryInfoProcessingOutputChannel() {
+		return new PublishSubscribeChannel(executor);
+	}	
+    ///////////////////////////////////////////////////////////////////////////
+
 	@Bean
 	public IntegrationFlow deliveryInfoReadFlow() {
 		return
@@ -110,34 +139,18 @@ public class DeliveryInfoFlowConfig {
 				.handle(deliveryInfoReadGenerator)
 				.split()
 				.handle(deliveryTransformer)
-//				.split()
 				.handle(deliveryInfoPersister)
-				.channel(DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID)
+				.channel(DELIVERY_INFO_READ_FLOW_OUTPUT_CHANNEL_ID)
 				.get();
 	}
-    
-	@Bean(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
-	public MessageChannel deliveryInfoSendInputChannel() {
-		return new PublishSubscribeChannel(executor);
-	}
-	
-	@Bean(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
-	public MessageChannel deliveryInfoProcessingInputChannel() {
-		return new PublishSubscribeChannel(executor);
-	}
-	
-	@Bean(DELIVERY_INFO_FAILED_FLOW_INPUT_CHANNEL_ID)
-	public MessageChannel deliveryInfoFailedInputChannel() {
-		return new PublishSubscribeChannel(executor);
-	}
-	
-	@Bean(DELIVERY_INFO_READ_FLOW_INPUT_CHANNEL_ID)
+
+    @Bean(DELIVERY_INFO_READ_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel deliveryInfoReadInputChannel() {
 		return new PublishSubscribeChannel(executor);
 	}
-	
-	@Bean(DELIVERY_INFO_FLOW_OUTPUT_CHANNEL_ID)
-	public MessageChannel deliveryInfoOutputChannel() {
+
+    @Bean(DELIVERY_INFO_READ_FLOW_OUTPUT_CHANNEL_ID)
+	public MessageChannel deliveryInfoReadOutputChannel() {
 		return new PublishSubscribeChannel(executor);
 	}
 

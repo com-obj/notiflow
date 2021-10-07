@@ -25,6 +25,9 @@ import java.util.function.Function;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public abstract class ProcessorFunction<IN, OUT> implements Function<IN, OUT> {
 
 	@Override
@@ -35,13 +38,19 @@ public abstract class ProcessorFunction<IN, OUT> implements Function<IN, OUT> {
 	}
 
 	private OUT doPreConditionCheckAndExecute(IN input) {
+        log.debug(this.getClass().getSimpleName() + ".preCondition START");
 		Optional<PayloadValidationException> error = preCondition().apply(input);
+        log.debug(this.getClass().getSimpleName() + ".preCondition END");
 		
 		if (error.isPresent()) {
 			throw error.get();
 		}
-		
-		return execution().apply(input);
+
+        log.debug(this.getClass().getSimpleName() + ".execution START: {}", input);
+		OUT result = execution().apply(input);    
+        log.debug(this.getClass().getSimpleName() + ".execution END: {}", result);
+
+        return result;
 	}
 	
 	public abstract PreCondition<IN> preCondition();

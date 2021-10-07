@@ -19,7 +19,7 @@
 
 package com.obj.nc.flows.errorHandling;
 
-import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_FAILED_FLOW_INPUT_CHANNEL_ID;
+import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,39 +28,59 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.handler.LoggingHandler.Level;
+import org.springframework.messaging.MessageHeaders;
 
 import com.obj.nc.functions.processors.errorHandling.SpringMessageToFailedPayloadFunction;
-import com.obj.nc.functions.sink.failedPaylodPersister.FailedPayloadPersister;
+import com.obj.nc.functions.processors.failedPaylodPersister.FailedPayloadPersister;
 
-
-/**
- * One has to make sure that error in errorHandlingFlow doesn't cause infinite loop. Currently this is achieved by errorChannel not being async and thus 
- * sending message to this channel with errors will result in error propagation to the caller. If any step in the error processing chain would be 
- * async, spring would put failed message from error handling flow back to the errorChannel
- * @return
- */
 @Configuration
 public class ErrorHandlingFlowConfig {
 	
 	public static final String ERROR_CHANNEL_NAME = "errorChannel";
+	public static final String ERROR_CHANNEL_FOR_ERROR_HANDLING_FLOW_NAME = "errorChannelTerminal";
 	
 	//Default channel for errorMessages used by spring
 	@Qualifier(ERROR_CHANNEL_NAME)
 	@Autowired private PublishSubscribeChannel errorChannel;
-	@Autowired private SpringMessageToFailedPayloadFunction failedPayloadTransformer;
+
+	@Qualifier(ERROR_CHANNEL_FOR_ERROR_HANDLING_FLOW_NAME)
+	@Autowired private PublishSubscribeChannel errorChannelTerminal;
+
+    @Autowired private SpringMessageToFailedPayloadFunction failedPayloadTransformer;
 	@Autowired private FailedPayloadPersister failedPayloadPersister;
+	@Autowired private DeliveryInfoFlow deliveryInfoFlow;
 	
-	
+    /**
+     * Error handlind must be processed in single thread (no publish/subsribe channels with executors or similar are used). 
+     * In case exception is throw in the error hadnlind it self this prevents potential error handling infinite loog cycles. Check MessagePublishingErrorHandler.handleError		
+     */
     @Bean
     public IntegrationFlow errorPayloadReceivedFlowConfig() {
         return 
-        	IntegrationFlows.from(errorChannel)
-				.handle(failedPayloadTransformer)
-				.wireTap( flowConfig -> 
-					flowConfig.channel(DELIVERY_INFO_FAILED_FLOW_INPUT_CHANNEL_ID)
-				)
-				.handle(failedPayloadPersister)
+        	IntegrationFlows
+                .from(errorChannel)
+                .log(Level.WARN, "ERROR HANDLING")
+                .enrichHeaders(h -> h.header(MessageHeaders.ERROR_CHANNEL, ERROR_CHANNEL_FOR_ERROR_HANDLING_FLOW_NAME, true))
+				.handle(failedPayloadTransformer)                
+                .handle(failedPayloadPersister)
+                .handle(deliveryInfoFlow, "createAndPersistFailedDeliveryInfo")
+                .log(Level.DEBUG, "ERROR HANDLING FINISHED")
         		.get();
+    }
+
+    @Bean
+    public IntegrationFlow errorPayloadReceivedFromErrorHandlingFlowConfig() {
+        return 
+        	IntegrationFlows
+                .from(errorChannelTerminal)
+                .log(Level.ERROR, "ERROR HANDLING ocured in error handling flow")
+        		.get();
+    }
+
+    @Bean(ERROR_CHANNEL_FOR_ERROR_HANDLING_FLOW_NAME)
+    PublishSubscribeChannel errorChannelTerminal() {
+        return new PublishSubscribeChannel();
     }
 
 }
