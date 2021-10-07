@@ -17,29 +17,30 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.flows.dataSources.properties.jdbc;
+package com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import org.hibernate.validator.constraints.UniqueElements;
+import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotEmpty;
-import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(of = "name")
-@ToString(of = "name")
-public class JdbcDataSource {
-    @NotEmpty
-    private String name;
-    @NotEmpty
-    private String url;
-    @NotEmpty
-    private String username;
-    @NotEmpty
-    private String password;
-    @UniqueElements
-    private List<Job> jobs = new ArrayList<>();
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.domain.dataObject.GenericData;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+
+import lombok.AllArgsConstructor;
+
+@Component
+@AllArgsConstructor
+public class JsonNodeToGenericDataTransformer extends ProcessorFunctionAdapter<List<JsonNode>, GenericData> {
+
+    @Override
+	protected GenericData execute(List<JsonNode> jsonNodes) {
+        return GenericData
+            .builder()
+            .payloads(jsonNodes)
+            .build();
+	}
+
+
+
 }

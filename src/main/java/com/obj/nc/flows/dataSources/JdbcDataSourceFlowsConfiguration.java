@@ -5,8 +5,9 @@ import com.obj.nc.Get;
 import com.obj.nc.domain.dataObject.GenericData;
 import com.obj.nc.flows.dataSources.properties.DataSourceFlowsProperties;
 import com.obj.nc.flows.dataSources.properties.jdbc.ExpiryCheck;
-import com.obj.nc.flows.dataSources.properties.jdbc.JdbcDataSource;
-import com.obj.nc.flows.dataSources.properties.jdbc.Job;
+import com.obj.nc.flows.dataSources.properties.jdbc.JdbcDataSourceProperties;
+import com.obj.nc.flows.dataSources.properties.jdbc.JdbcJob;
+import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.JsonNodeToGenericDataTransformer;
 import com.obj.nc.utils.JsonUtils;
 import lombok.Builder;
 import lombok.Data;
@@ -20,9 +21,6 @@ import org.springframework.integration.json.ObjectToJsonTransformer.ResultType;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +34,7 @@ public class JdbcDataSourceFlowsConfiguration {
     private final DataSourceFlowsProperties dataSourceFlowsProperties;
     private final IntegrationFlowContext integrationFlowContext;
     private final Get get;
+    private final JsonNodeToGenericDataTransformer genericDataFactory;
     
     @PostConstruct
     public void createJdbcDataSourceFlows() {
@@ -82,7 +81,7 @@ public class JdbcDataSourceFlowsConfiguration {
     
     private IntegrationFlow createJobIntegrationFlow(JdbcPollingChannelAdapter jdbcPollingChannelAdapter,
                                                      String dataSourceName,
-                                                     Job job) {
+                                                     JdbcJob job) {
         return IntegrationFlows
                 .from(jdbcPollingChannelAdapter, c -> c
                         .poller(cron(job.getCron()))
@@ -90,28 +89,23 @@ public class JdbcDataSourceFlowsConfiguration {
                 .transform(Transformers.toJson(JsonUtils.getJsonObjectMapper(), ResultType.NODE))
                 .split() // split ArrayNode to JsonNode-s
                 .aggregate() // aggregate JsonNode-s to List<JsonNode>
-                .<List<JsonNode>, GenericData>transform(nodes -> 
-                        GenericData
-                                .builder()
-                                .payloads(nodes)
-                                .metadata(job.toMetadata())
-                                .build())
+                .handle(genericDataFactory)
                 .channel(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
                 .get();
     }
     
-    private String createJobQuery(Job job) {
-        String query = String.format("select * from %s", job.getEntityName());
+    private String createJobQuery(JdbcJob job) {
+        // String query = String.format("select * from %s", job.getEntityName());
         
-        if (job.isExpiryCheckJob()) {
-            ExpiryCheck expiryCheck = job.getExpiryCheck();
+        // if (job.isExpiryCheckJob()) {
+        //     ExpiryCheck expiryCheck = job.getExpiryCheck();
             
-            query = query.concat(String.format(" where %s <= '%s'", 
-                    expiryCheck.getFieldName(), 
-                    Timestamp.from(Instant.now().plus(expiryCheck.getDaysUntilExpiry(), ChronoUnit.DAYS))));
-        }
+        //     query = query.concat(String.format(" where %s <= '%s'", 
+        //             expiryCheck.getFieldName(), 
+        //             Timestamp.from(Instant.now().plus(expiryCheck.getDaysUntilExpiry(), ChronoUnit.DAYS))));
+        // }
         
-        return query;
+        return job.getSqlQuery();
     }
     
     private String createDataSourceId(String dataSourceName) {
@@ -133,7 +127,7 @@ public class JdbcDataSourceFlowsConfiguration {
     @Data
     @Builder
     static class CustomDataSource {
-        private JdbcDataSource properties;
+        private JdbcDataSourceProperties properties;
         private DataSource dataSource;
     }
     

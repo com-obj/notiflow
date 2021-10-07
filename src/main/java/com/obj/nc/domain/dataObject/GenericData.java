@@ -20,7 +20,6 @@
 package com.obj.nc.domain.dataObject;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.flows.dataSources.properties.jdbc.Job;
 import com.obj.nc.utils.JsonUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class GenericData {
     
-    private Metadata metadata;
+    // private Metadata metadata;
     private List<JsonNode> payloads;
     
     public <T> List<T> getPayloadsAsPojo(Class<T> pojoClass) {
@@ -46,11 +45,11 @@ public class GenericData {
                 .collect(Collectors.toList());
     }
     
-    @Data
-    @Builder
-    public static class Metadata {
-        private String entityName;
-        private boolean isExpiryCheck;
-    }
+    // @Data
+    // @Builder
+    // public static class Metadata {
+    //     private String entityName;
+    //     private boolean isExpiryCheck;
+    // }
     
 }

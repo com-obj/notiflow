@@ -19,32 +19,27 @@
 
 package com.obj.nc.flows.dataSources.properties.jdbc;
 
-import com.obj.nc.domain.dataObject.GenericData;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
-public class Job {
+@EqualsAndHashCode(of = "name")
+@ToString(of = "name")
+public class JdbcDataSourceProperties {
     @NotEmpty
     private String name;
     @NotEmpty
-    private String entityName;
+    private String url;
     @NotEmpty
-    private String cron;
-    
-    private ExpiryCheck expiryCheck;
-    
-    public boolean isExpiryCheckJob() {
-        return expiryCheck != null;
-    }
-    
-    public GenericData.Metadata toMetadata() {
-        return GenericData.Metadata
-                .builder()
-                .entityName(entityName)
-                .isExpiryCheck(isExpiryCheckJob())
-                .build();
-    }
-    
+    private String username;
+    @NotEmpty
+    private String password;
+    @UniqueElements
+    private List<JdbcJob> jobs = new ArrayList<>();
 }
