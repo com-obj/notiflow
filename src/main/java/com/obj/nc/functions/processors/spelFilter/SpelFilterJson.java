@@ -37,13 +37,13 @@ import org.springframework.stereotype.Component;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-@DocumentProcessingInfo("SpelFilterJson")
-public class SpelFilterJson  extends ProcessorFunctionAdapter<List<JsonNode>, List<JsonNode>> {
+@DocumentProcessingInfo("SpELFilterJson")
+public class SpELFilterJson  extends ProcessorFunctionAdapter<List<JsonNode>, List<JsonNode>> {
 
     private final ExpressionParser parser;
     private final Expression expression;
 
-    public SpelFilterJson(String spelExpression) {
+    public SpELFilterJson(String spelExpression) {
         parser = new SpelExpressionParser();
         expression = parser.parseExpression(spelExpression);
     }

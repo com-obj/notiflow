@@ -3,8 +3,10 @@ package com.obj.nc.flows.dataSources;
 import com.obj.nc.Get;
 import com.obj.nc.flows.dataSources.properties.DataSourceFlowsProperties;
 import com.obj.nc.flows.dataSources.properties.jdbc.JdbcDataSourceProperties;
-import com.obj.nc.flows.dataSources.properties.jdbc.JdbcJob;
-import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.JsonNodeToGenericDataTransformer;
+import com.obj.nc.flows.dataSources.properties.jdbc.JdbcJobProperties;
+import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.Data2GenericDataTransformer;
+import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.JsonNodeFilterAndTransformer;
+import com.obj.nc.functions.processors.spelFilter.SpELFilterJson;
 import com.obj.nc.utils.JsonUtils;
 import lombok.Builder;
 import lombok.Data;
@@ -62,13 +64,15 @@ public class JdbcDataSourceFlowsConfiguration {
                     .forEach(job -> {
                         JdbcPollingChannelAdapter jdbcPollingChannelAdapter = new JdbcPollingChannelAdapter(
                                 customDataSource.getDataSource(),
-                                createJobQuery(job));
+                                job.getSqlQuery());
     
                         integrationFlowContext
-                                .registration(createJobIntegrationFlow(
-                                        jdbcPollingChannelAdapter,
-                                        customDataSource.getProperties().getName(),
-                                        job))
+                                .registration(
+                                        createJobIntegrationFlow(
+                                                jdbcPollingChannelAdapter,
+                                                customDataSource.getProperties().getName(),
+                                                job)
+                                        )
                                 .id(createJobFlowId(customDataSource.getProperties().getName(), job.getName()))
                                 .register();
                     });
@@ -77,7 +81,7 @@ public class JdbcDataSourceFlowsConfiguration {
     
     private IntegrationFlow createJobIntegrationFlow(JdbcPollingChannelAdapter jdbcPollingChannelAdapter,
                                                      String dataSourceName,
-                                                     JdbcJob job) {
+                                                     JdbcJobProperties job) {
         return IntegrationFlows
                 .from(jdbcPollingChannelAdapter, c -> c
                         .poller(cron(job.getCron()))
@@ -85,23 +89,10 @@ public class JdbcDataSourceFlowsConfiguration {
                 .transform(Transformers.toJson(JsonUtils.getJsonObjectMapper(), ResultType.NODE))
                 .split() // split ArrayNode to JsonNode-s
                 .aggregate() // aggregate JsonNode-s to List<JsonNode>
-                .handle(new JsonNodeToGenericDataTransformer(job.getPojoFCCN()))
+                .handle(new JsonNodeFilterAndTransformer(job.getPojoFCCN(), job.getSpelFilterExpression()))
+                .handle(new Data2GenericDataTransformer())
                 .channel(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
                 .get();
-    }
-    
-    private String createJobQuery(JdbcJob job) {
-        // String query = String.format("select * from %s", job.getEntityName());
-        
-        // if (job.isExpiryCheckJob()) {
-        //     ExpiryCheck expiryCheck = job.getExpiryCheck();
-            
-        //     query = query.concat(String.format(" where %s <= '%s'", 
-        //             expiryCheck.getFieldName(), 
-        //             Timestamp.from(Instant.now().plus(expiryCheck.getDaysUntilExpiry(), ChronoUnit.DAYS))));
-        // }
-        
-        return job.getSqlQuery();
     }
     
     private String createDataSourceId(String dataSourceName) {

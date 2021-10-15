@@ -24,13 +24,24 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.utils.JsonUtils;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class GenericData<PT> {
+public class GenericData<PT> {
     
     // private Metadata metadata;
     private List<PT> payloads;
+
+    public <T> List<T> getPayloadsAsPojo(Class<T> pojoClass) {
+        return getPayloads()
+                .stream()
+                .map(node -> JsonUtils.readObjectFromJSON((JsonNode)node, pojoClass))
+                .collect(Collectors.toList());
+    }
         
 }

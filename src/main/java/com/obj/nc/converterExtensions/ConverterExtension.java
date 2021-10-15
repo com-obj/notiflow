@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Will need to allow mapping specific instances of this class to flow_id
+ * This is like marker interface. In reality the implementations use only the direct subtypes. We might remove it at some point
  * @author Jan Cuzy
  *
  * @param <RESULT_TYPE>

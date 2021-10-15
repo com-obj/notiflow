@@ -25,4 +25,5 @@ import com.obj.nc.domain.event.GenericEvent;
 
 public interface InputEventConverterExtension<RESULT_TYPE extends IsNotification> 
 		extends ConverterExtension<GenericEvent, RESULT_TYPE> {
+			
 }

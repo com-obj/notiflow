@@ -42,5 +42,5 @@ public class JdbcDataSourceProperties {
     private String password;
 
     @UniqueElements
-    private List<JdbcJob> jobs = new ArrayList<>();
+    private List<JdbcJobProperties> jobs = new ArrayList<>();
 }

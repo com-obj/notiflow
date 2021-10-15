@@ -19,21 +19,22 @@
 
 package com.obj.nc.functions.processors.genericDataConverter;
 
-import com.obj.nc.converterExtensions.ConverterExtension;
-import com.obj.nc.domain.dataObject.GenericData;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import lombok.extern.log4j.Log4j2;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.obj.nc.converterExtensions.genericData.GenericDataConverterExtension;
+import com.obj.nc.domain.dataObject.GenericData;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+
+import lombok.extern.log4j.Log4j2;
+
 @Log4j2
 public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends ProcessorFunctionAdapter<GenericData<?>, List<OUT>> {
     
-    public abstract List<? extends ConverterExtension<GenericData<?>, OUT>> getConverterExtensions();
+    public abstract List<? extends GenericDataConverterExtension<?, OUT>> getConverterExtensions();
     
     @Override
     protected Optional<PayloadValidationException> checkPreCondition(GenericData<?> genericData) {
@@ -44,28 +45,40 @@ public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends Proce
         return Optional.empty();
     }
     
-    private List<ConverterExtension<GenericData<?>, OUT>> findMatchingConverters(GenericData<?> genericData) {
-        List<ConverterExtension<GenericData<?>, OUT>> matchingProcessors = new ArrayList<>();
+    private List<GenericDataConverterExtension<?, OUT>> findMatchingConverters(GenericData genericData) {
+        List<GenericDataConverterExtension<?, OUT>> matchingProcessors = new ArrayList<>();
         
-        for (ConverterExtension<GenericData<?>, OUT> p: getConverterExtensions()) {
+        for (GenericDataConverterExtension<?, OUT> p: getConverterExtensions()) {
+
+            if (genericData.getPayloads().size() == 0) {
+                continue;
+            }
+
+            Class<? extends Object> payloadCls = genericData.getPayloads().get(0).getClass();
+            if (!p.getPayloadType().isAssignableFrom(payloadCls)) {
+                continue;
+            }
+
             Optional<PayloadValidationException> errors = p.canHandle(genericData);
             if (!errors.isPresent()) {
                 matchingProcessors.add(p);
                 continue;
             }
-            
+
             if (log.isDebugEnabled()) {
-                log.debug("BaseExtensionsBasedGenericDataConverter examined generic data processor which cannot handle payload " + genericData + ". Processor replyed" + errors.get().getMessage());
+                log.debug("BaseExtensionsBasedGenericDataConverter examined generic data processor which cannot handle payload " + genericData + ". Processor replied" + errors.get().getMessage());
             }
+ 
         }
         
         return matchingProcessors;
     }
     
     @Override
-    protected List<OUT> execute(GenericData<?> genericData) {
+    protected List<OUT> execute(GenericData genericData) {
         return
-                findMatchingConverters(genericData).stream()
+                (List<OUT>)findMatchingConverters(genericData)
+                        .stream()
                         .map(p -> p.convert(genericData))
                         .flatMap(List::stream)
                         .collect(Collectors.toList());

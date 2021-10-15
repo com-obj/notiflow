@@ -1,24 +1,26 @@
 package com.obj.nc.flows.dataSources.config;
 
-import com.obj.nc.converterExtensions.genericData.GenericData2NotificationConverterExtension;
-import com.obj.nc.domain.IsNotification;
-import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
-import com.obj.nc.domain.dataObject.GenericDataPojo;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.message.EmailMessageTemplated;
-import com.obj.nc.exceptions.PayloadValidationException;
-import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.obj.nc.converterExtensions.genericData.GenericData2NotificationConverterExtension;
+import com.obj.nc.domain.IsNotification;
+import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
+import com.obj.nc.domain.dataObject.GenericData;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.message.EmailMessageTemplated;
+import com.obj.nc.exceptions.PayloadValidationException;
+
+import lombok.RequiredArgsConstructor;
+
 @RequiredArgsConstructor
-public class GenericDataToNotificationConverter implements GenericData2NotificationConverterExtension<GenericDataPojo<LicenseAgreement>> {
+public class TestLicenceAgreementToNotificationConverter implements GenericData2NotificationConverterExtension<TestLicenseAgreement> {
 	
-	private final LicenseAgreementProperties properties;
+	private final TestLicenseAgreementProperties properties;
 	
 	@Override
-	public Optional<PayloadValidationException> canHandle(GenericDataPojo<LicenseAgreement> data) {
+	public Optional<PayloadValidationException> canHandle(GenericData<TestLicenseAgreement> data) {
         if (data.getPayloads() != null) {
             return Optional.empty();
         }
@@ -27,15 +29,15 @@ public class GenericDataToNotificationConverter implements GenericData2Notificat
 	}
 	
 	@Override
-	public List<IsNotification> convert(GenericDataPojo<LicenseAgreement> data) {
-		TemplateWithModelEmailContent<List<LicenseAgreement>> content = new TemplateWithModelEmailContent<>();
+	public List<IsNotification> convert(GenericData<TestLicenseAgreement> data) {
+		TemplateWithModelEmailContent<List<TestLicenseAgreement>> content = new TemplateWithModelEmailContent<>();
 		content.setSubject("QC | These Agreements will expire soon");
 		content.setTemplateFileName(properties.getEmailTemplatePath());
 		
-		List<LicenseAgreement> agreementsPojo = data.getPayloads();
+		List<TestLicenseAgreement> agreementsPojo = data.getPayloads();
 		content.setModel(agreementsPojo);
 		
-		EmailMessageTemplated<List<LicenseAgreement>> message = new EmailMessageTemplated<>(content);
+		EmailMessageTemplated<List<TestLicenseAgreement>> message = new EmailMessageTemplated<>(content);
 		
 		message.addReceivingEndpoints(
 				EmailEndpoint
@@ -45,6 +47,11 @@ public class GenericDataToNotificationConverter implements GenericData2Notificat
 		);
         
 		return Arrays.asList(message);
+	}
+
+	@Override
+	public Class<TestLicenseAgreement> getPayloadType() {
+		return TestLicenseAgreement.class;
 	}
 	
 }

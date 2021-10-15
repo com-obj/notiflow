@@ -19,41 +19,21 @@
 
 package com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer;
 
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.dataObject.GenericData;
-import com.obj.nc.domain.dataObject.GenericDataJson;
-import com.obj.nc.domain.dataObject.GenericDataPojo;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class JsonNodeToGenericDataTransformer extends ProcessorFunctionAdapter<List<JsonNode>, GenericData<?>> {
-
-    private String resultSetPojoFccn;
+public class Data2GenericDataTransformer extends ProcessorFunctionAdapter<List<?>, GenericData<?>> {
 
     @Override
-	protected GenericData<?> execute(List<JsonNode> jsonNodes) {
-
-        GenericDataJson jsonData = new GenericDataJson(jsonNodes);
-        if (resultSetPojoFccn==null) {
-            return jsonData;
-        }
-
-        try {
-            Class<?> pojoClass = Class.forName(resultSetPojoFccn);
-
-            List<?> pojos = jsonData.getPayloadsAsPojo(pojoClass);
-
-            GenericDataPojo<?> pojoData = new GenericDataPojo(pojos);
-            return pojoData;    
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+	protected GenericData<?> execute(List<?> payload) {
+        GenericData jsonData = new GenericData(payload);
+        return jsonData;
 	}
 
 

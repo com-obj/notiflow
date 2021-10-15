@@ -19,10 +19,9 @@
 
 package com.obj.nc.converterExtensions.genericData;
 
-import com.obj.nc.converterExtensions.ConverterExtension;
 import com.obj.nc.domain.IsNotification;
-import com.obj.nc.domain.dataObject.GenericData;
 
-public interface GenericData2NotificationConverterExtension<T extends GenericData<?>>
-        extends ConverterExtension<T, IsNotification> {
+public interface GenericData2NotificationConverterExtension<T>
+        extends GenericDataConverterExtension<T, IsNotification> {
+                
 }

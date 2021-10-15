@@ -19,26 +19,27 @@
 
 package com.obj.nc.functions.processors.genericDataConverter;
 
-import com.obj.nc.converterExtensions.ConverterExtension;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.obj.nc.converterExtensions.genericData.GenericData2NotificationConverterExtension;
+import com.obj.nc.converterExtensions.genericData.GenericDataConverterExtension;
 import com.obj.nc.domain.IsNotification;
-import com.obj.nc.domain.dataObject.GenericData;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class ExtensionsBasedGenericData2NotificationConverter extends BaseExtensionsBasedGenericDataConverter<IsNotification> {
 	
 	@Autowired(required = false)
-	private final List<GenericData2NotificationConverterExtension<GenericData<?>>> converters = new ArrayList<>();
+	private final List<GenericData2NotificationConverterExtension<?>> converters = new ArrayList<>();
 	
 	@Override
-	public List<? extends ConverterExtension<GenericData<?>, IsNotification>> getConverterExtensions() {
+	public List<? extends GenericDataConverterExtension<?, IsNotification>> getConverterExtensions() {
 		return converters;
 	}
 	

@@ -19,10 +19,9 @@
 
 package com.obj.nc.converterExtensions.genericData;
 
-import com.obj.nc.converterExtensions.ConverterExtension;
-import com.obj.nc.domain.dataObject.GenericData;
 import com.obj.nc.domain.event.GenericEvent;
 
-public interface GenericData2EventConverterExtension<T extends GenericData<?>>
-        extends ConverterExtension<T, GenericEvent> {
+public interface GenericData2EventConverterExtension<T>
+        extends GenericDataConverterExtension<T, GenericEvent> {
+
 }

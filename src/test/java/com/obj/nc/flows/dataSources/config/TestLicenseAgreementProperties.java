@@ -25,8 +25,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "license-agreements")
-public class LicenseAgreementProperties {
+@ConfigurationProperties(prefix = "test-license-agreements")
+public class TestLicenseAgreementProperties {
     private String adminEmail;
     private String emailTemplatePath;
 }

@@ -17,32 +17,25 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.dataObject;
+package com.obj.nc.flows.dataSources.properties.jdbc;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.utils.JsonUtils;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.validation.constraints.NotEmpty;
 
 @Data
-public class GenericDataJson extends GenericData<JsonNode> {
+public class JdbcJobProperties {
+    @NotEmpty
+    private String name;
+    @NotEmpty
+    private String sqlQuery;
 
-    @Builder
-    public GenericDataJson(List<JsonNode> payloads){
-        super(payloads);
-    } 
-        
-    public <T> List<T> getPayloadsAsPojo(Class<T> pojoClass) {
-        return getPayloads()
-                .stream()
-                .map(node -> JsonUtils.readObjectFromJSON(node, pojoClass))
-                .collect(Collectors.toList());
-    }
-    
+    private String pojoFCCN; //if set, GenericData will be GenericDataPojo<FCCN>
+
+
+    private String spelFilterExpression; 
+
+    @NotEmpty
+    private String cron;
     
 }

@@ -1,43 +1,44 @@
 package com.obj.nc.flows.dataSources;
 
-import com.icegreen.greenmail.configuration.GreenMailConfiguration;
-import com.icegreen.greenmail.junit5.GreenMailExtension;
-import com.icegreen.greenmail.util.GreenMailUtil;
-import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.flows.dataSources.config.GenericDataToNotificationConverter;
-import com.obj.nc.flows.dataSources.config.LicenseAgreement;
-import com.obj.nc.flows.dataSources.config.LicenseAgreementProperties;
-import com.obj.nc.functions.processors.genericDataConverter.ExtensionsBasedGenericData2NotificationConverter;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static java.sql.Timestamp.from;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
-import javax.mail.internet.MimeMessage;
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.sql.Timestamp.from;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import javax.mail.internet.MimeMessage;
+
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import com.obj.nc.flows.dataSources.config.TestLicenceAgreementToNotificationConverter;
+import com.obj.nc.flows.dataSources.config.TestLicenseAgreement;
+import com.obj.nc.flows.dataSources.config.TestLicenseAgreementProperties;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
+import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(properties = {
@@ -47,24 +48,35 @@ import static org.junit.Assert.assertEquals;
         "nc.data-sources.jdbc[0].password=ZMss4o9mdBLV",
         "nc.data-sources.jdbc[0].jobs[0].name=check-agreements-expiry",
         "nc.data-sources.jdbc[0].jobs[0].entity-name=license_agreement",
+        "nc.data-sources.jdbc[0].jobs[0].sqlQuery=select * from license_agreement",  
+        "nc.data-sources.jdbc[0].jobs[0].pojoFCCN=com.obj.nc.flows.dataSources.config.TestLicenseAgreement",     
         "nc.data-sources.jdbc[0].jobs[0].cron=*/1 * * * * *",
-        "nc.data-sources.jdbc[0].jobs[0].expiry-check.field-name=expiry_date",
-        "nc.data-sources.jdbc[0].jobs[0].expiry-check.days-until-expiry=5",
-        "license-agreements.admin-email=johndoe@objectify.sk",
-        "license-agreements.email-template-path=agreements.html",
+//        "nc.data-sources.jdbc[0].jobs[0].spel-filter-expression=expiryDate.isBefore(T(java.time.Instant).now().plus(5, T(java.time.temporal.ChronoUnit).DAYS))",        
+        "nc.data-sources.jdbc[0].jobs[0].spel-filter-expression=isExpired(5)",        
+        "test-license-agreements.admin-email=johndoe@objectify.sk",
+        "test-license-agreements.email-template-path=agreements.html",
         "nc.functions.email-templates.templates-root-dir=src/test/resources/templates"
 })
+@SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME, GenericDataToNotificationTest.DATA_SOURCE_POLLER_NAME})
 class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
     
     @Autowired private JdbcTemplate springJdbcTemplate;
-    @Autowired private ExtensionsBasedGenericData2NotificationConverter extensionsBasedGenericData2NotificationConverter;
+
+    @Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
+    @Autowired private SourcePollingChannelAdapter pollableSource;
+
+    @Qualifier(GenericDataToNotificationTest.DATA_SOURCE_POLLER_NAME)
+    @Autowired private SourcePollingChannelAdapter pollableSourceJdbc;
     
     @BeforeEach
     void setupDbs() {
-        purgeNotifTables(springJdbcTemplate);
+        pollableSourceJdbc.stop(); //somehow this doesn't stop with the standard annotation
+        purgeNotifTables(springJdbcTemplate);        
+        
         springJdbcTemplate.update("drop table if exists license_agreement");
         springJdbcTemplate.execute("create table license_agreement (description text not null, expiry_date timestamptz not null); ");
-        persistTestLicenseAgreements();
+        
+        persistTestLicenseAgreements(springJdbcTemplate);
     }
     
     @AfterEach
@@ -75,9 +87,12 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
     @Test
     void testDataPulledAndMessageSent() {
         // when
-        boolean recieved = greenMail.waitForIncomingEmail(5000L, 1);
+        pollableSourceJdbc.start();
+
+        // then
+        boolean received = greenMail.waitForIncomingEmail(5000L, 1);
     
-        assertEquals(true, recieved);
+        assertEquals(true, received);
         assertEquals(1, greenMail.getReceivedMessages().length);
     
         MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
@@ -85,11 +100,11 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
         assertThat(body).contains("Agreement 1", "Agreement 2", "Agreement 3", "Agreement 4");
     }
     
-    private void persistTestLicenseAgreements() {
-        List<LicenseAgreement> testAgreements = IntStream
+    public static void persistTestLicenseAgreements(JdbcTemplate springJdbcTemplate) {
+        List<TestLicenseAgreement> testAgreements = IntStream
                 .range(1, 10)
                 .mapToObj(i -> 
-                        LicenseAgreement
+                        TestLicenseAgreement
                                 .builder()
                                 .description("Agreement ".concat(String.valueOf(i)))
                                 .expiryDate(Instant.now().plus(i, ChronoUnit.DAYS))
@@ -101,7 +116,7 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
                 new BatchPreparedStatementSetter() {
     
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        LicenseAgreement agreement = testAgreements.get(i);
+                        TestLicenseAgreement agreement = testAgreements.get(i);
                         ps.setString(1, agreement.getDescription());
                         ps.setTimestamp(2, from(agreement.getExpiryDate()));
                     }
@@ -116,8 +131,8 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
     @TestConfiguration
     public static class GenericDataToNotificationExpiryTestConfiguration {
         @Bean
-        public GenericDataToNotificationConverter genericDataToNotificationConverter(LicenseAgreementProperties properties) {
-            return new GenericDataToNotificationConverter(properties);
+        public TestLicenceAgreementToNotificationConverter genericDataToNotificationConverter(TestLicenseAgreementProperties properties) {
+            return new TestLicenceAgreementToNotificationConverter(properties);
         }
     }
     
