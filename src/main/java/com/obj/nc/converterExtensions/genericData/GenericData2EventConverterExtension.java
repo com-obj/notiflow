@@ -23,6 +23,6 @@ import com.obj.nc.converterExtensions.ConverterExtension;
 import com.obj.nc.domain.dataObject.GenericData;
 import com.obj.nc.domain.event.GenericEvent;
 
-public interface GenericData2EventConverterExtension
-        extends ConverterExtension<GenericData, GenericEvent> {
+public interface GenericData2EventConverterExtension<T extends GenericData<?>>
+        extends ConverterExtension<T, GenericEvent> {
 }

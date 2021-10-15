@@ -62,13 +62,14 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
     @BeforeEach
     void setupDbs() {
         purgeNotifTables(springJdbcTemplate);
+        springJdbcTemplate.update("drop table if exists license_agreement");
         springJdbcTemplate.execute("create table license_agreement (description text not null, expiry_date timestamptz not null); ");
         persistTestLicenseAgreements();
     }
     
     @AfterEach
     void tearDown() {
-        springJdbcTemplate.update("drop table license_agreement");
+        springJdbcTemplate.update("drop table if exists license_agreement");
     }
     
     @Test

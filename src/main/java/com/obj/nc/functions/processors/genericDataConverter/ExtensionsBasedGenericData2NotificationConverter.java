@@ -35,10 +35,10 @@ import java.util.List;
 public class ExtensionsBasedGenericData2NotificationConverter extends BaseExtensionsBasedGenericDataConverter<IsNotification> {
 	
 	@Autowired(required = false)
-	private final List<GenericData2NotificationConverterExtension> converters = new ArrayList<>();
+	private final List<GenericData2NotificationConverterExtension<GenericData<?>>> converters = new ArrayList<>();
 	
 	@Override
-	public List<? extends ConverterExtension<GenericData, IsNotification>> getConverterExtensions() {
+	public List<? extends ConverterExtension<GenericData<?>, IsNotification>> getConverterExtensions() {
 		return converters;
 	}
 	

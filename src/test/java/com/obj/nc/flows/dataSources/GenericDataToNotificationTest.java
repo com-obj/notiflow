@@ -42,6 +42,8 @@ import static org.junit.Assert.assertEquals;
         "nc.data-sources.jdbc[0].password=ZMss4o9mdBLV",
         "nc.data-sources.jdbc[0].jobs[0].name=check-agreements-expiry",
         "nc.data-sources.jdbc[0].jobs[0].entity-name=license_agreement",
+        "nc.data-sources.jdbc[0].jobs[0].sqlQuery=select * from license_agreement",  
+        "nc.data-sources.jdbc[0].jobs[0].pojoFCCN=com.obj.nc.flows.dataSources.config.LicenseAgreement",                
         "nc.data-sources.jdbc[0].jobs[0].cron=*/1 * * * * *",
         "license-agreements.admin-email=johndoe@objectify.sk",
         "license-agreements.email-template-path=agreements.html",
@@ -54,13 +56,14 @@ class GenericDataToNotificationTest extends BaseIntegrationTest {
     @BeforeEach
     void setupDbs() {
         purgeNotifTables(springJdbcTemplate);
+        springJdbcTemplate.update("drop table if exists license_agreement");
         springJdbcTemplate.execute("create table license_agreement (description text not null, expiry_date timestamptz not null); ");
         persistTestLicenseAgreements();
     }
     
     @AfterEach
     void tearDown() {
-        springJdbcTemplate.update("drop table license_agreement");
+        springJdbcTemplate.update("drop table if exists license_agreement");
     }
     
     @Test

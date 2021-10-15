@@ -35,10 +35,10 @@ import java.util.List;
 public class ExtensionsBasedGenericData2EventConverter extends BaseExtensionsBasedGenericDataConverter<GenericEvent> {
 	
 	@Autowired(required = false)
-	private final List<GenericData2EventConverterExtension> converters = new ArrayList<>();
+	private final List<GenericData2EventConverterExtension<GenericData<?>>> converters = new ArrayList<>();
 	
 	@Override
-	public List<? extends ConverterExtension<GenericData, GenericEvent>> getConverterExtensions() {
+	public List<? extends ConverterExtension<GenericData<?>, GenericEvent>> getConverterExtensions() {
 		return converters;
 	}
 	

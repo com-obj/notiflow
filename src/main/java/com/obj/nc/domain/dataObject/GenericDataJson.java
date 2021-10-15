@@ -19,18 +19,30 @@
 
 package com.obj.nc.domain.dataObject;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.utils.JsonUtils;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public abstract class GenericData<PT> {
-    
-    // private Metadata metadata;
-    private List<PT> payloads;
+public class GenericDataJson extends GenericData<JsonNode> {
+
+    @Builder
+    public GenericDataJson(List<JsonNode> payloads){
+        super(payloads);
+    } 
         
+    public <T> List<T> getPayloadsAsPojo(Class<T> pojoClass) {
+        return getPayloads()
+                .stream()
+                .map(node -> JsonUtils.readObjectFromJSON(node, pojoClass))
+                .collect(Collectors.toList());
+    }
+    
+    
 }

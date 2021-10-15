@@ -29,6 +29,8 @@ import com.obj.nc.converterExtensions.genericEvent.InputEvent2MessageConverterEx
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.dataObject.GenericData;
+import com.obj.nc.domain.dataObject.GenericDataJson;
+import com.obj.nc.domain.dataObject.GenericDataPojo;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
@@ -105,7 +107,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 .instant(Instant.now())
                 .build();
     
-        GenericData genericData = GenericData
+        GenericDataJson genericData = GenericDataJson
                 .builder()
                 .payloads(Arrays.asList(JsonUtils.writeObjectToJSONNode(payload)))
                 .build();
@@ -144,11 +146,11 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
     @TestConfiguration
     static class GenericDataConvertingFlowTestConfiguration {
         @Bean
-        public GenericData2NotificationConverterExtension genericData2Message() {
-            return new GenericData2NotificationConverterExtension() {
+        public GenericData2NotificationConverterExtension<?> genericData2Message() {
+            return new GenericData2NotificationConverterExtension<GenericDataPojo<TestPayload>>() {
                 @Override
-                public Optional<PayloadValidationException> canHandle(GenericData payload) {
-                    if (!payload.getPayloadsAsPojo(TestPayload.class).isEmpty()) {
+                public Optional<PayloadValidationException> canHandle(GenericDataPojo<TestPayload> payload) {
+                    if (!payload.getPayloads().isEmpty()) {
                         return Optional.empty();
                     }
     
@@ -156,23 +158,23 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 }
     
                 @Override
-                public List<IsNotification> convert(GenericData payload) {
+                public List<IsNotification> convert(GenericDataPojo<TestPayload> payload) {
                     EmailMessage email1 = new EmailMessage();
                     email1.addReceivingEndpoints(
                             EmailEndpoint.builder().email("test@objectify.sk").build()
                     );
                     email1.getBody().setSubject("Subject");
-                    email1.getBody().setText("GenericData2NotificationConverterExtension"+JsonUtils.writeObjectToJSONString(payload.getPayloadsAsPojo(TestPayload.class)));
+                    email1.getBody().setText("GenericData2NotificationConverterExtension"+JsonUtils.writeObjectToJSONString(payload.getPayloads()));
                     return Arrays.asList(email1);
                 }
             };
         }
     
         @Bean
-        public GenericData2EventConverterExtension genericData2Event() {
-            return new GenericData2EventConverterExtension() {
+        public GenericData2EventConverterExtension<?> genericData2Event() {
+            return new GenericData2EventConverterExtension<GenericDataJson>() {
                 @Override
-                public Optional<PayloadValidationException> canHandle(GenericData payload) {
+                public Optional<PayloadValidationException> canHandle(GenericDataJson payload) {
                     if (!payload.getPayloadsAsPojo(TestPayload.class).isEmpty()) {
                         return Optional.empty();
                     }
@@ -181,7 +183,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 }
             
                 @Override
-                public List<GenericEvent> convert(GenericData payload) {
+                public List<GenericEvent> convert(GenericDataJson payload) {
                     return Arrays.asList(
                             GenericEvent
                                     .builder()

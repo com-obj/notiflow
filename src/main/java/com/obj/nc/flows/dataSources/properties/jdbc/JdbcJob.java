@@ -29,6 +29,9 @@ public class JdbcJob {
     private String name;
     @NotEmpty
     private String sqlQuery;
+
+    private String pojoFCCN; //if set, GenericData will be GenericDataPojo<FCCN>
+
     @NotEmpty
     private String cron;
     

@@ -1,10 +1,7 @@
 package com.obj.nc.flows.dataSources;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.Get;
-import com.obj.nc.domain.dataObject.GenericData;
 import com.obj.nc.flows.dataSources.properties.DataSourceFlowsProperties;
-import com.obj.nc.flows.dataSources.properties.jdbc.ExpiryCheck;
 import com.obj.nc.flows.dataSources.properties.jdbc.JdbcDataSourceProperties;
 import com.obj.nc.flows.dataSources.properties.jdbc.JdbcJob;
 import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.JsonNodeToGenericDataTransformer;
@@ -34,7 +31,6 @@ public class JdbcDataSourceFlowsConfiguration {
     private final DataSourceFlowsProperties dataSourceFlowsProperties;
     private final IntegrationFlowContext integrationFlowContext;
     private final Get get;
-    private final JsonNodeToGenericDataTransformer genericDataFactory;
     
     @PostConstruct
     public void createJdbcDataSourceFlows() {
@@ -89,7 +85,7 @@ public class JdbcDataSourceFlowsConfiguration {
                 .transform(Transformers.toJson(JsonUtils.getJsonObjectMapper(), ResultType.NODE))
                 .split() // split ArrayNode to JsonNode-s
                 .aggregate() // aggregate JsonNode-s to List<JsonNode>
-                .handle(genericDataFactory)
+                .handle(new JsonNodeToGenericDataTransformer(job.getPojoFCCN()))
                 .channel(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
                 .get();
     }

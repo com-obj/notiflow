@@ -31,12 +31,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Log4j2
-public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends ProcessorFunctionAdapter<GenericData, List<OUT>> {
+public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends ProcessorFunctionAdapter<GenericData<?>, List<OUT>> {
     
-    public abstract List<? extends ConverterExtension<GenericData, OUT>> getConverterExtensions();
+    public abstract List<? extends ConverterExtension<GenericData<?>, OUT>> getConverterExtensions();
     
     @Override
-    protected Optional<PayloadValidationException> checkPreCondition(GenericData genericData) {
+    protected Optional<PayloadValidationException> checkPreCondition(GenericData<?> genericData) {
         if (genericData == null) {
             return Optional.of(new PayloadValidationException("GenericData instance must not be null"));
         }
@@ -44,10 +44,10 @@ public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends Proce
         return Optional.empty();
     }
     
-    private List<ConverterExtension<GenericData, OUT>> findMatchingConverters(GenericData genericData) {
-        List<ConverterExtension<GenericData, OUT>> matchingProcessors = new ArrayList<>();
+    private List<ConverterExtension<GenericData<?>, OUT>> findMatchingConverters(GenericData<?> genericData) {
+        List<ConverterExtension<GenericData<?>, OUT>> matchingProcessors = new ArrayList<>();
         
-        for (ConverterExtension<GenericData, OUT> p: getConverterExtensions()) {
+        for (ConverterExtension<GenericData<?>, OUT> p: getConverterExtensions()) {
             Optional<PayloadValidationException> errors = p.canHandle(genericData);
             if (!errors.isPresent()) {
                 matchingProcessors.add(p);
@@ -63,7 +63,7 @@ public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends Proce
     }
     
     @Override
-    protected List<OUT> execute(GenericData genericData) {
+    protected List<OUT> execute(GenericData<?> genericData) {
         return
                 findMatchingConverters(genericData).stream()
                         .map(p -> p.convert(genericData))

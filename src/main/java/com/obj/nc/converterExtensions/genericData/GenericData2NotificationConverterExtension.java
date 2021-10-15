@@ -23,6 +23,6 @@ import com.obj.nc.converterExtensions.ConverterExtension;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.dataObject.GenericData;
 
-public interface GenericData2NotificationConverterExtension
-        extends ConverterExtension<GenericData, IsNotification> {
+public interface GenericData2NotificationConverterExtension<T extends GenericData<?>>
+        extends ConverterExtension<T, IsNotification> {
 }

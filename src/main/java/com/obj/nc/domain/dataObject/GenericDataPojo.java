@@ -19,18 +19,16 @@
 
 package com.obj.nc.domain.dataObject;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.List;
 
+import lombok.Builder;
+import lombok.Data;
+
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public abstract class GenericData<PT> {
-    
-    // private Metadata metadata;
-    private List<PT> payloads;
+public class GenericDataPojo<PT> extends GenericData<PT> {
         
+    @Builder
+    public GenericDataPojo(List<PT> payloads){
+        super(payloads);
+    } 
 }

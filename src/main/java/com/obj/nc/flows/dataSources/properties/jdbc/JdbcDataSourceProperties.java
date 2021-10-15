@@ -40,6 +40,7 @@ public class JdbcDataSourceProperties {
     private String username;
     @NotEmpty
     private String password;
+
     @UniqueElements
     private List<JdbcJob> jobs = new ArrayList<>();
 }
