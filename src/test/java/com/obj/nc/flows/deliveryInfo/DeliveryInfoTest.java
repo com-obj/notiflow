@@ -157,7 +157,6 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         });
     }
     
-    @Disabled // TODO: remove when error handling works
     @Test
     void testDeliveryInfosCreateAndPersistedForFailedDelivery() throws InterruptedException, ExecutionException, TimeoutException {
         // GIVEN    	        
