@@ -38,6 +38,8 @@ import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
@@ -58,6 +60,7 @@ import org.springframework.test.context.ActiveProfiles;
         "nc.functions.email-templates.templates-root-dir=src/test/resources/templates"
 })
 @SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME, GenericDataToNotificationTest.DATA_SOURCE_POLLER_NAME})
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS) //this test register programmatically spring integration flows. it seems to confuse the spring context management in tests
 class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
     
     @Autowired private JdbcTemplate springJdbcTemplate;

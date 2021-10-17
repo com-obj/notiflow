@@ -23,6 +23,8 @@ import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import static com.obj.nc.flows.dataSources.GenericDataConvertingFlowConfiguration.GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
@@ -56,6 +58,7 @@ import static org.junit.Assert.assertEquals;
         "test-license-agreements.email-template-path=agreements.html",
         "nc.functions.email-templates.templates-root-dir=src/test/resources/templates"
 })
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS) //this test register programmatically spring integration flows. it seems to confuse the spring context management in tests
 class GenericDataToNotificationTest extends BaseIntegrationTest {
 
     @Autowired private JdbcTemplate springJdbcTemplate;
