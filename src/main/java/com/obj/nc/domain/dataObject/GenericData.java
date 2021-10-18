@@ -19,15 +19,14 @@
 
 package com.obj.nc.domain.dataObject;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.utils.JsonUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.utils.JsonUtils;
 
 @Data
 @AllArgsConstructor

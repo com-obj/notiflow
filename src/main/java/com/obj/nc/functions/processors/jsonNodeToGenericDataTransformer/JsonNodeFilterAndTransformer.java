@@ -19,17 +19,15 @@
 
 package com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+import com.obj.nc.functions.processors.spelFilter.SpELFilterJson;
+import com.obj.nc.functions.processors.spelFilter.SpELFilterPojo;
+import com.obj.nc.utils.JsonUtils;
+import lombok.AllArgsConstructor;
+
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.domain.dataObject.GenericData;
-import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import com.obj.nc.functions.processors.spelFilter.SpELFilterPojo;
-import com.obj.nc.functions.processors.spelFilter.SpELFilterJson;
-import com.obj.nc.utils.JsonUtils;
-
-import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class JsonNodeFilterAndTransformer extends ProcessorFunctionAdapter<List<JsonNode>, List<?>> {

@@ -19,22 +19,20 @@
 
 package com.obj.nc.functions.processors.messageTracking;
 
-import java.net.URI;
-import java.util.Optional;
-
+import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TrackableContent;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.obj.nc.config.NcAppConfigProperties;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-
-import lombok.RequiredArgsConstructor;
+import java.net.URI;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public abstract class BaseReadTrackingDecorator<T extends MessageContent> extends ProcessorFunctionAdapter<Message<T>, Message<T>> {

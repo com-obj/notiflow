@@ -19,12 +19,23 @@
 
 package com.obj.nc.domain.event;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ObjectArrays;
 import com.obj.nc.domain.HasEventId;
+import com.obj.nc.domain.HasFlowId;
+import com.obj.nc.domain.HasJsonPayload;
+import com.obj.nc.domain.headers.HasHeader;
+import com.obj.nc.domain.headers.Header;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.utils.JsonUtils;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -33,21 +44,8 @@ import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.PayloadDocumentation;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.ObjectArrays;
-import com.obj.nc.domain.HasFlowId;
-import com.obj.nc.domain.HasJsonPayload;
-import com.obj.nc.domain.headers.HasHeader;
-import com.obj.nc.domain.headers.Header;
-import com.obj.nc.utils.JsonUtils;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Setter

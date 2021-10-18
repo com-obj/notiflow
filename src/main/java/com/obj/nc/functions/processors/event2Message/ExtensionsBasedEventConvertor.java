@@ -19,22 +19,20 @@
 
 package com.obj.nc.functions.processors.event2Message;
 
+import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.converterExtensions.genericEvent.InputEventConverterExtension;
+import com.obj.nc.domain.IsNotification;
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.IsNotification;
-import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.converterExtensions.genericEvent.InputEventConverterExtension;
-import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 @DocumentProcessingInfo("ExtensionsBasedEventConvertor")
 @AllArgsConstructor

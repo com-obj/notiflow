@@ -20,7 +20,6 @@
 package com.obj.nc.functions.processors.senders.mailchimp.dtos;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-
 import lombok.Builder;
 import lombok.Data;
 

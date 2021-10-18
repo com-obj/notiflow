@@ -19,7 +19,12 @@
 
 package com.obj.nc.repositories;
 
-import static java.sql.Timestamp.from;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.repositories.mappers.ReceivingEndpointRowMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -34,14 +39,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import com.obj.nc.domain.endpoints.ReceivingEndpoint;
-import com.obj.nc.repositories.mappers.ReceivingEndpointRowMapper;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import static java.sql.Timestamp.from;
 
 @Log4j2
 @RequiredArgsConstructor

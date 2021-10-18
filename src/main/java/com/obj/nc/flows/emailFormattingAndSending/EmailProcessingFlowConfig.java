@@ -19,10 +19,17 @@
 
 package com.obj.nc.flows.emailFormattingAndSending;
 
-import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
-
+import com.obj.nc.domain.content.TemplateWithModelContent;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessageAggregationStrategy;
+import com.obj.nc.functions.processors.messagePersister.MessagePersister;
+import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
+import com.obj.nc.functions.processors.messageTemplating.config.TrackingConfigProperties;
 import com.obj.nc.functions.processors.messageTracking.EmailReadTrackingDecorator;
+import com.obj.nc.functions.processors.senders.EmailSender;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -32,17 +39,8 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-import com.obj.nc.domain.content.TemplateWithModelContent;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
-import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessageAggregationStrategy;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
-import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
-import com.obj.nc.functions.processors.messageTemplating.config.TrackingConfigProperties;
-import com.obj.nc.functions.processors.senders.EmailSender;
-
-import lombok.RequiredArgsConstructor;
+import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
 
 @Configuration
 @RequiredArgsConstructor

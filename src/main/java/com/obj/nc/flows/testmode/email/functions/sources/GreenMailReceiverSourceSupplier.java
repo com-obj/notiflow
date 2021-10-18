@@ -19,27 +19,6 @@
 
 package com.obj.nc.flows.testmode.email.functions.sources;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.mail.Address;
-import javax.mail.Flags;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
-import org.apache.commons.mail.util.MimeMessageParser;
-import org.apache.commons.text.StringEscapeUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.store.InMemoryStore;
 import com.icegreen.greenmail.store.MailFolder;
@@ -54,8 +33,27 @@ import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
 import com.obj.nc.utils.JsonUtils;
-
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.mail.util.MimeMessageParser;
+import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+
+import javax.mail.Address;
+import javax.mail.Flags;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")

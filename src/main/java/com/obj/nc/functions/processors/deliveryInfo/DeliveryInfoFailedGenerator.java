@@ -19,13 +19,6 @@
 
 package com.obj.nc.functions.processors.deliveryInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.HasPreviousIntentIds;
 import com.obj.nc.domain.HasPreviousMessageIds;
@@ -38,11 +31,16 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.errorHandling.FailedPaylodExtractor;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper=false)

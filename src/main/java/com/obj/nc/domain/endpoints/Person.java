@@ -19,18 +19,17 @@
 
 package com.obj.nc.domain.endpoints;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
 import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotNull;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper=false)

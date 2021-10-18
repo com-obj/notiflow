@@ -19,11 +19,10 @@
 
 package com.obj.nc.functions.sources.eventGenerator;
 
+import com.obj.nc.domain.notifIntent.NotificationIntent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import com.obj.nc.domain.notifIntent.NotificationIntent;
 
 @Component
 //@Profile({"dev"})

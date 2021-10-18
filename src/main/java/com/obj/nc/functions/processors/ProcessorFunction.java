@@ -19,13 +19,12 @@
 
 package com.obj.nc.functions.processors;
 
-import java.util.Optional;
-import java.util.function.Function;
-
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
-
 import lombok.extern.log4j.Log4j2;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 @Log4j2
 public abstract class ProcessorFunction<IN, OUT> implements Function<IN, OUT> {

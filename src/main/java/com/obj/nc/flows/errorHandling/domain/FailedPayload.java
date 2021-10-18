@@ -19,18 +19,8 @@
 
 package com.obj.nc.flows.errorHandling.domain;
 
-import java.time.Instant;
-import java.util.UUID;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Table;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.HasFlowId;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -38,6 +28,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Table;
+
+import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Setter

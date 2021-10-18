@@ -19,16 +19,15 @@
 
 package com.obj.nc.functions.sources.genericEvents;
 
-import java.time.Instant;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
 import com.obj.nc.repositories.GenericEventRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.Instant;
+import java.util.Optional;
 
 @DocumentProcessingInfo("InputEventSupplier")
 public class GenericEventsSupplier extends SourceSupplierAdapter<GenericEvent> {

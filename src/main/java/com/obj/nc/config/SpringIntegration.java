@@ -19,14 +19,13 @@
 
 package com.obj.nc.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.config.EnableMessageHistory;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.support.json.JacksonJsonUtils;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @EnableMessageHistory
 @Configuration

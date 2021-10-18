@@ -19,18 +19,6 @@
 
 package com.obj.nc.functions.processors.messageTeamplating;
 
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-import java.util.Locale;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.integration.test.context.SpringIntegrationTest;
-import org.springframework.test.context.ActiveProfiles;
-
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.EmailMessageTemplated;
@@ -38,6 +26,17 @@ import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.util.List;
+import java.util.Locale;
+
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)

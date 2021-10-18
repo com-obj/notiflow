@@ -1,19 +1,16 @@
 package com.obj.nc.functions.processors.spelFilter;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.utils.JsonUtils;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
-
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.utils.JsonUtils;
-
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
 
 public class SpelFilterTest {

@@ -19,8 +19,9 @@
 
 package com.obj.nc.security.service;
 
-import java.util.ArrayList;
-
+import com.obj.nc.security.config.NcJwtConfigProperties;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,10 +29,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.obj.nc.security.config.NcJwtConfigProperties;
-
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
 
 @Data
 @Service

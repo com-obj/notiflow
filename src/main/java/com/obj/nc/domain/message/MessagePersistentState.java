@@ -19,21 +19,6 @@
 
 package com.obj.nc.domain.message;
 
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
-import javax.validation.constraints.NotNull;
-
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Embedded;
-import org.springframework.data.relational.core.mapping.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.Get;
 import com.obj.nc.domain.content.MessageContent;
@@ -44,10 +29,23 @@ import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.MessageRepository;
 import com.obj.nc.repositories.NotificationIntentRepository;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Embedded;
+import org.springframework.data.relational.core.mapping.Table;
+
+import javax.validation.constraints.NotNull;
+
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @Table("nc_message")

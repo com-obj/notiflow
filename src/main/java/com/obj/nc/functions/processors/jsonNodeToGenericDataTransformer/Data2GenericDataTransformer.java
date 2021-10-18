@@ -19,13 +19,11 @@
 
 package com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer;
 
-import java.util.List;
-
-import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.dataObject.GenericData;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-
 import lombok.AllArgsConstructor;
+
+import java.util.List;
 
 @AllArgsConstructor
 public class Data2GenericDataTransformer extends ProcessorFunctionAdapter<List<?>, GenericData<?>> {

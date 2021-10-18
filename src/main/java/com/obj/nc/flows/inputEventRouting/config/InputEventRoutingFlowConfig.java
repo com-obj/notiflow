@@ -19,6 +19,8 @@
 
 package com.obj.nc.flows.inputEventRouting.config;
 
+import com.obj.nc.flows.inputEventRouting.InputEventRouter;
+import com.obj.nc.functions.sources.genericEvents.GenericEventsSupplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,9 +29,6 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.router.AbstractMessageRouter;
-
-import com.obj.nc.flows.inputEventRouting.InputEventRouter;
-import com.obj.nc.functions.sources.genericEvents.GenericEventsSupplier;
 
 @Configuration
 public class InputEventRoutingFlowConfig {

@@ -19,28 +19,30 @@
 
 package com.obj.nc.controllers;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import com.obj.nc.domain.dto.EndpointTableViewDto;
 import com.obj.nc.domain.dto.EndpointTableViewDto.EndpointType;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.repositories.EndpointsRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import com.obj.nc.domain.dto.EndpointTableViewDto;
-import com.obj.nc.repositories.EndpointsRepository;
-
-import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Validated
 @RestController

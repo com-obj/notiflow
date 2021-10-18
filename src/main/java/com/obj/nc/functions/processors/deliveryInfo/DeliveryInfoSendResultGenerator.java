@@ -19,12 +19,6 @@
 
 package com.obj.nc.functions.processors.deliveryInfo;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
 import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.HasReceivingEndpoints;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
@@ -34,8 +28,13 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult.DeliveryInfoSendResultBuilder;
-
 import lombok.AllArgsConstructor;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionAdapter<HasReceivingEndpoints, List<DeliveryInfoSendResult>> {

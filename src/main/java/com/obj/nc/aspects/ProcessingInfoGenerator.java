@@ -19,10 +19,12 @@
 
 package com.obj.nc.aspects;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import com.obj.nc.domain.headers.HasHeader;
+import com.obj.nc.domain.headers.Header;
+import com.obj.nc.domain.headers.NewProcessingInfoAppEvent;
+import com.obj.nc.domain.headers.ProcessingInfo;
+import com.obj.nc.repositories.ProcessingInfoRepository;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -36,13 +38,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
-import com.obj.nc.domain.headers.HasHeader;
-import com.obj.nc.domain.headers.Header;
-import com.obj.nc.domain.headers.NewProcessingInfoAppEvent;
-import com.obj.nc.domain.headers.ProcessingInfo;
-import com.obj.nc.repositories.ProcessingInfoRepository;
-
-import lombok.extern.log4j.Log4j2;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @Aspect
 @Component

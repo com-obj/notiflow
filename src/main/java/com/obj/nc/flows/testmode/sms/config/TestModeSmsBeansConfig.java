@@ -19,14 +19,13 @@
 
 package com.obj.nc.flows.testmode.sms.config;
 
+import com.obj.nc.flows.testmode.sms.funcitons.processors.InMemorySmsSender;
+import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
+import com.obj.nc.functions.processors.senders.SmsSender;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-
-import com.obj.nc.flows.testmode.sms.funcitons.processors.InMemorySmsSender;
-import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
-import com.obj.nc.functions.processors.senders.SmsSender;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")

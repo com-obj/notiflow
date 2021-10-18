@@ -19,13 +19,11 @@
 
 package com.obj.nc.functions.processors.senders.mailchimp.dtos;
 
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.springframework.core.io.FileSystemResource;
-
 import com.obj.nc.domain.Attachment;
 import com.obj.nc.utils.FileUtils;
-
 import lombok.Data;
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.springframework.core.io.FileSystemResource;
 
 @Data
 public class MailchimpAttachmentDto {

@@ -19,11 +19,12 @@
 
 package com.obj.nc.repositories;
 
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-
-import java.util.List;
-
+import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.domain.endpoints.SmsEndpoint;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,11 +34,9 @@ import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.ReceivingEndpoint;
-import com.obj.nc.domain.endpoints.SmsEndpoint;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import java.util.List;
+
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)

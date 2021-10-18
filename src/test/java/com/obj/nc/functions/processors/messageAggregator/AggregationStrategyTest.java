@@ -19,21 +19,6 @@
 
 package com.obj.nc.functions.processors.messageAggregator;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.nullValue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
@@ -42,6 +27,20 @@ import com.obj.nc.functions.processors.messageAggregator.AggregationStrategyTest
 import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessageAggregationStrategy;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringJUnitConfig(classes = MessageAggregatorTestConfig.class)

@@ -19,16 +19,16 @@
 
 package com.obj.nc.functions.processors;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.PreCondition;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.PreCondition;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 
 public abstract class ProcessorFunctionAdapter<IN, OUT> extends ProcessorFunction<IN, OUT> {
 	

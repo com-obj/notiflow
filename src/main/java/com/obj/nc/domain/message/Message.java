@@ -19,12 +19,6 @@
 
 package com.obj.nc.domain.message;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
 import com.obj.nc.domain.HasPreviousIntentIds;
@@ -33,11 +27,16 @@ import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.ToString;
+
+import javax.validation.constraints.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)

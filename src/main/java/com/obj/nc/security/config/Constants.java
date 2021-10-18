@@ -19,9 +19,9 @@
 
 package com.obj.nc.security.config;
 
-import static java.util.Arrays.asList;
-
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public interface Constants {
     

@@ -19,10 +19,6 @@
 
 package com.obj.nc.functions.processors.dummy;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Component;
-
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.Group;
@@ -30,8 +26,10 @@ import com.obj.nc.domain.endpoints.Person;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 @AllArgsConstructor

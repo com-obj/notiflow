@@ -19,8 +19,7 @@
 
 package com.obj.nc;
 
-import javax.annotation.PostConstruct;
-
+import com.obj.nc.repositories.EndpointsRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
@@ -29,7 +28,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import com.obj.nc.repositories.EndpointsRepository;
+import javax.annotation.PostConstruct;
 
 /**
  * This is @Component to give spring a hint in configuration ordering. 

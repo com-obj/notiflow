@@ -19,12 +19,6 @@
 
 package com.obj.nc.functions.processors.messageTemplating;
 
-import java.util.Locale;
-import java.util.Optional;
-
-import org.springframework.stereotype.Component;
-import org.thymeleaf.TemplateEngine;
-
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
@@ -33,6 +27,11 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
+import org.springframework.stereotype.Component;
+import org.thymeleaf.TemplateEngine;
+
+import java.util.Locale;
+import java.util.Optional;
 
 @Component
 @DocumentProcessingInfo("SmsFormatter")

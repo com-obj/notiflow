@@ -19,6 +19,12 @@
 
 package com.obj.nc.flows.deliveryInfo;
 
+import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoFailedGenerator;
+import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoPersister;
+import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoProcessingGenerator;
+import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoReadGenerator;
+import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoSendGenerator;
+import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoSendTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,15 +33,6 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-
-import lombok.extern.log4j.Log4j2;
-
-import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoFailedGenerator;
-import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoPersister;
-import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoProcessingGenerator;
-import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoReadGenerator;
-import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoSendGenerator;
-import com.obj.nc.functions.processors.deliveryInfo.DeliveryInfoSendTransformer;
 
 @Configuration
 public class DeliveryInfoFlowConfig {

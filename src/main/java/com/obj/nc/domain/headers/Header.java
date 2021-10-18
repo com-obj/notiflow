@@ -19,20 +19,18 @@
 
 package com.obj.nc.domain.headers;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.relational.core.mapping.Column;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.domain.HasFlowId;
 import com.obj.nc.domain.HasProcessingInfo;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.beans.BeanUtils;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
 
 @Getter
 @Setter

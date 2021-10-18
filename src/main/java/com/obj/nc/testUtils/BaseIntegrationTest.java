@@ -19,19 +19,15 @@
 
 package com.obj.nc.testUtils;
 
-import java.nio.charset.Charset;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ThreadPoolExecutor;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.obj.nc.Get;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
+import com.obj.nc.repositories.DeliveryInfoRepository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.springframework.beans.BeansException;
@@ -42,16 +38,17 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-import com.icegreen.greenmail.util.GreenMailUtil;
-import com.obj.nc.Get;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-import com.obj.nc.repositories.DeliveryInfoRepository;
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.ToString;
-import lombok.extern.log4j.Log4j2;
+import java.nio.charset.Charset;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Log4j2
 public abstract class BaseIntegrationTest implements ApplicationContextAware {

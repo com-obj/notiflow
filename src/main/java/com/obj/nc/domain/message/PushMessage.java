@@ -20,8 +20,8 @@
 package com.obj.nc.domain.message;
 
 import com.obj.nc.domain.content.push.PushContent;
-import com.obj.nc.domain.endpoints.push.PushEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.domain.endpoints.push.PushEndpoint;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

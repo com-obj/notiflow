@@ -19,8 +19,12 @@
 
 package com.obj.nc.flows.mailchimpSending;
 
+import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.messageTemplating.config.TrackingConfigProperties;
 import com.obj.nc.functions.processors.messageTracking.MailchimpReadTrackingDecorator;
+import com.obj.nc.functions.processors.senders.mailchimp.MailchimpMessageSender;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -28,12 +32,6 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
-import com.obj.nc.functions.processors.senders.mailchimp.MailchimpMessageSender;
-
-import lombok.RequiredArgsConstructor;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 

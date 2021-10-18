@@ -19,15 +19,13 @@
 
 package com.obj.nc.functions.sink.payloadLogger;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Component;
-
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sink.SinkConsumerAdapter;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 @AllArgsConstructor

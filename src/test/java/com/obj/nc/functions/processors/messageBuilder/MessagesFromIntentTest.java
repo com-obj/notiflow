@@ -19,14 +19,7 @@
 
 package com.obj.nc.functions.processors.messageBuilder;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.obj.nc.domain.Attachment;
-import org.junit.jupiter.api.Test;
-
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
@@ -40,6 +33,12 @@ import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.messageTeamplating.domain.TestModel;
 import com.obj.nc.utils.JsonUtils;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MessagesFromIntentTest {
 

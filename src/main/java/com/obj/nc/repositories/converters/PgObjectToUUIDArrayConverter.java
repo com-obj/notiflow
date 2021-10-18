@@ -19,11 +19,11 @@
 
 package com.obj.nc.repositories.converters;
 
-import java.util.UUID;
-
 import org.postgresql.util.PGobject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
+
+import java.util.UUID;
 
 @WritingConverter
 public class PgObjectToUUIDArrayConverter implements Converter<PGobject, UUID[]> {

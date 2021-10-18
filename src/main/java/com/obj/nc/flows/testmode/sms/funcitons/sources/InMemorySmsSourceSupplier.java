@@ -19,17 +19,16 @@
 
 package com.obj.nc.flows.testmode.sms.funcitons.sources;
 
-import java.util.LinkedList;
-import java.util.Optional;
-
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
-
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.stereotype.Component;
+
+import java.util.LinkedList;
+import java.util.Optional;
 
 @Component
 @ConditionalOnMissingBean(type = "SmsSender")

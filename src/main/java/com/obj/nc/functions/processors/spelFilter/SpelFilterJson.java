@@ -32,7 +32,6 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.integration.json.JsonPropertyAccessor;
-import org.springframework.stereotype.Component;
 
 import lombok.extern.log4j.Log4j2;
 

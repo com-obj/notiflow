@@ -19,16 +19,16 @@
 
 package com.obj.nc.functions.sink;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.PreCondition;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.PreCondition;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 
 public abstract class SinkConsumerAdapter<IN> extends SinkConsumer<IN> {
 

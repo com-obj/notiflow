@@ -19,16 +19,14 @@
 
 package com.obj.nc.repositories.converters;
 
-import java.sql.SQLException;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.utils.JsonUtils;
+import lombok.extern.log4j.Log4j2;
 import org.postgresql.util.PGobject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.utils.JsonUtils;
-
-import lombok.extern.log4j.Log4j2;
+import java.sql.SQLException;
 
 @WritingConverter
 @Log4j2

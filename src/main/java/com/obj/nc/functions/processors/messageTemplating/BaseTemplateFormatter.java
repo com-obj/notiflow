@@ -19,16 +19,6 @@
 
 package com.obj.nc.functions.processors.messageTemplating;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-
 import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
@@ -36,10 +26,18 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @Component
 @AllArgsConstructor

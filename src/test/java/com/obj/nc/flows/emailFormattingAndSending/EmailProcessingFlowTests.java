@@ -19,23 +19,16 @@
 
 package com.obj.nc.flows.emailFormattingAndSending;
 
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MESSAGE_PER_LOCALE;
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.startsWith;
-
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-
-import javax.mail.internet.MimeMessage;
-
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.store.FolderException;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import com.obj.nc.config.NcAppConfigProperties;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.EmailMessageTemplated;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import com.obj.nc.utils.JsonUtils;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.apache.commons.text.StringEscapeUtils;
 import org.hamcrest.CoreMatchers;
@@ -51,16 +44,22 @@ import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.icegreen.greenmail.configuration.GreenMailConfiguration;
-import com.icegreen.greenmail.junit5.GreenMailExtension;
-import com.icegreen.greenmail.store.FolderException;
-import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.config.NcAppConfigProperties;
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailMessageTemplated;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import com.obj.nc.utils.JsonUtils;
+import javax.mail.internet.MimeMessage;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MESSAGE_PER_LOCALE;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.startsWith;
 
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)

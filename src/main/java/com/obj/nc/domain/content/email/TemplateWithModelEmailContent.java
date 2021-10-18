@@ -19,25 +19,23 @@
 
 package com.obj.nc.domain.content.email;
 
-import static com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration.MESSAGE_SOURCE_FOR_TEMPLATES_BEAN_NAME;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import com.obj.nc.domain.Attachment;
-import org.springframework.context.MessageSource;
-import org.springframework.context.NoSuchMessageException;
-
 import com.obj.nc.Get;
+import com.obj.nc.domain.Attachment;
 import com.obj.nc.domain.content.TemplateWithModelContent;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import static com.obj.nc.functions.processors.messageTemplating.config.ThymeleafConfiguration.MESSAGE_SOURCE_FOR_TEMPLATES_BEAN_NAME;
 
 @Data
 @NoArgsConstructor

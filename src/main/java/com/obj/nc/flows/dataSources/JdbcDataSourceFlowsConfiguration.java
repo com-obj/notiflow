@@ -6,20 +6,22 @@ import com.obj.nc.flows.dataSources.properties.jdbc.JdbcDataSourceProperties;
 import com.obj.nc.flows.dataSources.properties.jdbc.JdbcJobProperties;
 import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.Data2GenericDataTransformer;
 import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.JsonNodeFilterAndTransformer;
-import com.obj.nc.functions.processors.spelFilter.SpELFilterJson;
 import com.obj.nc.utils.JsonUtils;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.dsl.*;
+import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.Transformers;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.integration.jdbc.JdbcPollingChannelAdapter;
 import org.springframework.integration.json.ObjectToJsonTransformer.ResultType;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
+
 import java.util.List;
 import java.util.stream.Collectors;
 

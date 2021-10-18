@@ -20,13 +20,12 @@
 package com.obj.nc.flows.intenProcessing;
 
 
-import static com.obj.nc.flows.intenProcessing.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.flows.errorHandling.ErrorHandlingFlowConfig;
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
 
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.flows.errorHandling.ErrorHandlingFlowConfig;
+import static com.obj.nc.flows.intenProcessing.NotificationIntentProcessingFlowConfig.INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 @MessagingGateway(errorChannel = ErrorHandlingFlowConfig.ERROR_CHANNEL_NAME)
 public interface NotificationIntentProcessingFlow {

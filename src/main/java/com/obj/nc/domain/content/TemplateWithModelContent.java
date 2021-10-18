@@ -19,18 +19,17 @@
 
 package com.obj.nc.domain.content;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 @Data
 @NoArgsConstructor

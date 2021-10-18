@@ -19,11 +19,11 @@
 
 package com.obj.nc.domain.dto;
 
-import java.util.UUID;
-
 import com.obj.nc.domain.endpoints.ReceivingEndpointWithStats;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.UUID;
 
 @Data
 @Builder

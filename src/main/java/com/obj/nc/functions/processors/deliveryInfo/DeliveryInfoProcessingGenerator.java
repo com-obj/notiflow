@@ -19,12 +19,10 @@
 
 package com.obj.nc.functions.processors.deliveryInfo;
 
-import org.springframework.stereotype.Component;
-
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.stereotype.Component;
 
 @Data
 @EqualsAndHashCode(callSuper=false)

@@ -19,18 +19,16 @@
 
 package com.obj.nc.functions.processors.messageAggregator;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.functions.processors.messageAggregator.aggregations.BasePayloadAggregationStrategy;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.integration.aggregator.AbstractAggregatingMessageGroupProcessor;
 import org.springframework.integration.store.MessageGroup;
 
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.messageAggregator.aggregations.BasePayloadAggregationStrategy;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor

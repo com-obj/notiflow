@@ -19,17 +19,15 @@
 
 package com.obj.nc.functions.processors.genericDataConverter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.obj.nc.converterExtensions.genericData.GenericData2EventConverterExtension;
 import com.obj.nc.converterExtensions.genericData.GenericDataConverterExtension;
 import com.obj.nc.domain.event.GenericEvent;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor

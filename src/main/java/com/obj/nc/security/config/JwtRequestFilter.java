@@ -19,17 +19,10 @@
 
 package com.obj.nc.security.config;
 
-import static com.obj.nc.security.config.Constants.AUTHORIZATION_HEADER;
-import static com.obj.nc.security.config.Constants.JWT_TOKEN_PREFIX;
-import static com.obj.nc.security.config.Constants.NOT_PROTECTED_RESOURCES;
-
-import java.io.IOException;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.obj.nc.config.NcAppConfigProperties;
+import com.obj.nc.security.exception.UserNotAuthenticatedException;
+import com.obj.nc.security.service.JwtUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,11 +32,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.obj.nc.config.NcAppConfigProperties;
-import com.obj.nc.security.exception.UserNotAuthenticatedException;
-import com.obj.nc.security.service.JwtUserDetailsService;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+
+import static com.obj.nc.security.config.Constants.AUTHORIZATION_HEADER;
+import static com.obj.nc.security.config.Constants.JWT_TOKEN_PREFIX;
+import static com.obj.nc.security.config.Constants.NOT_PROTECTED_RESOURCES;
 
 @Component
 @ConditionalOnBean(JwtSecurityConfig.class)

@@ -19,14 +19,12 @@
 
 package com.obj.nc.repositories.converters;
 
+import com.obj.nc.domain.notifIntent.content.IntentContent;
+import com.obj.nc.utils.JsonUtils;
+import lombok.NonNull;
 import org.postgresql.util.PGobject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
-
-import com.obj.nc.domain.notifIntent.content.IntentContent;
-import com.obj.nc.utils.JsonUtils;
-
-import lombok.NonNull;
 
 @ReadingConverter
 public class PgObjectToIntentContentConverter implements Converter<PGobject, IntentContent> {

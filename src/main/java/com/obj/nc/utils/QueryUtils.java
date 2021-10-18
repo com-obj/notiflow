@@ -19,12 +19,11 @@
 
 package com.obj.nc.utils;
 
-import java.util.stream.Collectors;
-
+import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
 
-import com.google.common.base.CaseFormat;
+import java.util.stream.Collectors;
 
 public final class QueryUtils {
     

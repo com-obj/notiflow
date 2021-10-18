@@ -19,17 +19,16 @@
 
 package com.obj.nc.functions.processors.genericDataConverter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.obj.nc.converterExtensions.genericData.GenericDataConverterExtension;
 import com.obj.nc.domain.dataObject.GenericData;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-
 import lombok.extern.log4j.Log4j2;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Log4j2
 public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends ProcessorFunctionAdapter<GenericData<?>, List<OUT>> {

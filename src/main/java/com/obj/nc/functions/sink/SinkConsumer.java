@@ -19,13 +19,12 @@
 
 package com.obj.nc.functions.sink;
 
-import java.util.Optional;
-import java.util.function.Consumer;
-
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
-
 import lombok.extern.log4j.Log4j2;
+
+import java.util.Optional;
+import java.util.function.Consumer;
 
 @Log4j2
 public abstract class SinkConsumer<IN> implements Consumer<IN> {

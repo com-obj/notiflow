@@ -19,15 +19,14 @@
 
 package com.obj.nc.repositories.converters;
 
-import java.sql.SQLException;
-import java.util.StringJoiner;
-import java.util.UUID;
-
+import lombok.extern.log4j.Log4j2;
 import org.postgresql.util.PGobject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 
-import lombok.extern.log4j.Log4j2;
+import java.sql.SQLException;
+import java.util.StringJoiner;
+import java.util.UUID;
 
 @WritingConverter
 @Log4j2

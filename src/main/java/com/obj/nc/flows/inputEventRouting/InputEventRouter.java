@@ -19,16 +19,6 @@
 
 package com.obj.nc.flows.inputEventRouting;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.router.AbstractMessageRouter;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.Get;
 import com.obj.nc.domain.HasFlowId;
@@ -36,8 +26,16 @@ import com.obj.nc.domain.HasJsonPayload;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.flows.inputEventRouting.config.InputEventExtensionConvertingFlowConfig;
 import com.obj.nc.flows.inputEventRouting.config.InputEventRoutingProperties;
-
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.integration.router.AbstractMessageRouter;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
 
 @Log4j2
 /**

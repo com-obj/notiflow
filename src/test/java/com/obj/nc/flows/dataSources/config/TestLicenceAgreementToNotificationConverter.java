@@ -1,9 +1,5 @@
 package com.obj.nc.flows.dataSources.config;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
 import com.obj.nc.converterExtensions.genericData.GenericData2NotificationConverterExtension;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
@@ -11,8 +7,11 @@ import com.obj.nc.domain.dataObject.GenericData;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.exceptions.PayloadValidationException;
-
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class TestLicenceAgreementToNotificationConverter implements GenericData2NotificationConverterExtension<TestLicenseAgreement> {

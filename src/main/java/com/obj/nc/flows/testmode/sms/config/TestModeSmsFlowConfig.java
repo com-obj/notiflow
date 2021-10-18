@@ -19,8 +19,9 @@
 
 package com.obj.nc.flows.testmode.sms.config;
 
-import java.util.concurrent.TimeUnit;
-
+import com.obj.nc.flows.testmode.TestModeProperties;
+import com.obj.nc.flows.testmode.config.TestModeFlowConfig;
+import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -32,9 +33,7 @@ import org.springframework.integration.dsl.Pollers;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
-import com.obj.nc.flows.testmode.TestModeProperties;
-import com.obj.nc.flows.testmode.config.TestModeFlowConfig;
-import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")

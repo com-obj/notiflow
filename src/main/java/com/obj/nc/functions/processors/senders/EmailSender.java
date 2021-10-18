@@ -19,25 +19,8 @@
 
 package com.obj.nc.functions.processors.senders;
 
-import java.io.File;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Optional;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
-import com.obj.nc.domain.Attachment;
-import org.apache.commons.text.StringEscapeUtils;
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.MediaType;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Component;
-
 import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.domain.Attachment;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
@@ -47,9 +30,24 @@ import com.obj.nc.exceptions.ProcessingException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.senders.config.EmailSenderConfigProperties;
 import com.obj.nc.utils.JsonUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+import java.io.File;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
 
 @Primary
 @Component

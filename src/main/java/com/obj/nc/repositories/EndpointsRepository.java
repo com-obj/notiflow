@@ -19,20 +19,19 @@
 
 package com.obj.nc.repositories;
 
+import com.obj.nc.domain.dto.EndpointTableViewDto.EndpointType;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpointWithStats;
+import com.obj.nc.domain.endpoints.ReceivingEndpointWithStats.ReceivingEndpointWithStatsRowMapper;
+import com.obj.nc.repositories.mappers.ReceivingEndpointRowMapper;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import com.obj.nc.domain.dto.EndpointTableViewDto.EndpointType;
-import com.obj.nc.domain.endpoints.ReceivingEndpointWithStats;
-import com.obj.nc.domain.endpoints.ReceivingEndpointWithStats.ReceivingEndpointWithStatsRowMapper;
-import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
-
-import com.obj.nc.domain.endpoints.ReceivingEndpoint;
-import com.obj.nc.repositories.mappers.ReceivingEndpointRowMapper;
-import org.springframework.data.repository.query.Param;
 
 public interface EndpointsRepository extends PagingAndSortingRepository<ReceivingEndpoint, UUID>, EndpointsRepositoryCustom {
     

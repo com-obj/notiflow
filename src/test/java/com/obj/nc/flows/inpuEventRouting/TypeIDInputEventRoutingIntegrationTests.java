@@ -19,10 +19,18 @@
 
 package com.obj.nc.flows.inpuEventRouting;
 
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-
-import javax.mail.MessagingException;
-
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import com.obj.nc.utils.JsonUtils;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,19 +47,9 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import com.obj.nc.utils.JsonUtils;
+import javax.mail.MessagingException;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
