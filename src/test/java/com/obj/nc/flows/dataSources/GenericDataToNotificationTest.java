@@ -41,7 +41,7 @@ import static org.junit.Assert.assertEquals;
         "nc.data-sources.jdbc[0].jobs[0].entity-name=license_agreement",
         "nc.data-sources.jdbc[0].jobs[0].sqlQuery=select * from license_agreement",  
         "nc.data-sources.jdbc[0].jobs[0].pojoFCCN=com.obj.nc.flows.dataSources.config.TestLicenseAgreement",                
-        "nc.data-sources.jdbc[0].jobs[0].cron=*/1 * * * * *",
+        "nc.data-sources.jdbc[0].jobs[0].cron=*/2 * * * * *",
         "test-license-agreements.admin-email=johndoe@objectify.sk",
         "test-license-agreements.email-template-path=agreements.html",
         "nc.functions.email-templates.templates-root-dir=src/test/resources/templates"
