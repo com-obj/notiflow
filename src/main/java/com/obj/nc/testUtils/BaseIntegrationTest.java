@@ -70,7 +70,6 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     
     @Autowired ThreadPoolTaskScheduler taskScheduler; 
 
-
     @BeforeEach
     void setUp() {
         MDC.put("testName", this.getClass().getSimpleName());
