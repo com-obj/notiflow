@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Deprecated
 public class EventGeneratorExecution implements Supplier<NotificationIntent> {
 
     @Autowired

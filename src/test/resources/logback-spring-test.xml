@@ -19,6 +19,7 @@
         <sift>
             <appender name="FILE-${testName}" class="ch.qos.logback.core.FileAppender">
                 <file>${LOGS_DIR}/${testName}.log</file>
+                <append>false</append>
 
                 <encoder>
                     <pattern>%d{HH:mm:ss.SSS} [%t] %p %C{36}.%M:  %m%n

@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 
 @Component
 @AllArgsConstructor
+@Deprecated
 public class EventGeneratorSourceSupplier extends SourceSupplier<NotificationIntent> {
 
 	@Autowired

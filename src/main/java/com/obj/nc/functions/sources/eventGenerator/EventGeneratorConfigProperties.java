@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "nc.functions.event-generator")
 @Data
 @Component
+@Deprecated
 public class EventGeneratorConfigProperties {
 
     String sourceDir;

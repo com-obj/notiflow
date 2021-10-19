@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
+@Deprecated
 public class EventGeneratorPreCondition implements PreCondition<NotificationIntent> {
 
     @Override

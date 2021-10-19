@@ -87,8 +87,6 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
     	
     	pollableSource.start();    	
     	
-//    	JsonUtils.resetObjectMapper();
-//    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
     }
 	
     @Test

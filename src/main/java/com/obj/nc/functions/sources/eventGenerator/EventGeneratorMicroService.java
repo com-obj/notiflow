@@ -29,6 +29,7 @@ import reactor.core.publisher.Flux;
 import java.util.function.Supplier;
 
 @Configuration
+@Deprecated
 public class EventGeneratorMicroService extends SourceMicroService<NotificationIntent, EventGeneratorSourceSupplier> {
 
     @Autowired
