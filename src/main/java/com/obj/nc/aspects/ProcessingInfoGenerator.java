@@ -25,6 +25,7 @@ import com.obj.nc.domain.headers.NewProcessingInfoAppEvent;
 import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.repositories.ProcessingInfoRepository;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -44,7 +45,7 @@ import java.util.List;
 
 @Aspect
 @Component
-@Log4j2
+@Slf4j
 public class ProcessingInfoGenerator {
 
 //	@Pointcut("within(@com.obj.nc.aspects.DocumentProcessingInfo *)")

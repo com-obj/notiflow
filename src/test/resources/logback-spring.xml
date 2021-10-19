@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="LogFilePerTestAppender" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>testName</key>
+            <defaultValue>ALL</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${testName}" class="ch.qos.logback.core.FileAppender">
+                <file>${LOGS_DIR}/${testName}.log</file>
+
+                <encoder>
+                    <pattern>%d{HH:mm:ss.SSS} [%t] %p %C{36}.%M:  %m%n
+                    </pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
+    
+    <root>
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+        <appender-ref ref="LogFilePerTestAppender" />        
+    </root>
+
+</configuration>

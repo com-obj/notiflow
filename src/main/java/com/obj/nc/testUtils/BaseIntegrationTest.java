@@ -30,6 +30,8 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
+import org.junit.jupiter.api.BeforeEach;
+import org.slf4j.MDC;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -59,6 +61,11 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     @Autowired(required = false) //not all tests require, some might not be @SpringBootTests 
     DeliveryInfoRepository deliveryInfoRepo;
     @Autowired ThreadPoolTaskScheduler executor;
+
+    @BeforeEach
+    void setUp() {
+        MDC.put("testName", this.getClass().getSimpleName());
+    }
 
     
     public static void purgeNotifTables(@Autowired JdbcTemplate jdbcTemplate) {

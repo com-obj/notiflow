@@ -53,6 +53,7 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.test.context.SpringIntegrationTest;
@@ -83,11 +84,10 @@ public class ProcessingInfoGeneratorTest {
 	
     @BeforeEach
     void setUp() {
+        MDC.put("testName", this.getClass().getSimpleName());
+
         jdbcTemplate.execute("truncate table nc_processing_info");
-        jdbcTemplate.execute("truncate table nc_endpoint cascade");
-        
-//    	JsonUtils.resetObjectMapper();
-//    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
+        jdbcTemplate.execute("truncate table nc_endpoint cascade");        
     }
     
 	@Test
