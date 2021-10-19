@@ -19,19 +19,18 @@
 
 package com.obj.nc.functions.processors.messageAggregator.aggregations;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.exceptions.PayloadValidationException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 
 
 @Component

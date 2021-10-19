@@ -19,9 +19,11 @@
 
 package com.obj.nc.config;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.security.model.AuthenticationError;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
@@ -33,11 +35,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.security.model.AuthenticationError;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class SpringMvcConfig {

@@ -19,10 +19,9 @@
 
 package com.obj.nc.config;
 
+import com.obj.nc.Get;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.obj.nc.Get;
 
 @Configuration
 public class InjectorConfiguration  {

@@ -20,7 +20,8 @@
 package com.obj.nc.flows.errorHandling;
 
 import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
-
+import com.obj.nc.functions.processors.errorHandling.SpringMessageToFailedPayloadFunction;
+import com.obj.nc.functions.processors.failedPaylodPersister.FailedPayloadPersister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -30,9 +31,6 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.handler.LoggingHandler.Level;
 import org.springframework.messaging.MessageHeaders;
-
-import com.obj.nc.functions.processors.errorHandling.SpringMessageToFailedPayloadFunction;
-import com.obj.nc.functions.processors.failedPaylodPersister.FailedPayloadPersister;
 
 @Configuration
 public class ErrorHandlingFlowConfig {

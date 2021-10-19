@@ -19,13 +19,12 @@
 
 package com.obj.nc.repositories;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.data.repository.CrudRepository;
-
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
+import org.springframework.data.repository.CrudRepository;
+
+import java.util.List;
+import java.util.UUID;
 
 public interface NotificationIntentRepository extends CrudRepository<NotificationIntent, UUID>, EntityExistenceChecker<UUID> {
 

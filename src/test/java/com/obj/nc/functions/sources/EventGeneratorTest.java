@@ -19,15 +19,16 @@
 
 package com.obj.nc.functions.sources;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Map;
-
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.notifIntent.content.IntentContent;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfigProperties;
+import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -39,18 +40,19 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.FileSystemUtils;
 
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.domain.notifIntent.content.IntentContent;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.sources.eventGenerator.EventGeneratorConfigProperties;
-import com.obj.nc.functions.sources.eventGenerator.EventGeneratorSourceSupplier;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Map;
 
-
+//this is completely useles,.. we don't use this aproach anymore
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @ExtendWith(SpringExtension.class)
 @EnableConfigurationProperties(value = EventGeneratorConfigProperties.class)
 @ContextConfiguration(classes = EventGeneratorTestConfig.class)
+@Deprecated
+@Disabled
 class EventGeneratorTest {
 
     private static final String INTENTS_DIR = "src/test/resources/intents/";

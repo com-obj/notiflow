@@ -19,16 +19,15 @@
 
 package com.obj.nc.functions.processors.messageAggregator.aggregations;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.exceptions.PayloadValidationException;
-
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class SmsMessageAggregationStrategy extends BasePayloadAggregationStrategy<SimpleTextContent> {

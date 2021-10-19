@@ -19,18 +19,6 @@
 
 package com.obj.nc.domain.notifIntent.content;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
-import com.obj.nc.domain.content.push.PushContent;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.endpoints.push.PushEndpoint;
-import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.http.MediaType;
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -38,13 +26,23 @@ import com.obj.nc.domain.Attachment;
 import com.obj.nc.domain.BaseJSONObject;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.push.PushContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
-
+import com.obj.nc.domain.endpoints.push.PushEndpoint;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.http.MediaType;
+
+import javax.validation.constraints.NotNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, defaultImpl = IntentContent.class)
 @JsonSubTypes({ 

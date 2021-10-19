@@ -19,22 +19,27 @@
 
 package com.obj.nc.flows.testmode;
 
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
-import static com.obj.nc.flows.testmode.sms.config.TestModeSmsFlowConfig.TEST_MODE_SMS_SOURCE_BEAN_NAME;
-import static com.obj.nc.flows.testmode.sms.config.TestModeSmsFlowConfig.TEST_MODE_SMS_SOURCE_TRIGGER_BEAN_NAME;
-import static org.awaitility.Awaitility.await;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.store.FolderException;
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.EmailMessageTemplated;
+import com.obj.nc.domain.message.SmsMessage;
+import com.obj.nc.domain.message.SmsMessageTemplated;
+import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
+import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
+import com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig;
+import com.obj.nc.flows.testmode.email.config.TestModeGreenMailProperties;
+import com.obj.nc.flows.testmode.email.functions.sources.GreenMailReceiverSourceSupplier;
+import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
+import com.obj.nc.functions.processors.senders.EmailSender;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -59,27 +64,21 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.icegreen.greenmail.configuration.GreenMailConfiguration;
-import com.icegreen.greenmail.junit5.GreenMailExtension;
-import com.icegreen.greenmail.store.FolderException;
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.GreenMailUtil;
-import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailMessageTemplated;
-import com.obj.nc.domain.message.SmsMessage;
-import com.obj.nc.domain.message.SmsMessageTemplated;
-import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
-import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
-import com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig;
-import com.obj.nc.flows.testmode.email.config.TestModeGreenMailProperties;
-import com.obj.nc.flows.testmode.email.functions.sources.GreenMailReceiverSourceSupplier;
-import com.obj.nc.flows.testmode.sms.funcitons.sources.InMemorySmsSourceSupplier;
-import com.obj.nc.functions.processors.senders.EmailSender;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import com.obj.nc.utils.JsonUtils;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.testmode.email.config.TestModeEmailsFlowConfig.TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME;
+import static com.obj.nc.flows.testmode.sms.config.TestModeSmsFlowConfig.TEST_MODE_SMS_SOURCE_BEAN_NAME;
+import static com.obj.nc.flows.testmode.sms.config.TestModeSmsFlowConfig.TEST_MODE_SMS_SOURCE_TRIGGER_BEAN_NAME;
+import static org.awaitility.Awaitility.await;
 
 @ActiveProfiles(value = { "test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = {TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME, TEST_MODE_SMS_SOURCE_BEAN_NAME })

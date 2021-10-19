@@ -19,6 +19,13 @@
 
 package com.obj.nc.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.obj.nc.exceptions.PayloadValidationException;
+import org.springframework.integration.support.json.Jackson2JsonObjectMapper;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -34,17 +41,12 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.obj.nc.exceptions.PayloadValidationException;
-
 public class JsonUtils {
 	
 	public static DateFormat stdJsonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 	
-	private static ObjectMapper instance;
+	private static ObjectMapper objectMapper;
+	private static Jackson2JsonObjectMapper jsonObjectMapper;
 
 	public static <T> T readObjectFromJSONFile(Path filePath, Class<T> beanType) {
 		String JSONStr = readFileContent(filePath);	
@@ -214,15 +216,24 @@ public class JsonUtils {
 	
 	//only for tests
 	public static void resetObjectMapper( ) {
-		instance = null;
+		objectMapper = null;
 	}
 	//Use objectmapper defined as srping bean
 	public static ObjectMapper getObjectMapper() {
-		if (instance == null) {
-			instance = new ObjectMapper();
-			instance.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-			instance.registerModule(new JavaTimeModule());
+		if (objectMapper == null) {
+			objectMapper = new ObjectMapper();
+			objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+			objectMapper.registerModule(new JavaTimeModule());
+			objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		}
-		return instance;
+		return objectMapper;
 	}
+	
+	public static Jackson2JsonObjectMapper getJsonObjectMapper() {
+		if (jsonObjectMapper == null) {
+			jsonObjectMapper = new Jackson2JsonObjectMapper(getObjectMapper());
+		}
+		return jsonObjectMapper;
+	}
+	
 }

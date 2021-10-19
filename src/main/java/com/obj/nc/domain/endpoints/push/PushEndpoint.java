@@ -21,7 +21,9 @@ package com.obj.nc.domain.endpoints.push;
 
 import com.google.firebase.messaging.Message;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @EqualsAndHashCode(callSuper=false)

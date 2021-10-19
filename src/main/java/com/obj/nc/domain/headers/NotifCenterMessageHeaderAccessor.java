@@ -19,11 +19,11 @@
 
 package com.obj.nc.domain.headers;
 
-import java.util.List;
-import java.util.UUID;
-
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.NativeMessageHeaderAccessor;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Inspired by AmqpMessageHeaderAccessor

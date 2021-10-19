@@ -20,7 +20,11 @@
 package com.obj.nc.domain.content.mailchimp;
 
 import com.obj.nc.domain.content.TrackableContent;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor

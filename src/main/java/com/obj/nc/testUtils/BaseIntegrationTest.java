@@ -19,6 +19,38 @@
 
 package com.obj.nc.testUtils;
 
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.obj.nc.Get;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
+import com.obj.nc.repositories.DeliveryInfoRepository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
+import org.awaitility.Awaitility;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.slf4j.MDC;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.integration.config.GlobalChannelInterceptor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -26,34 +58,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ThreadPoolExecutor;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
-import org.assertj.core.api.Assertions;
-import org.awaitility.Awaitility;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-
-import com.icegreen.greenmail.util.GreenMailUtil;
-import com.obj.nc.Get;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-import com.obj.nc.repositories.DeliveryInfoRepository;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.ToString;
-import lombok.extern.log4j.Log4j2;
-
-@Log4j2
+@Slf4j
 public abstract class BaseIntegrationTest implements ApplicationContextAware {
 
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
@@ -61,7 +67,19 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     @Autowired Get get;
     @Autowired(required = false) //not all tests require, some might not be @SpringBootTests 
     DeliveryInfoRepository deliveryInfoRepo;
-    @Autowired ThreadPoolTaskScheduler executor;
+    
+    @Autowired ThreadPoolTaskScheduler taskScheduler; 
+
+    @BeforeEach
+    void setUp() {
+        MDC.put("testName", this.getClass().getSimpleName());
+        log.info("TEST START {}", this.getClass().getSimpleName());  
+    }
+
+    @AfterEach
+    void tearDown() {
+       log.info("TEST FINISH {}", this.getClass().getSimpleName());        
+    }
 
     
     public static void purgeNotifTables(@Autowired JdbcTemplate jdbcTemplate) {
@@ -180,7 +198,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     	
     	Awaitility.await().atMost(maxTime).until(() -> {
     		List<DeliveryInfo> infos = deliveryInfoRepo.findByEventIdAndStatusOrderByProcessedOn(eventId, DELIVERY_STATUS.SENT);
-    		log.info(infos);
+    		log.info("DeliveryInfos: {}",infos);
     		
     		return infos.size()==messageCount;
     	});    
@@ -192,7 +210,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     }
 
 	public void wiatForIntegrationFlowsToFinish(int numberOfSeconds) {
-		Awaitility.await().atMost(Duration.ofSeconds(numberOfSeconds)).until(() -> executor.getActiveCount()==0);   		
+		Awaitility.await().atMost(Duration.ofSeconds(numberOfSeconds)).until(() -> taskScheduler.getActiveCount()==0);   		
 	}
 
 }

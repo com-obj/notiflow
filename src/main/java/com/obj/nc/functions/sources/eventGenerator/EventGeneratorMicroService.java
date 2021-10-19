@@ -19,18 +19,17 @@
 
 package com.obj.nc.functions.sources.eventGenerator;
 
-import java.util.function.Supplier;
-
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.functions.sources.SourceMicroService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.functions.sources.SourceMicroService;
-
 import reactor.core.publisher.Flux;
 
+import java.util.function.Supplier;
+
 @Configuration
+@Deprecated
 public class EventGeneratorMicroService extends SourceMicroService<NotificationIntent, EventGeneratorSourceSupplier> {
 
     @Autowired

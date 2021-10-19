@@ -19,9 +19,9 @@
 
 package com.obj.nc.domain;
 
-import java.util.List;
-
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+
+import java.util.List;
 
 public interface HasReceivingEndpoints {
 	

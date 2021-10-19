@@ -17,32 +17,13 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.flows.inputEventRouting.extensions;
+package com.obj.nc.converterExtensions.genericEvent;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.obj.nc.converterExtensions.ConverterExtension;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.exceptions.PayloadValidationException;
 
-/**
- * Will need to allow mapping specific instances of this class to flow_id
- * @author Jan Cuzy
- *
- * @param <RESULT_TYPE>
- */
-public interface InputEventConverterExtension<RESULT_TYPE extends IsNotification> {
-	
-	/**
-	 * 
-	 * @param payload
-	 * @return 
-	 * 		Optional.emtpy() if this extensions is capable of making payload->RESULT_TYPE transformation
-	 * 		Optional.of(new PayloadValidationException("Error description") if not (error description will be logged)	
-	 */
-	Optional<PayloadValidationException> canHandle(GenericEvent payload);
-	
-	List<RESULT_TYPE> convertEvent(GenericEvent event);
-	
+public interface InputEventConverterExtension<RESULT_TYPE extends IsNotification> 
+		extends ConverterExtension<GenericEvent, RESULT_TYPE> {
+			
 }

@@ -19,15 +19,15 @@
 
 package com.obj.nc.flows.messageProcessing;
 
-import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SEND_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.mailchimpSending.TemplatedMailchimpMessageProcessingFlowConfig.MAILCHIMP_TEMPLATE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.pushProcessing.PushProcessingFlowConfig.PUSH_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-
-import com.obj.nc.domain.message.*;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.EmailMessageTemplated;
+import com.obj.nc.domain.message.MailchimpMessage;
+import com.obj.nc.domain.message.PushMessage;
+import com.obj.nc.domain.message.SmsMessageTemplated;
+import com.obj.nc.domain.message.TemplatedMailchimpMessage;
+import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.messageBuilder.MessageByRecipientTokenizer;
+import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,9 +35,13 @@ import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
-import com.obj.nc.functions.processors.messageBuilder.MessageByRecipientTokenizer;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
+import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SEND_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.mailchimpSending.MailchimpProcessingFlowConfig.MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.mailchimpSending.TemplatedMailchimpMessageProcessingFlowConfig.MAILCHIMP_TEMPLATE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.pushProcessing.PushProcessingFlowConfig.PUSH_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 @Configuration
 public class MessageProcessingFlowConfig {

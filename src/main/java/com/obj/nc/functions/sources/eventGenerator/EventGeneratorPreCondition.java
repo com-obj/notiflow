@@ -19,15 +19,15 @@
 
 package com.obj.nc.functions.sources.eventGenerator;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Component;
-
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
+@Deprecated
 public class EventGeneratorPreCondition implements PreCondition<NotificationIntent> {
 
     @Override

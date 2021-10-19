@@ -19,44 +19,48 @@
 
 package com.obj.nc.domain.notifIntent;
 
-import com.obj.nc.domain.HasPreviousIntentIds;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.content.mailchimp.TemplatedMailchimpContent;
-import com.obj.nc.domain.content.push.PushContent;
-import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
-import com.obj.nc.domain.message.*;
-import com.obj.nc.domain.refIntegrity.Reference;
-import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.NotificationIntentRepository;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
-import javax.validation.constraints.NotNull;
-
-import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.HasPreviousIntentIds;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.mailchimp.TemplatedMailchimpContent;
+import com.obj.nc.domain.content.push.PushContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.EmailMessageTemplated;
+import com.obj.nc.domain.message.MailchimpMessage;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.PushMessage;
+import com.obj.nc.domain.message.SmsMessage;
+import com.obj.nc.domain.message.SmsMessageTemplated;
+import com.obj.nc.domain.message.TemplatedMailchimpMessage;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
-
+import com.obj.nc.domain.refIntegrity.Reference;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.NotificationIntentRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+import javax.validation.constraints.NotNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor

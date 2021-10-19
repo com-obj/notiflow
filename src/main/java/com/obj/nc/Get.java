@@ -19,16 +19,16 @@
 
 package com.obj.nc;
 
-import javax.annotation.PostConstruct;
-
+import com.obj.nc.repositories.EndpointsRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import com.obj.nc.repositories.EndpointsRepository;
+import javax.annotation.PostConstruct;
 
 /**
  * This is @Component to give spring a hint in configuration ordering. 
@@ -72,6 +72,13 @@ public class Get {
 	
 	public static boolean isInitalised() {
 		return getApplicationContext() != null;
+	}
+	
+	public void registerBean(String beanName, Class<?> beanClass) {
+		if (applicationContext instanceof GenericApplicationContext) {
+			((GenericApplicationContext) applicationContext)
+					.registerBean(beanName, beanClass);
+		}
 	}
 	
 	//we need all of them.. in tests

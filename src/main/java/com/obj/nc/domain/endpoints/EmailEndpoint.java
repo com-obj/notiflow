@@ -20,16 +20,14 @@
 package com.obj.nc.domain.endpoints;
 
 import com.google.common.collect.ObjectArrays;
-
-import org.springframework.restdocs.payload.FieldDescriptor;
-import org.springframework.restdocs.payload.PayloadDocumentation;
-
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.payload.PayloadDocumentation;
 
 @Data
 @EqualsAndHashCode(callSuper=false, of = "email")

@@ -17,10 +17,30 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.flows.inputEventRouting.extensions;
+package com.obj.nc.flows.dataSources.config;
 
-import com.obj.nc.domain.message.Message;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public interface InputEvent2MessageConverterExtension extends InputEventConverterExtension<Message<?>> {
-	
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class TestLicenseAgreement {
+    
+    private String description;
+    
+    @JsonProperty("expiry_date")
+    private Instant expiryDate;
+    
+
+    public boolean isExpired(int numberOfDaysBeforeExpiration) { //use instead of complicated SPeL expression
+        return expiryDate.isBefore(Instant.now().plus(numberOfDaysBeforeExpiration, ChronoUnit.DAYS));
+    }
 }

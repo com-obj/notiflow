@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h3>Agreements that will expire soon</h3>
+<table border="1" cellpadding="5" style="border-collapse:collapse; border: 1px solid gray;">
+    <thead>
+    <tr>
+        <th> Description </th>
+        <th> Expiry date </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="agreement : ${model}">
+        <td><span th:text="${agreement.description}"> Desc </span></td>
+        <td><span th:text="${agreement.expiryDate}"> Someday </span></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

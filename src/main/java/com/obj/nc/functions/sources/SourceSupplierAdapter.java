@@ -19,11 +19,11 @@
 
 package com.obj.nc.functions.sources;
 
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public abstract class SourceSupplierAdapter<OUT> extends SourceSupplier<OUT> {
 

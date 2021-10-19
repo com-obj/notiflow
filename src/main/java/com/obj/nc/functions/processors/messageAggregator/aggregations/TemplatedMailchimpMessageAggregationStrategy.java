@@ -19,24 +19,23 @@
 
 package com.obj.nc.functions.processors.messageAggregator.aggregations;
 
+import com.obj.nc.domain.Attachment;
+import com.obj.nc.domain.content.mailchimp.TemplatedMailchimpContent;
+import com.obj.nc.domain.endpoints.MailchimpEndpoint;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.TemplatedMailchimpMessage;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.obj.nc.domain.Attachment;
-import com.obj.nc.domain.content.mailchimp.TemplatedMailchimpContent;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.message.TemplatedMailchimpMessage;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.senders.mailchimp.config.MailchimpSenderConfigProperties;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 public class TemplatedMailchimpMessageAggregationStrategy extends BasePayloadAggregationStrategy<TemplatedMailchimpContent> {
 	

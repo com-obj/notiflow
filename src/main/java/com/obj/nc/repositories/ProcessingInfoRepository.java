@@ -19,12 +19,11 @@
 
 package com.obj.nc.repositories;
 
-import java.util.UUID;
-
-import org.springframework.data.repository.CrudRepository;
-
 import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
+import org.springframework.data.repository.CrudRepository;
+
+import java.util.UUID;
 
 public interface ProcessingInfoRepository extends CrudRepository<ProcessingInfo, UUID>, CustomProcessingInfoRepository, EntityExistenceChecker<UUID> {
 

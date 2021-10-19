@@ -19,20 +19,18 @@
 
 package com.obj.nc.domain.content.email;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.obj.nc.domain.Attachment;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TrackableContent;
-import org.springframework.http.MediaType;
-
-import com.obj.nc.domain.Attachment;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.http.MediaType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor

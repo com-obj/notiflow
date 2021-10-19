@@ -19,26 +19,24 @@
 
 package com.obj.nc.functions.processors.event2Message;
 
+import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.converterExtensions.genericEvent.InputEventConverterExtension;
+import com.obj.nc.domain.IsNotification;
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.IsNotification;
-import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.flows.inputEventRouting.extensions.InputEventConverterExtension;
-import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-
 @DocumentProcessingInfo("ExtensionsBasedEventConvertor")
 @AllArgsConstructor
-@Log4j2
+@Slf4j
 public class ExtensionsBasedEventConvertor extends ProcessorFunctionAdapter<GenericEvent, List<IsNotification>> {
 	
 	@Autowired(required = false) 
@@ -76,7 +74,7 @@ public class ExtensionsBasedEventConvertor extends ProcessorFunctionAdapter<Gene
 	protected List<IsNotification> execute(GenericEvent payload) {
 		return 
 				findMatchingEventProcessors(payload).stream()
-					.map(p -> p.convertEvent(payload))
+					.map(p -> p.convert(payload))
 					.peek(notifications -> notifications.stream()
 						.filter(notification -> !notification.getPreviousEventIds().contains(payload.getEventId()))
 						.forEach(notification -> notification.addPreviousEventId(payload.getId())))

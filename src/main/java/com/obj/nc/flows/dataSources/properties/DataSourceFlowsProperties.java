@@ -17,8 +17,23 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain;
+package com.obj.nc.flows.dataSources.properties;
 
-public interface IsTypedJson {
+import com.obj.nc.flows.dataSources.properties.jdbc.JdbcDataSourceProperties;
+import lombok.Data;
+import org.hibernate.validator.constraints.UniqueElements;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@Validated
+@Configuration
+@ConfigurationProperties("nc.data-sources")
+public class DataSourceFlowsProperties {
+    @UniqueElements
+    private List<JdbcDataSourceProperties> jdbc = new ArrayList<>();
 }

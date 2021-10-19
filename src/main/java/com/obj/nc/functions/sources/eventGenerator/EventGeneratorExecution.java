@@ -19,6 +19,15 @@
 
 package com.obj.nc.functions.sources.eventGenerator;
 
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.utils.JsonUtils;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.validation.constraints.NotNull;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,20 +37,10 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import javax.validation.constraints.NotNull;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.utils.JsonUtils;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-
 @Component
 @RequiredArgsConstructor
-@Log4j2
+@Slf4j
+@Deprecated
 public class EventGeneratorExecution implements Supplier<NotificationIntent> {
 
     @Autowired

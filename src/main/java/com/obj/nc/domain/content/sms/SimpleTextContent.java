@@ -20,7 +20,6 @@
 package com.obj.nc.domain.content.sms;
 
 import com.obj.nc.domain.content.MessageContent;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

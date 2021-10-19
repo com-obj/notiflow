@@ -24,14 +24,15 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
+
 import java.io.FileInputStream;
 
-@Log4j2
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class FirebaseConfiguration {

@@ -19,14 +19,12 @@
 
 package com.obj.nc.repositories;
 
-import java.util.List;
-import java.util.UUID;
-
+import com.obj.nc.domain.headers.ProcessingInfo;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.obj.nc.domain.headers.ProcessingInfo;
-
-import lombok.AllArgsConstructor;
+import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class CustomProcessingInfoRepositoryImpl implements CustomProcessingInfoRepository {

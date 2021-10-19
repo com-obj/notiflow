@@ -19,21 +19,6 @@
 
 package com.obj.nc.flows.testmode.config;
 
-import static org.springframework.integration.dsl.MessageChannels.executor;
-
-import java.util.concurrent.Executors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.aggregator.CorrelationStrategy;
-import org.springframework.integration.aggregator.ReleaseStrategy;
-import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.store.MessageGroup;
-
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
 import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
@@ -45,12 +30,25 @@ import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.aggregator.CorrelationStrategy;
+import org.springframework.integration.aggregator.ReleaseStrategy;
+import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.store.MessageGroup;
 
-import lombok.extern.log4j.Log4j2;
+import java.util.concurrent.Executors;
+
+import static org.springframework.integration.dsl.MessageChannels.executor;
 
 @Configuration
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-@Log4j2
+@Slf4j
 public class TestModeFlowConfig {
 
 	@Autowired private TestModeProperties testModeProps;

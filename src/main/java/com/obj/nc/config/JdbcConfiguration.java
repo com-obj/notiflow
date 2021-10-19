@@ -19,12 +19,15 @@
 
 package com.obj.nc.config;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import javax.sql.DataSource;
-
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.converters.ContentToPgObjectConverter;
+import com.obj.nc.repositories.converters.IntentContentToPgObjectConverter;
+import com.obj.nc.repositories.converters.JsonNodeToPgObjectConverter;
+import com.obj.nc.repositories.converters.PgObjectToContentConverter;
+import com.obj.nc.repositories.converters.PgObjectToIntentContentConverter;
+import com.obj.nc.repositories.converters.PgObjectToJsonNodeConverter;
+import com.obj.nc.repositories.converters.PgObjectToUUIDArrayConverter;
+import com.obj.nc.repositories.converters.UUIDArrayToPgObjectConverter;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,15 +39,11 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.converters.ContentToPgObjectConverter;
-import com.obj.nc.repositories.converters.IntentContentToPgObjectConverter;
-import com.obj.nc.repositories.converters.JsonNodeToPgObjectConverter;
-import com.obj.nc.repositories.converters.PgObjectToContentConverter;
-import com.obj.nc.repositories.converters.PgObjectToIntentContentConverter;
-import com.obj.nc.repositories.converters.PgObjectToJsonNodeConverter;
-import com.obj.nc.repositories.converters.PgObjectToUUIDArrayConverter;
-import com.obj.nc.repositories.converters.UUIDArrayToPgObjectConverter;
+import javax.sql.DataSource;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Configuration
 @EnableJdbcRepositories(basePackageClasses = GenericEventRepository.class)

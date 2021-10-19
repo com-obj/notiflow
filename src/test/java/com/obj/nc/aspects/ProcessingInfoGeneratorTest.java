@@ -19,26 +19,6 @@
 
 package com.obj.nc.aspects;
 
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
-import org.assertj.core.api.Assertions;
-import org.awaitility.Awaitility;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.integration.test.context.SpringIntegrationTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -48,7 +28,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.domain.IsTypedJson;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.headers.ProcessingInfo;
@@ -65,11 +44,30 @@ import com.obj.nc.repositories.GenericEventRepositoryTest;
 import com.obj.nc.repositories.ProcessingInfoRepository;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.assertj.core.api.Assertions;
+import org.awaitility.Awaitility;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
@@ -86,11 +84,10 @@ public class ProcessingInfoGeneratorTest {
 	
     @BeforeEach
     void setUp() {
+        MDC.put("testName", this.getClass().getSimpleName());
+
         jdbcTemplate.execute("truncate table nc_processing_info");
-        jdbcTemplate.execute("truncate table nc_endpoint cascade");
-        
-    	JsonUtils.resetObjectMapper();
-    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
+        jdbcTemplate.execute("truncate table nc_endpoint cascade");        
     }
     
 	@Test
@@ -133,7 +130,7 @@ public class ProcessingInfoGeneratorTest {
     @JsonTypeInfo(include = As.PROPERTY, use = Id.NAME)
     @JsonSubTypes({ 
     	@Type(value = TestPayload.class, name = "TYPE_NAME")})
-    public static class TestPayload implements IsTypedJson {
+    public static class TestPayload {
     	
     	private String content;
     }

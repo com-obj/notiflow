@@ -19,13 +19,12 @@
 
 package com.obj.nc.repositories;
 
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-
-import com.obj.nc.domain.endpoints.ReceivingEndpoint;
-import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
 
 public interface EndpointsRepositoryCustom extends EntityExistenceChecker<UUID> {
     

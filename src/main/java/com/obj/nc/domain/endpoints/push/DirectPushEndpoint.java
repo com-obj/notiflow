@@ -20,7 +20,9 @@
 package com.obj.nc.domain.endpoints.push;
 
 import com.google.firebase.messaging.Message;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false, of = "token")

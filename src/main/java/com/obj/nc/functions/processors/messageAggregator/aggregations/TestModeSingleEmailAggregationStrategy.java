@@ -19,13 +19,6 @@
 
 package com.obj.nc.functions.processors.messageAggregator.aggregations;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
-import org.thymeleaf.util.StringUtils;
-
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
@@ -36,8 +29,13 @@ import com.obj.nc.domain.message.EmailWithTestModeDigest;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.functions.processors.TestModeDigestModel;
-
 import lombok.RequiredArgsConstructor;
+import org.thymeleaf.util.StringUtils;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class TestModeSingleEmailAggregationStrategy extends BasePayloadAggregationStrategy<MessageContent> {

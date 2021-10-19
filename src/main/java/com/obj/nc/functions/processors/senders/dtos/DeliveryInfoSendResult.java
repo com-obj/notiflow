@@ -19,24 +19,23 @@
 
 package com.obj.nc.functions.processors.senders.dtos;
 
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
-import javax.validation.constraints.NotNull;
-
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import javax.validation.constraints.NotNull;
+
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
  
 @Getter
 @Setter

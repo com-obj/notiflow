@@ -19,15 +19,14 @@
 
 package com.obj.nc.functions.processors.senders.mailchimp.config;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
-import lombok.Data;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Validated
 @Data

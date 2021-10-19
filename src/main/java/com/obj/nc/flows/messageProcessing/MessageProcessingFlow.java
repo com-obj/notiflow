@@ -19,13 +19,12 @@
 
 package com.obj.nc.flows.messageProcessing;
 
-import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.flows.errorHandling.ErrorHandlingFlowConfig;
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
 
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.flows.errorHandling.ErrorHandlingFlowConfig;
+import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 @MessagingGateway(errorChannel = ErrorHandlingFlowConfig.ERROR_CHANNEL_NAME)
 public interface MessageProcessingFlow {

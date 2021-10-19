@@ -19,17 +19,26 @@
 
 package com.obj.nc.flows.inpuEventRouting;
 
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.mail.MessagingException;
-
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import com.obj.nc.converterExtensions.genericEvent.InputEvent2IntentConverterExtension;
+import com.obj.nc.converterExtensions.genericEvent.InputEvent2MessageConverterExtension;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
+import com.obj.nc.utils.JsonUtils;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,28 +54,16 @@ import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import com.icegreen.greenmail.configuration.GreenMailConfiguration;
-import com.icegreen.greenmail.junit5.GreenMailExtension;
-import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.domain.IsTypedJson;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.flows.inputEventRouting.extensions.InputEvent2IntentConverterExtension;
-import com.obj.nc.flows.inputEventRouting.extensions.InputEvent2MessageConverterExtension;
-import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import com.obj.nc.utils.JsonUtils;
+import javax.mail.MessagingException;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
@@ -90,8 +87,6 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
     	
     	pollableSource.start();    	
     	
-    	JsonUtils.resetObjectMapper();
-    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
     }
 	
     @Test
@@ -126,7 +121,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 
 				@Override
 				public Optional<PayloadValidationException> canHandle(GenericEvent payload) {
-					if (payload.getPayloadAsPojo() instanceof TestPayload) {
+					if (payload.getPayloadAsPojo(TestPayload.class) != null) {
 						return Optional.empty();
 					}
 					
@@ -134,7 +129,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				}
 
 				@Override
-				public List<Message<?>> convertEvent(GenericEvent event) {
+				public List<Message<?>> convert(GenericEvent event) {
 					EmailMessage email1 = new EmailMessage();
 					email1.addReceivingEndpoints(
 						EmailEndpoint.builder().email("test@objectify.sk").build()
@@ -155,7 +150,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 
 				@Override
 				public Optional<PayloadValidationException> canHandle(GenericEvent payload) {
-					if (payload.getPayloadAsPojo() instanceof TestPayload) {
+					if (payload.getPayloadAsPojo(TestPayload.class) != null) {
 						return Optional.empty();
 					}
 					
@@ -163,7 +158,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 				}
 
 				@Override
-				public List<NotificationIntent> convertEvent(GenericEvent event) {
+				public List<NotificationIntent> convert(GenericEvent event) {
 					NotificationIntent email1Intent = NotificationIntent.createWithStaticContent(
 							"Subject", 
 							"Text", 
@@ -182,7 +177,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
     @AllArgsConstructor
     @NoArgsConstructor
     @JsonTypeInfo(use = Id.CLASS)
-    public static class TestPayload implements IsTypedJson {
+    public static class TestPayload {
     	
     	private Integer num;
     	private String str;

@@ -19,10 +19,12 @@
 
 package com.obj.nc.functions.processors.errorHandling;
 
-import java.util.ListIterator;
-import java.util.Properties;
-import java.util.UUID;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.obj.nc.config.SpringIntegration;
+import com.obj.nc.flows.errorHandling.domain.FailedPayload;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.history.MessageHistory;
@@ -33,16 +35,12 @@ import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.ErrorMessage;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obj.nc.config.SpringIntegration;
-import com.obj.nc.flows.errorHandling.domain.FailedPayload;
-import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-
-import lombok.extern.log4j.Log4j2;
+import java.util.ListIterator;
+import java.util.Properties;
+import java.util.UUID;
 
 @Component
-@Log4j2
+@Slf4j
 public class SpringMessageToFailedPayloadFunction extends ProcessorFunctionAdapter<ErrorMessage, FailedPayload> {
 	
 	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;

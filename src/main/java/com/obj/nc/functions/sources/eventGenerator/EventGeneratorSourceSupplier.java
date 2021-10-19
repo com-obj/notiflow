@@ -19,19 +19,18 @@
 
 package com.obj.nc.functions.sources.eventGenerator;
 
-import java.util.function.Supplier;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.PreCondition;
 import com.obj.nc.functions.sources.SourceSupplier;
-
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.function.Supplier;
 
 @Component
 @AllArgsConstructor
+@Deprecated
 public class EventGeneratorSourceSupplier extends SourceSupplier<NotificationIntent> {
 
 	@Autowired

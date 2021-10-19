@@ -19,21 +19,22 @@
 
 package com.obj.nc.repositories;
 
-import java.util.List;
-import java.util.UUID;
-
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
+import java.util.List;
+import java.util.UUID;
 
 public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUID> {
 	
 	List<DeliveryInfo> findByEventIdAndStatusOrderByProcessedOn(UUID eventId, DELIVERY_STATUS status);
 	
 	List<DeliveryInfo> findByEventIdOrderByProcessedOn(UUID eventId);
+	
+	long countByStatus(DELIVERY_STATUS status);
 	
 	List<DeliveryInfo> findByStatus(DELIVERY_STATUS status);
 	

@@ -17,10 +17,11 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.flows.inputEventRouting.extensions;
+package com.obj.nc.converterExtensions.genericData;
 
-import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.IsNotification;
 
-public interface InputEvent2IntentConverterExtension extends InputEventConverterExtension<NotificationIntent> {
-	
+public interface GenericData2NotificationConverterExtension<T>
+        extends GenericDataConverterExtension<T, IsNotification> {
+                
 }

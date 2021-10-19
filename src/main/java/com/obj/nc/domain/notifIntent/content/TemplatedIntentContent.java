@@ -19,13 +19,6 @@
 
 package com.obj.nc.domain.notifIntent.content;
 
-import java.util.List;
-import java.util.Locale;
-
-import javax.validation.constraints.NotNull;
-
-import org.apache.commons.lang3.NotImplementedException;
-
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -35,9 +28,14 @@ import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.NotImplementedException;
+
+import javax.validation.constraints.NotNull;
+
+import java.util.List;
+import java.util.Locale;
 
 @Data
 @EqualsAndHashCode(callSuper = false)

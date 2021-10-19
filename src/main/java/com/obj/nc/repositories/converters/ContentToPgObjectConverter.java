@@ -19,13 +19,11 @@
 
 package com.obj.nc.repositories.converters;
 
+import com.obj.nc.domain.content.MessageContent;
+import lombok.NonNull;
 import org.postgresql.util.PGobject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
-
-import com.obj.nc.domain.content.MessageContent;
-
-import lombok.NonNull;
 
 @WritingConverter
 public class ContentToPgObjectConverter implements Converter<MessageContent, PGobject> {

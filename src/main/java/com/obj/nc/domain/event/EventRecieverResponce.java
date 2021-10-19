@@ -19,10 +19,10 @@
 
 package com.obj.nc.domain.event;
 
-import java.util.UUID;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.UUID;
 
 @Data
 @EqualsAndHashCode

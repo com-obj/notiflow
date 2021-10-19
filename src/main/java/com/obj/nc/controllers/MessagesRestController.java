@@ -20,25 +20,31 @@
 package com.obj.nc.controllers;
 
 import com.obj.nc.domain.dto.MessageTableViewDto;
-import com.obj.nc.domain.message.*;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.MessagePersistentState;
+import com.obj.nc.domain.message.SendEmailMessageRequest;
+import com.obj.nc.domain.message.SendMessageResponse;
+import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
 import com.obj.nc.repositories.MessageRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
-
-import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.*;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 

@@ -19,8 +19,9 @@
 
 package com.obj.nc.flows.intenProcessing;
 
-import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
-
+import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.intentPersister.NotificationIntentPersister;
+import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,9 +30,7 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
-import com.obj.nc.functions.processors.intentPersister.NotificationIntentPersister;
-import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
+import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 @Configuration
 public class NotificationIntentProcessingFlowConfig {
