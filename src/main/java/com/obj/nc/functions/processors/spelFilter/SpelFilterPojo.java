@@ -33,13 +33,13 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@DocumentProcessingInfo("SPeLFilterPojo")
-public class SpELFilterPojo<T> extends ProcessorFunctionAdapter<List<T>, List<T>> {
+@DocumentProcessingInfo("SpelFilterPojo")
+public class SpelFilterPojo<T> extends ProcessorFunctionAdapter<List<T>, List<T>> {
    
     private final ExpressionParser parser;
     private final Expression expression;
 
-    public SpELFilterPojo(String spelExpression) {
+    public SpelFilterPojo(String spelExpression) {
         parser = new SpelExpressionParser();
         expression = parser.parseExpression(spelExpression);
     }

@@ -21,8 +21,8 @@ package com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import com.obj.nc.functions.processors.spelFilter.SpELFilterJson;
-import com.obj.nc.functions.processors.spelFilter.SpELFilterPojo;
+import com.obj.nc.functions.processors.spelFilter.SpelFilterJson;
+import com.obj.nc.functions.processors.spelFilter.SpelFilterPojo;
 import com.obj.nc.utils.JsonUtils;
 import lombok.AllArgsConstructor;
 
@@ -61,7 +61,7 @@ public class JsonNodeFilterAndTransformer extends ProcessorFunctionAdapter<List<
             return pojos;
         }
 
-        SpELFilterPojo<?> filter = new SpELFilterPojo<>(SpELFilterExpression);
+        SpelFilterPojo<?> filter = new SpelFilterPojo<>(SpELFilterExpression);
         return filter.apply(pojos);   
     }
 
@@ -70,7 +70,7 @@ public class JsonNodeFilterAndTransformer extends ProcessorFunctionAdapter<List<
             return jsonNodes;
         }
 
-        SpELFilterJson filter = new SpELFilterJson(SpELFilterExpression);
+        SpelFilterJson filter = new SpelFilterJson(SpELFilterExpression);
         return filter.apply(jsonNodes);        
     }
 

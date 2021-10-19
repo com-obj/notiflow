@@ -23,7 +23,7 @@ public class SpelFilterTest {
         List<JsonNode> jsonsList = Arrays.asList(jsons);
 
         //WHEN
-        SpELFilterJson filter = new SpELFilterJson("new Integer(fieldOne.toString()) > 50");
+        SpelFilterJson filter = new SpelFilterJson("new Integer(fieldOne.toString()) > 50");
         List<JsonNode> result = filter.apply(jsonsList);
 
         Assertions.assertThat(result.size()).isEqualTo(1);
@@ -36,7 +36,7 @@ public class SpelFilterTest {
         List<TestBean> objList = Arrays.asList(objs);
 
         //WHEN
-        SpELFilterPojo<TestBean> filter = new SpELFilterPojo<>("fieldOne > 50");
+        SpelFilterPojo<TestBean> filter = new SpelFilterPojo<>("fieldOne > 50");
         List<TestBean> result = filter.apply(objList);
 
         Assertions.assertThat(result.size()).isEqualTo(1);
@@ -51,7 +51,7 @@ public class SpelFilterTest {
         List<TestBean2> objList = Arrays.asList(objs);
 
         //WHEN
-        SpELFilterPojo<TestBean2> filter = new SpELFilterPojo<>(
+        SpelFilterPojo<TestBean2> filter = new SpelFilterPojo<>(
             "date.truncatedTo(T(java.time.temporal.ChronoUnit).DAYS)" +
             ".isAfter(" +
             " T(java.time.Instant).now().truncatedTo(T(java.time.temporal.ChronoUnit).DAYS))");

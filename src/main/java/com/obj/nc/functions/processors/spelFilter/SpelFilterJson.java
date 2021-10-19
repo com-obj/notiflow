@@ -36,13 +36,13 @@ import org.springframework.integration.json.JsonPropertyAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@DocumentProcessingInfo("SpELFilterJson")
-public class SpELFilterJson  extends ProcessorFunctionAdapter<List<JsonNode>, List<JsonNode>> {
+@DocumentProcessingInfo("SpelFilterJson")
+public class SpelFilterJson  extends ProcessorFunctionAdapter<List<JsonNode>, List<JsonNode>> {
 
     private final ExpressionParser parser;
     private final Expression expression;
 
-    public SpELFilterJson(String spelExpression) {
+    public SpelFilterJson(String spelExpression) {
         parser = new SpelExpressionParser();
         expression = parser.parseExpression(spelExpression);
     }
