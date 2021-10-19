@@ -31,7 +31,7 @@ import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.senders.config.EmailSenderConfigProperties;
 import com.obj.nc.utils.JsonUtils;
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.FileSystemResource;
@@ -52,7 +52,7 @@ import java.util.Optional;
 @Primary
 @Component
 @AllArgsConstructor
-@Log4j2
+@Slf4j
 @DocumentProcessingInfo("SendEmail")
 public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMessage> {
 	

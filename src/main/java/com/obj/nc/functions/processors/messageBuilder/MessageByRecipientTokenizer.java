@@ -27,7 +27,7 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @Component
 @AllArgsConstructor
-@Log4j2
+@Slf4j
 @DocumentProcessingInfo("MessageByRecipientTokenizer")
 public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> extends ProcessorFunctionAdapter<Message<CONTENT_TYPE>, List<Message<CONTENT_TYPE>>> {
 

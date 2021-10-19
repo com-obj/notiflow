@@ -22,14 +22,14 @@ package com.obj.nc.functions.sink.payloadLogger;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sink.SinkConsumerAdapter;
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
 @AllArgsConstructor
-@Log4j2
+@Slf4j
 public class PaylaodLoggerSinkConsumer extends SinkConsumerAdapter<Object> {
 
 	@Override

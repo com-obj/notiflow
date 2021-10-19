@@ -23,14 +23,14 @@ import com.obj.nc.converterExtensions.genericData.GenericDataConverterExtension;
 import com.obj.nc.domain.dataObject.GenericData;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Log4j2
+@Slf4j
 public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends ProcessorFunctionAdapter<GenericData<?>, List<OUT>> {
     
     public abstract List<? extends GenericDataConverterExtension<?, OUT>> getConverterExtensions();

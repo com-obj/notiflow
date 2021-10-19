@@ -21,7 +21,7 @@ package com.obj.nc.repositories.converters;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.utils.JsonUtils;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PGobject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
@@ -29,7 +29,7 @@ import org.springframework.data.convert.WritingConverter;
 import java.sql.SQLException;
 
 @WritingConverter
-@Log4j2
+@Slf4j
 public class JsonNodeToPgObjectConverter implements Converter<JsonNode, PGobject> {
 
 	@Override

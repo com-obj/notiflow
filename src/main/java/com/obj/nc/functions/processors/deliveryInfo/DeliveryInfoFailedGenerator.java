@@ -34,7 +34,7 @@ import com.obj.nc.functions.processors.errorHandling.FailedPaylodExtractor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +45,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @Component
-@Log4j2
+@Slf4j
 public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<FailedPayload, List<DeliveryInfo>> {
 	
 	@Autowired

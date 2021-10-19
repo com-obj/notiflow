@@ -33,9 +33,9 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.integration.json.JsonPropertyAccessor;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j2
+@Slf4j
 @DocumentProcessingInfo("SpELFilterJson")
 public class SpELFilterJson  extends ProcessorFunctionAdapter<List<JsonNode>, List<JsonNode>> {
 

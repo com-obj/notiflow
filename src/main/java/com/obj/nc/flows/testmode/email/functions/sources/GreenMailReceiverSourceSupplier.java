@@ -33,7 +33,7 @@ import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
 import com.obj.nc.utils.JsonUtils;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 
 @Component
 @ConditionalOnProperty(value = "nc.flows.test-mode.enabled", havingValue = "true")
-@Log4j2
+@Slf4j
 public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<EmailMessage>> {
 
     public static final String ORIGINAL_RECIPIENTS_EMAIL_ATTR_NAME = "ORIGINAL_RECIPIENTS_EMAIL";

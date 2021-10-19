@@ -21,12 +21,12 @@ package com.obj.nc.functions.processors;
 
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.PreCondition;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 import java.util.function.Function;
 
-@Log4j2
+@Slf4j
 public abstract class ProcessorFunction<IN, OUT> implements Function<IN, OUT> {
 
 	@Override

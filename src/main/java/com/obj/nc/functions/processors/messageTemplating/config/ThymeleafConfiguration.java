@@ -20,7 +20,7 @@
 package com.obj.nc.functions.processors.messageTemplating.config;
 
 import lombok.Data;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 
 @Configuration
 @Data
-@Log4j2
+@Slf4j
 public class ThymeleafConfiguration {
 
 	private static final String EMAIL_TEMPLATE_ENCODING = "UTF-8";

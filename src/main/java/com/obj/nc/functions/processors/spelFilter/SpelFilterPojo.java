@@ -30,9 +30,9 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j2
+@Slf4j
 @DocumentProcessingInfo("SPeLFilterPojo")
 public class SpELFilterPojo<T> extends ProcessorFunctionAdapter<List<T>, List<T>> {
    

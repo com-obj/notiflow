@@ -23,13 +23,13 @@ import com.obj.nc.flows.errorHandling.domain.FailedPayload;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.repositories.FailedPayloadRepository;
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-@Log4j2
+@Slf4j
 public class FailedPayloadPersister extends ProcessorFunctionAdapter<FailedPayload, FailedPayload> {
 
     @Autowired

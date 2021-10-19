@@ -24,7 +24,7 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sink.SinkConsumerAdapter;
 import com.obj.nc.repositories.GenericEventRepository;
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +32,7 @@ import java.util.Optional;
 
 @Component
 @AllArgsConstructor
-@Log4j2
+@Slf4j
 public class GenericEventPersister extends SinkConsumerAdapter<GenericEvent> {
     
     @Autowired 

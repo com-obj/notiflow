@@ -26,7 +26,7 @@ import com.obj.nc.domain.HasJsonPayload;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.flows.inputEventRouting.config.InputEventExtensionConvertingFlowConfig;
 import com.obj.nc.flows.inputEventRouting.config.InputEventRoutingProperties;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.router.AbstractMessageRouter;
@@ -37,7 +37,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
-@Log4j2
+@Slf4j
 /**
  * Conversion from custom input event to anything which NC can handle might be very specific. This router enables to customize the event->intent or event->message conversion
  * It can be done it three ways

@@ -26,7 +26,7 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 @DocumentProcessingInfo("ExtensionsBasedEventConvertor")
 @AllArgsConstructor
-@Log4j2
+@Slf4j
 public class ExtensionsBasedEventConvertor extends ProcessorFunctionAdapter<GenericEvent, List<IsNotification>> {
 	
 	@Autowired(required = false) 

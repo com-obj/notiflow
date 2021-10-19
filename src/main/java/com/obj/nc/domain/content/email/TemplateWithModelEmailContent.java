@@ -27,7 +27,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 
@@ -40,7 +40,7 @@ import static com.obj.nc.functions.processors.messageTemplating.config.Thymeleaf
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-@Log4j2
+@Slf4j
 @Builder
 @AllArgsConstructor
 public class TemplateWithModelEmailContent<MODEL_TYPE> extends TemplateWithModelContent<MODEL_TYPE>  {
