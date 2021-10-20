@@ -126,18 +126,23 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
         Awaitility
                 .await()
                 .atMost(500, TimeUnit.SECONDS)
-                .until(() -> deliveryInfoRepository.countByStatus(SENT) >= 2);
+                .until(() -> findDeliveryInfosForMsg().size()>= 2);
     
-        List<DeliveryInfo> infos = deliveryInfoRepository
-                .findByStatus(SENT)
-                .stream()
-                .filter(info -> info.getMessageId() != null)
-                .collect(Collectors.toList());
+        List<DeliveryInfo> infos = findDeliveryInfosForMsg();
 
         assertThat(infos)
                 .hasSize(2)
                 .anySatisfy(assertRefersToMessageWithText("GenericData2NotificationConverterExtension"))
                 .anySatisfy(assertRefersToMessageWithText("InputEvent2MessageConverterExtension"));
+    }
+
+    private List<DeliveryInfo> findDeliveryInfosForMsg() {
+        List<DeliveryInfo> infos = deliveryInfoRepository
+                .findByStatus(SENT)
+                .stream()
+                .filter(info -> info.getMessageId() != null)
+                .collect(Collectors.toList());
+        return infos;
     }
 
     private TestPayload createTestPayload() {
