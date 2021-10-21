@@ -70,15 +70,23 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     
     @Autowired ThreadPoolTaskScheduler taskScheduler; 
 
+    public static volatile String testName;
+    public static final String MDC_FOR_TESTS_NAME = "testName";
+
     @BeforeEach
     void setUp() {
-        MDC.put("testName", this.getClass().getSimpleName());
+        BaseIntegrationTest.testName = this.getClass().getSimpleName();
+        MDC.put(MDC_FOR_TESTS_NAME, testName);
+
         log.info("TEST START {}", this.getClass().getSimpleName());  
     }
 
     @AfterEach
-    void tearDown() {
-       log.info("TEST FINISH {}", this.getClass().getSimpleName());        
+    void tearDown() {    
+        log.info("TEST FINISH {}", this.getClass().getSimpleName()); 
+
+        BaseIntegrationTest.testName = null;
+        MDC.put(MDC_FOR_TESTS_NAME, testName);
     }
 
     

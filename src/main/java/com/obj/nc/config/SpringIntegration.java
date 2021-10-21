@@ -53,4 +53,25 @@ public class SpringIntegration  {
 	}
 
     
+    @Bean
+    @GlobalChannelInterceptor(patterns = "*")
+    @Profile("test")
+    public ChannelInterceptor globaChannelInterceptorForTestLogging() {
+        return new ChannelInterceptor() {
+            @Override
+            public boolean preReceive(MessageChannel channel) {
+                MDC.put(BaseIntegrationTest.MDC_FOR_TESTS_NAME, BaseIntegrationTest.testName);
+
+                return ChannelInterceptor.super.preReceive(channel);
+            }
+
+            @Override
+            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                MDC.put(BaseIntegrationTest.MDC_FOR_TESTS_NAME, BaseIntegrationTest.testName);
+
+                return ChannelInterceptor.super.preSend(message, channel);
+            }
+        };
+    }
+
 }
