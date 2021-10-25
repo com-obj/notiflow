@@ -7,8 +7,16 @@ Reports-lib uses [Gradle](https://gradle.org) build system. You can use embedded
 Clone reports-lib to your machine:
 
 ```
-./git clone https://[YOUR_USERNAME]@bitbucket.org/obj-team/reports-lib.git
+./git clone https://github.com/com-obj/notiflow.git
 ```
+
+Run required components:
+
+```
+cd ./docker/devel
+docker-compose up -d
+```
+
 
 Run tests:
 
