@@ -49,6 +49,18 @@ database "Topic/Channels" {
         --
         (MailChimpMessage)
     ]
+    
+    component TEMPLATED_MAILCHIMP_PROCESSING_FLOW_ID_INPUT<<PUB/SUB>>[
+        TEMPLATED_MAILCHIMP_PROCESSING_FLOW_ID_INPUT
+        --
+        (TemplatedMailChimpMessage)
+    ]
+    
+    component PUSH_PROCESSING_FLOW_ID_INPUT<<PUB/SUB>>[
+        PUSH_PROCESSING_FLOW_ID_INPUT
+        --
+        (PushMessage)
+    ]
 }
 
 component "MessageProcessingFlow" {
@@ -65,7 +77,9 @@ component "MessageProcessingFlow" {
         [EmailMessage
         EmailMessageTemplated
         SmsMessageTemplated
-        MailChimpMessage]
+        TemplatedMailChimpMessage
+        MailChimpMessage
+        PushMessage]
     end note  
 
     endpointPersister1 -l-> messagePersister1 : (Message)
@@ -80,6 +94,8 @@ component "MessageProcessingFlow" {
     typeBasedRouter --> EMAIL_FORMAT_AND_SEND_ROUTING_FLOW_ID_INPUT: write (EmailMessageTemplated)
     typeBasedRouter --> SMS_PROCESSING_FLOW_ID_INPUT: write (SmsMessageTemplated)
     typeBasedRouter --> MAILCHIMP_PROCESSING_FLOW_ID_INPUT: write (MailChimpMessage)
+    typeBasedRouter --> TEMPLATED_MAILCHIMP_PROCESSING_FLOW_ID_INPUT: write (TemplatedMailChimpMessage)
+    typeBasedRouter --> PUSH_PROCESSING_FLOW_ID_INPUT: write (PushMessage)
 
     messagePersister2 -u-> nc_message2: write (Message)
     endpointPersister2 -u-> nc_endpoint2: write (List<RecievingEndpoint>)

@@ -10,7 +10,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.4">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.2">
     
     
       
@@ -18,10 +18,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.f7f47774.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.1118c9be.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ba0d045b.min.css">
         
       
     
@@ -282,6 +282,13 @@
         <li class="md-nav__item">
   <a href="#send-simple-email" class="md-nav__link">
     Send simple Email
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#send-push-notification" class="md-nav__link">
+    Send Push notification
   </a>
   
 </li>
@@ -560,6 +567,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#send-push-notification" class="md-nav__link">
+    Send Push notification
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#convert-custom-application-event-to-message" class="md-nav__link">
     Convert custom application event to Message
   </a>
@@ -667,6 +681,93 @@
 spring.mail.port=3025
 spring.mail.username=john_doe
 spring.mail.password=pwd
+</code></pre></div>
+</td></tr></table>
+<h2 id="send-push-notification">Send Push notification</h2>
+<p>This example illustrates how to send push notification to one specific device using <a href="../flows/#pushProcessingFlow">push processing flow</a>. 
+Notiflow uses <a href="https://firebase.google.com/docs/cloud-messaging/">Firebase Cloud Messaging</a> for sending 
+<a href="https://firebase.google.com/docs/cloud-messaging/android/client">Android</a>, 
+<a href="https://firebase.google.com/docs/cloud-messaging/ios/client">iOS</a>, 
+<a href="https://firebase.google.com/docs/cloud-messaging/js/client">Web</a> and other push notifications. 
+To set up client applications, please refer to included links. 
+To be able to communicate with FCM, you need to add path to your Firebase service account file to your <em>application.properties</em> file.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="na">nc.firebase.service-account-file-path</span><span class="o">=</span><span class="s">$HOME/.firebase/service-account-key.json</span>
+</code></pre></div>
+</td></tr></table>
+<p>Inject <em>PushProcessingFlow</em> bean into your sending service.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>    <span class="nd">@Service</span>
+    <span class="nd">@RequiredArgsConstructor</span>
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">SendPushService</span> <span class="p">{</span>
+
+        <span class="c1">// inject push processing flow bean</span>
+        <span class="kd">private</span> <span class="kd">final</span> <span class="n">PushProcessingFlow</span> <span class="n">pushProcessingFlow</span><span class="p">;</span>
+
+        <span class="kd">public</span> <span class="n">PushMessage</span> <span class="nf">createMessage</span><span class="p">(</span><span class="n">PushEndpoint</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">String</span> <span class="n">subject</span><span class="p">,</span> <span class="n">String</span> <span class="n">msgText</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="n">PushMessage</span> <span class="n">message</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PushMessage</span><span class="p">();</span>
+            <span class="n">message</span><span class="p">.</span><span class="na">setBody</span><span class="p">(</span>
+                    <span class="n">PushContent</span>
+                            <span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+                            <span class="p">.</span><span class="na">subject</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
+                            <span class="p">.</span><span class="na">text</span><span class="p">(</span><span class="n">msgText</span><span class="p">)</span>
+                            <span class="p">.</span><span class="na">build</span><span class="p">()</span>
+            <span class="p">);</span>
+            <span class="n">message</span><span class="p">.</span><span class="na">setReceivingEndpoints</span><span class="p">(</span>
+                    <span class="n">Collections</span><span class="p">.</span><span class="na">singletonList</span><span class="p">(</span><span class="n">endpoint</span><span class="p">)</span>
+            <span class="p">);</span>
+            <span class="k">return</span> <span class="n">message</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">send</span><span class="p">(</span><span class="n">PushMessage</span> <span class="n">message</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">pushProcessingFlow</span><span class="p">.</span><span class="na">sendPushMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>Then you can create message and send it to desired endpoint.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">sendDirectPush</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">PushEndpoint</span> <span class="n">endpoint</span> <span class="o">=</span> <span class="n">PushEndpoint</span><span class="p">.</span><span class="na">ofToken</span><span class="p">(</span><span class="s">&quot;someAndroidDeviceFCMToken&quot;</span><span class="p">);</span>
+
+        <span class="n">PushMessage</span> <span class="n">message</span> <span class="o">=</span> <span class="n">pushService</span>
+            <span class="p">.</span><span class="na">createMessage</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="s">&quot;Subject&quot;</span><span class="p">,</span> <span class="s">&quot;Hello World!&quot;</span><span class="p">);</span>
+
+        <span class="n">pushService</span><span class="p">.</span><span class="na">send</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+    <span class="p">}</span>
 </code></pre></div>
 </td></tr></table>
 <h2 id="convert-custom-application-event-to-message">Convert custom application event to Message</h2>
@@ -924,7 +1025,7 @@ Tha class can be any POJO class which can be serialized to JSON using <a href="h
     <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.709b4209.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.febc23d1.min.js"></script>
+      <script src="../assets/javascripts/bundle.2b46852b.min.js"></script>
       
     
   </body>
