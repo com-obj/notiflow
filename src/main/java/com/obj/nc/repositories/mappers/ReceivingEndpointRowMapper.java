@@ -19,10 +19,7 @@
 
 package com.obj.nc.repositories.mappers;
 
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.MailchimpEndpoint;
-import com.obj.nc.domain.endpoints.ReceivingEndpoint;
-import com.obj.nc.domain.endpoints.SmsEndpoint;
+import com.obj.nc.domain.endpoints.*;
 import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
 import com.obj.nc.domain.endpoints.push.TopicPushEndpoint;
 import org.springframework.jdbc.core.RowMapper;
@@ -32,40 +29,44 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 public class ReceivingEndpointRowMapper implements RowMapper<ReceivingEndpoint> {
-    
+
     @Override
     public ReceivingEndpoint mapRow(ResultSet rs, int i) throws SQLException {
         String epType = rs.getString("endpoint_type");
-    
+
         if (EmailEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
             EmailEndpoint emailEndpoint = new EmailEndpoint(rs.getString("endpoint_name"));
-            emailEndpoint.setId((UUID)rs.getObject("id"));
+            emailEndpoint.setId((UUID) rs.getObject("id"));
             return emailEndpoint;
         } else if (SmsEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
             SmsEndpoint smsEndpoint = new SmsEndpoint(rs.getString("endpoint_name"));
-            smsEndpoint.setId((UUID)rs.getObject("id"));
+            smsEndpoint.setId((UUID) rs.getObject("id"));
             return smsEndpoint;
         } else if (MailchimpEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
             MailchimpEndpoint mailChimpEndpoint = new MailchimpEndpoint(rs.getString("endpoint_name"));
-            mailChimpEndpoint.setId((UUID)rs.getObject("id"));
+            mailChimpEndpoint.setId((UUID) rs.getObject("id"));
             return mailChimpEndpoint;
         } else if (DirectPushEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
             DirectPushEndpoint directPushEndpoint = DirectPushEndpoint
                     .builder()
                     .token(rs.getString("endpoint_name"))
                     .build();
-            directPushEndpoint.setId((UUID)rs.getObject("id"));
+            directPushEndpoint.setId((UUID) rs.getObject("id"));
             return directPushEndpoint;
         } else if (TopicPushEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
             TopicPushEndpoint topicPushEndpoint = TopicPushEndpoint
                     .builder()
                     .topic(rs.getString("endpoint_name"))
                     .build();
-            topicPushEndpoint.setId((UUID)rs.getObject("id"));
+            topicPushEndpoint.setId((UUID) rs.getObject("id"));
             return topicPushEndpoint;
+        } else if (SlackEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
+            SlackEndpoint endpoint = SlackEndpoint.builder().channel(rs.getString("endpoint_name")).build();
+            endpoint.setId((UUID) rs.getObject("id"));
+            return endpoint;
         } else {
-            throw new RuntimeException("Uknown endpoint type for EndpointsRepository: "+ epType);
+            throw new RuntimeException("Unknown endpoint type for EndpointsRepository: " + epType);
         }
     }
-    
+
 }

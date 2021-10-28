@@ -125,6 +125,33 @@ Then you can create message and send it to desired endpoint.
 
 ```
 
+## Send slack message
+
+This example illustrates the use-case when you simply want to send slack message with constant body text to single channel.
+
+To start sending messages to public slack channel, first create a bot in slack. For simplicity sake, use example [here](https://api.slack.com/tutorials/tracks/posting-messages-with-curl). Then set application properties as follows:
+``` 
+nc.slack.apiUrl=https://slack.com/api
+nc.slack.botToken=xoxb-2660284751633-2647758251043-lettersAndNumbers
+```
+Bot of token always starts with '*xoxb-*'. Be sure. that your token starts with this prefix.
+
+Next you need channel code. Usually it is part of url (when you are in channel, it is part of url behind last /). 
+Replace the *public-slack-channel-code* in following code sample with your channel code.
+``` java
+    @Autowired
+    private SlackMessageProcessingFlow processingFlow;
+
+    void sendSlackMessage() {
+        SlackMessage message = new SlackMessage();
+        message.setBody(SlackMessageContent.builder().text("Hello World!").build());
+        message.setReceivingEndpoints(Collections.singletonList(SlackEndpoint.builder().channel("public-slack-channel-code").build()));
+        processingFlow.sendMessage(message);
+    }
+```
+
+
+
 ## Convert custom application event to Message
 
 Covering custom event is very common use-case for notiflow. This separation of responsibility ensures that client application does its job and only emits application events if something important happens. The processing of such events, with regards to notification of users or 3rd parties, is in the responsibility of notiflow. 
