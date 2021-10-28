@@ -150,7 +150,26 @@ Replace the *public-slack-channel-code* in following code sample with your chann
     }
 ```
 
+## Send teams message
+To start sending messages to teams chat, first create an incoming webhook. Follow official [documentation](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook). 
+As a result, you have webhook url.
 
+Here is sample how to send message to teams chat:
+``` java
+    @Autowired
+    private TeamsMessageProcessingFlow processingFlow;
+
+    @Test
+    void sendShortMessage() {
+        TeamsMessage message = new TeamsMessage();
+        
+        final String webhook = "https://webhook.office.com/webhookb2/numbersAndLetters";
+        message.setReceivingEndpoints(Collections.singletonList(new TeamsEndpoint(webhook)));
+        message.setBody(new TeamsMessageContent("Hello World!"));
+        
+        processingFlow.sendMessage(message);
+    }
+```
 
 ## Convert custom application event to Message
 

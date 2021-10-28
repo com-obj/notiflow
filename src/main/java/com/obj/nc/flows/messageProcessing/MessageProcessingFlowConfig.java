@@ -38,6 +38,7 @@ import static com.obj.nc.flows.mailchimpSending.TemplatedMailchimpMessageProcess
 import static com.obj.nc.flows.pushProcessing.PushProcessingFlowConfig.PUSH_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.slackMessageProcessingFlow.SlackMessageProcessingFlowConfig.SLACK_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.teamsMessageProcessing.TeamsMessageProcessingFlowConfig.TEAMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 @Configuration
 public class MessageProcessingFlowConfig {
@@ -79,6 +80,7 @@ public class MessageProcessingFlowConfig {
                         recipient(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID, m -> m instanceof MailchimpMessage).
                         recipient(PUSH_PROCESSING_FLOW_INPUT_CHANNEL_ID, m -> m instanceof PushMessage).
                         recipient(SLACK_PROCESSING_FLOW_INPUT_CHANNEL_ID, m -> m instanceof SlackMessage).
+                        recipient(TEAMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m -> m instanceof TeamsMessage).
                         defaultOutputToParentFlow()
                 )
                 .get();
