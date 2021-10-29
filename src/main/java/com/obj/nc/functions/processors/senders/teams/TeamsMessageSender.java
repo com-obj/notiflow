@@ -37,14 +37,14 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.obj.nc.functions.processors.senders.config.GenericConfig.GENERIC_REST_TEMPLATE;
+import static com.obj.nc.config.PureRestTemplateConfig.PURE_REST_TEMPLATE;
 
 @Slf4j
 @Component
 public class TeamsMessageSender extends ProcessorFunctionAdapter<TeamsMessage, TeamsMessage> {
     private final RestTemplate restTemplate;
 
-    public TeamsMessageSender(@Qualifier(GENERIC_REST_TEMPLATE) RestTemplate restTemplate) {
+    public TeamsMessageSender(@Qualifier(PURE_REST_TEMPLATE) RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
