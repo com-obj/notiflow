@@ -64,6 +64,10 @@ public class ReceivingEndpointRowMapper implements RowMapper<ReceivingEndpoint> 
             SlackEndpoint endpoint = SlackEndpoint.builder().channel(rs.getString("endpoint_name")).build();
             endpoint.setId((UUID) rs.getObject("id"));
             return endpoint;
+        } else if (TeamsEndpoint.JSON_TYPE_IDENTIFIER.equals(epType)) {
+            TeamsEndpoint endpoint = TeamsEndpoint.builder().webhookUrl(rs.getString("endpoint_name")).build();
+            endpoint.setId((UUID) rs.getObject("id"));
+            return endpoint;
         } else {
             throw new RuntimeException("Unknown endpoint type for EndpointsRepository: " + epType);
         }
