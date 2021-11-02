@@ -13,19 +13,20 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.config;
+package com.obj.nc.flows.smsFormattingAndSending;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
+import com.obj.nc.domain.message.SmsMessage;
+import com.obj.nc.domain.message.TeamsMessage;
+import com.obj.nc.flows.errorHandling.ErrorHandlingFlowConfig;
+import org.springframework.integration.annotation.Gateway;
+import org.springframework.integration.annotation.MessagingGateway;
 
-@Configuration
-public class PureRestTemplateConfig {
-    public static final String PURE_REST_TEMPLATE = "pureRestTemplate";
+import java.util.concurrent.Future;
 
-    @Bean(PURE_REST_TEMPLATE)
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder.build();
-    }
+import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+
+@MessagingGateway(errorChannel = ErrorHandlingFlowConfig.ERROR_CHANNEL_NAME)
+public interface SmsProcessingFlow {
+    @Gateway(requestChannel = SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+    Future<SmsMessage> sendMessage(SmsMessage msg);
 }
