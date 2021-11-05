@@ -13,19 +13,19 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.config;
+package com.obj.nc.functions.processors.senders.sms;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
 
+@Getter
+@Setter
 @Configuration
-public class PureRestTemplateConfig {
-    public static final String PURE_REST_TEMPLATE = "pureRestTemplate";
-
-    @Bean(PURE_REST_TEMPLATE)
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder.build();
-    }
+@ConfigurationProperties("nc.sms.gateway-api")
+public class GatewayApiConfig {
+    private String sendSmsUrl;
+    private String token;
+    private String sender;
 }

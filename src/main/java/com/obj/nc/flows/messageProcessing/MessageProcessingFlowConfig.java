@@ -38,6 +38,7 @@ import static com.obj.nc.flows.mailchimpSending.TemplatedMailchimpMessageProcess
 import static com.obj.nc.flows.pushProcessing.PushProcessingFlowConfig.PUSH_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.slackMessageProcessingFlow.SlackMessageProcessingFlowConfig.SLACK_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.smsFormattingAndSending.TemplatedSmsProcessingFlowConfig.TEMPLATED_SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.teamsMessageProcessing.TeamsMessageProcessingFlowConfig.TEAMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
 @Configuration
@@ -75,7 +76,8 @@ public class MessageProcessingFlowConfig {
                 .routeToRecipients(spec -> spec.
                         recipient(EMAIL_SEND_FLOW_INPUT_CHANNEL_ID, m -> m instanceof EmailMessage).
                         recipient(EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID, m -> m instanceof EmailMessageTemplated).
-                        recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m -> m instanceof SmsMessageTemplated).
+                        recipient(TEMPLATED_SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m -> m instanceof SmsMessageTemplated).
+                        recipient(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID, m -> m instanceof SmsMessage).
                         recipient(MAILCHIMP_TEMPLATE_PROCESSING_FLOW_INPUT_CHANNEL_ID, m -> m instanceof TemplatedMailchimpMessage).
                         recipient(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID, m -> m instanceof MailchimpMessage).
                         recipient(PUSH_PROCESSING_FLOW_INPUT_CHANNEL_ID, m -> m instanceof PushMessage).

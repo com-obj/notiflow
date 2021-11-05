@@ -171,6 +171,31 @@ Here is sample how to send message to teams chat:
     }
 ```
 
+## Send sms message
+Supported way of sending sms is via GatewayApi sms gateway. First create account at https://gatewayapi.com/. Then fill
+properties as follows:
+``` 
+nc.sms.gateway-api.sendSmsUrl=https://gatewayapi.com/rest/mtsms
+nc.sms.gateway-api.token=GatewayApiToken
+nc.sms.gateway-api.sender=YourCompanyName
+```
+Replace **GatewayApiToken** with token from your account and **YourCompanyName** with suitable sender name.
+
+Here is sample how to send sms message:
+``` java
+    @Autowired
+    private SmsProcessingFlow processingFlow;
+
+    void sendMessage() {
+        SmsMessage message = new SmsMessage();
+        message.setBody(SimpleTextContent.builder().text("Hello World!").build());
+        message.setReceivingEndpoints(Arrays.asList(SmsEndpoint.builder().phone("+421950123456").build()));
+        processingFlow.sendMessage(message);
+    }
+```
+Always send sms with correct phone number prefix. In example is +421 used, which is prefix for slovakia. List of prefixes
+can be found [here](https://www.iban.com/dialing-codes).
+
 ## Convert custom application event to Message
 
 Covering custom event is very common use-case for notiflow. This separation of responsibility ensures that client application does its job and only emits application events if something important happens. The processing of such events, with regards to notification of users or 3rd parties, is in the responsibility of notiflow. 
