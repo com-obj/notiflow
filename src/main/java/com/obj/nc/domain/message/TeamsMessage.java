@@ -17,19 +17,20 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.content.sms;
+package com.obj.nc.domain.message;
 
-import com.obj.nc.domain.content.MessageContent;
-import lombok.*;
+import com.obj.nc.domain.content.teams.TeamsMessageContent;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.domain.endpoints.TeamsEndpoint;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class SimpleTextContent extends MessageContent {
-	@NonNull
-	@EqualsAndHashCode.Include
-	private String text;
+public class TeamsMessage extends Message<TeamsMessageContent> {
+    @Override
+    public String getPayloadTypeName() {
+        return "TEAMS_MESSAGE";
+    }
 
+    @Override
+    public Class<? extends ReceivingEndpoint> getReceivingEndpointType() {
+        return TeamsEndpoint.class;
+    }
 }

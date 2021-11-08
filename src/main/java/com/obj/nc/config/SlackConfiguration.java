@@ -17,19 +17,18 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.content.sms;
+package com.obj.nc.config;
 
-import com.obj.nc.domain.content.MessageContent;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class SimpleTextContent extends MessageContent {
-	@NonNull
-	@EqualsAndHashCode.Include
-	private String text;
-
+@Getter
+@Setter
+@Configuration
+@ConfigurationProperties("nc.slack")
+public class SlackConfiguration {
+    private String apiUrl;
+    private String botToken;
 }

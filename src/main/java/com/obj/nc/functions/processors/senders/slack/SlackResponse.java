@@ -17,19 +17,12 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.content.sms;
+package com.obj.nc.functions.processors.senders.slack;
 
-import com.obj.nc.domain.content.MessageContent;
-import lombok.*;
+import lombok.Data;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class SimpleTextContent extends MessageContent {
-	@NonNull
-	@EqualsAndHashCode.Include
-	private String text;
-
+public class SlackResponse {
+    private boolean ok;
+    private String error;
 }

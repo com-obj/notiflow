@@ -17,12 +17,11 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.flows.smsFormattingAndSending;
+package com.obj.nc.flows.teamsMessageProcessing;
 
 import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
-import com.obj.nc.functions.processors.senders.SmsSender;
-import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
+import com.obj.nc.functions.processors.senders.teams.TeamsMessageSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,39 +29,41 @@ import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 
 @Configuration
 @RequiredArgsConstructor
-public class SmsProcessingFlowConfig {
+public class TeamsMessageProcessingFlowConfig {
+    public final static String TEAMS_PROCESSING_FLOW_ID = "TEAMS_PROCESSING_FLOW_ID";
+    public final static String TEAMS_PROCESSING_FLOW_INPUT_CHANNEL_ID = TEAMS_PROCESSING_FLOW_ID + "_INPUT";
+    public final static String TEAMS_PROCESSING_FLOW_OUTPUT_CHANNEL_ID = TEAMS_PROCESSING_FLOW_ID + "_OUTPUT";
 
-    private final SmsSender smsSender;
-    private final PaylaodLoggerSinkConsumer logConsumer;
+    private final TeamsMessageSender teamsMessageSender;
     private final MessagePersister messagePersister;
     private final EndpointPersister endpointPersister;
+    private final ThreadPoolTaskScheduler executor;
 
-    public final static String SMS_PROCESSING_FLOW_ID = "SMS_PROCESSING_FLOW_ID";
-    public final static String SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID = SMS_PROCESSING_FLOW_ID + "_INPUT";
-
-    @Bean(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID)
-    public MessageChannel smsProcessingInputChangel() {
-        return new PublishSubscribeChannel();
+    @Bean(TEAMS_PROCESSING_FLOW_INPUT_CHANNEL_ID)
+    public MessageChannel sendInputChannel() {
+        return new PublishSubscribeChannel(executor);
     }
 
-    @Bean(SMS_PROCESSING_FLOW_ID)
-    public IntegrationFlow smsProcessingFlowDefinition() {
+    @Bean(TEAMS_PROCESSING_FLOW_OUTPUT_CHANNEL_ID)
+    public MessageChannel sendOutputChannel() {
+        return new PublishSubscribeChannel(executor);
+    }
+
+    @Bean(TEAMS_PROCESSING_FLOW_ID)
+    public IntegrationFlow pushSendFlow() {
         return IntegrationFlows
-                .from(smsProcessingInputChangel())
+                .from(sendInputChannel())
                 .handle(endpointPersister)
                 .handle(messagePersister)
-                .split()
-                .handle(messagePersister)
-                .handle(smsSender)
-                .wireTap(flowConfig ->
-                        flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
-                )
-                .handle(logConsumer)
+                .handle(teamsMessageSender)
+                .wireTap(flowConfig -> flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID))
+                .channel(sendOutputChannel())
                 .get();
     }
 }

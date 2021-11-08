@@ -17,19 +17,32 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.content.sms;
+package com.obj.nc.domain.endpoints;
 
-import com.obj.nc.domain.content.MessageContent;
-import lombok.*;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.ToString;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class SimpleTextContent extends MessageContent {
-	@NonNull
-	@EqualsAndHashCode.Include
-	private String text;
+@ToString
+public class SlackEndpoint extends ReceivingEndpoint {
+    public static final String JSON_TYPE_IDENTIFIER = "SLACK";
 
+    @NonNull
+    private String channel;
+
+    @Override
+    public String getEndpointId() {
+        return channel;
+    }
+
+    @Override
+    public void setEndpointId(String endpointId) {
+        channel = endpointId;
+    }
+
+    @Override
+    public String getEndpointType() {
+        return JSON_TYPE_IDENTIFIER;
+    }
 }

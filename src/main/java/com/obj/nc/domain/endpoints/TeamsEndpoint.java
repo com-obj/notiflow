@@ -17,19 +17,30 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.content.sms;
+package com.obj.nc.domain.endpoints;
 
-import com.obj.nc.domain.content.MessageContent;
 import lombok.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class SimpleTextContent extends MessageContent {
-	@NonNull
-	@EqualsAndHashCode.Include
-	private String text;
+@ToString
+public class TeamsEndpoint extends ReceivingEndpoint {
+    public static final String JSON_TYPE_IDENTIFIER = "TEAMS";
 
+    @NonNull
+    private String webhookUrl;
+
+    @Override
+    public String getEndpointId() {
+        return webhookUrl;
+    }
+
+    @Override
+    public void setEndpointId(String endpointId) {
+        webhookUrl = endpointId;
+    }
+
+    @Override
+    public String getEndpointType() {
+        return JSON_TYPE_IDENTIFIER;
+    }
 }

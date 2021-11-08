@@ -17,19 +17,4 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.content.sms;
-
-import com.obj.nc.domain.content.MessageContent;
-import lombok.*;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class SimpleTextContent extends MessageContent {
-	@NonNull
-	@EqualsAndHashCode.Include
-	private String text;
-
-}
+alter table nc_endpoint alter column endpoint_name type varchar(250);
