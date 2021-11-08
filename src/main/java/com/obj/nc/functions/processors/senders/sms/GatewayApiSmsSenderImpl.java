@@ -40,7 +40,7 @@ import java.util.Optional;
 import static com.obj.nc.config.PureRestTemplateConfig.PURE_REST_TEMPLATE;
 
 @Component
-@Primary
+//@Primary // TODO: not working with TestMode
 @ConditionalOnMissingBean(type = "SmsSender")
 public class GatewayApiSmsSenderImpl extends ProcessorFunctionAdapter<SmsMessage, SmsMessage> implements SmsSender {
     private final RestTemplate restTemplate;

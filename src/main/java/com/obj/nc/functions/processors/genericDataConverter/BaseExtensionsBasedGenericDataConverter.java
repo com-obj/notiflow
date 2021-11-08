@@ -78,8 +78,7 @@ public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends Proce
         return
                 (List<OUT>)findMatchingConverters(genericData)
                         .stream()
-                        .map(p -> p.convert(genericData))
-                        .flatMap(list -> list.stream())
+                        .flatMap(p -> p.convert(genericData).stream())
                         .collect(Collectors.toList());
     }
     

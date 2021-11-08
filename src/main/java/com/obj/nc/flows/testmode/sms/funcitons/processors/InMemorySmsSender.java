@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-@Component
+//@Component // TODO: configured with @Bean annotation
 @ConditionalOnMissingBean(type = "SmsSender")
 @RequiredArgsConstructor
 @DocumentProcessingInfo("TestSMSSender")

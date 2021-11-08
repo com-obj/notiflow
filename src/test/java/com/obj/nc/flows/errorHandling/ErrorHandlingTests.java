@@ -48,13 +48,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.channel.PublishSubscribeChannel;
-import org.springframework.integration.config.EnableIntegrationManagement;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.test.context.SpringIntegrationTest;
@@ -142,10 +140,10 @@ public class ErrorHandlingTests {
         Assertions.assertTrue(thrown.getCause().getMessage().equals(TEST_EXCEPTION_MESSAGE) );
 
  	}
-
-	
-    @TestConfiguration	
-    @EnableIntegrationManagement
+    
+    
+    @org.springframework.boot.test.context.TestConfiguration
+    @org.springframework.integration.config.EnableIntegrationManagement
     public static class TestModeTestConfiguration {
 
         @Autowired FailedPayloadRepository failedPayloadRepo;
