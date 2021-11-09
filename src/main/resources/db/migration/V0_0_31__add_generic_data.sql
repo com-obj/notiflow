@@ -17,30 +17,11 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.flows.dataSources.config;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class TestLicenseAgreement {
-    private String id;
-    private String description;
-    
-    @JsonProperty("expiry_date")
-    private Instant expiryDate;
-    
-
-    public boolean isExpired(int numberOfDaysBeforeExpiration) { //use instead of complicated SPeL expression
-        return expiryDate.isBefore(Instant.now().plus(numberOfDaysBeforeExpiration, ChronoUnit.DAYS));
-    }
-}
+CREATE TABLE nc_generic_data (
+	id UUID not null,
+	external_id varchar(50) NOT NULL,
+	hash varchar(50) NOT NULL,
+	time_created timestamptz NOT NULL,
+	payload_json text NOT null,
+	CONSTRAINT nc_generic_data_pkey PRIMARY KEY (id)
+);

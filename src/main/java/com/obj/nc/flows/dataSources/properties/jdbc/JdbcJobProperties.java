@@ -37,5 +37,6 @@ public class JdbcJobProperties {
 
     @NotEmpty
     private String cron;
-    
+
+    private String externalIdKey;
 }
