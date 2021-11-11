@@ -128,7 +128,7 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
         
         Awaitility
                 .await()
-                .atMost(3, TimeUnit.SECONDS)
+                .atMost(15, TimeUnit.SECONDS)
                 .until(() -> deliveryInfoRepository.countByMessageIdAndStatus(messageUUID, DeliveryInfo.DELIVERY_STATUS.SENT) >= 2);
         
         assertThat(deliveryInfoRepository.countByMessageIdAndStatus(messageUUID, DeliveryInfo.DELIVERY_STATUS.SENT))

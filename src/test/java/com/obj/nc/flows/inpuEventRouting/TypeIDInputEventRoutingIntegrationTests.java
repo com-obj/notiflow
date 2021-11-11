@@ -88,7 +88,7 @@ public class TypeIDInputEventRoutingIntegrationTests extends BaseIntegrationTest
         persister.accept(event);
         
         //THEN
-	    Message<?> springMessage = flowInputChannel1.receive(5000);
+	    Message<?> springMessage = flowInputChannel1.receive(45000);
 	    FlowIDInputEventRoutingIntegrationTests.assertEventReadyForProcessing(springMessage);
 	    
     	//WHEN

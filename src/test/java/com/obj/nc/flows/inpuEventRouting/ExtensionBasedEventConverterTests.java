@@ -104,7 +104,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
              
         //THEN
         //one EmailMessage and one Intent resulting into second and third EmailMessage should be generated
-        awaitSent(event.getId(), 3, Duration.ofSeconds(5));
+        awaitSent(event.getId(), 3, Duration.ofSeconds(45));
     }
     
     @AfterEach

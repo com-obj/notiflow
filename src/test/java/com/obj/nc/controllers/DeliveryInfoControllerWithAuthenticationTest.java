@@ -114,7 +114,7 @@ class DeliveryInfoControllerWithAuthenticationTest extends BaseIntegrationTest {
 		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
 		
 		messageProcessingFlow.processMessage(emailMessage);
-		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) == 2);
+		Awaitility.await().atMost(15, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) == 2);
 		
 		List<MessagePersistentState> messages = StreamSupport.stream(messageRepo.findAll().spliterator(), false)
 				.filter(message -> !emailMessage.getId().equals(message.getId()))

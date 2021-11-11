@@ -202,7 +202,7 @@ public class ProcessingInfoGeneratorTest {
         Assertions.assertThat(messages.size()).isEqualTo(3);
         assertMessagesHaveOriginalEventId(originalEventIDs, messages);
             
-        Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "GenerateMessagesFromIntent").size()>0);
+        Awaitility.await().atMost(Duration.ofSeconds(15)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "GenerateMessagesFromIntent").size()>0);
        
         List<ProcessingInfo> persistedPIs = procInfoRepo.findByAnyEventIdAndStepName(eventId, "GenerateMessagesFromIntent");
         

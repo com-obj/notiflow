@@ -78,7 +78,7 @@ public class MessageProcessingTest extends BaseIntegrationTest {
         msgFlow.processMessage(msg);
 
         //THEN check processing deliveryInfo
-        awaitSent(eventId, 2, Duration.ofSeconds(3));
+        awaitSent(eventId, 2, Duration.ofSeconds(15));
     }
 
 
