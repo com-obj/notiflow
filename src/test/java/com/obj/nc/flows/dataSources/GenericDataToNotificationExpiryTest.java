@@ -51,7 +51,7 @@ import static org.junit.Assert.assertEquals;
         "nc.data-sources.jdbc[0].jobs[0].entity-name=license_agreement",
         "nc.data-sources.jdbc[0].jobs[0].sqlQuery=select * from license_agreement",  
         "nc.data-sources.jdbc[0].jobs[0].pojoFCCN=com.obj.nc.flows.dataSources.config.TestLicenseAgreement",     
-        "nc.data-sources.jdbc[0].jobs[0].cron=*/1 * * * * *",
+        "nc.data-sources.jdbc[0].jobs[0].cron=*/5 * * * * *",
 //        "nc.data-sources.jdbc[0].jobs[0].spel-filter-expression=expiryDate.isBefore(T(java.time.Instant).now().plus(5, T(java.time.temporal.ChronoUnit).DAYS))",        
         "nc.data-sources.jdbc[0].jobs[0].spel-filter-expression=isExpired(5)",        
         "test-license-agreements.admin-email=johndoe@objectify.sk",
@@ -76,7 +76,7 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
         purgeNotifTables(springJdbcTemplate);        
         
         springJdbcTemplate.update("drop table if exists license_agreement");
-        springJdbcTemplate.execute("create table license_agreement (description text not null, expiry_date timestamptz not null); ");
+        springJdbcTemplate.execute("create table license_agreement (id varchar(10) not null, description text not null, expiry_date timestamptz not null); ");
         
         persistTestLicenseAgreements(springJdbcTemplate);
     }
@@ -92,7 +92,7 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
         pollableSourceJdbc.start();
 
         // then
-        boolean received = greenMail.waitForIncomingEmail(5000L, 1);
+        boolean received = greenMail.waitForIncomingEmail(15000L, 1);
     
         assertEquals(true, received);
         assertEquals(1, greenMail.getReceivedMessages().length);
@@ -108,19 +108,21 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
                 .mapToObj(i -> 
                         TestLicenseAgreement
                                 .builder()
+                                .id(Integer.toString(i))
                                 .description("Agreement ".concat(String.valueOf(i)))
                                 .expiryDate(Instant.now().plus(i, ChronoUnit.DAYS))
                                 .build())
                 .collect(Collectors.toList());
     
         springJdbcTemplate.batchUpdate(
-                "insert into license_agreement (description, expiry_date) values (?, ?) ", 
+                "insert into license_agreement (id, description, expiry_date) values (?, ?, ?) ",
                 new BatchPreparedStatementSetter() {
     
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
                         TestLicenseAgreement agreement = testAgreements.get(i);
-                        ps.setString(1, agreement.getDescription());
-                        ps.setTimestamp(2, from(agreement.getExpiryDate()));
+                        ps.setString(1, agreement.getId());
+                        ps.setString(2, agreement.getDescription());
+                        ps.setTimestamp(3, from(agreement.getExpiryDate()));
                     }
             
                     public int getBatchSize() {

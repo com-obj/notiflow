@@ -13,16 +13,21 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.flows.dataSources;
+package com.obj.nc.flows.dataSources.http;
 
+class HttpDatasourceNameCreator {
+    private HttpDatasourceNameCreator() {
+    }
 
-import lombok.Getter;
-import lombok.Setter;
+    static String createDataSourceId(String dataSourceName) {
+        return "NC_HTTP_DATA_SOURCE_".concat(dataSourceName);
+    }
 
-@Setter
-@Getter
-public class JobConfig {
-    private String externalIdAttrName;
-    private String pojoFCCN;
-    private String spelFilterExpression;
+    static String createJobFlowId(String dataSourceName) {
+        return createDataSourceId(dataSourceName).concat("_INTEGRATION_FLOW");
+    }
+
+    static String createJobPollerId(String dataSourceName) {
+        return createJobFlowId(dataSourceName).concat("_POLLER");
+    }
 }

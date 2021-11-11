@@ -17,30 +17,47 @@ package com.obj.nc.functions.processors.genericDataPersister;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.genericData.GenericData;
+import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.repositories.GenericDataRepository;
 import lombok.RequiredArgsConstructor;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class GenericDataPersister extends ProcessorFunctionAdapter<List<JsonNode>, List<JsonNode>> {
     private final GenericDataRepository genericDataRepository;
-    private final String externalId;
+    private final String externalIdAttrName;
+
+    @Override
+    protected Optional<PayloadValidationException> checkPreCondition(List<JsonNode> payload) {
+        Optional<PayloadValidationException> exception = super.checkPreCondition(payload);
+        if (exception.isPresent()) {
+            return exception;
+        }
+
+        if (payload.stream().anyMatch(node -> extractIdFromPayload(node) == null)) {
+            String template = "One of polled items is missing attribute with name %s. Set it in nc.data-sources.\"your-datasource\".externalId*";
+            return Optional.of(new PayloadValidationException(String.format(template, externalIdAttrName)));
+        }
+
+        return Optional.empty();
+    }
 
     @Override
     protected List<JsonNode> execute(List<JsonNode> newData) {
-        List<String> collectedIds = newData.stream().map(this::findIdByKey).collect(Collectors.toList());
+        List<String> collectedIds = newData.stream().map(this::extractIdFromPayload).collect(Collectors.toList());
         List<GenericData> found = genericDataRepository.findAllHashesByExternalId(collectedIds);
 
-        genericDataRepository.saveAll(processData(newData, found));
+        genericDataRepository.saveAll(collectNewAndUpdated(newData, found));
         return newData;
     }
 
-    private List<GenericData> processData(List<JsonNode> payload, List<GenericData> savedData) {
+    private List<GenericData> collectNewAndUpdated(List<JsonNode> payload, List<GenericData> savedData) {
         List<GenericData> newData = new ArrayList<>();
 
         for (JsonNode jsonNode : payload) {
@@ -50,9 +67,9 @@ public class GenericDataPersister extends ProcessorFunctionAdapter<List<JsonNode
     }
 
     private Optional<GenericData> mapToGenericData(List<GenericData> found, JsonNode jsonNode) {
-        String id = findIdByKey(jsonNode);
+        String id = extractIdFromPayload(jsonNode);
         String json = jsonNode.toString();
-        String hash = hash(json);
+        String hash = HashFunction.hash(json);
 
         Optional<GenericData> record = findRecord(found, id);
 
@@ -69,21 +86,17 @@ public class GenericDataPersister extends ProcessorFunctionAdapter<List<JsonNode
         return Optional.empty();
     }
 
-    private String findIdByKey(JsonNode jsonNode) {
-        return jsonNode.get(externalId).asText();
+    private String extractIdFromPayload(JsonNode jsonNode) {
+        JsonNode attr = jsonNode.get(externalIdAttrName);
+
+        if (attr == null) {
+            return null;
+        }
+
+        return attr.asText();
     }
 
     private Optional<GenericData> findRecord(List<GenericData> savedData, String id) {
         return savedData.stream().filter(data -> id.equals(data.getExternalId())).findFirst();
-    }
-
-    private String hash(String content) {
-        try {
-            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
-            return Base64.getEncoder().encodeToString(sha256.digest(content.getBytes()));
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 is not available", e);
-        }
-
     }
 }

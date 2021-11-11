@@ -28,7 +28,7 @@ public class JdbcDataSourceFlowsConfiguration {
     private final DataSourceFlowsProperties dataSourceFlowsProperties;
     private final IntegrationFlowContext integrationFlowContext;
     private final Get get;
-    private final PollFlowAdapter pollFlowAdapter;
+    private final GenericDataTransformationAndPersistFlow pollFlowAdapter;
 
     @PostConstruct
     public void createJdbcDataSourceFlows() {
@@ -79,9 +79,9 @@ public class JdbcDataSourceFlowsConfiguration {
                                                      String dataSourceName,
                                                      JdbcJobProperties job) {
         JobConfig jobConfig = new JobConfig();
-        jobConfig.externalIdKey = job.getExternalIdKey();
-        jobConfig.pojoFCCN = job.getPojoFCCN();
-        jobConfig.spelFilterExpression = job.getSpelFilterExpression();
+        jobConfig.setExternalIdAttrName(job.getExternalIdColumnName());
+        jobConfig.setPojoFCCN(job.getPojoFCCN());
+        jobConfig.setSpelFilterExpression(job.getSpelFilterExpression());
 
         return pollFlowAdapter.continueFlow(IntegrationFlows
                 .from(jdbcPollingChannelAdapter, c -> c

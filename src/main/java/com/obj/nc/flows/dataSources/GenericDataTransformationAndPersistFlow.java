@@ -31,26 +31,26 @@ import static com.obj.nc.flows.dataSources.GenericDataConvertingFlowConfiguratio
 
 @Component
 @RequiredArgsConstructor
-public class PollFlowAdapter {
+public class GenericDataTransformationAndPersistFlow {
     private final GenericDataRepository genericDataRepository;
 
-    StandardIntegrationFlow continueFlow(IntegrationFlowBuilder builder, JobConfig jobConfig) {
+    public StandardIntegrationFlow continueFlow(IntegrationFlowBuilder builder, JobConfig jobConfig) {
         return builder.transform(Transformers.toJson(JsonUtils.getJsonObjectMapper(), ObjectToJsonTransformer.ResultType.NODE))
                 .split() // split ArrayNode to JsonNode-s
                 .aggregate() // aggregate JsonNode-s to List<JsonNode>
                 .handle(new GenericDataPersister(genericDataRepository, selectExternalIdKey(jobConfig)))
-                .handle(new JsonNodeFilterAndTransformer(jobConfig.pojoFCCN, jobConfig.spelFilterExpression))
+                .handle(new JsonNodeFilterAndTransformer(jobConfig.getPojoFCCN(), jobConfig.getSpelFilterExpression()))
                 .handle(new Data2GenericDataTransformer())
                 .channel(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
                 .get();
     }
 
     private String selectExternalIdKey(JobConfig jobConfig) {
-        String externalIdKey = jobConfig.externalIdKey;
+        String idAttrName = jobConfig.getExternalIdAttrName();
 
-        if (externalIdKey == null) {
-            externalIdKey = "id";
+        if (idAttrName == null) {
+            idAttrName = "id";
         }
-        return externalIdKey;
+        return idAttrName;
     }
 }

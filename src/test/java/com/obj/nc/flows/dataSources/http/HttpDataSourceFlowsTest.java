@@ -13,7 +13,7 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.flows.dataSources;
+package com.obj.nc.flows.dataSources.http;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
@@ -40,7 +40,6 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import javax.mail.internet.MimeMessage;
 
 import static com.obj.nc.config.PureRestTemplateConfig.PURE_REST_TEMPLATE;
@@ -51,15 +50,16 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @ActiveProfiles(value = {"test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(properties = {
-        "nc.data-sources.http[0].name=test0-ds",
-        "nc.data-sources.http[0].url=http://random/json",
+        "nc.data-sources.http[0].name=TEST0-DS",
+        "nc.data-sources.http[0].url=http://service-0/json",
         "nc.data-sources.http[0].pojoFCCN=com.obj.nc.flows.dataSources.config.TestLicenseAgreement",
         "nc.data-sources.http[0].cron=*/5 * * * * *",
+        "nc.data-sources.http[0].externalIdAttrName=id",
         "test-license-agreements.admin-email=johndoe@objectify.sk",
         "test-license-agreements.email-template-path=agreements.html",
         "nc.functions.email-templates.templates-root-dir=src/test/resources/templates"
 })
-@SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME, GenericDataToNotificationTest.DATA_SOURCE_POLLER_NAME})
+@SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 //this test register programmatically spring integration flows. it seems to confuse the spring context management in tests
 public class HttpDataSourceFlowsTest {
@@ -68,18 +68,14 @@ public class HttpDataSourceFlowsTest {
 
     @Autowired
     @Qualifier(PURE_REST_TEMPLATE)
-    RestTemplate restTemplate;
-
-    @PostConstruct
-    void prepare() {
-        server = MockRestServiceServer.bindTo(restTemplate).build();
-    }
+    RestTemplate pureRestTemplate;
 
     @BeforeEach
     void setUp() {
-        server.expect(ExpectedCount.manyTimes(), requestTo("http://random/json"))
+        server = MockRestServiceServer.bindTo(pureRestTemplate).build();
+        server.expect(ExpectedCount.manyTimes(), requestTo("http://service-0/json"))
                 .andExpect(method(HttpMethod.GET))
-                .andRespond(withSuccess("[{\"id\":\"faktura-01\", \"description\":\"Agreement 1\",\"expiry_date\":\"2021-11-05T11:32:45.757Z\"}]", MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess("[{\"id\":\"faktura-01\", \"description\":\"Invoice 1\",\"expiry_date\":\"2021-11-05T11:32:45.757Z\"}]", MediaType.APPLICATION_JSON));
     }
 
     @Test
@@ -92,7 +88,8 @@ public class HttpDataSourceFlowsTest {
 
         MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
         String body = GreenMailUtil.getBody(receivedMessage);
-        assertThat(body).contains("Agreement 1");
+        assertThat(body).contains("Invoice 1");
+
         server.verify();
     }
 

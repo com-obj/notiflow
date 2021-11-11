@@ -13,10 +13,12 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.flows.dataSources;
+package com.obj.nc.flows.dataSources.http;
 
+import com.obj.nc.flows.dataSources.GenericDataTransformationAndPersistFlow;
+import com.obj.nc.flows.dataSources.JobConfig;
+import com.obj.nc.flows.dataSources.http.properties.HttpDataSourceProperties;
 import com.obj.nc.flows.dataSources.properties.DataSourceFlowsProperties;
-import com.obj.nc.flows.dataSources.properties.http.HttpDataSourceProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Configuration;
@@ -39,19 +41,18 @@ public class HttpDataSourceFlowsConfiguration {
     private final IntegrationFlowContext integrationFlowContext;
     private final RestTemplate pureRestTemplate;
     private final RestTemplateBuilder restTemplateBuilder;
-    private final PollFlowAdapter pollFlowAdapter;
+    private final GenericDataTransformationAndPersistFlow nextFlow;
 
     public HttpDataSourceFlowsConfiguration(DataSourceFlowsProperties dataSourceFlowsProperties,
                                             IntegrationFlowContext integrationFlowContext,
                                             @Qualifier(PURE_REST_TEMPLATE) RestTemplate pureRestTemplate,
                                             RestTemplateBuilder restTemplateBuilder,
-                                            PollFlowAdapter pollFlowAdapter) {
-
+                                            GenericDataTransformationAndPersistFlow nextFlow) {
         this.dataSourceFlowsProperties = dataSourceFlowsProperties;
         this.integrationFlowContext = integrationFlowContext;
         this.pureRestTemplate = pureRestTemplate;
         this.restTemplateBuilder = restTemplateBuilder;
-        this.pollFlowAdapter = pollFlowAdapter;
+        this.nextFlow = nextFlow;
     }
 
     @PostConstruct
@@ -59,49 +60,38 @@ public class HttpDataSourceFlowsConfiguration {
         dataSourceFlowsProperties.getHttp().forEach(dataSource -> {
             integrationFlowContext
                     .registration(createJobIntegrationFlow(dataSource))
-                    .id(createJobFlowId(dataSource.getName()))
+                    .id(HttpDatasourceNameCreator.createJobFlowId(dataSource.getName()))
                     .register();
         });
 
     }
 
     private IntegrationFlow createJobIntegrationFlow(HttpDataSourceProperties dataSource) {
-        String token = dataSource.getToken();
-        RestTemplate restTemplate;
-
-        if (token != null && !token.isEmpty()) {
-            restTemplate = restTemplateBuilder.additionalInterceptors((request, body, execution) -> {
-                request.getHeaders().add("Authorization", "Bearer " + token);
-                return execution.execute(request, body);
-            }).build();
-        } else {
-            restTemplate = pureRestTemplate;
-        }
-
         JobConfig jobConfig = new JobConfig();
-        jobConfig.externalIdKey = dataSource.getExternalIdKey();
-        jobConfig.pojoFCCN = dataSource.getPojoFCCN();
-        jobConfig.spelFilterExpression = dataSource.getSpelFilterExpression();
+        jobConfig.setExternalIdAttrName(dataSource.getExternalIdAttrName());
+        jobConfig.setPojoFCCN(dataSource.getPojoFCCN());
+        jobConfig.setSpelFilterExpression(dataSource.getSpelFilterExpression());
 
-        return pollFlowAdapter.continueFlow(IntegrationFlows.from(
+        return nextFlow.continueFlow(IntegrationFlows.from(
                         () -> new GenericMessage<>(""),
                         c -> c
                                 .poller(cron(dataSource.getCron()))
-                                .id(createJobPollerId(dataSource.getName())))
-                .handle(Http.outboundGateway(dataSource.getUrl(), restTemplate)
+                                .id(HttpDatasourceNameCreator.createJobPollerId(dataSource.getName())))
+                .handle(Http.outboundGateway(dataSource.getUrl(), getRestTemplate(dataSource))
                         .httpMethod(HttpMethod.GET)
                         .expectedResponseType(String.class)), jobConfig);
     }
 
-    private String createDataSourceId(String dataSourceName) {
-        return "NC_HTTP_DATA_SOURCE_".concat(dataSourceName);
-    }
+    private RestTemplate getRestTemplate(HttpDataSourceProperties dataSource) {
+        String token = dataSource.getToken();
 
-    private String createJobFlowId(String dataSourceName) {
-        return createDataSourceId(dataSourceName).concat("_INTEGRATION_FLOW");
-    }
+        if (token == null || token.isEmpty()) {
+            return pureRestTemplate;
+        }
 
-    private String createJobPollerId(String dataSourceName) {
-        return createJobFlowId(dataSourceName).concat("_POLLER");
+        return restTemplateBuilder.additionalInterceptors((request, body, execution) -> {
+            request.getHeaders().add("Authorization", "Bearer " + token);
+            return execution.execute(request, body);
+        }).build();
     }
 }

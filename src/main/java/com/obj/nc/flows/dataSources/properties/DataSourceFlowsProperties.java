@@ -19,7 +19,7 @@
 
 package com.obj.nc.flows.dataSources.properties;
 
-import com.obj.nc.flows.dataSources.properties.http.HttpDataSourceProperties;
+import com.obj.nc.flows.dataSources.http.properties.HttpDataSourceProperties;
 import com.obj.nc.flows.dataSources.properties.jdbc.JdbcDataSourceProperties;
 import lombok.Data;
 import org.hibernate.validator.constraints.UniqueElements;

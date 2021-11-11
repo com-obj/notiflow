@@ -13,16 +13,29 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.flows.dataSources;
-
+package com.obj.nc.flows.dataSources.http.properties;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
+import javax.validation.constraints.NotEmpty;
+
 @Getter
-public class JobConfig {
-    private String externalIdAttrName;
+@Setter
+public class HttpDataSourceProperties {
+    @NotEmpty
+    private String name;
+    @NotEmpty
+    private String url;
+
+    private String token;
+
     private String pojoFCCN;
+
     private String spelFilterExpression;
+
+    @NotEmpty
+    private String cron;
+
+    private String externalIdAttrName;
 }

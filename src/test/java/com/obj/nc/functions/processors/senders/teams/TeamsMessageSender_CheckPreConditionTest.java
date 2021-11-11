@@ -49,18 +49,6 @@ public class TeamsMessageSender_CheckPreConditionTest {
     }
 
     @Test
-    @Disabled // TODO : message body is @NonNull -> cannot set it to null 
-    void testCheckPreCondition_NoText() {
-        TeamsMessage message = new TeamsMessage();
-        message.setBody(createBody(null));
-        message.setReceivingEndpoints(Collections.singletonList(createTeamsEndpoint()));
-        Optional<PayloadValidationException> exception = execCheckPreCondition(message);
-
-        assertTrue(exception.isPresent());
-        assertEquals("TeamsMessageContent text cannot be empty", exception.get().getMessage());
-    }
-
-    @Test
     void testCheckPreCondition() {
         TeamsMessage message = new TeamsMessage();
         message.setBody(createBody("text"));

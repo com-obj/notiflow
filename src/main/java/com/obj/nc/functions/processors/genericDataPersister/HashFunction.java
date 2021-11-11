@@ -13,29 +13,22 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.flows.dataSources.properties.http;
+package com.obj.nc.functions.processors.genericDataPersister;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
-import javax.validation.constraints.NotEmpty;
+class HashFunction {
+    private HashFunction() {
+    }
 
-@Getter
-@Setter
-public class HttpDataSourceProperties {
-    @NotEmpty
-    private String name;
-    @NotEmpty
-    private String url;
-
-    private String token;
-
-    private String pojoFCCN;
-
-    private String spelFilterExpression;
-
-    @NotEmpty
-    private String cron;
-
-    private String externalIdKey;
+    static String hash(String content) {
+        try {
+            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+            return Base64.getEncoder().encodeToString(sha256.digest(content.getBytes()));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 is not available", e);
+        }
+    }
 }
