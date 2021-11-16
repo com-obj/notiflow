@@ -94,7 +94,7 @@ class MessageReceiverTest extends BaseIntegrationTest {
         Assertions.assertThat(messageId).isNotNull();
     
         //and then
-        await().atMost(3, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(UUID.fromString(messageId), SENT) == 2);
+        await().atMost(15, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(UUID.fromString(messageId), SENT) == 2);
         Assertions.assertThat(deliveryInfoRepository.countByMessageIdAndStatus(UUID.fromString(messageId), SENT)).isEqualTo(2);
     }
     

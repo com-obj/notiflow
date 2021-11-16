@@ -17,26 +17,11 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.flows.dataSources.properties.jdbc;
-
-import lombok.Data;
-
-import javax.validation.constraints.NotEmpty;
-
-@Data
-public class JdbcJobProperties {
-    @NotEmpty
-    private String name;
-    @NotEmpty
-    private String sqlQuery;
-
-    private String pojoFCCN; //if set, GenericData will be GenericDataPojo<FCCN>
-
-
-    private String spelFilterExpression; 
-
-    @NotEmpty
-    private String cron;
-
-    private String externalIdColumnName;
-}
+CREATE TABLE nc_generic_data (
+	id UUID not null,
+	external_id varchar(50) NOT NULL,
+	hash varchar(50) NOT NULL,
+	time_created timestamptz NOT NULL,
+	payload_json text NOT null,
+	CONSTRAINT nc_generic_data_pkey PRIMARY KEY (id)
+);

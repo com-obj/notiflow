@@ -19,6 +19,7 @@
 
 package com.obj.nc.flows.dataSources.properties;
 
+import com.obj.nc.flows.dataSources.http.properties.HttpDataSourceProperties;
 import com.obj.nc.flows.dataSources.properties.jdbc.JdbcDataSourceProperties;
 import lombok.Data;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -36,4 +37,7 @@ import java.util.List;
 public class DataSourceFlowsProperties {
     @UniqueElements
     private List<JdbcDataSourceProperties> jdbc = new ArrayList<>();
+
+    @UniqueElements
+    private List<HttpDataSourceProperties> http = new ArrayList<>();
 }

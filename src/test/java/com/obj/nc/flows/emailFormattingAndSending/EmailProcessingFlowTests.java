@@ -91,7 +91,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         EmailMessageTemplated<?> inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", EmailMessageTemplated.class);
         emailSendingFlow.formatAndSend(inputMessage);
         // when
-        boolean success = greenMail.waitForIncomingEmail(5000L, 1);
+        boolean success = greenMail.waitForIncomingEmail(15000L, 1);
         // then
         assertThat(success, equalTo(true));
     
@@ -124,7 +124,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         EmailMessage inputMessage = JsonUtils.readObjectFromClassPathResource("messages/simple_email_message.json", EmailMessage.class);
         emailSendingFlow.sendEmail(inputMessage);
         // when
-        boolean success = greenMail.waitForIncomingEmail(5000L, 1);
+        boolean success = greenMail.waitForIncomingEmail(15000L, 1);
         // then
         assertThat(success, equalTo(true));
         
@@ -152,7 +152,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
 		EmailMessageTemplated<?> inputMessage = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessageTemplated.class);
         
         //when
-        EmailMessage emailSent = emailSendingFlow.formatAndSend(inputMessage).get(1, TimeUnit.SECONDS);
+        EmailMessage emailSent = emailSendingFlow.formatAndSend(inputMessage).get(15, TimeUnit.SECONDS);
         // then
         assertThat(emailSent, CoreMatchers.notNullValue());
     }
@@ -164,7 +164,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         EmailMessageTemplated<?> inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", EmailMessageTemplated.class);
         emailSendingFlow.formatAndSend(inputMessage);
         // when
-        boolean success = greenMail.waitForIncomingEmail(5000L, 1);
+        boolean success = greenMail.waitForIncomingEmail(15000L, 1);
         // then
         assertThat(success, equalTo(true));
     

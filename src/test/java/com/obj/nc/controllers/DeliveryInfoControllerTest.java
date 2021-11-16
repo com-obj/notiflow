@@ -209,7 +209,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
 		
 		messageProcessingFlow.processMessage(emailMessage);
-		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
+		Awaitility.await().atMost(15, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
 		
 		// WHEN find infos by input message's id
 		List<EndpointDeliveryInfoDto> deliveryInfosByMessageId = controller.findDeliveryInfosByMessageId(emailMessage.getId().toString());
@@ -242,7 +242,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
 		
 		messageProcessingFlow.processMessage(emailMessage);
-		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
+		Awaitility.await().atMost(15, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
 		
 		List<MessagePersistentState> messages = StreamSupport.stream(messageRepo.findAll().spliterator(), false)
 				.filter(message -> !emailMessage.getId().equals(message.getId()))
@@ -290,7 +290,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
 		
 		messageProcessingFlow.processMessage(emailMessage);
-		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
+		Awaitility.await().atMost(15, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
 		
 		List<DeliveryInfo> sentInfos = deliveryRepo.findByMessageIdAndStatus(emailMessage.getId(), SENT);
 		

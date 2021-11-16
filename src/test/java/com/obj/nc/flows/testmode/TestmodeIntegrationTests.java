@@ -199,7 +199,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     
         //AND GIVEN RECEIVED EMAILs
         messageProcessingFlow.processMessage(inputEmail);
-        testModeEmailsReciver.waitForIncomingEmail(1);
+        testModeEmailsReciver.waitForIncomingEmail(15000, 1);
         List<EmailMessage> receivedEmailMessages = greenMailReceiverSourceSupplier.get();
         Assertions.assertThat(receivedEmailMessages).hasSize(1);
         MessageSource<?> emailMessageSource = () -> new GenericMessage<>(receivedEmailMessages);

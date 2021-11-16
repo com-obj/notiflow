@@ -66,7 +66,7 @@ class GenericDataToNotificationTest extends BaseIntegrationTest {
         purgeNotifTables(springJdbcTemplate);
         
         springJdbcTemplate.update("drop table if exists license_agreement");
-        springJdbcTemplate.execute("create table license_agreement (description text not null, expiry_date timestamptz not null); ");
+        springJdbcTemplate.execute("create table license_agreement (id varchar(10) not null,description text not null, expiry_date timestamptz not null); ");
         
         GenericDataToNotificationExpiryTest.persistTestLicenseAgreements(springJdbcTemplate);
     }
@@ -82,7 +82,7 @@ class GenericDataToNotificationTest extends BaseIntegrationTest {
         pollableSourceJdbc.start();
 
         //then
-        boolean received = greenMail.waitForIncomingEmail(5000L, 1);
+        boolean received = greenMail.waitForIncomingEmail(15000L, 1);
     
         assertEquals(true, received);
         assertEquals(1, greenMail.getReceivedMessages().length); 

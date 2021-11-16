@@ -80,7 +80,7 @@ public class NotificationIntentProcessingTest extends BaseIntegrationTest {
 
         //THEN check processing deliveryInfo
         //TODO: awaitSend should be possible with intentId, event shouldn't be necessary in this case
-        awaitSent(eventId, 3, Duration.ofSeconds(5));
+        awaitSent(eventId, 3, Duration.ofSeconds(15));
     }
 
 	public NotificationIntent readTestIntent() {

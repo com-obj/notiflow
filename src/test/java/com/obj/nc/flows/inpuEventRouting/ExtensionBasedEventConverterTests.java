@@ -48,68 +48,57 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
-import org.springframework.integration.test.context.SpringIntegrationTest;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.mail.MessagingException;
-
 import java.time.Duration;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
-@ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
-@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
+@ActiveProfiles(value = {"test"}, resolver = SystemPropertyActiveProfileResolver.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest
 public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
-	
-	@Autowired private GenericEventPersister persister;
-	
-	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-	@Autowired private SourcePollingChannelAdapter pollableSource;
 
-	@Qualifier(MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID)
-	@Autowired private PublishSubscribeChannel messageProcessingInputChannel;
-	
-	@Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private GenericEventPersister persister;
 
-	
+    @Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
+    @Autowired
+    private SourcePollingChannelAdapter pollableSource;
+
     @BeforeEach
     public void startSourcePolling() {
-    	purgeNotifTables(jdbcTemplate);
-    	
-    	pollableSource.start();    	
-    	
+        pollableSource.start();
+
     }
-	
+
     @Test
-    void testGenericEventRouting() throws MessagingException {
-    	//GIVEN
-    	TestPayload pyload = new TestPayload(1, "value");
-    	
+    void testGenericEventRouting() {
+        //GIVEN
+        TestPayload pyload = new TestPayload(1, "value");
+
         GenericEvent event = GenericEvent.builder()
-        		.id(UUID.randomUUID())
-        		.payloadJson(JsonUtils.writeObjectToJSONNode(pyload))
-        		.build();
-        
+                .id(UUID.randomUUID())
+                .payloadJson(JsonUtils.writeObjectToJSONNode(pyload))
+                .build();
+
         //WHEN
         persister.accept(event);
-             
+
         //THEN
         //one EmailMessage and one Intent resulting into second and third EmailMessage should be generated
-        awaitSent(event.getId(), 3, Duration.ofSeconds(5));
+        awaitSent(event.getId(), 3, Duration.ofSeconds(30));
     }
-    
+
     @AfterEach
     public void stopSourcePolling() {
-    	pollableSource.stop();
+        pollableSource.stop();
     }
 
     @TestConfiguration
@@ -117,76 +106,72 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 
         @Bean
         public InputEvent2MessageConverterExtension event2Message() {
-            return new InputEvent2MessageConverterExtension () {
+            return new InputEvent2MessageConverterExtension() {
 
-				@Override
-				public Optional<PayloadValidationException> canHandle(GenericEvent payload) {
-					if (payload.getPayloadAsPojo(TestPayload.class) != null) {
-						return Optional.empty();
-					}
-					
-					return Optional.of(new PayloadValidationException("No test payload"));					
-				}
+                @Override
+                public Optional<PayloadValidationException> canHandle(GenericEvent payload) {
+                    if (payload.getPayloadAsPojo(TestPayload.class) != null) {
+                        return Optional.empty();
+                    }
 
-				@Override
-				public List<Message<?>> convert(GenericEvent event) {
-					EmailMessage email1 = new EmailMessage();
-					email1.addReceivingEndpoints(
-						EmailEndpoint.builder().email("test@objectify.sk").build()
-					);
-					email1.getBody().setSubject("Subject");
-					email1.getBody().setText("text");
+                    return Optional.of(new PayloadValidationException("No test payload"));
+                }
 
-					List<com.obj.nc.domain.message.Message<?>> msg = Arrays.asList(email1);
+                @Override
+                public List<Message<?>> convert(GenericEvent event) {
+                    EmailMessage email1 = new EmailMessage();
+                    email1.addReceivingEndpoints(
+                            EmailEndpoint.builder().email("test@objectify.sk").build()
+                    );
+                    email1.getBody().setSubject("Subject");
+                    email1.getBody().setText("text");
 
-					return msg;
-				}            	
+                    return Collections.singletonList(email1);
+                }
             };
         }
-        
+
         @Bean
         public InputEvent2IntentConverterExtension event2Intent() {
-            return new InputEvent2IntentConverterExtension () {
+            return new InputEvent2IntentConverterExtension() {
 
-				@Override
-				public Optional<PayloadValidationException> canHandle(GenericEvent payload) {
-					if (payload.getPayloadAsPojo(TestPayload.class) != null) {
-						return Optional.empty();
-					}
-					
-					return Optional.of(new PayloadValidationException("No test payload"));					
-				}
+                @Override
+                public Optional<PayloadValidationException> canHandle(GenericEvent payload) {
+                    if (payload.getPayloadAsPojo(TestPayload.class) != null) {
+                        return Optional.empty();
+                    }
 
-				@Override
-				public List<NotificationIntent> convert(GenericEvent event) {
-					NotificationIntent email1Intent = NotificationIntent.createWithStaticContent(
-							"Subject", 
-							"Text", 
-							EmailEndpoint.builder().email("test2@objectify.sk").build(),
-							EmailEndpoint.builder().email("test3@objectify.sk").build()
-					);
-					List<NotificationIntent> intents = Arrays.asList(email1Intent);
+                    return Optional.of(new PayloadValidationException("No test payload"));
+                }
 
-					return intents;
-				}            	
+                @Override
+                public List<NotificationIntent> convert(GenericEvent event) {
+                    NotificationIntent email1Intent = NotificationIntent.createWithStaticContent(
+                            "Subject",
+                            "Text",
+                            EmailEndpoint.builder().email("test2@objectify.sk").build(),
+                            EmailEndpoint.builder().email("test3@objectify.sk").build()
+                    );
+
+                    return Collections.singletonList(email1Intent);
+                }
             };
         }
     }
-    
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     @JsonTypeInfo(use = Id.CLASS)
     public static class TestPayload {
-    	
-    	private Integer num;
-    	private String str;
+        private Integer num;
+        private String str;
     }
-    
+
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
-      	.withConfiguration(
-      			GreenMailConfiguration.aConfig()
-      			.withUser("no-reply@objectify.sk", "xxx"))
-      	.withPerMethodLifecycle(true);
+            .withConfiguration(
+                    GreenMailConfiguration.aConfig()
+                            .withUser("no-reply@objectify.sk", "xxx"))
+            .withPerMethodLifecycle(true);
 }

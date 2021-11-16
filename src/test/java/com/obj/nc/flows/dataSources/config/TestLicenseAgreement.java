@@ -33,7 +33,7 @@ import java.time.temporal.ChronoUnit;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TestLicenseAgreement {
-    
+    private String id;
     private String description;
     
     @JsonProperty("expiry_date")

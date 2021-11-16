@@ -398,7 +398,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		emailMessage.setBody(EmailContent.builder().subject("Subject").text("Text").build());
 		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
 		messageProcessingFlow.processMessage(emailMessage);
-		await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
+		await().atMost(15, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
 
 		SmsEndpoint sms = SmsEndpoint.builder().phone("0908186997").build();
 
