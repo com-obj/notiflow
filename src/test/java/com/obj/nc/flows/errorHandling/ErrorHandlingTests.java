@@ -36,10 +36,7 @@ import com.obj.nc.functions.processors.failedPaylodPersister.FailedPayloadPersis
 import com.obj.nc.repositories.FailedPayloadRepository;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,7 +93,7 @@ public class ErrorHandlingTests {
 	
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testPayloadWithErrorProduced() throws InterruptedException, ExecutionException, TimeoutException, JsonProcessingException {
+	public void testPayloadWithErrorProduced() throws JsonProcessingException {
         //WHEN
 		TestPayload payload = TestPayload.builder().str("ss").build();
         Future<TestPayload> result = testFlow1.execute(payload);
@@ -119,11 +116,11 @@ public class ErrorHandlingTests {
 		errorHandlingController.resurrect(failed.getId().toString());
 		
         //THEN processing finished successfully
-		Awaitility.await().atMost(3, TimeUnit.SECONDS).until(() -> processingFinished == true);
+		Awaitility.await().atMost(3, TimeUnit.SECONDS).until(() -> processingFinished);
 	}
 	
 	@Test
-	public void testPayloadWithErrorProducedFailingErrorHandlingAndNoCycles() throws InterruptedException, ExecutionException, TimeoutException {
+	public void testPayloadWithErrorProducedFailingErrorHandlingAndNoCycles() {
         //WHEN
         ((FailingFailedPayloadPersister)failedPayloadPersister).setShouldFail(true);
 
@@ -137,7 +134,7 @@ public class ErrorHandlingTests {
         });
 
         Assertions.assertTrue(thrown.getCause() instanceof NullPointerException);
-        Assertions.assertTrue(thrown.getCause().getMessage().equals(TEST_EXCEPTION_MESSAGE) );
+        Assertions.assertEquals(thrown.getCause().getMessage(), TEST_EXCEPTION_MESSAGE);
 
  	}
     
@@ -171,11 +168,9 @@ public class ErrorHandlingTests {
         
         @MessagingGateway(name = "TestFlow1", errorChannel = ErrorHandlingFlowConfig.ERROR_CHANNEL_NAME)
         @ConditionalOnProperty(value = "test-flow-gateway", havingValue = "true")
-        public static interface TestFlow1 {
-        	
+        public interface TestFlow1 {
         	@Gateway(requestChannel = "testInputChannel1")
         	Future<TestPayload> execute(TestPayload payload);
-        	
         }
 
         @Bean
@@ -184,7 +179,7 @@ public class ErrorHandlingTests {
             return new FailingFailedPayloadPersister(failedPayloadRepo);
         }
 
-        @Data
+        @Setter
         public static class FailingFailedPayloadPersister extends FailedPayloadPersister {
 
             private boolean shouldFail = false;
@@ -211,7 +206,7 @@ public class ErrorHandlingTests {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    @JsonTypeInfo(include = As.PROPERTY, use = Id.CLASS)
+    @JsonTypeInfo(use = Id.CLASS)
     public static class TestPayload implements HasReceivingEndpoints {
     	
     	private Integer num;

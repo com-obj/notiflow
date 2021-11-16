@@ -19,6 +19,7 @@
 
 package com.obj.nc.flows.dataSources;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
@@ -58,13 +59,11 @@ import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -77,6 +76,7 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest
 class GenericDataConvertingFlowTest extends BaseIntegrationTest {
     
@@ -99,7 +99,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
     void testConvertGenericDataToMessageAndSend() {
         TestPayload payload = createTestPayload();
     
-        GenericData<JsonNode> genericData = new GenericData<>(Arrays.asList(JsonUtils.writeObjectToJSONNode(payload)));
+        GenericData<JsonNode> genericData = new GenericData<>(Collections.singletonList(JsonUtils.writeObjectToJSONNode(payload)));
     
         // when
         inputChannel.send(MessageBuilder.withPayload(genericData).build());
@@ -113,7 +113,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
         // given
         TestPayload payload = createTestPayload();
     
-        GenericData<TestPayload> genericData = new GenericData<>(Arrays.asList(payload));
+        GenericData<TestPayload> genericData = new GenericData<>(Collections.singletonList(payload));
     
         // when
         inputChannel.send(MessageBuilder.withPayload(genericData).build());
@@ -125,7 +125,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
     private void assertMessageDelivered() {
         Awaitility
                 .await()
-                .atMost(500, TimeUnit.SECONDS)
+                .atMost(5000, TimeUnit.SECONDS)
                 .until(() -> findDeliveryInfosForMsg().size()>= 2);
     
         List<DeliveryInfo> infos = findDeliveryInfosForMsg();
@@ -137,22 +137,20 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
     }
 
     private List<DeliveryInfo> findDeliveryInfosForMsg() {
-        List<DeliveryInfo> infos = deliveryInfoRepository
+        return deliveryInfoRepository
                 .findByStatus(SENT)
                 .stream()
                 .filter(info -> info.getMessageId() != null)
                 .collect(Collectors.toList());
-        return infos;
     }
 
     private TestPayload createTestPayload() {
-        TestPayload payload = TestPayload
+        return TestPayload
                 .builder()
                 .num(3)
                 .str("str")
                 .instant(Instant.now())
                 .build();
-        return payload;
     }    
     
     private Consumer<DeliveryInfo> assertRefersToMessageWithText(String text) {
@@ -160,7 +158,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 .extracting(info -> messageRepository.findById(any.getMessageId()))
                 .extracting(message -> message.get().getBody())
                 .asInstanceOf(type(EmailContent.class))
-                .extracting(content -> content.getText())
+                .extracting(EmailContent::getText)
                 .asString()
                 .contains(text);
     }
@@ -222,7 +220,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
             );
             email1.getBody().setSubject("Subject");
             email1.getBody().setText("GenericData2NotificationConverterExtension"+JsonUtils.writeObjectToJSONString(payload));
-            return Arrays.asList(email1);
+            return Collections.singletonList(email1);
         }
     
         @Bean
@@ -239,7 +237,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
             
                 @Override
                 public List<GenericEvent> convert(GenericData<JsonNode> payload) {
-                    return Arrays.asList(
+                    return Collections.singletonList(
                             GenericEvent
                                     .builder()
                                     .id(UUID.randomUUID())
@@ -270,7 +268,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 @Override
                 public List<GenericEvent> convert(GenericData<TestPayload> data) {
                     TestPayload testPayload = data.getPayloads().get(0);
-                    return Arrays.asList(
+                    return Collections.singletonList(
                             GenericEvent
                                     .builder()
                                     .id(UUID.randomUUID())
@@ -308,9 +306,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                     email1.getBody().setSubject("Subject");
                     email1.getBody().setText("InputEvent2MessageConverterExtension"+JsonUtils.writeObjectToJSONString(event.getPayloadAsPojo(TestPayload.class)));
                 
-                    List<com.obj.nc.domain.message.Message<?>> msg = Arrays.asList(email1);
-                
-                    return msg;
+                    return Collections.singletonList(email1);
                 }
             };
         }
@@ -320,6 +316,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TestPayload {
         
         private Integer num;
