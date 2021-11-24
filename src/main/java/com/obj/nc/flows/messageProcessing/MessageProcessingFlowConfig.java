@@ -20,6 +20,8 @@
 package com.obj.nc.flows.messageProcessing;
 
 import com.obj.nc.domain.message.*;
+import com.obj.nc.functions.processors.spamPrevention.SpamPreventionFilter;
+import com.obj.nc.functions.processors.spamPrevention.SpamPreventionOptionsHandler;
 import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.messageBuilder.MessageByRecipientTokenizer;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
@@ -50,6 +52,10 @@ public class MessageProcessingFlowConfig {
     MessagePersister messagePersister;
     @Autowired
     EndpointPersister endpointPersister;
+    @Autowired
+    SpamPreventionOptionsHandler spamPreventionOptionsHandler;
+    @Autowired
+    SpamPreventionFilter spamPreventionFilter;
 
 
     public final static String MESSAGE_PROCESSING_FLOW_ID = "MESSAGE_PROCESSING_FLOW_ID";
@@ -64,12 +70,14 @@ public class MessageProcessingFlowConfig {
     public IntegrationFlow messageProcessingFlowDefinition() {
         return IntegrationFlows
                 .from(messageProcessingInputChannel())
+                .handle(spamPreventionOptionsHandler)
                 .handle(endpointPersister)
                 .handle(messagePersister)
                 .transform(messageByRecipientTokenizer)
                 .split()
                 .handle(endpointPersister)
                 .handle(messagePersister) //need to persist, otherwise delivery info will have invalid reference
+                .filter(spamPreventionFilter::test)
                 .wireTap(flowConfig ->
                         flowConfig.channel(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
                 )

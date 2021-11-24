@@ -23,9 +23,7 @@ import lombok.Data;
 
 @Data
 public class DeliveryOptions {
-	
-//	private ChannelDeliveryOption channel;
+	private SpamPreventionOption spamPrevention;
 	private AggregationOption aggregation;
 	private SchedulingOption scheduling;
-	
 }

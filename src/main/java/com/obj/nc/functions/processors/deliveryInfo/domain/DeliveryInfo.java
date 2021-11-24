@@ -54,8 +54,8 @@ import java.util.UUID;
 public class DeliveryInfo implements Persistable<UUID> {
 	
 	//Order of elements in this enum is important. Final state should be last
-	public static enum DELIVERY_STATUS {
-		PROCESSING, SENT, DELIVERED, READ, FAILED
+	public enum DELIVERY_STATUS {
+		PROCESSING, SENT, DELIVERED, READ, FAILED, DISCARDED
 	}
 
 	@Id

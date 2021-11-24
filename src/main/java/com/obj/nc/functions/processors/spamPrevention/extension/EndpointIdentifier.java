@@ -1,0 +1,53 @@
+/*
+ * Copyright (C) 2021 the original author or authors.
+ * This file is part of Notiflow
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see https://www.gnu.org/licenses/.
+ */
+
+package com.obj.nc.functions.processors.spamPrevention.extension;
+
+import com.obj.nc.domain.deliveryOptions.SpamPreventionProperties;
+import com.obj.nc.domain.endpoints.*;
+import com.obj.nc.domain.endpoints.push.PushEndpoint;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@RequiredArgsConstructor
+@Component
+public class EndpointIdentifier {
+    private final SpamPreventionProperties globalSpamPreventionProperties;
+
+    SpamPreventionConfig identify(ReceivingEndpoint endpoint) {
+        SpamPreventionConfig config = new SpamPreventionConfig();
+
+        if (endpoint instanceof EmailEndpoint || endpoint instanceof MailchimpEndpoint) {
+            config.channel = SpamPreventionConfig.Channel.EMAIL;
+            config.option = globalSpamPreventionProperties.getEmail();
+        } else if (endpoint instanceof SmsEndpoint) {
+            config.channel = SpamPreventionConfig.Channel.SMS;
+            config.option = globalSpamPreventionProperties.getSms();
+        } else if (endpoint instanceof SlackEndpoint) {
+            config.channel = SpamPreventionConfig.Channel.SLACK;
+            config.option = globalSpamPreventionProperties.getSlack();
+        } else if (endpoint instanceof TeamsEndpoint) {
+            config.channel = SpamPreventionConfig.Channel.TEAMS;
+            config.option = globalSpamPreventionProperties.getTeams();
+        } else if (endpoint instanceof PushEndpoint) {
+            config.channel = SpamPreventionConfig.Channel.PUSH;
+            config.option = globalSpamPreventionProperties.getPush();
+        } else {
+            throw new RuntimeException("Unknown endpoint type: " + endpoint);
+        }
+
+        return config;
+    }
+}
