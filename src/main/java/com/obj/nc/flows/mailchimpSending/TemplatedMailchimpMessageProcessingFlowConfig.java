@@ -19,8 +19,7 @@
 
 package com.obj.nc.flows.mailchimpSending;
 
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
+import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.mailchimp.TemplatedMailchimpMessageSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import lombok.RequiredArgsConstructor;
@@ -41,8 +40,7 @@ public class TemplatedMailchimpMessageProcessingFlowConfig {
     
     private final TemplatedMailchimpMessageSender templatedMailchimpMessageSender;
     private final PaylaodLoggerSinkConsumer logConsumer;
-    private final MessagePersister messagePersister;
-    private final EndpointPersister endpointPersister;
+    private final MessageAndEndpointPersister persister;
     private final ThreadPoolTaskScheduler executor;
     
     @Bean(MAILCHIMP_TEMPLATE_PROCESSING_FLOW_INPUT_CHANNEL_ID)
@@ -54,8 +52,7 @@ public class TemplatedMailchimpMessageProcessingFlowConfig {
     public IntegrationFlow mailchimpTemplateProcessingFlowDefinition() {
         return IntegrationFlows
                 .from(MAILCHIMP_TEMPLATE_PROCESSING_FLOW_INPUT_CHANNEL_ID)
-                .handle(endpointPersister)
-                .handle(messagePersister)
+                .handle(persister)
                 .handle(templatedMailchimpMessageSender)
                 .handle(logConsumer)
                 .get();

@@ -32,6 +32,7 @@ import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistentState;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
+import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.SmsSender;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.EndpointsRepository;
@@ -78,10 +79,10 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 
 	@Autowired private EndpointsRepository endpointsRepository;
 	@Autowired private DeliveryInfoRepository deliveryInfoRepository;
-	@Autowired private MessageRepository messageRepository;
 	@Autowired private GenericEventRepository genericEventRepository;
 	@Autowired private MockMvc mockMvc;
 	@Autowired private MessageProcessingFlow messageProcessingFlow;
+	@Autowired private MessageAndEndpointPersister messageAndEndpointPersister;
 	@MockBean
 	SmsSender smsSender;
 
@@ -364,18 +365,14 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 				.build();
 		event = genericEventRepository.save(event);
 
-		EmailEndpoint email1 = EmailEndpoint.builder().email("john.doe@gmail.com").build();
-		endpointsRepository.persistEnpointIfNotExists(email1);
-		EmailEndpoint email2 = EmailEndpoint.builder().email("john.dudly@gmail.com").build();
-		endpointsRepository.persistEnpointIfNotExists(email2);
-		EmailEndpoint email3 = EmailEndpoint.builder().email("john.wick@gmail.com").build();
-		endpointsRepository.persistEnpointIfNotExists(email3);
-
 		EmailMessage emailMessage = new EmailMessage();
 		emailMessage.addPreviousEventId(event.getId());
 		emailMessage.setBody(EmailContent.builder().subject("Subject").text("Text").build());
-		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
-		messageRepository.save(emailMessage.toPersistentState());
+		emailMessage.setReceivingEndpoints(Arrays.asList(
+				EmailEndpoint.builder().email("john.doe@gmail.com").build(),
+				EmailEndpoint.builder().email("john.dudly@gmail.com").build()));
+
+		messageAndEndpointPersister.apply(emailMessage);
 
 		return event.getId();
 	}
@@ -416,23 +413,6 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		Optional<LinkedHashMap<?, ?>> emailDto = endpoints.stream().filter(endpoint -> endpointName.equals(endpoint.get("name"))).findFirst();
 		assertThat(emailDto).isNotNull();
 		assertThat(Long.valueOf(emailDto.get().get("messagesSentCount").toString())).isEqualTo(sentMessagesCount);
-	}
-
-	private void awaitMessageAndDeliveryInfos(int numberToWait) {
-		MessagePersistentState sentMessage = waitForFirstMessage();
-
-		await().atMost(Duration.ofSeconds(3)).until(
-				() -> deliveryInfoRepository.findByMessageIdOrderByProcessedOn(sentMessage.getId()).size() >= numberToWait
-		);
-	}
-
-	public MessagePersistentState waitForFirstMessage() {
-		await().atMost(Duration.ofSeconds(3)).until(
-				() -> messageRepository.findAll().iterator().next() != null
-		);
-
-		MessagePersistentState sentMessage = messageRepository.findAll().iterator().next();
-		return sentMessage;
 	}
 
 	private void persistNEmailEndpoints(int n) {

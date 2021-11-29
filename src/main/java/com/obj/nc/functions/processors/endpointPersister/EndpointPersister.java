@@ -20,22 +20,35 @@
 package com.obj.nc.functions.processors.endpointPersister;
 
 import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import lombok.AllArgsConstructor;
+import com.obj.nc.repositories.EndpointsRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class EndpointPersister extends ProcessorFunctionAdapter<BasePayload<?>, BasePayload<?>> {
+    private final EndpointsRepository repo;
 
+    @Override
+    protected BasePayload<?> execute(BasePayload<?> basePayload) {
+        List<? extends ReceivingEndpoint> savedEndpoints = repo.persistEnpointIfNotExists(basePayload.getReceivingEndpoints());
+        for (ReceivingEndpoint endpointBeforeSave : basePayload.getReceivingEndpoints()) {
+            if (endpointBeforeSave.getDeliveryOptions() == null) {
+                continue;
+            }
 
-	@Override
-	protected BasePayload<?> execute(BasePayload<?> basePayload) {		
-		basePayload.ensureEndpointsPersisted();
-		
-		return basePayload;
-	}
+            ReceivingEndpoint endpoint = savedEndpoints.stream()
+                    .filter(endpointBeforeSave::equals)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Failed to match endpoint after save: " + endpointBeforeSave));
+            endpoint.setDeliveryOptions(endpointBeforeSave.getDeliveryOptions());
+        }
+        basePayload.setReceivingEndpoints(savedEndpoints);
 
-
-
+        return basePayload;
+    }
 }

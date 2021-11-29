@@ -17,18 +17,20 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.deliveryOptions;
+CREATE TABLE nc_delivery_options (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    time_created timestamptz NOT NULL,
+    message_id UUID NOT NULL,
+    endpoint_id UUID NOT NULL,
+    delivery_options jsonb,
+    CONSTRAINT fk_message
+        FOREIGN KEY(message_id) REFERENCES nc_message(id),
+    CONSTRAINT fk_endpoint
+        FOREIGN KEY(endpoint_id) REFERENCES nc_endpoint(id)
+);
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.obj.nc.domain.content.MessageContent;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+INSERT INTO nc_delivery_options (message_id, endpoint_id)
+SELECT id as message_id, UNNEST(endpoint_ids) as endpoint_id
+FROM nc_message;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-public class DeliveryOptions extends MessageContent {
-    private SpamPreventionOption spamPrevention;
-    private AggregationOption aggregation;
-    private SchedulingOption scheduling;
-}
+ALTER TABLE nc_message DROP COLUMN endpoint_ids;

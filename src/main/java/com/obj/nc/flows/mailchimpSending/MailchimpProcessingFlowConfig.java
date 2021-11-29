@@ -19,7 +19,7 @@
 
 package com.obj.nc.flows.mailchimpSending;
 
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.messageTemplating.config.TrackingConfigProperties;
 import com.obj.nc.functions.processors.messageTracking.MailchimpReadTrackingDecorator;
@@ -47,7 +47,7 @@ public class MailchimpProcessingFlowConfig {
     private final MailchimpReadTrackingDecorator readTrackingDecorator;
     private final TrackingConfigProperties trackingConfigProperties;
     private final MessagePersister messagePersister;
-    private final EndpointPersister endpointPersister;
+    private final MessageAndEndpointPersister messageAndEndpointPersister;
     private final ThreadPoolTaskScheduler executor;
     
     @Bean(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID)
@@ -59,8 +59,7 @@ public class MailchimpProcessingFlowConfig {
     public IntegrationFlow mailchimpProcessingFlowDefinition() {
         return IntegrationFlows
                 .from(MAILCHIMP_PROCESSING_FLOW_INPUT_CHANNEL_ID)
-                .handle(endpointPersister)
-                .handle(messagePersister)
+                .handle(messageAndEndpointPersister)
                 .routeToRecipients(spec -> spec
                         .recipientFlow(source -> trackingConfigProperties.isEnabled(),
                                 trackingSubflow -> trackingSubflow

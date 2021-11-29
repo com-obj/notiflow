@@ -62,7 +62,9 @@ public abstract class ReceivingEndpoint implements Persistable<UUID> {
 	@Id
 	@EqualsAndHashCode.Include
 	private UUID id = UUID.randomUUID();
+	@Transient
 	private DeliveryOptions deliveryOptions;
+	@Transient
 	private Recipient recipient;
 	@CreatedDate
 	private Instant timeCreated;

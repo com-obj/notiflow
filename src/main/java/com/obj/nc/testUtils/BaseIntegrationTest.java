@@ -66,7 +66,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     
     @Autowired Get get;
     @Autowired(required = false) //not all tests require, some might not be @SpringBootTests 
-    DeliveryInfoRepository deliveryInfoRepo;
+    protected DeliveryInfoRepository deliveryInfoRepo;
     
     @Autowired ThreadPoolTaskScheduler taskScheduler; 
 
@@ -94,11 +94,12 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
         log.info("Purging all tables in test");
         
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
+		jdbcTemplate.batchUpdate("delete from nc_delivery_options");
         jdbcTemplate.batchUpdate("delete from nc_delivery_info");
-        jdbcTemplate.batchUpdate("delete from nc_endpoint");        
-        jdbcTemplate.batchUpdate("delete from nc_event");    
-        jdbcTemplate.batchUpdate("delete from nc_intent");  
-        jdbcTemplate.batchUpdate("delete from nc_message");  
+        jdbcTemplate.batchUpdate("delete from nc_endpoint");
+        jdbcTemplate.batchUpdate("delete from nc_event");
+        jdbcTemplate.batchUpdate("delete from nc_intent");
+        jdbcTemplate.batchUpdate("delete from nc_message");
         jdbcTemplate.batchUpdate("delete from nc_failed_payload");
     }
     

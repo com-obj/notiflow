@@ -28,6 +28,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class SpamPreventionFilterTest {
@@ -62,11 +63,12 @@ public class SpamPreventionFilterTest {
 
         verifyCountMethodCall(emailMessage);
 
-        ArgumentCaptor<DeliveryInfo> captor = ArgumentCaptor.forClass(DeliveryInfo.class);
-        Mockito.verify(repo).save(captor.capture());
+        ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+        Mockito.verify(repo).saveAll(captor.capture());
 
-        DeliveryInfo deliveryInfo = captor.getValue();
-        Assertions.assertEquals(DeliveryInfo.DELIVERY_STATUS.DISCARDED, deliveryInfo.getStatus());
+        List<DeliveryInfo> deliveryInfo = (List<DeliveryInfo>) captor.getValue();
+        Assertions.assertEquals(1, deliveryInfo.size());
+        Assertions.assertEquals(DeliveryInfo.DELIVERY_STATUS.DISCARDED, deliveryInfo.get(0).getStatus());
     }
 
     private EmailMessage prepareDataAndMocks(long deliveryInfoCount) {

@@ -36,7 +36,7 @@ public interface MessageRepository extends PagingAndSortingRepository<MessagePer
     
     @Query(
             value = "select " +
-                    "	msg.* " +
+                    "	msg.*, array(select endpoint_id from nc_delivery_options d where d.message_id = msg.id) as endpoint_ids " +
                     "from " +
                     "	nc_message msg " +
                     "where " +

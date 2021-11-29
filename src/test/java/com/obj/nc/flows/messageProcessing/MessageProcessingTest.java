@@ -24,11 +24,13 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.GenericEventRepositoryTest;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -39,6 +41,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
@@ -48,28 +51,32 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 @SpringBootTest
 public class MessageProcessingTest extends BaseIntegrationTest {
 
-	@Autowired private MessageProcessingFlow msgFlow; 
-	@Autowired private GenericEventRepository eventRepo; 
-	    
+    @Autowired
+    MessageProcessingFlow msgFlow;
+
+    @Autowired
+    GenericEventRepository eventRepo;
+
+
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
-      	.withConfiguration(
-      			GreenMailConfiguration.aConfig()
-      			.withUser("no-reply@objectify.sk", "xxx"))
-      	.withPerMethodLifecycle(true);
-    
-    
+            .withConfiguration(
+                    GreenMailConfiguration.aConfig()
+                            .withUser("no-reply@objectify.sk", "xxx"))
+            .withPerMethodLifecycle(true);
+
+
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
-    	purgeNotifTables(jdbcTemplate);
+        purgeNotifTables(jdbcTemplate);
     }
-    
+
     @Test
     void testSendMessage() {
         // given
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
-		UUID eventId = eventRepo.save(event).getId();
-		
+        GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+        UUID eventId = eventRepo.save(event).getId();
+
         String INPUT_JSON_FILE = "messages/e_email_message_2_many.json";
         EmailMessage msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
         msg.addPreviousEventId(eventId);
@@ -81,5 +88,20 @@ public class MessageProcessingTest extends BaseIntegrationTest {
         awaitSent(eventId, 2, Duration.ofSeconds(15));
     }
 
+    @Test
+    void testEventIsFilteredOut() {
+        GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+        UUID eventId = eventRepo.save(event).getId();
 
+        String INPUT_JSON_FILE = "messages/email_message_spam_prevention.json";
+        EmailMessage msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
+        msg.addPreviousEventId(eventId);
+
+        msgFlow.processMessage(msg);
+
+        Awaitility.await().atMost(Duration.ofSeconds(15)).until(() -> {
+            List<DeliveryInfo> info = deliveryInfoRepo.findByEventIdAndStatusOrderByProcessedOn(eventId, DeliveryInfo.DELIVERY_STATUS.DISCARDED);
+            return info.size() == 1;
+        });
+    }
 }

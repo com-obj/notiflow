@@ -22,7 +22,7 @@ package com.obj.nc.flows.emailFormattingAndSending;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.EmailMessageAggregationStrategy;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.messageTemplating.EmailTemplateFormatter;
@@ -52,7 +52,7 @@ public class EmailProcessingFlowConfig {
 	private final TrackingConfigProperties trackingConfigProperties;
 	private final EmailProcessingFlowProperties properties;
 	private final MessagePersister messagePersister;
-	private final  EndpointPersister endpointPersister; 
+	private final MessageAndEndpointPersister messageAndEndpointPersister;
 	private final ThreadPoolTaskScheduler executor;
 	private final EmailMessageAggregationStrategy emailMessageAggregationStrategy;
 	
@@ -68,8 +68,7 @@ public class EmailProcessingFlowConfig {
 	public IntegrationFlow emailFormatAndSendFlowDefinition() {
 		return IntegrationFlows
 				.from(emailFormatAndSendInputChannel())
-				.handle(endpointPersister)
-				.handle(messagePersister)
+				.handle(messageAndEndpointPersister)
 				.routeToRecipients(spec -> spec
 						.<Message<?>>recipient(
 								internalEmailFormatFlowDefinition().getInputChannel(),
@@ -105,8 +104,7 @@ public class EmailProcessingFlowConfig {
 	public IntegrationFlow emailSendFlowDefinition() {
 		return IntegrationFlows
 				.from(emailSendInputChannel())
-				.handle(endpointPersister)
-				.handle(messagePersister)
+				.handle(messageAndEndpointPersister)
 				.routeToRecipients(spec -> spec
 						.recipientFlow((Message<EmailContent> source) -> trackingConfigProperties.isEnabled() 
 										&& MediaType.TEXT_HTML_VALUE.equals(source.getBody().getContentType()),

@@ -13,21 +13,15 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.domain.deliveryOptions;
+package com.obj.nc.repositories;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.obj.nc.domain.delivery.DeliveryOptionsEntity;
+import org.springframework.data.repository.CrudRepository;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-public class SpamPreventionOption {
-    public enum MaxMessageUnit {
-        MINUTES, HOURS, DAYS
-    }
+import java.util.List;
+import java.util.UUID;
 
-    private Integer maxMessages;
-    private Integer maxMessagesTimeFrame;
-    private MaxMessageUnit maxMessagesUnit;
+public interface DeliveryOptionsRepository extends CrudRepository<DeliveryOptionsEntity, UUID> {
+    boolean existsByEndpointIdAndMessageId(UUID endpointId, UUID messageId);
+    List<DeliveryOptionsEntity> findByMessageId(UUID messageId);
 }

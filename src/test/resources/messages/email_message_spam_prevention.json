@@ -1,0 +1,25 @@
+{
+  "type": "EMAIL_MESSAGE",
+  "header": {
+    "id": "2598a791-08d6-4795-8354-2f675f72b067",
+    "flow-id": "static-routing-pipeline"
+  },
+  "body": {
+    "text": "Text",
+    "subject": "Subject"
+  },
+  "receivingEndpoints": [
+    {
+      "@type": "EMAIL",
+      "email": "john.doe@objectify.sk",
+      "deliveryOptions": {
+        "@class": "com.obj.nc.domain.deliveryOptions.DeliveryOptions",
+        "spamPrevention": {
+          "maxMessages": 0,
+          "maxMessagesTimeFrame": 1,
+          "maxMessagesUnit": "DAYS"
+        }
+      }
+    }
+  ]
+}

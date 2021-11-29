@@ -25,18 +25,11 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.obj.nc.Get;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.headers.ProcessingInfo;
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailMessageTemplated;
-import com.obj.nc.domain.message.EmailWithTestModeDigest;
-import com.obj.nc.domain.message.MailchimpMessage;
-import com.obj.nc.domain.message.SmsMessage;
-import com.obj.nc.domain.message.SmsMessageTemplated;
-import com.obj.nc.domain.message.TemplatedMailchimpMessage;
+import com.obj.nc.domain.message.*;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -57,7 +50,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({ 
 	@Type(value = NotificationIntent.class, name = NotificationIntent.JSON_TYPE_IDENTIFIER),
 	@Type(value = EmailMessage.class, name = EmailMessage.JSON_TYPE_IDENTIFIER),
@@ -99,12 +92,7 @@ public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements H
 		
 		this.setReceivingEndpoints(typedEndpoints);
 	}
-	
-	public void ensureEndpointsPersisted() {		
-		List<? extends ReceivingEndpoint> persistedEndpoints = Get.getEndpointsRepo().persistEnpointIfNotExists(getReceivingEndpoints());
-		setReceivingEndpoints(persistedEndpoints);
-	}
-	
+
 	@Override
 	@Transient
 	public List<? extends ReceivingEndpoint> getReceivingEndpoints() {

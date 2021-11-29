@@ -19,8 +19,7 @@
 
 package com.obj.nc.flows.smsFormattingAndSending;
 
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
+import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.SmsSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +38,7 @@ public class SmsProcessingFlowConfig {
 
     private final SmsSender smsSender;
     private final PaylaodLoggerSinkConsumer logConsumer;
-    private final MessagePersister messagePersister;
-    private final EndpointPersister endpointPersister;
+    private final MessageAndEndpointPersister messageAndEndpointPersister;
 
     public final static String SMS_PROCESSING_FLOW_ID = "SMS_PROCESSING_FLOW_ID";
     public final static String SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID = SMS_PROCESSING_FLOW_ID + "_INPUT";
@@ -54,10 +52,7 @@ public class SmsProcessingFlowConfig {
     public IntegrationFlow smsProcessingFlowDefinition() {
         return IntegrationFlows
                 .from(smsProcessingInputChangel())
-                .handle(endpointPersister)
-                .handle(messagePersister)
-                .split()
-                .handle(messagePersister)
+                .handle(messageAndEndpointPersister)
                 .handle(smsSender)
                 .wireTap(flowConfig ->
                         flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
