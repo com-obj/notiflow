@@ -35,11 +35,7 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
 
     List<DeliveryInfo> findByEventIdOrderByProcessedOn(UUID eventId);
 
-    long countByStatus(DELIVERY_STATUS status);
-
     List<DeliveryInfo> findByStatus(DELIVERY_STATUS status);
-
-    long countByEventIdAndStatus(UUID eventId, DELIVERY_STATUS status);
 
     @Query("select * " +
             "from nc_delivery_info " +
@@ -54,15 +50,15 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
     @Query("select * " +
             "from nc_delivery_info di " +
             "where di.message_id = any (" +
-            "with recursive msg_chain as ( " +
-            "select msg.id, msg.previous_message_ids " +
-            "from nc_message msg " +
-            "where msg.id = (:messageId) " +
-            "union all " +
-            "select next_msg.id, next_msg.previous_message_ids " +
-            "from nc_message next_msg " +
-            "join msg_chain on msg_chain.id = any ( next_msg.previous_message_ids ))" +
-            "select msg_chain.id from msg_chain)" +
+            "    with recursive msg_chain as ( " +
+            "        select msg.id, msg.previous_message_ids " +
+            "        from nc_message msg " +
+            "        where msg.id = (:messageId) " +
+            "    union all " +
+            "        select next_msg.id, next_msg.previous_message_ids " +
+            "        from nc_message next_msg " +
+            "        join msg_chain on msg_chain.id = any ( next_msg.previous_message_ids ))" +
+            "    select msg_chain.id from msg_chain)" +
             "order by di.processed_on")
     List<DeliveryInfo> findByMessageIdOrderByProcessedOn(@Param("messageId") UUID messageId);
 
@@ -70,15 +66,15 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
             "from nc_delivery_info di " +
             "where di.status = (:status) " +
             "and di.message_id = any (" +
-            "with recursive msg_chain as ( " +
-            "select msg.id, msg.previous_message_ids " +
-            "from nc_message msg " +
-            "where msg.id = (:messageId) " +
-            "union all " +
-            "select next_msg.id, next_msg.previous_message_ids " +
-            "from nc_message next_msg " +
-            "join msg_chain on msg_chain.id = any ( next_msg.previous_message_ids ))" +
-            "select msg_chain.id from msg_chain)")
+            "    with recursive msg_chain as ( " +
+            "        select msg.id, msg.previous_message_ids " +
+            "        from nc_message msg " +
+            "        where msg.id = (:messageId) " +
+            "    union all " +
+            "        select next_msg.id, next_msg.previous_message_ids " +
+            "        from nc_message next_msg " +
+            "        join msg_chain on msg_chain.id = any ( next_msg.previous_message_ids ))" +
+            "    select msg_chain.id from msg_chain)")
     List<DeliveryInfo> findByMessageIdAndStatus(@Param("messageId") UUID messageId,
                                                 @Param("status") DELIVERY_STATUS status);
 
@@ -86,15 +82,15 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
             "from nc_delivery_info di " +
             "where di.status = (:status) " +
             "and di.message_id = any (" +
-            "with recursive msg_chain as ( " +
-            "select msg.id, msg.previous_message_ids " +
-            "from nc_message msg " +
-            "where msg.id = (:messageId) " +
-            "union all " +
-            "select next_msg.id, next_msg.previous_message_ids " +
-            "from nc_message next_msg " +
-            "join msg_chain on msg_chain.id = any ( next_msg.previous_message_ids ))" +
-            "select msg_chain.id from msg_chain)")
+            "    with recursive msg_chain as ( " +
+            "        select msg.id, msg.previous_message_ids " +
+            "        from nc_message msg " +
+            "        where msg.id = (:messageId) " +
+            "    union all " +
+            "        select next_msg.id, next_msg.previous_message_ids " +
+            "        from nc_message next_msg " +
+            "        join msg_chain on msg_chain.id = any ( next_msg.previous_message_ids ))" +
+            "    select msg_chain.id from msg_chain)")
     long countByMessageIdAndStatus(@Param("messageId") UUID messageId,
                                    @Param("status") DELIVERY_STATUS status);
 
