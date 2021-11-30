@@ -196,6 +196,65 @@ Here is sample how to send sms message:
 Always send sms with correct phone number prefix. In example is +421 used, which is prefix for slovakia. List of prefixes
 can be found [here](https://www.iban.com/dialing-codes).
 
+## Spam prevention
+Spam prevention support two ways of configuration: 
+- global
+- endpoint
+
+When applying spam prevention, the endpoint configuration has priority over global config. Both are not required.
+
+Both configurations share same configuration object with properties:
+- maxMessagesUnit (enum) - Allowed values are: **MINUTES**, **HOURS**, **DAYS**.
+- maxMessagesTimeFrame (int) - how many units are in time frame
+- maxMessages (int) - maximum of sent messages per time frame
+
+### Global settings
+Actual supported global endpoint configurations are:
+- email
+- slack
+- sms
+- teams
+- push
+
+Every endpoint has same properties. As example email endpoint configuration is provided.
+```properties
+nc.delivery.spam-prevention.email.maxMessages=5
+nc.delivery.spam-prevention.email.maxMessagesTimeFrame=1
+nc.delivery.spam-prevention.email.maxMessagesUnit=DAYS
+```
+This configuration allows sending of maximum 5 emails per 1 day.
+
+### Endpoint settings
+One of ways how to implement spam prevention is via implementing SpamPreventionExtension. In the following example
+the most important part is method *setSpamPreventionSettings* when SpamPreventionOption object is created and set to
+deliveryOptions.
+```java
+@Component
+class EmailSpamPreventionExtension implements SpamPreventionExtension {
+
+    @Override
+    public BasePayload<?> apply(BasePayload<?> basePayload) {
+        for (ReceivingEndpoint endpoint : basePayload.getReceivingEndpoints()) {
+            if (endpoint instanceof EmailEndpoint) {
+                setSpamPreventionSettings(endpoint);
+            }
+        }
+        return basePayload;
+    }
+
+    void setSpamPreventionSettings(ReceivingEndpoint receivingEndpoint) {
+        DeliveryOptions deliveryOptions = receivingEndpoint.getDeliveryOptions();
+
+        if (deliveryOptions == null) {
+            deliveryOptions = new DeliveryOptions();
+            receivingEndpoint.setDeliveryOptions(deliveryOptions);
+        }
+
+        deliveryOptions.setSpamPrevention(new SpamPreventionOption(5,1, SpamPreventionOption.MaxMessageUnit.DAYS));
+    }
+}
+```
+
 ## Convert custom application event to Message
 
 Covering custom event is very common use-case for notiflow. This separation of responsibility ensures that client application does its job and only emits application events if something important happens. The processing of such events, with regards to notification of users or 3rd parties, is in the responsibility of notiflow. 
