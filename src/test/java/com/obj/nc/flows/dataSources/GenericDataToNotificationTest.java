@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
-@SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME, GenericDataToNotificationTest.DATA_SOURCE_POLLER_NAME})
+@SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME, "NC_JDBC_DATA_SOURCE_*"})
 @SpringBootTest(properties = {
         "nc.data-sources.jdbc[0].name=test-ds",
         "nc.data-sources.jdbc[0].url=jdbc:postgresql://localhost:25432/nc",
@@ -43,8 +43,7 @@ import static org.junit.Assert.assertEquals;
         "nc.data-sources.jdbc[0].jobs[0].pojoFCCN=com.obj.nc.flows.dataSources.config.TestLicenseAgreement",                
         "nc.data-sources.jdbc[0].jobs[0].cron=*/2 * * * * *",
         "test-license-agreements.admin-email=johndoe@objectify.sk",
-        "test-license-agreements.email-template-path=agreements.html",
-        "nc.functions.email-templates.templates-root-dir=src/test/resources/templates"
+        "test-license-agreements.email-template-path=agreements.html"
 })
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //this test register programmatically spring integration flows. it seems to confuse the spring context management in tests
 class GenericDataToNotificationTest extends BaseIntegrationTest {
@@ -60,7 +59,7 @@ class GenericDataToNotificationTest extends BaseIntegrationTest {
     public static final String DATA_SOURCE_POLLER_NAME = "NC_JDBC_DATA_SOURCE_test-ds_check-agreements-expiry_INTEGRATION_FLOW_POLLER";
     
     @BeforeEach
-    void setupDbs() {
+    public void setupDbs() {
         pollableSourceJdbc.stop(); //somehow this doesn't stop with the standard annotation
 
         purgeNotifTables(springJdbcTemplate);
@@ -68,11 +67,11 @@ class GenericDataToNotificationTest extends BaseIntegrationTest {
         springJdbcTemplate.update("drop table if exists license_agreement");
         springJdbcTemplate.execute("create table license_agreement (id varchar(10) not null,description text not null, expiry_date timestamptz not null); ");
         
-        GenericDataToNotificationExpiryTest.persistTestLicenseAgreements(springJdbcTemplate);
+        GenericDataToNotificationExpiryTest.persist10TestLicenseAgreements(springJdbcTemplate);
     }
     
     @AfterEach
-    void tearDown() {
+    public void tearDownDbs() {
         springJdbcTemplate.update("drop table if exists license_agreement");
     }
     
@@ -91,6 +90,13 @@ class GenericDataToNotificationTest extends BaseIntegrationTest {
         String body = GreenMailUtil.getBody(receivedMessage);
         assertThat(body).contains("Agreement 1", "Agreement 2", "Agreement 3", "Agreement 4",
                 "Agreement 5", "Agreement 6", "Agreement 7", "Agreement 8", "Agreement 9");
+
+//TODO: after notification, NC should make sure to not redeliver new notification unless Hash of the GenericData changed
+        // //then try again
+        // received = greenMail.waitForIncomingEmail(5000L, 1);
+
+        // //there shouldn't be redelivery
+        // assertEquals(false, received);
     }
     
     

@@ -55,8 +55,7 @@ import static org.junit.Assert.assertEquals;
 //        "nc.data-sources.jdbc[0].jobs[0].spel-filter-expression=expiryDate.isBefore(T(java.time.Instant).now().plus(5, T(java.time.temporal.ChronoUnit).DAYS))",        
         "nc.data-sources.jdbc[0].jobs[0].spel-filter-expression=isExpired(5)",        
         "test-license-agreements.admin-email=johndoe@objectify.sk",
-        "test-license-agreements.email-template-path=agreements.html",
-        "nc.functions.email-templates.templates-root-dir=src/test/resources/templates"
+        "test-license-agreements.email-template-path=agreements.html"
 })
 @SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME, GenericDataToNotificationTest.DATA_SOURCE_POLLER_NAME})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //this test register programmatically spring integration flows. it seems to confuse the spring context management in tests
@@ -78,11 +77,11 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
         springJdbcTemplate.update("drop table if exists license_agreement");
         springJdbcTemplate.execute("create table license_agreement (id varchar(10) not null, description text not null, expiry_date timestamptz not null); ");
         
-        persistTestLicenseAgreements(springJdbcTemplate);
+        persist10TestLicenseAgreements(springJdbcTemplate);
     }
     
     @AfterEach
-    void tearDown() {
+    void tearDownDbs() {
         springJdbcTemplate.update("drop table if exists license_agreement");
     }
     
@@ -100,9 +99,16 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
         MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
         String body = GreenMailUtil.getBody(receivedMessage);
         assertThat(body).contains("Agreement 1", "Agreement 2", "Agreement 3", "Agreement 4");
+
+        //TODO: after notification, NC should make sure to not redeliver new notification unless Hash of the GenericData changed
+        // //then try again
+        // received = greenMail.waitForIncomingEmail(5000L, 1);
+
+        // //there shouldn't be re-delivery
+        // assertEquals(false, received);
     }
     
-    public static void persistTestLicenseAgreements(JdbcTemplate springJdbcTemplate) {
+    public static void persist10TestLicenseAgreements(JdbcTemplate springJdbcTemplate) {
         List<TestLicenseAgreement> testAgreements = IntStream
                 .range(1, 10)
                 .mapToObj(i -> 
