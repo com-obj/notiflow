@@ -20,7 +20,7 @@ nav:
     - Payloads: entities.md
   - Web UI: web-ui.md
   - API: 
-    - Delivery infos: api/delivery-info_api.md
+ #   - Delivery infos: api/generated/event/delivery-info_api.md
     - Events: api/event_api.md
   - Releases:
     - Changelog: changelog.md
