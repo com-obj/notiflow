@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class SpamPreventionFilterTest {
-    DeliveryInfoRepository repo = Mockito.mock(DeliveryInfoRepository.class);
-    SpamPreventionFilter filter = new SpamPreventionFilter(repo);
+    DeliveryInfoRepository diRepo = Mockito.mock(DeliveryInfoRepository.class);
+    SpamPreventionFilter filter = new SpamPreventionFilter(diRepo);
 
     @Test
     void testNoDeliveryOptions() {
@@ -52,7 +52,7 @@ public class SpamPreventionFilterTest {
         Assertions.assertTrue(filter.test(emailMessage));
 
         verifyCountMethodCall(emailMessage);
-        Mockito.verify(repo, Mockito.never()).save(ArgumentMatchers.any());
+        Mockito.verify(diRepo, Mockito.never()).save(ArgumentMatchers.any());
     }
 
     @Test
@@ -63,12 +63,12 @@ public class SpamPreventionFilterTest {
 
         verifyCountMethodCall(emailMessage);
 
-        ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(repo).saveAll(captor.capture());
+        ArgumentCaptor<DeliveryInfo> captor = ArgumentCaptor.forClass(DeliveryInfo.class);
+        Mockito.verify(diRepo).save(captor.capture());
 
-        List<DeliveryInfo> deliveryInfo = (List<DeliveryInfo>) captor.getValue();
-        Assertions.assertEquals(1, deliveryInfo.size());
-        Assertions.assertEquals(DeliveryInfo.DELIVERY_STATUS.DISCARDED, deliveryInfo.get(0).getStatus());
+        DeliveryInfo deliveryInfo = captor.getValue();
+        Assertions.assertNotNull(deliveryInfo);
+        Assertions.assertEquals(DeliveryInfo.DELIVERY_STATUS.DISCARDED, deliveryInfo.getStatus());
     }
 
     private EmailMessage prepareDataAndMocks(long deliveryInfoCount) {
@@ -81,11 +81,11 @@ public class SpamPreventionFilterTest {
     }
 
     private void mockCountMethodCall(long deliveryInfoCount, EmailMessage emailMessage) {
-        Mockito.when(repo.countByEndpointIdAndProcessedOnAfter(ArgumentMatchers.eq(getEndpointId(emailMessage)), ArgumentMatchers.any())).thenReturn(deliveryInfoCount);
+        Mockito.when(diRepo.countByEndpointIdAndProcessedOnAfter(ArgumentMatchers.eq(getEndpointId(emailMessage)), ArgumentMatchers.any())).thenReturn(deliveryInfoCount);
     }
 
     private void verifyCountMethodCall(EmailMessage emailMessage) {
-        Mockito.verify(repo).countByEndpointIdAndProcessedOnAfter(ArgumentMatchers.eq(getEndpointId(emailMessage)), ArgumentMatchers.any());
+        Mockito.verify(diRepo).countByEndpointIdAndProcessedOnAfter(ArgumentMatchers.eq(getEndpointId(emailMessage)), ArgumentMatchers.any());
     }
 
     private UUID getEndpointId(EmailMessage emailMessage) {

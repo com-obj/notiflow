@@ -272,7 +272,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		
 		//AND READ STATUS IS JOURNALIZED
 		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), READ) >= 1);
-		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatus(emailMessage.getId(), READ);
+		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatusOrderByProcessedOn(emailMessage.getId(), READ);
 		assertThat(infosOfMessage).hasSize(1);
 	}
 	
@@ -292,7 +292,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		messageProcessingFlow.processMessage(emailMessage);
 		Awaitility.await().atMost(15, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
 		
-		List<DeliveryInfo> sentInfos = deliveryRepo.findByMessageIdAndStatus(emailMessage.getId(), SENT);
+		List<DeliveryInfo> sentInfos = deliveryRepo.findByMessageIdAndStatusOrderByProcessedOn(emailMessage.getId(), SENT);
 		
 		//WHEN TEST REST
 		ResultActions resp1 = mockMvc
@@ -316,7 +316,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		Awaitility.await().atLeast(2, TimeUnit.SECONDS);
 		
 		//AND READ STATUS IS JOURNALIZED ONLY ONCE
-		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatus(sentInfos.get(0).getMessageId(), READ);
+		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatusOrderByProcessedOn(sentInfos.get(0).getMessageId(), READ);
 		assertThat(infosOfMessage).hasSize(1);
 	}
 

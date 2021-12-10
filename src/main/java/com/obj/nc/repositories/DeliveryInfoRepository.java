@@ -74,9 +74,11 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
             "        select next_msg.id, next_msg.previous_message_ids " +
             "        from nc_message next_msg " +
             "        join msg_chain on msg_chain.id = any ( next_msg.previous_message_ids ))" +
-            "    select msg_chain.id from msg_chain)")
-    List<DeliveryInfo> findByMessageIdAndStatus(@Param("messageId") UUID messageId,
-                                                @Param("status") DELIVERY_STATUS status);
+            "    select msg_chain.id from msg_chain) " +
+            "order by di.processed_on")
+    List<DeliveryInfo> findByMessageIdAndStatusOrderByProcessedOn(
+                @Param("messageId") UUID messageId,
+                @Param("status") DELIVERY_STATUS status);
 
     @Query("select count(di.id) " +
             "from nc_delivery_info di " +

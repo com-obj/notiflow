@@ -100,7 +100,7 @@ public class MessageProcessingTest extends BaseIntegrationTest {
         msgFlow.processMessage(msg);
 
         Awaitility.await().atMost(Duration.ofSeconds(15)).until(() -> {
-            List<DeliveryInfo> info = deliveryInfoRepo.findByEventIdAndStatusOrderByProcessedOn(eventId, DeliveryInfo.DELIVERY_STATUS.DISCARDED);
+            List<DeliveryInfo> info = deliveryInfoRepo.findByMessageIdAndStatusOrderByProcessedOn(msg.getId(), DeliveryInfo.DELIVERY_STATUS.DISCARDED);
             return info.size() == 1;
         });
     }

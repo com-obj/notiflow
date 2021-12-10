@@ -51,7 +51,6 @@ import java.util.stream.Collectors;
 public class DeliveryInfoRestController {
 
 	@Autowired private DeliveryInfoRepository deliveryRepo;
-	@Autowired private MessageRepository messageRepo;
 	@Autowired private EndpointsRepository endpointRepo;
 	@Autowired private GenericEventRepository eventRepo;
 	@Autowired private DeliveryInfoFlow deliveryInfoFlow;

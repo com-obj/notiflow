@@ -24,14 +24,11 @@ import java.time.OffsetDateTime;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 class TimeSpanCalculator {
-    static Instant calculate(OffsetDateTime from, SpamPreventionOption spamPreventionOptions) {
-        Integer timeFrame = spamPreventionOptions.getMaxMessagesTimeFrame();
 
+    static Instant calculateNowMinusTimeFrame(OffsetDateTime from, Integer timeFrame, SpamPreventionOption.MaxMessageUnit unit) {
         if (timeFrame == 0) {
             return from.toInstant();
         }
-
-        SpamPreventionOption.MaxMessageUnit unit = spamPreventionOptions.getMaxMessagesUnit();
 
         OffsetDateTime date;
 

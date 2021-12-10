@@ -23,41 +23,34 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 
 class TimeSpanCalculatorTest {
-    OffsetDateTime date = OffsetDateTime.now();
+    OffsetDateTime now = OffsetDateTime.now();
 
     @Test
     void testDaysSubtraction() {
         int limit = 1;
-        SpamPreventionOption options = createOptions(limit,SpamPreventionOption.MaxMessageUnit.DAYS);
-        Instant timePoint = TimeSpanCalculator.calculate(date, options);
-        Assertions.assertEquals(date.minusDays(limit).toInstant(), timePoint);
+        Instant timePoint = TimeSpanCalculator.calculateNowMinusTimeFrame(now, limit, SpamPreventionOption.MaxMessageUnit.DAYS);
+        Assertions.assertEquals(now.minusDays(limit).toInstant(), timePoint);
     }
 
     @Test
     void testHoursSubtraction() {
         int limit = 1;
-        SpamPreventionOption options = createOptions(limit,SpamPreventionOption.MaxMessageUnit.HOURS);
-        Instant timePoint = TimeSpanCalculator.calculate(date, options);
-        Assertions.assertEquals(date.minusHours(limit).toInstant(), timePoint);
+        Instant timePoint = TimeSpanCalculator.calculateNowMinusTimeFrame(now, limit, SpamPreventionOption.MaxMessageUnit.HOURS);
+        Assertions.assertEquals(now.minusHours(limit).toInstant(), timePoint);
     }
 
     @Test
     void testMinutesSubtraction() {
         int limit = 1;
-        SpamPreventionOption options = createOptions(limit,SpamPreventionOption.MaxMessageUnit.MINUTES);
-        Instant timePoint = TimeSpanCalculator.calculate(date, options);
-        Assertions.assertEquals(date.minusMinutes(limit).toInstant(), timePoint);
+        Instant timePoint = TimeSpanCalculator.calculateNowMinusTimeFrame(now, limit, SpamPreventionOption.MaxMessageUnit.MINUTES);
+        Assertions.assertEquals(now.minusMinutes(limit).toInstant(), timePoint);
     }
 
     @Test
     void testNegativeLimit() {
         int limit = 0;
-        SpamPreventionOption options = createOptions(limit, SpamPreventionOption.MaxMessageUnit.DAYS);
-        Instant timePoint = TimeSpanCalculator.calculate(date, options);
-        Assertions.assertEquals(date.toInstant(), timePoint);
+        Instant timePoint = TimeSpanCalculator.calculateNowMinusTimeFrame(now, limit, SpamPreventionOption.MaxMessageUnit.DAYS);
+        Assertions.assertEquals(now.toInstant(), timePoint);
     }
 
-    private SpamPreventionOption createOptions(int limit, SpamPreventionOption.MaxMessageUnit unit) {
-        return new SpamPreventionOption(null, limit, unit);
-    }
 }

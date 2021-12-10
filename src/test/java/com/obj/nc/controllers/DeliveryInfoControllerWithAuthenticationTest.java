@@ -144,7 +144,7 @@ class DeliveryInfoControllerWithAuthenticationTest extends BaseIntegrationTest {
 		
 		//AND READ STATUS IS JOURNALD
 		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), READ) >= 1);
-		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatus(emailMessage.getId(), READ);
+		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatusOrderByProcessedOn(emailMessage.getId(), READ);
 		assertThat(infosOfMessage).hasSize(1);
 	}
 

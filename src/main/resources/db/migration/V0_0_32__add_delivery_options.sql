@@ -28,6 +28,7 @@ CREATE TABLE nc_delivery_options (
     CONSTRAINT fk_endpoint
         FOREIGN KEY(endpoint_id) REFERENCES nc_endpoint(id)
 );
+ALTER TABLE nc_delivery_options ALTER COLUMN time_createdY SET DEFAULT now();
 
 INSERT INTO nc_delivery_options (message_id, endpoint_id)
 SELECT id as message_id, UNNEST(endpoint_ids) as endpoint_id

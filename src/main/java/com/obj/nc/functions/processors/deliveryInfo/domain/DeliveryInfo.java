@@ -72,9 +72,11 @@ public class DeliveryInfo implements Persistable<UUID> {
 	private Instant processedOn;
 	
 	@Reference(GenericEventRepository.class)
+    @Deprecated
 	private UUID eventId;
 	
 	@Reference(NotificationIntentRepository.class)
+    @Deprecated
 	private UUID intentId;
 	
 	@Reference(MessageRepository.class)
@@ -91,5 +93,13 @@ public class DeliveryInfo implements Persistable<UUID> {
 	public boolean isNew() {
 		return processedOn == null;
 	}
+
+    public static DeliveryInfo createDiscardedDeliveryInfo(UUID payloadId, UUID endpointId) {
+        return DeliveryInfo.builder()
+                .id(UUID.randomUUID())
+                .endpointId(endpointId)
+                .messageId(payloadId)
+                .status(DeliveryInfo.DELIVERY_STATUS.DISCARDED).build();
+    }
 	
 }

@@ -28,11 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -50,20 +46,20 @@ public class SpamPreventionFilter implements Predicate<Message<?>> {
             }
             SpamPreventionOption spamPreventionOptions = deliveryOptions.getSpamPrevention();
 
-            Instant instant = TimeSpanCalculator.calculate(OffsetDateTime.now(), spamPreventionOptions);
+            Instant startOfTimeInterval = TimeSpanCalculator.calculateNowMinusTimeFrame(OffsetDateTime.now(), spamPreventionOptions.getMaxMessagesTimeFrame(), spamPreventionOptions.getMaxMessagesUnit());
 
-            long count = deliveryInfoRepository.countByEndpointIdAndProcessedOnAfter(endpoint.getId(), instant);
+            long numberOfReceivedSince = deliveryInfoRepository.countByEndpointIdAndProcessedOnAfter(endpoint.getId(), startOfTimeInterval);
 
-            if (count >= spamPreventionOptions.getMaxMessages()) {
+            if (numberOfReceivedSince >= spamPreventionOptions.getMaxMessages()) {
                 log.debug("Messages are over limit. No more messages will be send to endpoint {}.", endpoint.getEndpointId());
-                List<DeliveryInfo> deliveryInfo;
-                if (payload.getPreviousEventIds() != null && !payload.getPreviousEventIds().isEmpty()) {
-                    deliveryInfo = payload.getPreviousEventIds().stream().map(eventId -> createDeliveryInfo(payload.getId(), endpoint.getId(), eventId)).collect(Collectors.toList());
-                } else {
-                    deliveryInfo = Collections.singletonList(createDeliveryInfo(payload.getId(), endpoint.getId(), null));
-                }
 
-                deliveryInfoRepository.saveAll(deliveryInfo);
+                // if (payload.getPreviousEventIds() != null && !payload.getPreviousEventIds().isEmpty()) {
+                //     deliveryInfo = payload.getPreviousEventIds().stream().map(eventId -> createDeliveryInfo(payload.getId(), endpoint.getId(), eventId)).collect(Collectors.toList());
+                // } else {
+                DeliveryInfo  discardedDI = DeliveryInfo.createDiscardedDeliveryInfo(payload.getId(), endpoint.getId());
+                // }
+
+                deliveryInfoRepository.save(discardedDI);
                 return false;
             }
         }
@@ -71,12 +67,12 @@ public class SpamPreventionFilter implements Predicate<Message<?>> {
         return true;
     }
 
-    private DeliveryInfo createDeliveryInfo(UUID payloadId, UUID endpointId, UUID eventId) {
-        return DeliveryInfo.builder()
-                .id(UUID.randomUUID())
-                .endpointId(endpointId)
-                .messageId(payloadId)
-                .eventId(eventId)
-                .status(DeliveryInfo.DELIVERY_STATUS.DISCARDED).build();
-    }
+    // private DeliveryInfo createDeliveryInfo(UUID payloadId, UUID endpointId, UUID eventId) {
+    //     return DeliveryInfo.builder()
+    //             .id(UUID.randomUUID())
+    //             .endpointId(endpointId)
+    //             .messageId(payloadId)
+    //             .eventId(eventId)
+    //             .status(DeliveryInfo.DELIVERY_STATUS.DISCARDED).build();
+    // }
 }
