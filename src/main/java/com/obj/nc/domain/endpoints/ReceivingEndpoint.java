@@ -54,18 +54,21 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public abstract class ReceivingEndpoint implements Persistable<UUID> {
 	
-	/**
-	 * Kazdy Endpoint (Email, SMS, PUSH) ma nastavene options. Kedy na neho mozes posielat, ci agregovat. 
-	 * Je mozne, ze niektore setting by mali byt aj pre Recipienta tj. take ktore su platne nezavisle od kanala. Zatial ale sa budem tvarit, ze ak aj take budu
-	 * prekopiruju(zmerguju) sa k danemu enpointu
-	 */
+
 	@Id
 	@EqualsAndHashCode.Include
 	private UUID id = UUID.randomUUID();
+    /**
+	 * Kazdy Endpoint (Email, SMS, PUSH) ma nastavene options. Kedy na neho mozes posielat, ci agregovat. 
+	 * Je mozne, ze niektore setting by mali byt aj pre Recipienta tj. take ktore su platne nezavisle od kanala. Zatial ale sa budem tvarit, ze ak aj take budu
+	 * prekopiruju(zmerguju) sa k danemu enpointu
+	 **/
 	@Transient
-	private DeliveryOptions deliveryOptions;
+    private DeliveryOptions deliveryOptions;
+
 	@Transient
 	private Recipient recipient;
+    
 	@CreatedDate
 	private Instant timeCreated;
 	

@@ -94,7 +94,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
         log.info("Purging all tables in test");
         
         jdbcTemplate.batchUpdate("delete from nc_processing_info");
-		jdbcTemplate.batchUpdate("delete from nc_delivery_options");
+		jdbcTemplate.batchUpdate("delete from nc_message_2_endpoint_rel");
         jdbcTemplate.batchUpdate("delete from nc_delivery_info");
         jdbcTemplate.batchUpdate("delete from nc_endpoint");
         jdbcTemplate.batchUpdate("delete from nc_event");

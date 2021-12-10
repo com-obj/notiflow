@@ -50,14 +50,16 @@ public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionA
 					.status(status)
 					.receivingEndpoint(endpoint)
 					.processedOn(Instant.now());
-					
+
+                    //TOTO pojde prec - len k message
 			if (payload instanceof HasPreviousEventIds) {
 				List<UUID> eventIds = new ArrayList<>(((HasPreviousEventIds) payload).getPreviousEventIds());
 				infoBuilder = infoBuilder.eventIds(eventIds.toArray(new UUID[0]));
 			} else {
 				infoBuilder = infoBuilder.eventIds(new UUID[0]);
 			}
-			
+
+                    //TOTO pojde prec - len k message
 			if (payload instanceof NotificationIntent) {
 				List<UUID> intentIds = Arrays.asList(((NotificationIntent) payload).getId());
 				infoBuilder = infoBuilder.intentIds(intentIds.toArray(new UUID[0]));

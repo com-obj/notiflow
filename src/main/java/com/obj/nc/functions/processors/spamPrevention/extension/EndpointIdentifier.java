@@ -26,23 +26,23 @@ import org.springframework.stereotype.Component;
 public class EndpointIdentifier {
     private final SpamPreventionProperties globalSpamPreventionProperties;
 
-    SpamPreventionConfig identify(ReceivingEndpoint endpoint) {
-        SpamPreventionConfig config = new SpamPreventionConfig();
+    SpamPreventionConfigForChannel identify(ReceivingEndpoint endpoint) {
+        SpamPreventionConfigForChannel config = new SpamPreventionConfigForChannel();
 
         if (endpoint instanceof EmailEndpoint || endpoint instanceof MailchimpEndpoint) {
-            config.channel = SpamPreventionConfig.Channel.EMAIL;
+            config.channel = SpamPreventionConfigForChannel.Channel.EMAIL;
             config.option = globalSpamPreventionProperties.getEmail();
         } else if (endpoint instanceof SmsEndpoint) {
-            config.channel = SpamPreventionConfig.Channel.SMS;
+            config.channel = SpamPreventionConfigForChannel.Channel.SMS;
             config.option = globalSpamPreventionProperties.getSms();
         } else if (endpoint instanceof SlackEndpoint) {
-            config.channel = SpamPreventionConfig.Channel.SLACK;
+            config.channel = SpamPreventionConfigForChannel.Channel.SLACK;
             config.option = globalSpamPreventionProperties.getSlack();
         } else if (endpoint instanceof TeamsEndpoint) {
-            config.channel = SpamPreventionConfig.Channel.TEAMS;
+            config.channel = SpamPreventionConfigForChannel.Channel.TEAMS;
             config.option = globalSpamPreventionProperties.getTeams();
         } else if (endpoint instanceof PushEndpoint) {
-            config.channel = SpamPreventionConfig.Channel.PUSH;
+            config.channel = SpamPreventionConfigForChannel.Channel.PUSH;
             config.option = globalSpamPreventionProperties.getPush();
         } else {
             throw new RuntimeException("Unknown endpoint type: " + endpoint);

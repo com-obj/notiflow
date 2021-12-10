@@ -63,9 +63,9 @@ public interface EndpointsRepository extends PagingAndSortingRepository<Receivin
                     "from " +
                     "	nc_endpoint ep " +
                     " left join ( " +
-                    "	select msg.id, event_id, d.endpoint_id as endpoint_id " +
-                    "	from nc_delivery_options d " +
-                    "   join nc_message msg on msg.id = d.message_id " +
+                    "	select msg.id, event_id, m2e.endpoint_id as endpoint_id " +
+                    "	from nc_message_2_endpoint_rel m2e " +
+                    "   join nc_message msg on msg.id = m2e.message_id " +
                     "	cross join unnest(msg.previous_event_ids) as event_id " +
                     ") msg on ep.id = msg.endpoint_id " +
                     // TODO uncomment when nc_intent stores endpoint_ids
@@ -104,9 +104,9 @@ public interface EndpointsRepository extends PagingAndSortingRepository<Receivin
                     "from " +
                     "	nc_endpoint ep " +
                     " left join ( " +
-                    "	select msg.id, event_id, d.endpoint_id as endpoint_id " +
-                    "	from nc_delivery_options d " +
-                    "   join nc_message msg on msg.id = d.message_id " +
+                    "	select msg.id, event_id, m2e.endpoint_id as endpoint_id " +
+                    "	from nc_message_2_endpoint_rel m2e " +
+                    "   join nc_message msg on msg.id = m2e.message_id " +
                     "	cross join unnest(msg.previous_event_ids) as event_id " +
                     ") msg on ep.id = msg.endpoint_id " +
                     // TODO uncomment when nc_intent stores endpoint_ids

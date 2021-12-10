@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 class OptionsValidator {
-    static void validate(SpamPreventionConfig config) {
+    static void validate(SpamPreventionConfigForChannel config) {
         SpamPreventionOption props = config.option;
         if (props == null) {
             return;
@@ -52,17 +52,17 @@ class OptionsValidator {
         }
     }
 
-    private static String createNotSetErrMessage(String propName, SpamPreventionConfig.Channel channel) {
+    private static String createNotSetErrMessage(String propName, SpamPreventionConfigForChannel.Channel channel) {
         String template = "Property %s is not set, or has wrong value.";
         return String.format(template, propName) + " " + createGenericSentencePart(channel, propName);
     }
 
-    private static String createInvalidValueErrMessage(String propName, String value, SpamPreventionConfig.Channel channel) {
+    private static String createInvalidValueErrMessage(String propName, String value, SpamPreventionConfigForChannel.Channel channel) {
         String template = "Property %s has invalid value %s.";
         return String.format(template, propName, value) + " " + createGenericSentencePart(channel, propName);
     }
 
-    private static String createInvalidMaxMessagesUnitValueErrMessage(SpamPreventionConfig.Channel channel) {
+    private static String createInvalidMaxMessagesUnitValueErrMessage(SpamPreventionConfigForChannel.Channel channel) {
         String propName = "maxMessagesUnit";
         String listOfValues = Arrays.stream(SpamPreventionOption.MaxMessageUnit.values())
                 .map(SpamPreventionOption.MaxMessageUnit::name)
@@ -71,7 +71,7 @@ class OptionsValidator {
         return String.format(template, propName, listOfValues) + " " + createGenericSentencePart(channel, propName);
     }
 
-    private static String createGenericSentencePart(SpamPreventionConfig.Channel channel, String propName) {
+    private static String createGenericSentencePart(SpamPreventionConfigForChannel.Channel channel, String propName) {
         String template = "Please set nc.delivery.spam-prevention.%s.%s in application.properties.";
         return String.format(template, channel.name().toLowerCase(Locale.ROOT), propName);
     }

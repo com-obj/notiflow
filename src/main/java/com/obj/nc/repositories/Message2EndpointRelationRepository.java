@@ -15,13 +15,15 @@
 
 package com.obj.nc.repositories;
 
-import com.obj.nc.domain.delivery.DeliveryOptionsEntity;
+import com.obj.nc.domain.delivery.Message2EndpointRelation;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface DeliveryOptionsRepository extends CrudRepository<DeliveryOptionsEntity, UUID> {
+public interface Message2EndpointRelationRepository extends CrudRepository<Message2EndpointRelation, UUID> {
+
     boolean existsByEndpointIdAndMessageId(UUID endpointId, UUID messageId);
-    List<DeliveryOptionsEntity> findByMessageId(UUID messageId);
+
+    List<Message2EndpointRelation> findByMessageId(UUID messageId);
 }

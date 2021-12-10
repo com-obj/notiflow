@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class DefaultSpamPreventionExtensionTest {
-    SpamPreventionConfig config = new SpamPreventionConfig();
+    SpamPreventionConfigForChannel config = new SpamPreventionConfigForChannel();
     EndpointIdentifier identifier = Mockito.mock(EndpointIdentifier.class);
 
     @Test

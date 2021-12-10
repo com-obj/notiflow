@@ -118,16 +118,11 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
                 .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
                 .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(1)));
-    }
-    
-    @Test
-    void testFindEndpointStatsByEndpointId() throws Exception {
-        // GIVEN
-        persistTestEventProcessing();
-        List<ReceivingEndpoint> endpoints = endpointsRepository.findAllEndpoints();
 
-        //WHEN
-        ResultActions resp = mockMvc
+        //AND WHEN
+        List<ReceivingEndpoint> endpoints = endpointsRepository.findByNameIds("johndoe@objectify.sk");
+
+        resp = mockMvc
                 .perform(MockMvcRequestBuilders.get("/stats/endpoints/{endpointId}", endpoints.get(0).getId())
                         .contentType(APPLICATION_JSON_UTF8)
                         .accept(APPLICATION_JSON_UTF8))
@@ -164,8 +159,8 @@ class StatsRestControllerTest extends BaseIntegrationTest {
         
         intentProcessingFlow.processNotificationIntent(intent);
         
-        await().atMost(5, TimeUnit.SECONDS).until(() ->  findSentDeliveryInfosForMessage().size() >= 1);
-        List<DeliveryInfo> sentInfos = findSentDeliveryInfosForMessage();
+        await().atMost(5, TimeUnit.SECONDS).until(() ->  findSentDeliveryInfosForMessage(emailEndpoint.getId(),SENT).size() >= 1);
+        List<DeliveryInfo> sentInfos = findSentDeliveryInfosForMessage(emailEndpoint.getId(), SENT);
         
         ResultActions resp1 = mockMvc
                 .perform(MockMvcRequestBuilders
@@ -179,11 +174,12 @@ class StatsRestControllerTest extends BaseIntegrationTest {
         return event;
     }
 
-    private List<DeliveryInfo> findSentDeliveryInfosForMessage() {
+    private List<DeliveryInfo> findSentDeliveryInfosForMessage(UUID endpointId, DeliveryInfo.DELIVERY_STATUS status) {
         List<DeliveryInfo> sentInfos = deliveryInfoRepository
-            .findByStatus(SENT)
+            .findByEndpointIdOrderByProcessedOn(endpointId)
             .stream()
             .filter(sentInfo -> sentInfo.getMessageId() != null)
+            .filter(sentInfo -> sentInfo.getStatus() == status)
             .collect(Collectors.toList());
         return sentInfos;
     }

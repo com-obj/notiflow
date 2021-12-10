@@ -52,9 +52,9 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 					"left join " +
 					"	nc_intent intent on event.id = any ( intent.previous_event_ids ) " +
 					"left join ( " +
-					"	select msg.*, d.endpoint_id as endpoint_id " +
+					"	select msg.*, m2e.endpoint_id as endpoint_id " +
 					"	from nc_message msg " +
-					"	inner join nc_delivery_options d on d.message_id = msg.id " +
+					"	inner join nc_message_2_endpoint_rel m2e on m2e.message_id = msg.id " +
 					") message on event.id = any ( message.previous_event_ids ) " +
 					"left join " +
 					"	nc_delivery_info di on di.event_id = event.id " +

@@ -20,11 +20,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class OptionsValidatorTest {
-    SpamPreventionConfig config;
+    SpamPreventionConfigForChannel config;
 
     OptionsValidatorTest() {
-        config = new SpamPreventionConfig();
-        config.channel = SpamPreventionConfig.Channel.EMAIL;
+        config = new SpamPreventionConfigForChannel();
+        config.channel = SpamPreventionConfigForChannel.Channel.EMAIL;
     }
 
     @Test
@@ -67,7 +67,7 @@ public class OptionsValidatorTest {
         runAndVerifyCaughtMessage(config, expected);
     }
 
-    private void runAndVerifyCaughtMessage(SpamPreventionConfig config, String expectedMessage) {
+    private void runAndVerifyCaughtMessage(SpamPreventionConfigForChannel config, String expectedMessage) {
         RuntimeException thrown = Assertions.assertThrows(RuntimeException.class, () -> OptionsValidator.validate(config));
         Assertions.assertEquals(expectedMessage, thrown.getMessage());
     }

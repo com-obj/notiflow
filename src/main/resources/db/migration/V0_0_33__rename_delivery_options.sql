@@ -17,20 +17,5 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.deliveryOptions;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-public class DeliveryOptions {
-
-    private SpamPreventionOption spamPrevention;
-
-    private AggregationOption aggregation;
-
-    private SchedulingOption scheduling;
-}
+ALTER TABLE nc_delivery_options
+RENAME TO nc_message_2_endpoint_rel;

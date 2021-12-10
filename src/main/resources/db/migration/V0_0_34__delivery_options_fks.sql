@@ -17,20 +17,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.deliveryOptions;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-public class DeliveryOptions {
-
-    private SpamPreventionOption spamPrevention;
-
-    private AggregationOption aggregation;
-
-    private SchedulingOption scheduling;
-}
+ALTER TABLE nc_delivery_info ADD CONSTRAINT fk_endpoint FOREIGN KEY (endpoint_id) REFERENCES nc_endpoint (id) on delete restrict;
+ALTER TABLE nc_delivery_info ADD CONSTRAINT fk_message FOREIGN KEY (message_id) REFERENCES nc_message (id) on delete restrict;   
+ALTER TABLE nc_delivery_info ADD CONSTRAINT fk_intent FOREIGN KEY (intent_id) REFERENCES nc_intent (id) on delete restrict;   
+ALTER TABLE nc_delivery_info ADD CONSTRAINT fk_event FOREIGN KEY (event_id) REFERENCES nc_event (id) on delete restrict;   

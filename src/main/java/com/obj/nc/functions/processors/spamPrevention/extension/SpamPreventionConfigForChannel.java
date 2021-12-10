@@ -17,11 +17,11 @@ package com.obj.nc.functions.processors.spamPrevention.extension;
 
 import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
 
-public class SpamPreventionConfig {
+public class SpamPreventionConfigForChannel {
     public enum Channel {
         EMAIL, SMS, SLACK, TEAMS, PUSH
     }
 
-    SpamPreventionConfig.Channel channel;
+    SpamPreventionConfigForChannel.Channel channel;
     SpamPreventionOption option;
 }

@@ -19,6 +19,7 @@
 
 package com.obj.nc;
 
+import com.obj.nc.repositories.Message2EndpointRelationRepository;
 import com.obj.nc.repositories.EndpointsRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -64,6 +65,10 @@ public class Get {
     
     public static EndpointsRepository getEndpointsRepo() {
     	return getBean(EndpointsRepository.class);
+    }
+
+    public static Message2EndpointRelationRepository getMessage2EndpointRelationRepo() {
+    	return getBean(Message2EndpointRelationRepository.class);
     }
     
 	public static ApplicationContext getApplicationContext() {

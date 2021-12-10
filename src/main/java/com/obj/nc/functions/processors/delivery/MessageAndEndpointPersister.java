@@ -15,13 +15,13 @@
 
 package com.obj.nc.functions.processors.delivery;
 
-import com.obj.nc.domain.delivery.DeliveryOptionsEntity;
+import com.obj.nc.domain.delivery.Message2EndpointRelation;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
-import com.obj.nc.repositories.DeliveryOptionsRepository;
+import com.obj.nc.repositories.Message2EndpointRelationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 public class MessageAndEndpointPersister extends ProcessorFunctionAdapter<Message<?>, Message<?>> {
     private final MessagePersister messagePersister;
     private final EndpointPersister endpointPersister;
-    private final DeliveryOptionsRepository deliveryRepo;
+    private final Message2EndpointRelationRepository deliveryRepo;
 
     @Override
     protected Message<?> execute(Message<?> payload) {
@@ -43,7 +43,7 @@ public class MessageAndEndpointPersister extends ProcessorFunctionAdapter<Messag
                 continue;
             }
 
-            DeliveryOptionsEntity options = new DeliveryOptionsEntity();
+            Message2EndpointRelation options = new Message2EndpointRelation();
             options.setMessageId(persisted.getId());
             options.setEndpointId(endpoint.getId());
             options.setDeliveryOptions(endpoint.getDeliveryOptions());

@@ -39,7 +39,7 @@ public class DefaultSpamPreventionExtension implements SpamPreventionExtension {
                 deliveryOptions = new DeliveryOptions();
             }
 
-            SpamPreventionConfig config = endpointIdentifier.identify(endpoint);
+            SpamPreventionConfigForChannel config = endpointIdentifier.identify(endpoint);
 
             if (deliveryOptions.getSpamPrevention() != null) {
                 config.option = deliveryOptions.getSpamPrevention();
@@ -48,7 +48,7 @@ public class DefaultSpamPreventionExtension implements SpamPreventionExtension {
             OptionsValidator.validate(config);
 
             deliveryOptions.setSpamPrevention(config.option);
-            endpoint.setDeliveryOptions(deliveryOptions);
+           // endpoint.setDeliveryOptions(deliveryOptions);
         }
 
         return payload;

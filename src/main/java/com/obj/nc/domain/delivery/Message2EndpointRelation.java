@@ -20,6 +20,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -28,8 +29,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
-@Table("nc_delivery_options")
-public class DeliveryOptionsEntity implements Persistable<UUID> {
+@Table("nc_message_2_endpoint_rel")
+public class Message2EndpointRelation implements Persistable<UUID> {
     @Id
     @EqualsAndHashCode.Include
     private UUID id;
@@ -39,7 +40,9 @@ public class DeliveryOptionsEntity implements Persistable<UUID> {
 
     private UUID messageId;
     private UUID endpointId;
-    @Column("delivery_options")
+
+//    @Column("delivery_options")
+    @Transient
     private DeliveryOptions deliveryOptions;
 
     @Override

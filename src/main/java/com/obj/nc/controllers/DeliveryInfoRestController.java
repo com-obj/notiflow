@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.MessagePersistentState;
 import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
@@ -30,7 +32,6 @@ import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.MessageRepository;
-import com.obj.nc.utils.DeliveryOptionsManager;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,9 +54,9 @@ public class DeliveryInfoRestController {
 	@Autowired private DeliveryInfoRepository deliveryRepo;
 	@Autowired private EndpointsRepository endpointRepo;
 	@Autowired private GenericEventRepository eventRepo;
+    @Autowired private MessageRepository messageRepo;
 	@Autowired private DeliveryInfoFlow deliveryInfoFlow;
 	@Autowired private NcAppConfigProperties ncAppConfigProperties;
-	@Autowired private DeliveryOptionsManager deliveryOptionsManager;
 
 	@GetMapping(value = "/events/{eventId}", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
@@ -105,8 +106,11 @@ public class DeliveryInfoRestController {
 			return trackingPixelImageRedirectionResponse;
 		}
 
-		deliveryOptionsManager.reconstructMessage(UUID.fromString(messageId)).ifPresent(deliveryInfoFlow::createAndPersistReadDeliveryInfo);
-
+        MessagePersistentState msgInDb = messageRepo.findById(UUID.fromString(messageId)).get();
+        msgInDb.loadReceivingEndpoints();
+        Message<?> msg = msgInDb.toMessage();
+        deliveryInfoFlow.createAndPersistReadDeliveryInfo(msg);
+        
 		return trackingPixelImageRedirectionResponse;
 	}
 
@@ -118,9 +122,16 @@ public class DeliveryInfoRestController {
 
 		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
 
-		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
+		List<UUID> endpointIds = infoDtos
+            .stream()
+            .map(i -> i.getEndpointId())
+            .collect(Collectors.toList());
 		List<ReceivingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
-		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
+
+		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos
+            .stream()
+            .collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
+
 		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
 
 		return infoDtos;
