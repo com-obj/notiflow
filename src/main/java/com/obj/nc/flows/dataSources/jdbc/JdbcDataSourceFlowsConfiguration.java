@@ -1,9 +1,11 @@
-package com.obj.nc.flows.dataSources;
+package com.obj.nc.flows.dataSources.jdbc;
 
 import com.obj.nc.Get;
-import com.obj.nc.flows.dataSources.properties.DataSourceFlowsProperties;
-import com.obj.nc.flows.dataSources.properties.jdbc.JdbcDataSourceProperties;
-import com.obj.nc.flows.dataSources.properties.jdbc.JdbcJobProperties;
+import com.obj.nc.flows.dataSources.DataSourceFlowsProperties;
+import com.obj.nc.flows.dataSources.GenericDataTransformationAndPersistFlow;
+import com.obj.nc.flows.dataSources.JobConfig;
+import com.obj.nc.flows.dataSources.jdbc.properties.JdbcDataSourceProperties;
+import com.obj.nc.flows.dataSources.jdbc.properties.JdbcJobProperties;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

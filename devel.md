@@ -124,10 +124,6 @@ pip install mkdocs-macros-plugin
 
 ##### API documentation
 
-API documentation is generated as part of tests run using [spring rest docs](https://docs.spring.io/spring-restdocs/docs/current/reference/html5). Running tests create *.adoc files in the corresponding subdirectory of docs/api/generated folder. This files needs to be rendered as HTML in order to be included into main documentation.This happens automatically because the gradle asciidoctor task depends on test task. If you need to do this step manually, run 
+API documentation is generated as part of tests run using [spring rest docs](https://docs.spring.io/spring-restdocs/docs/current/reference/html5). Tests, that generate documentation are implemented in com.obj.nc.controllers test classes and the method name starts with doc* instead of test*. The generatd *.md files are put into docs/api/generated folder. 
+**For these files to appier in documentation, you need to include them in the mkdocs.yml**
 
-```
-./gradlew asciidoctor -x test --info
-```
-
-Each REST endpoint needs test to be documented. This only ensures generation of adoc snippets. These needs to be put into single html. For this to happen, there needs to be an include statement in the corresponding docs/api/*_api.adoc file.

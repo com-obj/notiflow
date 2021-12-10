@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.flows.dataSources.properties.jdbc;
+package com.obj.nc.flows.dataSources.jdbc.properties;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -4,6 +4,7 @@ There are many applications that communicate with its users in an asynchronous f
 Sending a message seems to be a simple task at first and most application decide for straight forward solution and use Emails to communicate with users. In most cases they simply call SMTP server when condition for notification are met. This approach can quickly result in unexpected and non-trivial development costs as the requirements evolve. 
 
 Example of such requirements are
+
   * Email has to be generated from template
   * Notification has to have some delivery guaranties and the engine has to be able to handle error cases
   * What was send? To whom? And when?
@@ -39,14 +40,14 @@ Test your configuration before going to production. Notiflow let you turn on the
 
 To find out more about turning on the test mode check our Cook book in the [Test mode]() section.
 
-## Message delivery in predefined hours 
+## Message delivery in predefined hours (future versions)
 
 You can configure how and when recipients should receive your message. For example 
 
   * you might want to send SMS in working hours and Email on weekends 
   * you can postpone the message delivery if outside of working hours. 
 
-## Message aggregation 
+## Message aggregation (future versions)
 
 Instead of sending message each time some application event occurs, configure notiflow to send single aggregated message which consists of all messages which would have been send in the given time period
 
@@ -74,17 +75,17 @@ If message processing fails because of problems in data of network connectivity 
 
 Do you have customers that you definitively don't want to send more than N messages in a given time period? Configure spam prevention mechanism in notiflow to either reject messages which would pass the limit or send them as single aggregate message at the end of that period. 
 
-## Message prioritization 
+## Message prioritization (future versions)
 
 Notiflow does its best to process messages as fast as possible but there might be a case when you want the message to be delivered before Notiflow processes all prior messages. For this purpose, you can prioritize your messages so that the more important are always processed before the others.
 
-## Scheduled notification
+## Scheduled notification / PULL based notification
 
-If you need to query some other resources to find out if something important happened, so that you can notify those who are interested, you can schedule when the notification flow should start.
+If you need to query some other resources to find out if something important happened, so that you can notify those who are interested, you can schedule when the notification flow should start. If you have a data source exposing data aboul contracts expiration, you can configure Notiflow to inform you X days before the expiration happens
 
-## Web UI for monitoring and statistics
+## Web UI for monitoring and statistics (Paid component)
 
-Get deep inside into using our [Web UI]()
+Find out more about our [Web UI]() and information it can provide like
 
   * What event has beed received by the Notiflow
   * What are delivery statistics

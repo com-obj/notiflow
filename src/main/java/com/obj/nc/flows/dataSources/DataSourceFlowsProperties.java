@@ -17,26 +17,27 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.flows.dataSources.properties.jdbc;
+package com.obj.nc.flows.dataSources;
 
+import com.obj.nc.flows.dataSources.http.properties.HttpDataSourceProperties;
+import com.obj.nc.flows.dataSources.jdbc.properties.JdbcDataSourceProperties;
 import lombok.Data;
+import org.hibernate.validator.constraints.UniqueElements;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
-public class JdbcJobProperties {
-    @NotEmpty
-    private String name;
-    @NotEmpty
-    private String sqlQuery;
+@Validated
+@Configuration
+@ConfigurationProperties("nc.data-sources")
+public class DataSourceFlowsProperties {
+    @UniqueElements
+    private List<JdbcDataSourceProperties> jdbc = new ArrayList<>();
 
-    private String pojoFCCN; //if set, GenericData will be GenericDataPojo<FCCN>
-
-
-    private String spelFilterExpression; 
-
-    @NotEmpty
-    private String cron;
-
-    private String externalIdColumnName;
+    @UniqueElements
+    private List<HttpDataSourceProperties> http = new ArrayList<>();
 }

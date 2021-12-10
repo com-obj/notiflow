@@ -15,10 +15,10 @@
 
 package com.obj.nc.flows.dataSources.http;
 
+import com.obj.nc.flows.dataSources.DataSourceFlowsProperties;
 import com.obj.nc.flows.dataSources.GenericDataTransformationAndPersistFlow;
 import com.obj.nc.flows.dataSources.JobConfig;
 import com.obj.nc.flows.dataSources.http.properties.HttpDataSourceProperties;
-import com.obj.nc.flows.dataSources.properties.DataSourceFlowsProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Configuration;

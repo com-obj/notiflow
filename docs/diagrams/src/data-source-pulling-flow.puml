@@ -1,0 +1,75 @@
+@startuml
+
+!theme cerulean-outline
+
+skinparam backgroundcolor White
+skinparam component {
+    backgroundColor<<user defined>> LightGray
+}
+
+database "PostgreSQL" {
+    [nc_notification_data]
+    [nc_event]
+
+}
+
+database "Topic/Channels" {
+    [NOTIFICATION_DATA_CONVERTING_FLOW_ID_INPUT]<<PUB/SUB>> 
+}
+
+Interface "External REST API" as extRESTApi
+Interface "External JDBC" as extJDBCApi
+
+ note top of extRESTApi 
+    ..configuration..
+    nc.data-sources.http[0].name=TEST0-DS,
+    nc.data-sources.http[0].url=http://service-0/json,
+    nc.data-sources.http[0].pojoFCCN=com.obj.nc.flows.dataSources.config.TestLicenseAgreement,
+    nc.data-sources.http[0].cron=*/5 * * * * *
+end note  
+
+note top of extJDBCApi
+    ..configuration..
+    nc.data-sources.jdbc[0].name=test-ds,
+    nc.data-sources.jdbc[0].url=jdbc:postgresql://localhost:25432/nc,
+    nc.data-sources.jdbc[0].username=nc,
+    nc.data-sources.jdbc[0].password=xxx,
+    nc.data-sources.jdbc[0].jobs[0].name=check-agreements-expiry,
+    nc.data-sources.jdbc[0].jobs[0].sqlQuery=select * from license_agreement,  
+    nc.data-sources.jdbc[0].jobs[0].pojoFCCN=com.obj.nc.flows.dataSources.config.TestLicenseAgreement,     
+    nc.data-sources.jdbc[0].jobs[0].cron=*/5 * * * * *,
+    nc.data-sources.jdbc[0].jobs[0].spel-filter-expression=isExpired(5)
+end note  
+
+[restPoller] .u.> extRESTApi
+[jdbcPoller] .u.> extJDBCApi
+
+[jdbcPoller] --> [ToJsonTransformer] : (ResultSet)
+[restPoller] --> [ToJsonTransformer] : (String)
+[ToJsonTransformer] -> [Aggragate] : (JsonNode)
+[Aggragate] -> [NotificationDataPersister] : (List<JsonNode>)
+[NotificationDataPersister] -d-> nc_notification_data : (List<JsonNode>)
+[NotificationDataPersister] -> [filterAndTransformer] : (Pojo)
+[filterAndTransformer] -> [Pojo2NotificationDataTransformer] : (NotificationData<Pojo>)
+[Pojo2NotificationDataTransformer] -d=> [NOTIFICATION_DATA_CONVERTING_FLOW_ID_INPUT]
+
+[ExtensionsBasedGenericData2EventConverter] .u.> [NOTIFICATION_DATA_CONVERTING_FLOW_ID_INPUT]
+[ExtensionsBasedGenericData2NotificationConverter] .u.> [NOTIFICATION_DATA_CONVERTING_FLOW_ID_INPUT]
+
+note top of ExtensionsBasedGenericData2EventConverter
+    ..user defined converter..
+    List<GenericData2EventConverterExtension<?>> converters
+end note 
+
+note top of ExtensionsBasedGenericData2NotificationConverter
+    ..user defined converter..
+    List<GenericData2NotificationConverterExtension<?>> converters
+end note 
+
+[ExtensionsBasedGenericData2EventConverter] ----> [GenericEventPersister]: (GenericEvent)
+[ExtensionsBasedGenericData2NotificationConverter] --> [MessageOrIntentRouter]: (Intent/Message)
+[GenericEventPersister] --> [Standard Event processing]
+[GenericEventPersister] -> [nc_event]: (GenericEvent)
+[MessageOrIntentRouter] --> [Standard Message/Intent processin]
+
+@enduml

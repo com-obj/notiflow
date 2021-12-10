@@ -56,8 +56,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
         "nc.data-sources.http[0].cron=*/5 * * * * *",
         "nc.data-sources.http[0].externalIdAttrName=id",
         "test-license-agreements.admin-email=johndoe@objectify.sk",
-        "test-license-agreements.email-template-path=agreements.html",
-        "nc.functions.email-templates.templates-root-dir=src/test/resources/templates"
+        "test-license-agreements.email-template-path=agreements.html"
 })
 @SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
