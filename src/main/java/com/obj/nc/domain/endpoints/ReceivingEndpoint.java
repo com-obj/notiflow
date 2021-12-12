@@ -23,9 +23,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
+import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
 import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
 import com.obj.nc.domain.endpoints.push.TopicPushEndpoint;
+import com.obj.nc.functions.processors.spamPrevention.config.OptionsValidator;
+import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionConfigForChannel;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -64,7 +68,7 @@ public abstract class ReceivingEndpoint implements Persistable<UUID> {
 	 * prekopiruju(zmerguju) sa k danemu enpointu
 	 **/
 	@Transient
-    private DeliveryOptions deliveryOptions;
+    private EndpointDeliveryOptionsConfig deliveryOptions;
 
 	@Transient
 	private Recipient recipient;
@@ -78,6 +82,21 @@ public abstract class ReceivingEndpoint implements Persistable<UUID> {
 	
 	@JsonIgnore
 	public abstract String getEndpointType();
+
+	protected abstract SpamPreventionConfigForChannel createDefaultGlobalSpamPreventionConfig();
+	
+	public SpamPreventionConfigForChannel calculateSpamPreventionOption() {
+		SpamPreventionConfigForChannel config = createDefaultGlobalSpamPreventionConfig();
+		OptionsValidator.validate(config);
+
+		EndpointDeliveryOptionsConfig deliveryOptions = getDeliveryOptions();
+		if (deliveryOptions == null || deliveryOptions.getSpamPrevention() == null) {
+			return config;
+		}
+
+		config.setOption(deliveryOptions.getSpamPrevention());
+		return config;
+	}
 	
 	@Override
 	@JsonIgnore

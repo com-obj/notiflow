@@ -20,6 +20,7 @@
 package com.obj.nc;
 
 import com.obj.nc.repositories.Message2EndpointRelationRepository;
+import com.obj.nc.domain.deliveryOptions.SpamPreventionGlobalConfigProperties;
 import com.obj.nc.repositories.EndpointsRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -70,6 +71,10 @@ public class Get {
     public static Message2EndpointRelationRepository getMessage2EndpointRelationRepo() {
     	return getBean(Message2EndpointRelationRepository.class);
     }
+
+	public static SpamPreventionGlobalConfigProperties getSpamPreventionProperties() {
+		return getBean(SpamPreventionGlobalConfigProperties.class);
+	}
     
 	public static ApplicationContext getApplicationContext() {
 		return instance.applicationContext;

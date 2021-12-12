@@ -26,7 +26,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-public class DeliveryOptions {
+public class EndpointDeliveryOptionsConfig {
 
     private SpamPreventionOption spamPrevention;
 

@@ -15,7 +15,7 @@
 
 package com.obj.nc.functions.processors.spamPrevention;
 
-import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
 import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
@@ -42,7 +42,7 @@ public class SpamPreventionFilterTest {
 
     @Test
     void testNoSpamPreventionOptions() {
-        Assertions.assertTrue(filter.test(createEmailMessage(new DeliveryOptions())));
+        Assertions.assertTrue(filter.test(createEmailMessage(new EndpointDeliveryOptionsConfig())));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class SpamPreventionFilterTest {
     }
 
     private EmailMessage prepareDataAndMocks(long deliveryInfoCount) {
-        DeliveryOptions deliveryOptions = new DeliveryOptions();
+        EndpointDeliveryOptionsConfig deliveryOptions = new EndpointDeliveryOptionsConfig();
         deliveryOptions.setSpamPrevention(new SpamPreventionOption(1, 1, SpamPreventionOption.MaxMessageUnit.MINUTES));
 
         EmailMessage emailMessage = createEmailMessage(deliveryOptions);
@@ -92,7 +92,7 @@ public class SpamPreventionFilterTest {
         return emailMessage.getReceivingEndpoints().get(0).getId();
     }
 
-    private EmailMessage createEmailMessage(DeliveryOptions deliveryOptions) {
+    private EmailMessage createEmailMessage(EndpointDeliveryOptionsConfig deliveryOptions) {
         EmailEndpoint endpoint = EmailEndpoint.builder().email("test@test.com").build();
         endpoint.setDeliveryOptions(deliveryOptions);
 

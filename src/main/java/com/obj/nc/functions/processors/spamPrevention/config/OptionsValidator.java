@@ -13,7 +13,7 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.functions.processors.spamPrevention.extension;
+package com.obj.nc.functions.processors.spamPrevention.config;
 
 import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
 import lombok.AccessLevel;
@@ -24,8 +24,8 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-class OptionsValidator {
-    static void validate(SpamPreventionConfigForChannel config) {
+public class OptionsValidator {
+    public static void validate(SpamPreventionConfigForChannel config) {
         SpamPreventionOption props = config.option;
         if (props == null) {
             return;

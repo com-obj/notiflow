@@ -13,9 +13,12 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.functions.processors.spamPrevention.extension;
+package com.obj.nc.functions.processors.spamPrevention.config;
 
 import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
+import com.obj.nc.functions.processors.spamPrevention.config.OptionsValidator;
+import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionConfigForChannel;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +26,7 @@ public class OptionsValidatorTest {
     SpamPreventionConfigForChannel config;
 
     OptionsValidatorTest() {
-        config = new SpamPreventionConfigForChannel();
+        config = SpamPreventionConfigForChannel.builder().build();
         config.channel = SpamPreventionConfigForChannel.Channel.EMAIL;
     }
 

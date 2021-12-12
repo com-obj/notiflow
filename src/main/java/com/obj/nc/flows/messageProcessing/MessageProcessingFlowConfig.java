@@ -22,12 +22,8 @@ package com.obj.nc.flows.messageProcessing;
 import com.obj.nc.domain.message.*;
 import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.spamPrevention.SpamPreventionFilter;
-import com.obj.nc.functions.processors.spamPrevention.SpamPreventionOptionsHandler;
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
 import com.obj.nc.functions.processors.messageBuilder.MessageByRecipientTokenizer;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -50,7 +46,6 @@ import static com.obj.nc.flows.teamsMessageProcessing.TeamsMessageProcessingFlow
 public class MessageProcessingFlowConfig {
     private final MessageByRecipientTokenizer<?> messageByRecipientTokenizer;
     private final MessageAndEndpointPersister deliveryPersister;
-    private final SpamPreventionOptionsHandler spamPreventionOptionsHandler;
     private final SpamPreventionFilter spamPreventionFilter;
 
 
@@ -70,7 +65,6 @@ public class MessageProcessingFlowConfig {
                 .transform(messageByRecipientTokenizer)
                 .split()
                 .handle(deliveryPersister) //need to persist, otherwise delivery info will have invalid reference
-                .handle(spamPreventionOptionsHandler)
                 .filter(spamPreventionFilter::test)
                 .wireTap(flowConfig ->
                         flowConfig.channel(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)

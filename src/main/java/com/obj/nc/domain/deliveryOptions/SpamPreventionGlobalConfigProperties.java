@@ -13,24 +13,26 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.functions.processors.spamPrevention;
+package com.obj.nc.domain.deliveryOptions;
 
-import com.obj.nc.domain.BasePayload;
-import com.obj.nc.functions.processors.spamPrevention.extension.SpamPreventionExtension;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
-import java.util.function.Function;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-@Component
-@RequiredArgsConstructor
-public class SpamPreventionOptionsHandler implements Function<BasePayload<?>, BasePayload<?>> {
-    private final List<SpamPreventionExtension> extensions;
-
-    @Override
-    public BasePayload<?> apply(BasePayload<?> in) {
-        extensions.forEach(extension -> extension.apply(in));
-        return in;
-    }
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Configuration
+@ConfigurationProperties("nc.delivery.spam-prevention")
+public class SpamPreventionGlobalConfigProperties {
+    private SpamPreventionOption email;
+    private SpamPreventionOption slack;
+    private SpamPreventionOption sms;
+    private SpamPreventionOption teams;
+    private SpamPreventionOption push;
 }

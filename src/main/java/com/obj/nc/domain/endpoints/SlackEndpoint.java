@@ -19,6 +19,9 @@
 
 package com.obj.nc.domain.endpoints;
 
+import com.obj.nc.Get;
+import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionConfigForChannel;
+
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.ToString;
@@ -45,4 +48,14 @@ public class SlackEndpoint extends ReceivingEndpoint {
     public String getEndpointType() {
         return JSON_TYPE_IDENTIFIER;
     }
+
+    @Override
+	public SpamPreventionConfigForChannel createDefaultGlobalSpamPreventionConfig() {
+        SpamPreventionConfigForChannel config = SpamPreventionConfigForChannel
+			.builder()
+			.channel(SpamPreventionConfigForChannel.Channel.SLACK)
+			.option(Get.getSpamPreventionProperties().getSlack())
+			.build();
+        return config;
+	}
 }

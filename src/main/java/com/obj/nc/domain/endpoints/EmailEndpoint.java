@@ -20,6 +20,9 @@
 package com.obj.nc.domain.endpoints;
 
 import com.google.common.collect.ObjectArrays;
+import com.obj.nc.Get;
+import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionConfigForChannel;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -81,6 +84,16 @@ public class EmailEndpoint extends ReceivingEndpoint {
         },
         FieldDescriptor.class
     );
+
+	@Override
+	public SpamPreventionConfigForChannel createDefaultGlobalSpamPreventionConfig() {
+        SpamPreventionConfigForChannel config = SpamPreventionConfigForChannel
+			.builder()
+			.channel(SpamPreventionConfigForChannel.Channel.EMAIL)
+			.option(Get.getSpamPreventionProperties().getEmail())
+			.build();
+        return config;
+	}
 
 	
 	

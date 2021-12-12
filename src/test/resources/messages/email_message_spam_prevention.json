@@ -13,7 +13,7 @@
       "@type": "EMAIL",
       "email": "john.doe@objectify.sk",
       "deliveryOptions": {
-        "@class": "com.obj.nc.domain.deliveryOptions.DeliveryOptions",
+        "@class": "com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig",
         "spamPrevention": {
           "maxMessages": 0,
           "maxMessagesTimeFrame": 1,

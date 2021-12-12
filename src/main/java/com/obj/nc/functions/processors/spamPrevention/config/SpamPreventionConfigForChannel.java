@@ -13,23 +13,19 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.domain.deliveryOptions;
+package com.obj.nc.functions.processors.spamPrevention.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Configuration
-@ConfigurationProperties("nc.delivery.spam-prevention")
-public class SpamPreventionProperties {
-    private SpamPreventionOption email;
-    private SpamPreventionOption slack;
-    private SpamPreventionOption sms;
-    private SpamPreventionOption teams;
-    private SpamPreventionOption push;
+import lombok.Data;
+
+@Data
+@lombok.Builder
+public class SpamPreventionConfigForChannel {
+    public enum Channel {
+        EMAIL, SMS, SLACK, TEAMS, PUSH
+    }
+
+    SpamPreventionConfigForChannel.Channel channel;
+    SpamPreventionOption option;
 }

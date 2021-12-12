@@ -15,8 +15,7 @@
 
 package com.obj.nc.functions.processors.spamPrevention;
 
-import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
 import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.Message;
@@ -39,25 +38,23 @@ public class SpamPreventionFilter implements Predicate<Message<?>> {
     @Override
     public boolean test(Message<?> payload) {
         for (ReceivingEndpoint endpoint : payload.getReceivingEndpoints()) {
-            DeliveryOptions deliveryOptions = endpoint.getDeliveryOptions();
+            SpamPreventionOption spamPreventionOptions = endpoint.calculateSpamPreventionOption().getOption();
 
-            if (deliveryOptions == null || deliveryOptions.getSpamPrevention() == null) {
+            if (spamPreventionOptions == null) {
                 continue;
             }
-            SpamPreventionOption spamPreventionOptions = deliveryOptions.getSpamPrevention();
 
-            Instant startOfTimeInterval = TimeSpanCalculator.calculateNowMinusTimeFrame(OffsetDateTime.now(), spamPreventionOptions.getMaxMessagesTimeFrame(), spamPreventionOptions.getMaxMessagesUnit());
+            Instant startOfTimeInterval = TimeSpanCalculator.calculateNowMinusTimeFrame(
+                OffsetDateTime.now(), 
+                spamPreventionOptions.getMaxMessagesTimeFrame(), 
+                spamPreventionOptions.getMaxMessagesUnit());
 
             long numberOfReceivedSince = deliveryInfoRepository.countByEndpointIdAndProcessedOnAfter(endpoint.getId(), startOfTimeInterval);
 
             if (numberOfReceivedSince >= spamPreventionOptions.getMaxMessages()) {
                 log.debug("Messages are over limit. No more messages will be send to endpoint {}.", endpoint.getEndpointId());
 
-                // if (payload.getPreviousEventIds() != null && !payload.getPreviousEventIds().isEmpty()) {
-                //     deliveryInfo = payload.getPreviousEventIds().stream().map(eventId -> createDeliveryInfo(payload.getId(), endpoint.getId(), eventId)).collect(Collectors.toList());
-                // } else {
                 DeliveryInfo  discardedDI = DeliveryInfo.createDiscardedDeliveryInfo(payload.getId(), endpoint.getId());
-                // }
 
                 deliveryInfoRepository.save(discardedDI);
                 return false;
@@ -67,12 +64,4 @@ public class SpamPreventionFilter implements Predicate<Message<?>> {
         return true;
     }
 
-    // private DeliveryInfo createDeliveryInfo(UUID payloadId, UUID endpointId, UUID eventId) {
-    //     return DeliveryInfo.builder()
-    //             .id(UUID.randomUUID())
-    //             .endpointId(endpointId)
-    //             .messageId(payloadId)
-    //             .eventId(eventId)
-    //             .status(DeliveryInfo.DELIVERY_STATUS.DISCARDED).build();
-    // }
 }

@@ -15,7 +15,7 @@
 
 package com.obj.nc.domain.delivery;
 
-import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.CreatedDate;
@@ -43,7 +43,7 @@ public class Message2EndpointRelation implements Persistable<UUID> {
 
 //    @Column("delivery_options")
     @Transient
-    private DeliveryOptions deliveryOptions;
+    private EndpointDeliveryOptionsConfig deliveryOptions;
 
     @Override
     public boolean isNew() {
