@@ -19,8 +19,7 @@
 
 package com.obj.nc.flows.pushProcessing;
 
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
+import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.PushSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -42,8 +41,7 @@ public class PushProcessingFlowConfig {
 	public final static String PUSH_PROCESSING_FLOW_OUTPUT_CHANNEL_ID = PUSH_PROCESSING_FLOW_ID + "_OUTPUT";
 	
 	private final PushSender pushSender;
-	private final MessagePersister messagePersister;
-	private final EndpointPersister endpointPersister; 
+	private final MessageAndEndpointPersister persister;
 	private final ThreadPoolTaskScheduler executor;
 	
 	@Bean(PUSH_PROCESSING_FLOW_INPUT_CHANNEL_ID)
@@ -60,8 +58,7 @@ public class PushProcessingFlowConfig {
 	public IntegrationFlow pushSendFlow() {
 		return IntegrationFlows
 				.from(pushSendInputChannel())
-				.handle(endpointPersister)
-				.handle(messagePersister)
+				.handle(persister)
 				.handle(pushSender)
 				.wireTap(flowConfig -> flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID))
 				.channel(pushSendOutputChannel())

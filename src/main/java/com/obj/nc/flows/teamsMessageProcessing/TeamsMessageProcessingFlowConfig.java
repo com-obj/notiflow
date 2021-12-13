@@ -19,8 +19,7 @@
 
 package com.obj.nc.flows.teamsMessageProcessing;
 
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
+import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.teams.TeamsMessageSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -41,8 +40,7 @@ public class TeamsMessageProcessingFlowConfig {
     public final static String TEAMS_PROCESSING_FLOW_OUTPUT_CHANNEL_ID = TEAMS_PROCESSING_FLOW_ID + "_OUTPUT";
 
     private final TeamsMessageSender teamsMessageSender;
-    private final MessagePersister messagePersister;
-    private final EndpointPersister endpointPersister;
+    private final MessageAndEndpointPersister persister;
     private final ThreadPoolTaskScheduler executor;
 
     @Bean(TEAMS_PROCESSING_FLOW_INPUT_CHANNEL_ID)
@@ -59,8 +57,7 @@ public class TeamsMessageProcessingFlowConfig {
     public IntegrationFlow pushSendFlow() {
         return IntegrationFlows
                 .from(sendInputChannel())
-                .handle(endpointPersister)
-                .handle(messagePersister)
+                .handle(persister)
                 .handle(teamsMessageSender)
                 .wireTap(flowConfig -> flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID))
                 .channel(sendOutputChannel())

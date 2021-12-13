@@ -21,7 +21,7 @@ package com.obj.nc.flows.testmode.config;
 
 import com.obj.nc.flows.testmode.TestModeProperties;
 import com.obj.nc.flows.testmode.email.config.TestModeEmailsBeansConfig;
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.messageAggregator.MessageAggregator;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.BasePayloadAggregationStrategy;
 import com.obj.nc.functions.processors.messageAggregator.aggregations.TestModeSingleEmailAggregationStrategy;
@@ -57,7 +57,7 @@ public class TestModeFlowConfig {
     @Autowired private PaylaodLoggerSinkConsumer logConsumer;
 
     @Autowired private EmailTemplateFormatter digestEmailFormatter;
-    @Autowired private EndpointPersister endpointPersister;
+	@Autowired private MessageAndEndpointPersister persister;
     @Autowired private MessagePersister messagePersister;
 
 	public final static String TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME = "tmExecutorChannel";
@@ -70,8 +70,7 @@ public class TestModeFlowConfig {
     	
         return IntegrationFlows
         		.from(executor(TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME, Executors.newSingleThreadExecutor()))
-				.handle(endpointPersister)
-				.handle(messagePersister)
+				.handle(persister)
         		.aggregate(
         			aggSpec-> aggSpec
         				.correlationStrategy( testModeCorrelationStrategy() )
@@ -83,8 +82,7 @@ public class TestModeFlowConfig {
         				.outputProcessor( testModeMessageAggregator() )
         				.id(TEST_MODE_AGGREGATOR_BEAN_NAME)
         			)
-				.handle(endpointPersister)
-				.handle(messagePersister)
+				.handle(persister)
 				.handle(digestEmailFormatter)
 				.handle(messagePersister)
 				.handle(sendEmailRealSmtp)

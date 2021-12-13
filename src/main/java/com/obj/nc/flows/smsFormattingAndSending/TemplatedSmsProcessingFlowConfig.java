@@ -19,7 +19,7 @@
 
 package com.obj.nc.flows.smsFormattingAndSending;
 
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.messageTemplating.SmsTemplateFormatter;
 import com.obj.nc.functions.processors.senders.SmsSender;
@@ -42,7 +42,7 @@ public class TemplatedSmsProcessingFlowConfig {
 	private final SmsTemplateFormatter smsFormatter;
 	private final PaylaodLoggerSinkConsumer logConsumer;
 	private final MessagePersister messagePersister;
-	private final EndpointPersister endpointPersister;
+	private final MessageAndEndpointPersister messageAndEndpointPersister;
 
 	public final static String TEMPLATED_SMS_PROCESSING_FLOW_ID = "TEMPLATED_SMS_PROCESSING_FLOW_ID";
 	public final static String TEMPLATED_SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID = TEMPLATED_SMS_PROCESSING_FLOW_ID + "_INPUT";
@@ -56,8 +56,7 @@ public class TemplatedSmsProcessingFlowConfig {
 	public IntegrationFlow smsProcessingFlowDefinition() {
 		return IntegrationFlows
 				.from(smsProcessingInputChangel())
-				.handle(endpointPersister)
-				.handle(messagePersister)
+				.handle(messageAndEndpointPersister)
 				.handle(smsFormatter)
 				.split()
 				.handle(messagePersister)

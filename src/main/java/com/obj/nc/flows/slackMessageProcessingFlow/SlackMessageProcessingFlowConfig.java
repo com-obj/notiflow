@@ -19,8 +19,7 @@
 
 package com.obj.nc.flows.slackMessageProcessingFlow;
 
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
+import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.slack.SlackMessageSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -41,8 +40,7 @@ public class SlackMessageProcessingFlowConfig {
     public final static String SLACK_PROCESSING_FLOW_OUTPUT_CHANNEL_ID = SLACK_PROCESSING_FLOW_ID + "_OUTPUT";
 
     private final SlackMessageSender slackMessageSender;
-    private final MessagePersister messagePersister;
-    private final EndpointPersister endpointPersister;
+    private final MessageAndEndpointPersister persister;
     private final ThreadPoolTaskScheduler executor;
 
     @Bean(SLACK_PROCESSING_FLOW_INPUT_CHANNEL_ID)
@@ -59,8 +57,7 @@ public class SlackMessageProcessingFlowConfig {
     public IntegrationFlow pushSendFlow() {
         return IntegrationFlows
                 .from(sendInputChannel())
-                .handle(endpointPersister)
-                .handle(messagePersister)
+                .handle(persister)
                 .handle(slackMessageSender)
                 .wireTap(flowConfig -> flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID))
                 .channel(sendOutputChannel())

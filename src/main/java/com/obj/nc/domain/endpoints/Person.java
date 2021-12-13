@@ -19,7 +19,7 @@
 
 package com.obj.nc.domain.endpoints;
 
-import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,7 +40,7 @@ public class Person extends Recipient{
 	
 	public static final String JSON_TYPE_IDENTIFIER = "PERSON";
 	
-	private DeliveryOptions deliveryOptions;
+	private EndpointDeliveryOptionsConfig deliveryOptions;
 
 	@NotNull
 	private String name;

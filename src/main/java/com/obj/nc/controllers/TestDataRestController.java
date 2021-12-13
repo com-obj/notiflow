@@ -164,8 +164,7 @@ public class TestDataRestController {
         message.setPreviousEventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") });
         message.setBody(EmailContent.builder().subject("Subject").text("Text").build());
         message.setMessageClass(EmailMessage.class.getName());
-        message.setEndpointIds(new UUID[]{ UUID.fromString("3d02890b-1b53-465c-b8c3-b0a722483a45") });
-        
+
         message = messageRepository.save(message);
         message.setTimeCreated(Timestamp.valueOf("2021-08-24 09:37:39.540000").toInstant());
         messageRepository.save(message);
@@ -177,8 +176,7 @@ public class TestDataRestController {
         message.setPreviousEventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") });
         message.setBody(EmailContent.builder().subject("Subject").text("Text").build());
         message.setMessageClass(EmailMessage.class.getName());
-        message.setEndpointIds(new UUID[]{ UUID.fromString("d2ca2a68-1dc4-4052-a93a-67319449ef5b") });
-        
+
         message = messageRepository.save(message);
         message.setTimeCreated(Timestamp.valueOf("2021-08-24 09:37:39.575000").toInstant());
         messageRepository.save(message);
@@ -190,8 +188,7 @@ public class TestDataRestController {
         message.setPreviousEventIds(new UUID[]{ UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d") });
         message.setBody(SimpleTextContent.builder().text("Text").build());
         message.setMessageClass(SmsMessage.class.getName());
-        message.setEndpointIds(new UUID[]{ UUID.fromString("820023cf-7dd0-407f-abfa-0d6453bde6d3") });
-        
+
         message = messageRepository.save(message);
         message.setTimeCreated(Timestamp.valueOf("2021-08-24 09:37:39.603000").toInstant());
         messageRepository.save(message);

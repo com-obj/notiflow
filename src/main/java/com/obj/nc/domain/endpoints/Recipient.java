@@ -22,7 +22,7 @@ package com.obj.nc.domain.endpoints;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -41,7 +41,7 @@ public abstract class Recipient {
 	
 	public abstract List<Person> findFinalRecipientsAsPersons();
 	
-	public abstract DeliveryOptions getDeliveryOptions();
+	public abstract EndpointDeliveryOptionsConfig getDeliveryOptions();
 
 
 }

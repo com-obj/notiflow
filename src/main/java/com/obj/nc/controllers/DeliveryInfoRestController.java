@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessagePersistentState;
 import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
@@ -38,54 +39,44 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Validated
 @RestController
 @RequestMapping("/delivery-info")
 public class DeliveryInfoRestController {
-	
+
 	@Autowired private DeliveryInfoRepository deliveryRepo;
-	@Autowired private MessageRepository messageRepo;
 	@Autowired private EndpointsRepository endpointRepo;
 	@Autowired private GenericEventRepository eventRepo;
+    @Autowired private MessageRepository messageRepo;
 	@Autowired private DeliveryInfoFlow deliveryInfoFlow;
 	@Autowired private NcAppConfigProperties ncAppConfigProperties;
-	
+
 	@GetMapping(value = "/events/{eventId}", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
     		@PathVariable (value = "eventId", required = true) String eventId,
 			@RequestParam(value = "endpointId", required = false) String endpointId) {
-		
+
 		UUID endpointUUID = endpointId == null ? null : UUID.fromString(endpointId);
 
 		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByEventIdAndEndpointIdOrderByProcessedOn(UUID.fromString(eventId), endpointUUID);
 
 		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
-		
+
 		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
 		List<ReceivingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
 		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
 		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
-		
+
 		return infoDtos;
     }
-	
+
 	@GetMapping(value = "/events/ext/{extEventId}", produces="application/json")
     public List<EndpointDeliveryInfoDto> findDeliveryInfosByExtId(
     		@PathVariable (value = "extEventId", required = true) String extEventId,
@@ -95,10 +86,10 @@ public class DeliveryInfoRestController {
 		if (event == null) {
 			throw new IllegalArgumentException("Event with " +  extEventId +" external ID not found");
 		}
-		
+
 		return findDeliveryInfosByEventId(event.getId().toString(), endpointId);
     }
-	
+
 	@GetMapping(value = "/messages/{messageId}/mark-as-read")
 	public ResponseEntity<Void> trackMessageRead(@PathVariable(value = "messageId", required = true) String messageId) {
 		ResponseEntity<Void> trackingPixelImageRedirectionResponse = ResponseEntity
@@ -110,49 +101,58 @@ public class DeliveryInfoRestController {
 								.build()
 								.toUri())
 				.build();
-		
+
 		if (deliveryRepo.countByMessageIdAndStatus(UUID.fromString(messageId), DELIVERY_STATUS.READ) > 0) {
 			return trackingPixelImageRedirectionResponse;
 		}
-		
-		Optional<MessagePersistentState> message = messageRepo.findById(UUID.fromString(messageId));
-		message.ifPresent(messagePersistantState -> deliveryInfoFlow.createAndPersistReadDeliveryInfo(messagePersistantState.toMessage()));
-		
+
+        MessagePersistentState msgInDb = messageRepo.findById(UUID.fromString(messageId)).get();
+        msgInDb.loadReceivingEndpoints();
+        Message<?> msg = msgInDb.toMessage();
+        deliveryInfoFlow.createAndPersistReadDeliveryInfo(msg);
+        
 		return trackingPixelImageRedirectionResponse;
 	}
-	
+
 	@GetMapping(value = "/messages/{messageId}", produces="application/json")
 	public List<EndpointDeliveryInfoDto> findDeliveryInfosByMessageId(
 			@PathVariable (value = "messageId", required = true) String messageId) {
-		
+
 		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByMessageIdOrderByProcessedOn(UUID.fromString(messageId));
-		
+
 		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
-		
-		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
+
+		List<UUID> endpointIds = infoDtos
+            .stream()
+            .map(i -> i.getEndpointId())
+            .collect(Collectors.toList());
 		List<ReceivingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
-		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
+
+		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos
+            .stream()
+            .collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
+
 		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
-		
+
 		return infoDtos;
 	}
-	
+
 	@Data
 	@Builder
 	public static class EndpointDeliveryInfoDto {
-		
+
 		@JsonIgnore
 		@Transient
 		UUID endpointId;
-		
+
 		ReceivingEndpoint endpoint;
-		
+
 		DELIVERY_STATUS currentStatus;
 		Instant statusReachedAt;
-		
+
 		public static List<EndpointDeliveryInfoDto> createFrom(List<DeliveryInfo> deliveryInfos) {
 			List<EndpointDeliveryInfoDto> result = new ArrayList<>();
-			
+
 			Map<UUID, List<DeliveryInfo>> ep2Infos = deliveryInfos.stream().collect(
 					Collectors.groupingBy(
 							DeliveryInfo::getEndpointId,
@@ -161,21 +161,21 @@ public class DeliveryInfoRestController {
 					)
 				)
 			);
-			
+
 			for (UUID endpointId: ep2Infos.keySet()) {
 				List<DeliveryInfo> infos = ep2Infos.get(endpointId);
 				orderByProcessedTimeDescStatus(infos);
 				DeliveryInfo lastInfo = infos.get(infos.size()-1);
-				
+
 				EndpointDeliveryInfoDto dto = EndpointDeliveryInfoDto.builder()
 					.currentStatus(lastInfo.getStatus())
 					.endpointId(endpointId)
 					.statusReachedAt(lastInfo.getProcessedOn())
 					.build();
-				
+
 				result.add(dto);
 			}
-			
+
 			return result;
 		}
 

@@ -19,6 +19,9 @@
 
 package com.obj.nc.domain.endpoints;
 
+import com.obj.nc.Get;
+import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionConfigForChannel;
+
 import lombok.*;
 
 @Builder
@@ -43,4 +46,14 @@ public class TeamsEndpoint extends ReceivingEndpoint {
     public String getEndpointType() {
         return JSON_TYPE_IDENTIFIER;
     }
+
+    @Override
+	public SpamPreventionConfigForChannel createDefaultGlobalSpamPreventionConfig() {
+        SpamPreventionConfigForChannel config = SpamPreventionConfigForChannel
+			.builder()
+			.channel(SpamPreventionConfigForChannel.Channel.TEAMS)
+			.option(Get.getSpamPreventionProperties().getTeams())
+			.build();
+        return config;
+	}
 }

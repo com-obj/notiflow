@@ -38,7 +38,10 @@ public class MessagePersister extends ProcessorFunctionAdapter<Message<?>,Messag
 	@Override
 	protected Message<?> execute(Message<?> message) {
 		MessagePersistentState persisted = messageRepo.save(message.toPersistentState());
-		return persisted.toMessage();
+
+		Message<?> reconstructed = persisted.toMessage();
+		reconstructed.setReceivingEndpoints(message.getReceivingEndpoints());
+		return reconstructed;
 	}
 
 

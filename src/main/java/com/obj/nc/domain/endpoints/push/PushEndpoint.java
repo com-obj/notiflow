@@ -20,7 +20,10 @@
 package com.obj.nc.domain.endpoints.push;
 
 import com.google.firebase.messaging.Message;
+import com.obj.nc.Get;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionConfigForChannel;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -46,4 +49,14 @@ public abstract class PushEndpoint extends ReceivingEndpoint {
                 .build();
     }
     
+    
+    @Override
+	public SpamPreventionConfigForChannel createDefaultGlobalSpamPreventionConfig() {
+        SpamPreventionConfigForChannel config = SpamPreventionConfigForChannel
+			.builder()
+			.channel(SpamPreventionConfigForChannel.Channel.PUSH)
+			.option(Get.getSpamPreventionProperties().getPush())
+			.build();
+        return config;
+	}
 }

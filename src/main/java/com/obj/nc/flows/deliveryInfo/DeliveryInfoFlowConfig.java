@@ -62,7 +62,7 @@ public class DeliveryInfoFlowConfig {
 	@Autowired private ThreadPoolTaskScheduler executor;
 
     @Bean
-    // process error handlind in single thread. In case exception is throw in the error hadnlind it self this prevents potential error handling infinite loog cycles. Check MessagePublishingErrorHandler.handleError
+    // process error handling in single thread. In case exception is throw in the error handling it self this prevents potential error handling infinite loop. Check MessagePublishingErrorHandler.handleError
     public IntegrationFlow deliveryInfoFailedFlow() {
         return 
         	IntegrationFlows.from(deliveryInfoFailedInputChannel())

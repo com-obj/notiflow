@@ -62,11 +62,12 @@ public interface EndpointsRepository extends PagingAndSortingRepository<Receivin
                     "	count(distinct di.id) filter(where di.status = 'FAILED') as messages_failed_count " +
                     "from " +
                     "	nc_endpoint ep " +
-                    "left join ( " +
-                    "	select msg.id, msg.endpoint_ids, event_id " +
-                    "	from nc_message msg " +
+                    " left join ( " +
+                    "	select msg.id, event_id, m2e.endpoint_id as endpoint_id " +
+                    "	from nc_message_2_endpoint_rel m2e " +
+                    "   join nc_message msg on msg.id = m2e.message_id " +
                     "	cross join unnest(msg.previous_event_ids) as event_id " +
-                    ") msg on ep.id = any ( msg.endpoint_ids ) " +
+                    ") msg on ep.id = msg.endpoint_id " +
                     // TODO uncomment when nc_intent stores endpoint_ids
 //                    "left join " +
 //                    "   nc_intent intent " +
@@ -102,11 +103,12 @@ public interface EndpointsRepository extends PagingAndSortingRepository<Receivin
                     "	count(distinct ep.id) " +
                     "from " +
                     "	nc_endpoint ep " +
-                    "left join ( " +
-                    "	select msg.id, msg.endpoint_ids, event_id " +
-                    "	from nc_message msg " +
+                    " left join ( " +
+                    "	select msg.id, event_id, m2e.endpoint_id as endpoint_id " +
+                    "	from nc_message_2_endpoint_rel m2e " +
+                    "   join nc_message msg on msg.id = m2e.message_id " +
                     "	cross join unnest(msg.previous_event_ids) as event_id " +
-                    ") msg on ep.id = any ( msg.endpoint_ids ) " +
+                    ") msg on ep.id = msg.endpoint_id " +
                     // TODO uncomment when nc_intent stores endpoint_ids
 //                    "left join " +
 //                    "   nc_intent intent " +

@@ -19,7 +19,7 @@
 
 package com.obj.nc.domain.endpoints;
 
-import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -51,7 +51,7 @@ public class Group extends Recipient{
 	@Builder.Default
 	private boolean wasResolved = false;
 	
-	private DeliveryOptions deliveryOptions; 
+	private EndpointDeliveryOptionsConfig deliveryOptions; 
 	
 	public Group(String name) {
 		this.name = name;

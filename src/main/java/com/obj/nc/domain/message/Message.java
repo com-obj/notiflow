@@ -112,7 +112,6 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		persistentState.setPreviousMessageIds(previousMessageIds.toArray(new UUID[0]));
 		persistentState.setMessageClass(getClass().getName());
 		persistentState.setTimeCreated(getTimeCreated());
-		persistentState.setEndpointIds(getReceivingEndpoints().stream().map(ReceivingEndpoint::getId).toArray(UUID[]::new));
 		return persistentState;	 
 	}
 	

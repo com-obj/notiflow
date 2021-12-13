@@ -20,10 +20,10 @@
 package com.obj.nc.flows.messageProcessing;
 
 import com.obj.nc.domain.message.*;
-import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
+import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
+import com.obj.nc.functions.processors.spamPrevention.SpamPreventionFilter;
 import com.obj.nc.functions.processors.messageBuilder.MessageByRecipientTokenizer;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -41,15 +41,12 @@ import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.S
 import static com.obj.nc.flows.smsFormattingAndSending.TemplatedSmsProcessingFlowConfig.TEMPLATED_SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.teamsMessageProcessing.TeamsMessageProcessingFlowConfig.TEAMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
+@RequiredArgsConstructor
 @Configuration
 public class MessageProcessingFlowConfig {
-
-    @Autowired
-    MessageByRecipientTokenizer<?> messageByRecipientTokenizer;
-    @Autowired
-    MessagePersister messagePersister;
-    @Autowired
-    EndpointPersister endpointPersister;
+    private final MessageByRecipientTokenizer<?> messageByRecipientTokenizer;
+    private final MessageAndEndpointPersister deliveryPersister;
+    private final SpamPreventionFilter spamPreventionFilter;
 
 
     public final static String MESSAGE_PROCESSING_FLOW_ID = "MESSAGE_PROCESSING_FLOW_ID";
@@ -64,12 +61,11 @@ public class MessageProcessingFlowConfig {
     public IntegrationFlow messageProcessingFlowDefinition() {
         return IntegrationFlows
                 .from(messageProcessingInputChannel())
-                .handle(endpointPersister)
-                .handle(messagePersister)
+                .handle(deliveryPersister)
                 .transform(messageByRecipientTokenizer)
                 .split()
-                .handle(endpointPersister)
-                .handle(messagePersister) //need to persist, otherwise delivery info will have invalid reference
+                .handle(deliveryPersister) //need to persist, otherwise delivery info will have invalid reference
+                .filter(spamPreventionFilter::test)
                 .wireTap(flowConfig ->
                         flowConfig.channel(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
                 )
@@ -87,5 +83,4 @@ public class MessageProcessingFlowConfig {
                 )
                 .get();
     }
-
 }

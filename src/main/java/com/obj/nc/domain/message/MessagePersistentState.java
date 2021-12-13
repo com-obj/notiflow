@@ -22,9 +22,11 @@ package com.obj.nc.domain.message;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.Get;
 import com.obj.nc.domain.content.MessageContent;
+import com.obj.nc.domain.delivery.Message2EndpointRelation;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.refIntegrity.Reference;
+import com.obj.nc.repositories.Message2EndpointRelationRepository;
 import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.MessageRepository;
@@ -41,11 +43,12 @@ import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.validation.constraints.NotNull;
-
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 @Table("nc_message")
@@ -64,11 +67,7 @@ public class MessagePersistentState implements Persistable<UUID> {
 	private MessageContent body;
 	
 	private String messageClass;
-	
-	@NotNull
-	@Reference(EndpointsRepository.class)
-	private UUID[] endpointIds;
-	
+
 	@NotNull
 	@Reference(GenericEventRepository.class)
 	private UUID[] previousEventIds;
@@ -84,7 +83,8 @@ public class MessagePersistentState implements Persistable<UUID> {
 	@JsonIgnore
 	@Transient
 	private List<ReceivingEndpoint> receivingEndpoints;
-	
+
+
 	@Override
 	@JsonIgnore
 	@Transient
@@ -100,22 +100,40 @@ public class MessagePersistentState implements Persistable<UUID> {
 		msg.setHeader(getHeader());
 		msg.setId(getId());
 		msg.setTimeCreated(getTimeCreated());
-		
-		List<ReceivingEndpoint> endpoints = findReceivingEndpoints();
-		msg.setReceivingEndpoints(endpoints);
-		
 		msg.setPreviousEventIds(Arrays.asList(previousEventIds));
 		msg.setPreviousIntentIds(Arrays.asList(previousIntentIds));
 		msg.setPreviousMessageIds(Arrays.asList(previousMessageIds));
+
+        msg.setReceivingEndpoints(receivingEndpoints);
 		
 		return msg;
 	}
-	
-	public List<ReceivingEndpoint> findReceivingEndpoints() {
-		if (receivingEndpoints == null) {
-			receivingEndpoints = Get.getEndpointsRepo().findByIds(getEndpointIds());
-		}
-		return receivingEndpoints;
-	}
-	
+
+    public void loadReceivingEndpoints() {
+        Message2EndpointRelationRepository endpointRelRepository = Get.getMessage2EndpointRelationRepo();
+
+        List<Message2EndpointRelation> endpointRelsForMessage = endpointRelRepository.findByMessageId(id);
+        
+        if (endpointRelsForMessage.isEmpty()) {
+                setReceivingEndpoints(new ArrayList<>());
+                return;
+            }
+
+        List<ReceivingEndpoint> endpointList = resolveEndpoints(endpointRelsForMessage);
+
+        setReceivingEndpoints(endpointList);
+    }
+
+    private List<ReceivingEndpoint> resolveEndpoints(List<Message2EndpointRelation> endpointRelsForMessage) {
+        EndpointsRepository endpointsRepository = Get.getEndpointsRepo();
+
+        List<ReceivingEndpoint> endpoints = endpointsRepository.findByIds(
+                endpointRelsForMessage
+                    .stream()
+                    .map(Message2EndpointRelation::getEndpointId)
+                    .collect(Collectors.toList())
+                    .toArray(new UUID[endpointRelsForMessage.size()])
+            );
+        return endpoints;
+    }
 }

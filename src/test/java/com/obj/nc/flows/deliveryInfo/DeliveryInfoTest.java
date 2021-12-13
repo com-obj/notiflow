@@ -108,7 +108,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         notificationIntent.addPreviousEventId(eventId);
         
         notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
-        notificationIntent.ensureEndpointsPersisted();
+        endpointRepo.persistEnpointIfNotExists(notificationIntent.getReceivingEndpoints());
         intentRepo.save(notificationIntent);
         
         //WHEN

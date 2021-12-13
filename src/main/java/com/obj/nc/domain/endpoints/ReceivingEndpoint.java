@@ -23,9 +23,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.obj.nc.domain.deliveryOptions.DeliveryOptions;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
+import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
 import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
 import com.obj.nc.domain.endpoints.push.TopicPushEndpoint;
+import com.obj.nc.functions.processors.spamPrevention.config.OptionsValidator;
+import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionConfigForChannel;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -54,16 +58,21 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public abstract class ReceivingEndpoint implements Persistable<UUID> {
 	
-	/**
-	 * Kazdy Endpoint (Email, SMS, PUSH) ma nastavene options. Kedy na neho mozes posielat, ci agregovat. 
-	 * Je mozne, ze niektore setting by mali byt aj pre Recipienta tj. take ktore su platne nezavisle od kanala. Zatial ale sa budem tvarit, ze ak aj take budu
-	 * prekopiruju(zmerguju) sa k danemu enpointu
-	 */
+
 	@Id
 	@EqualsAndHashCode.Include
 	private UUID id = UUID.randomUUID();
-	private DeliveryOptions deliveryOptions;
+    /**
+	 * Kazdy Endpoint (Email, SMS, PUSH) ma nastavene options. Kedy na neho mozes posielat, ci agregovat. 
+	 * Je mozne, ze niektore setting by mali byt aj pre Recipienta tj. take ktore su platne nezavisle od kanala. Zatial ale sa budem tvarit, ze ak aj take budu
+	 * prekopiruju(zmerguju) sa k danemu enpointu
+	 **/
+	@Transient
+    private EndpointDeliveryOptionsConfig deliveryOptions;
+
+	@Transient
 	private Recipient recipient;
+    
 	@CreatedDate
 	private Instant timeCreated;
 	
@@ -73,6 +82,21 @@ public abstract class ReceivingEndpoint implements Persistable<UUID> {
 	
 	@JsonIgnore
 	public abstract String getEndpointType();
+
+	protected abstract SpamPreventionConfigForChannel createDefaultGlobalSpamPreventionConfig();
+	
+	public SpamPreventionConfigForChannel calculateSpamPreventionOption() {
+		SpamPreventionConfigForChannel config = createDefaultGlobalSpamPreventionConfig();
+		OptionsValidator.validate(config);
+
+		EndpointDeliveryOptionsConfig deliveryOptions = getDeliveryOptions();
+		if (deliveryOptions == null || deliveryOptions.getSpamPrevention() == null) {
+			return config;
+		}
+
+		config.setOption(deliveryOptions.getSpamPrevention());
+		return config;
+	}
 	
 	@Override
 	@JsonIgnore
