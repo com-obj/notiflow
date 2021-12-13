@@ -28,7 +28,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 public class SpamPreventionFilterTest {

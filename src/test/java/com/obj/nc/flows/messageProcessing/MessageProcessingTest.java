@@ -90,12 +90,8 @@ public class MessageProcessingTest extends BaseIntegrationTest {
 
     @Test
     void testEventIsFilteredOut() {
-        GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
-        UUID eventId = eventRepo.save(event).getId();
-
         String INPUT_JSON_FILE = "messages/email_message_spam_prevention.json";
         EmailMessage msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
-        msg.addPreviousEventId(eventId);
 
         msgFlow.processMessage(msg);
 
