@@ -305,22 +305,49 @@
       
         <li class="md-nav__item">
   <a href="#send-slack-message" class="md-nav__link">
-    Send slack message
+    Send Slack message
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#send-teams-message" class="md-nav__link">
-    Send teams message
+  <a href="#send-ms-teams-message" class="md-nav__link">
+    Send MS Teams message
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#send-sms-message" class="md-nav__link">
-    Send sms message
+    Send SMS message
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spam-prevention" class="md-nav__link">
+    Spam prevention
+  </a>
+  
+    <nav class="md-nav" aria-label="Spam prevention">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#global-settings" class="md-nav__link">
+    Global settings
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#endpoint-settings" class="md-nav__link">
+    Endpoint settings
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -618,22 +645,49 @@
       
         <li class="md-nav__item">
   <a href="#send-slack-message" class="md-nav__link">
-    Send slack message
+    Send Slack message
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#send-teams-message" class="md-nav__link">
-    Send teams message
+  <a href="#send-ms-teams-message" class="md-nav__link">
+    Send MS Teams message
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#send-sms-message" class="md-nav__link">
-    Send sms message
+    Send SMS message
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spam-prevention" class="md-nav__link">
+    Spam prevention
+  </a>
+  
+    <nav class="md-nav" aria-label="Spam prevention">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#global-settings" class="md-nav__link">
+    Global settings
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#endpoint-settings" class="md-nav__link">
+    Endpoint settings
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -834,7 +888,7 @@ To be able to communicate with FCM, you need to add path to your Firebase servic
     <span class="p">}</span>
 </code></pre></div>
 </td></tr></table>
-<h2 id="send-slack-message">Send slack message</h2>
+<h2 id="send-slack-message">Send Slack message</h2>
 <p>This example illustrates the use-case when you simply want to send slack message with constant body text to single channel.</p>
 <p>To start sending messages to public slack channel, first create a bot in slack. For simplicity sake, use example <a href="https://api.slack.com/tutorials/tracks/posting-messages-with-curl">here</a>. Then set application properties as follows:
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
@@ -864,7 +918,7 @@ Replace the <em>public-slack-channel-code</em> in following code sample with you
     <span class="p">}</span>
 </code></pre></div>
 </td></tr></table></p>
-<h2 id="send-teams-message">Send teams message</h2>
+<h2 id="send-ms-teams-message">Send MS Teams message</h2>
 <p>To start sending messages to teams chat, first create an incoming webhook. Follow official <a href="https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook">documentation</a>. 
 As a result, you have webhook url.</p>
 <p>Here is sample how to send message to teams chat:
@@ -895,7 +949,7 @@ As a result, you have webhook url.</p>
     <span class="p">}</span>
 </code></pre></div>
 </td></tr></table></p>
-<h2 id="send-sms-message">Send sms message</h2>
+<h2 id="send-sms-message">Send SMS message</h2>
 <p>Supported way of sending sms is via GatewayApi sms gateway. First create account at https://gatewayapi.com/. Then fill
 properties as follows:
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
@@ -928,6 +982,84 @@ Replace <strong>GatewayApiToken</strong> with token from your account and <stron
 </td></tr></table>
 Always send sms with correct phone number prefix. In example is +421 used, which is prefix for slovakia. List of prefixes
 can be found <a href="https://www.iban.com/dialing-codes">here</a>.</p>
+<h2 id="spam-prevention">Spam prevention</h2>
+<p>Spam prevention support two ways of configuration: 
+- global
+- endpoint</p>
+<p>When applying spam prevention, the endpoint configuration has priority over global config. Both are not required.</p>
+<p>Both configurations share same configuration object with properties:
+- maxMessagesUnit (enum) - Allowed values are: <strong>MINUTES</strong>, <strong>HOURS</strong>, <strong>DAYS</strong>.
+- maxMessagesTimeFrame (int) - how many units are in time frame
+- maxMessages (int) - maximum of sent messages per time frame</p>
+<h3 id="global-settings">Global settings</h3>
+<p>Actual supported global endpoint configurations are:
+- email
+- slack
+- sms
+- teams
+- push</p>
+<p>Every endpoint has same properties. As example email endpoint configuration is provided.
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="na">nc.delivery.spam-prevention.email.maxMessages</span><span class="o">=</span><span class="s">5</span>
+<span class="na">nc.delivery.spam-prevention.email.maxMessagesTimeFrame</span><span class="o">=</span><span class="s">1</span>
+<span class="na">nc.delivery.spam-prevention.email.maxMessagesUnit</span><span class="o">=</span><span class="s">DAYS</span>
+</code></pre></div>
+</td></tr></table>
+This configuration allows sending of maximum 5 emails per 1 day.</p>
+<h3 id="endpoint-settings">Endpoint settings</h3>
+<p>One of ways how to implement spam prevention is via implementing SpamPreventionExtension. In the following example
+the most important part is method <em>setSpamPreventionSettings</em> when SpamPreventionOption object is created and set to
+deliveryOptions.
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="nd">@Component</span>
+<span class="kd">class</span> <span class="nc">EmailSpamPreventionExtension</span> <span class="kd">implements</span> <span class="n">SpamPreventionExtension</span> <span class="p">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">BasePayload</span><span class="o">&lt;?&gt;</span> <span class="n">apply</span><span class="p">(</span><span class="n">BasePayload</span><span class="o">&lt;?&gt;</span> <span class="n">basePayload</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">ReceivingEndpoint</span> <span class="n">endpoint</span> <span class="p">:</span> <span class="n">basePayload</span><span class="p">.</span><span class="na">getReceivingEndpoints</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">endpoint</span> <span class="k">instanceof</span> <span class="n">EmailEndpoint</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">setSpamPreventionSettings</span><span class="p">(</span><span class="n">endpoint</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">basePayload</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kt">void</span> <span class="nf">setSpamPreventionSettings</span><span class="p">(</span><span class="n">ReceivingEndpoint</span> <span class="n">receivingEndpoint</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">DeliveryOptions</span> <span class="n">deliveryOptions</span> <span class="o">=</span> <span class="n">receivingEndpoint</span><span class="p">.</span><span class="na">getDeliveryOptions</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">deliveryOptions</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">deliveryOptions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DeliveryOptions</span><span class="p">();</span>
+            <span class="n">receivingEndpoint</span><span class="p">.</span><span class="na">setDeliveryOptions</span><span class="p">(</span><span class="n">deliveryOptions</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="n">deliveryOptions</span><span class="p">.</span><span class="na">setSpamPrevention</span><span class="p">(</span><span class="k">new</span> <span class="n">SpamPreventionOption</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">SpamPreventionOption</span><span class="p">.</span><span class="na">MaxMessageUnit</span><span class="p">.</span><span class="na">DAYS</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</td></tr></table></p>
 <h2 id="convert-custom-application-event-to-message">Convert custom application event to Message</h2>
 <p>Covering custom event is very common use-case for notiflow. This separation of responsibility ensures that client application does its job and only emits application events if something important happens. The processing of such events, with regards to notification of users or 3rd parties, is in the responsibility of notiflow. </p>
 <p>In this example we will send an welcome email to  newly registered customer. Let us first define custom event </p>
