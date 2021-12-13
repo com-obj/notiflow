@@ -125,7 +125,7 @@ Then you can create message and send it to desired endpoint.
 
 ```
 
-## Send slack message
+## Send Slack message
 
 This example illustrates the use-case when you simply want to send slack message with constant body text to single channel.
 
@@ -150,7 +150,7 @@ Replace the *public-slack-channel-code* in following code sample with your chann
     }
 ```
 
-## Send teams message
+## Send MS Teams message
 To start sending messages to teams chat, first create an incoming webhook. Follow official [documentation](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook). 
 As a result, you have webhook url.
 
@@ -171,7 +171,7 @@ Here is sample how to send message to teams chat:
     }
 ```
 
-## Send sms message
+## Send SMS message
 Supported way of sending sms is via GatewayApi sms gateway. First create account at https://gatewayapi.com/. Then fill
 properties as follows:
 ``` 

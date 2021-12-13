@@ -3,7 +3,7 @@ package com.obj.nc.flows.dataSources.config;
 import com.obj.nc.converterExtensions.genericData.GenericData2NotificationConverterExtension;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
-import com.obj.nc.domain.dataObject.GenericData;
+import com.obj.nc.domain.dataObject.PulledNotificationData;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -19,7 +19,7 @@ public class TestLicenceAgreementToNotificationConverter implements GenericData2
 	private final TestLicenseAgreementProperties properties;
 	
 	@Override
-	public Optional<PayloadValidationException> canHandle(GenericData<TestLicenseAgreement> data) {
+	public Optional<PayloadValidationException> canHandle(PulledNotificationData<TestLicenseAgreement> data) {
         if (data.getPayloads() != null) {
             return Optional.empty();
         }
@@ -28,7 +28,7 @@ public class TestLicenceAgreementToNotificationConverter implements GenericData2
 	}
 	
 	@Override
-	public List<IsNotification> convert(GenericData<TestLicenseAgreement> data) {
+	public List<IsNotification> convert(PulledNotificationData<TestLicenseAgreement> data) {
 		TemplateWithModelEmailContent<List<TestLicenseAgreement>> content = new TemplateWithModelEmailContent<>();
 		content.setSubject("QC | These Agreements will expire soon");
 		content.setTemplateFileName(properties.getEmailTemplatePath());

@@ -20,7 +20,7 @@
 package com.obj.nc.functions.processors.genericDataConverter;
 
 import com.obj.nc.converterExtensions.genericData.GenericDataConverterExtension;
-import com.obj.nc.domain.dataObject.GenericData;
+import com.obj.nc.domain.dataObject.PulledNotificationData;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +31,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends ProcessorFunctionAdapter<GenericData<?>, List<OUT>> {
+public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends ProcessorFunctionAdapter<PulledNotificationData<?>, List<OUT>> {
     
     public abstract List<? extends GenericDataConverterExtension<?, OUT>> getConverterExtensions();
     
     @Override
-    protected Optional<PayloadValidationException> checkPreCondition(GenericData<?> genericData) {
+    protected Optional<PayloadValidationException> checkPreCondition(PulledNotificationData<?> genericData) {
         if (genericData == null) {
             return Optional.of(new PayloadValidationException("GenericData instance must not be null"));
         }
@@ -44,7 +44,7 @@ public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends Proce
         return Optional.empty();
     }
     
-    private List<GenericDataConverterExtension<?, OUT>> findMatchingConverters(GenericData genericData) {
+    private List<GenericDataConverterExtension<?, OUT>> findMatchingConverters(PulledNotificationData genericData) {
         List<GenericDataConverterExtension<?, OUT>> matchingProcessors = new ArrayList<>();
         
         for (GenericDataConverterExtension<?, OUT> p: getConverterExtensions()) {
@@ -74,7 +74,7 @@ public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends Proce
     }
     
     @Override
-    protected List<OUT> execute(GenericData genericData) {
+    protected List<OUT> execute(PulledNotificationData genericData) {
         return
                 (List<OUT>)findMatchingConverters(genericData)
                         .stream()

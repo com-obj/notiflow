@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GenericData<PT> {
+public class PulledNotificationData<PT> {
     
     // private Metadata metadata;
     private List<PT> payloads;

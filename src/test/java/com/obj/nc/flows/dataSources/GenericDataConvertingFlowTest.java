@@ -29,7 +29,7 @@ import com.obj.nc.converterExtensions.genericData.GenericData2NotificationConver
 import com.obj.nc.converterExtensions.genericEvent.InputEvent2MessageConverterExtension;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.dataObject.GenericData;
+import com.obj.nc.domain.dataObject.PulledNotificationData;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
@@ -99,7 +99,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
     void testConvertGenericDataToMessageAndSend() {
         TestPayload payload = createTestPayload();
     
-        GenericData<JsonNode> genericData = new GenericData<>(Collections.singletonList(JsonUtils.writeObjectToJSONNode(payload)));
+        PulledNotificationData<JsonNode> genericData = new PulledNotificationData<>(Collections.singletonList(JsonUtils.writeObjectToJSONNode(payload)));
     
         // when
         inputChannel.send(MessageBuilder.withPayload(genericData).build());
@@ -113,7 +113,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
         // given
         TestPayload payload = createTestPayload();
     
-        GenericData<TestPayload> genericData = new GenericData<>(Collections.singletonList(payload));
+        PulledNotificationData<TestPayload> genericData = new PulledNotificationData<>(Collections.singletonList(payload));
     
         // when
         inputChannel.send(MessageBuilder.withPayload(genericData).build());
@@ -169,7 +169,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
         public GenericData2NotificationConverterExtension<?> genericJsonData2Message() {
             return new GenericData2NotificationConverterExtension<JsonNode>() {
                 @Override
-                public Optional<PayloadValidationException> canHandle(GenericData<JsonNode> payload) {
+                public Optional<PayloadValidationException> canHandle(PulledNotificationData<JsonNode> payload) {
                     if (!payload.getPayloadsAsPojo(TestPayload.class).isEmpty()) {
                         return Optional.empty();
                     }
@@ -178,7 +178,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 }
     
                 @Override
-                public List<IsNotification> convert(GenericData<JsonNode> payload) {
+                public List<IsNotification> convert(PulledNotificationData<JsonNode> payload) {
                     return convertTestPayloads(payload.getPayloadsAsPojo(TestPayload.class));
                 }
 
@@ -193,7 +193,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
         public GenericData2NotificationConverterExtension<?> genericPojoData2Message() {
             return new GenericData2NotificationConverterExtension<TestPayload>() {
                 @Override
-                public Optional<PayloadValidationException> canHandle(GenericData<TestPayload> data) {
+                public Optional<PayloadValidationException> canHandle(PulledNotificationData<TestPayload> data) {
                     if (!data.getPayloads().isEmpty()) {
                         return Optional.empty();
                     }
@@ -202,7 +202,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 }
     
                 @Override
-                public List<IsNotification> convert(GenericData<TestPayload> data) {
+                public List<IsNotification> convert(PulledNotificationData<TestPayload> data) {
                     return convertTestPayloads(data.getPayloads());
                 }
 
@@ -227,7 +227,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
         public GenericData2EventConverterExtension<?> genericJsonData2Event() {
             return new GenericData2EventConverterExtension<JsonNode>() {
                 @Override
-                public Optional<PayloadValidationException> canHandle(GenericData<JsonNode> payload) {
+                public Optional<PayloadValidationException> canHandle(PulledNotificationData<JsonNode> payload) {
                     if (!payload.getPayloadsAsPojo(TestPayload.class).isEmpty()) {
                         return Optional.empty();
                     }
@@ -236,7 +236,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 }
             
                 @Override
-                public List<GenericEvent> convert(GenericData<JsonNode> payload) {
+                public List<GenericEvent> convert(PulledNotificationData<JsonNode> payload) {
                     return Collections.singletonList(
                             GenericEvent
                                     .builder()
@@ -257,7 +257,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
         public GenericData2EventConverterExtension<?> genericPojoData2Event() {
             return new GenericData2EventConverterExtension<TestPayload>() {
                 @Override
-                public Optional<PayloadValidationException> canHandle(GenericData<TestPayload> data) {
+                public Optional<PayloadValidationException> canHandle(PulledNotificationData<TestPayload> data) {
                     if (!data.getPayloads().isEmpty()) {
                         return Optional.empty();
                     }
@@ -266,7 +266,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 }
             
                 @Override
-                public List<GenericEvent> convert(GenericData<TestPayload> data) {
+                public List<GenericEvent> convert(PulledNotificationData<TestPayload> data) {
                     TestPayload testPayload = data.getPayloads().get(0);
                     return Collections.singletonList(
                             GenericEvent

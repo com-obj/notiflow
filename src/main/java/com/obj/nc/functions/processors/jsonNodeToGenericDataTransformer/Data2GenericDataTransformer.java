@@ -19,18 +19,18 @@
 
 package com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer;
 
-import com.obj.nc.domain.dataObject.GenericData;
+import com.obj.nc.domain.dataObject.PulledNotificationData;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
 
 @AllArgsConstructor
-public class Data2GenericDataTransformer extends ProcessorFunctionAdapter<List<?>, GenericData<?>> {
+public class Data2GenericDataTransformer extends ProcessorFunctionAdapter<List<?>, PulledNotificationData<?>> {
 
     @Override
-	protected GenericData<?> execute(List<?> payload) {
-        GenericData jsonData = new GenericData(payload);
+	protected PulledNotificationData<?> execute(List<?> payload) {
+        PulledNotificationData jsonData = new PulledNotificationData(payload);
         return jsonData;
 	}
 
