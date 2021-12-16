@@ -85,7 +85,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     }
     
     @Test
-    void testSendMultiLocaleMessagesTypeMerge() throws Exception {
+    void testSendMultiLocaleMessagesTypeMerge() {
         // given
         properties.setMultiLocalesMergeStrategy(MERGE);
         EmailMessageTemplated<?> inputMessage = JsonUtils.readObjectFromClassPathResource("messages/templated/teamplate_message_en_de.json", EmailMessageTemplated.class);
@@ -139,7 +139,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         
         //when
         EmailMessage emailSent = emailSendingFlow.sendEmail(inputMessage)
-        		.get(1, TimeUnit.SECONDS);
+        		.get(5, TimeUnit.SECONDS);
         // then
         assertThat(emailSent, CoreMatchers.notNullValue());
     }

@@ -15,7 +15,7 @@
 
 package com.obj.nc.flows.dataSources;
 
-import com.obj.nc.functions.processors.genericDataPersister.GenericDataPersister;
+import com.obj.nc.functions.processors.genericDataPersister.AlreadyProcessedGenericDataFilter;
 import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.Data2GenericDataTransformer;
 import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.JsonNodeFilterAndTransformer;
 import com.obj.nc.repositories.GenericDataRepository;
@@ -37,8 +37,8 @@ public class GenericDataTransformationAndPersistFlow {
     public StandardIntegrationFlow continueFlow(IntegrationFlowBuilder builder, JobConfig jobConfig) {
         return builder.transform(Transformers.toJson(JsonUtils.getJsonObjectMapper(), ObjectToJsonTransformer.ResultType.NODE))
                 .split() // split ArrayNode to JsonNode-s
+                .filter(new AlreadyProcessedGenericDataFilter(genericDataRepository, selectExternalIdKey(jobConfig))::test)
                 .aggregate() // aggregate JsonNode-s to List<JsonNode>
-                .handle(new GenericDataPersister(genericDataRepository, selectExternalIdKey(jobConfig)))
                 .handle(new JsonNodeFilterAndTransformer(jobConfig.getPojoFCCN(), jobConfig.getSpelFilterExpression()))
                 .handle(new Data2GenericDataTransformer())
                 .channel(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)

@@ -37,27 +37,16 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.integration.config.GlobalChannelInterceptor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
 import java.nio.charset.Charset;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 public abstract class BaseIntegrationTest implements ApplicationContextAware {
@@ -67,7 +56,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     @Autowired Get get;
     @Autowired(required = false) //not all tests require, some might not be @SpringBootTests 
     protected DeliveryInfoRepository deliveryInfoRepo;
-    
+
     @Autowired ThreadPoolTaskScheduler taskScheduler; 
 
     public static volatile String testName;
@@ -89,20 +78,20 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
         MDC.put(MDC_FOR_TESTS_NAME, testName);
     }
 
-    
     public static void purgeNotifTables(@Autowired JdbcTemplate jdbcTemplate) {
         log.info("Purging all tables in test");
-        
-        jdbcTemplate.batchUpdate("delete from nc_processing_info");
-		jdbcTemplate.batchUpdate("delete from nc_message_2_endpoint_rel");
-        jdbcTemplate.batchUpdate("delete from nc_delivery_info");
-        jdbcTemplate.batchUpdate("delete from nc_endpoint");
-        jdbcTemplate.batchUpdate("delete from nc_event");
-        jdbcTemplate.batchUpdate("delete from nc_intent");
-        jdbcTemplate.batchUpdate("delete from nc_message");
-        jdbcTemplate.batchUpdate("delete from nc_failed_payload");
+
+        jdbcTemplate.execute("truncate nc_processing_info, " +
+				"nc_message_2_endpoint_rel," +
+				"nc_delivery_info, nc_endpoint," +
+				"nc_event," +
+				"nc_intent," +
+				"nc_message," +
+				"nc_failed_payload," +
+				"nc_generic_data cascade");
+
     }
-    
+
     @Data
     @AllArgsConstructor
     @ToString
@@ -113,8 +102,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     	String[] textParts;
     	
     	public static MailMessageForAssertions as(String to,String subjectPart,String ... textParts ) {
-    		MailMessageForAssertions msg = new MailMessageForAssertions(Optional.empty(),Optional.of(to),Optional.of(subjectPart), textParts);
-    		return msg;
+    		return new MailMessageForAssertions(Optional.empty(),Optional.of(to),Optional.of(subjectPart), textParts);
     	}
     	
     }
@@ -141,9 +129,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
 	    	for (MimeMessage msg: receivedMessages) {
 	    		boolean has = Arrays.stream(msg.getAllRecipients())
 	    			.map(adr-> ((InternetAddress)adr).getAddress())
-	    			.filter(email -> emailAddress.equals(email))
-	    			.findFirst().isPresent();
-	    		
+	    			.anyMatch(emailAddress::equals);
 	    		if (has) {
 	    			matched.add(msg);
 	    			totalCount++;
@@ -158,48 +144,45 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     	}
     }
     
-    public static MimeMessage assertMessagesContains(MimeMessage[] receivedMessages, MailMessageForAssertions msgToMatch) {
+    public static void assertMessagesContains(MimeMessage[] receivedMessages, MailMessageForAssertions msgToMatch) {
 		 System.out.println("About to check message TO:" + msgToMatch.getTo() + " SUBJECT:" + msgToMatch.getSubjectPart() + " BODY:" + Arrays.toString(msgToMatch.textParts) );
-		 
-    	try { 
-	    	 for (MimeMessage message: receivedMessages) {	    		 
+
+    	try {
+	    	 for (MimeMessage message: receivedMessages) {
 		    	 boolean isMatchingTo = true;
 		    	 boolean isMatchingSubject = true;
 		    	 boolean isMatchingContent = true;
-	    		 
+
 	    		 if (msgToMatch.getTo().isPresent()) {
-	    			 
+
 	    			 isMatchingTo &=
-								 
+
 								 Arrays.stream( message.getAllRecipients())
 								 	.map(fromAddr -> ((InternetAddress)fromAddr).getAddress())
-								 	.filter(fromAddr -> msgToMatch.getTo().get().equals(fromAddr) )
-								 	.findFirst().isPresent(); 
+								 	.anyMatch(fromAddr -> msgToMatch.getTo().get().equals(fromAddr) );
 	    		 }
-	    		 
+
 	    		 if (msgToMatch.getSubjectPart().isPresent()) {
 	    			 	System.out.println("Checking subject '" + message.getSubject() + "' to contain '" + msgToMatch.getSubjectPart().get() + "'");
 	    			 	isMatchingSubject &= message.getSubject().contains(msgToMatch.getSubjectPart().get());
-		
+
 	    		 }
-	    		 
+
 	    		 for (String bodyTextToMatch: msgToMatch.getTextParts()) {
-	    			 	
+
 	    			 isMatchingContent &= GreenMailUtil.getBody(message).contains(bodyTextToMatch);
-						
+
 	    		 }
-	    		 
+
 	    		 if (isMatchingTo && isMatchingSubject && isMatchingContent) {
-	    			 return message;
+	    			 return;
 	    		 }
-	    	 }	
-	    	 
+	    	 }
+
 	    	 Assertions.assertThat(false).as("Greenmail didn't receive mail which would match to " + msgToMatch.toString()).isTrue();
     	} catch (MessagingException e) {
     		throw new RuntimeException(e);
     	}
-    	
-    	return null;
 	}
     
     //In most cases it is overkill to wait for sent,.. but otherwise test finish before execution finishes resulting in shutdown exceptions (tests are green)

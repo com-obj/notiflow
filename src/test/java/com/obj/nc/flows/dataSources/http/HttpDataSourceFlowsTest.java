@@ -21,6 +21,7 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.flows.dataSources.config.TestLicenceAgreementToNotificationConverter;
 import com.obj.nc.flows.dataSources.config.TestLicenseAgreementProperties;
+import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.ExpectedCount;
@@ -45,7 +47,8 @@ import javax.mail.internet.MimeMessage;
 import static com.obj.nc.config.PureRestTemplateConfig.PURE_REST_TEMPLATE;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ActiveProfiles(value = {"test"}, resolver = SystemPropertyActiveProfileResolver.class)
@@ -61,7 +64,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 //this test register programmatically spring integration flows. it seems to confuse the spring context management in tests
-public class HttpDataSourceFlowsTest {
+public class HttpDataSourceFlowsTest extends BaseIntegrationTest {
 
     private MockRestServiceServer server;
 
@@ -70,7 +73,8 @@ public class HttpDataSourceFlowsTest {
     RestTemplate pureRestTemplate;
 
     @BeforeEach
-    void setUp() {
+    void setUp(@Autowired JdbcTemplate springJdbcTemplate) {
+        purgeNotifTables(springJdbcTemplate);
         server = MockRestServiceServer.bindTo(pureRestTemplate).build();
         server.expect(ExpectedCount.manyTimes(), requestTo("http://service-0/json"))
                 .andExpect(method(HttpMethod.GET))
@@ -78,7 +82,7 @@ public class HttpDataSourceFlowsTest {
     }
 
     @Test
-    void testContact() throws InterruptedException {
+    void testContact() {
         // then
         boolean received = greenMail.waitForIncomingEmail(15000L, 1);
 

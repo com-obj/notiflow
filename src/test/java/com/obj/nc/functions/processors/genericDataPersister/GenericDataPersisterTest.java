@@ -27,8 +27,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
 public class GenericDataPersisterTest {
     ObjectMapper mapper = new ObjectMapper();
@@ -42,45 +41,43 @@ public class GenericDataPersisterTest {
     void testInvalidExternalIdAttrName() throws JsonProcessingException {
         JsonNode jsonNode = mapper.readTree(emptyJson);
 
-        GenericDataPersister persister = new GenericDataPersister(repo, "id");
-        PayloadValidationException thrown = Assertions.assertThrows(PayloadValidationException.class, () -> persister.apply(Collections.singletonList(jsonNode)));
+        AlreadyProcessedGenericDataFilter filter = new AlreadyProcessedGenericDataFilter(repo, "id");
+
+        PayloadValidationException thrown = Assertions.assertThrows(PayloadValidationException.class, () -> filter.test(jsonNode));
         Assertions.assertEquals("One of polled items is missing attribute with name id. Set it in nc.data-sources.\"your-datasource\".externalId*", thrown.getMessage());
 
-        Mockito.verify(repo, Mockito.never()).findAllHashesByExternalId(ArgumentMatchers.any());
+        Mockito.verify(repo, Mockito.never()).findByExternalId(ArgumentMatchers.any());
         Mockito.verify(repo, Mockito.never()).saveAll(ArgumentMatchers.any());
     }
 
     @Test
     void testPersistingNew() throws JsonProcessingException {
-        verifyPersistingProcess(Collections.emptyList());
+        verifyPersistingProcess(Optional.empty());
     }
 
     @Test
     void testPersistingUpdated() throws JsonProcessingException {
         GenericData previous = GenericData.builder().externalId(extId).hash(HashFunction.hash(emptyJson)).build();
-        verifyPersistingProcess(Collections.singletonList(previous));
+        verifyPersistingProcess(Optional.of(previous));
     }
 
-    private void verifyPersistingProcess(List<GenericData> storedRecords) throws JsonProcessingException {
+    private void verifyPersistingProcess(Optional<GenericData> storedRecords) throws JsonProcessingException {
         // given
         JsonNode jsonNode = mapper.readTree(content);
-        Mockito.when(repo.findAllHashesByExternalId(Collections.singletonList(extId))).thenReturn(storedRecords);
-        Mockito.when(repo.saveAll(ArgumentMatchers.any())).thenAnswer(a -> a.getArgument(0));
+        Mockito.when(repo.findByExternalId(extId)).thenReturn(storedRecords);
+        Mockito.when(repo.save(ArgumentMatchers.any())).thenAnswer(a -> a.getArgument(0));
 
         // when
-        GenericDataPersister persister = new GenericDataPersister(repo, "id");
-        persister.apply(Collections.singletonList(jsonNode));
+        AlreadyProcessedGenericDataFilter filter = new AlreadyProcessedGenericDataFilter(repo, "id");
+        filter.test(jsonNode);
 
         // then
-        Mockito.verify(repo).findAllHashesByExternalId(Collections.singletonList(extId));
+        Mockito.verify(repo).findByExternalId(extId);
 
-        ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(repo).saveAll(captor.capture());
+        ArgumentCaptor<GenericData> captor = ArgumentCaptor.forClass(GenericData.class);
+        Mockito.verify(repo).save(captor.capture());
 
-        List list = captor.getValue();
-        Assertions.assertEquals(1, list.size());
-
-        GenericData data = (GenericData) list.get(0);
+        GenericData data = captor.getValue();
         Assertions.assertEquals(extId, data.getExternalId());
         Assertions.assertEquals(content, data.getBody());
         Assertions.assertEquals(HashFunction.hash(content), data.getHash());
