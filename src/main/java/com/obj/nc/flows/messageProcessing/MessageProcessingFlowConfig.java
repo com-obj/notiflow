@@ -45,7 +45,7 @@ import static com.obj.nc.flows.teamsMessageProcessing.TeamsMessageProcessingFlow
 @Configuration
 public class MessageProcessingFlowConfig {
     private final MessageByRecipientTokenizer<?> messageByRecipientTokenizer;
-    private final MessageAndEndpointPersister deliveryPersister;
+    private final MessageAndEndpointPersister messageAndEndpointPersister;
     private final SpamPreventionFilter spamPreventionFilter;
 
 
@@ -61,10 +61,10 @@ public class MessageProcessingFlowConfig {
     public IntegrationFlow messageProcessingFlowDefinition() {
         return IntegrationFlows
                 .from(messageProcessingInputChannel())
-                .handle(deliveryPersister)
+                .handle(messageAndEndpointPersister)
                 .transform(messageByRecipientTokenizer)
                 .split()
-                .handle(deliveryPersister) //need to persist, otherwise delivery info will have invalid reference
+                .handle(messageAndEndpointPersister) //need to persist, otherwise delivery info will have invalid reference
                 .filter(spamPreventionFilter::test)
                 .wireTap(flowConfig ->
                         flowConfig.channel(DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID)
