@@ -23,18 +23,10 @@ import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
-
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
  
 @Getter
@@ -58,28 +50,17 @@ public class DeliveryInfoSendResult implements HasHeader {
 	private Instant processedOn;
 	
 	@NotNull
-	private UUID[] eventIds;
-	
-	@NotNull
-	private UUID[] intentIds;
-	
-	@NotNull
 	private UUID[] messageIds;
 	
 	@NotNull
 	private ReceivingEndpoint receivingEndpoint;
 
 	private Header header;
-	
-	public List<UUID> getEventIdsAsList() {
-		return Arrays.asList(eventIds);
-	}
-	
+
 	public Header getHeader() {
 		if (header==null) {
 			header = new Header();
 		}
 		return header;
 	}
-	
 }

@@ -61,8 +61,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.READ;
-import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.*;
 import static org.awaitility.Awaitility.await;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -106,8 +105,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
         ResultActions resp = mockMvc
                 .perform(MockMvcRequestBuilders.get("/stats/events/{eventId}", event.getId())
                         .contentType(APPLICATION_JSON_UTF8)
-                        .accept(APPLICATION_JSON_UTF8))
-                .andDo(MockMvcResultHandlers.print());
+                        .accept(APPLICATION_JSON_UTF8));
         // THEN
         resp
                 .andExpect(status().is2xxSuccessful())
@@ -117,7 +115,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(2)))
                 .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
                 .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(1)));
+                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(2)));
 
         //AND WHEN
         List<ReceivingEndpoint> endpoints = endpointsRepository.findByNameIds("johndoe@objectify.sk");
@@ -171,17 +169,17 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                 .andDo(MockMvcResultHandlers.print());
         
         await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(sentInfos.get(0).getMessageId(), READ) >= 1);
+        await().atMost(5, TimeUnit.SECONDS).until(() ->  findSentDeliveryInfosForMessage(emailEndpoint2.getId(),FAILED).size() >= 1);
         return event;
     }
 
     private List<DeliveryInfo> findSentDeliveryInfosForMessage(UUID endpointId, DeliveryInfo.DELIVERY_STATUS status) {
-        List<DeliveryInfo> sentInfos = deliveryInfoRepository
+        return deliveryInfoRepository
             .findByEndpointIdOrderByProcessedOn(endpointId)
             .stream()
             .filter(sentInfo -> sentInfo.getMessageId() != null)
             .filter(sentInfo -> sentInfo.getStatus() == status)
             .collect(Collectors.toList());
-        return sentInfos;
     }
     
     @Data

@@ -21,6 +21,7 @@ package com.obj.nc.repositories;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
@@ -46,6 +47,7 @@ public class DeliveryInfoRepositoryTest {
 	@Autowired DeliveryInfoRepository deliveryInfoRepo;
 	@Autowired GenericEventRepository eventRepo;
 	@Autowired EndpointsRepository endpointRepo;
+	@Autowired MessageRepository messageRepo;
 	
 	@BeforeEach
 	public void clean() {
@@ -58,13 +60,12 @@ public class DeliveryInfoRepositoryTest {
 		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
 		eventRepo.save(event);
 		
-		EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
-		UUID endpointId = endpointRepo.persistEnpointIfNotExists(email1).getId();
+		EmailEndpoint email = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
+		UUID endpointId = endpointRepo.persistEnpointIfNotExists(email).getId();
 		
 		//WHEN
 		DeliveryInfo deliveryInfo = DeliveryInfo.builder()
 				.endpointId(endpointId)
-				.eventId(event.getId())
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
@@ -89,36 +90,36 @@ public class DeliveryInfoRepositoryTest {
 		
 		EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
 		UUID endpointId = endpointRepo.persistEnpointIfNotExists(email1).getId();
-		
+
+		EmailMessage message1 = new EmailMessage();
+		message1.addPreviousEventId(eventId);
+		message1 = messageRepo.save(message1.toPersistentState()).toMessage();
+
+		EmailMessage message2 = new EmailMessage();
+		message2.addPreviousEventId(eventId2);
+		message2 = messageRepo.save(message2.toPersistentState()).toMessage();
+
 		//AND GIVEN
 		DeliveryInfo deliveryInfo1 = DeliveryInfo.builder()
 				.endpointId(endpointId)
-				.eventId(eventId)
+				.messageId(message1.getId())
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
 		DeliveryInfo deliveryInfo2 = DeliveryInfo.builder()
 				.endpointId(endpointId)
-				.eventId(eventId)
-				.status(DELIVERY_STATUS.SENT)
-				.id(UUID.randomUUID())
-				.build();
-		
-		DeliveryInfo deliveryInfo3 = DeliveryInfo.builder()
-				.endpointId(endpointId)
-				.eventId(eventId2)
+				.messageId(message2.getId())
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
 		deliveryInfoRepo.save(deliveryInfo1);
 		deliveryInfoRepo.save(deliveryInfo2);
-		deliveryInfoRepo.save(deliveryInfo3);
 		
 		List<DeliveryInfo> infosInDb = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
 		
-		Assertions.assertThat(infosInDb.size()).isEqualTo(2);
+		Assertions.assertThat(infosInDb.size()).isEqualTo(1);
 	}
 	
 	@Test
@@ -135,25 +136,33 @@ public class DeliveryInfoRepositoryTest {
 		
 		EmailEndpoint email2 = EmailEndpoint.builder().email("johndudly@gmail.com").build();
 		UUID endpointId2 = endpointRepo.persistEnpointIfNotExists(email2).getId();
-		
+
+		EmailMessage message1 = new EmailMessage();
+		message1.addPreviousEventId(eventId);
+		message1 = messageRepo.save(message1.toPersistentState()).toMessage();
+
+		EmailMessage message2 = new EmailMessage();
+		message2.addPreviousEventId(eventId2);
+		message2 = messageRepo.save(message2.toPersistentState()).toMessage();
+
 		//AND GIVEN
 		DeliveryInfo deliveryInfo1 = DeliveryInfo.builder()
 				.endpointId(endpointId1)
-				.eventId(eventId)
+				.messageId(message1.getId())
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
 		DeliveryInfo deliveryInfo2 = DeliveryInfo.builder()
 				.endpointId(endpointId2)
-				.eventId(eventId)
+				.messageId(message1.getId())
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
 		DeliveryInfo deliveryInfo3 = DeliveryInfo.builder()
 				.endpointId(endpointId2)
-				.eventId(eventId2)
+				.messageId(message2.getId())
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
@@ -182,21 +191,18 @@ public class DeliveryInfoRepositoryTest {
 		// AND GIVEN
 		DeliveryInfo deliveryInfo1 = DeliveryInfo.builder()
 				.endpointId(endpointId)
-				.eventId(eventId)
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
 		DeliveryInfo deliveryInfo2 = DeliveryInfo.builder()
 				.endpointId(endpointId)
-				.eventId(eventId)
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
 		
 		DeliveryInfo deliveryInfo3 = DeliveryInfo.builder()
 				.endpointId(endpoint2Id)
-				.eventId(eventId)
 				.status(DELIVERY_STATUS.SENT)
 				.id(UUID.randomUUID())
 				.build();
@@ -226,20 +232,7 @@ public class DeliveryInfoRepositoryTest {
 			.isInstanceOf(RuntimeException.class)
 			.hasMessageContaining("which cannot be found in the DB")
 			.hasMessageContaining("endpointId");
-		
-		//GIVEN
-		DeliveryInfo deliveryInfo2 = DeliveryInfo.builder()
-				.eventId(UUID.randomUUID())
-				.status(DELIVERY_STATUS.SENT)
-				.id(UUID.randomUUID())
-				.build();
-		// WHEN
-		Assertions.assertThatThrownBy(
-				() -> deliveryInfoRepo.save(deliveryInfo2))
-			.isInstanceOf(RuntimeException.class)
-			.hasMessageContaining("which cannot be found in the DB")
-			.hasMessageContaining("eventId");
-		
+
 		//GIVEN
 		DeliveryInfo deliveryInfo3 = DeliveryInfo.builder()
 				.messageId(UUID.randomUUID())

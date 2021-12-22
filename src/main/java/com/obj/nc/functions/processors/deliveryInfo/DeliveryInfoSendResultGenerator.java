@@ -31,10 +31,7 @@ import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult.Deliv
 import lombok.AllArgsConstructor;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @AllArgsConstructor
 public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionAdapter<HasReceivingEndpoints, List<DeliveryInfoSendResult>> {
@@ -43,32 +40,16 @@ public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionA
 	
 	@Override
 	protected List<DeliveryInfoSendResult> execute(HasReceivingEndpoints payload) {
-		List<DeliveryInfoSendResult> results= new ArrayList<>();
+		List<DeliveryInfoSendResult> results = new ArrayList<>();
 		
 		for (ReceivingEndpoint endpoint: payload.getReceivingEndpoints()) {
 			DeliveryInfoSendResultBuilder infoBuilder = DeliveryInfoSendResult.builder()
 					.status(status)
 					.receivingEndpoint(endpoint)
 					.processedOn(Instant.now());
-
-                    //TOTO pojde prec - len k message
-			if (payload instanceof HasPreviousEventIds) {
-				List<UUID> eventIds = new ArrayList<>(((HasPreviousEventIds) payload).getPreviousEventIds());
-				infoBuilder = infoBuilder.eventIds(eventIds.toArray(new UUID[0]));
-			} else {
-				infoBuilder = infoBuilder.eventIds(new UUID[0]);
-			}
-
-                    //TOTO pojde prec - len k message
-			if (payload instanceof NotificationIntent) {
-				List<UUID> intentIds = Arrays.asList(((NotificationIntent) payload).getId());
-				infoBuilder = infoBuilder.intentIds(intentIds.toArray(new UUID[0]));
-			} else {
-				infoBuilder = infoBuilder.intentIds(new UUID[0]);
-			}
 			
 			if (payload instanceof Message<?>) {
-				List<UUID> messageIds = Arrays.asList(((Message<?>) payload).getId());
+				List<UUID> messageIds = Collections.singletonList(((Message<?>) payload).getId());
 				infoBuilder = infoBuilder.messageIds(messageIds.toArray(new UUID[0]));
 			} else {
 				infoBuilder = infoBuilder.messageIds(new UUID[0]);
@@ -85,6 +66,4 @@ public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionA
 	protected void adapt(DeliveryInfoSendResult info){
 		//modify, add data in subtypes if needed
 	}
-	
-
 }

@@ -31,15 +31,30 @@ import java.util.UUID;
 
 public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUID> {
 
+    @Query("select di.* " +
+            "from nc_delivery_info di " +
+            "join nc_message m " +
+            "on di.message_id = m.id " +
+            "where di.status = :status " +
+            "and (:eventId)::uuid = ANY(m.previous_event_ids) " +
+            "order by processed_on")
     List<DeliveryInfo> findByEventIdAndStatusOrderByProcessedOn(UUID eventId, DELIVERY_STATUS status);
 
+    @Query("select di.* " +
+            "from nc_delivery_info di " +
+            "join nc_message m " +
+            "on di.message_id = m.id " +
+            "where (:eventId)::uuid = ANY(m.previous_event_ids) " +
+            "order by processed_on")
     List<DeliveryInfo> findByEventIdOrderByProcessedOn(UUID eventId);
 
     List<DeliveryInfo> findByStatus(DELIVERY_STATUS status);
 
-    @Query("select * " +
-            "from nc_delivery_info " +
-            "where event_id = (:eventId) " +
+    @Query("select di.* " +
+            "from nc_delivery_info di " +
+            "join nc_message m " +
+            "on di.message_id = m.id " +
+            "where :eventId = ANY(m.previous_event_ids) " +
             "and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid) " +
             "order by processed_on")
     List<DeliveryInfo> findByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,

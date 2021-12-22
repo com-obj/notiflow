@@ -57,7 +57,7 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 					"	inner join nc_message_2_endpoint_rel m2e on m2e.message_id = msg.id " +
 					") message on event.id = any ( message.previous_event_ids ) " +
 					"left join " +
-					"	nc_delivery_info di on di.event_id = event.id " +
+					"	nc_delivery_info di on di.message_id = message.id " +
 					"where " +
 					"	event.time_consumed between (:consumedFrom) and (:consumedTo) " +
 					"and " +
