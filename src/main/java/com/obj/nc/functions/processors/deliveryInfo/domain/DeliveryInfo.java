@@ -22,16 +22,8 @@ package com.obj.nc.functions.processors.deliveryInfo.domain;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.FailedPayloadRepository;
-import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.MessageRepository;
-import com.obj.nc.repositories.NotificationIntentRepository;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
@@ -39,7 +31,6 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.validation.constraints.NotNull;
-
 import java.time.Instant;
 import java.util.UUID;
 
@@ -70,14 +61,6 @@ public class DeliveryInfo implements Persistable<UUID> {
 	@CreatedDate
 	@Getter
 	private Instant processedOn;
-	
-	@Reference(GenericEventRepository.class)
-    @Deprecated
-	private UUID eventId;
-	
-	@Reference(NotificationIntentRepository.class)
-    @Deprecated
-	private UUID intentId;
 	
 	@Reference(MessageRepository.class)
 	private UUID messageId;

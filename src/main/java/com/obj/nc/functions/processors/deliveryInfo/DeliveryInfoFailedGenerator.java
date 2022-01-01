@@ -19,13 +19,10 @@
 
 package com.obj.nc.functions.processors.deliveryInfo;
 
-import com.obj.nc.domain.HasPreviousEventIds;
-import com.obj.nc.domain.HasPreviousIntentIds;
 import com.obj.nc.domain.HasPreviousMessageIds;
 import com.obj.nc.domain.HasReceivingEndpoints;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.flows.errorHandling.domain.FailedPayload;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
@@ -63,38 +60,20 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 		List<? extends ReceivingEndpoint> endpoints = extracteEndpoints(payload);
 		
         if (endpoints.size() == 0) {
-            log.info("Cannot extract endpoints from fayled payload. Not possible to create failed delivery infos for failed paylod " + failedPayload );
+            log.info("Cannot extract endpoints from failed payload. Not possible to create failed delivery info for failed payload " + failedPayload );
             return results;
         }
 		
         //TODO: should we duplicate the deliveryInfosHere for each dimension? Maybe we should introduce LIst<UUID> for intentId, eventId, messageId
         //or should there be eventId, intentId at all? is it not that it makes sence to only calculate Delivery info for message and endpoint?
         for (ReceivingEndpoint endpoint: endpoints) {
-			
-			if (payload instanceof HasPreviousEventIds) {
-				List<UUID> eventIds = ((HasPreviousEventIds) payload).getPreviousEventIds();
-				eventIds.forEach(eventId -> 
-						results.add(failedDeliveryInfoBuilder(failedPayload, endpoint).eventId(eventId).build()));
-			}
-			
-			if (payload instanceof HasPreviousIntentIds) {
-				List<UUID> intentIds = ((HasPreviousIntentIds) payload).getPreviousIntentIds();
-				
-				if (payload instanceof NotificationIntent) {
-					intentIds.add(((NotificationIntent) payload).getId());
-				}
-				
-				intentIds.forEach(intentId ->
-						results.add(failedDeliveryInfoBuilder(failedPayload, endpoint).intentId(intentId).build()));
-			}
-			
 			if (payload instanceof HasPreviousMessageIds) {
 				List<UUID> messageIds = ((HasPreviousMessageIds) payload).getPreviousMessageIds();
-				
+
 				if (payload instanceof Message<?>) {
 					messageIds.add(((Message<?>) payload).getId());
 				}
-				
+
 				messageIds.forEach(messageId ->
 						results.add(failedDeliveryInfoBuilder(failedPayload, endpoint).messageId(messageId).build()));
 			}
@@ -105,11 +84,10 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 	}
 	
 	private DeliveryInfo.DeliveryInfoBuilder failedDeliveryInfoBuilder(FailedPayload failedPayload, ReceivingEndpoint endpoint) {
-		DeliveryInfo.DeliveryInfoBuilder infoBuilder = DeliveryInfo.builder()
+		return DeliveryInfo.builder()
 				.endpointId(endpoint.getId())
 				.status(DELIVERY_STATUS.FAILED)
 				.failedPayloadId(failedPayload.getId());
-		return infoBuilder;
 	}
 	
 	private List<? extends ReceivingEndpoint> extracteEndpoints(Object payload) {
@@ -117,8 +95,8 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 			log.debug("Cannot generate Failed delivery infos from message because payload is not of type HasReceivingEndpoints. Its of type {}", payload.getClass());
 			return new ArrayList<>();
 		}
-		List<? extends ReceivingEndpoint> endpoints = ((HasReceivingEndpoints)payload).getReceivingEndpoints();
-		return endpoints;
+
+		return ((HasReceivingEndpoints)payload).getReceivingEndpoints();
 	}
 	
 

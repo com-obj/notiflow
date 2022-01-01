@@ -61,8 +61,6 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 class EmailSenderSinkTest extends BaseIntegrationTest {
-
-//    @Autowired private JavaMailSenderImpl defaultJavaMailSender;
     @Autowired private EmailSender functionSend;
     @Autowired private DeliveryInfoSendGenerator delInfoGenerator;
     @Autowired private EmailSenderConfigProperties settings;
@@ -81,7 +79,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     }
 
     @Test
-    void sendSingleMail() throws MessagingException, IOException {
+    void sendSingleMail() throws MessagingException {
         //GIVEN
 		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
 		UUID eventId1 = eventRepo.save(event).getId();
@@ -100,7 +98,6 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
         Assertions.assertThat(delInfo.getReceivingEndpoint()).isEqualTo(message.getReceivingEndpoints().get(0));
-        Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(message.getPreviousEventIds());
 
         //THEN
         MimeMessage[] messages = greenMail.getReceivedMessages();
@@ -116,9 +113,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         EmailMessage message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 
         //WHEN -THEN
-        Assertions.assertThatThrownBy(() -> {
-            functionSend.apply(message);
-        })
+        Assertions.assertThatThrownBy(() -> functionSend.apply(message))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("EmailContent sender can send to only one recipient. Found more: ");
     }
@@ -130,9 +125,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         EmailMessage message = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 
         //WHEN -THEN
-        Assertions.assertThatThrownBy(() -> {
-            functionSend.apply(message);
-        })
+        Assertions.assertThatThrownBy(() -> functionSend.apply(message))
                 .isInstanceOf(PayloadValidationException.class)
                 .hasMessageContaining("EmailContent sender can send to EmailEndpoint endpoints only. Found ");
     }
@@ -188,7 +181,6 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
         Assertions.assertThat(delInfo.getStatus()).isEqualTo(DELIVERY_STATUS.SENT);
         Assertions.assertThat(delInfo.getProcessedOn()).isNotNull();
         Assertions.assertThat(delInfo.getReceivingEndpoint()).isEqualTo(inputMessage.getReceivingEndpoints().get(0));
-        Assertions.assertThat(delInfo.getEventIdsAsList()).isEqualTo(inputMessage.getPreviousEventIds());
 
         //THEN
         MimeMessage message = greenMail.getReceivedMessages()[0];

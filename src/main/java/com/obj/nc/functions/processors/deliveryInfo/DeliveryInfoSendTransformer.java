@@ -39,34 +39,14 @@ public class DeliveryInfoSendTransformer extends ProcessorFunctionAdapter<Delive
 	protected List<DeliveryInfo> execute(DeliveryInfoSendResult deliveryInfo) {
 		List<DeliveryInfo> infos = createFromSendResults(deliveryInfo);
 				
-		infos.forEach(info -> {
-			info.setId(UUID.randomUUID());
-		});
+		infos.forEach(info -> info.setId(UUID.randomUUID()));
 		
 		return infos;
 	}
 
 	private List<DeliveryInfo> createFromSendResults(DeliveryInfoSendResult sendResult) {
 		List<DeliveryInfo> resultInfos = new ArrayList<>();
-		
-		for (UUID eventId: sendResult.getEventIds()) {
-			DeliveryInfo info = DeliveryInfo.builder()
-					.endpointId(sendResult.getReceivingEndpoint().getId())
-					.eventId(eventId)
-					.status(sendResult.getStatus())
-					.build();
-			resultInfos.add(info);
-		}
-		
-		for (UUID intentId: sendResult.getIntentIds()) {
-			DeliveryInfo info = DeliveryInfo.builder()
-					.endpointId(sendResult.getReceivingEndpoint().getId())
-					.intentId(intentId)
-					.status(sendResult.getStatus())
-					.build();
-			resultInfos.add(info);
-		}
-		
+
 		for (UUID messageId: sendResult.getMessageIds()) {
 			DeliveryInfo info = DeliveryInfo.builder()
 					.endpointId(sendResult.getReceivingEndpoint().getId())
@@ -78,5 +58,4 @@ public class DeliveryInfoSendTransformer extends ProcessorFunctionAdapter<Delive
 		
 		return resultInfos;
 	}
-	
 }

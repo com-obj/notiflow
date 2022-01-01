@@ -31,6 +31,7 @@ import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistentState;
+import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
@@ -62,11 +63,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -121,19 +118,29 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
 		UUID eventId = eventRepo.save(event).getId();
 
+		List<UUID> eventIds = Collections.singletonList(eventId);
+
+		EmailMessage emailMessage = new EmailMessage();
+		emailMessage.setPreviousEventIds(eventIds);
+		emailMessage = messageRepo.save(emailMessage.toPersistentState()).toMessage();
+
+		SmsMessage smsMessage = new SmsMessage();
+		smsMessage.setPreviousEventIds(eventIds);
+		smsMessage = messageRepo.save(smsMessage.toPersistentState()).toMessage();
+
     	//AND
     	DeliveryInfo info1 = DeliveryInfo.builder()
-    			.endpointId(emailEndPointId).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+    			.endpointId(emailEndPointId).messageId(emailMessage.getId()).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	DeliveryInfo info2 = DeliveryInfo.builder()
-    			.endpointId(emailEndPointId).eventId(eventId).status(SENT).id(UUID.randomUUID()).build();
+    			.endpointId(emailEndPointId).messageId(emailMessage.getId()).status(SENT).id(UUID.randomUUID()).build();
 
 
     	DeliveryInfo info3 = DeliveryInfo.builder()
-    			.endpointId(smsEndPointId).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+    			.endpointId(smsEndPointId).messageId(smsMessage.getId()).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	Thread.sleep(10); // to have different processedOn
 
     	DeliveryInfo info4 = DeliveryInfo.builder()
-    			.endpointId(smsEndPointId).eventId(eventId).status(SENT).id(UUID.randomUUID()).build();
+    			.endpointId(smsEndPointId).messageId(smsMessage.getId()).status(SENT).id(UUID.randomUUID()).build();
  
     	deliveryRepo.saveAll( Arrays.asList(info1, info2, info3, info4) );
     	
@@ -169,11 +176,15 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
 		UUID eventId = eventRepo.save(event).getId();
 
+		EmailMessage message = new EmailMessage();
+		message.setPreviousEventIds(Collections.singletonList(eventId));
+		message = messageRepo.save(message.toPersistentState()).toMessage();
+
     	//AND
     	DeliveryInfo info1 = DeliveryInfo.builder()
-    			.endpointId(emailEndpointId).eventId(eventId).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
+    			.endpointId(emailEndpointId).messageId(message.getId()).status(DELIVERY_STATUS.PROCESSING).id(UUID.randomUUID()).build();
     	DeliveryInfo info2 = DeliveryInfo.builder()
-    			.endpointId(emailEndpointId).eventId(eventId).status(SENT).id(UUID.randomUUID()).build();
+    			.endpointId(emailEndpointId).messageId(message.getId()).status(SENT).id(UUID.randomUUID()).build();
 
     	deliveryRepo.saveAll( Arrays.asList(info1, info2) );
     	
@@ -263,8 +274,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 				.andExpect(redirectedUrl(ncAppConfigProperties.getContextPath() + "/resources/images/px.png"));
 		
 		//AND IMAGE IS FOUND
-		resp = mockMvc
-				.perform(MockMvcRequestBuilders
+		mockMvc.perform(MockMvcRequestBuilders
 						.get(ncAppConfigProperties.getContextPath() + "/resources/images/px.png")
 						.contextPath(ncAppConfigProperties.getContextPath()))
 				.andExpect(status().is2xxSuccessful())
