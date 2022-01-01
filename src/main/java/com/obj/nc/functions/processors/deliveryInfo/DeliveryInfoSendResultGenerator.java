@@ -19,11 +19,9 @@
 
 package com.obj.nc.functions.processors.deliveryInfo;
 
-import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.HasReceivingEndpoints;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import com.obj.nc.functions.processors.senders.dtos.DeliveryInfoSendResult;

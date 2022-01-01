@@ -35,12 +35,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder=true)
-/**
- * Hmmm,... check why this is necessary. The HasHeader might by the reason
- * @author ja
- *
- */
-
 public class DeliveryInfoSendResult implements HasHeader {
 	 	
 	@NotNull

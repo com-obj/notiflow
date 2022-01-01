@@ -57,15 +57,13 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
         		
 		List<DeliveryInfo> results= new ArrayList<>();
 		
-		List<? extends ReceivingEndpoint> endpoints = extracteEndpoints(payload);
+		List<? extends ReceivingEndpoint> endpoints = extractEndpoints(payload);
 		
         if (endpoints.size() == 0) {
             log.info("Cannot extract endpoints from failed payload. Not possible to create failed delivery info for failed payload " + failedPayload );
             return results;
         }
 		
-        //TODO: should we duplicate the deliveryInfosHere for each dimension? Maybe we should introduce LIst<UUID> for intentId, eventId, messageId
-        //or should there be eventId, intentId at all? is it not that it makes sence to only calculate Delivery info for message and endpoint?
         for (ReceivingEndpoint endpoint: endpoints) {
 			if (payload instanceof HasPreviousMessageIds) {
 				List<UUID> messageIds = ((HasPreviousMessageIds) payload).getPreviousMessageIds();
@@ -75,7 +73,12 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 				}
 
 				messageIds.forEach(messageId ->
-						results.add(failedDeliveryInfoBuilder(failedPayload, endpoint).messageId(messageId).build()));
+						results.add(
+							failedDeliveryInfoBuilder(failedPayload, endpoint)
+							.messageId(messageId)
+							.build()
+						)
+				);
 			}
 			
 		}
@@ -90,7 +93,7 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
 				.failedPayloadId(failedPayload.getId());
 	}
 	
-	private List<? extends ReceivingEndpoint> extracteEndpoints(Object payload) {
+	private List<? extends ReceivingEndpoint> extractEndpoints(Object payload) {
 		if (!(payload instanceof HasReceivingEndpoints)) {
 			log.debug("Cannot generate Failed delivery infos from message because payload is not of type HasReceivingEndpoints. Its of type {}", payload.getClass());
 			return new ArrayList<>();

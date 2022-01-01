@@ -92,14 +92,14 @@ class StatsRestControllerTest extends BaseIntegrationTest {
     }
 
     @AfterEach
-    public void wiatForIntegrationFlowsToFinish() {
+    public void waitForIntegrationFlowsToFinish() {
         super.wiatForIntegrationFlowsToFinish(500000);
     }
     
     @Test
     void testFindEventStatsByEventId() throws Exception {
         // GIVEN
-        GenericEvent event = persistTestEventProcessing();
+        GenericEvent event = processTestEventAndIntent();
     
         //WHEN
         ResultActions resp = mockMvc
@@ -137,7 +137,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(0)));
     }
     
-    private GenericEvent persistTestEventProcessing() throws Exception {
+    private GenericEvent processTestEventAndIntent() throws Exception {
         GenericEvent event = GenericEvent.builder()
                 .id(UUID.randomUUID())
                 .flowId("default-flow")
