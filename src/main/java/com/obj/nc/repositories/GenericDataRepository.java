@@ -21,6 +21,7 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,6 +29,6 @@ public interface GenericDataRepository extends CrudRepository<GenericData, UUID>
 
     @Query(
         "SELECT id, external_id, time_created, hash " +
-        "FROM nc_generic_data where external_id = :id")
-    Optional<GenericData> findByExternalId(@Param("id") String id);
+        "FROM nc_generic_data where external_id in (:ids)")
+    List<GenericData> findAllHashesByExternalId(@Param("ids") List<String> ids);
 }

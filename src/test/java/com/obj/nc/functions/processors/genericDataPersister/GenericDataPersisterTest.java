@@ -21,66 +21,125 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.domain.genericData.GenericData;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.repositories.GenericDataRepository;
+import com.obj.nc.utils.JsonUtils;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public class GenericDataPersisterTest {
     ObjectMapper mapper = new ObjectMapper();
     GenericDataRepository repo = Mockito.mock(GenericDataRepository.class);
 
-    final String extId = "id-1";
-    final String content = "{\"id\":\"" + extId + "\"}";
-    final String emptyJson = "{}";
+    final String extId1 = "id-1";
+    final String extId2 = "id-2";
+    final String content1 = "{\"id\" : \"" + extId1 + "\" , \"data\" : 3}";
+    final String content1_changed = "{ \"id\": \"" + extId1 + "\" , \"data\" : 3}";
+    final String content2 = "{\"id\":\"" + extId2 + "\",\"data\": 3}";
+    final String content_other = "{\"id\" :\"other\" , \"data\": 3}";
+    final String pulledData = "["+content1+","+content2+"]";
+    final String invalidJson = "[{\"id-other-name\":\"" + extId1 + "\"}]";
 
     @Test
     void testInvalidExternalIdAttrName() throws JsonProcessingException {
-        JsonNode jsonNode = mapper.readTree(emptyJson);
+        List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(invalidJson);
 
-        AlreadyProcessedGenericDataFilter filter = new AlreadyProcessedGenericDataFilter(repo, "id");
+        PulledNotificationDataNewAndChangedPersister persister = new PulledNotificationDataNewAndChangedPersister(repo, "id");
 
-        PayloadValidationException thrown = Assertions.assertThrows(PayloadValidationException.class, () -> filter.test(jsonNode));
+        PayloadValidationException thrown = Assertions.assertThrows(
+            PayloadValidationException.class, () -> persister.apply(pulledNotifData));
         Assertions.assertEquals("One of polled items is missing attribute with name id. Set it in nc.data-sources.\"your-datasource\".externalId*", thrown.getMessage());
 
-        Mockito.verify(repo, Mockito.never()).findByExternalId(ArgumentMatchers.any());
+        Mockito.verify(repo, Mockito.never()).findAllHashesByExternalId(ArgumentMatchers.any());
         Mockito.verify(repo, Mockito.never()).saveAll(ArgumentMatchers.any());
     }
 
     @Test
     void testPersistingNew() throws JsonProcessingException {
-        verifyPersistingProcess(Optional.empty());
+        List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(pulledData);
+
+        GenericData expectPersisted1 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");
+        GenericData expectPersisted2 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
+
+        List<GenericData> existingData = Collections.emptyList();
+
+        verifyPersistingProcess(existingData, pulledNotifData, expectPersisted1, expectPersisted2);
     }
 
     @Test
-    void testPersistingUpdated() throws JsonProcessingException {
-        GenericData previous = GenericData.builder().externalId(extId).hash(HashFunction.hash(emptyJson)).build();
-        verifyPersistingProcess(Optional.of(previous));
+    void testPersistingNew2() throws JsonProcessingException {
+        List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(pulledData);
+
+        GenericData expectPersisted1 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");
+        GenericData expectPersisted2 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
+
+        List<GenericData> existingData = Collections.singletonList(GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content_other), "id"));
+
+        verifyPersistingProcess(existingData, pulledNotifData, expectPersisted1, expectPersisted2);
     }
 
-    private void verifyPersistingProcess(Optional<GenericData> storedRecords) throws JsonProcessingException {
+    @Test
+    void testPersistingNewAndChanged() throws JsonProcessingException {
+        List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(pulledData);
+
+        GenericData expectPersisted1 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");
+        GenericData expectPersisted2 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
+
+        GenericData previous = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content_other), "id");           
+
+        verifyPersistingProcess(Collections.singletonList(previous),pulledNotifData, expectPersisted1, expectPersisted2);
+    }
+
+    @Test
+    void testNotPersistingExisting() throws JsonProcessingException {
+        List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(pulledData);
+
+        GenericData expectPersisted2 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
+
+        GenericData previous = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");           
+
+        verifyPersistingProcess(Collections.singletonList(previous),pulledNotifData, expectPersisted2);
+    }
+
+    private void verifyPersistingProcess(List<GenericData> storedRecords, List<JsonNode> pulledNotifData, GenericData ... expectedPersisted) throws JsonProcessingException {
         // given
-        JsonNode jsonNode = mapper.readTree(content);
-        Mockito.when(repo.findByExternalId(extId)).thenReturn(storedRecords);
-        Mockito.when(repo.save(ArgumentMatchers.any())).thenAnswer(a -> a.getArgument(0));
+        Mockito.when(repo.findAllHashesByExternalId(Arrays.asList(extId1, extId2))).thenReturn(storedRecords);
+        Mockito.when(repo.saveAll(ArgumentMatchers.any())).thenAnswer(a -> a.getArgument(0));
 
         // when
-        AlreadyProcessedGenericDataFilter filter = new AlreadyProcessedGenericDataFilter(repo, "id");
-        filter.test(jsonNode);
+        PulledNotificationDataNewAndChangedPersister persister = new PulledNotificationDataNewAndChangedPersister(repo, "id");
+        List<JsonNode> notifDataNewAndChanged = persister.apply(pulledNotifData);
 
         // then
-        Mockito.verify(repo).findByExternalId(extId);
+        //only new and changed get processed further
+        Assertions.assertEquals(expectedPersisted.length, notifDataNewAndChanged.size());
 
-        ArgumentCaptor<GenericData> captor = ArgumentCaptor.forClass(GenericData.class);
-        Mockito.verify(repo).save(captor.capture());
+        //all input notifs have been checked
+        Mockito.verify(repo).findAllHashesByExternalId(Arrays.asList(extId1, extId2));
 
-        GenericData data = captor.getValue();
-        Assertions.assertEquals(extId, data.getExternalId());
-        Assertions.assertEquals(content, data.getBody());
-        Assertions.assertEquals(HashFunction.hash(content), data.getHash());
+        //all new and changed have been persisted
+        ArgumentCaptor<List<GenericData>> newAndChangedCaptor = ArgumentCaptor.forClass(List.class);
+        Mockito.verify(repo).saveAll(newAndChangedCaptor.capture());
+
+        List<GenericData> newAndChanged = newAndChangedCaptor.getValue();
+        Assertions.assertEquals(expectedPersisted.length, newAndChanged.size());
+
+        for (int i =0; i< expectedPersisted.length; i++) {
+            assertEquals(expectedPersisted[i], newAndChanged.get(i));
+        }
+    }
+
+    private void assertEquals(GenericData expected, GenericData actual) {
+        Assertions.assertEquals(expected.getExternalId(), actual.getExternalId());
+        Assertions.assertEquals(expected.getBody(), actual.getBody());
+        Assertions.assertEquals(expected.getHash(), actual.getHash());
     }
 
 }

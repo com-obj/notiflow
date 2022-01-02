@@ -22,7 +22,9 @@ package com.obj.nc.utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.gson.JsonArray;
 import com.obj.nc.exceptions.PayloadValidationException;
 import org.springframework.integration.support.json.Jackson2JsonObjectMapper;
 
@@ -37,7 +39,9 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -98,6 +102,25 @@ public class JsonUtils {
 
 			JsonNode jsonNode = objectMapper.readTree(json);
 			return jsonNode;
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+		
+	}
+
+		
+	public static List<JsonNode> readJsonNodeListFromJSONString(String json) {
+		
+		try {
+		    final ObjectMapper objectMapper = getObjectMapper();
+
+			JsonNode jsonObject = objectMapper.readTree(json);
+			ArrayNode jsonArray = (ArrayNode)jsonObject; 
+
+			List<JsonNode> result = new ArrayList<JsonNode>();     
+			jsonArray.iterator().forEachRemaining(a-> result.add(a));
+
+			return result;
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);
 		}

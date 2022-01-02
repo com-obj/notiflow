@@ -97,12 +97,22 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
     
         MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
         String body = GreenMailUtil.getBody(receivedMessage);
-        assertThat(body).contains("Agreement 1", "Agreement 2", "Agreement 3", "Agreement 4");
+        assertThat(body).contains("Agreement 1", "Agreement 2", "Agreement 3", "Agreement 4","Agreement 5");
+        assertThat(body).doesNotContain("Agreement 6", "Agreement 7", "Agreement 8", "Agreement 9", "Agreement 10");
 
         greenMail.purgeEmailFromAllMailboxes();
 
-         //there shouldn't be re-delivery
-         assertFalse(greenMail.waitForIncomingEmail(5000L, 1));
+        //when change data of in existing datasource
+        springJdbcTemplate.update("update license_agreement set description = 'Agreement 11' where id = '1'");
+
+         //there shouldn't be re-delivery for not changed
+        assertTrue(greenMail.waitForIncomingEmail(10000L, 1));
+        assertEquals(1, greenMail.getReceivedMessages().length);
+
+        receivedMessage = greenMail.getReceivedMessages()[0];
+        body = GreenMailUtil.getBody(receivedMessage);
+        assertThat(body).contains("Agreement 11");
+        assertThat(body).doesNotContain("Agreement 2", "Agreement 3", "Agreement 4", "Agreement 5", "Agreement 6", "Agreement 7", "Agreement 8", "Agreement 9", "Agreement 10");
     }
     
     public static void persist10TestLicenseAgreements(JdbcTemplate springJdbcTemplate) {
