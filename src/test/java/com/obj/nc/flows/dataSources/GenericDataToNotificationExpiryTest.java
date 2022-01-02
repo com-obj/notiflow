@@ -2,6 +2,7 @@ package com.obj.nc.flows.dataSources;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.flows.dataSources.config.TestLicenceAgreementToNotificationConverter;
@@ -39,7 +40,7 @@ import java.util.stream.IntStream;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static java.sql.Timestamp.from;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(properties = {
@@ -86,26 +87,32 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
     }
     
     @Test
-    void testDataPulledAndMessageSent() {
+    void testDataPulledAndMessageSent() throws FolderException {
         // when
         pollableSourceJdbc.start();
 
         // then
-        boolean received = greenMail.waitForIncomingEmail(15000L, 1);
-    
-        assertEquals(true, received);
+        assertTrue(greenMail.waitForIncomingEmail(15000L, 1));
         assertEquals(1, greenMail.getReceivedMessages().length);
     
         MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
         String body = GreenMailUtil.getBody(receivedMessage);
-        assertThat(body).contains("Agreement 1", "Agreement 2", "Agreement 3", "Agreement 4");
+        assertThat(body).contains("Agreement 1", "Agreement 2", "Agreement 3", "Agreement 4","Agreement 5");
+        assertThat(body).doesNotContain("Agreement 6", "Agreement 7", "Agreement 8", "Agreement 9", "Agreement 10");
 
-        //TODO: after notification, NC should make sure to not redeliver new notification unless Hash of the GenericData changed
-        // //then try again
-        // received = greenMail.waitForIncomingEmail(5000L, 1);
+        greenMail.purgeEmailFromAllMailboxes();
 
-        // //there shouldn't be re-delivery
-        // assertEquals(false, received);
+        //when change data of in existing datasource
+        springJdbcTemplate.update("update license_agreement set description = 'Agreement 11' where id = '1'");
+
+         //there shouldn't be re-delivery for not changed
+        assertTrue(greenMail.waitForIncomingEmail(10000L, 1));
+        assertEquals(1, greenMail.getReceivedMessages().length);
+
+        receivedMessage = greenMail.getReceivedMessages()[0];
+        body = GreenMailUtil.getBody(receivedMessage);
+        assertThat(body).contains("Agreement 11");
+        assertThat(body).doesNotContain("Agreement 2", "Agreement 3", "Agreement 4", "Agreement 5", "Agreement 6", "Agreement 7", "Agreement 8", "Agreement 9", "Agreement 10");
     }
     
     public static void persist10TestLicenseAgreements(JdbcTemplate springJdbcTemplate) {

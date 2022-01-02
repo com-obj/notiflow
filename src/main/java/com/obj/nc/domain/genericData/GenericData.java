@@ -17,20 +17,31 @@ package com.obj.nc.domain.genericData;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.With;
+import lombok.experimental.Accessors;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.UUID;
 
-@Builder
-@With
-@Getter
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.utils.JsonUtils;
+
+
+@Getter @Setter
 @Table("nc_generic_data")
+@RequiredArgsConstructor(staticName = "of")
 public class GenericData implements Persistable<UUID> {
     @Id
     private UUID id;
@@ -43,10 +54,69 @@ public class GenericData implements Persistable<UUID> {
     @Column("payload_json")
     private String body;
 
+    @Transient
+    private JsonNode bodyJson;
+
     private String hash;
+
+    @Builder
+    GenericData(UUID id, String externalId, Instant timeCreated, String body, String hash) {
+        this.id = id;
+        this.externalId = externalId;
+        this.timeCreated = timeCreated;
+        this.body = body;
+        this.hash = hash;
+    }
 
     @Override
     public boolean isNew() {
         return timeCreated == null;
     }
+
+    public GenericData updateFromJson(JsonNode json) {
+        this.hash = calculateHash(json);
+        this.body = JsonUtils.writeObjectToJSONString(json);
+        this.bodyJson = json;
+
+        return this;
+    }
+
+    public static GenericData createFromJson(JsonNode json, String extIdAttributeName) {
+        String jsonString = JsonUtils.writeObjectToJSONString(json);
+        String externalId = extractIdFromPayload(json, extIdAttributeName);
+
+        GenericData notifData = GenericData.builder()
+            .id(UUID.randomUUID())
+            .externalId(externalId)
+            .body(jsonString)
+            .hash(calculateHash(jsonString))
+            .build();
+        notifData.setBodyJson(json);
+        return notifData;
+    }
+
+    public static String extractIdFromPayload(JsonNode jsonNode, String externalIdAttrName) {
+        JsonNode attr = jsonNode.get(externalIdAttrName);
+
+        if (attr == null) {
+            return null;
+        }
+
+        return attr.asText();
+    }
+        
+    public static String calculateHash(JsonNode bodyJson) {
+        String jsonStr = JsonUtils.writeObjectToJSONString(bodyJson);
+        return calculateHash(jsonStr);
+    }
+
+    public static String calculateHash(String jsonStr) {
+        try {
+            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+            return Base64.getEncoder().encodeToString(sha256.digest(jsonStr.getBytes()));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 is not available", e);
+        }
+    }
+
 }

@@ -15,8 +15,8 @@
 
 package com.obj.nc.flows.dataSources;
 
-import com.obj.nc.functions.processors.genericDataPersister.GenericDataPersister;
-import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.Data2GenericDataTransformer;
+import com.obj.nc.functions.processors.genericDataPersister.PulledNotificationDataNewAndChangedPersister;
+import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.Data2PulledNotificationDataTransformer;
 import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.JsonNodeFilterAndTransformer;
 import com.obj.nc.repositories.GenericDataRepository;
 import com.obj.nc.utils.JsonUtils;
@@ -35,12 +35,14 @@ public class GenericDataTransformationAndPersistFlow {
     private final GenericDataRepository genericDataRepository;
 
     public StandardIntegrationFlow continueFlow(IntegrationFlowBuilder builder, JobConfig jobConfig) {
+        String externalIdKey = selectExternalIdKey(jobConfig);
+
         return builder.transform(Transformers.toJson(JsonUtils.getJsonObjectMapper(), ObjectToJsonTransformer.ResultType.NODE))
                 .split() // split ArrayNode to JsonNode-s
                 .aggregate() // aggregate JsonNode-s to List<JsonNode>
-                .handle(new GenericDataPersister(genericDataRepository, selectExternalIdKey(jobConfig)))
+                .handle(new PulledNotificationDataNewAndChangedPersister(genericDataRepository, externalIdKey))
                 .handle(new JsonNodeFilterAndTransformer(jobConfig.getPojoFCCN(), jobConfig.getSpelFilterExpression()))
-                .handle(new Data2GenericDataTransformer())
+                .handle(new Data2PulledNotificationDataTransformer())
                 .channel(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
                 .get();
     }

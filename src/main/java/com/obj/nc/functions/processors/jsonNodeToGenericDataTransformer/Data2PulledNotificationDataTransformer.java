@@ -26,7 +26,7 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 
 @AllArgsConstructor
-public class Data2GenericDataTransformer extends ProcessorFunctionAdapter<List<?>, PulledNotificationData<?>> {
+public class Data2PulledNotificationDataTransformer extends ProcessorFunctionAdapter<List<?>, PulledNotificationData<?>> {
 
     @Override
 	protected PulledNotificationData<?> execute(List<?> payload) {

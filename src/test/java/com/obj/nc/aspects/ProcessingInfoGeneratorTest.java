@@ -162,7 +162,7 @@ public class ProcessingInfoGeneratorTest {
         			eventFromDB.getHeader().getProcessingInfo().getEventIds())
         );
         UUID eventId = eventFromDB.getId();
-        Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "InputEventSupplier").size()>0);
+        Awaitility.await().atMost(Duration.ofSeconds(5)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "InputEventSupplier").size()>0);
 
         List<ProcessingInfo> persistedPIs = procInfoRepo.findByAnyEventIdAndStepName(eventId, "InputEventSupplier");
         Assertions.assertThat(persistedPIs.size()).isEqualTo(1);
@@ -202,7 +202,7 @@ public class ProcessingInfoGeneratorTest {
         Assertions.assertThat(messages.size()).isEqualTo(3);
         assertMessagesHaveOriginalEventId(originalEventIDs, messages);
             
-        Awaitility.await().atMost(Duration.ofSeconds(15)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "GenerateMessagesFromIntent").size()>0);
+        Awaitility.await().atMost(Duration.ofSeconds(5)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "GenerateMessagesFromIntent").size()>0);
        
         List<ProcessingInfo> persistedPIs = procInfoRepo.findByAnyEventIdAndStepName(eventId, "GenerateMessagesFromIntent");
         
@@ -254,7 +254,7 @@ public class ProcessingInfoGeneratorTest {
         notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
         List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);                      
         
-        Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "GenerateMessagesFromIntent").size()>0);
+        Awaitility.await().atMost(Duration.ofSeconds(5)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "GenerateMessagesFromIntent").size()>0);
         
     	 EmailMessage email = (EmailMessage)messages.iterator().next();
     	 email.getProcessingInfo().setVersion(0);//need to set to avoid async error in test. it's no hack
