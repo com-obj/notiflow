@@ -13,26 +13,24 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.functions.processors.genericDataPersister;
+package com.obj.nc.functions.processors.pullNotifDataPersister;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.domain.genericData.GenericData;
+import com.obj.nc.domain.pullNotifData.PullNotifDataPersistentState;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import com.obj.nc.repositories.GenericDataRepository;
-import com.obj.nc.utils.JsonUtils;
+import com.obj.nc.repositories.PullNotifDataRepository;
 
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class PulledNotificationDataNewAndChangedPersister extends ProcessorFunctionAdapter<List<JsonNode>, List<JsonNode>> {
-    private final GenericDataRepository genericDataRepository;
+    private final PullNotifDataRepository pullNotifDataRepository;
     private final String externalIdAttrName;
 
     @Override
@@ -42,7 +40,7 @@ public class PulledNotificationDataNewAndChangedPersister extends ProcessorFunct
             return exception;
         }
 
-        if (payload.stream().anyMatch(node -> GenericData.extractIdFromPayload(node, externalIdAttrName) == null)) {
+        if (payload.stream().anyMatch(node -> PullNotifDataPersistentState.extractIdFromPayload(node, externalIdAttrName) == null)) {
             String template = "One of polled items is missing attribute with name %s. Set it in nc.data-sources.\"your-datasource\".externalId*";
             return Optional.of(new PayloadValidationException(String.format(template, externalIdAttrName)));
         }
@@ -52,44 +50,44 @@ public class PulledNotificationDataNewAndChangedPersister extends ProcessorFunct
 
     @Override
     protected List<JsonNode> execute(List<JsonNode> incomingData) {
-        List<GenericData> newAndChanged = findAndPersistAllNewAndChanged(incomingData);
+        List<PullNotifDataPersistentState> newAndChanged = findAndPersistAllNewAndChanged(incomingData);
 
         List<JsonNode> newAndChangedJsonNodes = newAndChanged.stream().map(data -> data.getBodyJson()).collect(Collectors.toList());
         
         return newAndChangedJsonNodes;
     }
 
-    private List<GenericData> findAndPersistAllNewAndChanged(List<JsonNode> incomingData) {
+    private List<PullNotifDataPersistentState> findAndPersistAllNewAndChanged(List<JsonNode> incomingData) {
         List<String> externalIds = incomingData.stream()
-            .map(d-> GenericData.extractIdFromPayload(d, externalIdAttrName))
+            .map(d-> PullNotifDataPersistentState.extractIdFromPayload(d, externalIdAttrName))
             .collect(Collectors.toList());
         
-        List<GenericData> found = genericDataRepository.findAllHashesByExternalId(externalIds);
+        List<PullNotifDataPersistentState> found = pullNotifDataRepository.findAllHashesByExternalId(externalIds);
 
-        List<GenericData> newAndChanged = collectNewAndChanged(incomingData, found);
-        genericDataRepository.saveAll(newAndChanged);
+        List<PullNotifDataPersistentState> newAndChanged = collectNewAndChanged(incomingData, found);
+        pullNotifDataRepository.saveAll(newAndChanged);
 
         return newAndChanged;
     }
 
-    private List<GenericData> collectNewAndChanged(List<JsonNode> incomingData, List<GenericData> savedData) {
-        List<GenericData> newAndChanged = new ArrayList<>();
+    private List<PullNotifDataPersistentState> collectNewAndChanged(List<JsonNode> incomingData, List<PullNotifDataPersistentState> savedData) {
+        List<PullNotifDataPersistentState> newAndChanged = new ArrayList<>();
 
         for (JsonNode jsonNode : incomingData) {
-            mapToGenericData(savedData, jsonNode)
+            mapToPullNotifData(savedData, jsonNode)
                 .ifPresent(newAndChanged::add);
         }
         return newAndChanged;
     }
 
-    private Optional<GenericData> mapToGenericData(List<GenericData> found, JsonNode incomingData) {
-        String externalId = GenericData.extractIdFromPayload(incomingData, externalIdAttrName);
-        String incomingHash = GenericData.calculateHash(incomingData);    
+    private Optional<PullNotifDataPersistentState> mapToPullNotifData(List<PullNotifDataPersistentState> found, JsonNode incomingData) {
+        String externalId = PullNotifDataPersistentState.extractIdFromPayload(incomingData, externalIdAttrName);
+        String incomingHash = PullNotifDataPersistentState.calculateHash(incomingData);    
 
-        Optional<GenericData> record = getRecordByExternalId(found, externalId);
+        Optional<PullNotifDataPersistentState> record = getRecordByExternalId(found, externalId);
 
         if (record.isPresent()) {
-            GenericData exitingData = record.get();
+            PullNotifDataPersistentState exitingData = record.get();
             String existingHash = exitingData.getHash();
 
             if (!existingHash.equals(incomingHash)) {
@@ -103,13 +101,13 @@ public class PulledNotificationDataNewAndChangedPersister extends ProcessorFunct
           
         //new data
         return Optional.of(
-            GenericData.createFromJson(incomingData, externalIdAttrName)
+            PullNotifDataPersistentState.createFromJson(incomingData, externalIdAttrName)
         );
     }
 
 
 
-    private Optional<GenericData> getRecordByExternalId(List<GenericData> savedData, String id) {
+    private Optional<PullNotifDataPersistentState> getRecordByExternalId(List<PullNotifDataPersistentState> savedData, String id) {
         return savedData.stream().filter(data -> id.equals(data.getExternalId())).findFirst();
     }
 }

@@ -97,9 +97,9 @@ public class HttpDataSourceFlowsTest extends BaseIntegrationTest {
     }
 
     @TestConfiguration
-    public static class GenericDataToNotificationExpiryTestConfiguration {
+    public static class PullNotifDataToNotificationExpiryTestConfiguration {
         @Bean
-        public TestLicenceAgreementToNotificationConverter genericDataToNotificationConverter(TestLicenseAgreementProperties properties) {
+        public TestLicenceAgreementToNotificationConverter pullNotifDataToNotificationConverter(TestLicenseAgreementProperties properties) {
             return new TestLicenceAgreementToNotificationConverter(properties);
         }
     }

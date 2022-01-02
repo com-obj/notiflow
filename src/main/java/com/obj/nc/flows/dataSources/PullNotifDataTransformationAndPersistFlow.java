@@ -15,10 +15,10 @@
 
 package com.obj.nc.flows.dataSources;
 
-import com.obj.nc.functions.processors.genericDataPersister.PulledNotificationDataNewAndChangedPersister;
-import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.Data2PulledNotificationDataTransformer;
-import com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer.JsonNodeFilterAndTransformer;
-import com.obj.nc.repositories.GenericDataRepository;
+import com.obj.nc.functions.processors.jsonNodeToPullNotifDataTransformer.Data2PullNotifDataTransformer;
+import com.obj.nc.functions.processors.jsonNodeToPullNotifDataTransformer.JsonNodeFilterAndTransformer;
+import com.obj.nc.functions.processors.pullNotifDataPersister.PulledNotificationDataNewAndChangedPersister;
+import com.obj.nc.repositories.PullNotifDataRepository;
 import com.obj.nc.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.integration.dsl.IntegrationFlowBuilder;
@@ -27,12 +27,12 @@ import org.springframework.integration.dsl.Transformers;
 import org.springframework.integration.json.ObjectToJsonTransformer;
 import org.springframework.stereotype.Component;
 
-import static com.obj.nc.flows.dataSources.GenericDataConvertingFlowConfiguration.GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.dataSources.PulledNotificationDataConvertingFlowConfiguration.PULL_NOTIF_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID;
 
 @Component
 @RequiredArgsConstructor
-public class GenericDataTransformationAndPersistFlow {
-    private final GenericDataRepository genericDataRepository;
+public class PullNotifDataTransformationAndPersistFlow {
+    private final PullNotifDataRepository pullNotifDataRepository;
 
     public StandardIntegrationFlow continueFlow(IntegrationFlowBuilder builder, JobConfig jobConfig) {
         String externalIdKey = selectExternalIdKey(jobConfig);
@@ -40,10 +40,10 @@ public class GenericDataTransformationAndPersistFlow {
         return builder.transform(Transformers.toJson(JsonUtils.getJsonObjectMapper(), ObjectToJsonTransformer.ResultType.NODE))
                 .split() // split ArrayNode to JsonNode-s
                 .aggregate() // aggregate JsonNode-s to List<JsonNode>
-                .handle(new PulledNotificationDataNewAndChangedPersister(genericDataRepository, externalIdKey))
+                .handle(new PulledNotificationDataNewAndChangedPersister(pullNotifDataRepository, externalIdKey))
                 .handle(new JsonNodeFilterAndTransformer(jobConfig.getPojoFCCN(), jobConfig.getSpelFilterExpression()))
-                .handle(new Data2PulledNotificationDataTransformer())
-                .channel(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
+                .handle(new Data2PullNotifDataTransformer())
+                .channel(PULL_NOTIF_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
                 .get();
     }
 

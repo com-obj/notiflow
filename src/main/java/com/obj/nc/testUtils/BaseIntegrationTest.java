@@ -88,7 +88,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
 				"nc_intent," +
 				"nc_message," +
 				"nc_failed_payload," +
-				"nc_generic_data cascade");
+				"nc_pulled_notif_data cascade");
 
     }
 

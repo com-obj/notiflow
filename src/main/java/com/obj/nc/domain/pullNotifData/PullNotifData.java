@@ -17,11 +17,30 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.converterExtensions.genericData;
+package com.obj.nc.domain.pullNotifData;
 
-import com.obj.nc.domain.event.GenericEvent;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.utils.JsonUtils;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public interface GenericData2EventConverterExtension<T>
-        extends GenericDataConverterExtension<T, GenericEvent> {
+import java.util.List;
+import java.util.stream.Collectors;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class PullNotifData<PT> {
+    
+    // private Metadata metadata;
+    private List<PT> payloads;
+
+    public <T> List<T> getPayloadsAsPojo(Class<T> pojoClass) {
+        return getPayloads()
+                .stream()
+                .map(node -> JsonUtils.readObjectFromJSON((JsonNode)node, pojoClass))
+                .collect(Collectors.toList());
+    }
+        
 }

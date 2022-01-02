@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer;
+package com.obj.nc.functions.processors.jsonNodeToPullNotifDataTransformer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;

@@ -16,7 +16,7 @@
 package com.obj.nc.flows.dataSources.http;
 
 import com.obj.nc.flows.dataSources.DataSourceFlowsProperties;
-import com.obj.nc.flows.dataSources.GenericDataTransformationAndPersistFlow;
+import com.obj.nc.flows.dataSources.PullNotifDataTransformationAndPersistFlow;
 import com.obj.nc.flows.dataSources.JobConfig;
 import com.obj.nc.flows.dataSources.http.properties.HttpDataSourceProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,13 +41,13 @@ public class HttpDataSourceFlowsConfiguration {
     private final IntegrationFlowContext integrationFlowContext;
     private final RestTemplate pureRestTemplate;
     private final RestTemplateBuilder restTemplateBuilder;
-    private final GenericDataTransformationAndPersistFlow nextFlow;
+    private final PullNotifDataTransformationAndPersistFlow nextFlow;
 
     public HttpDataSourceFlowsConfiguration(DataSourceFlowsProperties dataSourceFlowsProperties,
                                             IntegrationFlowContext integrationFlowContext,
                                             @Qualifier(PURE_REST_TEMPLATE) RestTemplate pureRestTemplate,
                                             RestTemplateBuilder restTemplateBuilder,
-                                            GenericDataTransformationAndPersistFlow nextFlow) {
+                                            PullNotifDataTransformationAndPersistFlow nextFlow) {
         this.dataSourceFlowsProperties = dataSourceFlowsProperties;
         this.integrationFlowContext = integrationFlowContext;
         this.pureRestTemplate = pureRestTemplate;

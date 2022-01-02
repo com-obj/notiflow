@@ -17,30 +17,23 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.dataObject;
+package com.obj.nc.functions.processors.jsonNodeToPullNotifDataTransformer;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.utils.JsonUtils;
+import com.obj.nc.domain.pullNotifData.PullNotifData;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class PulledNotificationData<PT> {
-    
-    // private Metadata metadata;
-    private List<PT> payloads;
+public class Data2PullNotifDataTransformer extends ProcessorFunctionAdapter<List<?>, PullNotifData<?>> {
 
-    public <T> List<T> getPayloadsAsPojo(Class<T> pojoClass) {
-        return getPayloads()
-                .stream()
-                .map(node -> JsonUtils.readObjectFromJSON((JsonNode)node, pojoClass))
-                .collect(Collectors.toList());
-    }
-        
+    @Override
+	protected PullNotifData<?> execute(List<?> payload) {
+        PullNotifData jsonData = new PullNotifData(payload);
+        return jsonData;
+	}
+
+
+
 }

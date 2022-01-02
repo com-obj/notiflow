@@ -17,23 +17,11 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.functions.processors.jsonNodeToGenericDataTransformer;
+package com.obj.nc.converterExtensions.pullNotifData;
 
-import com.obj.nc.domain.dataObject.PulledNotificationData;
-import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import lombok.AllArgsConstructor;
+import com.obj.nc.domain.IsNotification;
 
-import java.util.List;
-
-@AllArgsConstructor
-public class Data2PulledNotificationDataTransformer extends ProcessorFunctionAdapter<List<?>, PulledNotificationData<?>> {
-
-    @Override
-	protected PulledNotificationData<?> execute(List<?> payload) {
-        PulledNotificationData jsonData = new PulledNotificationData(payload);
-        return jsonData;
-	}
-
-
-
+public interface PullNotifData2NotificationConverterExtension<T>
+        extends PullNotifDataConverterExtension<T, IsNotification> {
+                
 }

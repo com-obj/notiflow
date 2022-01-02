@@ -58,16 +58,16 @@ import static org.junit.jupiter.api.Assertions.*;
         "test-license-agreements.admin-email=johndoe@objectify.sk",
         "test-license-agreements.email-template-path=agreements.html"
 })
-@SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME, GenericDataToNotificationTest.DATA_SOURCE_POLLER_NAME})
+@SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME, PullNotifDataToNotificationTest.DATA_SOURCE_POLLER_NAME})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //this test register programmatically spring integration flows. it seems to confuse the spring context management in tests
-class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
+class PullNotifDataToNotificationExpiryTest extends BaseIntegrationTest {
     
     @Autowired private JdbcTemplate springJdbcTemplate;
 
     @Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
     @Autowired private SourcePollingChannelAdapter pollableSource;
 
-    @Qualifier(GenericDataToNotificationTest.DATA_SOURCE_POLLER_NAME)
+    @Qualifier(PullNotifDataToNotificationTest.DATA_SOURCE_POLLER_NAME)
     @Autowired private SourcePollingChannelAdapter pollableSourceJdbc;
     
     @BeforeEach
@@ -146,9 +146,9 @@ class GenericDataToNotificationExpiryTest extends BaseIntegrationTest {
     }
     
     @TestConfiguration
-    public static class GenericDataToNotificationExpiryTestConfiguration {
+    public static class PullNotifDataToNotificationExpiryTestConfiguration {
         @Bean
-        public TestLicenceAgreementToNotificationConverter genericDataToNotificationConverter(TestLicenseAgreementProperties properties) {
+        public TestLicenceAgreementToNotificationConverter pullNotifDataToNotificationConverter(TestLicenseAgreementProperties properties) {
             return new TestLicenceAgreementToNotificationConverter(properties);
         }
     }

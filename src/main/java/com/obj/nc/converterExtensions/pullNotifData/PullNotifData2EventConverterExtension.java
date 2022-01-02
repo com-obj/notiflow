@@ -17,26 +17,11 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.flows.dataSources.jdbc.properties;
+package com.obj.nc.converterExtensions.pullNotifData;
 
-import lombok.Data;
+import com.obj.nc.domain.event.GenericEvent;
 
-import javax.validation.constraints.NotEmpty;
+public interface PullNotifData2EventConverterExtension<T>
+        extends PullNotifDataConverterExtension<T, GenericEvent> {
 
-@Data
-public class JdbcJobProperties {
-    @NotEmpty
-    private String name;
-    @NotEmpty
-    private String sqlQuery;
-
-    private String pojoFCCN; //if set, PullNotifData will be PullNotifData<FCCN>
-
-
-    private String spelFilterExpression; 
-
-    @NotEmpty
-    private String cron;
-
-    private String externalIdColumnName;
 }

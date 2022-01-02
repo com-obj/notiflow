@@ -17,10 +17,10 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.functions.processors.genericDataConverter;
+package com.obj.nc.functions.processors.pullNotifDataConverter;
 
-import com.obj.nc.converterExtensions.genericData.GenericData2EventConverterExtension;
-import com.obj.nc.converterExtensions.genericData.GenericDataConverterExtension;
+import com.obj.nc.converterExtensions.pullNotifData.PullNotifData2EventConverterExtension;
+import com.obj.nc.converterExtensions.pullNotifData.PullNotifDataConverterExtension;
 import com.obj.nc.domain.event.GenericEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +31,13 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ExtensionsBasedGenericData2EventConverter extends BaseExtensionsBasedGenericDataConverter<GenericEvent> {
+public class ExtensionsBasedPullNotifData2EventConverter extends BaseExtensionsBasedPullNotifDataConverter<GenericEvent> {
 	
 	@Autowired(required = false)
-	private final List<GenericData2EventConverterExtension<?>> converters = new ArrayList<>();
+	private final List<PullNotifData2EventConverterExtension<?>> converters = new ArrayList<>();
 
 	@Override
-	public List<? extends GenericDataConverterExtension<?, GenericEvent>> getConverterExtensions() {
+	public List<? extends PullNotifDataConverterExtension<?, GenericEvent>> getConverterExtensions() {
 		return converters;
 	}
 

@@ -1,11 +1,11 @@
 package com.obj.nc.flows.dataSources.config;
 
-import com.obj.nc.converterExtensions.genericData.GenericData2NotificationConverterExtension;
+import com.obj.nc.converterExtensions.pullNotifData.PullNotifData2NotificationConverterExtension;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
-import com.obj.nc.domain.dataObject.PulledNotificationData;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.EmailMessageTemplated;
+import com.obj.nc.domain.pullNotifData.PullNotifData;
 import com.obj.nc.exceptions.PayloadValidationException;
 import lombok.RequiredArgsConstructor;
 
@@ -14,21 +14,21 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public class TestLicenceAgreementToNotificationConverter implements GenericData2NotificationConverterExtension<TestLicenseAgreement> {
+public class TestLicenceAgreementToNotificationConverter implements PullNotifData2NotificationConverterExtension<TestLicenseAgreement> {
 	
 	private final TestLicenseAgreementProperties properties;
 	
 	@Override
-	public Optional<PayloadValidationException> canHandle(PulledNotificationData<TestLicenseAgreement> data) {
+	public Optional<PayloadValidationException> canHandle(PullNotifData<TestLicenseAgreement> data) {
         if (data.getPayloads() != null) {
             return Optional.empty();
         }
         
-		return Optional.of(new PayloadValidationException("GenericDataToNotificationConverter only handles expiry check payload of type LicenseAgreement"));
+		return Optional.of(new PayloadValidationException("PullNotifDataToNotificationConverter only handles expiry check payload of type LicenseAgreement"));
 	}
 	
 	@Override
-	public List<IsNotification> convert(PulledNotificationData<TestLicenseAgreement> data) {
+	public List<IsNotification> convert(PullNotifData<TestLicenseAgreement> data) {
 		TemplateWithModelEmailContent<List<TestLicenseAgreement>> content = new TemplateWithModelEmailContent<>();
 		content.setSubject("QC | These Agreements will expire soon");
 		content.setTemplateFileName(properties.getEmailTemplatePath());

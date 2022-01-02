@@ -13,14 +13,15 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.functions.processors.genericDataPersister;
+package com.obj.nc.functions.processors.pullNotifDataPersister;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obj.nc.domain.genericData.GenericData;
+import com.obj.nc.domain.pullNotifData.PullNotifDataPersistentState;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.repositories.GenericDataRepository;
+import com.obj.nc.functions.processors.pullNotifDataPersister.PulledNotificationDataNewAndChangedPersister;
+import com.obj.nc.repositories.PullNotifDataRepository;
 import com.obj.nc.utils.JsonUtils;
 
 import org.junit.jupiter.api.Assertions;
@@ -32,11 +33,10 @@ import org.mockito.Mockito;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-public class GenericDataPersisterTest {
+public class PullNotifDataPersisterTest {
     ObjectMapper mapper = new ObjectMapper();
-    GenericDataRepository repo = Mockito.mock(GenericDataRepository.class);
+    PullNotifDataRepository repo = Mockito.mock(PullNotifDataRepository.class);
 
     final String extId1 = "id-1";
     final String extId2 = "id-2";
@@ -65,10 +65,10 @@ public class GenericDataPersisterTest {
     void testPersistingNew() throws JsonProcessingException {
         List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(pulledData);
 
-        GenericData expectPersisted1 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");
-        GenericData expectPersisted2 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
+        PullNotifDataPersistentState expectPersisted1 = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");
+        PullNotifDataPersistentState expectPersisted2 = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
 
-        List<GenericData> existingData = Collections.emptyList();
+        List<PullNotifDataPersistentState> existingData = Collections.emptyList();
 
         verifyPersistingProcess(existingData, pulledNotifData, expectPersisted1, expectPersisted2);
     }
@@ -77,10 +77,10 @@ public class GenericDataPersisterTest {
     void testPersistingNew2() throws JsonProcessingException {
         List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(pulledData);
 
-        GenericData expectPersisted1 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");
-        GenericData expectPersisted2 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
+        PullNotifDataPersistentState expectPersisted1 = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");
+        PullNotifDataPersistentState expectPersisted2 = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
 
-        List<GenericData> existingData = Collections.singletonList(GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content_other), "id"));
+        List<PullNotifDataPersistentState> existingData = Collections.singletonList(PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content_other), "id"));
 
         verifyPersistingProcess(existingData, pulledNotifData, expectPersisted1, expectPersisted2);
     }
@@ -89,10 +89,10 @@ public class GenericDataPersisterTest {
     void testPersistingNewAndChanged() throws JsonProcessingException {
         List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(pulledData);
 
-        GenericData expectPersisted1 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");
-        GenericData expectPersisted2 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
+        PullNotifDataPersistentState expectPersisted1 = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");
+        PullNotifDataPersistentState expectPersisted2 = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
 
-        GenericData previous = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content_other), "id");           
+        PullNotifDataPersistentState previous = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content_other), "id");           
 
         verifyPersistingProcess(Collections.singletonList(previous),pulledNotifData, expectPersisted1, expectPersisted2);
     }
@@ -101,14 +101,14 @@ public class GenericDataPersisterTest {
     void testNotPersistingExisting() throws JsonProcessingException {
         List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(pulledData);
 
-        GenericData expectPersisted2 = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
+        PullNotifDataPersistentState expectPersisted2 = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
 
-        GenericData previous = GenericData.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");           
+        PullNotifDataPersistentState previous = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");           
 
         verifyPersistingProcess(Collections.singletonList(previous),pulledNotifData, expectPersisted2);
     }
 
-    private void verifyPersistingProcess(List<GenericData> storedRecords, List<JsonNode> pulledNotifData, GenericData ... expectedPersisted) throws JsonProcessingException {
+    private void verifyPersistingProcess(List<PullNotifDataPersistentState> storedRecords, List<JsonNode> pulledNotifData, PullNotifDataPersistentState ... expectedPersisted) throws JsonProcessingException {
         // given
         Mockito.when(repo.findAllHashesByExternalId(Arrays.asList(extId1, extId2))).thenReturn(storedRecords);
         Mockito.when(repo.saveAll(ArgumentMatchers.any())).thenAnswer(a -> a.getArgument(0));
@@ -125,10 +125,10 @@ public class GenericDataPersisterTest {
         Mockito.verify(repo).findAllHashesByExternalId(Arrays.asList(extId1, extId2));
 
         //all new and changed have been persisted
-        ArgumentCaptor<List<GenericData>> newAndChangedCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List<PullNotifDataPersistentState>> newAndChangedCaptor = ArgumentCaptor.forClass(List.class);
         Mockito.verify(repo).saveAll(newAndChangedCaptor.capture());
 
-        List<GenericData> newAndChanged = newAndChangedCaptor.getValue();
+        List<PullNotifDataPersistentState> newAndChanged = newAndChangedCaptor.getValue();
         Assertions.assertEquals(expectedPersisted.length, newAndChanged.size());
 
         for (int i =0; i< expectedPersisted.length; i++) {
@@ -136,7 +136,7 @@ public class GenericDataPersisterTest {
         }
     }
 
-    private void assertEquals(GenericData expected, GenericData actual) {
+    private void assertEquals(PullNotifDataPersistentState expected, PullNotifDataPersistentState actual) {
         Assertions.assertEquals(expected.getExternalId(), actual.getExternalId());
         Assertions.assertEquals(expected.getBody(), actual.getBody());
         Assertions.assertEquals(expected.getHash(), actual.getHash());

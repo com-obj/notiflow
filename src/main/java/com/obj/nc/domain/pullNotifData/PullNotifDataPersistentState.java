@@ -13,7 +13,7 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.domain.genericData;
+package com.obj.nc.domain.pullNotifData;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -40,9 +40,9 @@ import com.obj.nc.utils.JsonUtils;
 
 
 @Getter @Setter
-@Table("nc_generic_data")
+@Table("nc_pulled_notif_data")
 @RequiredArgsConstructor(staticName = "of")
-public class GenericData implements Persistable<UUID> {
+public class PullNotifDataPersistentState implements Persistable<UUID> {
     @Id
     private UUID id;
 
@@ -60,7 +60,7 @@ public class GenericData implements Persistable<UUID> {
     private String hash;
 
     @Builder
-    GenericData(UUID id, String externalId, Instant timeCreated, String body, String hash) {
+    PullNotifDataPersistentState(UUID id, String externalId, Instant timeCreated, String body, String hash) {
         this.id = id;
         this.externalId = externalId;
         this.timeCreated = timeCreated;
@@ -73,7 +73,7 @@ public class GenericData implements Persistable<UUID> {
         return timeCreated == null;
     }
 
-    public GenericData updateFromJson(JsonNode json) {
+    public PullNotifDataPersistentState updateFromJson(JsonNode json) {
         this.hash = calculateHash(json);
         this.body = JsonUtils.writeObjectToJSONString(json);
         this.bodyJson = json;
@@ -81,11 +81,11 @@ public class GenericData implements Persistable<UUID> {
         return this;
     }
 
-    public static GenericData createFromJson(JsonNode json, String extIdAttributeName) {
+    public static PullNotifDataPersistentState createFromJson(JsonNode json, String extIdAttributeName) {
         String jsonString = JsonUtils.writeObjectToJSONString(json);
         String externalId = extractIdFromPayload(json, extIdAttributeName);
 
-        GenericData notifData = GenericData.builder()
+        PullNotifDataPersistentState notifData = PullNotifDataPersistentState.builder()
             .id(UUID.randomUUID())
             .externalId(externalId)
             .body(jsonString)

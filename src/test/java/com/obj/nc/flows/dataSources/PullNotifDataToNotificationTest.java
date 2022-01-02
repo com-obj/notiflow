@@ -46,7 +46,7 @@ import static org.junit.Assert.assertEquals;
         "test-license-agreements.email-template-path=agreements.html"
 })
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //this test register programmatically spring integration flows. it seems to confuse the spring context management in tests
-class GenericDataToNotificationTest extends BaseIntegrationTest {
+class PullNotifDataToNotificationTest extends BaseIntegrationTest {
 
     @Autowired private JdbcTemplate springJdbcTemplate;
     
@@ -67,7 +67,7 @@ class GenericDataToNotificationTest extends BaseIntegrationTest {
         springJdbcTemplate.update("drop table if exists license_agreement");
         springJdbcTemplate.execute("create table license_agreement (id varchar(10) not null,description text not null, expiry_date timestamptz not null); ");
         
-        GenericDataToNotificationExpiryTest.persist10TestLicenseAgreements(springJdbcTemplate);
+        PullNotifDataToNotificationExpiryTest.persist10TestLicenseAgreements(springJdbcTemplate);
     }
     
     @AfterEach
@@ -90,20 +90,13 @@ class GenericDataToNotificationTest extends BaseIntegrationTest {
         String body = GreenMailUtil.getBody(receivedMessage);
         assertThat(body).contains("Agreement 1", "Agreement 2", "Agreement 3", "Agreement 4",
                 "Agreement 5", "Agreement 6", "Agreement 7", "Agreement 8", "Agreement 9");
-
-//TODO: after notification, NC should make sure to not redeliver new notification unless Hash of the GenericData changed
-        // //then try again
-        // received = greenMail.waitForIncomingEmail(5000L, 1);
-
-        // //there shouldn't be redelivery
-        // assertEquals(false, received);
     }
     
     
     @TestConfiguration
-    public static class GenericDataToNotificationExpiryTestConfiguration {
+    public static class PullNotifDataToNotificationExpiryTestConfiguration {
         @Bean
-        public TestLicenceAgreementToNotificationConverter genericDataToNotificationConverter(TestLicenseAgreementProperties properties) {
+        public TestLicenceAgreementToNotificationConverter pullNotifDataToNotificationConverter(TestLicenseAgreementProperties properties) {
             return new TestLicenceAgreementToNotificationConverter(properties);
         }
     }

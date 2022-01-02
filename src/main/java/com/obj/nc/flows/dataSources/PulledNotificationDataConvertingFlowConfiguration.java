@@ -19,8 +19,8 @@
 
 package com.obj.nc.flows.dataSources;
 
-import com.obj.nc.functions.processors.genericDataConverter.ExtensionsBasedGenericData2EventConverter;
-import com.obj.nc.functions.processors.genericDataConverter.ExtensionsBasedGenericData2NotificationConverter;
+import com.obj.nc.functions.processors.pullNotifDataConverter.ExtensionsBasedPullNotifData2EventConverter;
+import com.obj.nc.functions.processors.pullNotifDataConverter.ExtensionsBasedPullNotifData2NotificationConverter;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
 import com.obj.nc.routers.MessageOrIntentRouter;
 import lombok.RequiredArgsConstructor;
@@ -33,33 +33,33 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @Configuration
 @RequiredArgsConstructor
-public class GenericDataConvertingFlowConfiguration {
+public class PulledNotificationDataConvertingFlowConfiguration {
     
-    public static final String GENERIC_DATA_CONVERTING_FLOW_ID = "GENERIC_DATA_CONVERTING_FLOW_ID";
-    public static final String GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID = GENERIC_DATA_CONVERTING_FLOW_ID + "_INPUT";
+    public static final String PULL_NOTIF_DATA_CONVERTING_FLOW_ID = "PULL_NOTIF_DATA_CONVERTING_FLOW_ID";
+    public static final String PULL_NOTIF_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID = PULL_NOTIF_DATA_CONVERTING_FLOW_ID + "_INPUT";
     
-    private final ExtensionsBasedGenericData2EventConverter genericData2EventsConverter;
-    private final ExtensionsBasedGenericData2NotificationConverter genericData2NotificationsConverter;
+    private final ExtensionsBasedPullNotifData2EventConverter pullNotifData2EventsConverter;
+    private final ExtensionsBasedPullNotifData2NotificationConverter pullNotifData2NotificationsConverter;
     private final MessageOrIntentRouter messageOrIntentRouter;
     private final GenericEventPersister genericEventPersister;
     private final ThreadPoolTaskScheduler executor;
     
-    @Bean(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
-    public PublishSubscribeChannel genericDataConvertingFlowInputChannel() {
+    @Bean(PULL_NOTIF_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
+    public PublishSubscribeChannel pullNotifDataConvertingFlowInputChannel() {
         return new PublishSubscribeChannel(executor);
     }
     
-    @Bean(GENERIC_DATA_CONVERTING_FLOW_ID)
-    public IntegrationFlow genericDataConvertingFlow() {
+    @Bean(PULL_NOTIF_DATA_CONVERTING_FLOW_ID)
+    public IntegrationFlow pullNotifDataConvertingFlow() {
         return IntegrationFlows
-                .from(genericDataConvertingFlowInputChannel())
+                .from(pullNotifDataConvertingFlowInputChannel())
                 .publishSubscribeChannel(spec -> spec
                         .subscribe(subFlow -> subFlow
-                                .handle(genericData2EventsConverter)
+                                .handle(pullNotifData2EventsConverter)
                                 .split()
                                 .handle(genericEventPersister))
                         .subscribe(subFlow -> subFlow
-                                .handle(genericData2NotificationsConverter)
+                                .handle(pullNotifData2NotificationsConverter)
                                 .split()
                                 .route(messageOrIntentRouter))
                 )

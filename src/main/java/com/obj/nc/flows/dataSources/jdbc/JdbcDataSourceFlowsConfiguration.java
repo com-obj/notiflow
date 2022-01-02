@@ -2,7 +2,7 @@ package com.obj.nc.flows.dataSources.jdbc;
 
 import com.obj.nc.Get;
 import com.obj.nc.flows.dataSources.DataSourceFlowsProperties;
-import com.obj.nc.flows.dataSources.GenericDataTransformationAndPersistFlow;
+import com.obj.nc.flows.dataSources.PullNotifDataTransformationAndPersistFlow;
 import com.obj.nc.flows.dataSources.JobConfig;
 import com.obj.nc.flows.dataSources.jdbc.properties.JdbcDataSourceProperties;
 import com.obj.nc.flows.dataSources.jdbc.properties.JdbcJobProperties;
@@ -30,7 +30,7 @@ public class JdbcDataSourceFlowsConfiguration {
     private final DataSourceFlowsProperties dataSourceFlowsProperties;
     private final IntegrationFlowContext integrationFlowContext;
     private final Get get;
-    private final GenericDataTransformationAndPersistFlow pollFlowAdapter;
+    private final PullNotifDataTransformationAndPersistFlow pollFlowAdapter;
 
     @PostConstruct
     public void createJdbcDataSourceFlows() {

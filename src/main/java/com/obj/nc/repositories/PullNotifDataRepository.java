@@ -15,7 +15,7 @@
 
 package com.obj.nc.repositories;
 
-import com.obj.nc.domain.genericData.GenericData;
+import com.obj.nc.domain.pullNotifData.PullNotifDataPersistentState;
 import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface GenericDataRepository extends CrudRepository<GenericData, UUID>, EntityExistenceChecker<UUID> {
+public interface PullNotifDataRepository extends CrudRepository<PullNotifDataPersistentState, UUID>, EntityExistenceChecker<UUID> {
 
     @Query(
         "SELECT id, external_id, time_created, hash " +
-        "FROM nc_generic_data where external_id in (:ids)")
-    List<GenericData> findAllHashesByExternalId(@Param("ids") List<String> ids);
+        "FROM nc_pulled_notif_data where external_id in (:ids)")
+    List<PullNotifDataPersistentState> findAllHashesByExternalId(@Param("ids") List<String> ids);
 }

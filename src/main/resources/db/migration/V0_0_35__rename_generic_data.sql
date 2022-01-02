@@ -17,11 +17,4 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.converterExtensions.genericData;
-
-import com.obj.nc.domain.IsNotification;
-
-public interface GenericData2NotificationConverterExtension<T>
-        extends GenericDataConverterExtension<T, IsNotification> {
-                
-}
+ALTER TABLE nc_generic_data RENAME TO nc_pulled_notif_data;

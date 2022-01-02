@@ -17,10 +17,10 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.functions.processors.genericDataConverter;
+package com.obj.nc.functions.processors.pullNotifDataConverter;
 
-import com.obj.nc.converterExtensions.genericData.GenericDataConverterExtension;
-import com.obj.nc.domain.dataObject.PulledNotificationData;
+import com.obj.nc.converterExtensions.pullNotifData.PullNotifDataConverterExtension;
+import com.obj.nc.domain.pullNotifData.PullNotifData;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import lombok.extern.slf4j.Slf4j;
@@ -31,41 +31,41 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends ProcessorFunctionAdapter<PulledNotificationData<?>, List<OUT>> {
+public abstract class BaseExtensionsBasedPullNotifDataConverter<OUT> extends ProcessorFunctionAdapter<PullNotifData<?>, List<OUT>> {
     
-    public abstract List<? extends GenericDataConverterExtension<?, OUT>> getConverterExtensions();
+    public abstract List<? extends PullNotifDataConverterExtension<?, OUT>> getConverterExtensions();
     
     @Override
-    protected Optional<PayloadValidationException> checkPreCondition(PulledNotificationData<?> genericData) {
-        if (genericData == null) {
-            return Optional.of(new PayloadValidationException("GenericData instance must not be null"));
+    protected Optional<PayloadValidationException> checkPreCondition(PullNotifData<?> pullNotifData) {
+        if (pullNotifData == null) {
+            return Optional.of(new PayloadValidationException("PullNotifData instance must not be null"));
         }
         
         return Optional.empty();
     }
     
-    private List<GenericDataConverterExtension<?, OUT>> findMatchingConverters(PulledNotificationData genericData) {
-        List<GenericDataConverterExtension<?, OUT>> matchingProcessors = new ArrayList<>();
+    private List<PullNotifDataConverterExtension<?, OUT>> findMatchingConverters(PullNotifData pullNotifData) {
+        List<PullNotifDataConverterExtension<?, OUT>> matchingProcessors = new ArrayList<>();
         
-        for (GenericDataConverterExtension<?, OUT> p: getConverterExtensions()) {
+        for (PullNotifDataConverterExtension<?, OUT> p: getConverterExtensions()) {
 
-            if (genericData.getPayloads().size() == 0) {
+            if (pullNotifData.getPayloads().size() == 0) {
                 continue;
             }
 
-            Class<? extends Object> payloadCls = genericData.getPayloads().get(0).getClass();
+            Class<? extends Object> payloadCls = pullNotifData.getPayloads().get(0).getClass();
             if (!p.getPayloadType().isAssignableFrom(payloadCls)) {
                 continue;
             }
 
-            Optional<PayloadValidationException> errors = p.canHandle(genericData);
+            Optional<PayloadValidationException> errors = p.canHandle(pullNotifData);
             if (!errors.isPresent()) {
                 matchingProcessors.add(p);
                 continue;
             }
 
             if (log.isDebugEnabled()) {
-                log.debug("BaseExtensionsBasedGenericDataConverter examined generic data processor which cannot handle payload " + genericData + ". Processor replied" + errors.get().getMessage());
+                log.debug("BaseExtensionsBasedPullNotifDataConverter examined generic data processor which cannot handle payload " + pullNotifData + ". Processor replied" + errors.get().getMessage());
             }
  
         }
@@ -74,11 +74,11 @@ public abstract class BaseExtensionsBasedGenericDataConverter<OUT> extends Proce
     }
     
     @Override
-    protected List<OUT> execute(PulledNotificationData genericData) {
+    protected List<OUT> execute(PullNotifData pullNotifData) {
         return
-                (List<OUT>)findMatchingConverters(genericData)
+                (List<OUT>)findMatchingConverters(pullNotifData)
                         .stream()
-                        .flatMap(p -> p.convert(genericData).stream())
+                        .flatMap(p -> p.convert(pullNotifData).stream())
                         .collect(Collectors.toList());
     }
     

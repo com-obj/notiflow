@@ -24,16 +24,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.obj.nc.converterExtensions.genericData.GenericData2EventConverterExtension;
-import com.obj.nc.converterExtensions.genericData.GenericData2NotificationConverterExtension;
 import com.obj.nc.converterExtensions.genericEvent.InputEvent2MessageConverterExtension;
+import com.obj.nc.converterExtensions.pullNotifData.PullNotifData2EventConverterExtension;
+import com.obj.nc.converterExtensions.pullNotifData.PullNotifData2NotificationConverterExtension;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.dataObject.PulledNotificationData;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.pullNotifData.PullNotifData;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.repositories.DeliveryInfoRepository;
@@ -68,7 +68,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static com.obj.nc.flows.dataSources.GenericDataConvertingFlowConfiguration.GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID;
+import static com.obj.nc.flows.dataSources.PulledNotificationDataConvertingFlowConfiguration.PULL_NOTIF_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -78,12 +78,12 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest
-class GenericDataConvertingFlowTest extends BaseIntegrationTest {
+class PullNotifDataConvertingFlowTest extends BaseIntegrationTest {
     
     @Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
     @Autowired private SourcePollingChannelAdapter pollableSource;
     
-    @Qualifier(GENERIC_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
+    @Qualifier(PULL_NOTIF_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
     @Autowired private MessageChannel inputChannel;
     
     @Autowired private DeliveryInfoRepository deliveryInfoRepository;
@@ -96,27 +96,27 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
     }
     
     @Test
-    void testConvertGenericDataToMessageAndSend() {
+    void testConvertPullNotifDataToMessageAndSend() {
         TestPayload payload = createTestPayload();
     
-        PulledNotificationData<JsonNode> genericData = new PulledNotificationData<>(Collections.singletonList(JsonUtils.writeObjectToJSONNode(payload)));
+        PullNotifData<JsonNode> pullNotifData = new PullNotifData<>(Collections.singletonList(JsonUtils.writeObjectToJSONNode(payload)));
     
         // when
-        inputChannel.send(MessageBuilder.withPayload(genericData).build());
+        inputChannel.send(MessageBuilder.withPayload(pullNotifData).build());
         
         // then
         assertMessageDelivered();
     }
 
     @Test
-    void testConvertGenericDataToMessageAndSendUsingPojo() {
+    void testConvertNotifPullDataToMessageAndSendUsingPojo() {
         // given
         TestPayload payload = createTestPayload();
     
-        PulledNotificationData<TestPayload> genericData = new PulledNotificationData<>(Collections.singletonList(payload));
+        PullNotifData<TestPayload> pullNotifData = new PullNotifData<>(Collections.singletonList(payload));
     
         // when
-        inputChannel.send(MessageBuilder.withPayload(genericData).build());
+        inputChannel.send(MessageBuilder.withPayload(pullNotifData).build());
         
         // then
         assertMessageDelivered();
@@ -132,7 +132,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
 
         assertThat(infos)
                 .hasSize(2)
-                .anySatisfy(assertRefersToMessageWithText("GenericData2NotificationConverterExtension"))
+                .anySatisfy(assertRefersToMessageWithText("PullNotifData2NotificationConverterExtension"))
                 .anySatisfy(assertRefersToMessageWithText("InputEvent2MessageConverterExtension"));
     }
 
@@ -164,12 +164,12 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
     }
     
     @TestConfiguration
-    static class GenericDataConvertingFlowTestConfiguration {
+    static class PullNotifDataConvertingFlowTestConfiguration {
         @Bean
-        public GenericData2NotificationConverterExtension<?> genericJsonData2Message() {
-            return new GenericData2NotificationConverterExtension<JsonNode>() {
+        public PullNotifData2NotificationConverterExtension<?> genericJsonData2Message() {
+            return new PullNotifData2NotificationConverterExtension<JsonNode>() {
                 @Override
-                public Optional<PayloadValidationException> canHandle(PulledNotificationData<JsonNode> payload) {
+                public Optional<PayloadValidationException> canHandle(PullNotifData<JsonNode> payload) {
                     if (!payload.getPayloadsAsPojo(TestPayload.class).isEmpty()) {
                         return Optional.empty();
                     }
@@ -178,7 +178,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 }
     
                 @Override
-                public List<IsNotification> convert(PulledNotificationData<JsonNode> payload) {
+                public List<IsNotification> convert(PullNotifData<JsonNode> payload) {
                     return convertTestPayloads(payload.getPayloadsAsPojo(TestPayload.class));
                 }
 
@@ -190,10 +190,10 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
         }
 
         @Bean
-        public GenericData2NotificationConverterExtension<?> genericPojoData2Message() {
-            return new GenericData2NotificationConverterExtension<TestPayload>() {
+        public PullNotifData2NotificationConverterExtension<?> genericPojoData2Message() {
+            return new PullNotifData2NotificationConverterExtension<TestPayload>() {
                 @Override
-                public Optional<PayloadValidationException> canHandle(PulledNotificationData<TestPayload> data) {
+                public Optional<PayloadValidationException> canHandle(PullNotifData<TestPayload> data) {
                     if (!data.getPayloads().isEmpty()) {
                         return Optional.empty();
                     }
@@ -202,7 +202,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 }
     
                 @Override
-                public List<IsNotification> convert(PulledNotificationData<TestPayload> data) {
+                public List<IsNotification> convert(PullNotifData<TestPayload> data) {
                     return convertTestPayloads(data.getPayloads());
                 }
 
@@ -219,15 +219,15 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                     EmailEndpoint.builder().email("test@objectify.sk").build()
             );
             email1.getBody().setSubject("Subject");
-            email1.getBody().setText("GenericData2NotificationConverterExtension"+JsonUtils.writeObjectToJSONString(payload));
+            email1.getBody().setText("PullNotifData2NotificationConverterExtension"+JsonUtils.writeObjectToJSONString(payload));
             return Collections.singletonList(email1);
         }
     
         @Bean
-        public GenericData2EventConverterExtension<?> genericJsonData2Event() {
-            return new GenericData2EventConverterExtension<JsonNode>() {
+        public PullNotifData2EventConverterExtension<?> genericJsonData2Event() {
+            return new PullNotifData2EventConverterExtension<JsonNode>() {
                 @Override
-                public Optional<PayloadValidationException> canHandle(PulledNotificationData<JsonNode> payload) {
+                public Optional<PayloadValidationException> canHandle(PullNotifData<JsonNode> payload) {
                     if (!payload.getPayloadsAsPojo(TestPayload.class).isEmpty()) {
                         return Optional.empty();
                     }
@@ -236,7 +236,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 }
             
                 @Override
-                public List<GenericEvent> convert(PulledNotificationData<JsonNode> payload) {
+                public List<GenericEvent> convert(PullNotifData<JsonNode> payload) {
                     return Collections.singletonList(
                             GenericEvent
                                     .builder()
@@ -254,10 +254,10 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
         }
 
         @Bean
-        public GenericData2EventConverterExtension<?> genericPojoData2Event() {
-            return new GenericData2EventConverterExtension<TestPayload>() {
+        public PullNotifData2EventConverterExtension<?> genericPojoData2Event() {
+            return new PullNotifData2EventConverterExtension<TestPayload>() {
                 @Override
-                public Optional<PayloadValidationException> canHandle(PulledNotificationData<TestPayload> data) {
+                public Optional<PayloadValidationException> canHandle(PullNotifData<TestPayload> data) {
                     if (!data.getPayloads().isEmpty()) {
                         return Optional.empty();
                     }
@@ -266,7 +266,7 @@ class GenericDataConvertingFlowTest extends BaseIntegrationTest {
                 }
             
                 @Override
-                public List<GenericEvent> convert(PulledNotificationData<TestPayload> data) {
+                public List<GenericEvent> convert(PullNotifData<TestPayload> data) {
                     TestPayload testPayload = data.getPayloads().get(0);
                     return Collections.singletonList(
                             GenericEvent
