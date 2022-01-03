@@ -22,6 +22,7 @@ package com.obj.nc.flows.deliveryInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.config.SpringIntegration;
+import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
@@ -98,7 +99,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Disabled("Intent isn't connected to any message. Probably wrong test?")
     void testDeliveryInfosCreateAndPersisted() {
         // GIVEN
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
 		
         String INPUT_JSON_FILE = "intents/ba_job_post.json";
@@ -115,7 +116,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         //THEN check processing deliveryInfo
         Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()>=3);
         
-        assertEnpointPersistedNotDuplicated(notificationIntent);
+        assertEndpointPersistedNotDuplicated(notificationIntent);
         List<DeliveryInfo> deliveryInfos = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
         
         Assertions.assertThat(deliveryInfos.size()).isEqualTo(3);
@@ -141,7 +142,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()==6);
 
         deliveryInfos = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
-        assertEnpointPersistedNotDuplicated(notificationIntent);
+        assertEndpointPersistedNotDuplicated(notificationIntent);
         
         
         Assertions.assertThat(deliveryInfos.size()).isEqualTo(6);
@@ -161,7 +162,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     			EmailEndpoint.builder().email("wrong email").build()
     	);
         
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
 		
     	EmailMessage email = new EmailMessage();
@@ -185,11 +186,10 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         });
     }
     
-    @Test
-    @Disabled //TODO: DOES NOT FINISH
-    void testDeliveryInfosCreateAndPersistedForFailedDeliveryViaGateway() {
+    @Test    
+    void testDeliveryInfosCreateAndPersistedForFailedDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
 		
 		SmsEndpoint smsEndpoint = endpointRepo.persistEnpointIfNotExists(new SmsEndpoint("09050123456"));  
@@ -201,21 +201,20 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     	
     	JsonNode messageJson = jsonConverterForSpringMessages.valueToTree(failedSpringMessage);
     	
-    	FailedPayload failedPaylod = FailedPayload.builder()
+    	FailedPayload failedPayload = FailedPayload.builder()
         		.errorMessage("Error")
         		.exceptionName("Exception")
         		.flowId("flow_id")
         		.id(UUID.randomUUID())
         		.messageJson(messageJson)
         		.build();
-    	failedPayloadRepo.save(failedPaylod);
+    	failedPayloadRepo.save(failedPayload);
         
         //WHEN
-        List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistFailedDeliveryInfo(failedPaylod);
-
+        List<DeliveryInfo> delInfo = deliveryInfoFlow.createAndPersistFailedDeliveryInfo(failedPayload).get(1, TimeUnit.SECONDS);
 
         //THEN check infos
-        Assertions.assertThat(delInfo.size()).isEqualTo(2); // 1 for event, 1 for message
+        Assertions.assertThat(delInfo.size()).isEqualTo(1); 
         delInfo.forEach(info -> {
         	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.FAILED);
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
@@ -230,7 +229,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Test
     void testDeliveryInfosCreateAndPersistedForProcessingDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
 		
 		//AND GIVEN
@@ -257,6 +256,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 	private SmsMessage createTestSMS(UUID eventId, SmsEndpoint telNumber) {
 		SmsMessage msg = new SmsMessage();
     	msg.setPreviousEventIds(Collections.singletonList(eventId));
+        msg.setBody(SimpleTextContent.builder().text("test").build());
     	
     	msg.addReceivingEndpoints(telNumber);
 		return msg;
@@ -270,7 +270,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     @Test
     void testDeliveryInfosCreateAndPersistedForSentDeliveryViaGateway() throws InterruptedException, ExecutionException, TimeoutException {
 		// GIVEN    	
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
 		
 		//AND GIVEN
@@ -294,7 +294,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     }
 
 
-	private void assertEnpointPersistedNotDuplicated(NotificationIntent notificationIntent) {
+	private void assertEndpointPersistedNotDuplicated(NotificationIntent notificationIntent) {
 		List<Map<String, Object>> persistedEndpoints = jdbcTemplate.queryForList("select * from nc_endpoint");
         assertThat(persistedEndpoints, CoreMatchers.notNullValue());
         Assertions.assertThat(persistedEndpoints.size()).isEqualTo(3);

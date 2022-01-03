@@ -32,13 +32,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-//@Component // TODO: configured with @Bean annotation
 @ConditionalOnMissingBean(type = "SmsSender")
 @RequiredArgsConstructor
 @DocumentProcessingInfo("TestSMSSender")
 public class InMemorySmsSender extends ProcessorFunctionAdapter<SmsMessage,SmsMessage> implements SmsSender  {
 	
-	private final InMemorySmsSourceSupplier reciever;
+	private final InMemorySmsSourceSupplier receiver;
 
 	
 	@Override
@@ -52,7 +51,7 @@ public class InMemorySmsSender extends ProcessorFunctionAdapter<SmsMessage,SmsMe
 	@Override
 	protected SmsMessage execute(SmsMessage smsMessage) {
 				
-		reciever.recieve(smsMessage);
+		receiver.recieve(smsMessage);
 
 		return smsMessage;
 	}

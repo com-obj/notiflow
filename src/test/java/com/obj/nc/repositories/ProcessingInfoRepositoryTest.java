@@ -116,9 +116,9 @@ public class ProcessingInfoRepositoryTest extends BaseIntegrationTest {
 	}
 
 	private ProcessingInfo createSimpleProcessingInfo() {
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId1 = eventRepo.save(event).getId();
-		GenericEvent event2 = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event2 = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId2 = eventRepo.save(event2).getId();
 		
 		String INPUT_JSON_FILE = "intents/direct_message.json";

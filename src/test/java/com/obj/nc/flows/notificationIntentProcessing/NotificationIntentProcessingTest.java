@@ -68,7 +68,7 @@ public class NotificationIntentProcessingTest extends BaseIntegrationTest {
     @Test
     void testResolveRecipientsMergeWithExisting() {
         // given
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
 		
         NotificationIntent notificationIntent = readTestIntent();

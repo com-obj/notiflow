@@ -73,6 +73,7 @@ class PullNotifDataToNotificationExpiryTest extends BaseIntegrationTest {
     @BeforeEach
     void setupDbs() {
         pollableSourceJdbc.stop(); //somehow this doesn't stop with the standard annotation
+        
         purgeNotifTables(springJdbcTemplate);        
         
         springJdbcTemplate.update("drop table if exists license_agreement");

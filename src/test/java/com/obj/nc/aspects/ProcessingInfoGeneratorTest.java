@@ -42,6 +42,7 @@ import com.obj.nc.functions.sources.genericEvents.GenericEventsSupplier;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.GenericEventRepositoryTest;
 import com.obj.nc.repositories.ProcessingInfoRepository;
+import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 import lombok.AllArgsConstructor;
@@ -72,7 +73,7 @@ import static org.assertj.core.api.Assertions.entry;
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
-public class ProcessingInfoGeneratorTest {
+public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
 	
 	@Autowired private GenericEventsSupplier generateEventSupplier;
 	@Autowired private GenericEventRepository eventRepository;
@@ -185,7 +186,7 @@ public class ProcessingInfoGeneratorTest {
 	@SuppressWarnings("unchecked")
     void testPersistPIForMessageFromIntentStep() {
         // given
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepository.save(event).getId();
 		
         String INPUT_JSON_FILE = "intents/ba_job_post.json";
@@ -243,7 +244,7 @@ public class ProcessingInfoGeneratorTest {
 	@Test
     void testPersistPIForSendMessage() {
         // given
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepository.save(event).getId();
 
         String INPUT_JSON_FILE = "intents/ba_job_post.json";

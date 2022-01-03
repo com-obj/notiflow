@@ -74,7 +74,7 @@ public class MessageProcessingTest extends BaseIntegrationTest {
     @Test
     void testSendMessage() {
         // given
-        GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+        GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
         UUID eventId = eventRepo.save(event).getId();
 
         String INPUT_JSON_FILE = "messages/e_email_message_2_many.json";

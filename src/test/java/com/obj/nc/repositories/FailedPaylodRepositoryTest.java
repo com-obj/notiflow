@@ -22,6 +22,7 @@ package com.obj.nc.repositories;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.flows.errorHandling.domain.FailedPayload;
+import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,7 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
-public class FailedPaylodRepositoryTest {
+public class FailedPaylodRepositoryTest extends BaseIntegrationTest {
 
 	@Autowired FailedPayloadRepository failedPaylaodRepo;
 	@Autowired @Qualifier(SpringIntegration.OBJECT_MAPPER_FOR_SPRING_MESSAGES_BEAN_NAME) ObjectMapper jsonConverterForMessages;

@@ -62,7 +62,6 @@ public class DeliveryInfoFlowConfig {
 	@Autowired private ThreadPoolTaskScheduler executor;
 
     @Bean
-    // process error handling in single thread. In case exception is throw in the error handling it self this prevents potential error handling infinite loop. Check MessagePublishingErrorHandler.handleError
     public IntegrationFlow deliveryInfoFailedFlow() {
         return 
         	IntegrationFlows.from(deliveryInfoFailedInputChannel())
@@ -74,12 +73,12 @@ public class DeliveryInfoFlowConfig {
 
     @Bean(DELIVERY_INFO_FAILED_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel deliveryInfoFailedInputChannel() {
-		return new PublishSubscribeChannel();
+		return new PublishSubscribeChannel(executor);
 	}
 
     @Bean(DELIVERY_INFO_FAILED_FLOW_OUTPUT_CHANNEL_ID)
 	public MessageChannel deliveryInfoFailedOutputChannel() {
-		return new PublishSubscribeChannel();
+		return new PublishSubscribeChannel(executor);
 	}
     ///////////////////////////////////////////////////////////////////////////
     
@@ -150,5 +149,5 @@ public class DeliveryInfoFlowConfig {
 	public MessageChannel deliveryInfoReadOutputChannel() {
 		return new PublishSubscribeChannel(executor);
 	}
-
+	
 }

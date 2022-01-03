@@ -20,6 +20,7 @@
 package com.obj.nc.repositories;
 
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
@@ -38,14 +39,14 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
-public class GenericEventRepositoryTest {
+public class GenericEventRepositoryTest extends BaseIntegrationTest {
 
 	@Autowired GenericEventRepository eventRepository;
 	
 	@Test
 	public void testPersistingSingleEvent() {
 		//GIVEN
-		GenericEvent event = createDirectMessageEvent();
+		GenericEvent event = createProcessedEvent();
 		
 		eventRepository.save(event);
 		
@@ -55,16 +56,15 @@ public class GenericEventRepositoryTest {
 
 	}
 
-	public static GenericEvent createDirectMessageEvent() {
-		String INPUT_JSON_FILE = "intents/direct_message.json";
-		String content = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
+	public static GenericEvent createProcessedEvent() {
+		String content = JsonUtils.readJsonStringFromClassPathResource("intents/direct_message.json");
 		
 		GenericEvent event = GenericEvent.builder()
 				.externalId(UUID.randomUUID().toString())
 				.flowId("FLOW_ID")
 				.id(UUID.randomUUID())
 				.payloadJson(JsonUtils.readJsonNodeFromJSONString(content))
-				.timeConsumed(Instant.now())
+				.timeConsumed(Instant.now()) 
 				.build();
 		return event;
 	}

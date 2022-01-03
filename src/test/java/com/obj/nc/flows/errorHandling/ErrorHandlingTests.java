@@ -73,7 +73,7 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 @SpringBootTest(properties = {
 		"test-flow-gateway=true", //this is strange, if I don't make TestFlow1 conditional, some unrelated test fail because they don't see testInputChannel1
 }) 
-public class ErrorHandlingTests {
+public class ErrorHandlingTests extends BaseIntegrationTest {
 	
     private static final String TEST_EXCEPTION_MESSAGE = "test exception message";
 

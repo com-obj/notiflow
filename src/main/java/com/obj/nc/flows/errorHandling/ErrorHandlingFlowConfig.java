@@ -50,8 +50,8 @@ public class ErrorHandlingFlowConfig {
 	@Autowired private DeliveryInfoFlow deliveryInfoFlow;
 	
     /**
-     * Error handlind must be processed in single thread (no publish/subsribe channels with executors or similar are used). 
-     * In case exception is throw in the error hadnlind it self this prevents potential error handling infinite loog cycles. Check MessagePublishingErrorHandler.handleError		
+     * Error handling must be processed in single thread (no publish/subscribe channels with executors or similar are used). 
+     * In case exception is throw in the error handling it self this prevents potential error handling infinite loop cycles. Check MessagePublishingErrorHandler.handleError		
      */
     @Bean
     public IntegrationFlow errorPayloadReceivedFlowConfig() {
@@ -72,7 +72,7 @@ public class ErrorHandlingFlowConfig {
         return 
         	IntegrationFlows
                 .from(errorChannelTerminal)
-                .log(Level.ERROR, "ERROR HANDLING ocured in error handling flow")
+                .log(Level.ERROR, "ERROR HANDLING ocurred in error handling flow")
         		.get();
     }
 

@@ -72,16 +72,11 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     @Autowired private EmailProcessingFlowProperties properties;
     @Autowired private EmailProcessingFlow emailSendingFlow;
     @Autowired private NcAppConfigProperties ncAppConfigProperties;
-    
-//	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-//	@Autowired private SourcePollingChannelAdapter pollableSource;
-    
+        
     @BeforeEach
     void setupGreenMail(@Autowired JdbcTemplate jdbcTemplate) throws FolderException {
         purgeNotifTables(jdbcTemplate);
-        greenMail.purgeEmailFromAllMailboxes();
-        
-//    	pollableSource.start();
+        greenMail.purgeEmailFromAllMailboxes();        
     }
     
     @Test

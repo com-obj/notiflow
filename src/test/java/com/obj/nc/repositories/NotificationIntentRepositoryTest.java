@@ -60,8 +60,8 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	     NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
 	     notificationIntent.getHeader().setFlowId("default-flow");
 	     
-	     GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
-	     GenericEvent event2 = GenericEventRepositoryTest.createDirectMessageEvent();
+	     GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
+	     GenericEvent event2 = GenericEventRepositoryTest.createProcessedEvent();
 		 UUID[] eventIds = new UUID[]{
 					eventRepo.save(event).getId(), 
 					eventRepo.save(event2).getId()};

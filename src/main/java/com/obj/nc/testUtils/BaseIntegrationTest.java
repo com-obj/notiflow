@@ -30,16 +30,21 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
+import org.junit.AfterClass;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.MDC;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.MediaType;
+import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -63,7 +68,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     public static final String MDC_FOR_TESTS_NAME = "testName";
 
     @BeforeEach
-    void setUp() {
+    void startLogging() {
         BaseIntegrationTest.testName = this.getClass().getSimpleName();
         MDC.put(MDC_FOR_TESTS_NAME, testName);
 
@@ -71,11 +76,16 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     }
 
     @AfterEach
-    void tearDown() {    
+    void stopLogging() {    
         log.info("TEST FINISH {}", this.getClass().getSimpleName()); 
 
         BaseIntegrationTest.testName = null;
         MDC.put(MDC_FOR_TESTS_NAME, testName);
+    }
+
+	@AfterClass
+    static void cleanUp() {    
+        Get.getBean(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME, SourcePollingChannelAdapter.class).stop();
     }
 
     public static void purgeNotifTables(@Autowired JdbcTemplate jdbcTemplate) {
@@ -83,7 +93,8 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
 
         jdbcTemplate.execute("truncate nc_processing_info, " +
 				"nc_message_2_endpoint_rel," +
-				"nc_delivery_info, nc_endpoint," +
+				"nc_delivery_info, " + 
+				"nc_endpoint," +
 				"nc_event," +
 				"nc_intent," +
 				"nc_message," +

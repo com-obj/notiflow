@@ -24,6 +24,7 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
+import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +43,7 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
-public class DeliveryInfoRepositoryTest {
+public class DeliveryInfoRepositoryTest extends BaseIntegrationTest {
 
 	@Autowired DeliveryInfoRepository deliveryInfoRepo;
 	@Autowired GenericEventRepository eventRepo;
@@ -57,7 +58,7 @@ public class DeliveryInfoRepositoryTest {
 	@Test
 	public void testPersistingSingleInfo() {
 		//GIVEN
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		eventRepo.save(event);
 		
 		EmailEndpoint email = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
@@ -82,10 +83,10 @@ public class DeliveryInfoRepositoryTest {
 	@Test
 	public void testFindByEventId() {
 		//GIVEN
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
 		
-		GenericEvent event2 = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event2 = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId2 = eventRepo.save(event2).getId();
 		
 		EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();
@@ -125,10 +126,10 @@ public class DeliveryInfoRepositoryTest {
 	@Test
 	public void testFindByEventIdAndEndpointId() {
 		//GIVEN
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
 		
-		GenericEvent event2 = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event2 = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId2 = eventRepo.save(event2).getId();
 		
 		EmailEndpoint email1 = EmailEndpoint.builder().email("johndoe@gmail.com").build();
@@ -179,7 +180,7 @@ public class DeliveryInfoRepositoryTest {
 	@Test
 	public void testFindByEndpointId() {
 		//GIVEN
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
 		
 		EmailEndpoint email1 = EmailEndpoint.builder().email("jancuzy@gmail.com").build();

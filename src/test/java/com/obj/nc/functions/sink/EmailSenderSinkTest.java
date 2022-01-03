@@ -81,7 +81,7 @@ class EmailSenderSinkTest extends BaseIntegrationTest {
     @Test
     void sendSingleMail() throws MessagingException {
         //GIVEN
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId1 = eventRepo.save(event).getId();
     	
         String INPUT_JSON_FILE = "messages/email_message.json";

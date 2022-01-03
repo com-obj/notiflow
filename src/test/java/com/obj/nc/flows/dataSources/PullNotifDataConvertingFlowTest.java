@@ -92,6 +92,7 @@ class PullNotifDataConvertingFlowTest extends BaseIntegrationTest {
     @BeforeEach
     public void cleanTablesAndStartPollingEvents(@Autowired JdbcTemplate jdbcTemplate) {
         purgeNotifTables(jdbcTemplate);
+        
         pollableSource.start();
     }
     
@@ -102,7 +103,7 @@ class PullNotifDataConvertingFlowTest extends BaseIntegrationTest {
         PullNotifData<JsonNode> pullNotifData = new PullNotifData<>(Collections.singletonList(JsonUtils.writeObjectToJSONNode(payload)));
     
         // when
-        inputChannel.send(MessageBuilder.withPayload(pullNotifData).build());
+        inputChannel.send(MessageBuilder.withPayload(pullNotifData).build(), 5000l);
         
         // then
         assertMessageDelivered();
@@ -116,7 +117,7 @@ class PullNotifDataConvertingFlowTest extends BaseIntegrationTest {
         PullNotifData<TestPayload> pullNotifData = new PullNotifData<>(Collections.singletonList(payload));
     
         // when
-        inputChannel.send(MessageBuilder.withPayload(pullNotifData).build());
+        inputChannel.send(MessageBuilder.withPayload(pullNotifData).build(), 5000l);
         
         // then
         assertMessageDelivered();
@@ -125,7 +126,7 @@ class PullNotifDataConvertingFlowTest extends BaseIntegrationTest {
     private void assertMessageDelivered() {
         Awaitility
                 .await()
-                .atMost(5000, TimeUnit.SECONDS)
+                .atMost(5, TimeUnit.SECONDS)
                 .until(() -> findDeliveryInfosForMsg().size()>= 2);
     
         List<DeliveryInfo> infos = findDeliveryInfosForMsg();

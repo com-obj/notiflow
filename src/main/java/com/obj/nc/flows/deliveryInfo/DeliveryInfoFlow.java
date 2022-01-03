@@ -52,6 +52,5 @@ public interface DeliveryInfoFlow {
     Future<List<DeliveryInfo>> createAndPersistReadDeliveryInfo(HasReceivingEndpoints msg);
 
     @Gateway(requestChannel=DELIVERY_INFO_FAILED_FLOW_INPUT_CHANNEL_ID, replyChannel = DELIVERY_INFO_FAILED_FLOW_OUTPUT_CHANNEL_ID)
-    // check ErrorHandlingFlowConfig.errorPayloadReceivedFlowConfig why this is not async
-    List<DeliveryInfo> createAndPersistFailedDeliveryInfo(FailedPayload failedPaylod);
+    Future<List<DeliveryInfo>> createAndPersistFailedDeliveryInfo(FailedPayload failedPayload);
 }

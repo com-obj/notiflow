@@ -22,6 +22,7 @@ package com.obj.nc.functions.processors.dummy;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 import org.hamcrest.MatcherAssert;
@@ -39,7 +40,7 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 //TODO: Does this test has any meaning??
-class RecepientsUsingSubscriptionTest {
+class RecepientsUsingSubscriptionTest extends BaseIntegrationTest {
 
     private final DummyRecepientsEnrichmentProcessingFunction resolveRecipients =
             new DummyRecepientsEnrichmentProcessingFunction();

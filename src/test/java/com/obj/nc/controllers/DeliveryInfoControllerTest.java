@@ -115,7 +115,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	UUID smsEndPointId = endpoints.get("0908111111").getId();
     	
     	//AND
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
 
 		List<UUID> eventIds = Collections.singletonList(eventId);
@@ -173,7 +173,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	UUID emailEndpointId = endpointRepo.persistEnpointIfNotExists(email1).getId();
     	
     	//AND
-		GenericEvent event = GenericEventRepositoryTest.createDirectMessageEvent();
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
 
 		EmailMessage message = new EmailMessage();
