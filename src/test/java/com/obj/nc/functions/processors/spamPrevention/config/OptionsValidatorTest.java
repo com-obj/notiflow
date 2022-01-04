@@ -16,7 +16,7 @@
 package com.obj.nc.functions.processors.spamPrevention.config;
 
 import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
-import com.obj.nc.functions.processors.spamPrevention.config.OptionsValidator;
+import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionOptionsValidator;
 import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionConfigForChannel;
 
 import org.junit.jupiter.api.Assertions;
@@ -71,7 +71,7 @@ public class OptionsValidatorTest {
     }
 
     private void runAndVerifyCaughtMessage(SpamPreventionConfigForChannel config, String expectedMessage) {
-        RuntimeException thrown = Assertions.assertThrows(RuntimeException.class, () -> OptionsValidator.validate(config));
+        RuntimeException thrown = Assertions.assertThrows(RuntimeException.class, () -> SpamPreventionOptionsValidator.validate(config));
         Assertions.assertEquals(expectedMessage, thrown.getMessage());
     }
 }

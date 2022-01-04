@@ -24,11 +24,11 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class SchedulingOption extends BaseDeliveryOption {
+public class ChannelSelectionDeliveryOption {
 
-	public enum TIME_CONSTRAINT_TYPE {
-		IMMEDIATE, NOT_BEFORE
+	public enum CHANNEL_TYPE {
+		EMAIL, SMS, PUSH
 	}
 	
-	private TIME_CONSTRAINT_TYPE  schedulingType = TIME_CONSTRAINT_TYPE.IMMEDIATE;
+	private CHANNEL_TYPE channelType = CHANNEL_TYPE.EMAIL;
 }

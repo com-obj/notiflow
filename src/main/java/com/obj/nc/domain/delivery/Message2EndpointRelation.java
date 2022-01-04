@@ -41,7 +41,6 @@ public class Message2EndpointRelation implements Persistable<UUID> {
     private UUID messageId;
     private UUID endpointId;
 
-//    @Column("delivery_options")
     @Transient
     private EndpointDeliveryOptionsConfig deliveryOptions;
 

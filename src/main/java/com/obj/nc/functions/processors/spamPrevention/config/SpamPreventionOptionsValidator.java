@@ -24,7 +24,8 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class OptionsValidator {
+public class SpamPreventionOptionsValidator {
+
     public static void validate(SpamPreventionConfigForChannel config) {
         SpamPreventionOption props = config.option;
         if (props == null) {

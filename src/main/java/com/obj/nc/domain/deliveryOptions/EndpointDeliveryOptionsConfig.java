@@ -30,7 +30,7 @@ public class EndpointDeliveryOptionsConfig {
 
     private SpamPreventionOption spamPrevention;
 
-    private AggregationOption aggregation;
+    private AggregationDeliveryOption aggregation;
 
-    private SchedulingOption scheduling;
+    private SchedulingDeliveryOption scheduling;
 }

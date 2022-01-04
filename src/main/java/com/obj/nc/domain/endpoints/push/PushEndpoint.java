@@ -48,8 +48,7 @@ public abstract class PushEndpoint extends ReceivingEndpoint {
                 .token(token)
                 .build();
     }
-    
-    
+        
     @Override
 	public SpamPreventionConfigForChannel createDefaultGlobalSpamPreventionConfig() {
         SpamPreventionConfigForChannel config = SpamPreventionConfigForChannel
