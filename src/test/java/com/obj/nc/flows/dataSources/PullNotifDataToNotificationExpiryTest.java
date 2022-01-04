@@ -64,33 +64,32 @@ class PullNotifDataToNotificationExpiryTest extends BaseIntegrationTest {
     
     @Autowired private JdbcTemplate springJdbcTemplate;
 
-    @Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-    @Autowired private SourcePollingChannelAdapter pollableSource;
 
     @Qualifier(PullNotifDataToNotificationTest.DATA_SOURCE_POLLER_NAME)
-    @Autowired private SourcePollingChannelAdapter pollableSourceJdbc;
+    @Autowired private SourcePollingChannelAdapter pollAbleSourceJdbc;
     
     @BeforeEach
-    void setupDbs() {
-        pollableSourceJdbc.stop(); //somehow this doesn't stop with the standard annotation
-        
+    void setupDbs() {        
         purgeNotifTables(springJdbcTemplate);        
         
         springJdbcTemplate.update("drop table if exists license_agreement");
         springJdbcTemplate.execute("create table license_agreement (id varchar(10) not null, description text not null, expiry_date timestamptz not null); ");
         
         persist10TestLicenseAgreements(springJdbcTemplate);
+
+        pollAbleSourceJdbc.start(); 
     }
     
     @AfterEach
     void tearDownDbs() {
+        pollAbleSourceJdbc.stop(); 
+
         springJdbcTemplate.update("drop table if exists license_agreement");
     }
     
     @Test
     void testDataPulledAndMessageSent() throws FolderException {
         // when
-        pollableSourceJdbc.start();
 
         // then
         assertTrue(greenMail.waitForIncomingEmail(15000L, 1));

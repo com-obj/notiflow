@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 @ActiveProfiles(value = { "test" }, resolver = SystemPropertyActiveProfileResolver.class)
-@SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME, "NC_JDBC_DATA_SOURCE_*"})
+@SpringIntegrationTest(noAutoStartup = {GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME, PullNotifDataToNotificationTest.DATA_SOURCE_POLLER_NAME})
 @SpringBootTest(properties = {
         "nc.data-sources.jdbc[0].name=test-ds",
         "nc.data-sources.jdbc[0].url=jdbc:postgresql://localhost:25432/nc",
@@ -50,35 +50,33 @@ class PullNotifDataToNotificationTest extends BaseIntegrationTest {
 
     @Autowired private JdbcTemplate springJdbcTemplate;
     
-    @Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-    @Autowired private SourcePollingChannelAdapter pollableSource;
-
     @Qualifier(DATA_SOURCE_POLLER_NAME)
-    @Autowired private SourcePollingChannelAdapter pollableSourceJdbc;
+    @Autowired private SourcePollingChannelAdapter pollAbleSourceJdbc;
 
     public static final String DATA_SOURCE_POLLER_NAME = "NC_JDBC_DATA_SOURCE_test-ds_check-agreements-expiry_INTEGRATION_FLOW_POLLER";
     
     @BeforeEach
     public void setupDbs() {
-        pollableSourceJdbc.stop(); //somehow this doesn't stop with the standard annotation
-
         purgeNotifTables(springJdbcTemplate);
         
         springJdbcTemplate.update("drop table if exists license_agreement");
         springJdbcTemplate.execute("create table license_agreement (id varchar(10) not null,description text not null, expiry_date timestamptz not null); ");
         
         PullNotifDataToNotificationExpiryTest.persist10TestLicenseAgreements(springJdbcTemplate);
+
+        pollAbleSourceJdbc.start();
     }
     
     @AfterEach
     public void tearDownDbs() {
+        pollAbleSourceJdbc.stop(); 
+
         springJdbcTemplate.update("drop table if exists license_agreement");
     }
     
     @Test
     void testDataPulledAndMessageSent() {
         // when
-        pollableSourceJdbc.start();
 
         //then
         boolean received = greenMail.waitForIncomingEmail(15000L, 1);

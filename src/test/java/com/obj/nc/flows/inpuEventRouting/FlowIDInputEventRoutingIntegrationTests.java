@@ -61,14 +61,11 @@ public class FlowIDInputEventRoutingIntegrationTests extends BaseIntegrationTest
 	@Autowired private PollableChannel flowInputChannel;
 	
 	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-	@Autowired private SourcePollingChannelAdapter pollableSource;
+	@Autowired private SourcePollingChannelAdapter pollAbleSource;
 	
     @BeforeEach
     public void startSourcePolling() {
-    	pollableSource.start();
-    	
-//    	JsonUtils.resetObjectMapper();
-//    	JsonUtils.getObjectMapper().addMixIn(IsTypedJson.class, TestPayload.class);
+    	pollAbleSource.start();    	
     }
 	
     @Test
@@ -84,7 +81,7 @@ public class FlowIDInputEventRoutingIntegrationTests extends BaseIntegrationTest
     
     @AfterEach
     public void stopSourcePolling() {
-    	pollableSource.stop();
+    	pollAbleSource.stop();
     }
 
 	public static void assertEventReadyForProcessing(Message<?> springMessage) {

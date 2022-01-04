@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.obj.nc.Get;
 import com.obj.nc.converterExtensions.genericEvent.InputEvent2MessageConverterExtension;
 import com.obj.nc.converterExtensions.pullNotifData.PullNotifData2EventConverterExtension;
 import com.obj.nc.converterExtensions.pullNotifData.PullNotifData2NotificationConverterExtension;
@@ -46,6 +47,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.awaitility.Awaitility;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -79,10 +84,10 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest
 class PullNotifDataConvertingFlowTest extends BaseIntegrationTest {
-    
+
     @Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-    @Autowired private SourcePollingChannelAdapter pollableSource;
-    
+    @Autowired private SourcePollingChannelAdapter pollAbleChannel;
+        
     @Qualifier(PULL_NOTIF_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
     @Autowired private MessageChannel inputChannel;
     
@@ -91,9 +96,14 @@ class PullNotifDataConvertingFlowTest extends BaseIntegrationTest {
     
     @BeforeEach
     public void cleanTablesAndStartPollingEvents(@Autowired JdbcTemplate jdbcTemplate) {
-        purgeNotifTables(jdbcTemplate);
-        
-        pollableSource.start();
+        purgeNotifTables(jdbcTemplate);        
+
+        pollAbleChannel.start();
+    }
+
+    @AfterEach
+    public void cleanUp() {    
+        pollAbleChannel.stop();
     }
     
     @Test
@@ -165,7 +175,7 @@ class PullNotifDataConvertingFlowTest extends BaseIntegrationTest {
     }
     
     @TestConfiguration
-    static class PullNotifDataConvertingFlowTestConfiguration {
+    public static class PullNotifDataConvertingFlowTestConfiguration {
         @Bean
         public PullNotifData2NotificationConverterExtension<?> genericJsonData2Message() {
             return new PullNotifData2NotificationConverterExtension<JsonNode>() {
@@ -214,16 +224,6 @@ class PullNotifDataConvertingFlowTest extends BaseIntegrationTest {
             };
         }
 
-        public static List<IsNotification> convertTestPayloads(List<TestPayload> payload) {
-            EmailMessage email1 = new EmailMessage();
-            email1.addReceivingEndpoints(
-                    EmailEndpoint.builder().email("test@objectify.sk").build()
-            );
-            email1.getBody().setSubject("Subject");
-            email1.getBody().setText("PullNotifData2NotificationConverterExtension"+JsonUtils.writeObjectToJSONString(payload));
-            return Collections.singletonList(email1);
-        }
-    
         @Bean
         public PullNotifData2EventConverterExtension<?> genericJsonData2Event() {
             return new PullNotifData2EventConverterExtension<JsonNode>() {
@@ -311,6 +311,17 @@ class PullNotifDataConvertingFlowTest extends BaseIntegrationTest {
                 }
             };
         }
+
+        public static List<IsNotification> convertTestPayloads(List<TestPayload> payload) {
+            EmailMessage email1 = new EmailMessage();
+            email1.addReceivingEndpoints(
+                    EmailEndpoint.builder().email("test@objectify.sk").build()
+            );
+            email1.getBody().setSubject("Subject");
+            email1.getBody().setText("PullNotifData2NotificationConverterExtension"+JsonUtils.writeObjectToJSONString(payload));
+            return Collections.singletonList(email1);
+        }
+    
     }
     
     @Data

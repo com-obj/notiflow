@@ -177,11 +177,6 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
         assertThat(imgs.get(0).attr("src"), endsWith("/mark-as-read"));
     }
 
-//    @AfterEach
-//    public void stopSourcePolling() {
-//    	pollableSource.stop();
-//    }
-//    
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
             .withConfiguration(

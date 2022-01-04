@@ -70,13 +70,18 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 
     @Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
     @Autowired
-    private SourcePollingChannelAdapter pollableSource;
+    private SourcePollingChannelAdapter pollAbleSource;
 
     @BeforeEach
     public void startSourcePolling() {
-        pollableSource.start();
-
+        pollAbleSource.start();
     }
+
+    @AfterEach
+    public void stopSourcePolling() {
+        pollAbleSource.stop();
+    }
+
 
     @Test
     void testGenericEventRouting() {
@@ -94,11 +99,6 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
         //THEN
         //one EmailMessage and one Intent resulting into second and third EmailMessage should be generated
         awaitSent(event.getId(), 3, Duration.ofSeconds(30));
-    }
-
-    @AfterEach
-    public void stopSourcePolling() {
-        pollableSource.stop();
     }
 
     @TestConfiguration

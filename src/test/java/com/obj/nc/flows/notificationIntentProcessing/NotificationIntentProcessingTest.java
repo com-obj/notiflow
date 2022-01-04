@@ -56,13 +56,13 @@ public class NotificationIntentProcessingTest extends BaseIntegrationTest {
 	@Autowired private GenericEventRepository eventRepo;
 	
 	@Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-	@Autowired private SourcePollingChannelAdapter pollableSource;
+	@Autowired private SourcePollingChannelAdapter pollAbleSource;
 
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {
     	purgeNotifTables(jdbcTemplate);
     	
-    	pollableSource.start();
+    	pollAbleSource.start();
     }
     
     @Test
@@ -92,7 +92,7 @@ public class NotificationIntentProcessingTest extends BaseIntegrationTest {
     
     @AfterEach
     public void stopSourcePolling() {
-    	pollableSource.stop();
+    	pollAbleSource.stop();
     }
     
     @RegisterExtension

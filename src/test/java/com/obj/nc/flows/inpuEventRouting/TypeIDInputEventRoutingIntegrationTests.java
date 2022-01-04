@@ -65,13 +65,12 @@ public class TypeIDInputEventRoutingIntegrationTests extends BaseIntegrationTest
 
     @Qualifier(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
     @Autowired
-    private SourcePollingChannelAdapter pollableSource;
+    private SourcePollingChannelAdapter pollAbleSource;
 
     @BeforeEach
     public void startSourcePolling() {
-        pollableSource.start();
+        pollAbleSource.start();
     }
-
 
     @Test
     void testGenericEventRouting() {
@@ -94,7 +93,7 @@ public class TypeIDInputEventRoutingIntegrationTests extends BaseIntegrationTest
 
     @AfterEach
     public void stopSourcePolling() {
-        pollableSource.stop();
+        pollAbleSource.stop();
     }
 
     @TestConfiguration
