@@ -21,6 +21,7 @@ package com.obj.nc.domain.message;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.HasPreviousIntentIds;
 import com.obj.nc.domain.HasPreviousMessageIds;
 import com.obj.nc.domain.IsNotification;
@@ -41,7 +42,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @ToString(callSuper = false)
-public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayload<BODY_TYPE> implements IsNotification, HasPreviousIntentIds, HasPreviousMessageIds {
+public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayload<BODY_TYPE> implements IsNotification, HasPreviousIntentIds, HasPreviousMessageIds, HasPreviousEventIds {
 	
 	@NotNull  
 	private List<UUID> previousEventIds = new ArrayList<>();
