@@ -21,6 +21,8 @@ package com.obj.nc.functions.processors.event2Message;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.converterExtensions.genericEvent.InputEventConverterExtension;
+import com.obj.nc.domain.HasEventId;
+import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -49,7 +51,7 @@ public class ExtensionsBasedEventConvertor extends ProcessorFunctionAdapter<Gene
 			return Optional.empty();
 		}
 		
-		return Optional.of(new PayloadValidationException("No EventProcessorExtension is able to handle " + payload + ". The paylod won't be transformed and thus will not be processed"));
+		return Optional.of(new PayloadValidationException("No EventProcessorExtension is able to handle " + payload + ". The payload won't be transformed and thus will not be processed"));
 	}
 	
 	private List<InputEventConverterExtension<?>> findMatchingEventProcessors(GenericEvent payload) {
@@ -63,7 +65,7 @@ public class ExtensionsBasedEventConvertor extends ProcessorFunctionAdapter<Gene
 			} 
 			
 			if (log.isDebugEnabled()) {
-				log.debug("ExtensionsBasedEventConvertor examined event processor which cannot handle payload " + payload + ". Processor replyed" + errors.get().getMessage());
+				log.debug("ExtensionsBasedEventConvertor examined event processor which cannot handle payload " + payload + ". Processor replied" + errors.get().getMessage());
 			}
 		}
 
@@ -76,8 +78,10 @@ public class ExtensionsBasedEventConvertor extends ProcessorFunctionAdapter<Gene
 				findMatchingEventProcessors(payload).stream()
 					.map(p -> p.convert(payload))
 					.peek(notifications -> notifications.stream()
-						.filter(notification -> !notification.getPreviousEventIds().contains(payload.getEventId()))
-						.forEach(notification -> notification.addPreviousEventId(payload.getId())))
+						.filter(notification -> notification instanceof HasPreviousEventIds)
+						.map(notification -> (HasPreviousEventIds) notification )
+						.filter(hasPrevEventIds -> !hasPrevEventIds.getPreviousEventIds().contains(payload.getEventId()))
+						.forEach(hasPrevEventIds -> hasPrevEventIds.addPreviousEventId(payload.getId())))
 					.flatMap(List::stream)
 					.collect(Collectors.toList());
 	}

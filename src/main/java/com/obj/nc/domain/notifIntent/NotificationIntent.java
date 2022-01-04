@@ -21,6 +21,7 @@ package com.obj.nc.domain.notifIntent;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.domain.BasePayload;
+import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.HasPreviousIntentIds;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.MessageContent;
@@ -85,18 +86,16 @@ import java.util.UUID;
  *
  * @param <BODY_TYPE>
  */
-public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification, HasPreviousIntentIds {
+public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification, HasPreviousIntentIds, HasPreviousEventIds {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "INTENT";
 	
 	@NotNull
-	@EqualsAndHashCode.Include
 	@Transient
 	@Reference(GenericEventRepository.class)
 	private List<UUID> previousEventIds = new ArrayList<>();
 	
 	@NotNull
-	@EqualsAndHashCode.Include
 	@Transient
 	@Reference(NotificationIntentRepository.class)
 	private List<UUID> previousIntentIds = new ArrayList<>();

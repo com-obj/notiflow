@@ -19,7 +19,7 @@
 
 package com.obj.nc.functions.processors.messageTemplating;
 
-import com.obj.nc.domain.BaseJSONObject;
+import com.obj.nc.domain.BaseDynamicAttributesBean;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.message.Message;
@@ -80,8 +80,8 @@ public abstract class BaseTemplateFormatter<TEMPLATE_TYPE extends TemplateWithMo
 		
 		for (Locale locale: forLocales) {
 			Context ctx = new Context(locale);
-			if (emailFromTemplate.getModel() instanceof BaseJSONObject) {
-				ctx.setVariables(((BaseJSONObject)emailFromTemplate.getModel()).getAttributes());
+			if (emailFromTemplate.getModel() instanceof BaseDynamicAttributesBean) {
+				ctx.setVariables(((BaseDynamicAttributesBean)emailFromTemplate.getModel()).getAttributes());
 			} else {
 				ctx.setVariable("model", emailFromTemplate.getModel());
 			}

@@ -17,17 +17,5 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.content;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.obj.nc.domain.BaseDynamicAttributesBean;
-import com.obj.nc.domain.content.email.EmailContent;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, defaultImpl = EmailContent.class)
-@Data
-@EqualsAndHashCode(callSuper = false)
-public abstract class MessageContent extends BaseDynamicAttributesBean {
-	
-}
+alter table nc_delivery_info drop column event_id;
+alter table nc_delivery_info drop column intent_id;

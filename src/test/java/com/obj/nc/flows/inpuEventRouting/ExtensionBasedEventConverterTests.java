@@ -49,6 +49,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -73,7 +74,9 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
     private SourcePollingChannelAdapter pollAbleSource;
 
     @BeforeEach
-    public void startSourcePolling() {
+    void setUp(@Autowired JdbcTemplate jdbcTemplate) {
+    	BaseIntegrationTest.purgeNotifTables(jdbcTemplate);
+
         pollAbleSource.start();
     }
 
@@ -82,15 +85,14 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
         pollAbleSource.stop();
     }
 
-
     @Test
     void testGenericEventRouting() {
         //GIVEN
-        TestPayload pyload = new TestPayload(1, "value");
+        TestPayload payload = new TestPayload(1, "value");
 
         GenericEvent event = GenericEvent.builder()
                 .id(UUID.randomUUID())
-                .payloadJson(JsonUtils.writeObjectToJSONNode(pyload))
+                .payloadJson(JsonUtils.writeObjectToJSONNode(payload))
                 .build();
 
         //WHEN
@@ -98,7 +100,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 
         //THEN
         //one EmailMessage and one Intent resulting into second and third EmailMessage should be generated
-        awaitSent(event.getId(), 3, Duration.ofSeconds(30));
+        awaitSent(event.getId(), 3, Duration.ofSeconds(10));
     }
 
     @TestConfiguration

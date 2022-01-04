@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.obj.nc.domain.Attachment;
-import com.obj.nc.domain.BaseJSONObject;
+import com.obj.nc.domain.BaseDynamicAttributesBean;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.push.PushContent;
@@ -51,7 +51,7 @@ import java.util.List;
 })
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class IntentContent extends BaseJSONObject {
+public class IntentContent extends BaseDynamicAttributesBean {
 
 	public final static String JSON_TYPE_IDENTIFIER = "CONSTANT_INTENT_CONTENT";
 

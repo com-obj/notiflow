@@ -43,16 +43,13 @@ import java.util.UUID;
 @ToString(callSuper = false)
 public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayload<BODY_TYPE> implements IsNotification, HasPreviousIntentIds, HasPreviousMessageIds {
 	
-	@NotNull
-	@EqualsAndHashCode.Include
+	@NotNull  
 	private List<UUID> previousEventIds = new ArrayList<>();
 	
 	@NotNull
-	@EqualsAndHashCode.Include
 	private List<UUID> previousIntentIds = new ArrayList<>();
 	
 	@NotNull
-	@EqualsAndHashCode.Include
 	private List<UUID> previousMessageIds = new ArrayList<>();
 	
 	@SneakyThrows
@@ -62,7 +59,7 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 			return null;
 		}
 		
-		T newMessage = messageType.newInstance();
+		T newMessage = messageType.getDeclaredConstructor().newInstance();
 		
 		if (messages.length == 1) {
 			newMessage.getHeader().setFlowId(messages[0].getHeader().getFlowId());
@@ -89,7 +86,7 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 	@SneakyThrows
 	public static <T extends Message<?>> T newTypedMessageFrom(Class<T> messageType,
 															   NotificationIntent intent) {
-		T newMessage = messageType.newInstance();
+		T newMessage = messageType.getDeclaredConstructor().newInstance();
 		
 		newMessage.getHeader().setFlowId(intent.getHeader().getFlowId());
 		

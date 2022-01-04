@@ -34,7 +34,7 @@ import java.util.UUID;
 
 @Data
 @AccessType(AccessType.Type.PROPERTY)
-public class BaseJSONObject {
+public class BaseDynamicAttributesBean {
 
 	@Transient
 	private Map<String, Object> attributes = new HashMap<String, Object>();

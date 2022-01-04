@@ -46,6 +46,17 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
             "from nc_delivery_info di " +
             "join nc_message m " +
             "on di.message_id = m.id " +
+            "where di.status = :status " +
+            "and (:intentId)::uuid = ANY(m.previous_intent_ids) " +
+            "order by processed_on")
+    List<DeliveryInfo> findByIntentIdAndStatusOrderByProcessedOn(
+            @Param("intentId") UUID intentId, 
+            @Param("status") DELIVERY_STATUS status);            
+
+    @Query("select di.* " +
+            "from nc_delivery_info di " +
+            "join nc_message m " +
+            "on di.message_id = m.id " +
             "where (:eventId)::uuid = ANY(m.previous_event_ids) " +
             "order by processed_on")
     List<DeliveryInfo> findByEventIdOrderByProcessedOn(@Param("eventId") UUID eventId);

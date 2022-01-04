@@ -20,7 +20,7 @@
 package com.obj.nc.domain.headers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.obj.nc.domain.BaseJSONObject;
+import com.obj.nc.domain.BaseDynamicAttributesBean;
 import com.obj.nc.domain.HasEventId;
 import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.refIntegrity.Reference;
@@ -134,7 +134,7 @@ public class ProcessingInfo implements Persistable<UUID> {
 	}
 
 	private void stepFinish(Object endPayload) {
-		processingId =  BaseJSONObject.generateUUID();
+		processingId =  BaseDynamicAttributesBean.generateUUID();
 		
 		timeProcessingEnd = Instant.now();
 		stepDurationMs = ChronoUnit.MILLIS.between(timeProcessingStart, timeProcessingEnd);

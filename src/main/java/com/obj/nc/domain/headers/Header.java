@@ -21,7 +21,7 @@ package com.obj.nc.domain.headers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.obj.nc.domain.BaseJSONObject;
+import com.obj.nc.domain.BaseDynamicAttributesBean;
 import com.obj.nc.domain.HasFlowId;
 import com.obj.nc.domain.HasProcessingInfo;
 import lombok.EqualsAndHashCode;
@@ -36,7 +36,7 @@ import org.springframework.data.relational.core.mapping.Column;
 @Setter
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class Header extends BaseJSONObject implements HasFlowId, HasProcessingInfo {
+public class Header extends BaseDynamicAttributesBean implements HasFlowId, HasProcessingInfo {
 	
 	@JsonProperty("flow-id")
 	@Column("flow_id")

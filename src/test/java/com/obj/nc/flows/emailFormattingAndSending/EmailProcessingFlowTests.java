@@ -76,6 +76,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     @BeforeEach
     void setupGreenMail(@Autowired JdbcTemplate jdbcTemplate) throws FolderException {
         purgeNotifTables(jdbcTemplate);
+        
         greenMail.purgeEmailFromAllMailboxes();        
     }
     

@@ -63,7 +63,7 @@ import java.util.UUID;
 })
 @ToString(callSuper = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public abstract class BasePayload<BODY_TYPE> extends BaseJSONObject implements HasHeader, HasReceivingEndpoints, HasProcessingInfo, Persistable<UUID> {
+public abstract class BasePayload<BODY_TYPE> extends BaseDynamicAttributesBean implements HasHeader, HasReceivingEndpoints, HasProcessingInfo, Persistable<UUID> {
 	
 	@Id
 	@EqualsAndHashCode.Include

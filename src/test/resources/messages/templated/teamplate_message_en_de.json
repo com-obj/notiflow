@@ -9,7 +9,7 @@
             "subject":"Subject",
             "requiredLocales": ["en_US","de"],
             "model": {
-            	"@class":"com.obj.nc.domain.BaseJSONObject",          	
+            	"@class":"com.obj.nc.domain.BaseDynamicAttributesBean",          	
             	"name":"John Doe"
             }
    },

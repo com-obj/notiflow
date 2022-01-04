@@ -36,7 +36,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.MDC;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.MediaType;
@@ -206,7 +205,18 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     		return infos.size()==messageCount;
     	});    
     }
-    
+
+	public void awaitSentForIntent(UUID intentId, int messageCount, Duration maxTime) {
+    	
+    	Awaitility.await().atMost(maxTime).until(() -> {
+    		List<DeliveryInfo> infos = deliveryInfoRepo.findByIntentIdAndStatusOrderByProcessedOn(intentId, DELIVERY_STATUS.SENT);
+    		log.info("DeliveryInfos: {}",infos);
+    		
+    		return infos.size()==messageCount;
+    	});    
+    }
+
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
     	Get.setApplicationContext(applicationContext);
