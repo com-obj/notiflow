@@ -141,7 +141,7 @@ class EmailProcessingFlowTests extends BaseIntegrationTest {
     }
     
     @Test
-    void testSendTemaplatedEmailGateway() throws InterruptedException, ExecutionException, TimeoutException {
+    void testSendTemplatedEmailGateway() throws InterruptedException, ExecutionException, TimeoutException {
         // given
 		//GIVEN
 		String INPUT_JSON_FILE = "messages/templated/teamplate_message.json";

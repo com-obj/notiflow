@@ -22,6 +22,7 @@ import com.obj.nc.domain.deliveryOptions.SpamPreventionGlobalConfigProperties;
 import com.obj.nc.domain.endpoints.*;
 import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
 import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionConfigForChannel;
+import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 
 import org.junit.jupiter.api.Assertions;
@@ -30,6 +31,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.test.context.ActiveProfiles;
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+
 
 import java.util.stream.Stream;
 
@@ -52,7 +55,8 @@ import javax.websocket.EndpointConfig;
     "nc.delivery.spam-prevention.push.maxMessages=1", 
     "nc.delivery.spam-prevention.push.maxMessagesTimeFrame=1",
     "nc.delivery.spam-prevention.push.maxMessagesUnit=DAYS",})
-public class SpamPreventionConfigCalculationTest {
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
+public class SpamPreventionConfigCalculationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("prepareTestInput")

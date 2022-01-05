@@ -87,10 +87,10 @@ import static org.awaitility.Awaitility.await;
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //need to dispose @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME) testModeEmailsReciver
 @Tag("test-mode")
-public class TestmodeIntegrationTests extends BaseIntegrationTest {
+public class TestModeIntegrationTests extends BaseIntegrationTest {
 	
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
-	@Autowired private GreenMail testModeEmailsReciver;
+	@Autowired private GreenMail testModeEmailsReceiver;
     
     @Qualifier(EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID)
     @Autowired private MessageChannel emailProcessingInputChannel;
@@ -115,7 +115,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() throws FolderException {
-    	testModeEmailsReciver.purgeEmailFromAllMailboxes();
+    	testModeEmailsReceiver.purgeEmailFromAllMailboxes();
     	greenMail.purgeEmailFromAllMailboxes();
     	smsSourceSupplier.purgeAllReceivedMessages();
     }
@@ -126,8 +126,8 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     	//is created which is a different instannce. In this mode testModeEmailsReciver will catch all emails normaly send to standardTestGMServer
     	//and thus in production will catch all emails send to standard SMTP server configured
     	//PRE-CONDITION
-    	Assertions.assertThat(greenMail).isNotEqualTo(testModeEmailsReciver);
-    	Assertions.assertThat(greenMail.getSmtp().getPort()).isNotEqualTo(testModeEmailsReciver.getSmtp().getPort());
+    	Assertions.assertThat(greenMail).isNotEqualTo(testModeEmailsReceiver);
+    	Assertions.assertThat(greenMail.getSmtp().getPort()).isNotEqualTo(testModeEmailsReceiver.getSmtp().getPort());
 
     	//PRE-CONDITION
     	//Any injected JavaMailSenderImpl has to be configured to send email to testModeEmailReviver. Not to standard SMTP
@@ -145,10 +145,10 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
         emailSender.apply(message2);
         emailSender.apply(message3);
 
-        testModeEmailsReciver.waitForIncomingEmail(3);
+        testModeEmailsReceiver.waitForIncomingEmail(3);
 
         //THEN MeSSAGES RECIEVED to TESTMODE GREENMAIL
-        MimeMessage[] inputMimeMessages = testModeEmailsReciver.getReceivedMessages();
+        MimeMessage[] inputMimeMessages = testModeEmailsReceiver.getReceivedMessages();
         Assertions.assertThat(inputMimeMessages.length).isEqualTo(3);
 
         List<EmailMessage> messages = greenMailReceiverSourceSupplier.get();
@@ -199,7 +199,7 @@ public class TestmodeIntegrationTests extends BaseIntegrationTest {
     
         //AND GIVEN RECEIVED EMAILs
         messageProcessingFlow.processMessage(inputEmail);
-        testModeEmailsReciver.waitForIncomingEmail(15000, 1);
+        testModeEmailsReceiver.waitForIncomingEmail(15000, 1);
         List<EmailMessage> receivedEmailMessages = greenMailReceiverSourceSupplier.get();
         Assertions.assertThat(receivedEmailMessages).hasSize(1);
         MessageSource<?> emailMessageSource = () -> new GenericMessage<>(receivedEmailMessages);
