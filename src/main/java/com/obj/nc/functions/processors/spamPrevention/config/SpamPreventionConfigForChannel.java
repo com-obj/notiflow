@@ -26,6 +26,6 @@ public class SpamPreventionConfigForChannel {
         EMAIL, SMS, SLACK, TEAMS, PUSH
     }
 
-    SpamPreventionConfigForChannel.Channel channel;
-    SpamPreventionOption option;
+    public SpamPreventionConfigForChannel.Channel channel;
+    public SpamPreventionOption option;
 }

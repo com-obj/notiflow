@@ -19,6 +19,7 @@ import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
 import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.extensions.providers.deliveryOptions.DeliveryOptionsProvider;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import org.junit.jupiter.api.Assertions;
@@ -32,31 +33,37 @@ import java.util.UUID;
 
 public class SpamPreventionFilterTest {
     DeliveryInfoRepository diRepo = Mockito.mock(DeliveryInfoRepository.class);
-    SpamPreventionFilter filter = new SpamPreventionFilter(diRepo);
+    DeliveryOptionsProvider doProvider = Mockito.mock(DeliveryOptionsProvider.class);
 
-    @Test
-    void testNoDeliveryOptions() {
-        Assertions.assertTrue(filter.test(createEmailMessage(null)));
-    }
+    SpamPreventionFilter filter = new SpamPreventionFilter(diRepo, doProvider);
+
+    EmailEndpoint testEndpoint = EmailEndpoint.builder().email("test@test.com").build();
 
     @Test
     void testNoSpamPreventionOptions() {
-        Assertions.assertTrue(filter.test(createEmailMessage(new EndpointDeliveryOptionsConfig())));
+        Mockito
+            .when( doProvider.findDeliveryOptions( ArgumentMatchers.any()))
+            .thenReturn(new EndpointDeliveryOptionsConfig());
+
+        EmailMessage emailMessage = createEmailMessage();
+
+        Assertions.assertTrue(filter.test(emailMessage));
     }
 
     @Test
     void testNotReachedLimit() {
-        EmailMessage emailMessage = prepareDataAndMocks(0L);
+        EmailMessage emailMessage = setSpamPreventionAndAlreadyDelivered(1, 0);
 
         Assertions.assertTrue(filter.test(emailMessage));
 
         verifyCountMethodCall(emailMessage);
+
         Mockito.verify(diRepo, Mockito.never()).save(ArgumentMatchers.any());
     }
 
     @Test
     void testAlreadyReachedLimit() {
-        EmailMessage emailMessage = prepareDataAndMocks(1L);
+        EmailMessage emailMessage = setSpamPreventionAndAlreadyDelivered(1, 1);
 
         Assertions.assertFalse(filter.test(emailMessage));
 
@@ -70,33 +77,40 @@ public class SpamPreventionFilterTest {
         Assertions.assertEquals(DeliveryInfo.DELIVERY_STATUS.DISCARDED, deliveryInfo.getStatus());
     }
 
-    private EmailMessage prepareDataAndMocks(long deliveryInfoCount) {
+    private EmailMessage setSpamPreventionAndAlreadyDelivered(int maxMessages, int deliveryInfoCount) {
         EndpointDeliveryOptionsConfig deliveryOptions = new EndpointDeliveryOptionsConfig();
-        deliveryOptions.setSpamPrevention(new SpamPreventionOption(1, 1, SpamPreventionOption.MaxMessageUnit.MINUTES));
+        deliveryOptions.setSpamPrevention(new SpamPreventionOption(maxMessages, 1, SpamPreventionOption.MaxMessageUnit.MINUTES));
+        Mockito
+            .when( doProvider.findDeliveryOptions( ArgumentMatchers.any()))
+            .thenReturn(deliveryOptions);
 
-        EmailMessage emailMessage = createEmailMessage(deliveryOptions);
+        EmailMessage emailMessage = createEmailMessage();
         mockCountMethodCall(deliveryInfoCount, emailMessage);
         return emailMessage;
     }
 
+
     private void mockCountMethodCall(long deliveryInfoCount, EmailMessage emailMessage) {
-        Mockito.when(diRepo.countByEndpointIdAndProcessedOnAfter(ArgumentMatchers.eq(getEndpointId(emailMessage)), ArgumentMatchers.any())).thenReturn(deliveryInfoCount);
+        Mockito.when(
+            diRepo.countByEndpointIdAndProcessedOnAfter(
+                ArgumentMatchers.eq(testEndpoint.getId()), 
+                ArgumentMatchers.any())
+            )
+            .thenReturn(deliveryInfoCount);
     }
 
     private void verifyCountMethodCall(EmailMessage emailMessage) {
-        Mockito.verify(diRepo).countByEndpointIdAndProcessedOnAfter(ArgumentMatchers.eq(getEndpointId(emailMessage)), ArgumentMatchers.any());
+        Mockito
+            .verify(diRepo)
+            .countByEndpointIdAndProcessedOnAfter(
+                ArgumentMatchers.eq(testEndpoint.getId()), 
+                ArgumentMatchers.any()
+            );
     }
 
-    private UUID getEndpointId(EmailMessage emailMessage) {
-        return emailMessage.getReceivingEndpoints().get(0).getId();
-    }
-
-    private EmailMessage createEmailMessage(EndpointDeliveryOptionsConfig deliveryOptions) {
-        EmailEndpoint endpoint = EmailEndpoint.builder().email("test@test.com").build();
-        endpoint.setDeliveryOptions(deliveryOptions);
-
+    private EmailMessage createEmailMessage() {
         EmailMessage message = new EmailMessage();
-        message.setReceivingEndpoints(Collections.singletonList(endpoint));
+        message.setReceivingEndpoints(Collections.singletonList(testEndpoint));
         return message;
     }
 }

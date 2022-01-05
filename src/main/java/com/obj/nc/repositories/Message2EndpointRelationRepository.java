@@ -15,11 +15,12 @@
 
 package com.obj.nc.repositories;
 
-import com.obj.nc.domain.delivery.Message2EndpointRelation;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 import java.util.UUID;
+
+import com.obj.nc.domain.relationship.Message2EndpointRelation;
 
 public interface Message2EndpointRelationRepository extends CrudRepository<Message2EndpointRelation, UUID> {
 

@@ -19,19 +19,16 @@
 
 package com.obj.nc.domain.endpoints;
 
+import java.time.Instant;
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
 import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
 import com.obj.nc.domain.endpoints.push.TopicPushEndpoint;
-import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionOptionsValidator;
-import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionConfigForChannel;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -40,8 +37,9 @@ import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.PayloadDocumentation;
 
-import java.time.Instant;
-import java.util.UUID;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
 @JsonSubTypes({ 
@@ -57,17 +55,9 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public abstract class ReceivingEndpoint implements Persistable<UUID> {
 	
-
 	@Id
 	@EqualsAndHashCode.Include
 	private UUID id = UUID.randomUUID();
-    /**
-	 * Kazdy Endpoint (Email, SMS, PUSH) ma nastavene options. Kedy na neho mozes posielat, ci agregovat. 
-	 * Je mozne, ze niektore setting by mali byt aj pre Recipienta tj. take ktore su platne nezavisle od kanala. Zatial ale sa budem tvarit, ze ak aj take budu
-	 * prekopiruju(zmerguju) sa k danemu enpointu
-	 **/
-	@Transient
-    private EndpointDeliveryOptionsConfig deliveryOptions;
 
 	@Transient
 	private Recipient recipient;
@@ -82,22 +72,6 @@ public abstract class ReceivingEndpoint implements Persistable<UUID> {
 	@JsonIgnore
 	public abstract String getEndpointType();
 
-	protected abstract SpamPreventionConfigForChannel createDefaultGlobalSpamPreventionConfig();
-	
-	public SpamPreventionConfigForChannel calculateSpamPreventionOption() {
-		SpamPreventionConfigForChannel config = createDefaultGlobalSpamPreventionConfig();
-		SpamPreventionOptionsValidator.validate(config);
-
-		EndpointDeliveryOptionsConfig deliveryOptions = getDeliveryOptions();
-		if (deliveryOptions == null || deliveryOptions.getSpamPrevention() == null) {
-			return config;
-		}
-		
-		//override global config
-		config.setOption(deliveryOptions.getSpamPrevention());
-		return config;
-	}
-	
 	@Override
 	@JsonIgnore
 	@Transient
@@ -107,7 +81,6 @@ public abstract class ReceivingEndpoint implements Persistable<UUID> {
 
 	public static FieldDescriptor[] fieldDesc = new FieldDescriptor[] {
 		PayloadDocumentation.fieldWithPath("id").description("Internal ID"),
-		PayloadDocumentation.fieldWithPath("deliveryOptions").description("TODO"),
 		PayloadDocumentation.fieldWithPath("recipient").description("Information about real recipient to whom this endpoint belongs to"),
 		PayloadDocumentation.fieldWithPath("endpointId").description("Non technical ID of this endpoint (Email address, Phone number, .."),
 		PayloadDocumentation.fieldWithPath("timeCreated").description("Timestamp of record creation"),		

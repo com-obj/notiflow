@@ -37,18 +37,19 @@ public class EndpointPersister extends ProcessorFunctionAdapter<BasePayload<?>, 
     protected BasePayload<?> execute(BasePayload<?> basePayload) {
         List<? extends ReceivingEndpoint> savedEndpoints = repo.persistEnpointIfNotExists(basePayload.getReceivingEndpoints());
         
-        //TODO: this should be removed as soon as delivery options are persisted 
-        for (ReceivingEndpoint endpointBeforeSave : basePayload.getReceivingEndpoints()) {
-            if (endpointBeforeSave.getDeliveryOptions() == null) {
-                continue;
-            }
+        // //TODO: this should be removed as soon as delivery options are persisted 
+        // for (ReceivingEndpoint endpointBeforeSave : basePayload.getReceivingEndpoints()) {
+        //     if (endpointBeforeSave.getDeliveryOptions() == null) {
+        //         continue;
+        //     }
 
-            ReceivingEndpoint endpoint = savedEndpoints.stream()
-                    .filter(endpointBeforeSave::equals)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Failed to match endpoint after save: " + endpointBeforeSave));
-            endpoint.setDeliveryOptions(endpointBeforeSave.getDeliveryOptions());
-        }
+        //     ReceivingEndpoint endpoint = savedEndpoints.stream()
+        //             .filter(endpointBeforeSave::equals)
+        //             .findFirst()
+        //             .orElseThrow(() -> new IllegalStateException("Failed to match endpoint after save: " + endpointBeforeSave));
+        //     endpoint.setDeliveryOptions(endpointBeforeSave.getDeliveryOptions());
+        // }
+        
         basePayload.setReceivingEndpoints(savedEndpoints);
 
         return basePayload;

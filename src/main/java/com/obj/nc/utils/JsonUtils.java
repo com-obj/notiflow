@@ -57,6 +57,13 @@ public class JsonUtils {
 		T pojo = readObjectFromJSONString(JSONStr,beanType);
 		return pojo;
 	}
+
+	public static void writeObjectToJSONFile(Path filePath, Object bean) {
+		String JSONStr = writeObjectToJSONString(bean);
+		writeFileContent(filePath, JSONStr);	
+	}
+
+	
 	
 	public static <T> T readObjectFromClassPathResource(String resourceName, Class<T> beanType) {
 		String JSONStr =  readJsonStringFromClassPathResource(resourceName);
@@ -210,6 +217,17 @@ public class JsonUtils {
 			throw new RuntimeException(ex);
 		}
     }
+
+	private static void writeFileContent(Path filePath, String content) {
+		try {
+			byte[] strToBytes = content.getBytes();
+
+			Files.write(filePath, strToBytes);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+   
 	
 	public static Optional<String> checkValidAndGetError(String jsonString) {
 		try {

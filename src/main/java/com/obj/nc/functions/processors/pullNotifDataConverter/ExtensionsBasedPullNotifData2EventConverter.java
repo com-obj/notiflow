@@ -19,9 +19,10 @@
 
 package com.obj.nc.functions.processors.pullNotifDataConverter;
 
-import com.obj.nc.converterExtensions.pullNotifData.PullNotifData2EventConverterExtension;
-import com.obj.nc.converterExtensions.pullNotifData.PullNotifDataConverterExtension;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.extensions.converters.pullNotifData.PullNotifData2EventConverterExtension;
+import com.obj.nc.extensions.converters.pullNotifData.PullNotifDataConverterExtension;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

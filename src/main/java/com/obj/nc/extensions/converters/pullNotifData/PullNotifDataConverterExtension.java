@@ -1,7 +1,7 @@
-package com.obj.nc.converterExtensions.pullNotifData;
+package com.obj.nc.extensions.converters.pullNotifData;
 
-import com.obj.nc.converterExtensions.ConverterExtension;
 import com.obj.nc.domain.pullNotifData.PullNotifData;
+import com.obj.nc.extensions.converters.ConverterExtension;
 
 public interface PullNotifDataConverterExtension<PT, OUT> extends ConverterExtension<PullNotifData<PT>, OUT>{
     

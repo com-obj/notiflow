@@ -13,16 +13,13 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.domain.delivery;
+package com.obj.nc.domain.relationship;
 
-import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
@@ -41,8 +38,8 @@ public class Message2EndpointRelation implements Persistable<UUID> {
     private UUID messageId;
     private UUID endpointId;
 
-    @Transient
-    private EndpointDeliveryOptionsConfig deliveryOptions;
+    // @Transient
+    // private EndpointDeliveryOptionsConfig deliveryOptions;
 
     @Override
     public boolean isNew() {

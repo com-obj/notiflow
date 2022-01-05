@@ -19,8 +19,8 @@
 
 package com.obj.nc.flows.inputEventRouting.config;
 
-import com.obj.nc.converterExtensions.genericEvent.InputEventConverterExtension;
 import com.obj.nc.domain.IsNotification;
+import com.obj.nc.extensions.converters.genericEvent.InputEventConverterExtension;
 import com.obj.nc.functions.processors.event2Message.ExtensionsBasedEventConvertor;
 import com.obj.nc.routers.MessageOrIntentRouter;
 import lombok.RequiredArgsConstructor;

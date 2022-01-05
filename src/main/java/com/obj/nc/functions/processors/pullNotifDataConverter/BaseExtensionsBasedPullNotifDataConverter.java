@@ -19,9 +19,9 @@
 
 package com.obj.nc.functions.processors.pullNotifDataConverter;
 
-import com.obj.nc.converterExtensions.pullNotifData.PullNotifDataConverterExtension;
 import com.obj.nc.domain.pullNotifData.PullNotifData;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.extensions.converters.pullNotifData.PullNotifDataConverterExtension;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import lombok.extern.slf4j.Slf4j;
 

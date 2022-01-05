@@ -17,10 +17,13 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.converterExtensions.genericEvent;
+package com.obj.nc.extensions.converters.genericEvent;
 
-import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.IsNotification;
+import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.extensions.converters.ConverterExtension;
 
-public interface InputEvent2IntentConverterExtension extends InputEventConverterExtension<NotificationIntent> {
-	
+public interface InputEventConverterExtension<RESULT_TYPE extends IsNotification> 
+		extends ConverterExtension<GenericEvent, RESULT_TYPE> {
+			
 }

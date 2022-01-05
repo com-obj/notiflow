@@ -48,7 +48,9 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest
+@SpringBootTest(properties = {
+    "nc.delivery.spam-prevention.jsonRepoPathAndFileName=src/test/resources/deliver-options/delivery-options-setting2.json", 
+})
 public class MessageProcessingTest extends BaseIntegrationTest {
 
     @Autowired
@@ -89,7 +91,7 @@ public class MessageProcessingTest extends BaseIntegrationTest {
     }
 
     @Test
-    void testEventIsFilteredOut() {
+    void testEventIsFilteredOutBecauseSpamPrevention() {
         String INPUT_JSON_FILE = "messages/email_message_spam_prevention.json";
         EmailMessage msg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
 

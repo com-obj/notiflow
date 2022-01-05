@@ -19,16 +19,13 @@
 
 package com.obj.nc.domain.endpoints;
 
+import javax.validation.constraints.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotNull;
-
-import com.obj.nc.Get;
-import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionConfigForChannel;
 
 @Data
 @EqualsAndHashCode(callSuper = false, of = "phone")
@@ -62,15 +59,5 @@ public class SmsEndpoint extends ReceivingEndpoint {
     public String getEndpointType() {
         return JSON_TYPE_IDENTIFIER;
     }
-
-    @Override
-	public SpamPreventionConfigForChannel createDefaultGlobalSpamPreventionConfig() {
-        SpamPreventionConfigForChannel config = SpamPreventionConfigForChannel
-			.builder()
-			.channel(SpamPreventionConfigForChannel.Channel.SMS)
-			.option(Get.getSpamPreventionProperties().getSms())
-			.build();
-        return config;
-	}
 
 }

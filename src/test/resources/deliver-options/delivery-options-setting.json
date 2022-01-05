@@ -1,0 +1,79 @@
+{
+    "emailGlobal": {
+        "maxMessages": 1,
+        "maxMessagesTimeFrame": 1,
+        "maxMessagesUnit": "DAYS"
+    },
+    "email": {
+        "test@test.com": {
+            "maxMessages": 5,
+            "maxMessagesTimeFrame": 3,
+            "maxMessagesUnit": "DAYS"
+        },
+        "bbb@aa.com": {
+            "maxMessages": 5,
+            "maxMessagesTimeFrame": 3,
+            "maxMessagesUnit": "DAYS"
+        }
+    },
+    "mailChimpGlobal": {
+        "maxMessages": 1,
+        "maxMessagesTimeFrame": 1,
+        "maxMessagesUnit": "DAYS"
+    },
+    "mailChimp": {
+        "test@test.com": {
+            "maxMessages": 5,
+            "maxMessagesTimeFrame": 3,
+            "maxMessagesUnit": "DAYS"
+        }
+    },
+    "slackGlobal": {
+        "maxMessages": 1,
+        "maxMessagesTimeFrame": 1,
+        "maxMessagesUnit": "DAYS"
+    },
+    "slack": {
+        "public-channel": {
+            "maxMessages": 5,
+            "maxMessagesTimeFrame": 3,
+            "maxMessagesUnit": "DAYS"
+        }
+    },
+    "smsGlobal": {
+        "maxMessages": 1,
+        "maxMessagesTimeFrame": 1,
+        "maxMessagesUnit": "DAYS"
+    },
+    "sms": {
+        "+421123456789": {
+            "maxMessages": 5,
+            "maxMessagesTimeFrame": 3,
+            "maxMessagesUnit": "DAYS"
+        }
+    },
+    "teamsGlobal": {
+        "maxMessages": 1,
+        "maxMessagesTimeFrame": 1,
+        "maxMessagesUnit": "DAYS"
+    },
+    "teams": {
+        "wild-webhook-url": {
+            "maxMessages": 5,
+            "maxMessagesTimeFrame": 3,
+            "maxMessagesUnit": "DAYS"
+        }
+    },
+    "pushGlobal": {
+        "maxMessages": 1,
+        "maxMessagesTimeFrame": 1,
+        "maxMessagesUnit": "DAYS"
+    },
+    "push": {
+        "push-topic": {
+            "maxMessages": 5,
+            "maxMessagesTimeFrame": 3,
+            "maxMessagesUnit": "DAYS"
+        }
+    }
+}

@@ -20,12 +20,12 @@
 package com.obj.nc.functions.processors.event2Message;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.converterExtensions.genericEvent.InputEventConverterExtension;
 import com.obj.nc.domain.HasEventId;
 import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.extensions.converters.genericEvent.InputEventConverterExtension;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

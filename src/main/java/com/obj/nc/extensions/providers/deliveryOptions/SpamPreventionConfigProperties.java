@@ -13,13 +13,17 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.domain.deliveryOptions;
+package com.obj.nc.extensions.providers.deliveryOptions;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Map;
+
+import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -29,10 +33,8 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties("nc.delivery.spam-prevention")
-public class SpamPreventionGlobalConfigProperties {
-    private SpamPreventionOption email;
-    private SpamPreventionOption slack;
-    private SpamPreventionOption sms;
-    private SpamPreventionOption teams;
-    private SpamPreventionOption push;
+public class SpamPreventionConfigProperties {   
+
+    private String jsonRepoPathAndFileName;
+
 }

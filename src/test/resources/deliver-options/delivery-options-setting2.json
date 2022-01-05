@@ -1,0 +1,19 @@
+{
+    "emailGlobal": {
+        "maxMessages": 5,
+        "maxMessagesTimeFrame": 1,
+        "maxMessagesUnit": "DAYS"
+    },
+    "email": {
+        "aaa@aaa.sk": {
+            "maxMessages": 0,
+            "maxMessagesTimeFrame": 3,
+            "maxMessagesUnit": "DAYS"
+        },
+        "bbb@aa.com": {
+            "maxMessages": 5,
+            "maxMessagesTimeFrame": 3,
+            "maxMessagesUnit": "DAYS"
+        }
+    }
+}

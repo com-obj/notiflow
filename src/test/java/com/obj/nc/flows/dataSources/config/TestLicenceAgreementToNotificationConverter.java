@@ -1,12 +1,13 @@
 package com.obj.nc.flows.dataSources.config;
 
-import com.obj.nc.converterExtensions.pullNotifData.PullNotifData2NotificationConverterExtension;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.pullNotifData.PullNotifData;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.extensions.converters.pullNotifData.PullNotifData2NotificationConverterExtension;
+
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;

@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.converterExtensions.genericEvent;
+package com.obj.nc.extensions.converters.genericEvent;
 
 import com.obj.nc.domain.message.Message;
 

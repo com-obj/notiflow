@@ -15,30 +15,34 @@
 
 package com.obj.nc.functions.processors.spamPrevention;
 
-import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
-import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
-import com.obj.nc.domain.endpoints.ReceivingEndpoint;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
-import com.obj.nc.repositories.DeliveryInfoRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.function.Predicate;
+
+import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.extensions.providers.deliveryOptions.DeliveryOptionsProvider;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
+import com.obj.nc.repositories.DeliveryInfoRepository;
+
+import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class SpamPreventionFilter implements Predicate<Message<?>> {
     private final DeliveryInfoRepository deliveryInfoRepository;
+    private final DeliveryOptionsProvider deliveryOptionsProvider;
 
     @Override
     public boolean test(Message<?> payload) {
         for (ReceivingEndpoint endpoint : payload.getReceivingEndpoints()) {
-            SpamPreventionOption spamPreventionOptions = endpoint.calculateSpamPreventionOption().getOption();
+            
+            SpamPreventionOption spamPreventionOptions = deliveryOptionsProvider.findDeliveryOptions(endpoint).getSpamPrevention();
 
             if (spamPreventionOptions == null) {
                 continue;

@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.converterExtensions;
+package com.obj.nc.extensions.converters;
 
 import com.obj.nc.exceptions.PayloadValidationException;
 

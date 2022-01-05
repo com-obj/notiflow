@@ -20,8 +20,9 @@
 package com.obj.nc.domain.endpoints;
 
 import com.google.common.collect.ObjectArrays;
-import com.obj.nc.Get;
-import com.obj.nc.functions.processors.spamPrevention.config.SpamPreventionConfigForChannel;
+
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.payload.PayloadDocumentation;
 
 import lombok.Builder;
 import lombok.Data;
@@ -29,8 +30,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.restdocs.payload.FieldDescriptor;
-import org.springframework.restdocs.payload.PayloadDocumentation;
 
 @Data
 @EqualsAndHashCode(callSuper=false, of = "email")
@@ -84,17 +83,5 @@ public class EmailEndpoint extends ReceivingEndpoint {
         },
         FieldDescriptor.class
     );
-
-	@Override
-	public SpamPreventionConfigForChannel createDefaultGlobalSpamPreventionConfig() {
-        SpamPreventionConfigForChannel config = SpamPreventionConfigForChannel
-			.builder()
-			.channel(SpamPreventionConfigForChannel.Channel.EMAIL)
-			.option(Get.getSpamPreventionProperties().getEmail())
-			.build();
-        return config;
-	}
-
-	
 	
 }

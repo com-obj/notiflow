@@ -12,7 +12,6 @@
 	"receivingEndpoints": [
 		{
 			"@type": "EMAIL",
-			"deliveryOptions": null,
 			"recipient": {
 				"type": "PERSON",
 				"name": "John Doe"
