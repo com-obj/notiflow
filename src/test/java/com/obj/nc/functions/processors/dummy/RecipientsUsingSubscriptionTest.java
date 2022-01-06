@@ -40,7 +40,7 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 //TODO: Does this test has any meaning??
-class RecepientsUsingSubscriptionTest extends BaseIntegrationTest {
+class RecipientsUsingSubscriptionTest extends BaseIntegrationTest {
 
     private final DummyRecepientsEnrichmentProcessingFunction resolveRecipients =
             new DummyRecepientsEnrichmentProcessingFunction();
@@ -87,8 +87,13 @@ class RecepientsUsingSubscriptionTest extends BaseIntegrationTest {
     @Test
     void testResolveRecipientsMergeWithExisting() {
         // given
-        String INPUT_JSON_FILE = "intents/ba_job_post_recipients.json";
-        NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+        NotificationIntent inputNotificationIntent = NotificationIntent.createWithStaticContent(
+            "Business Intelligence (BI) Developer", 
+            "We are looking for a Business Intelligence", 
+            EmailEndpoint.builder().email("john.doe@objectify.sk").build(),
+            EmailEndpoint.builder().email("john.dudly@objectify.sk").build(),
+            EmailEndpoint.builder().email("all@objectify.sk").build()
+        );   
 
         // when
         NotificationIntent outputNotificationIntent = (NotificationIntent)resolveRecipients.apply(inputNotificationIntent);

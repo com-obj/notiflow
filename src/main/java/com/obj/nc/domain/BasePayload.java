@@ -52,7 +52,6 @@ import java.util.UUID;
 @Setter
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({ 
-	@Type(value = NotificationIntent.class, name = NotificationIntent.JSON_TYPE_IDENTIFIER),
 	@Type(value = EmailMessage.class, name = EmailMessage.JSON_TYPE_IDENTIFIER),
 	@Type(value = SmsMessage.class, name = SmsMessage.JSON_TYPE_IDENTIFIER),
 	@Type(value = MailchimpMessage.class, name = MailchimpMessage.JSON_TYPE_IDENTIFIER),

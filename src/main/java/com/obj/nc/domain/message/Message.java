@@ -44,12 +44,15 @@ import java.util.UUID;
 @ToString(callSuper = false)
 public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayload<BODY_TYPE> implements IsNotification, HasPreviousIntentIds, HasPreviousMessageIds, HasPreviousEventIds {
 	
+	//TODO: purely technical staf, should be moved to header
 	@NotNull  
 	private List<UUID> previousEventIds = new ArrayList<>();
 	
+	//TODO: purely technical staf, should be moved to header
 	@NotNull
 	private List<UUID> previousIntentIds = new ArrayList<>();
 	
+	//TODO: purely technical staf, should be moved to header
 	@NotNull
 	private List<UUID> previousMessageIds = new ArrayList<>();
 	

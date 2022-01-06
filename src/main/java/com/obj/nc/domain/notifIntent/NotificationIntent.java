@@ -19,49 +19,43 @@
 
 package com.obj.nc.domain.notifIntent;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.HasPreviousEventIds;
-import com.obj.nc.domain.HasPreviousIntentIds;
-import com.obj.nc.domain.IsNotification;
-import com.obj.nc.domain.content.MessageContent;
-import com.obj.nc.domain.content.TemplateWithModelContent;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.content.mailchimp.TemplatedMailchimpContent;
-import com.obj.nc.domain.content.push.PushContent;
-import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.ReceivingEndpoint;
-import com.obj.nc.domain.endpoints.SmsEndpoint;
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailMessageTemplated;
-import com.obj.nc.domain.message.MailchimpMessage;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.PushMessage;
-import com.obj.nc.domain.message.SmsMessage;
-import com.obj.nc.domain.message.SmsMessageTemplated;
-import com.obj.nc.domain.message.TemplatedMailchimpMessage;
-import com.obj.nc.domain.notifIntent.content.IntentContent;
-import com.obj.nc.domain.refIntegrity.Reference;
-import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.NotificationIntentRepository;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
-
-import javax.validation.constraints.NotNull;
-
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.api.client.util.Lists;
+import com.google.common.collect.Iterables;
+import com.obj.nc.domain.BaseDynamicAttributesBean;
+import com.obj.nc.domain.HasPreviousEventIds;
+import com.obj.nc.domain.HasProcessingInfo;
+import com.obj.nc.domain.HasReceivingEndpoints;
+import com.obj.nc.domain.IsNotification;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.domain.headers.HasHeader;
+import com.obj.nc.domain.headers.Header;
+import com.obj.nc.domain.headers.ProcessingInfo;
+import com.obj.nc.domain.notifIntent.content.IntentContent;
+import com.obj.nc.domain.refIntegrity.Reference;
+import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.NotificationIntentRepository;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Embedded;
+import org.springframework.data.relational.core.mapping.Table;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
@@ -86,19 +80,61 @@ import java.util.UUID;
  *
  * @param <BODY_TYPE>
  */
-public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification, HasPreviousIntentIds, HasPreviousEventIds {
+public class NotificationIntent extends BaseDynamicAttributesBean implements HasHeader, HasReceivingEndpoints, HasProcessingInfo, Persistable<UUID>, IsNotification, HasPreviousEventIds {
 	
-	public static final String JSON_TYPE_IDENTIFIER = "INTENT";
+	@Id
+	@EqualsAndHashCode.Include
+	private UUID id = UUID.randomUUID();
+	@CreatedDate
+	private Instant timeCreated;
+	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+	protected Header header = new Header();
 	
+	@Column("payload_json")	
+	protected IntentContent body;
+	
+	//TODO: purely technical staf, should be moved to header
 	@NotNull
 	@Transient
 	@Reference(GenericEventRepository.class)
 	private List<UUID> previousEventIds = new ArrayList<>();
 	
+	//TODO: purely technical staf, should be moved to header
+	//Can Intent have parent Intent? What is that good for?
 	@NotNull
 	@Transient
 	@Reference(NotificationIntentRepository.class)
 	private List<UUID> previousIntentIds = new ArrayList<>();
+
+	public static NotificationIntent createWithStaticContent(String subject, String body, ReceivingEndpoint ... endpoints) {
+		NotificationIntent intent = new NotificationIntent();	
+		intent.setBody(IntentContent.createStaticContent(subject,body));
+		intent.addReceivingEndpoints(endpoints);
+		return intent;
+	}
+
+	//if body is part of message then receivingEndpoints.size() = 1
+	private List<? extends ReceivingEndpoint> receivingEndpoints = new ArrayList<ReceivingEndpoint>();
+
+	public NotificationIntent addReceivingEndpoints(ReceivingEndpoint ... r) {
+		((List<ReceivingEndpoint>)this.receivingEndpoints).addAll(Arrays.asList(r));
+		return this;
+	}
+		
+	@JsonIgnore
+	@Transient
+	public void setReceivingEndpointsSL(List<ReceivingEndpoint> endpoints) {
+		List<ReceivingEndpoint> typedEndpoints = Lists.newArrayList(
+					Iterables.filter(endpoints, ReceivingEndpoint.class));
+		
+		this.setReceivingEndpoints(typedEndpoints);
+	}
+
+	@Override
+	@Transient
+	public List<? extends ReceivingEndpoint> getReceivingEndpoints() {
+		return receivingEndpoints;
+	}
 	
 	@Override
 	public void addPreviousEventId(UUID eventId) {
@@ -130,76 +166,20 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 	public UUID[] getPreviousIntentIdsAsArray() {
 		return previousIntentIds.toArray(new UUID[0]);
 	}
+
+	@JsonIgnore
+	@Transient
+	public ProcessingInfo getProcessingInfo() {
+		return getHeader().getProcessingInfo();
+	}
 	
 	@Override
 	@JsonIgnore
-	public String getPayloadTypeName() {
-		return JSON_TYPE_IDENTIFIER;
+	@Transient
+	public boolean isNew() {
+		return timeCreated == null;
 	}
-	
-	public static NotificationIntent createWithStaticContent(String subject, String body, ReceivingEndpoint ... endpoints) {
-		NotificationIntent intent = new NotificationIntent();	
-		intent.setBody(IntentContent.createStaticContent(subject,body));
-		intent.addReceivingEndpoints(endpoints);
-		return intent;
-	}
-	
-	public Message<?> createMessage(ReceivingEndpoint endpointsForOneSubject) {
-		MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
+		
 
-		if (msgContent instanceof EmailContent) {
-			EmailMessage email = Message.newTypedMessageFrom(EmailMessage.class, this);
-			email.setBody((EmailContent)msgContent);
-			
-			return email;
-		} 
 		
-		if (msgContent instanceof SimpleTextContent) {
-			SmsMessage sms = Message.newTypedMessageFrom(SmsMessage.class, this);
-			sms.setBody((SimpleTextContent)msgContent);
-			
-			return sms;
-		} 
-		
-		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof EmailEndpoint) {
-			EmailMessageTemplated<?> email = Message.newTypedMessageFrom(EmailMessageTemplated.class, this);
-			email.setBody((TemplateWithModelEmailContent)msgContent);
-			
-			return email;
-		} 
-		
-		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof SmsEndpoint) {
-			SmsMessageTemplated<?> sms = Message.newTypedMessageFrom(SmsMessageTemplated.class, this);
-			sms.setBody((TemplateWithModelContent)msgContent);
-			
-			return sms;
-		}
-		
-		if (msgContent instanceof TemplatedMailchimpContent) {
-			TemplatedMailchimpMessage mailChimp = Message.newTypedMessageFrom(TemplatedMailchimpMessage.class, this);
-			mailChimp.setBody((TemplatedMailchimpContent)msgContent);
-			
-			return mailChimp;
-		}
-		
-		if (msgContent instanceof MailchimpContent) {
-			MailchimpMessage mailChimp = Message.newTypedMessageFrom(MailchimpMessage.class, this);
-			mailChimp.setBody((MailchimpContent)msgContent);
-			
-			return mailChimp;
-		}
-		
-		if (msgContent instanceof PushContent) {
-			PushMessage push = Message.newTypedMessageFrom(PushMessage.class, this);
-			push.setBody((PushContent)msgContent);
-			
-			return push;
-		}
-
-		throw new NotImplementedException("Add additional cases");
-
-	}
-
-
-	
 }

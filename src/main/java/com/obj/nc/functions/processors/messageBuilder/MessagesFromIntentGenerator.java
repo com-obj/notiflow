@@ -19,19 +19,39 @@
 
 package com.obj.nc.functions.processors.messageBuilder;
 
-import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.endpoints.ReceivingEndpoint;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import com.obj.nc.aspects.DocumentProcessingInfo;
+import com.obj.nc.domain.content.MessageContent;
+import com.obj.nc.domain.content.TemplateWithModelContent;
+import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
+import com.obj.nc.domain.content.mailchimp.MailchimpContent;
+import com.obj.nc.domain.content.mailchimp.TemplatedMailchimpContent;
+import com.obj.nc.domain.content.push.PushContent;
+import com.obj.nc.domain.content.sms.SimpleTextContent;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.domain.endpoints.SmsEndpoint;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.message.EmailMessageTemplated;
+import com.obj.nc.domain.message.MailchimpMessage;
+import com.obj.nc.domain.message.Message;
+import com.obj.nc.domain.message.PushMessage;
+import com.obj.nc.domain.message.SmsMessage;
+import com.obj.nc.domain.message.SmsMessageTemplated;
+import com.obj.nc.domain.message.TemplatedMailchimpMessage;
+import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
+
+import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.stereotype.Component;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @AllArgsConstructor
@@ -60,7 +80,7 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 
 		for (ReceivingEndpoint receivingEndpoint: notificationIntent.getReceivingEndpoints()) {
 			
-			Message<?> msg = (Message<?>) notificationIntent.createMessage(receivingEndpoint);
+			Message<?> msg = (Message<?>) createMessageForEndpoint(notificationIntent, receivingEndpoint);
 			
 			msg.addReceivingEndpoints(receivingEndpoint);
 
@@ -69,6 +89,62 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 		}
 
 		return messages;
+	}
+
+	public Message<?> createMessageForEndpoint(NotificationIntent intent, ReceivingEndpoint forEndpoint) {
+		MessageContent msgContent = intent.getBody().createMessageContent(forEndpoint);
+
+		if (msgContent instanceof EmailContent) {
+			EmailMessage email = Message.newTypedMessageFrom(EmailMessage.class, intent);
+			email.setBody((EmailContent)msgContent);
+			
+			return email;
+		} 
+		
+		if (msgContent instanceof SimpleTextContent) {
+			SmsMessage sms = Message.newTypedMessageFrom(SmsMessage.class, intent);
+			sms.setBody((SimpleTextContent)msgContent);
+			
+			return sms;
+		} 
+		
+		if (msgContent instanceof TemplateWithModelContent && forEndpoint instanceof EmailEndpoint) {
+			EmailMessageTemplated<?> email = Message.newTypedMessageFrom(EmailMessageTemplated.class, intent);
+			email.setBody((TemplateWithModelEmailContent)msgContent);
+			
+			return email;
+		} 
+		
+		if (msgContent instanceof TemplateWithModelContent && forEndpoint instanceof SmsEndpoint) {
+			SmsMessageTemplated<?> sms = Message.newTypedMessageFrom(SmsMessageTemplated.class, intent);
+			sms.setBody((TemplateWithModelContent)msgContent);
+			
+			return sms;
+		}
+		
+		if (msgContent instanceof TemplatedMailchimpContent) {
+			TemplatedMailchimpMessage mailChimp = Message.newTypedMessageFrom(TemplatedMailchimpMessage.class, intent);
+			mailChimp.setBody((TemplatedMailchimpContent)msgContent);
+			
+			return mailChimp;
+		}
+		
+		if (msgContent instanceof MailchimpContent) {
+			MailchimpMessage mailChimp = Message.newTypedMessageFrom(MailchimpMessage.class, intent);
+			mailChimp.setBody((MailchimpContent)msgContent);
+			
+			return mailChimp;
+		}
+		
+		if (msgContent instanceof PushContent) {
+			PushMessage push = Message.newTypedMessageFrom(PushMessage.class, intent);
+			push.setBody((PushContent)msgContent);
+			
+			return push;
+		}
+
+		throw new NotImplementedException("Add additional cases in createMessageForEndpoint for endpoint type " + forEndpoint.getClass().getSimpleName());
+
 	}
 
 }

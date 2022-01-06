@@ -51,7 +51,7 @@ public class NotificationIntentProcessingFlowConfig {
 	public IntegrationFlow intentProcessingFlowDefinition() {
 		return IntegrationFlows
 				.from(intentProcessingInputChannel())
-				.handle(endpointPersister)
+				// .handle(endpointPersister)
 				.handle(notificationIntentPersister)	
                 //TODO: users could subscribe to intents. NC would be able to calculate recipients based on these settings. Currently recipients has to be provided
 				.transform(generateMessagesFromIntent)

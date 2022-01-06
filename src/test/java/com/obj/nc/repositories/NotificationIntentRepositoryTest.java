@@ -73,7 +73,6 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	     
 	     Assertions.assertThat(oIntentInDB.isPresent()).isTrue();
 	     NotificationIntent intentInDB = oIntentInDB.get();
-	     Assertions.assertThat(intentInDB.getPayloadTypeName()).isEqualTo("INTENT"); 
 	     Assertions.assertThat(intentInDB.getTimeCreated()).isNotNull();
 	     Assertions.assertThat(intentInDB.getHeader().getFlowId()).isEqualTo("default-flow");
 	     Assertions.assertThat(intentInDB.getPreviousEventIds()).isEqualTo(Arrays.asList(eventIds));
