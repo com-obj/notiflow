@@ -20,6 +20,7 @@
 package com.obj.nc.functions.processors.intentPersister;
 
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.notifIntent.NotificationIntentPersistentState;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.repositories.NotificationIntentRepository;
 import lombok.AllArgsConstructor;
@@ -35,7 +36,13 @@ public class NotificationIntentPersister extends ProcessorFunctionAdapter<Notifi
 
     @Override
 	protected NotificationIntent execute(NotificationIntent notifIntent) {
-		return intentRepo.save(notifIntent);
+		NotificationIntentPersistentState intentIdDB = intentRepo.save(notifIntent.toPersistentState());
+
+        NotificationIntent result = intentIdDB.toIntent();
+        //TODO: Hack until notification intent have recipients
+        result.setReceivingEndpoints(notifIntent.getReceivingEndpoints());
+
+        return result;
 	}
 
 

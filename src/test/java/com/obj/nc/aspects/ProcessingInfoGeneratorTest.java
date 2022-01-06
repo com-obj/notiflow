@@ -189,11 +189,13 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
 		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepository.save(event).getId();
 		
-        String INPUT_JSON_FILE = "intents/ba_job_post.json";
-        NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+			"Business Intelligence (BI) Developer", 
+			"We are looking for a Business Intelligence"
+		);  	
         notificationIntent.addPreviousEventId(eventId);
         
-        UUID[] originalEventIDs = notificationIntent.getPreviousEventIdsAsArray();
+        UUID[] originalEventIDs = notificationIntent.getPreviousEventIds().toArray(new UUID[0]);
         notificationIntent = (NotificationIntent) resolveRecipients.apply(notificationIntent);
         List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);
 
@@ -247,10 +249,12 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
 		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepository.save(event).getId();
 
-        String INPUT_JSON_FILE = "intents/ba_job_post.json";
-        NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+			"Business Intelligence (BI) Developer", 
+			"We are looking for a Business Intelligence"
+		);  	
         notificationIntent.addPreviousEventId(eventId);
-        UUID[] originalEventIDs = notificationIntent.getPreviousEventIdsAsArray();
+        UUID[] originalEventIDs = notificationIntent.getPreviousEventIds().toArray(new UUID[0]);
         
         notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
         List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);                      

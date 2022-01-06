@@ -19,7 +19,7 @@
 
 package com.obj.nc.flows.slackMessageProcessingFlow;
 
-import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
+import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.slack.SlackMessageSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

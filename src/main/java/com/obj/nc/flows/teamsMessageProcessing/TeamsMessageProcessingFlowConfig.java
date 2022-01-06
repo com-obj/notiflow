@@ -19,7 +19,7 @@
 
 package com.obj.nc.flows.teamsMessageProcessing;
 
-import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
+import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.teams.TeamsMessageSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

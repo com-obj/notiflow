@@ -61,7 +61,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(callSuper = false)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
-@Table("nc_intent")
 /**
  * This class represents Intent to deliver *some* kind of information at *some* point in time to recipient. Use this class in case
  * that you cannot tell the details about what/when/how are stored in delivery settings of that recipient. 
@@ -80,33 +79,29 @@ import lombok.ToString;
  *
  * @param <BODY_TYPE>
  */
-public class NotificationIntent extends BaseDynamicAttributesBean implements HasHeader, HasReceivingEndpoints, HasProcessingInfo, Persistable<UUID>, IsNotification, HasPreviousEventIds {
+public class NotificationIntent extends BaseDynamicAttributesBean implements HasHeader, HasReceivingEndpoints, HasProcessingInfo, IsNotification, HasPreviousEventIds {
 	
-	@Id
 	@EqualsAndHashCode.Include
 	private UUID id = UUID.randomUUID();
 
-	@CreatedDate
 	private Instant timeCreated;
-	
-	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+
 	protected Header header = new Header();
 	
-	@Column("payload_json")	
 	protected IntentContent body;
 	
 	//TODO: purely technical staf, should be moved to header
-	@NotNull
 	@Transient
 	@Reference(GenericEventRepository.class)
 	private List<UUID> previousEventIds = new ArrayList<>();
 	
 	//TODO: purely technical staf, should be moved to header
 	//Can Intent have parent Intent? What is that good for?
-	@NotNull
 	@Transient
 	@Reference(NotificationIntentRepository.class)
 	private List<UUID> previousIntentIds = new ArrayList<>();
+
+	private List<? extends ReceivingEndpoint> receivingEndpoints = new ArrayList<ReceivingEndpoint>();
 
 	public static NotificationIntent createWithStaticContent(String subject, String body, ReceivingEndpoint ... endpoints) {
 		NotificationIntent intent = new NotificationIntent();	
@@ -115,8 +110,16 @@ public class NotificationIntent extends BaseDynamicAttributesBean implements Has
 		return intent;
 	}
 
-	//if body is part of message then receivingEndpoints.size() = 1
-	private List<? extends ReceivingEndpoint> receivingEndpoints = new ArrayList<ReceivingEndpoint>();
+	public NotificationIntentPersistentState toPersistentState() {
+		NotificationIntentPersistentState persistentState = new NotificationIntentPersistentState();
+		persistentState.setBody(getBody());
+		persistentState.setHeader(getHeader());
+		persistentState.setId(getId());
+		persistentState.setPreviousEventIds(previousEventIds.toArray(new UUID[0]));
+		persistentState.setPreviousIntentIds(previousIntentIds.toArray(new UUID[0]));
+		persistentState.setTimeCreated(getTimeCreated());
+		return persistentState;	 
+	}
 
 	public NotificationIntent addReceivingEndpoints(ReceivingEndpoint ... r) {
 		((List<ReceivingEndpoint>)this.receivingEndpoints).addAll(Arrays.asList(r));
@@ -124,7 +127,6 @@ public class NotificationIntent extends BaseDynamicAttributesBean implements Has
 	}
 		
 	@JsonIgnore
-	@Transient
 	public void setReceivingEndpointsSL(List<ReceivingEndpoint> endpoints) {
 		List<ReceivingEndpoint> typedEndpoints = Lists.newArrayList(
 					Iterables.filter(endpoints, ReceivingEndpoint.class));
@@ -133,7 +135,6 @@ public class NotificationIntent extends BaseDynamicAttributesBean implements Has
 	}
 
 	@Override
-	@Transient
 	public List<? extends ReceivingEndpoint> getReceivingEndpoints() {
 		return receivingEndpoints;
 	}
@@ -146,42 +147,15 @@ public class NotificationIntent extends BaseDynamicAttributesBean implements Has
 	public void addPreviousIntentId(UUID intentId) {
 		previousIntentIds.add(intentId);
 	}
-	
-	@JsonIgnore
-	@Column("previous_event_ids")
-	public void setPreviousEventIdsAsArray(UUID[] eventIds) {
-		setPreviousEventIds(Arrays.asList(eventIds));
-	}
-	
-	@JsonIgnore
-	@Column("previous_intent_ids")
-	public void setPreviousIntentIdsAsArray(UUID[] intentIds) {
-		setPreviousIntentIds(Arrays.asList(intentIds));
-	}
-	
-	@Column("previous_event_ids")
-	public UUID[] getPreviousEventIdsAsArray() {
-		return previousEventIds.toArray(new UUID[0]);
-	}
-	
-	@Column("previous_intent_ids")
-	public UUID[] getPreviousIntentIdsAsArray() {
-		return previousIntentIds.toArray(new UUID[0]);
-	}
 
 	@JsonIgnore
-	@Transient
 	public ProcessingInfo getProcessingInfo() {
 		return getHeader().getProcessingInfo();
 	}
 	
-	@Override
 	@JsonIgnore
-	@Transient
 	public boolean isNew() {
 		return timeCreated == null;
 	}
-		
-
 		
 }

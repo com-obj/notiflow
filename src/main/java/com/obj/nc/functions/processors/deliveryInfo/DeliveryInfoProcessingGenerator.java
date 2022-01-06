@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @Component
-public class DeliveryInfoProcessingGenerator extends DeliveryInfoSendResultGenerator {
+public class DeliveryInfoProcessingGenerator extends DeliveryInfoResultGenerator {
 	
 	public DeliveryInfoProcessingGenerator() {
 		super(DELIVERY_STATUS.PROCESSING);

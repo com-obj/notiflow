@@ -19,7 +19,7 @@
 
 package com.obj.nc.flows.mailchimpSending;
 
-import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
+import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.mailchimp.TemplatedMailchimpMessageSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import lombok.RequiredArgsConstructor;

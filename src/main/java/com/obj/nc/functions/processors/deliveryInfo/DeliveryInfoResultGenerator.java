@@ -32,7 +32,7 @@ import java.time.Instant;
 import java.util.*;
 
 @AllArgsConstructor
-public abstract class DeliveryInfoSendResultGenerator extends ProcessorFunctionAdapter<HasReceivingEndpoints, List<DeliveryInfoSendResult>> {
+public abstract class DeliveryInfoResultGenerator extends ProcessorFunctionAdapter<HasReceivingEndpoints, List<DeliveryInfoSendResult>> {
 	
 	private final DELIVERY_STATUS status;
 	

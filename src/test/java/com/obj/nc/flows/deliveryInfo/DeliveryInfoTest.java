@@ -101,14 +101,16 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         // GIVEN
 		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
-		
-        String INPUT_JSON_FILE = "intents/ba_job_post.json";
-        NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+
+		NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+			"Business Intelligence (BI) Developer", 
+			"We are looking for a Business Intelligence"
+		);  		
         notificationIntent.addPreviousEventId(eventId);
         
         notificationIntent = resolveRecipients.apply(notificationIntent);
         endpointRepo.persistEnpointIfNotExists(notificationIntent.getReceivingEndpoints());
-        intentRepo.save(notificationIntent);
+        intentRepo.save(notificationIntent.toPersistentState());
         
         //WHEN
         deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(notificationIntent);

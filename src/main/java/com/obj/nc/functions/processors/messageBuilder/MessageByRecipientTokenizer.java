@@ -45,7 +45,7 @@ public class MessageByRecipientTokenizer<CONTENT_TYPE extends MessageContent> ex
 
 		if (notificationIntent.getReceivingEndpoints().isEmpty()) {
 			return Optional.of(new PayloadValidationException(
-					String.format("NotificationIntent %s has no receiving endpoints defined.", notificationIntent)));
+					String.format("Message %s has no receiving endpoints defined.", notificationIntent)));
 		}
 
 		return Optional.empty();

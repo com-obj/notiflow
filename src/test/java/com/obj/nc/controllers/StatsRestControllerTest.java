@@ -97,6 +97,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
     }
     
     @Test
+
     void testFindEventStatsByEventId() throws Exception {
         // GIVEN
         GenericEvent event = processTestEventAndIntent();

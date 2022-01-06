@@ -104,7 +104,7 @@ public class MessagePersistentState implements Persistable<UUID> {
 		msg.setPreviousIntentIds(Arrays.asList(previousIntentIds));
 		msg.setPreviousMessageIds(Arrays.asList(previousMessageIds));
 
-        msg.setReceivingEndpoints(receivingEndpoints);
+        msg.setReceivingEndpoints(getReceivingEndpoints());
 		
 		return msg;
 	}

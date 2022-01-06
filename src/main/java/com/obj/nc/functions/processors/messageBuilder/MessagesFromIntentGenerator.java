@@ -61,7 +61,7 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent notificationIntent) {
-
+		//If there is a way to subscribe to intent, this would be ok
 		if (notificationIntent.getReceivingEndpoints().isEmpty()) {
 			return Optional.of(new PayloadValidationException(
 					String.format("NotificationIntent %s has no receiving endpoints defined.", notificationIntent)));
@@ -75,8 +75,7 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 		log.debug("Create messages for {}",  notificationIntent);
 		
 		// TODO different settings can apply here based on delivery options like if we are outside business hours, convert to email. otherwise convert to SMS
-		List<Message<?>> messages = new ArrayList<>();
-		
+		List<Message<?>> messages = new ArrayList<>();		
 
 		for (ReceivingEndpoint receivingEndpoint: notificationIntent.getReceivingEndpoints()) {
 			

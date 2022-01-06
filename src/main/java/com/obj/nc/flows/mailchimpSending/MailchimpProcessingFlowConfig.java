@@ -19,7 +19,7 @@
 
 package com.obj.nc.flows.mailchimpSending;
 
-import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
+import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.messageTemplating.config.TrackingConfigProperties;
 import com.obj.nc.functions.processors.messageTracking.MailchimpReadTrackingDecorator;

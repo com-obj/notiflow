@@ -48,11 +48,13 @@ class RecipientsUsingSubscriptionTest extends BaseIntegrationTest {
     @Test
     void testResolveRecipientsPassWithRequiredAttributes() {
         // given
-        String INPUT_JSON_FILE = "intents/ba_job_post.json";
-        NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+			"Business Intelligence (BI) Developer", 
+			"We are looking for a Business Intelligence"
+		);  
 
         // when
-        NotificationIntent outputNotificationIntent = (NotificationIntent)resolveRecipients.apply(inputNotificationIntent);
+        NotificationIntent outputNotificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
 
         // then
         MatcherAssert.assertThat(outputNotificationIntent, Matchers.notNullValue());
@@ -61,11 +63,13 @@ class RecipientsUsingSubscriptionTest extends BaseIntegrationTest {
     @Test
     void testResolveRecipientsResolvesAll() {
         // given
-        String INPUT_JSON_FILE = "intents/ba_job_post.json";
-        NotificationIntent inputNotificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+			"Business Intelligence (BI) Developer", 
+			"We are looking for a Business Intelligence"
+		);  
 
         // when
-        NotificationIntent outputNotificationIntent = (NotificationIntent)resolveRecipients.apply(inputNotificationIntent);
+        NotificationIntent outputNotificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
 
         // then
         MatcherAssert.assertThat(outputNotificationIntent, Matchers.notNullValue());
