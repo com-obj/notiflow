@@ -95,7 +95,7 @@ public class MessagePersistentState implements Persistable<UUID> {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	@SneakyThrows
 	public <T extends Message> T toMessage() {
-		T msg = (T)Class.forName(messageClass).newInstance();
+		T msg = (T)Class.forName(messageClass).getDeclaredConstructor().newInstance();
 		msg.setBody(getBody());
 		msg.setHeader(getHeader());
 		msg.setId(getId());
@@ -109,19 +109,24 @@ public class MessagePersistentState implements Persistable<UUID> {
 		return msg;
 	}
 
-    public void loadReceivingEndpoints() {
+	public List<ReceivingEndpoint> getReceivingEndpoints() {
+		if (receivingEndpoints == null) {
+			receivingEndpoints = findReceivingEndpoints();
+		}
+
+		return receivingEndpoints;
+	}
+
+    private List<ReceivingEndpoint> findReceivingEndpoints() {
         Message2EndpointRelationRepository endpointRelRepository = Get.getMessage2EndpointRelationRepo();
 
         List<Message2EndpointRelation> endpointRelsForMessage = endpointRelRepository.findByMessageId(id);
         
         if (endpointRelsForMessage.isEmpty()) {
-                setReceivingEndpoints(new ArrayList<>());
-                return;
-            }
+			return new ArrayList<>();
+        }
 
-        List<ReceivingEndpoint> endpointList = resolveEndpoints(endpointRelsForMessage);
-
-        setReceivingEndpoints(endpointList);
+        return resolveEndpoints(endpointRelsForMessage);
     }
 
     private List<ReceivingEndpoint> resolveEndpoints(List<Message2EndpointRelation> endpointRelsForMessage) {

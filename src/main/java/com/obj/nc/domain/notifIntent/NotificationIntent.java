@@ -85,8 +85,10 @@ public class NotificationIntent extends BaseDynamicAttributesBean implements Has
 	@Id
 	@EqualsAndHashCode.Include
 	private UUID id = UUID.randomUUID();
+
 	@CreatedDate
 	private Instant timeCreated;
+	
 	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
 	protected Header header = new Header();
 	

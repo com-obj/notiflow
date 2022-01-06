@@ -107,7 +107,6 @@ public class DeliveryInfoRestController {
 		}
 
         MessagePersistentState msgInDb = messageRepo.findById(UUID.fromString(messageId)).get();
-        msgInDb.loadReceivingEndpoints();
         Message<?> msg = msgInDb.toMessage();
         deliveryInfoFlow.createAndPersistReadDeliveryInfo(msg);
         
