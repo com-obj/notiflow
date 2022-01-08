@@ -124,7 +124,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(2)));
 
         //AND WHEN
-        List<ReceivingEndpoint> endpoints = endpointsRepository.findByNameIds("johndoe@objectify.sk");
+        List<ReceivingEndpoint> endpoints = endpointsRepository.findByNameIds("john.doe@objectify.sk");
 
         resp = mockMvc
                 .perform(MockMvcRequestBuilders.get("/stats/endpoints/{endpointId}", endpoints.get(0).getId())
