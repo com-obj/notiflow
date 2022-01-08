@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
 import com.obj.nc.domain.endpoints.push.TopicPushEndpoint;
+import com.obj.nc.domain.recipients.Recipient;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -58,11 +59,9 @@ public abstract class ReceivingEndpoint implements Persistable<UUID> {
 	@Id
 	@EqualsAndHashCode.Include
 	private UUID id = UUID.randomUUID();
-
-	@Transient
-	private Recipient recipient;
     
 	@CreatedDate
+	@JsonIgnore
 	private Instant timeCreated;
 	
 	public abstract String getEndpointId();

@@ -218,9 +218,9 @@ Actual supported global endpoint configurations are:
 
 Every endpoint has same properties. As example email endpoint configuration is provided.
 ```properties
-nc.delivery.spam-prevention.email-global.maxMessages=5
-nc.delivery.spam-prevention.email-global.maxMessagesTimeFrame=1
-nc.delivery.spam-prevention.email-global.maxMessagesUnit=DAYS
+nc.delivery-options.email-global.maxMessages=5
+nc.delivery-options.email-global.maxMessagesTimeFrame=1
+nc.delivery-options.email-global.maxMessagesUnit=DAYS
 ```
 This configuration allows sending of maximum 5 emails per 1 day.
 

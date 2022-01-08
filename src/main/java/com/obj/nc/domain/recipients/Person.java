@@ -17,37 +17,42 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.endpoints;
+package com.obj.nc.domain.recipients;
 
-import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
+import javax.validation.constraints.NotNull;
+
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotNull;
-
-import java.util.Arrays;
-import java.util.List;
+import lombok.Singular;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
-@NoArgsConstructor
+@EqualsAndHashCode(callSuper=false, onlyExplicitlyIncluded = true)
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class Person extends Recipient{
+public class Person extends Recipient {
 	
 	public static final String JSON_TYPE_IDENTIFIER = "PERSON";
 	
-	private EndpointDeliveryOptionsConfig deliveryOptions;
+	@NotNull
+	@EqualsAndHashCode.Include
+	@Builder.Default
+	private UUID id = UUID.randomUUID();
 
 	@NotNull
 	private String name;
-	
-	public Person(String name) {
-		this.name = name;
-	}
+
+	@Singular
+	private List<ReceivingEndpoint> receivingEndpoints;
 
 	@Override
 	public List<Person> findFinalRecipientsAsPersons() {

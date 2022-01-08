@@ -13,7 +13,7 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.extensions.providers.deliveryOptions;
+package com.obj.nc.extensions.providers.recipients;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,9 +32,9 @@ import org.springframework.context.annotation.Configuration;
 @AllArgsConstructor
 @Data
 @Configuration
-@ConfigurationProperties("nc.delivery.spam-prevention")
-public class SpamPreventionConfigProperties {   
+@ConfigurationProperties("nc.contacts-store")
+public class ContactsStoreConfigProperties {   
 
-    private String jsonRepoPathAndFileName;
+    private String jsonStorePathAndFileName;
 
 }

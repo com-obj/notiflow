@@ -19,12 +19,22 @@
 
 package com.obj.nc.flows.deliveryInfo;
 
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+
+import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.config.SpringIntegration;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
@@ -34,7 +44,6 @@ import com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlow;
 import com.obj.nc.flows.errorHandling.domain.FailedPayload;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.repositories.DeliveryInfoRepository;
@@ -46,10 +55,9 @@ import com.obj.nc.repositories.MessageRepository;
 import com.obj.nc.repositories.NotificationIntentRepository;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-import com.obj.nc.utils.JsonUtils;
+
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -61,22 +69,11 @@ import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest
 public class DeliveryInfoTest extends BaseIntegrationTest {
 	
-    @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
     @Autowired private MessagesFromIntentGenerator generateMessagesFromIntent;
     @Autowired private MessagePersister messagePersister;
     @Autowired private DeliveryInfoRepository deliveryInfoRepo;
@@ -96,7 +93,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     }
 
     @Test
-    @Disabled("Intent isn't connected to any message. Probably wrong test?")
+    @Disabled("Intent isn't connected to any message + cannot create delivery Info from intent. Need deliveryInfoFlow refactoring")
     void testDeliveryInfosCreateAndPersisted() {
         // GIVEN
 		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
@@ -106,19 +103,25 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
 			"Business Intelligence (BI) Developer", 
 			"We are looking for a Business Intelligence"
 		);  		
+        notificationIntent.addRecipientsByName(
+            "John Doe",
+            "John Dudly",
+            "Objectify"
+        );
         notificationIntent.addPreviousEventId(eventId);
         
-        notificationIntent = resolveRecipients.apply(notificationIntent);
-        endpointRepo.persistEnpointIfNotExists(notificationIntent.getReceivingEndpoints());
+        // endpointRepo.persistEnpointIfNotExists(notificationIntent.getReceivingEndpoints());
         intentRepo.save(notificationIntent.toPersistentState());
         
         //WHEN
-        deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(notificationIntent);
+        //uncomment after DeliveryInfoFlowRefactoring
+        // deliveryInfoFlow.createAndPersistProcessingDeliveryInfo(notificationIntent);
         
         //THEN check processing deliveryInfo
         Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()>=3);
         
-        assertEndpointPersistedNotDuplicated(notificationIntent);
+        //uncomment after DeliveryInfoFlowRefactoring
+        //assertEndpointPersistedNotDuplicated(notificationIntent);
         List<DeliveryInfo> deliveryInfos = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
         
         Assertions.assertThat(deliveryInfos.size()).isEqualTo(3);
@@ -127,7 +130,7 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         deliveryInfos.forEach(info -> {
         	Assertions.assertThat(info.getStatus()).isEqualTo(DELIVERY_STATUS.PROCESSING);
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn(extractReceivingEndpointIds(finalNotificationIntent));
+        	// Assertions.assertThat(info.getEndpointId()).isIn(extractReceivingEndpointIds(finalNotificationIntent));
         });
         
         //WHEN
@@ -144,7 +147,8 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId).size()==6);
 
         deliveryInfos = deliveryInfoRepo.findByEventIdOrderByProcessedOn(eventId);
-        assertEndpointPersistedNotDuplicated(notificationIntent);
+        //uncomment after DeliveryInfoFlowRefactoring
+       // assertEndpointPersistedNotDuplicated(notificationIntent);
         
         
         Assertions.assertThat(deliveryInfos.size()).isEqualTo(6);
@@ -153,9 +157,14 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
         Assertions.assertThat(deliveredInfos.size()).isEqualTo(3);
         deliveryInfos.forEach(info -> {
         	Assertions.assertThat(info.getProcessedOn()).isNotNull();
-        	Assertions.assertThat(info.getEndpointId()).isIn(extractReceivingEndpointIds(finalNotificationIntent));
+        	// Assertions.assertThat(info.getEndpointId()).isIn(extractReceivingEndpointIds(finalNotificationIntent));
         });
     }
+        
+    //uncomment after DeliveryInfoFlowRefactoring
+    // private List<UUID> extractReceivingEndpointIds(NotificationIntent finalNotificationIntent) {
+    //     return finalNotificationIntent.getReceivingEndpoints().stream().map(ReceivingEndpoint::getId).collect(Collectors.toList());
+    // }
     
     @Test
     void testDeliveryInfosCreateAndPersistedForFailedDelivery() {
@@ -296,20 +305,19 @@ public class DeliveryInfoTest extends BaseIntegrationTest {
     }
 
 
-	private void assertEndpointPersistedNotDuplicated(NotificationIntent notificationIntent) {
-		List<Map<String, Object>> persistedEndpoints = jdbcTemplate.queryForList("select * from nc_endpoint");
-        assertThat(persistedEndpoints, CoreMatchers.notNullValue());
-        Assertions.assertThat(persistedEndpoints.size()).isEqualTo(3);
+    //uncomment after DeliveryInfoFlowRefactoring
+	// private void assertEndpointPersistedNotDuplicated(NotificationIntent notificationIntent) {
+	// 	List<Map<String, Object>> persistedEndpoints = jdbcTemplate.queryForList("select * from nc_endpoint");
+    //     assertThat(persistedEndpoints, CoreMatchers.notNullValue());
+    //     Assertions.assertThat(persistedEndpoints.size()).isEqualTo(3);
 
-        for (int i = 0; i < persistedEndpoints.size(); i++) {
-            List<EmailEndpoint> receivingEndpoints = (List<EmailEndpoint>)notificationIntent.getReceivingEndpoints();
-            assertThat(persistedEndpoints.get(i).get("endpoint_name"), CoreMatchers.equalTo((receivingEndpoints.get(i)).getEmail()));
-            assertThat(persistedEndpoints.get(i).get("endpoint_type"), CoreMatchers.equalTo(receivingEndpoints.get(i).getEndpointType()));
-        }
-	}
+    //     for (int i = 0; i < persistedEndpoints.size(); i++) {
+    //         List<EmailEndpoint> receivingEndpoints = (List<EmailEndpoint>)notificationIntent.getReceivingEndpoints();
+    //         assertThat(persistedEndpoints.get(i).get("endpoint_name"), CoreMatchers.equalTo((receivingEndpoints.get(i)).getEmail()));
+    //         assertThat(persistedEndpoints.get(i).get("endpoint_type"), CoreMatchers.equalTo(receivingEndpoints.get(i).getEndpointType()));
+    //     }
+	// }
 	
-    private List<UUID> extractReceivingEndpointIds(NotificationIntent finalNotificationIntent) {
-        return finalNotificationIntent.getReceivingEndpoints().stream().map(ReceivingEndpoint::getId).collect(Collectors.toList());
-    }
+
 
 }

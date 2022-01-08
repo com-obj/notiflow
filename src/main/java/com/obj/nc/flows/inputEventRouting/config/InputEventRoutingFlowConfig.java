@@ -34,7 +34,6 @@ import org.springframework.integration.router.AbstractMessageRouter;
 public class InputEventRoutingFlowConfig {
 		
 	@Autowired private InputEventRoutingProperties routingProps;	
-//	@Autowired private GenericEventsSupplier genericEventSupplier;	
 	
     public static final String GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME = "genericEventSupplierFlowId"; 
     

@@ -21,6 +21,8 @@ package com.obj.nc.domain.endpoints;
 
 import javax.validation.constraints.NotNull;
 
+import com.obj.nc.domain.recipients.Person;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,11 +41,11 @@ public class SmsEndpoint extends ReceivingEndpoint {
     @NotNull
     private String phone;
 
-    public static SmsEndpoint createForPerson(Person person, String phone) {
-        SmsEndpoint smsEndpoint = new SmsEndpoint(phone);
-        smsEndpoint.setRecipient(person);
-        return smsEndpoint;
-    }
+    // public static SmsEndpoint createForPerson(Person person, String phone) {
+    //     SmsEndpoint smsEndpoint = new SmsEndpoint(phone);
+    //     smsEndpoint.setRecipient(person);
+    //     return smsEndpoint;
+    // }
 
     @Override
     public String getEndpointId() {

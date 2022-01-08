@@ -38,11 +38,7 @@ public class NotificationIntentPersister extends ProcessorFunctionAdapter<Notifi
 	protected NotificationIntent execute(NotificationIntent notifIntent) {
 		NotificationIntentPersistentState intentIdDB = intentRepo.save(notifIntent.toPersistentState());
 
-        NotificationIntent result = intentIdDB.toIntent();
-        //TODO: Hack until notification intent have recipients
-        result.setReceivingEndpoints(notifIntent.getReceivingEndpoints());
-
-        return result;
+        return intentIdDB.toIntent();
 	}
 
 

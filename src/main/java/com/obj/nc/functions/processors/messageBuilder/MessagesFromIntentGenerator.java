@@ -20,9 +20,11 @@
 package com.obj.nc.functions.processors.messageBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.collect.Collections2;
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TemplateWithModelContent;
@@ -44,11 +46,15 @@ import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.message.TemplatedMailchimpMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.recipients.Recipient;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.extensions.providers.recipients.ContactsProvider;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,9 +68,9 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(NotificationIntent notificationIntent) {
 		//If there is a way to subscribe to intent, this would be ok
-		if (notificationIntent.getReceivingEndpoints().isEmpty()) {
+		if (notificationIntent.getRecipients().isEmpty()) {
 			return Optional.of(new PayloadValidationException(
-					String.format("NotificationIntent %s has no receiving endpoints defined.", notificationIntent)));
+					String.format("NotificationIntent %s has no recipients defined.", notificationIntent)));
 		}
 
 		return Optional.empty();
@@ -77,11 +83,22 @@ public class MessagesFromIntentGenerator extends ProcessorFunctionAdapter<Notifi
 		// TODO different settings can apply here based on delivery options like if we are outside business hours, convert to email. otherwise convert to SMS
 		List<Message<?>> messages = new ArrayList<>();		
 
-		for (ReceivingEndpoint receivingEndpoint: notificationIntent.getReceivingEndpoints()) {
+		for (Recipient recipient: notificationIntent.getRecipients()) {
+
+			List<ReceivingEndpoint> endpoints = recipient.getReceivingEndpoints();
+
+			if (CollectionUtils.isEmpty(endpoints)) {
+				log.warn("Intent to message generator didn't find endpoint for Recipient {}. This means that Notiflow cannot route Intent for this recipient", recipient);
+			}
+			if (endpoints.size()>1) {
+				// TODO 
+				log.warn("Notiflow in current version picks first endpoint for each recipient. This will be enhanced in the future", recipient);
+			}
 			
-			Message<?> msg = (Message<?>) createMessageForEndpoint(notificationIntent, receivingEndpoint);
+			ReceivingEndpoint endpoint = endpoints.iterator().next();
+			Message<?> msg = (Message<?>) createMessageForEndpoint(notificationIntent, endpoint);
 			
-			msg.addReceivingEndpoints(receivingEndpoint);
+			msg.addReceivingEndpoints(endpoint);
 
 			msg.setAttributes(notificationIntent.getAttributes());
 			messages.add(msg);

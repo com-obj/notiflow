@@ -28,8 +28,12 @@ import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
+
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Singular;
+
 import org.apache.commons.lang3.NotImplementedException;
 
 import javax.validation.constraints.NotNull;
@@ -40,6 +44,7 @@ import java.util.Locale;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonTypeName(TemplatedIntentContent.JSON_TYPE_IDENTIFIER)
+@Builder
 public class TemplatedIntentContent<MODEL_TYPE> extends IntentContent {
 	
 	public final static String JSON_TYPE_IDENTIFIER = "TEMPLATED_INTENT_CONTENT";
@@ -49,6 +54,7 @@ public class TemplatedIntentContent<MODEL_TYPE> extends IntentContent {
 
 	private String subjectResourceKey;	
 	
+	@Singular
 	private List<Locale> locales;
 
 	@JsonTypeInfo(use = Id.CLASS)

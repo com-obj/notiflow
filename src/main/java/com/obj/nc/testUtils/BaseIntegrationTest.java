@@ -90,16 +90,15 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     public static void purgeNotifTables(@Autowired JdbcTemplate jdbcTemplate) {
         log.info("Purging all tables in test");
 
-        jdbcTemplate.execute("truncate nc_processing_info, " +
-				"nc_message_2_endpoint_rel," +
-				"nc_delivery_info, " + 
-				"nc_endpoint," +
-				"nc_event," +
-				"nc_intent," +
-				"nc_message," +
-				"nc_failed_payload," +
-				"nc_pulled_notif_data cascade");
-
+		jdbcTemplate.execute("truncate table nc_event cascade");
+        jdbcTemplate.execute("truncate table nc_intent cascade");    
+        jdbcTemplate.execute("truncate table nc_message cascade");    
+        jdbcTemplate.execute("truncate table nc_pulled_notif_data cascade");    
+        jdbcTemplate.execute("truncate table nc_endpoint cascade");    
+        jdbcTemplate.execute("truncate table nc_delivery_info cascade");    
+        jdbcTemplate.execute("truncate table nc_message_2_endpoint_rel cascade");    
+        jdbcTemplate.execute("truncate table nc_failed_payload cascade");    
+        jdbcTemplate.execute("truncate table nc_processing_info cascade");    
     }
 
     @Data

@@ -17,17 +17,20 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.message;
+package com.obj.nc.domain.dto;
+
+import java.util.List;
 
 import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.Person;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.domain.recipients.Person;
+
+import org.springframework.http.MediaType;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.MediaType;
-
-import java.util.List;
 
 @Data
 @Builder
@@ -48,7 +51,7 @@ public class SendEmailMessageRequest {
         private String name;
         
         public EmailEndpoint toReceivingEndpoint() {
-            return EmailEndpoint.createForPerson(new Person(name), email);
+            return EmailEndpoint.createForPerson(Person.builder().name(name).build(), email);
         }
     }
     

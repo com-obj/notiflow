@@ -42,6 +42,7 @@ import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO
 @MessagingGateway(errorChannel = ErrorHandlingFlowConfig.ERROR_CHANNEL_NAME)
 public interface DeliveryInfoFlow {
 
+    //TODO: refactor to accept IsNotification (and Event), remove endpoint
 	@Gateway(requestChannel=DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID, replyChannel = DELIVERY_INFO_PROCESSING_FLOW_OUTPUT_CHANNEL_ID)
     Future<List<DeliveryInfo>> createAndPersistProcessingDeliveryInfo(HasReceivingEndpoints msg);
 	

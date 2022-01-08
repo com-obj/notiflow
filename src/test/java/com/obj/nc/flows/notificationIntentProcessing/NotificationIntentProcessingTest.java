@@ -50,7 +50,9 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest
+@SpringBootTest(properties = {
+    "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
+})
 public class NotificationIntentProcessingTest extends BaseIntegrationTest {
 
 	@Autowired private NotificationIntentProcessingFlow intentFlow; 
@@ -71,9 +73,9 @@ public class NotificationIntentProcessingTest extends BaseIntegrationTest {
         // given		
         NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
             "subject", 
-            "body", 
-            EmailEndpoint.builder().email("test@test.sk").build()
+            "body"
         );
+        notificationIntent.addRecipientsByIds(UUID.fromString("baf25cbe-2975-4666-adda-c8ea01dc909d")); //John Doe
 
         // when
         intentFlow.processNotificationIntent(notificationIntent);
@@ -91,19 +93,19 @@ public class NotificationIntentProcessingTest extends BaseIntegrationTest {
         // given		
         NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
             "Business Intelligence (BI) Developer", 
-            "We are looking for a Business Intelligence", 
-            EmailEndpoint.builder().email("john.doe@objectify.sk").build(),
-            EmailEndpoint.builder().email("john.dudly@objectify.sk").build(),
-            EmailEndpoint.builder().email("all@objectify.sk").build()
+            "We are looking for a Business Intelligence"
         );        
-
+        notificationIntent.addRecipientsByName(
+            "John Doe",
+            "John Dudly",
+            "Objectify"
+        );
         notificationIntent.addPreviousEventId(eventId);
 
         // when
         intentFlow.processNotificationIntent(notificationIntent);
 
         //THEN check processing deliveryInfo
-        //TODO: awaitSend should be possible with intentId, event shouldn't be necessary in this case
         awaitSent(eventId, 3, Duration.ofSeconds(10));
     }
     

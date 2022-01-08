@@ -24,33 +24,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-import javax.validation.constraints.NotNull;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.api.client.util.Lists;
-import com.google.common.collect.Iterables;
+import com.obj.nc.Get;
+import com.obj.nc.domain.Attachment;
 import com.obj.nc.domain.BaseDynamicAttributesBean;
 import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.HasProcessingInfo;
-import com.obj.nc.domain.HasReceivingEndpoints;
 import com.obj.nc.domain.IsNotification;
-import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
-import com.obj.nc.domain.refIntegrity.Reference;
-import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.NotificationIntentRepository;
-
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Embedded;
-import org.springframework.data.relational.core.mapping.Table;
+import com.obj.nc.domain.notifIntent.content.TemplatedIntentContent;
+import com.obj.nc.domain.recipients.Recipient;
+import com.obj.nc.domain.stats.HasRecipients;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -79,7 +68,7 @@ import lombok.ToString;
  *
  * @param <BODY_TYPE>
  */
-public class NotificationIntent extends BaseDynamicAttributesBean implements HasHeader, HasReceivingEndpoints, HasProcessingInfo, IsNotification, HasPreviousEventIds {
+public class NotificationIntent extends BaseDynamicAttributesBean implements HasHeader, HasRecipients, HasProcessingInfo, IsNotification, HasPreviousEventIds {
 	
 	@EqualsAndHashCode.Include
 	private UUID id = UUID.randomUUID();
@@ -91,22 +80,25 @@ public class NotificationIntent extends BaseDynamicAttributesBean implements Has
 	protected IntentContent body;
 	
 	//TODO: purely technical staf, should be moved to header
-	@Transient
-	@Reference(GenericEventRepository.class)
 	private List<UUID> previousEventIds = new ArrayList<>();
 	
 	//TODO: purely technical staf, should be moved to header
 	//Can Intent have parent Intent? What is that good for?
-	@Transient
-	@Reference(NotificationIntentRepository.class)
 	private List<UUID> previousIntentIds = new ArrayList<>();
 
-	private List<? extends ReceivingEndpoint> receivingEndpoints = new ArrayList<ReceivingEndpoint>();
+	private List<Recipient> recipients = new ArrayList<Recipient>();
 
-	public static NotificationIntent createWithStaticContent(String subject, String body, ReceivingEndpoint ... endpoints) {
+	public static NotificationIntent createWithStaticContent(String subject, String body, Attachment ... attachments) {
 		NotificationIntent intent = new NotificationIntent();	
 		intent.setBody(IntentContent.createStaticContent(subject,body));
-		intent.addReceivingEndpoints(endpoints);
+		intent.getBody().setAttachments(Arrays.asList(attachments));
+		return intent;
+	}
+
+	public static NotificationIntent createWithTemplatedContent(TemplatedIntentContent<?> templatedContent, Attachment ... attachments) {
+		NotificationIntent intent = new NotificationIntent();	
+		intent.setBody(templatedContent);
+		intent.getBody().setAttachments(Arrays.asList(attachments));
 		return intent;
 	}
 
@@ -117,28 +109,33 @@ public class NotificationIntent extends BaseDynamicAttributesBean implements Has
 		persistentState.setId(getId());
 		persistentState.setPreviousEventIds(previousEventIds.toArray(new UUID[0]));
 		persistentState.setPreviousIntentIds(previousIntentIds.toArray(new UUID[0]));
+		persistentState.setRecipientIds(getRecipientsAsId().toArray(new UUID[0]));
+		persistentState.setRecipients(getRecipients());
 		persistentState.setTimeCreated(getTimeCreated());
 		return persistentState;	 
 	}
 
-	public NotificationIntent addReceivingEndpoints(ReceivingEndpoint ... r) {
-		((List<ReceivingEndpoint>)this.receivingEndpoints).addAll(Arrays.asList(r));
-		return this;
-	}
-		
-	@JsonIgnore
-	public void setReceivingEndpointsSL(List<ReceivingEndpoint> endpoints) {
-		List<ReceivingEndpoint> typedEndpoints = Lists.newArrayList(
-					Iterables.filter(endpoints, ReceivingEndpoint.class));
-		
-		this.setReceivingEndpoints(typedEndpoints);
+	public List<UUID> getRecipientsAsId() {
+		return recipients.stream().map(Recipient::getId).collect(Collectors.toList());
 	}
 
-	@Override
-	public List<? extends ReceivingEndpoint> getReceivingEndpoints() {
-		return receivingEndpoints;
+	public NotificationIntent addRecipients(Recipient ... r) {
+		this.recipients.addAll(Arrays.asList(r));
+		return this;
 	}
-	
+
+	public NotificationIntent addRecipientsByIds(UUID ... recipientsIds) {
+		List<Recipient> recipients = Get.getContactStore().findRecipients(recipientsIds);
+		this.recipients.addAll(recipients);
+		return this;
+	}
+
+	public NotificationIntent addRecipientsByName(String ... names) {
+		List<Recipient> recipients = Get.getContactStore().findRecipientsByName(names);
+		this.recipients.addAll(recipients);
+		return this;
+	}
+
 	@Override
 	public void addPreviousEventId(UUID eventId) {
 		previousEventIds.add(eventId);

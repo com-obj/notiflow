@@ -19,6 +19,14 @@
 
 package com.obj.nc.functions.processors.messageBuilder;
 
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.net.URI;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
 import com.obj.nc.domain.Attachment;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
@@ -31,25 +39,40 @@ import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.message.SmsMessageTemplated;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.notifIntent.content.TemplatedIntentContent;
+import com.obj.nc.functions.processors.messageTeamplating.domain.TestChildModel;
 import com.obj.nc.functions.processors.messageTeamplating.domain.TestModel;
+import com.obj.nc.testUtils.BaseIntegrationTest;
+import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
+
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-class MessagesFromIntentTest {
-
+@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
+@SpringBootTest(properties = {
+    "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
+})
+@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
+class MessagesFromIntentTest extends BaseIntegrationTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
 	void createMessagesFromEvent() {
 		//GIVEN
-		String INPUT_JSON_FILE = "intents/direct_message.json";
-		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-		
+        NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+            "Subject", 
+            "Text"
+        );        
+        notificationIntent.addRecipientsByName(
+            "John Doe",
+            "John Dudly",
+            "Objectify"
+        );
+
 		//WHEN
 		MessagesFromIntentGenerator createMessagesFunction = new MessagesFromIntentGenerator();
 		List<EmailMessage> result = (List<EmailMessage>)createMessagesFunction.apply(notificationIntent);
@@ -73,17 +96,25 @@ class MessagesFromIntentTest {
 	}
 	
 	@Test
-	void createMessagesFromEventAttachements() {
+	void createMessagesFromEventAttachments() {
 		//GIVEN
-		String INPUT_JSON_FILE = "intents/direct_message_attachements.json";
-		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-		
+        NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+            "Subject", 
+            "Text",
+			Attachment.builder().name("name.extension").fileURI(URI.create("http://domain/location/name.extension")).build(),
+			Attachment.builder().name("name.extension").fileURI(URI.create("http://domain/location/name.extension")).build()
+        );        
+        notificationIntent.addRecipientsByName(
+            "John Doe",
+            "John Dudly"
+        );
+
 		//WHEN
 		MessagesFromIntentGenerator createMessagesFunction = new MessagesFromIntentGenerator();
 		List<Message<?>> result = (List<Message<?>>)createMessagesFunction.apply(notificationIntent);
 		
 		//THEN
-		EmailMessage deliveryNullMessage = findMessageWithEnpoint(result, "john.doe@objectify.sk");
+		EmailMessage deliveryNullMessage = findMessageWithEndpoint(result, "john.doe@objectify.sk");
 		
         EmailContent emailContent = deliveryNullMessage.getBody();
 		List<Attachment> attachments = emailContent.getAttachments();
@@ -97,9 +128,17 @@ class MessagesFromIntentTest {
 	@Test
 	void createMessagesFromEventDifferentChannels() {
 		//GIVEN
-		String INPUT_JSON_FILE = "intents/direct_message_different_channels.json";
-		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-		
+        NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+            "Subject", 
+            "Text",
+			Attachment.builder().name("name.extension").filePathAndName("someFile.tmp").build(),
+			Attachment.builder().name("name.extension").filePathAndName("someFile.tmp").build()
+        );        
+        notificationIntent.addRecipientsByName(
+            "John Doe",
+            "Phone"
+        );
+
 		//WHEN
 		MessagesFromIntentGenerator createMessagesFunction = new MessagesFromIntentGenerator();
 		List<Message<?>> result = (List<Message<?>>)createMessagesFunction.apply(notificationIntent);
@@ -107,7 +146,7 @@ class MessagesFromIntentTest {
 		//AND THEN
 		assertThat(result.size()).isEqualTo(2);
 		
-		SmsMessage message = findMessageWithEnpoint(result, "0918186997");
+		SmsMessage message = findMessageWithEndpoint(result, "+421905000111");
 		
 		List<? extends ReceivingEndpoint> receivingEndpoints = message.getReceivingEndpoints();
 		assertThat(receivingEndpoints.size()).isEqualTo(1);
@@ -116,22 +155,40 @@ class MessagesFromIntentTest {
 		assertThat(smsContent.getText()).isEqualTo("Text");
 		
 		//AND THEN
-		EmailMessage mail = findMessageWithEnpoint(result, "john.doe@objectify.sk");
+		EmailMessage mail = findMessageWithEndpoint(result, "john.doe@objectify.sk");
 		
         EmailContent emailContent = mail.getBody();
 		List<Attachment> attachments = emailContent.getAttachments();
 		assertThat(attachments).isNotNull();
 		assertThat(attachments.size()).isEqualTo(2);
 		assertThat(attachments).first().extracting("name").isEqualTo("name.extension");
-		assertThat(attachments).first().extracting("filePathAndName").isEqualTo("src/test/resources/intents/0_ba_job_post.json");
+		assertThat(attachments).first().extracting("filePathAndName").isEqualTo("someFile.tmp");
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	void createTemplatedMessagesFromEventDifferentChannels() {
 		//GIVEN
-		String INPUT_JSON_FILE = "intents/teamplate_message_en_de.json";
-		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		TemplatedIntentContent<Object> templatedContent = TemplatedIntentContent.builder()
+			.templateFileName("test-template2.txt")
+			.locale(new Locale("en_US"))
+			.locale(new Locale("de"))
+			.subjectResourceKey("some.subject.resource.key")
+			.model(TestModel.builder()
+				.name("John Doe")
+				.part(TestChildModel.builder().field1("val11").field2("val12").build())
+				.part(TestChildModel.builder().field1("val21").field2("val22").build())
+				.build()
+			).build();
+		NotificationIntent notificationIntent = NotificationIntent.createWithTemplatedContent(
+			templatedContent,	
+			Attachment.builder().name("name.extension").filePathAndName("someFile.tmp").build(),
+			Attachment.builder().name("name.extension").filePathAndName("someFile.tmp").build()
+		);        
+		notificationIntent.addRecipientsByName(
+			"John Doe",
+			"Phone"
+		);
 		
 		//WHEN
 		MessagesFromIntentGenerator createMessagesFunction = new MessagesFromIntentGenerator();
@@ -140,7 +197,7 @@ class MessagesFromIntentTest {
 		//AND THEN
 		assertThat(result.size()).isEqualTo(2);
 		
-		SmsMessageTemplated<TestModel> message = findMessageWithEnpoint(result, "0908186997");
+		SmsMessageTemplated<TestModel> message = findMessageWithEndpoint(result, "+421905000111");
 		
 		List<? extends ReceivingEndpoint> receivingEndpoints = message.getReceivingEndpoints();
 		assertThat(receivingEndpoints.size()).isEqualTo(1);
@@ -155,7 +212,7 @@ class MessagesFromIntentTest {
 		assertThat(model.getName()).isEqualTo("John Doe");
 		
 		//AND THEN
-		EmailMessageTemplated<TestModel> mail = findMessageWithEnpoint(result, "john.doe@objectify.sk");
+		EmailMessageTemplated<TestModel> mail = findMessageWithEndpoint(result, "john.doe@objectify.sk");
 		
 		TemplateWithModelEmailContent<TestModel> emailContent = mail.getBody();
 		assertThat(smsContent.getTemplateFileName()).isEqualTo("test-template2.txt");
@@ -170,13 +227,11 @@ class MessagesFromIntentTest {
 		assertThat(attachments).isNotNull();
 		assertThat(attachments.size()).isEqualTo(2);
 		assertThat(attachments).first().extracting("name").isEqualTo("name.extension");
-		assertThat(attachments).first().extracting("filePathAndName").isEqualTo("src/test/resources/intents/0_ba_job_post.json");
+		assertThat(attachments).first().extracting("filePathAndName").isEqualTo("someFile.tmp");
 	}
 	
-	
-	
 	@SuppressWarnings("unchecked")
-	private <T extends Message<?>> T findMessageWithEnpoint(List<Message<?>> result, String endpointName) {
+	private <T extends Message<?>> T findMessageWithEndpoint(List<Message<?>> result, String endpointName) {
 		T deliveryNullMessage = (T) result
 				.stream()
 				.filter( msg -> msg.getReceivingEndpoints().get(0).getEndpointId().equals(endpointName))

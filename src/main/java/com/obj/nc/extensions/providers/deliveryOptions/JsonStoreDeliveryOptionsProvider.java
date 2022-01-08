@@ -1,6 +1,7 @@
 package com.obj.nc.extensions.providers.deliveryOptions;
 
-import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptions;
+import com.obj.nc.domain.deliveryOptions.RecipientDeliveryOptions;
 import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
@@ -9,30 +10,37 @@ import com.obj.nc.domain.endpoints.SlackEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.endpoints.TeamsEndpoint;
 import com.obj.nc.domain.endpoints.push.PushEndpoint;
+import com.obj.nc.domain.recipients.Recipient;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Component;
 
+/**
+ * Default strategy for delivery options resolution.
+ *      * delivery options are stored in plain json file
+ *      * delivery options are stored globally and for each endpoint
+ *      * delivery options resolution favors specific endpoint configuration before global configuration
+ */
 @Component
-public class JsonRepoDeliveryOptionsProvider implements DeliveryOptionsProvider {
+public class JsonStoreDeliveryOptionsProvider implements DeliveryOptionsProvider {
 
-    private SpamPreventionConfigProperties config;
+    private DeliveryOptionsConfigProperties config;
     
-    private DeliveryOptionsJsonRepository repo;
+    private DeliveryOptionsJsonStore repo;
 
-    public JsonRepoDeliveryOptionsProvider(SpamPreventionConfigProperties config) {
+    public JsonStoreDeliveryOptionsProvider(DeliveryOptionsConfigProperties config) {
         this.config = config;
 
-        if (this.config.getJsonRepoPathAndFileName()==null) {
-            repo = new DeliveryOptionsJsonRepository();
+        if (this.config.getJsonStorePathAndFileName()==null) {
+            repo = new DeliveryOptionsJsonStore();
         } else {
-            repo = DeliveryOptionsJsonRepository.loadRepository(this.config.getJsonRepoPathAndFileName());
+            repo = DeliveryOptionsJsonStore.loadRepository(this.config.getJsonStorePathAndFileName());
         }
     }
 
     @Override
-    public EndpointDeliveryOptionsConfig findDeliveryOptions(ReceivingEndpoint forEndpoint) {
-        EndpointDeliveryOptionsConfig deliveryOptions = new EndpointDeliveryOptionsConfig();
+    public EndpointDeliveryOptions findDeliveryOptions(ReceivingEndpoint forEndpoint) {
+        EndpointDeliveryOptions deliveryOptions = new EndpointDeliveryOptions();
 
         SpamPreventionOption endpointConfig = findEndpointSpamPreventionConfig(forEndpoint);
         if (endpointConfig != null) {
@@ -94,6 +102,11 @@ public class JsonRepoDeliveryOptionsProvider implements DeliveryOptionsProvider 
         SpamPreventionOptionsValidator.validate(config);
         
         return config;
+    }
+
+    @Override
+    public RecipientDeliveryOptions findDeliveryOptions(Recipient forRecipient) {
+        throw new NotImplementedException();
     }
     
 }

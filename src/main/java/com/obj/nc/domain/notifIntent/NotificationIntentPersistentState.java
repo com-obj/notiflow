@@ -25,10 +25,13 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.obj.nc.Get;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
+import com.obj.nc.domain.recipients.Recipient;
 import com.obj.nc.domain.refIntegrity.Reference;
+import com.obj.nc.extensions.providers.recipients.ContactsProvider;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.NotificationIntentRepository;
 
@@ -73,9 +76,11 @@ public class NotificationIntentPersistentState implements Persistable<UUID> {
 	@Reference(NotificationIntentRepository.class)
 	private UUID[] previousIntentIds;
 	
+	private UUID[] recipientIds;
+
 	@JsonIgnore
 	@Transient
-	private List<ReceivingEndpoint> receivingEndpoints;
+	private List<Recipient> recipients;
 
 	@Override
 	@JsonIgnore
@@ -93,8 +98,25 @@ public class NotificationIntentPersistentState implements Persistable<UUID> {
 		intent.setTimeCreated(getTimeCreated());
 		intent.setPreviousEventIds(Arrays.asList(previousEventIds));
 		intent.setPreviousIntentIds(Arrays.asList(previousIntentIds));
+
+		intent.setRecipients(getRecipients());
 		
 		return intent;
 	}
+
+	public List<Recipient> getRecipients() {
+		if (recipients == null) {
+			recipients = findRecipients();
+		}
+
+		return recipients;
+	}
+
+    private List<Recipient> findRecipients() {
+        ContactsProvider recipientsProvider = Get.getContactStore();
+
+        return recipientsProvider.findRecipients(recipientIds);
+    }
+
 
 }

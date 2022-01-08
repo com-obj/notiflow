@@ -17,25 +17,4 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.functions.processors.messageTeamplating.domain;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Singular;
-
-import java.util.ArrayList;
-import java.util.List;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class TestModel {
-	String name;
-	
-	@Singular
-	List<TestChildModel> parts = new ArrayList<>();
-
-}
+alter table nc_intent add recipient_ids uuid[];

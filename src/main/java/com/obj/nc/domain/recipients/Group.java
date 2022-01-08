@@ -17,51 +17,52 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.endpoints;
+package com.obj.nc.domain.recipients;
 
-import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.validation.constraints.NotNull;
+
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotNull;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.Singular;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper=false, onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Group extends Recipient{
 	
 	public static final String JSON_TYPE_IDENTIFIER = "GROUP";
+
+	@NotNull
+	@Builder.Default
+	@EqualsAndHashCode.Include
+	private UUID id = UUID.randomUUID();
 	
 	@NotNull
 	private String name;
-	
-	@Builder.Default
-	private List<Recipient> members = new ArrayList<>();
-	
-	@Builder.Default
-	private boolean wasResolved = false;
-	
-	private EndpointDeliveryOptionsConfig deliveryOptions; 
-	
-	public Group(String name) {
-		this.name = name;
-	}
+
+	@Singular
+	private List<ReceivingEndpoint> receivingEndpoints;
+
+	@Singular
+	private List<Recipient> members;
+
 	
 	public static Group createWithMembers(String name, Recipient ... members ) {
 		Group group = Group.builder()
 				.name(name)
 				.members(Arrays.asList(members))
-				.wasResolved(true)
 				.build();
 		
 		return group;

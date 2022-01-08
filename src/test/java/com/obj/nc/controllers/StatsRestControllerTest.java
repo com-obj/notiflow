@@ -27,6 +27,8 @@ import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.recipients.Recipient;
+import com.obj.nc.extensions.providers.recipients.ContactsProvider;
 import com.obj.nc.flows.intenProcessing.NotificationIntentProcessingFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.repositories.DeliveryInfoRepository;
@@ -69,7 +71,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest
+@SpringBootTest(properties = {
+        "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
+})
 class StatsRestControllerTest extends BaseIntegrationTest {
     
     @Autowired private GenericEventRepository genericEventRepository;
@@ -78,6 +82,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
     @Autowired private NotificationIntentProcessingFlow intentProcessingFlow;
     @Autowired private NcAppConfigProperties ncAppConfigProperties;
     @Autowired protected MockMvc mockMvc;
+    @Autowired private ContactsProvider contactStore;
     
     @RegisterExtension
     protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
@@ -130,7 +135,6 @@ class StatsRestControllerTest extends BaseIntegrationTest {
         resp
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.eventsCount").value(CoreMatchers.is(1)))
-//                .andExpect(jsonPath("$.intentsCount").value(CoreMatchers.is(1))) // TODO uncomment when nc_intent stores endpoint_ids
                 .andExpect(jsonPath("$.messagesCount").value(CoreMatchers.is(2)))
                 .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(1)))
                 .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
@@ -147,14 +151,13 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                 .build();
         event = genericEventRepository.save(event);
         
-        EmailEndpoint emailEndpoint = EmailEndpoint.builder().email("johndoe@objectify.sk").build();
-        EmailEndpoint emailEndpoint2 = EmailEndpoint.builder().email("invalid email").build();
+        ReceivingEndpoint emailEndpoint = contactStore.findEndpoint("john.doe@objectify.sk");
+        ReceivingEndpoint emailEndpoint2 = contactStore.findEndpoint("invalid mail");
         
         NotificationIntent intent = NotificationIntent.createWithStaticContent("Subject", "Text");
+        intent.addRecipientsByName("John Doe", "Invalid");
         intent.getHeader().setFlowId("default-flow");
         intent.addPreviousEventId(event.getId());
-        intent.addReceivingEndpoints(emailEndpoint);
-        intent.addReceivingEndpoints(emailEndpoint2);
         
         intentProcessingFlow.processNotificationIntent(intent);
         

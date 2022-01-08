@@ -19,9 +19,15 @@
 
 package com.obj.nc.functions.processors.messageTeamplating.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TestChildModel {
 	String field1;
 	String field2;

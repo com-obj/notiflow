@@ -51,7 +51,7 @@ public class InMemorySmsSender extends ProcessorFunctionAdapter<SmsMessage,SmsMe
 	@Override
 	protected SmsMessage execute(SmsMessage smsMessage) {
 				
-		receiver.recieve(smsMessage);
+		receiver.receive(smsMessage);
 
 		return smsMessage;
 	}

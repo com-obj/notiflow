@@ -17,16 +17,22 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.endpoints;
+package com.obj.nc.domain.recipients;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptions;
+import com.obj.nc.domain.deliveryOptions.RecipientDeliveryOptions;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
+import java.util.UUID;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ 
@@ -35,13 +41,21 @@ import java.util.List;
 })
 @Data
 @NoArgsConstructor
+@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public abstract class Recipient {
 	
+	@ToString.Include
 	public abstract String getName();
+
+	@ToString.Include
+	@EqualsAndHashCode.Include
+	public abstract UUID getId();
 	
-	public abstract List<Person> findFinalRecipientsAsPersons();
-	
-	public abstract EndpointDeliveryOptionsConfig getDeliveryOptions();
+	public abstract List<Person> findFinalRecipientsAsPersons();	
+
+	//this should be some more notiflow unspecific term,.. kind of dto, only type and value like email,aaa@aaa.com
+	public abstract List<ReceivingEndpoint> getReceivingEndpoints();
 
 
 }

@@ -26,11 +26,11 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-public class EndpointDeliveryOptionsConfig {
+public class EndpointDeliveryOptions {
 
     private SpamPreventionOption spamPrevention;
 
     private AggregationDeliveryOption aggregation;
-
+        
     private SchedulingDeliveryOption scheduling;
 }
