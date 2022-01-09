@@ -21,8 +21,10 @@ package com.obj.nc.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.net.URI;
@@ -30,6 +32,8 @@ import java.net.URI;
 @Data
 @ToString
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Attachment {
 
 	String name;

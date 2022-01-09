@@ -105,7 +105,7 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
             "Objectify"
         );
         notificationIntent.getHeader().setAttributeValue("custom-property1", Arrays.asList("xx","yy"));
-        notificationIntent.getHeader().setAttributeValue("custom-property2", Arrays.asList("zz"));
+        notificationIntent.getHeader().setAttributeValue("custom-property2", "zz");
 
 		//WHEN
 		List<EmailMessage> result = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);
