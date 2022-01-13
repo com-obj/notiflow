@@ -19,16 +19,15 @@
 
 package com.obj.nc.flows.slackMessageProcessingFlow;
 
+import com.obj.nc.channels.ChannelFactory;
 import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.slack.SlackMessageSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 
@@ -41,16 +40,16 @@ public class SlackMessageProcessingFlowConfig {
 
     private final SlackMessageSender slackMessageSender;
     private final MessageAndEndpointPersister persister;
-    private final ThreadPoolTaskScheduler executor;
+    private final ChannelFactory channelFactory;
 
     @Bean(SLACK_PROCESSING_FLOW_INPUT_CHANNEL_ID)
     public MessageChannel sendInputChannel() {
-        return new PublishSubscribeChannel(executor);
+        return channelFactory.getPublishSubscribeChannel(SLACK_PROCESSING_FLOW_INPUT_CHANNEL_ID);
     }
 
     @Bean(SLACK_PROCESSING_FLOW_OUTPUT_CHANNEL_ID)
     public MessageChannel sendOutputChannel() {
-        return new PublishSubscribeChannel(executor);
+        return channelFactory.getPublishSubscribeChannel(SLACK_PROCESSING_FLOW_OUTPUT_CHANNEL_ID);
     }
 
     @Bean(SLACK_PROCESSING_FLOW_ID)

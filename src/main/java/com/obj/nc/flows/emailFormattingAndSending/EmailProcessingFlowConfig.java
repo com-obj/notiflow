@@ -19,6 +19,7 @@
 
 package com.obj.nc.flows.emailFormattingAndSending;
 
+import com.obj.nc.channels.ChannelFactory;
 import com.obj.nc.domain.content.TemplateWithModelContent;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.message.Message;
@@ -33,11 +34,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
@@ -53,8 +52,8 @@ public class EmailProcessingFlowConfig {
 	private final EmailProcessingFlowProperties properties;
 	private final MessagePersister messagePersister;
 	private final MessageAndEndpointPersister messageAndEndpointPersister;
-	private final ThreadPoolTaskScheduler executor;
 	private final EmailMessageAggregationStrategy emailMessageAggregationStrategy;
+	private final ChannelFactory channelFactory;
 	
 	public final static String EMAIL_FORMAT_AND_SEND_FLOW_ID = "EMAIL_FORMAT_AND_SEND_FLOW_ID";
 	public final static String EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID = EMAIL_FORMAT_AND_SEND_FLOW_ID + "_INPUT";
@@ -126,17 +125,17 @@ public class EmailProcessingFlowConfig {
 	
 	@Bean(EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel emailFormatAndSendInputChannel() {
-		return new PublishSubscribeChannel(executor);
+		return channelFactory.getPublishSubscribeChannel(EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID);
 	}
 	
 	@Bean(EMAIL_SEND_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel emailSendInputChannel() {
-		return new PublishSubscribeChannel(executor);
+		return channelFactory.getPublishSubscribeChannel(EMAIL_SEND_FLOW_INPUT_CHANNEL_ID);
 	}
 	
 	@Bean(EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID)
 	public MessageChannel emailSendOutputChannel() {
-		return new PublishSubscribeChannel(executor);
+		return channelFactory.getPublishSubscribeChannel(EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID);
 	}
 	
 }

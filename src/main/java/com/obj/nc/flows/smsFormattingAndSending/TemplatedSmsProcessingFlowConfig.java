@@ -19,6 +19,7 @@
 
 package com.obj.nc.flows.smsFormattingAndSending;
 
+import com.obj.nc.channels.ChannelFactory;
 import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.functions.processors.messageTemplating.SmsTemplateFormatter;
@@ -27,7 +28,6 @@ import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
@@ -43,13 +43,14 @@ public class TemplatedSmsProcessingFlowConfig {
 	private final PaylaodLoggerSinkConsumer logConsumer;
 	private final MessagePersister messagePersister;
 	private final MessageAndEndpointPersister messageAndEndpointPersister;
+	private final ChannelFactory channelFactory;
 
 	public final static String TEMPLATED_SMS_PROCESSING_FLOW_ID = "TEMPLATED_SMS_PROCESSING_FLOW_ID";
 	public final static String TEMPLATED_SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID = TEMPLATED_SMS_PROCESSING_FLOW_ID + "_INPUT";
 	
 	@Bean(TEMPLATED_SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel smsProcessingInputChangel() {
-		return new PublishSubscribeChannel();
+		return channelFactory.getPublishSubscribeChannel(TEMPLATED_SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID);
 	}
 	
 	@Bean(TEMPLATED_SMS_PROCESSING_FLOW_ID)
@@ -66,7 +67,5 @@ public class TemplatedSmsProcessingFlowConfig {
 				)
 				.handle(logConsumer)
 				.get();
-
 	}
-
 }

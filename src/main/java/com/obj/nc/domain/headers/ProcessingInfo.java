@@ -26,12 +26,7 @@ import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.refIntegrity.Reference;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.utils.JsonUtils;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
@@ -42,7 +37,6 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -155,11 +149,13 @@ public class ProcessingInfo implements Persistable<UUID> {
 		log.debug("Processing finished for step {}. Took {} ms", getStepName(), getStepDurationMs());
 	}
 
+	@JsonIgnore
 	@Override
 	public UUID getId() {		
 		return processingId;
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isNew() {
 		//Processing info is append only
