@@ -16,6 +16,7 @@ import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 
 import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -65,7 +66,7 @@ public class RecipientsAndEndpointsResolutionTest extends BaseIntegrationTest {
     }
 
     @Test
-    @Ignore("only one time initialization of contact store")
+    @Disabled("only one time initialization of contact store")
     public void createTestDataInStore() {
         Person p1 = Person.builder()
             .name("John Doe")
