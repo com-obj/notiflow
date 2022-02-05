@@ -130,7 +130,7 @@ public class ProcessingInfoGenerator {
 			return startProcessingInfos;
 		}
 		
-		//oters
+		//others
 		for (ImmutablePair<Header, Object> startPayloadAndHeader: startPayloadAndHeaders) {
 			 Object startPayload = startPayloadAndHeader.getRight();
 			 Header startHeader = startPayloadAndHeader.getLeft();
