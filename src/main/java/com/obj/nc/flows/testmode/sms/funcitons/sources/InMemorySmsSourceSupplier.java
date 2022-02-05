@@ -38,7 +38,7 @@ public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<SmsMessage>
 	public static final String ORIGINAL_RECIPIENTS_NAME_ATTR_NAME = "ORIGINAL_RECIPIENTS_NAME";
 
 	
-	private LinkedList<SmsMessage> recieved = new LinkedList<SmsMessage>();
+	private LinkedList<SmsMessage> received = new LinkedList<SmsMessage>();
 
 	@Override
 	protected Optional<PayloadValidationException> checkPreCondition(SmsMessage payload) {
@@ -47,36 +47,36 @@ public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<SmsMessage>
 
 	@Override
 	protected SmsMessage execute() {
-		if (recieved.isEmpty()) {
+		if (received.isEmpty()) {
 			return null;
 		}
 		
-		SmsMessage sms= recieved.getFirst();
+		SmsMessage sms= received.getFirst();
 		
 		SimpleTextContent content =sms.getBody();
 		
 		SmsEndpoint recipient = (SmsEndpoint)sms.getReceivingEndpoints().iterator().next();		
 
 		content.setAttributeValue(ORIGINAL_RECIPIENTS_PHONE_ATTR_NAME, recipient.getPhone());
-		if (recipient.getRecipient()!=null) {
-			content.setAttributeValue(ORIGINAL_RECIPIENTS_NAME_ATTR_NAME, recipient.getRecipient().getName());
-		}
+		// if (recipient.getRecipient()!=null) {
+		// 	content.setAttributeValue(ORIGINAL_RECIPIENTS_NAME_ATTR_NAME, recipient.getRecipient().getName());
+		// }
 		
-		recieved.removeFirst();
+		received.removeFirst();
 		
 		return sms;
 	}
 	
-	public void recieve(SmsMessage msg) {
-		recieved.addLast(msg);
+	public void receive(SmsMessage msg) {
+		received.addLast(msg);
 	}
 	
 	public int getReceivedCount() {
-		return recieved.size();
+		return received.size();
 	}
 	
 	public void purgeAllReceivedMessages() {
-		recieved = new LinkedList<>();
+		received = new LinkedList<>();
 	}
 
 }

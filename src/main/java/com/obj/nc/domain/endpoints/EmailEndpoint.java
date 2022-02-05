@@ -20,6 +20,8 @@
 package com.obj.nc.domain.endpoints;
 
 import com.google.common.collect.ObjectArrays;
+import com.obj.nc.domain.recipients.Group;
+import com.obj.nc.domain.recipients.Person;
 
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.PayloadDocumentation;
@@ -48,7 +50,7 @@ public class EmailEndpoint extends ReceivingEndpoint {
 				.email(emailAddress)
 				.build();
 		
-		r.setRecipient(person);
+		// r.setRecipient(person);
 		return r;
 	}
 	
@@ -57,7 +59,7 @@ public class EmailEndpoint extends ReceivingEndpoint {
 				.email(emailAddress)
 				.build();
 		
-		r.setRecipient(group);
+		// r.setRecipient(group);
 		return r;
 	}
 

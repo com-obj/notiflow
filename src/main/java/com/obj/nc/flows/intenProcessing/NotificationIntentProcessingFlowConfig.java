@@ -37,7 +37,7 @@ public class NotificationIntentProcessingFlowConfig {
 		
 	@Autowired private MessagesFromIntentGenerator generateMessagesFromIntent;
 	@Autowired private NotificationIntentPersister notificationIntentPersister;
-	@Autowired private EndpointPersister endpointPersister; 
+	// @Autowired private EndpointPersister endpointPersister; 
 	
 	public final static String INTENT_PROCESSING_FLOW_ID = "INTENT_PROCESSING_FLOW_ID";
 	public final static String INTENT_PROCESSING_FLOW_INPUT_CHANNEL_ID = INTENT_PROCESSING_FLOW_ID + "_INPUT";
@@ -51,7 +51,7 @@ public class NotificationIntentProcessingFlowConfig {
 	public IntegrationFlow intentProcessingFlowDefinition() {
 		return IntegrationFlows
 				.from(intentProcessingInputChannel())
-				.handle(endpointPersister)
+				// .handle(endpointPersister)
 				.handle(notificationIntentPersister)	
                 //TODO: users could subscribe to intents. NC would be able to calculate recipients based on these settings. Currently recipients has to be provided
 				.transform(generateMessagesFromIntent)

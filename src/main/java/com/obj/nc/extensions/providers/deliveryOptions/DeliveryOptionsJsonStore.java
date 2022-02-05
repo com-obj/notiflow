@@ -11,12 +11,12 @@ import com.obj.nc.utils.JsonUtils;
 import lombok.Data;
 
 @Data
-public class DeliveryOptionsJsonRepository {
+public class DeliveryOptionsJsonStore {
 
-    public static DeliveryOptionsJsonRepository loadRepository(String optionsRepoPathAndFileName) {
-        Path configJsonFile = Paths.get(optionsRepoPathAndFileName);
+    public static DeliveryOptionsJsonStore loadRepository(String optionsStorePathAndFileName) {
+        Path configJsonFile = Paths.get(optionsStorePathAndFileName);
                 
-        DeliveryOptionsJsonRepository repo = JsonUtils.readObjectFromJSONFile(configJsonFile, DeliveryOptionsJsonRepository.class);
+        DeliveryOptionsJsonStore repo = JsonUtils.readObjectFromJSONFile(configJsonFile, DeliveryOptionsJsonStore.class);
         return repo;
     }
 

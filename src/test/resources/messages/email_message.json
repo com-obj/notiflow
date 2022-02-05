@@ -15,10 +15,6 @@
 	"receivingEndpoints": [
 		{
 			"@type": "EMAIL",
-			"recipient": {
-				"type": "PERSON",
-				"name": "John Doe"
-			},
 			"email": "john.doe@objectify.sk",
 			"endpointId": "john.doe@objectify.sk"
 		}

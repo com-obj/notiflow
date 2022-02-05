@@ -150,9 +150,9 @@ public class TestDataRestController {
         intent.getHeader().setFlowId("default-flow");
         intent.addPreviousEventId(UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d"));
         
-        intent = notificationIntentRepository.save(intent);
+        intent = notificationIntentRepository.save(intent.toPersistentState()).toIntent();
         intent.setTimeCreated(Timestamp.valueOf("2021-08-24 09:37:39.490000").toInstant());
-        notificationIntentRepository.save(intent);
+        notificationIntentRepository.save(intent.toPersistentState());
     }
     
     private void persistMessages() {

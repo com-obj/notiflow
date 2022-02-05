@@ -20,7 +20,8 @@
 package com.obj.nc;
 
 import com.obj.nc.repositories.Message2EndpointRelationRepository;
-import com.obj.nc.extensions.providers.deliveryOptions.SpamPreventionConfigProperties;
+import com.obj.nc.extensions.providers.deliveryOptions.DeliveryOptionsConfigProperties;
+import com.obj.nc.extensions.providers.recipients.ContactsProvider;
 import com.obj.nc.repositories.EndpointsRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -68,12 +69,16 @@ public class Get {
     	return getBean(EndpointsRepository.class);
     }
 
+	public static ContactsProvider getContactStore() {
+    	return getBean(ContactsProvider.class);
+    }
+
     public static Message2EndpointRelationRepository getMessage2EndpointRelationRepo() {
     	return getBean(Message2EndpointRelationRepository.class);
     }
 
-	public static SpamPreventionConfigProperties getSpamPreventionProperties() {
-		return getBean(SpamPreventionConfigProperties.class);
+	public static DeliveryOptionsConfigProperties getSpamPreventionProperties() {
+		return getBean(DeliveryOptionsConfigProperties.class);
 	}
     
 	public static ApplicationContext getApplicationContext() {

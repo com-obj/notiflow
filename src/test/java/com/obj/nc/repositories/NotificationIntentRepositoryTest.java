@@ -21,6 +21,7 @@ package com.obj.nc.repositories;
 
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.notifIntent.NotificationIntentPersistentState;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
@@ -42,7 +43,9 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest
+@SpringBootTest(properties = {
+	"nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
+})
 public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	
 	@Autowired NotificationIntentRepository intentRepository;
@@ -55,68 +58,76 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	
 	@Test
 	public void testPersistingSingleIntent() {
-		//GIVEN
-		 String INPUT_JSON_FILE = "intents/ba_job_post.json";
-	     NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-	     notificationIntent.getHeader().setFlowId("default-flow");
-	     
-	     GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
-	     GenericEvent event2 = GenericEventRepositoryTest.createProcessedEvent();
-		 UUID[] eventIds = new UUID[]{
-					eventRepo.save(event).getId(), 
-					eventRepo.save(event2).getId()};
-		 notificationIntent.setPreviousEventIds(Arrays.asList(eventIds));	     
- 		
-	     intentRepository.save(notificationIntent);
-	     
-	     Optional<NotificationIntent> oIntentInDB = intentRepository.findById(notificationIntent.getId());
-	     
-	     Assertions.assertThat(oIntentInDB.isPresent()).isTrue();
-	     NotificationIntent intentInDB = oIntentInDB.get();
-	     Assertions.assertThat(intentInDB.getPayloadTypeName()).isEqualTo("INTENT"); 
-	     Assertions.assertThat(intentInDB.getTimeCreated()).isNotNull();
-	     Assertions.assertThat(intentInDB.getHeader().getFlowId()).isEqualTo("default-flow");
-	     Assertions.assertThat(intentInDB.getPreviousEventIds()).isEqualTo(Arrays.asList(eventIds));
-	     Assertions.assertThat(intentInDB.getBody().getSubject()).contains("Business Intelligence (BI) Developer");
-	     Assertions.assertThat(intentInDB.getBody().getBody()).contains("We are looking for a Business Intelligence (BI) Developer to create...");	    
+		//GIVEN		
+		NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+			"Business Intelligence (BI) Developer", 
+			"We are looking for a Business Intelligence"
+		);   
+		 
+		notificationIntent.getHeader().setFlowId("default-flow");
+		
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
+		GenericEvent event2 = GenericEventRepositoryTest.createProcessedEvent();
+		UUID[] eventIds = new UUID[]{
+				eventRepo.save(event).getId(), 
+				eventRepo.save(event2).getId()};
+		notificationIntent.setPreviousEventIds(Arrays.asList(eventIds));	     
+	
+		NotificationIntentPersistentState notificationIntentPS = intentRepository.save(notificationIntent.toPersistentState());
+		
+		Optional<NotificationIntentPersistentState> oIntentInDB = intentRepository.findById(notificationIntentPS.getId());
+		
+		Assertions.assertThat(oIntentInDB.isPresent()).isTrue();
+		NotificationIntent intentInDB = oIntentInDB.get().toIntent();
+		Assertions.assertThat(intentInDB.getTimeCreated()).isNotNull();
+		Assertions.assertThat(intentInDB.getHeader().getFlowId()).isEqualTo("default-flow");
+		Assertions.assertThat(intentInDB.getPreviousEventIds()).isEqualTo(Arrays.asList(eventIds));
+		Assertions.assertThat(intentInDB.getBody().getSubject()).contains("Business Intelligence (BI) Developer");
+		Assertions.assertThat(intentInDB.getBody().getBody()).contains("We are looking for a Business Intelligence");	    
 	}
 	
 	@Test
 	public void testFindByIdInContainingIntentsId() {
-		//GIVEN
-		String INPUT_JSON_FILE = "intents/ba_job_post.json";
-		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		//GIVEN		
+		NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+			"Business Intelligence (BI) Developer", 
+			"We are looking for a Business Intelligence"
+		);   		
 		notificationIntent.getHeader().setFlowId("default-flow");
 		notificationIntent.setId(UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b"));
-		intentRepository.save(notificationIntent);
+
 		// WHEN
-		List<NotificationIntent> oIntentInDB = intentRepository.findByIdIn(Arrays.asList(
+		intentRepository.save(notificationIntent.toPersistentState());
+
+		List<NotificationIntentPersistentState> oIntentInDB = intentRepository.findByIdIn(Arrays.asList(
 				UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981a"),
 				UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b")));
+
 		// THEN
 		Assertions.assertThat(!oIntentInDB.isEmpty()).isTrue();
 	}
 	
 	@Test
 	public void testFindByIdInNotContainingIntentsId() {
-		//GIVEN
-		String INPUT_JSON_FILE = "intents/ba_job_post.json";
-		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		//GIVEN		
+		NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+			"Business Intelligence (BI) Developer", 
+			"We are looking for a Business Intelligence"
+		);   
 		notificationIntent.getHeader().setFlowId("default-flow");
 		notificationIntent.setId(UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b"));
-		intentRepository.save(notificationIntent);
+
 		// WHEN
-		List<NotificationIntent> oIntentInDB = intentRepository.findByIdIn(Arrays.asList(
+		List<NotificationIntentPersistentState> oIntentInDB = intentRepository.findByIdIn(Arrays.asList(
 				UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981c")));
+
 		// THEN
 		Assertions.assertThat(oIntentInDB.isEmpty()).isTrue();
 	}
 	
 	@Test
 	public void testIntentReferencingNonExistingEnpoindAndEventFails() {
-		//GIVEN
-		String INPUT_JSON_FILE = "intents/ba_job_post.json";
-		
+		//GIVEN				
 		//Intent nuklada zatial do db endpointIds,.. ked sa prida toto odkomentovat
 //		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);			
 //		notificationIntent.setId(UUID.randomUUID());
@@ -130,13 +141,16 @@ public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 //			.hasMessageContaining("endpointIds");
 		
 		//GIVEN
-		final NotificationIntent notificationIntent2 = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);				
-		notificationIntent2.setId(UUID.randomUUID());
-		notificationIntent2.addPreviousEventId(UUID.randomUUID());
+		NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+			"Business Intelligence (BI) Developer", 
+			"We are looking for a Business Intelligence"
+		);  
+		notificationIntent.setId(UUID.randomUUID());
+		notificationIntent.addPreviousEventId(UUID.randomUUID());
 		
 		// WHEN
 		Assertions.assertThatThrownBy(
-				() -> intentRepository.save(notificationIntent2))
+				() -> intentRepository.save(notificationIntent.toPersistentState()))
 			.isInstanceOf(RuntimeException.class)
 			.hasMessageContaining("which cannot be found in the DB")
 			.hasMessageContaining("previousEventIds");

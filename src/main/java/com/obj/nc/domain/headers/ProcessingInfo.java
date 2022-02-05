@@ -107,30 +107,30 @@ public class ProcessingInfo implements Persistable<UUID> {
 	public static ProcessingInfo createProcessingInfoOnStepStart(String processingStepName, ProcessingInfo prevProcessingInfo, Object startPayload) {
 		log.debug("Generating start processing info for step {}", processingStepName);
 		
-		ProcessingInfo stepProcessinfInfo = new ProcessingInfo();
-		stepProcessinfInfo.payloadJsonStart = startPayload!=null?JsonUtils.writeObjectToJSONString(startPayload): null;
+		ProcessingInfo stepProcessingInfo = new ProcessingInfo();
+		stepProcessingInfo.payloadJsonStart = startPayload!=null?JsonUtils.writeObjectToJSONString(startPayload): null;
 		
-		stepProcessinfInfo.prevProcessingId = prevProcessingInfo!=null? prevProcessingInfo.getProcessingId(): null;
+		stepProcessingInfo.prevProcessingId = prevProcessingInfo!=null? prevProcessingInfo.getProcessingId(): null;
 		
-		stepProcessinfInfo.stepName = processingStepName;
-		stepProcessinfInfo.stepIndex = prevProcessingInfo!=null? prevProcessingInfo.getStepIndex()+1: 0;
+		stepProcessingInfo.stepName = processingStepName;
+		stepProcessingInfo.stepIndex = prevProcessingInfo!=null? prevProcessingInfo.getStepIndex()+1: 0;
 
 		Instant now = Instant.now();
-		stepProcessinfInfo.timeProcessingStart = now;
+		stepProcessingInfo.timeProcessingStart = now;
 		
-		return stepProcessinfInfo;
+		return stepProcessingInfo;
 	}
 	
 	public static ProcessingInfo createProcessingInfoOnStepEnd(ProcessingInfo startProcessingInfo,
 			Header endHeader, Object endPayload) {
 		log.debug("Generating end processing info for step {}", startProcessingInfo.getStepName());
 		
-		ProcessingInfo endProcessinfInfo = createCopy(startProcessingInfo);
-		endHeader.setProcessingInfo(endProcessinfInfo); 
+		ProcessingInfo endProcessingInfo = createCopy(startProcessingInfo);
+		endHeader.setProcessingInfo(endProcessingInfo); 
 		
-		endProcessinfInfo.stepFinish(endPayload);
+		endProcessingInfo.stepFinish(endPayload);
 		
-		return endProcessinfInfo;
+		return endProcessingInfo;
 	}
 
 	private void stepFinish(Object endPayload) {
@@ -151,7 +151,7 @@ public class ProcessingInfo implements Persistable<UUID> {
 		
 		payloadJsonEnd = JsonUtils.writeObjectToJSONString(endPayload); //this make snapshot of its self. has to be the last call
 		
-//		calculateDiffToPreviosVersion();
+//		calculateDiffToPreviousVersion();
 		log.debug("Processing finished for step {}. Took {} ms", getStepName(), getStepDurationMs());
 	}
 
@@ -167,7 +167,7 @@ public class ProcessingInfo implements Persistable<UUID> {
 	}
 
 	
-//	private void calculateDiffToPreviosVersion() {
+//	private void calculateDiffToPreviousVersion() {
 //		try {	
 //			DiffMatchPatch diff = new DiffMatchPatch();
 //			LinkedList<Diff> diffs = diff.diff_main(payloadJson, modifiedPayloadBodyJsonJson);

@@ -19,10 +19,10 @@
 
 package com.obj.nc.domain;
 
-import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptions;
 
 public interface HasDeliveryOptions {
 	
-	public EndpointDeliveryOptionsConfig getDeliveryOptions();
+	public EndpointDeliveryOptions getDeliveryOptions();
 
 }

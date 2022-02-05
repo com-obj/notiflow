@@ -58,6 +58,12 @@ public class JsonUtils {
 		return pojo;
 	}
 
+	public static <T> T readObjectFromJSONFileToInstance(Path filePath, T bean) {
+		String JSONStr = readFileContent(filePath);	
+		T pojo = readObjectFromJSONStringToInstance(JSONStr,bean);
+		return pojo;
+	}	
+
 	public static void writeObjectToJSONFile(Path filePath, Object bean) {
 		String JSONStr = writeObjectToJSONString(bean);
 		writeFileContent(filePath, JSONStr);	
@@ -98,8 +104,19 @@ public class JsonUtils {
 			return pojo;
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);
-		}
+		}		
+	}
+
+	public static <T> T readObjectFromJSONStringToInstance(String json, T bean) {
 		
+		try {
+		    final ObjectMapper objectMapper = getObjectMapper();
+
+			T pojo = objectMapper.readerForUpdating(bean).readValue(json);
+			return pojo;
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}		
 	}
 	
 	public static JsonNode readJsonNodeFromJSONString(String json) {

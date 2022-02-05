@@ -1,0 +1,150 @@
+{
+    "contacts": [
+        {
+            "type": "PERSON",
+            "id": "baf25cbe-2975-4666-adda-c8ea01dc909d",
+            "name": "John Doe",
+            "receivingEndpoints": [
+                {
+                    "@type": "EMAIL",
+                    "id": "21c1d133-8857-4314-8117-5a47b60db5eb",
+                    "email": "john.doe@objectify.sk",
+                    "endpointId": "john.doe@objectify.sk"
+                }
+            ]
+        },
+        {
+            "type": "PERSON",
+            "id": "ee61d11c-f4e4-403d-befb-ad9a6766c106",
+            "name": "John Dudly",
+            "receivingEndpoints": [
+                {
+                    "@type": "EMAIL",
+                    "id": "bf40c200-f770-4b8c-ab48-4c1fd76a7773",
+                    "email": "john.dudly@objectify.sk",
+                    "endpointId": "john.dudly@objectify.sk"
+                }
+            ]
+        },
+        {
+            "type": "PERSON",
+            "id": "6b31e60a-7c2d-44ff-9938-34554102b48a",
+            "name": "Invalid",
+            "receivingEndpoints": [
+                {
+                    "@type": "EMAIL",
+                    "id": "6d1d80db-ac08-45c7-9710-8bd824fe4ed9",
+                    "email": "invalid mail",
+                    "endpointId": "invalid mail"
+                }
+            ]
+        },
+        {
+            "type": "PERSON",
+            "id": "2f33ed55-bca0-493e-b71d-0cf13b29b629",
+            "name": "Jonson and Johnson",
+            "receivingEndpoints": []
+        },
+        {
+            "type": "PERSON",
+            "id": "081dd763-d6f9-4a89-81ff-f7ffb1fa088b",
+            "name": "Phone",
+            "receivingEndpoints": [
+                {
+                    "@type": "SMS",
+                    "id": "cbceca35-9979-4615-83be-06392e32899e",
+                    "phone": "+421905000111",
+                    "endpointId": "+421905000111"
+                }
+            ]
+        },
+        {
+            "type": "GROUP",
+            "id": "ce48aab7-7160-4b1d-b22c-0bd1bb8bbce2",
+            "name": "Objectify",
+            "receivingEndpoints": [
+                {
+                    "@type": "EMAIL",
+                    "id": "18236163-2623-44cb-929a-7af7f39160b9",
+                    "email": "all@objectify.sk",
+                    "endpointId": "all@objectify.sk"
+                }
+            ],
+            "members": [
+                {
+                    "type": "GROUP",
+                    "id": "89372129-b5c9-42d0-a354-1a835dec86a9",
+                    "name": "Marketing",
+                    "receivingEndpoints": [],
+                    "members": [
+                        {
+                            "type": "PERSON",
+                            "id": "c38afca9-ea47-4fcc-bef4-87cfc6ccb2c0",
+                            "name": "David S",
+                            "receivingEndpoints": [
+                                {
+                                    "@type": "EMAIL",
+                                    "id": "3c0393d8-1ccc-4454-b91b-c2e37c3ee404",
+                                    "email": "stolarik@objectify.sk",
+                                    "endpointId": "stolarik@objectify.sk"
+                                },
+                                {
+                                    "@type": "SMS",
+                                    "id": "109f92a9-b10a-49ba-87f9-92095f06f6fa",
+                                    "phone": "+421905012312",
+                                    "endpointId": "+421905012312"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "GROUP",
+                    "id": "bf05e1c1-e012-4723-ad12-a53e95bcdc3b",
+                    "name": "FE Department",
+                    "receivingEndpoints": [],
+                    "members": [
+                        {
+                            "type": "PERSON",
+                            "id": "438a6fd3-dd58-4292-a524-3ccaaf131187",
+                            "name": "David L",
+                            "receivingEndpoints": [
+                                {
+                                    "@type": "EMAIL",
+                                    "id": "f2292df3-7660-4de4-8793-c0e59f7aac7e",
+                                    "email": "lazar@objectify.sk",
+                                    "endpointId": "lazar@objectify.sk"
+                                },
+                                {
+                                    "@type": "SMS",
+                                    "id": "e97d433c-eeaa-44c4-aa65-252d8cfd58d6",
+                                    "phone": "+421911111111",
+                                    "endpointId": "+421911111111"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "PERSON",
+                    "id": "de0b5e95-cc21-49ca-9b7b-471829fbb475",
+                    "name": "Jan",
+                    "receivingEndpoints": [
+                        {
+                            "@type": "EMAIL",
+                            "id": "42966b01-293c-42ef-b079-5c50b0809815",
+                            "email": "cuzy@objectify.sk",
+                            "endpointId": "cuzy@objectify.sk"
+                        },
+                        {
+                            "@type": "SMS",
+                            "id": "c6cebad7-0634-4569-90f9-bada5380f2fa",
+                            "phone": "+4219131554",
+                            "endpointId": "+4219131554"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

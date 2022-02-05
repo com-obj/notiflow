@@ -13,15 +13,14 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.functions.processors.spamPrevention.config;
+package com.obj.nc.extensions.providers.deliveryOptions;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 
 import java.util.stream.Stream;
 
-import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptions;
 import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
-import com.obj.nc.domain.deliveryOptions.SpamPreventionOption.MaxMessageUnit;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.MailchimpEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
@@ -29,8 +28,6 @@ import com.obj.nc.domain.endpoints.SlackEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.endpoints.TeamsEndpoint;
 import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
-import com.obj.nc.extensions.providers.deliveryOptions.JsonRepoDeliveryOptionsProvider;
-import com.obj.nc.extensions.providers.deliveryOptions.SpamPreventionConfigProperties;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 
@@ -44,20 +41,20 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringBootTest(properties = {
-    "nc.delivery.spam-prevention.jsonRepoPathAndFileName=src/test/resources/deliver-options/delivery-options-setting.json", 
+    "nc.delivery-options.jsonStorePathAndFileName=src/test/resources/deliver-options/delivery-options-setting.json", 
 })
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 public class SpamPreventionConfigCalculationTest extends BaseIntegrationTest {
 
     @Autowired
-    protected SpamPreventionConfigProperties config;
+    protected DeliveryOptionsConfigProperties config;
     @Autowired
-    protected JsonRepoDeliveryOptionsProvider doProvider;
+    protected JsonStoreDeliveryOptionsProvider doProvider;
 
     @ParameterizedTest
     @MethodSource("prepareTestInput")
     void testRightEndpointIdentification(TestInput input) {
-        EndpointDeliveryOptionsConfig delOpt = doProvider.findDeliveryOptions(input.endpoint);
+        EndpointDeliveryOptions delOpt = doProvider.findDeliveryOptions(input.endpoint);
 
         Assertions.assertEquals(delOpt.getSpamPrevention(), input.expectedOption);
     }

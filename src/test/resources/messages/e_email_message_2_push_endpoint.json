@@ -12,11 +12,7 @@
    "receivingEndpoints":[
          {
             "@type":"MAILCHIMP",
-            "email" : "john.doe@objectify.sk",
-            "recipient":{
-               "type":"PERSON",
-               "name":"John Doe"
-            }
+            "email" : "john.doe@objectify.sk"
          }
    ]
 }

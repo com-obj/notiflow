@@ -19,7 +19,7 @@
 
 package com.obj.nc.flows.pushProcessing;
 
-import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
+import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.PushSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

@@ -19,6 +19,8 @@
 
 package com.obj.nc.repositories;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.aspects.ProcessingInfoGeneratorTest.TestPayload;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
@@ -68,4 +70,5 @@ public class GenericEventRepositoryTest extends BaseIntegrationTest {
 				.build();
 		return event;
 	}
+
 }

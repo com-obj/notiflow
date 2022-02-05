@@ -49,7 +49,7 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 @SpringBootTest(properties = {
-    "nc.delivery.spam-prevention.jsonRepoPathAndFileName=src/test/resources/deliver-options/delivery-options-setting2.json", 
+    "nc.delivery-options.jsonStorePathAndFileName=src/test/resources/deliver-options/delivery-options-setting2.json", 
 })
 public class MessageProcessingTest extends BaseIntegrationTest {
 

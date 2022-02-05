@@ -253,7 +253,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		emailMessage.setReceivingEndpoints(Arrays.asList(email1, email2));
 		
 		messageProcessingFlow.processMessage(emailMessage);
-		Awaitility.await().atMost(15, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
+		Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), SENT) >= 2);
 		
 		List<MessagePersistentState> messages = StreamSupport.stream(messageRepo.findAll().spliterator(), false)
 				.filter(message -> !emailMessage.getId().equals(message.getId()))
@@ -281,7 +281,10 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 				.andExpect(content().contentType(MediaType.IMAGE_PNG));
 		
 		//AND READ STATUS IS JOURNALIZED
-		Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), READ) >= 1);
+		Awaitility.await()
+			.atMost(5, TimeUnit.SECONDS)
+			.until(() -> deliveryRepo.countByMessageIdAndStatus(emailMessage.getId(), READ) >= 1);
+			
 		List<DeliveryInfo> infosOfMessage = deliveryRepo.findByMessageIdAndStatusOrderByProcessedOn(emailMessage.getId(), READ);
 		assertThat(infosOfMessage).hasSize(1);
 	}

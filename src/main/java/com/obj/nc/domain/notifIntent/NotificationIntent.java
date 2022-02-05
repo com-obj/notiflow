@@ -19,55 +19,37 @@
 
 package com.obj.nc.domain.notifIntent;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.obj.nc.domain.BasePayload;
-import com.obj.nc.domain.HasPreviousEventIds;
-import com.obj.nc.domain.HasPreviousIntentIds;
-import com.obj.nc.domain.IsNotification;
-import com.obj.nc.domain.content.MessageContent;
-import com.obj.nc.domain.content.TemplateWithModelContent;
-import com.obj.nc.domain.content.email.EmailContent;
-import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
-import com.obj.nc.domain.content.mailchimp.MailchimpContent;
-import com.obj.nc.domain.content.mailchimp.TemplatedMailchimpContent;
-import com.obj.nc.domain.content.push.PushContent;
-import com.obj.nc.domain.content.sms.SimpleTextContent;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
-import com.obj.nc.domain.endpoints.ReceivingEndpoint;
-import com.obj.nc.domain.endpoints.SmsEndpoint;
-import com.obj.nc.domain.message.EmailMessage;
-import com.obj.nc.domain.message.EmailMessageTemplated;
-import com.obj.nc.domain.message.MailchimpMessage;
-import com.obj.nc.domain.message.Message;
-import com.obj.nc.domain.message.PushMessage;
-import com.obj.nc.domain.message.SmsMessage;
-import com.obj.nc.domain.message.SmsMessageTemplated;
-import com.obj.nc.domain.message.TemplatedMailchimpMessage;
-import com.obj.nc.domain.notifIntent.content.IntentContent;
-import com.obj.nc.domain.refIntegrity.Reference;
-import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.NotificationIntentRepository;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
-
-import javax.validation.constraints.NotNull;
-
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.obj.nc.Get;
+import com.obj.nc.domain.Attachment;
+import com.obj.nc.domain.BaseDynamicAttributesBean;
+import com.obj.nc.domain.HasPreviousEventIds;
+import com.obj.nc.domain.HasProcessingInfo;
+import com.obj.nc.domain.IsNotification;
+import com.obj.nc.domain.headers.HasHeader;
+import com.obj.nc.domain.headers.Header;
+import com.obj.nc.domain.headers.ProcessingInfo;
+import com.obj.nc.domain.notifIntent.content.IntentContent;
+import com.obj.nc.domain.notifIntent.content.TemplatedIntentContent;
+import com.obj.nc.domain.recipients.Recipient;
+import com.obj.nc.domain.stats.HasRecipients;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
 @ToString(callSuper = false)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
-@Table("nc_intent")
 /**
  * This class represents Intent to deliver *some* kind of information at *some* point in time to recipient. Use this class in case
  * that you cannot tell the details about what/when/how are stored in delivery settings of that recipient. 
@@ -86,20 +68,74 @@ import java.util.UUID;
  *
  * @param <BODY_TYPE>
  */
-public class NotificationIntent extends BasePayload<IntentContent> implements IsNotification, HasPreviousIntentIds, HasPreviousEventIds {
+public class NotificationIntent extends BaseDynamicAttributesBean implements HasHeader, HasRecipients, HasProcessingInfo, IsNotification, HasPreviousEventIds {
 	
-	public static final String JSON_TYPE_IDENTIFIER = "INTENT";
+	@EqualsAndHashCode.Include
+	private UUID id = UUID.randomUUID();
+
+	private Instant timeCreated;
+
+	protected Header header = new Header();
 	
-	@NotNull
-	@Transient
-	@Reference(GenericEventRepository.class)
+	protected IntentContent body;
+	
+	//TODO: purely technical staf, should be moved to header
 	private List<UUID> previousEventIds = new ArrayList<>();
 	
-	@NotNull
-	@Transient
-	@Reference(NotificationIntentRepository.class)
+	//TODO: purely technical staf, should be moved to header
+	//Can Intent have parent Intent? What is that good for?
 	private List<UUID> previousIntentIds = new ArrayList<>();
-	
+
+	private List<Recipient> recipients = new ArrayList<Recipient>();
+
+	public static NotificationIntent createWithStaticContent(String subject, String body, Attachment ... attachments) {
+		NotificationIntent intent = new NotificationIntent();	
+		intent.setBody(IntentContent.createStaticContent(subject,body));
+		intent.getBody().setAttachments(Arrays.asList(attachments));
+		return intent;
+	}
+
+	public static NotificationIntent createWithTemplatedContent(TemplatedIntentContent<?> templatedContent, Attachment ... attachments) {
+		NotificationIntent intent = new NotificationIntent();	
+		intent.setBody(templatedContent);
+		intent.getBody().setAttachments(Arrays.asList(attachments));
+		return intent;
+	}
+
+	public NotificationIntentPersistentState toPersistentState() {
+		NotificationIntentPersistentState persistentState = new NotificationIntentPersistentState();
+		persistentState.setBody(getBody());
+		persistentState.setHeader(getHeader());
+		persistentState.setId(getId());
+		persistentState.setPreviousEventIds(previousEventIds.toArray(new UUID[0]));
+		persistentState.setPreviousIntentIds(previousIntentIds.toArray(new UUID[0]));
+		persistentState.setRecipientIds(getRecipientsAsId().toArray(new UUID[0]));
+		persistentState.setRecipients(getRecipients());
+		persistentState.setTimeCreated(getTimeCreated());
+		return persistentState;	 
+	}
+
+	public List<UUID> getRecipientsAsId() {
+		return recipients.stream().map(Recipient::getId).collect(Collectors.toList());
+	}
+
+	public NotificationIntent addRecipients(Recipient ... r) {
+		this.recipients.addAll(Arrays.asList(r));
+		return this;
+	}
+
+	public NotificationIntent addRecipientsByIds(UUID ... recipientsIds) {
+		List<Recipient> recipients = Get.getContactStore().findRecipients(recipientsIds);
+		this.recipients.addAll(recipients);
+		return this;
+	}
+
+	public NotificationIntent addRecipientsByName(String ... names) {
+		List<Recipient> recipients = Get.getContactStore().findRecipientsByName(names);
+		this.recipients.addAll(recipients);
+		return this;
+	}
+
 	@Override
 	public void addPreviousEventId(UUID eventId) {
 		previousEventIds.add(eventId);
@@ -108,98 +144,15 @@ public class NotificationIntent extends BasePayload<IntentContent> implements Is
 	public void addPreviousIntentId(UUID intentId) {
 		previousIntentIds.add(intentId);
 	}
+
+	@JsonIgnore
+	public ProcessingInfo getProcessingInfo() {
+		return getHeader().getProcessingInfo();
+	}
 	
 	@JsonIgnore
-	@Column("previous_event_ids")
-	public void setPreviousEventIdsAsArray(UUID[] eventIds) {
-		setPreviousEventIds(Arrays.asList(eventIds));
+	public boolean isNew() {
+		return timeCreated == null;
 	}
-	
-	@JsonIgnore
-	@Column("previous_intent_ids")
-	public void setPreviousIntentIdsAsArray(UUID[] intentIds) {
-		setPreviousIntentIds(Arrays.asList(intentIds));
-	}
-	
-	@Column("previous_event_ids")
-	public UUID[] getPreviousEventIdsAsArray() {
-		return previousEventIds.toArray(new UUID[0]);
-	}
-	
-	@Column("previous_intent_ids")
-	public UUID[] getPreviousIntentIdsAsArray() {
-		return previousIntentIds.toArray(new UUID[0]);
-	}
-	
-	@Override
-	@JsonIgnore
-	public String getPayloadTypeName() {
-		return JSON_TYPE_IDENTIFIER;
-	}
-	
-	public static NotificationIntent createWithStaticContent(String subject, String body, ReceivingEndpoint ... endpoints) {
-		NotificationIntent intent = new NotificationIntent();	
-		intent.setBody(IntentContent.createStaticContent(subject,body));
-		intent.addReceivingEndpoints(endpoints);
-		return intent;
-	}
-	
-	public Message<?> createMessage(ReceivingEndpoint endpointsForOneSubject) {
-		MessageContent msgContent = getBody().createMessageContent(endpointsForOneSubject);
-
-		if (msgContent instanceof EmailContent) {
-			EmailMessage email = Message.newTypedMessageFrom(EmailMessage.class, this);
-			email.setBody((EmailContent)msgContent);
-			
-			return email;
-		} 
 		
-		if (msgContent instanceof SimpleTextContent) {
-			SmsMessage sms = Message.newTypedMessageFrom(SmsMessage.class, this);
-			sms.setBody((SimpleTextContent)msgContent);
-			
-			return sms;
-		} 
-		
-		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof EmailEndpoint) {
-			EmailMessageTemplated<?> email = Message.newTypedMessageFrom(EmailMessageTemplated.class, this);
-			email.setBody((TemplateWithModelEmailContent)msgContent);
-			
-			return email;
-		} 
-		
-		if (msgContent instanceof TemplateWithModelContent && endpointsForOneSubject instanceof SmsEndpoint) {
-			SmsMessageTemplated<?> sms = Message.newTypedMessageFrom(SmsMessageTemplated.class, this);
-			sms.setBody((TemplateWithModelContent)msgContent);
-			
-			return sms;
-		}
-		
-		if (msgContent instanceof TemplatedMailchimpContent) {
-			TemplatedMailchimpMessage mailChimp = Message.newTypedMessageFrom(TemplatedMailchimpMessage.class, this);
-			mailChimp.setBody((TemplatedMailchimpContent)msgContent);
-			
-			return mailChimp;
-		}
-		
-		if (msgContent instanceof MailchimpContent) {
-			MailchimpMessage mailChimp = Message.newTypedMessageFrom(MailchimpMessage.class, this);
-			mailChimp.setBody((MailchimpContent)msgContent);
-			
-			return mailChimp;
-		}
-		
-		if (msgContent instanceof PushContent) {
-			PushMessage push = Message.newTypedMessageFrom(PushMessage.class, this);
-			push.setBody((PushContent)msgContent);
-			
-			return push;
-		}
-
-		throw new NotImplementedException("Add additional cases");
-
-	}
-
-
-	
 }

@@ -13,14 +13,13 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package com.obj.nc.functions.processors.delivery;
+package com.obj.nc.functions.processors.messagePersister;
 
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.relationship.Message2EndpointRelation;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.endpointPersister.EndpointPersister;
-import com.obj.nc.functions.processors.messagePersister.MessagePersister;
 import com.obj.nc.repositories.Message2EndpointRelationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

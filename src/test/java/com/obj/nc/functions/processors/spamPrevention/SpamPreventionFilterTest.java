@@ -15,9 +15,10 @@
 
 package com.obj.nc.functions.processors.spamPrevention;
 
-import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptionsConfig;
+import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptions;
 import com.obj.nc.domain.deliveryOptions.SpamPreventionOption;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
+import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.extensions.providers.deliveryOptions.DeliveryOptionsProvider;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
@@ -42,8 +43,8 @@ public class SpamPreventionFilterTest {
     @Test
     void testNoSpamPreventionOptions() {
         Mockito
-            .when( doProvider.findDeliveryOptions( ArgumentMatchers.any()))
-            .thenReturn(new EndpointDeliveryOptionsConfig());
+            .when( doProvider.findDeliveryOptions( ArgumentMatchers.any(ReceivingEndpoint.class)))
+            .thenReturn(new EndpointDeliveryOptions());
 
         EmailMessage emailMessage = createEmailMessage();
 
@@ -78,10 +79,10 @@ public class SpamPreventionFilterTest {
     }
 
     private EmailMessage setSpamPreventionAndAlreadyDelivered(int maxMessages, int deliveryInfoCount) {
-        EndpointDeliveryOptionsConfig deliveryOptions = new EndpointDeliveryOptionsConfig();
+        EndpointDeliveryOptions deliveryOptions = new EndpointDeliveryOptions();
         deliveryOptions.setSpamPrevention(new SpamPreventionOption(maxMessages, 1, SpamPreventionOption.MaxMessageUnit.MINUTES));
         Mockito
-            .when( doProvider.findDeliveryOptions( ArgumentMatchers.any()))
+            .when( doProvider.findDeliveryOptions( ArgumentMatchers.any(ReceivingEndpoint.class)))
             .thenReturn(deliveryOptions);
 
         EmailMessage emailMessage = createEmailMessage();

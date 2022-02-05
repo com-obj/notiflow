@@ -63,7 +63,9 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 
 @ActiveProfiles(value = {"test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@SpringBootTest
+@SpringBootTest(properties = {
+    "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
+})
 public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 
     @Autowired
@@ -104,7 +106,7 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
     }
 
     @TestConfiguration
-    public static class EventConvertionExtensionConfiguration {
+    public static class EventConversionExtensionConfiguration {
 
         @Bean
         public InputEvent2MessageConverterExtension event2Message() {
@@ -150,10 +152,9 @@ public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
                 public List<NotificationIntent> convert(GenericEvent event) {
                     NotificationIntent email1Intent = NotificationIntent.createWithStaticContent(
                             "Subject",
-                            "Text",
-                            EmailEndpoint.builder().email("test2@objectify.sk").build(),
-                            EmailEndpoint.builder().email("test3@objectify.sk").build()
+                            "Text"
                     );
+                    email1Intent.addRecipientsByName("John Doe", "John Dudly");
 
                     return Collections.singletonList(email1Intent);
                 }

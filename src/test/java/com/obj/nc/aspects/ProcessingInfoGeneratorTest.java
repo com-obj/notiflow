@@ -35,7 +35,6 @@ import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.domain.notifIntent.content.IntentContent;
-import com.obj.nc.functions.processors.dummy.DummyRecepientsEnrichmentProcessingFunction;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sources.genericEvents.GenericEventsSupplier;
@@ -72,12 +71,13 @@ import static org.assertj.core.api.Assertions.entry;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest
+@SpringBootTest(properties = {
+    "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
+})
 public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
 	
-	@Autowired private GenericEventsSupplier generateEventSupplier;
+	@Autowired private GenericEventsSupplier eventSupplier;
 	@Autowired private GenericEventRepository eventRepository;
-    @Autowired private DummyRecepientsEnrichmentProcessingFunction resolveRecipients;
     @Autowired private MessagesFromIntentGenerator generateMessagesFromIntent;
     @Autowired private EmailSender functionSend;
     @Autowired private JdbcTemplate jdbcTemplate;
@@ -93,13 +93,20 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
     
 	@Test
 	@SuppressWarnings("unchecked")
-	void testOneToNProcessor() {
+	void testCopyHeaderInOneToNProcessor() {
 		//GIVEN
-		String INPUT_JSON_FILE = "intents/direct_message.json";
+        NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+			"Subject", 
+			"Text"
+		); 
+        notificationIntent.addRecipientsByName(
+            "John Doe",
+            "John Dudly",
+            "Objectify"
+        );
+        notificationIntent.getHeader().setAttributeValue("custom-property1", Arrays.asList("xx","yy"));
+        notificationIntent.getHeader().setAttributeValue("custom-property2", "zz");
 
-		NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-
-//		notificationIntent = (NotificationIntent)generateEventId.apply(notificationIntent);
 		//WHEN
 		List<EmailMessage> result = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);
 		
@@ -111,17 +118,9 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
 		assertThat(header.getFlowId()).isEqualTo(notificationIntent.getHeader().getFlowId());
 		assertThat(header.getAttributes())
 			.contains(
-					entry("custom-proerty1", Arrays.asList("xx","yy")), 
-					entry("custom-proerty2", "zz")
+					entry("custom-property1", Arrays.asList("xx","yy")), 
+					entry("custom-property2", "zz")
 			);
-	}
-
-	public static NotificationIntent createWithSimpleMessage(String flowId, String message) {
-		NotificationIntent notificationIntent = new NotificationIntent();
-		notificationIntent.getHeader().setFlowId(flowId);
-		notificationIntent.setBody(IntentContent.createStaticContent("some subject", message));
-		
-		return notificationIntent;
 	}
     
     @Data
@@ -130,7 +129,8 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
     @AllArgsConstructor
     @JsonTypeInfo(include = As.PROPERTY, use = Id.NAME)
     @JsonSubTypes({ 
-    	@Type(value = TestPayload.class, name = "TYPE_NAME")})
+    	@Type(value = TestPayload.class, name = "TYPE_NAME")}
+    )
     public static class TestPayload {
     	
     	private String content;
@@ -139,19 +139,11 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
     @Test
     void testPersistPIForGenericEvent() {
     	//GIVEN
-    	JsonNode payload = JsonUtils.writeObjectToJSONNode(TestPayload.builder().content("Test").build());
-    	
-		GenericEvent event = GenericEvent.builder()
-				.externalId(UUID.randomUUID().toString())
-				.flowId("FLOW_ID")
-				.id(UUID.randomUUID())
-				.payloadJson(payload)
-				.build();
-		
+        GenericEvent event = createUnprocessedEvent();		
 		eventRepository.save(event);
 		
 		//WHEN
-		GenericEvent eventFromDB = generateEventSupplier.get();
+		GenericEvent eventFromDB = eventSupplier.get();
 
         // when
         // ProcessingInfo persistence is done using aspect and in an async way
@@ -186,15 +178,27 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
 	@SuppressWarnings("unchecked")
     void testPersistPIForMessageFromIntentStep() {
         // given
-		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
-		UUID eventId = eventRepository.save(event).getId();
+        GenericEvent event = createUnprocessedEvent();		
+		eventRepository.save(event);
+
+        //generates processing info
+        GenericEvent eventFromDB = eventSupplier.get();
+        UUID eventId = eventFromDB.getEventId();
 		
-        String INPUT_JSON_FILE = "intents/ba_job_post.json";
-        NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+			"Business Intelligence (BI) Developer", 
+			"We are looking for a Business Intelligence"
+		);  	
+        notificationIntent.addRecipientsByName(
+            "John Doe",
+            "John Dudly",
+            "Objectify"
+        );
+        //need to set manually to simulate that intent has been generated from event 
         notificationIntent.addPreviousEventId(eventId);
+        notificationIntent.getHeader().setProcessingInfo(eventFromDB.getHeader().getProcessingInfo());
         
-        UUID[] originalEventIDs = notificationIntent.getPreviousEventIdsAsArray();
-        notificationIntent = (NotificationIntent) resolveRecipients.apply(notificationIntent);
+        UUID[] originalEventIDs = notificationIntent.getPreviousEventIds().toArray(new UUID[0]);
         List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);
 
         // ProcessingInfo persistence is done using aspect and in an async way
@@ -220,6 +224,7 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
         Assertions.assertThat(persistedPI.getTimeProcessingStart()).isNotNull();
         Assertions.assertThat(persistedPI.getTimeProcessingEnd()).isAfterOrEqualTo(persistedPI.getTimeProcessingStart());
         Assertions.assertThat(persistedPI.getProcessingId()).isNotNull();
+        Assertions.assertThat(notificationIntent.getProcessingInfo().getProcessingId()).isNotNull();        
         Assertions.assertThat(persistedPI.getPrevProcessingId()).isEqualTo(notificationIntent.getProcessingInfo().getProcessingId());
         Assertions.assertThat(persistedPI.getStepIndex()).isEqualTo(1);
 
@@ -247,12 +252,18 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
 		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepository.save(event).getId();
 
-        String INPUT_JSON_FILE = "intents/ba_job_post.json";
-        NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
+		NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+			"Business Intelligence (BI) Developer", 
+			"We are looking for a Business Intelligence"
+		);  	
+        notificationIntent.addRecipientsByName(
+            "John Doe",
+            "John Dudly",
+            "Objectify"
+        );
         notificationIntent.addPreviousEventId(eventId);
-        UUID[] originalEventIDs = notificationIntent.getPreviousEventIdsAsArray();
+        UUID[] originalEventIDs = notificationIntent.getPreviousEventIds().toArray(new UUID[0]);
         
-        notificationIntent = (NotificationIntent)resolveRecipients.apply(notificationIntent);
         List<EmailMessage> messages = (List<EmailMessage>)generateMessagesFromIntent.apply(notificationIntent);                      
         
         Awaitility.await().atMost(Duration.ofSeconds(5)).until(() -> procInfoRepo.findByAnyEventIdAndStepName(eventId, "GenerateMessagesFromIntent").size()>0);
@@ -260,7 +271,7 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
     	 EmailMessage email = (EmailMessage)messages.iterator().next();
     	 email.getProcessingInfo().setVersion(0);//need to set to avoid async error in test. it's no hack
     	 String messageJsonBeforeSend = email.toJSONString();
-         UUID previosProcessingId = email.getProcessingInfo().getProcessingId();
+         UUID previousProcessingId = email.getProcessingInfo().getProcessingId();
          
          // when
          // ProcessingInfo persistence is done using aspect and in an async way
@@ -287,8 +298,8 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
          Assertions.assertThat(persistedPI.getTimeProcessingStart()).isNotNull();
          Assertions.assertThat(persistedPI.getTimeProcessingEnd()).isAfterOrEqualTo(persistedPI.getTimeProcessingStart());
          Assertions.assertThat(persistedPI.getProcessingId()).isNotNull();
-         Assertions.assertThat(persistedPI.getPrevProcessingId()).isEqualTo(previosProcessingId);
-         Assertions.assertThat(persistedPI.getStepIndex()).isEqualTo(2);
+         Assertions.assertThat(persistedPI.getPrevProcessingId()).isEqualTo(previousProcessingId);
+         Assertions.assertThat(persistedPI.getStepIndex()).isEqualTo(1);
          
          procInfoRepo.delete(persistedPI); //not to interfere with next iteration
     }
@@ -301,4 +312,17 @@ public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
       			.withUser("no-reply@objectify.sk", "xxx"))
       	.withPerMethodLifecycle(true);
 
+
+          
+	public static GenericEvent createUnprocessedEvent() {
+    	JsonNode payload = JsonUtils.writeObjectToJSONNode(TestPayload.builder().content("Test").build());
+    	
+		GenericEvent event = GenericEvent.builder()
+				.externalId(UUID.randomUUID().toString())
+				.flowId("FLOW_ID")
+				.id(UUID.randomUUID())
+				.payloadJson(payload)
+				.build();
+		return event;
+	}
 }

@@ -22,6 +22,7 @@ package com.obj.nc.flows.notificationIntentProcessing;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
 import com.obj.nc.flows.intenProcessing.NotificationIntentProcessingFlow;
@@ -49,7 +50,9 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest
+@SpringBootTest(properties = {
+    "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
+})
 public class NotificationIntentProcessingTest extends BaseIntegrationTest {
 
 	@Autowired private NotificationIntentProcessingFlow intentFlow; 
@@ -64,6 +67,22 @@ public class NotificationIntentProcessingTest extends BaseIntegrationTest {
     	
     	pollAbleSource.start();
     }
+
+    @Test
+    void testSimpleIntentToMessage() {
+        // given		
+        NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+            "subject", 
+            "body"
+        );
+        notificationIntent.addRecipientsByIds(UUID.fromString("baf25cbe-2975-4666-adda-c8ea01dc909d")); //John Doe
+
+        // when
+        intentFlow.processNotificationIntent(notificationIntent);
+
+        //THEN check processing deliveryInfo
+        awaitSentForIntent(notificationIntent.getId(), 1, Duration.ofSeconds(5));
+    }
     
     @Test
     void testResolveRecipientsMergeWithExisting() {
@@ -71,24 +90,24 @@ public class NotificationIntentProcessingTest extends BaseIntegrationTest {
 		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
 		UUID eventId = eventRepo.save(event).getId();
 		
-        NotificationIntent notificationIntent = readTestIntent();
-        
+        // given		
+        NotificationIntent notificationIntent = NotificationIntent.createWithStaticContent(
+            "Business Intelligence (BI) Developer", 
+            "We are looking for a Business Intelligence"
+        );        
+        notificationIntent.addRecipientsByName(
+            "John Doe",
+            "John Dudly",
+            "Objectify"
+        );
         notificationIntent.addPreviousEventId(eventId);
 
         // when
         intentFlow.processNotificationIntent(notificationIntent);
 
         //THEN check processing deliveryInfo
-        //TODO: awaitSend should be possible with intentId, event shouldn't be necessary in this case
-        awaitSent(eventId, 3, Duration.ofSeconds(15));
+        awaitSent(eventId, 3, Duration.ofSeconds(10));
     }
-
-	public NotificationIntent readTestIntent() {
-		String INPUT_JSON_FILE = "intents/ba_job_post_recipients.json";
-        NotificationIntent notificationIntent = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, NotificationIntent.class);
-        
-		return notificationIntent;
-	}
     
     @AfterEach
     public void stopSourcePolling() {

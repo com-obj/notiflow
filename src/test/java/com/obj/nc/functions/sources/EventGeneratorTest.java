@@ -101,7 +101,6 @@ class EventGeneratorTest {
         Assertions.assertThat(emailContent.getBody()).isEqualTo("We are looking for a Business Intelligence (BI) Developer to create...");
         Assertions.assertThat(emailContent.getSubject()).isEqualTo("Business Intelligence (BI) Developer");
         Assertions.assertThat(((Map<?, ?>) notificationIntentFromFile.getAttributes().get("originalEvent"))).hasSize(2);
-        Assertions.assertThat(notificationIntentFromFile.getReceivingEndpoints()).isEmpty();
     }
 
     @Test

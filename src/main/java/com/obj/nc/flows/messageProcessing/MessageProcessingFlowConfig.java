@@ -20,9 +20,10 @@
 package com.obj.nc.flows.messageProcessing;
 
 import com.obj.nc.domain.message.*;
-import com.obj.nc.functions.processors.delivery.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.spamPrevention.SpamPreventionFilter;
 import com.obj.nc.functions.processors.messageBuilder.MessageByRecipientTokenizer;
+import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
