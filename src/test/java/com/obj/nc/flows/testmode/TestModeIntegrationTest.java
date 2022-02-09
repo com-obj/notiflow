@@ -87,7 +87,7 @@ import static org.awaitility.Awaitility.await;
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //need to dispose @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME) testModeEmailsReciver
 @Tag("test-mode")
-public class TestModeIntegrationTests extends BaseIntegrationTest {
+public class TestModeIntegrationTest extends BaseIntegrationTest {
 	
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
 	@Autowired private GreenMail testModeEmailsReceiver;
@@ -152,8 +152,6 @@ public class TestModeIntegrationTests extends BaseIntegrationTest {
         Assertions.assertThat(inputMimeMessages.length).isEqualTo(3);
 
         List<EmailMessage> messages = greenMailReceiverSourceSupplier.get();
-//        List<Message> messages = messagesWrapped.getMessages();
-
         // WHEN Simulate further aggregation processing
         MessageSource<?> messageSource = () -> new GenericMessage<>(messages);
         mockIntegrationContext.substituteMessageSourceFor(TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME, messageSource);
