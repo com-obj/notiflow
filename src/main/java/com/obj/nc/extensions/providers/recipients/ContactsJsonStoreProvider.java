@@ -87,7 +87,7 @@ public class ContactsJsonStoreProvider implements ContactsProvider {
             if (!configJsonFile.toFile().exists()) {   
                 Files.createDirectories(configJsonFile.getParent());
                 configJsonFile.toFile().createNewFile();
-                Files.writeString(configJsonFile, "{}");
+                Files.write(configJsonFile, "{}".getBytes());
             }
 
             return configJsonFile;
