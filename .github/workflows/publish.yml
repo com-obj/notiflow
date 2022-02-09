@@ -48,4 +48,11 @@ jobs:
         run: ./gradlew build
       
       - name: Publish to Maven Central
-        run: ./gradlew -PsonatypeUsername=${{secrets.SONATYPE_USERNAME}} -PsonatypePassword=${{secrets.SONATYPE_PASSWORD}} -PgpgSigningKey=${{secrets.GPG_SIGNING_KEY}} -PgpgSigningPassword=${{secrets.GPG_SIGNING_PASSWORD}} publishToSonatype closeAndReleaseSonatypeStagingRepository
+        run: |
+          ./gradlew \
+            -P sonatypeUsername="${{ secrets.SONATYPE_USERNAME }}" \
+            -P sonatypePassword="${{ secrets.SONATYPE_PASSWORD }}" \
+            -P gpgSigningKey="${{ secrets.GPG_SIGNING_KEY }}" \
+            -P gpgSigningPassword="${{ secrets.GPG_SIGNING_PASSWORD }}" \
+            publishToSonatype \
+            closeAndReleaseSonatypeStagingRepository
