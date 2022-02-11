@@ -176,8 +176,12 @@ nexusPublishing {
 	}
 }
 
+def base64DecodeEnv(env) {
+	return new String(Base64.getDecoder().decode(System.getenv(env).toString())).trim()
+}
+
 signing {
-	def gpgSigningKey = System.getenv('GPG_SIGNING_KEY')
+	def gpgSigningKey = base64DecodeEnv('GPG_SIGNING_KEY')
 	def gpgSigningPassword = System.getenv('GPG_SIGNING_PASSWORD')
 	useInMemoryPgpKeys(gpgSigningKey, gpgSigningPassword)
 	sign publishing.publications.mavenJava
