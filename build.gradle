@@ -170,15 +170,18 @@ nexusPublishing {
 		sonatype {
 			nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
 			snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-			username = findProperty('sonatypeUsername')
-			password = findProperty('sonatypePassword')
 		}
 	}
 }
 
+def base64DecodeProp(prop) {
+	def propEscaped = project.findProperty(prop).toString().replace("\n", "")
+	return new String(Base64.getDecoder().decode(propEscaped)).trim()
+}
+
 signing {
-	def gpgSigningKey = findProperty('gpgSigningKey')
-	def gpgSigningPassword = findProperty('gpgSigningPassword')
+	def gpgSigningKey = base64DecodeProp('gpgSigningKey')
+	def gpgSigningPassword = base64DecodeProp('gpgSigningPassword')
 	useInMemoryPgpKeys(gpgSigningKey, gpgSigningPassword)
 	sign publishing.publications.mavenJava
 }
