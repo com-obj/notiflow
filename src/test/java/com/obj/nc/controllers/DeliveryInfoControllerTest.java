@@ -364,7 +364,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 	}
 
 	@Test
-	void testMatchOnDeliveryInfoWithoutMessage() throws Exception {
+	void testMatchOnDeliveryInfoWithMessage() throws Exception {
 		// GIVEN
 		EmailEndpoint email = endpointRepo
 				.persistEnpointIfNotExists(EmailEndpoint.builder().email("kosarnik@objectify.sk").build());
