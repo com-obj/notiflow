@@ -19,6 +19,27 @@
 
 package com.obj.nc.controllers;
 
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.READ;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
@@ -43,9 +64,11 @@ import com.obj.nc.repositories.MessageRepository;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.DateFormatMatcher;
+
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -60,22 +83,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.READ;
-import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
@@ -333,4 +341,55 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		assertThat(infosOfMessage).hasSize(1);
 	}
 
+	@Test
+	void testEventWithExtIdDoesNotExist() throws Exception {
+		String nonExistingExtId = UUID.randomUUID().toString();
+		mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", nonExistingExtId)
+				.contentType(APPLICATION_JSON_UTF8)
+				.accept(APPLICATION_JSON_UTF8))
+				.andExpect(MockMvcResultMatchers.status().is4xxClientError())
+				.andExpect(MockMvcResultMatchers.content()
+						.string("Event with " + nonExistingExtId + " external ID not found"));
+	}
+
+	@Test
+	void testEventHasNoMessagesAttached() throws Exception {
+		GenericEvent event = GenericEventRepositoryTest.createProcessedEvent();
+		String extId = eventRepo.save(event).getExternalId();
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", extId)
+				.contentType(APPLICATION_JSON_UTF8)
+				.accept(APPLICATION_JSON_UTF8))
+				.andExpect(MockMvcResultMatchers.content().string("[]"));
+	}
+
+	@Test
+	void testMatchOnDeliveryInfoWithMessage() throws Exception {
+		// GIVEN
+		EmailEndpoint email = endpointRepo
+				.persistEnpointIfNotExists(EmailEndpoint.builder().email("kosarnik@objectify.sk").build());
+		GenericEvent event = eventRepo.save(GenericEventRepositoryTest.createProcessedEvent());
+
+		EmailMessage message = new EmailMessage();
+		message.setPreviousEventIds(Collections.singletonList(event.getEventId()));
+		message = messageRepo.save(message.toPersistentState()).toMessage();
+
+		DeliveryInfo deliveryInfo = DeliveryInfo.builder()
+				.endpointId(email.getId()).messageId(message.getId()).status(DELIVERY_STATUS.PROCESSING)
+				.id(UUID.randomUUID()).build();
+
+		deliveryRepo.save(deliveryInfo);
+
+		// WHEN
+		mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", event.getExternalId())
+				.contentType(APPLICATION_JSON_UTF8)
+				.accept(APPLICATION_JSON_UTF8))
+				.andExpect(jsonPath("$", Matchers.hasSize(1)))
+				.andExpect(jsonPath("$.[0].endpoint.id", Matchers.is(email.getId().toString())))
+				.andExpect(jsonPath("$.[0].endpoint.email", Matchers.is(email.getEmail())))
+				.andExpect(jsonPath("$.[0].endpoint.endpointId", Matchers.is(email.getEndpointId())))
+				.andExpect(jsonPath("$.[0].currentStatus", Matchers.is(deliveryInfo.getStatus().name())));
+	}
+
 }
+

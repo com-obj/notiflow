@@ -34,6 +34,8 @@ import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.repositories.MessageRepository;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.http.HttpStatus;
@@ -46,6 +48,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Validated
 @RestController
 @RequestMapping("/delivery-info")
@@ -66,6 +69,11 @@ public class DeliveryInfoRestController {
 		UUID endpointUUID = endpointId == null ? null : UUID.fromString(endpointId);
 
 		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByEventIdAndEndpointIdOrderByProcessedOn(UUID.fromString(eventId), endpointUUID);
+
+		if (deliveryInfos.isEmpty()) {
+			log.warn("Failed to map event {} to delivery info. This indicate problem with data - probably no message exists for event.", eventId);
+			return Collections.emptyList();
+		}
 
 		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
 
