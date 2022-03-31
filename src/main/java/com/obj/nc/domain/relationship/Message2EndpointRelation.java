@@ -30,7 +30,7 @@ import java.util.UUID;
 public class Message2EndpointRelation implements Persistable<UUID> {
     @Id
     @EqualsAndHashCode.Include
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @CreatedDate
     private Instant timeCreated;

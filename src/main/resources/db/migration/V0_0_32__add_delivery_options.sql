@@ -18,7 +18,7 @@
  */
 
 CREATE TABLE nc_delivery_options (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID NOT NULL,
     time_created timestamptz NOT NULL,
     message_id UUID NOT NULL,
     endpoint_id UUID NOT NULL,
