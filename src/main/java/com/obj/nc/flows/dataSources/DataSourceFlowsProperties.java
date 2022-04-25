@@ -19,6 +19,7 @@
 
 package com.obj.nc.flows.dataSources;
 
+import com.obj.nc.flows.dataSources.firestore.properties.FirestoreDataSourceProperties;
 import com.obj.nc.flows.dataSources.http.properties.HttpDataSourceProperties;
 import com.obj.nc.flows.dataSources.jdbc.properties.JdbcDataSourceProperties;
 import lombok.Data;
@@ -40,4 +41,7 @@ public class DataSourceFlowsProperties {
 
     @UniqueElements
     private List<HttpDataSourceProperties> http = new ArrayList<>();
+
+    @UniqueElements
+    private List<FirestoreDataSourceProperties> firestore = new ArrayList<>();
 }

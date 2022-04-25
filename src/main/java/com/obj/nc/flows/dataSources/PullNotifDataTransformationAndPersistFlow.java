@@ -37,7 +37,7 @@ public class PullNotifDataTransformationAndPersistFlow {
     public StandardIntegrationFlow continueFlow(IntegrationFlowBuilder builder, JobConfig jobConfig) {
         String externalIdKey = selectExternalIdKey(jobConfig);
 
-        return builder.transform(Transformers.toJson(JsonUtils.getJsonObjectMapper(), ObjectToJsonTransformer.ResultType.NODE))
+        return builder.transform(Transformers.toJson(JsonUtils.getJsonObjectMapperUsingSortedProperties(), ObjectToJsonTransformer.ResultType.NODE))
                 .split() // split ArrayNode to JsonNode-s
                 .aggregate() // aggregate JsonNode-s to List<JsonNode>
                 .handle(new PulledNotificationDataNewAndChangedPersister(pullNotifDataRepository, externalIdKey))

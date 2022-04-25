@@ -20,11 +20,11 @@
 package com.obj.nc.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.gson.JsonArray;
 import com.obj.nc.exceptions.PayloadValidationException;
 import org.springframework.integration.support.json.Jackson2JsonObjectMapper;
 
@@ -34,8 +34,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
@@ -47,10 +45,8 @@ import java.util.stream.Stream;
 
 public class JsonUtils {
 	
-	public static DateFormat stdJsonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-	
-	private static ObjectMapper objectMapper;
-	private static Jackson2JsonObjectMapper jsonObjectMapper;
+	private static ObjectMapper objectMapperWithSortedProperties;
+	private static Jackson2JsonObjectMapper jsonObjectMapperUsingSortedProperties;
 
 	public static <T> T readObjectFromJSONFile(Path filePath, Class<T> beanType) {
 		String JSONStr = readFileContent(filePath);	
@@ -98,7 +94,7 @@ public class JsonUtils {
 	public static <T> T readObjectFromJSONString(String json, Class<T> beanType) {
 		
 		try {
-		    final ObjectMapper objectMapper = getObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapperWithSortedProperties();
 
 			T pojo = objectMapper.readValue(json, beanType);
 			return pojo;
@@ -110,7 +106,7 @@ public class JsonUtils {
 	public static <T> T readObjectFromJSONStringToInstance(String json, T bean) {
 		
 		try {
-		    final ObjectMapper objectMapper = getObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapperWithSortedProperties();
 
 			T pojo = objectMapper.readerForUpdating(bean).readValue(json);
 			return pojo;
@@ -122,7 +118,7 @@ public class JsonUtils {
 	public static JsonNode readJsonNodeFromJSONString(String json) {
 		
 		try {
-		    final ObjectMapper objectMapper = getObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapperWithSortedProperties();
 
 			JsonNode jsonNode = objectMapper.readTree(json);
 			return jsonNode;
@@ -136,7 +132,7 @@ public class JsonUtils {
 	public static List<JsonNode> readJsonNodeListFromJSONString(String json) {
 		
 		try {
-		    final ObjectMapper objectMapper = getObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapperWithSortedProperties();
 
 			JsonNode jsonObject = objectMapper.readTree(json);
 			ArrayNode jsonArray = (ArrayNode)jsonObject; 
@@ -152,13 +148,13 @@ public class JsonUtils {
 	}
 	
 	public static JsonNode readJsonNodeFromPojo(Object object) {
-		final ObjectMapper objectMapper = getObjectMapper();
+		final ObjectMapper objectMapper = getObjectMapperWithSortedProperties();
 		return objectMapper.valueToTree(object);
 	}
 	
 	public static <T> T readObjectFromJSON(JsonNode json, Class<T> beanType) {
 		try {
-		    final ObjectMapper objectMapper = getObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapperWithSortedProperties();
 
 			T pojo = objectMapper.treeToValue(json, beanType);
 			return pojo;
@@ -169,7 +165,7 @@ public class JsonUtils {
 	}
 
 	public static <T> T readClassFromObject(Object object, Class<T> clazz) {
-	    	final ObjectMapper objectMapper = getObjectMapper();
+	    	final ObjectMapper objectMapper = getObjectMapperWithSortedProperties();
 			T pojo = objectMapper.convertValue(object, clazz);
 			return pojo;
 	}
@@ -177,7 +173,7 @@ public class JsonUtils {
 	public static String writeObjectToJSONString(JsonNode json) {
 		
 		try {
-		    final ObjectMapper objectMapper = getObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapperWithSortedProperties();
 			String jsonString = objectMapper.writeValueAsString(json);
 
 			return jsonString;
@@ -190,7 +186,7 @@ public class JsonUtils {
 	public static String writeObjectToJSONString(Object pojo) {
 		
 		try {
-		    final ObjectMapper objectMapper = getObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapperWithSortedProperties();
 			String jsonString = objectMapper.writeValueAsString(pojo);
 
 			return jsonString;
@@ -201,7 +197,7 @@ public class JsonUtils {
 	}
 	
 	public static JsonNode writeObjectToJSONNode(Object pojo) {
-	    final ObjectMapper objectMapper = getObjectMapper();
+	    final ObjectMapper objectMapper = getObjectMapperWithSortedProperties();
 		JsonNode jsonNode = objectMapper.valueToTree(pojo);
 
 		return jsonNode;
@@ -210,7 +206,7 @@ public class JsonUtils {
 	public static String writeObjectToJSONStringPretty(Object pojo) {
 
 		try {
-		    final ObjectMapper objectMapper = getObjectMapper();
+		    final ObjectMapper objectMapper = getObjectMapperWithSortedProperties();
 			String jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(pojo);
 
 			return jsonString;
@@ -248,7 +244,7 @@ public class JsonUtils {
 	
 	public static Optional<String> checkValidAndGetError(String jsonString) {
 		try {
-		       final ObjectMapper mapper = getObjectMapper();
+		       final ObjectMapper mapper = getObjectMapperWithSortedProperties();
 		       mapper.readTree(jsonString);
 		       return Optional.empty();
 		} catch (Exception e) {
@@ -274,24 +270,26 @@ public class JsonUtils {
 	
 	//only for tests
 	public static void resetObjectMapper( ) {
-		objectMapper = null;
+		objectMapperWithSortedProperties = null;
 	}
-	//Use objectmapper defined as srping bean
-	public static ObjectMapper getObjectMapper() {
-		if (objectMapper == null) {
-			objectMapper = new ObjectMapper();
-			objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-			objectMapper.registerModule(new JavaTimeModule());
-			objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+	//Use objectmapper defined as spring bean
+	public static ObjectMapper getObjectMapperWithSortedProperties() {
+		if (objectMapperWithSortedProperties == null) {
+			objectMapperWithSortedProperties = new ObjectMapper();
+			objectMapperWithSortedProperties.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+			objectMapperWithSortedProperties.registerModule(new JavaTimeModule());
+			objectMapperWithSortedProperties.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+			objectMapperWithSortedProperties.enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY);
+			objectMapperWithSortedProperties.enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
 		}
-		return objectMapper;
+		return objectMapperWithSortedProperties;
 	}
-	
-	public static Jackson2JsonObjectMapper getJsonObjectMapper() {
-		if (jsonObjectMapper == null) {
-			jsonObjectMapper = new Jackson2JsonObjectMapper(getObjectMapper());
+
+	public static Jackson2JsonObjectMapper getJsonObjectMapperUsingSortedProperties() {
+		if (jsonObjectMapperUsingSortedProperties == null) {
+			jsonObjectMapperUsingSortedProperties = new Jackson2JsonObjectMapper(getObjectMapperWithSortedProperties());
 		}
-		return jsonObjectMapper;
+		return jsonObjectMapperUsingSortedProperties;
 	}
-	
+
 }
