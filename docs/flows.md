@@ -211,8 +211,84 @@ For this to work in any situation, [transaction boundaries]() for steps in flows
 
 ## External data-source notification data polling (PULL) <span id="pullProcessing"/>
 ![pull-flow](diagrams/png/data-source-pulling-flow.png)
-You are able to configure data sources that provide notiflow with arbitrary data. You can then configure conditions to check against theses data and if matched notiflow will trigger notification processing based on further configuration. 
+You are able to configure data sources that provide notiflow with arbitrary data. You can then configure conditions to check against the data and if matched notiflow will trigger notification processing based on further configuration. 
 This mode is useful if you have application with for example contracts or orders and you want to be notified one month before contract expires.  
+
+Check configuration root `com.obj.nc.flows.dataSources.DataSourceFlowsProperties` to see options available
+for each of the pull strategies.
+
+### http
+Connects to a HTTP endpoint (GET request). Data can be further filtered using spel-filter-expression.
+
+Example configuration:
+```
+   nc.data-sources.http[0].name=TEST0-DS
+   nc.data-sources.http[0].url=http://service-0/json
+   nc.data-sources.http[0].pojoFCCN=com.obj.nc.flows.dataSources.config.TestLicenseAgreement
+   nc.data-sources.http[0].cron=*/5 * * * * *
+   nc.data-sources.http[0].externalIdAttrName=id
+   nc.data-sources.http[0].spel-filter-expression=isExpired(5)   
+```
+
+Also check `com.obj.nc.flows.dataSources.http.HttpDataSourceFlowsTest` for example configuration/usage.
+
+### jdbc
+
+Connects to a database using JDBC and performs a SQL query.
+
+```
+nc.data-sources.jdbc[0].name=test-ds
+nc.data-sources.jdbc[0].url=jdbc:postgresql://localhost:25432/nc
+nc.data-sources.jdbc[0].username=nc
+nc.data-sources.jdbc[0].password=xxx
+nc.data-sources.jdbc[0].jobs[0].name=check-agreements-expiry
+nc.data-sources.jdbc[0].jobs[0].entity-name=license_agreement
+nc.data-sources.jdbc[0].jobs[0].sqlQuery=select * from license_agreement  
+nc.data-sources.jdbc[0].jobs[0].pojoFCCN=com.obj.nc.flows.dataSources.config.TestLicenseAgreement     
+nc.data-sources.jdbc[0].jobs[0].cron=*/5 * * * * *
+nc.data-sources.jdbc[0].jobs[0].spel-filter-expression=isExpired(5)        
+```
+
+Also check `com.obj.nc.flows.dataSources.PullNotifDataToNotificationTest` for example configuration/usage.
+
+### firestore
+
+Connects to a firestore database and performs a document collection query.
+
+```
+nc.data-sources.firestore[0].name=test-ds
+nc.data-sources.firestore[0].serviceKeyPath=/test/path/file.json
+nc.data-sources.firestore[0].appName=test-app
+nc.data-sources.firestore[0].databaseUrl=https://test-database-url.com
+nc.data-sources.firestore[0].jobs[0].name=test-cvs
+nc.data-sources.firestore[0].jobs[0].collectionName=cv_view
+nc.data-sources.firestore[0].jobs[0].pojoFCCN=com.obj.nc.flows.dataSources.config.TestCv
+nc.data-sources.firestore[0].jobs[0].cron=*/2 * * * * *
+nc.data-sources.firestore[0].jobs[0].selectedProperties=certificate,createdAt
+```
+
+Also check `com.obj.nc.flows.dataSources.firestore.FirestoreDataSourceFlowsTest` for example configuration/usage.
+
+User can plug in custom queries by registering a `com.obj.nc.flows.dataSources.firestore.extensions.FirestoreQueryExtension` implementation.
+
+Example:
+
+```
+#nc.data-sources.firestore[0].jobs[0].queryExtensionBeanName=firestoreQueryExtensionExtern
+```
+
+```
+@Component(value = "firestoreQueryExtensionExtern")
+public class FirestoreQueryExtensionExtern implements FirestoreQueryExtension {
+
+    @Override
+    public Query createCustomQuery(CollectionReference collectionReference) {
+        Instant yesterdayInstant = LocalDate.now().minusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+        Timestamp yesterdayFirestoreTimestamp = Timestamp.of(Date.from(yesterdayInstant));
+        return collectionReference.whereGreaterThanOrEqualTo("updatedAt", yesterdayFirestoreTimestamp);
+    }
+}
+```
 
 ## Delivery Info flows <span id="deliveryInfoFlow"/>
 ![delivery-info-flow](diagrams/png/delivery-info-flow.png)

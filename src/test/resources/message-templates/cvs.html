@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h3>These are the test CVs.</h3>
+<table border="1" cellpadding="5" style="border-collapse:collapse; border: 1px solid gray;">
+    <thead>
+    <tr>
+        <th> Id </th>
+        <th> Updated at </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="cv : ${model}">
+        <td><span th:text="${cv.id}"> Id </span></td>
+        <td><span th:text="${cv.updatedAt}"> Updated at </span></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
