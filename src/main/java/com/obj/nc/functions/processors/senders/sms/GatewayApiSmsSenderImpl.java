@@ -39,8 +39,7 @@ import java.util.Optional;
 import static com.obj.nc.config.PureRestTemplateConfig.PURE_REST_TEMPLATE;
 
 @Component
-//@Primary // TODO: not working with TestMode
-@ConditionalOnProperty(prefix = "nc.sms", name = "gateway-api")	
+@ConditionalOnProperty(prefix = "nc", name = "sms", havingValue = "gateway-api")	
 public class GatewayApiSmsSenderImpl extends ProcessorFunctionAdapter<SmsMessage, SmsMessage> implements SmsSender {
     private final RestTemplate restTemplate;
     private final GatewayApiConfig config;
