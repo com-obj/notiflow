@@ -102,7 +102,7 @@ class PullNotifDataConvertingFlowTest extends BaseIntegrationTest {
     }
 
     @AfterEach
-    public void cleanUp() {    
+    public void stopPolling() {    
         pollAbleChannel.stop();
     }
     

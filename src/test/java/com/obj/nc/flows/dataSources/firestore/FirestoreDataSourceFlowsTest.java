@@ -68,7 +68,7 @@ public class FirestoreDataSourceFlowsTest extends BaseIntegrationTest {
     }
 
     @Test
-    void testDataPulledAndMessageSent() {
+    public void testDataPulledAndMessageSent() {
         boolean received = greenMail.waitForIncomingEmail(15000L, 1);
 
         assertEquals(true, received);

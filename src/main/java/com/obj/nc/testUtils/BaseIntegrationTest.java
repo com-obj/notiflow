@@ -83,7 +83,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     }
 
 	@AfterClass
-    static void cleanUp() {    
+    public static void cleanUp() {    
         Get.getBean(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME, SourcePollingChannelAdapter.class).stop();
     }
 

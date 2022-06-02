@@ -17,7 +17,7 @@ import java.util.Optional;
 @Validated
 @DocumentProcessingInfo("LOG_SMSSender")
 @Log
-@ConditionalOnProperty(prefix = "nc.sms", name = "logging", matchIfMissing = true)	
+@ConditionalOnProperty(prefix = "nc", name = "sms", havingValue = "logging", matchIfMissing = true)
 @Component
 public class SmsSenderLogingImpl extends ProcessorFunctionAdapter<SmsMessage, SmsMessage> implements SmsSender {
 
