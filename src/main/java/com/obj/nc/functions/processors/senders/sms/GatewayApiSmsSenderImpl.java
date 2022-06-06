@@ -23,8 +23,7 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.senders.SmsSender;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Primary;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -40,8 +39,7 @@ import java.util.Optional;
 import static com.obj.nc.config.PureRestTemplateConfig.PURE_REST_TEMPLATE;
 
 @Component
-//@Primary // TODO: not working with TestMode
-@ConditionalOnMissingBean(type = "SmsSender")
+@ConditionalOnProperty(prefix = "nc", name = "sms", havingValue = "gateway-api")	
 public class GatewayApiSmsSenderImpl extends ProcessorFunctionAdapter<SmsMessage, SmsMessage> implements SmsSender {
     private final RestTemplate restTemplate;
     private final GatewayApiConfig config;

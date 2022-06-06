@@ -57,7 +57,7 @@ import static org.mockito.Mockito.when;
         "test-license-agreements.email-template-path=cvs.html"
 })
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //this test register programmatically spring integration flows. it seems to confuse the spring context management in tests
-class FirestoreDataSourceFlowsTest extends BaseIntegrationTest {
+public class FirestoreDataSourceFlowsTest extends BaseIntegrationTest {
 
     @Autowired
     private JdbcTemplate springJdbcTemplate;
@@ -68,7 +68,7 @@ class FirestoreDataSourceFlowsTest extends BaseIntegrationTest {
     }
 
     @Test
-    void testDataPulledAndMessageSent() {
+    public void testDataPulledAndMessageSent() {
         boolean received = greenMail.waitForIncomingEmail(15000L, 1);
 
         assertEquals(true, received);
