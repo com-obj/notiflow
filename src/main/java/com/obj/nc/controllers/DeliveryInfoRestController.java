@@ -75,7 +75,7 @@ public class DeliveryInfoRestController {
 			return Collections.emptyList();
 		}
 
-		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
+		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createLastDeliveryInfoForEndpoint(deliveryInfos);
 
 		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
 		List<ReceivingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
@@ -127,7 +127,7 @@ public class DeliveryInfoRestController {
 
 		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByMessageIdOrderByProcessedOn(UUID.fromString(messageId));
 
-		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
+		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createLastDeliveryInfoForEndpoint(deliveryInfos);
 
 		List<UUID> endpointIds = infoDtos
             .stream()
@@ -157,7 +157,7 @@ public class DeliveryInfoRestController {
 		DELIVERY_STATUS currentStatus;
 		Instant statusReachedAt;
 
-		public static List<EndpointDeliveryInfoDto> createFrom(List<DeliveryInfo> deliveryInfos) {
+		public static List<EndpointDeliveryInfoDto> createLastDeliveryInfoForEndpoint(List<DeliveryInfo> deliveryInfos) {
 			List<EndpointDeliveryInfoDto> result = new ArrayList<>();
 
 			Map<UUID, List<DeliveryInfo>> ep2Infos = deliveryInfos.stream().collect(
