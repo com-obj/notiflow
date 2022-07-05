@@ -19,33 +19,13 @@
 
 package com.obj.nc.controllers;
 
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.READ;
-import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.controllers.DeliveryInfoRestController.EndpointDeliveryInfoDto;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.content.sms.SimpleTextContent;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
@@ -53,18 +33,14 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistentState;
 import com.obj.nc.domain.message.SmsMessage;
+import com.obj.nc.domain.pagination.ResultPage;
 import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-import com.obj.nc.repositories.DeliveryInfoRepository;
-import com.obj.nc.repositories.EndpointsRepository;
-import com.obj.nc.repositories.GenericEventRepository;
-import com.obj.nc.repositories.GenericEventRepositoryTest;
-import com.obj.nc.repositories.MessageRepository;
+import com.obj.nc.repositories.*;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.DateFormatMatcher;
-
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
@@ -75,6 +51,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -84,6 +61,19 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.READ;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
@@ -134,6 +124,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 
 		SmsMessage smsMessage = new SmsMessage();
 		smsMessage.setPreviousEventIds(eventIds);
+		smsMessage.setBody(new SimpleTextContent("Something terrible happened!"));
 		smsMessage = messageRepo.save(smsMessage.toPersistentState()).toMessage();
 
     	//AND
@@ -153,22 +144,21 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
     	deliveryRepo.saveAll( Arrays.asList(info1, info2, info3, info4) );
     	
     	//WHEN
-    	List<EndpointDeliveryInfoDto> infos = controller.findDeliveryInfosByEventId(eventId.toString(), null);
+    	ResultPage<EndpointDeliveryInfoDto> infos = controller.findDeliveryInfosByEventId(eventId.toString(), null, PageRequest.of(0, 20));
     	
     	//THEN
-    	Assertions.assertThat(infos.size()).isEqualTo(2);
-    	EndpointDeliveryInfoDto infoForEmail = infos.stream().filter(i-> i.getEndpoint() instanceof EmailEndpoint).findFirst().get();
+    	Assertions.assertThat(infos.getData().size()).isEqualTo(2);
+    	EndpointDeliveryInfoDto infoForEmail = infos.getData().stream().filter(i -> i.getEndpoint() instanceof EmailEndpoint).findFirst().get();
 
     	Instant now = Instant.now();
 
-    	Assertions.assertThat(infoForEmail.endpointId).isEqualTo(emailEndPointId);
+    	Assertions.assertThat(infoForEmail.getEndpoint().getId()).isEqualTo(emailEndPointId);
 		Assertions.assertThat(infoForEmail.getStatusReachedAt()).isCloseTo(now, Assertions.within(1, ChronoUnit.MINUTES));
     	Assertions.assertThat(infoForEmail.getCurrentStatus()).isEqualTo(SENT);
-    	infos.remove(infoForEmail);
-    	
-    	
-    	EndpointDeliveryInfoDto infoForSms = infos.iterator().next();
-    	Assertions.assertThat(infoForSms.endpointId).isEqualTo(smsEndPointId);
+
+		EndpointDeliveryInfoDto infoForSms = infos.getData().stream().filter(i -> i.getEndpoint() instanceof SmsEndpoint).findFirst().get();
+
+    	Assertions.assertThat(infoForSms.getEndpoint().getId()).isEqualTo(smsEndPointId);
     	Assertions.assertThat(infoForSms.getStatusReachedAt()).isCloseTo(now, Assertions.within(1, ChronoUnit.MINUTES));
     	Assertions.assertThat(infoForSms.getCurrentStatus()).isEqualTo(SENT);
     	
@@ -207,11 +197,11 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		
 		resp
         	.andExpect(status().is2xxSuccessful())
-			.andExpect(jsonPath("$[0].currentStatus").value(CoreMatchers.is("SENT")))
-			.andExpect(jsonPath("$[0].statusReachedAt").value(DateFormatMatcher.matchesISO8601()))
-			.andExpect(jsonPath("$[0].endpoint.email").value(CoreMatchers.is("jancuzy@gmail.com")))
-			.andExpect(jsonPath("$[0].endpoint.endpointId").value(CoreMatchers.is("jancuzy@gmail.com")))
-			.andExpect(jsonPath("$[0].endpoint.@type").value(CoreMatchers.is("EMAIL"))).andReturn();
+			.andExpect(jsonPath("$.data.[0].currentStatus").value(CoreMatchers.is("SENT")))
+			.andExpect(jsonPath("$.data.[0].statusReachedAt").value(DateFormatMatcher.matchesISO8601()))
+			.andExpect(jsonPath("$.data.[0].endpoint.email").value(CoreMatchers.is("jancuzy@gmail.com")))
+			.andExpect(jsonPath("$.data.[0].endpoint.endpointId").value(CoreMatchers.is("jancuzy@gmail.com")))
+			.andExpect(jsonPath("$.data.[0].endpoint.@type").value(CoreMatchers.is("EMAIL"))).andReturn();
 	}
 	
 	@Test
@@ -360,7 +350,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", extId)
 				.contentType(APPLICATION_JSON_UTF8)
 				.accept(APPLICATION_JSON_UTF8))
-				.andExpect(MockMvcResultMatchers.content().string("[]"));
+				.andExpect(MockMvcResultMatchers.content().json("{\"data\": []}"));
 	}
 
 	@Test
@@ -384,11 +374,11 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", event.getExternalId())
 				.contentType(APPLICATION_JSON_UTF8)
 				.accept(APPLICATION_JSON_UTF8))
-				.andExpect(jsonPath("$", Matchers.hasSize(1)))
-				.andExpect(jsonPath("$.[0].endpoint.id", Matchers.is(email.getId().toString())))
-				.andExpect(jsonPath("$.[0].endpoint.email", Matchers.is(email.getEmail())))
-				.andExpect(jsonPath("$.[0].endpoint.endpointId", Matchers.is(email.getEndpointId())))
-				.andExpect(jsonPath("$.[0].currentStatus", Matchers.is(deliveryInfo.getStatus().name())));
+				.andExpect(jsonPath("$.data", Matchers.hasSize(1)))
+				.andExpect(jsonPath("$.data.[0].endpoint.id", Matchers.is(email.getId().toString())))
+				.andExpect(jsonPath("$.data.[0].endpoint.email", Matchers.is(email.getEmail())))
+				.andExpect(jsonPath("$.data.[0].endpoint.endpointId", Matchers.is(email.getEndpointId())))
+				.andExpect(jsonPath("$.data.[0].currentStatus", Matchers.is(deliveryInfo.getStatus().name())));
 	}
 
 }

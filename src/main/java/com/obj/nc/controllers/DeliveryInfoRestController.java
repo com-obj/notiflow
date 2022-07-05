@@ -21,10 +21,12 @@ package com.obj.nc.controllers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.config.NcAppConfigProperties;
+import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.message.MessagePersistentState;
+import com.obj.nc.domain.pagination.ResultPage;
 import com.obj.nc.flows.deliveryInfo.DeliveryInfoFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
@@ -35,9 +37,10 @@ import com.obj.nc.repositories.MessageRepository;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -62,41 +65,62 @@ public class DeliveryInfoRestController {
 	@Autowired private NcAppConfigProperties ncAppConfigProperties;
 
 	@GetMapping(value = "/events/{eventId}", produces="application/json")
-    public List<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
-    		@PathVariable (value = "eventId", required = true) String eventId,
-			@RequestParam(value = "endpointId", required = false) String endpointId) {
-
+	public ResultPage<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
+			@PathVariable (value = "eventId", required = true) String eventId,
+			@RequestParam(value = "endpointId", required = false) String endpointId,
+			@PageableDefault(size = 20) Pageable pageable
+	) {
 		UUID endpointUUID = endpointId == null ? null : UUID.fromString(endpointId);
 
-		List<DeliveryInfo> deliveryInfos = deliveryRepo.findByEventIdAndEndpointIdOrderByProcessedOn(UUID.fromString(eventId), endpointUUID);
+		long total = deliveryRepo.countByEventIdAndEndpointId(UUID.fromString(eventId), endpointUUID);
+		List<DeliveryInfo> deliveries = deliveryRepo.findByEventIdAndEndpointIdOrderByProcessedOn(
+				UUID.fromString(eventId), endpointUUID, pageable.getPageSize(), pageable.getOffset());
 
-		if (deliveryInfos.isEmpty()) {
+		if (deliveries.isEmpty()) {
 			log.warn("Failed to map event {} to delivery info. This indicate problem with data - probably no message exists for event.", eventId);
-			return Collections.emptyList();
+			return new ResultPage<>(Collections.emptyList());
 		}
 
-		List<EndpointDeliveryInfoDto> infoDtos =  EndpointDeliveryInfoDto.createFrom(deliveryInfos);
+		UUID[] endpointIds = deliveries.stream().map(DeliveryInfo::getEndpointId).toArray(UUID[]::new);
+		List<UUID> messageIds = deliveries.stream().map(DeliveryInfo::getMessageId).collect(Collectors.toList());
 
-		List<UUID> endpointIds = infoDtos.stream().map(i -> i.getEndpointId()).collect(Collectors.toList());
-		List<ReceivingEndpoint> endpoints = endpointRepo.findByIds(endpointIds.toArray(new UUID[0]));
-		Map<UUID, EndpointDeliveryInfoDto> endpointsById = infoDtos.stream().collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
-		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
+		List<ReceivingEndpoint> endpoints = endpointRepo.findByIds(endpointIds);
+		List<MessagePersistentState> messages = messageRepo.findByIdIn(messageIds);
 
-		return infoDtos;
-    }
+		List<EndpointDeliveryInfoDto> result = deliveries.stream()
+				.map(delivery -> {
+					UUID epId = delivery.getEndpointId();
+					UUID msgId = delivery.getMessageId();
+
+					Optional<ReceivingEndpoint> ep = endpoints.stream().filter(it -> it.getId().equals(epId)).findFirst();
+					Optional<MessagePersistentState> msg = messages.stream().filter(it -> it.getId().equals(msgId)).findFirst();
+
+					return EndpointDeliveryInfoDto.builder()
+							.endpoint(ep.orElse(null))
+							.message(msg.map(MessagePersistentState::getBody).orElse(null))
+							.currentStatus(delivery.getStatus())
+							.statusReachedAt(delivery.getProcessedOn())
+							.build();
+				})
+				.collect(Collectors.toList());
+
+		return new ResultPage<>(result, pageable, total);
+	}
 
 	@GetMapping(value = "/events/ext/{extEventId}", produces="application/json")
-    public List<EndpointDeliveryInfoDto> findDeliveryInfosByExtId(
-    		@PathVariable (value = "extEventId", required = true) String extEventId,
-			@RequestParam(value = "endpointId", required = false) String endpointId) {
+	public ResultPage<EndpointDeliveryInfoDto> findDeliveryInfosByExtId(
+			@PathVariable (value = "extEventId", required = true) String extEventId,
+			@RequestParam(value = "endpointId", required = false) String endpointId,
+			@PageableDefault(size = 20) Pageable pageable
+	) {
 
 		GenericEvent event = eventRepo.findByExternalId(extEventId);
 		if (event == null) {
 			throw new IllegalArgumentException("Event with " +  extEventId +" external ID not found");
 		}
 
-		return findDeliveryInfosByEventId(event.getId().toString(), endpointId);
-    }
+		return findDeliveryInfosByEventId(event.getId().toString(), endpointId, pageable);
+	}
 
 	@GetMapping(value = "/messages/{messageId}/mark-as-read")
 	public ResponseEntity<Void> trackMessageRead(@PathVariable(value = "messageId", required = true) String messageId) {
@@ -152,8 +176,8 @@ public class DeliveryInfoRestController {
 		@Transient
 		UUID endpointId;
 
+		MessageContent message;
 		ReceivingEndpoint endpoint;
-
 		DELIVERY_STATUS currentStatus;
 		Instant statusReachedAt;
 
