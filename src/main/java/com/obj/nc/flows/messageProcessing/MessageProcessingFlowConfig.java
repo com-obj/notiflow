@@ -27,7 +27,6 @@ import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersis
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
@@ -50,20 +49,20 @@ public class MessageProcessingFlowConfig {
     private final MessageAndEndpointPersister messageAndEndpointPersister;
     private final SpamPreventionFilter spamPreventionFilter;
 
-    private final TaskExecutor threadPoolTaskExecutor;
 
     public final static String MESSAGE_PROCESSING_FLOW_ID = "MESSAGE_PROCESSING_FLOW_ID";
     public final static String MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID = MESSAGE_PROCESSING_FLOW_ID + "_INPUT";
 
     @Bean(MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID)
     public PublishSubscribeChannel messageProcessingInputChannel() {
-        return new PublishSubscribeChannel(threadPoolTaskExecutor);
+        return new PublishSubscribeChannel();
     }
 
     @Bean(MESSAGE_PROCESSING_FLOW_ID)
     public IntegrationFlow messageProcessingFlowDefinition() {
         return IntegrationFlows
                 .from(messageProcessingInputChannel())
+                .handle(messageAndEndpointPersister)
                 .transform(messageByRecipientTokenizer)
                 .split()
                 .handle(messageAndEndpointPersister) //need to persist, otherwise delivery info will have invalid reference
