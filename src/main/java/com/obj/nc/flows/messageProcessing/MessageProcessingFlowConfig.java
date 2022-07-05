@@ -64,7 +64,6 @@ public class MessageProcessingFlowConfig {
     public IntegrationFlow messageProcessingFlowDefinition() {
         return IntegrationFlows
                 .from(messageProcessingInputChannel())
-                .handle(messageAndEndpointPersister)
                 .transform(messageByRecipientTokenizer)
                 .split()
                 .handle(messageAndEndpointPersister) //need to persist, otherwise delivery info will have invalid reference
