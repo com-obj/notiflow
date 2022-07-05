@@ -32,10 +32,10 @@ public class NcAppConfigProperties {
     private String url;
     private boolean checkReferenceIntegrity = false;
 
-    @Value("${executor.core-pool-size:10}")
+    @Value("${nc.app.executor.core-pool-size:10}")
     private int corePoolSize;
 
-    @Value("${executor.max-pool-size:20}")
+    @Value("${nc.app.executor.max-pool-size:20}")
     private int maxPoolSize;
 
     @Value("${nc.app.url.context-path:/notiflow}")
