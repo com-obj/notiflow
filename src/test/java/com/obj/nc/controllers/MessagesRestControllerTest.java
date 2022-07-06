@@ -238,7 +238,7 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .get("/messages")
-                        .param("page", "1")
+                        .param("page", "2")
                         .param("size", "10")
                         .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().is2xxSuccessful())

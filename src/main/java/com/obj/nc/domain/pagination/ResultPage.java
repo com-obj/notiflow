@@ -26,7 +26,7 @@ public class ResultPage<T> extends PageImpl<T> {
     }
 
     @JsonProperty
-    public List<T> getData() {
+    public List<T> getContent() {
         return super.getContent();
     }
 

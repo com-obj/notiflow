@@ -73,7 +73,7 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
     List<DeliveryInfo> findByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,
                                                                     @Param("endpointId") UUID endpointId);
 
-    String QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "WITH temp AS (\n" +
+    String QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "WITH deliveries_partitioned_by_endpoint_id AS (\n" +
             "    SELECT di.*,\n" +
             "           dense_rank() OVER (PARTITION BY di.endpoint_id ORDER BY di.processed_on DESC) rnk\n" +
             "    FROM nc_delivery_info di\n" +
@@ -82,7 +82,7 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
             "      and ((:endpointId)::uuid is null or di.endpoint_id = (:endpointId)::uuid)\n" +
             ")\n" +
             "SELECT id, status, processed_on, version, failed_payload_id, message_id, endpoint_id\n" +
-            "FROM temp\n" +
+            "FROM deliveries_partitioned_by_endpoint_id\n" +
             "WHERE rnk = 1\n" +
             "limit :size offset :offset";
 
@@ -93,7 +93,7 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
                                                                     @Param("offset") long offset);
 
 
-    String QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "WITH temp AS (\n" +
+    String QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "WITH deliveries_partitioned_by_endpoint_id AS (\n" +
             "    SELECT di.*,\n" +
             "           dense_rank() OVER (PARTITION BY di.endpoint_id ORDER BY di.processed_on DESC) rnk\n" +
             "    FROM nc_delivery_info di\n" +
@@ -102,7 +102,7 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
             "      and ((:endpointId)::uuid is null or di.endpoint_id = (:endpointId)::uuid)\n" +
             ")\n" +
             "SELECT count(*)\n" +
-            "FROM temp\n" +
+            "FROM deliveries_partitioned_by_endpoint_id\n" +
             "WHERE rnk = 1\n";
 
     @Query(QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
