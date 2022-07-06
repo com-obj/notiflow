@@ -27,6 +27,7 @@ import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersis
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
@@ -53,9 +54,11 @@ public class MessageProcessingFlowConfig {
     public final static String MESSAGE_PROCESSING_FLOW_ID = "MESSAGE_PROCESSING_FLOW_ID";
     public final static String MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID = MESSAGE_PROCESSING_FLOW_ID + "_INPUT";
 
+    private final TaskExecutor threadPoolTaskExecutor;
+
     @Bean(MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID)
     public PublishSubscribeChannel messageProcessingInputChannel() {
-        return new PublishSubscribeChannel();
+        return new PublishSubscribeChannel(threadPoolTaskExecutor);
     }
 
     @Bean(MESSAGE_PROCESSING_FLOW_ID)
