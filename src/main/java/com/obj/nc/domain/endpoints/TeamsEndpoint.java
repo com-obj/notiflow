@@ -19,7 +19,7 @@
 
 package com.obj.nc.domain.endpoints;
 
-import com.obj.nc.domain.dto.endpoint.ReceivingEndpointDto;
+import com.obj.nc.domain.dto.endpoint.TeamsEndpointDto;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.ToString;
@@ -48,8 +48,8 @@ public class TeamsEndpoint extends ReceivingEndpoint {
     }
 
     @Override
-    public ReceivingEndpointDto toDto() {
-        return null;
+    public TeamsEndpointDto toDto() {
+        return TeamsEndpointDto.create(this.getId().toString(), this.webhookUrl);
     }
 
 }

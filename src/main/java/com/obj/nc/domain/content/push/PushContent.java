@@ -36,7 +36,6 @@ public class PushContent extends MessageContent {
 
     @Override
     public PushContentDto toDto() {
-        PushContentDto.create(this.subject, this.text, this.iconUrl);
-        return null;
+        return PushContentDto.create(this.subject, this.text, this.iconUrl);
     }
 }

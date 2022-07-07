@@ -20,7 +20,7 @@
 package com.obj.nc.domain.endpoints.push;
 
 import com.google.firebase.messaging.Message;
-import com.obj.nc.domain.dto.endpoint.ReceivingEndpointDto;
+import com.obj.nc.domain.dto.endpoint.DirectPushEndpointDto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -57,8 +57,8 @@ public class DirectPushEndpoint extends PushEndpoint {
     }
 
     @Override
-    public ReceivingEndpointDto toDto() {
-        return null;
+    public DirectPushEndpointDto toDto() {
+        return DirectPushEndpointDto.create(this.getId().toString(), this.token);
     }
 
 }

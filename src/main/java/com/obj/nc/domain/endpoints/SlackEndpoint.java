@@ -19,7 +19,7 @@
 
 package com.obj.nc.domain.endpoints;
 
-import com.obj.nc.domain.dto.endpoint.ReceivingEndpointDto;
+import com.obj.nc.domain.dto.endpoint.SlackEndpointDto;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.ToString;
@@ -48,8 +48,8 @@ public class SlackEndpoint extends ReceivingEndpoint {
     }
 
     @Override
-    public ReceivingEndpointDto toDto() {
-        return null;
+    public SlackEndpointDto toDto() {
+        return SlackEndpointDto.create(this.getId().toString(), this.channel);
     }
 
 }
