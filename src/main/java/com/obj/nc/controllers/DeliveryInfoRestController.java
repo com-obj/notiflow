@@ -22,6 +22,8 @@ package com.obj.nc.controllers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.domain.content.MessageContent;
+import com.obj.nc.domain.dto.content.MessageContentDto;
+import com.obj.nc.domain.dto.endpoint.ReceivingEndpointDto;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.Message;
@@ -96,8 +98,8 @@ public class DeliveryInfoRestController {
 					Optional<MessagePersistentState> msg = messages.stream().filter(it -> it.getId().equals(msgId)).findFirst();
 
 					return EndpointDeliveryInfoDto.builder()
-							.endpoint(ep.orElse(null))
-							.message(msg.map(MessagePersistentState::getBody).orElse(null))
+							.endpoint(ep.map(ReceivingEndpoint::toDto).orElse(null))
+							.message(msg.map(MessagePersistentState::getBody).map(MessageContent::toDto).orElse(null))
 							.currentStatus(delivery.getStatus())
 							.statusReachedAt(delivery.getProcessedOn())
 							.build();
@@ -163,7 +165,7 @@ public class DeliveryInfoRestController {
             .stream()
             .collect(Collectors.toMap(EndpointDeliveryInfoDto::getEndpointId, info->info));
 
-		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re));
+		endpoints.forEach(re-> endpointsById.get(re.getId()).setEndpoint(re.toDto()));
 
 		return infoDtos;
 	}
@@ -176,8 +178,8 @@ public class DeliveryInfoRestController {
 		@Transient
 		UUID endpointId;
 
-		MessageContent message;
-		ReceivingEndpoint endpoint;
+		MessageContentDto message;
+		ReceivingEndpointDto endpoint;
 		DELIVERY_STATUS currentStatus;
 		Instant statusReachedAt;
 

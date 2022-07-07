@@ -20,11 +20,8 @@
 package com.obj.nc.domain.content.push;
 
 import com.obj.nc.domain.content.MessageContent;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.obj.nc.domain.dto.content.PushContentDto;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
@@ -36,5 +33,10 @@ public class PushContent extends MessageContent {
     private String subject;
     private String text;
     private String iconUrl;
-    
+
+    @Override
+    public PushContentDto toDto() {
+        PushContentDto.create(this.subject, this.text, this.iconUrl);
+        return null;
+    }
 }

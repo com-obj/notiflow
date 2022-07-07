@@ -20,6 +20,7 @@
 package com.obj.nc.domain.content.sms;
 
 import com.obj.nc.domain.content.MessageContent;
+import com.obj.nc.domain.dto.content.SmsContentDto;
 import lombok.*;
 
 @Data
@@ -32,4 +33,8 @@ public class SimpleTextContent extends MessageContent {
 	@EqualsAndHashCode.Include
 	private String text;
 
+	@Override
+	public SmsContentDto toDto() {
+		return SmsContentDto.create(this.text);
+	}
 }

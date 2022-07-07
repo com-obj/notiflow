@@ -21,11 +21,8 @@ package com.obj.nc.domain.content;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import com.obj.nc.domain.dto.content.TemplateWithModelContentDto;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,5 +41,9 @@ public class TemplateWithModelContent<MODEL_TYPE> extends MessageContent {
 	private MODEL_TYPE model;
 	
 	private List<Locale> requiredLocales = new ArrayList<>();
-	
+
+	@Override
+	public TemplateWithModelContentDto<MODEL_TYPE> toDto() {
+		return TemplateWithModelContentDto.create(this.templateFileName, this.model, this.requiredLocales);
+	}
 }

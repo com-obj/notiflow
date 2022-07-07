@@ -27,6 +27,8 @@ import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.controllers.DeliveryInfoRestController.EndpointDeliveryInfoDto;
 import com.obj.nc.domain.content.email.EmailContent;
 import com.obj.nc.domain.content.sms.SimpleTextContent;
+import com.obj.nc.domain.dto.endpoint.EmailEndpointDto;
+import com.obj.nc.domain.dto.endpoint.SmsEndpointDto;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
@@ -157,17 +159,17 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 
 		//THEN
 		Assertions.assertThat(infos.getContent().size()).isEqualTo(2);
-		EndpointDeliveryInfoDto infoForEmail = infos.getContent().stream().filter(i -> i.getEndpoint() instanceof EmailEndpoint).findFirst().get();
+		EndpointDeliveryInfoDto infoForEmail = infos.getContent().stream().filter(i -> i.getEndpoint() instanceof EmailEndpointDto).findFirst().get();
 
 		Instant now = Instant.now();
 
-		Assertions.assertThat(infoForEmail.getEndpoint().getId()).isEqualTo(emailEndPointId);
+		Assertions.assertThat(infoForEmail.getEndpoint().getId()).isEqualTo(emailEndPointId.toString());
 		Assertions.assertThat(infoForEmail.getStatusReachedAt()).isCloseTo(now, Assertions.within(1, ChronoUnit.MINUTES));
 		Assertions.assertThat(infoForEmail.getCurrentStatus()).isEqualTo(SENT);
 
-		EndpointDeliveryInfoDto infoForSms = infos.getContent().stream().filter(i -> i.getEndpoint() instanceof SmsEndpoint).findFirst().get();
+		EndpointDeliveryInfoDto infoForSms = infos.getContent().stream().filter(i -> i.getEndpoint() instanceof SmsEndpointDto).findFirst().get();
 
-		Assertions.assertThat(infoForSms.getEndpoint().getId()).isEqualTo(smsEndPointId);
+		Assertions.assertThat(infoForSms.getEndpoint().getId()).isEqualTo(smsEndPointId.toString());
 		Assertions.assertThat(infoForSms.getStatusReachedAt()).isCloseTo(now, Assertions.within(1, ChronoUnit.MINUTES));
 		Assertions.assertThat(infoForSms.getCurrentStatus()).isEqualTo(SENT);
 
@@ -209,8 +211,8 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 				.andExpect(jsonPath("$.content.[0].currentStatus").value(CoreMatchers.is("SENT")))
 				.andExpect(jsonPath("$.content.[0].statusReachedAt").value(DateFormatMatcher.matchesISO8601()))
 				.andExpect(jsonPath("$.content.[0].endpoint.email").value(CoreMatchers.is("jancuzy@gmail.com")))
-				.andExpect(jsonPath("$.content.[0].endpoint.endpointId").value(CoreMatchers.is("jancuzy@gmail.com")))
-				.andExpect(jsonPath("$.content.[0].endpoint.@type").value(CoreMatchers.is("EMAIL"))).andReturn();
+				.andExpect(jsonPath("$.content.[0].endpoint.value").value(CoreMatchers.is("jancuzy@gmail.com")))
+				.andExpect(jsonPath("$.content.[0].endpoint.type").value(CoreMatchers.is("EMAIL"))).andReturn();
 	}
 
 	@Test
@@ -238,11 +240,11 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 				.allMatch(endpointDeliveryInfoDto -> SENT.equals(endpointDeliveryInfoDto.getCurrentStatus()));
 
 		assertThat(deliveryInfosByMessageId)
-				.filteredOn(endpointDeliveryInfoDto -> "john.doe@gmail.com".equals(endpointDeliveryInfoDto.getEndpoint().getEndpointId()))
+				.filteredOn(endpointDeliveryInfoDto -> "john.doe@gmail.com".equals(endpointDeliveryInfoDto.getEndpoint().getValue()))
 				.isNotEmpty();
 
 		assertThat(deliveryInfosByMessageId)
-				.filteredOn(endpointDeliveryInfoDto -> "john.dudly@gmail.com".equals(endpointDeliveryInfoDto.getEndpoint().getEndpointId()))
+				.filteredOn(endpointDeliveryInfoDto -> "john.dudly@gmail.com".equals(endpointDeliveryInfoDto.getEndpoint().getValue()))
 				.isNotEmpty();
 	}
 
@@ -386,7 +388,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 				.andExpect(jsonPath("$.content", Matchers.hasSize(1)))
 				.andExpect(jsonPath("$.content.[0].endpoint.id", Matchers.is(email.getId().toString())))
 				.andExpect(jsonPath("$.content.[0].endpoint.email", Matchers.is(email.getEmail())))
-				.andExpect(jsonPath("$.content.[0].endpoint.endpointId", Matchers.is(email.getEndpointId())))
+				.andExpect(jsonPath("$.content.[0].endpoint.value", Matchers.is(email.getEndpointId())))
 				.andExpect(jsonPath("$.content.[0].currentStatus", Matchers.is(deliveryInfo.getStatus().name())));
 	}
 

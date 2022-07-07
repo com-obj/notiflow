@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.obj.nc.domain.dto.endpoint.ReceivingEndpointDto;
 import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
 import com.obj.nc.domain.endpoints.push.TopicPushEndpoint;
 import com.obj.nc.domain.recipients.Recipient;
@@ -70,6 +71,8 @@ public abstract class ReceivingEndpoint implements Persistable<UUID> {
 	
 	@JsonIgnore
 	public abstract String getEndpointType();
+
+	public abstract ReceivingEndpointDto toDto();
 
 	@Override
 	@JsonIgnore
