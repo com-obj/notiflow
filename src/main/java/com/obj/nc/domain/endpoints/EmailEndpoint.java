@@ -20,6 +20,8 @@
 package com.obj.nc.domain.endpoints;
 
 import com.google.common.collect.ObjectArrays;
+import com.obj.nc.domain.dto.endpoint.EmailEndpointDto;
+import com.obj.nc.domain.dto.endpoint.ReceivingEndpointDto;
 import com.obj.nc.domain.recipients.Group;
 import com.obj.nc.domain.recipients.Person;
 
@@ -76,6 +78,11 @@ public class EmailEndpoint extends ReceivingEndpoint {
 	@Override
 	public String getEndpointType() {
 		return JSON_TYPE_IDENTIFIER;
+	}
+
+	@Override
+	public ReceivingEndpointDto toDto() {
+		return EmailEndpointDto.create(this.getId().toString(), this.email);
 	}
 
 	public static FieldDescriptor[] fieldDesc = ObjectArrays.concat(

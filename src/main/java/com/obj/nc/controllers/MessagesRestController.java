@@ -24,6 +24,7 @@ import com.obj.nc.domain.dto.SendEmailMessageRequest;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistentState;
 import com.obj.nc.domain.message.SendMessageResponse;
+import com.obj.nc.domain.pagination.ResultPage;
 import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
 import com.obj.nc.repositories.MessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -77,7 +78,7 @@ public class MessagesRestController {
                 .findAllMessages(createdFrom, createdTo, eventUUID, pageable.getOffset(), pageable.getPageSize());
         
         long messagesTotalCount = messageRepository.countAllMessages(createdFrom, createdTo, eventUUID);
-        return new PageImpl<>(messages, pageable, messagesTotalCount);
+        return new ResultPage<>(messages, pageable, messagesTotalCount);
     }
     
     @GetMapping(value = "/{messageId}", produces = APPLICATION_JSON_VALUE)

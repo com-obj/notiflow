@@ -19,12 +19,8 @@
 
 package com.obj.nc.domain.endpoints;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import com.obj.nc.domain.dto.endpoint.MailchimpEndpointDto;
+import lombok.*;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -53,5 +49,10 @@ public class MailchimpEndpoint extends ReceivingEndpoint {
     public String getEndpointType() {
         return JSON_TYPE_IDENTIFIER;
     }
-    
+
+    @Override
+    public MailchimpEndpointDto toDto() {
+        return MailchimpEndpointDto.create(this.getId().toString(), this.getEmail());
+    }
+
 }

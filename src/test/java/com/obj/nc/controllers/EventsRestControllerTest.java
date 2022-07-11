@@ -472,7 +472,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void testGetPage0Size20() throws Exception {
+    void testGetPage1Size20() throws Exception {
         // GIVEN
         persistNTestEvents(19);
 
@@ -490,7 +490,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void testGetPage0Size10() throws Exception {
+    void testGetPage1Size10() throws Exception {
         // GIVEN
         persistNTestEvents(19);
 
@@ -508,14 +508,14 @@ class EventsRestControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void testGetPage1Size10() throws Exception {
+    void testGetPage2Size10() throws Exception {
         // GIVEN
         persistNTestEvents(19);
 
         //WHEN
         ResultActions resp = mockMvc
                 .perform(MockMvcRequestBuilders.get("/events")
-                        .param("page", "1")
+                        .param("page", "2")
                         .param("size", "10")
                         .contentType(APPLICATION_JSON_UTF8)
                         .accept(APPLICATION_JSON_UTF8))

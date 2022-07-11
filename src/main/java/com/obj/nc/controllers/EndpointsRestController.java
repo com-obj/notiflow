@@ -22,6 +22,7 @@ package com.obj.nc.controllers;
 import com.obj.nc.domain.dto.EndpointTableViewDto;
 import com.obj.nc.domain.dto.EndpointTableViewDto.EndpointType;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.domain.pagination.ResultPage;
 import com.obj.nc.repositories.EndpointsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -69,7 +70,7 @@ public class EndpointsRestController {
         
         long endpointsTotalCount = endpointsRepository.countAllEndpointsWithStats(processedFrom, processedTo, endpointType, eventId, endpointId);
         
-        return new PageImpl<>(endpoints, pageable, endpointsTotalCount);
+        return new ResultPage<>(endpoints, pageable, endpointsTotalCount);
     }
     
     @GetMapping(value = "/{endpointId}", produces = APPLICATION_JSON_VALUE)

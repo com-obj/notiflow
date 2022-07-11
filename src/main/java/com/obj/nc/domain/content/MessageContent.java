@@ -22,6 +22,7 @@ package com.obj.nc.domain.content;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.obj.nc.domain.BaseDynamicAttributesBean;
 import com.obj.nc.domain.content.email.EmailContent;
+import com.obj.nc.domain.dto.content.MessageContentDto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -29,5 +30,5 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public abstract class MessageContent extends BaseDynamicAttributesBean {
-	
+    public abstract MessageContentDto toDto();
 }

@@ -20,6 +20,7 @@
 package com.obj.nc.domain.content.slack;
 
 import com.obj.nc.domain.content.MessageContent;
+import com.obj.nc.domain.dto.content.SlackMessageContentDto;
 import lombok.*;
 
 @Data
@@ -29,4 +30,9 @@ import lombok.*;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class SlackMessageContent extends MessageContent {
     private String text;
+
+    @Override
+    public SlackMessageContentDto toDto() {
+        return SlackMessageContentDto.create(this.text);
+    }
 }

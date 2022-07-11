@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.dto.GenericEventTableViewDto;
 import com.obj.nc.domain.event.EventRecieverResponce;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.pagination.ResultPage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.processors.eventValidator.GenericEventJsonSchemaValidator;
 import com.obj.nc.functions.processors.eventValidator.SimpleJsonValidator;
@@ -109,7 +110,7 @@ public class EventsRestController {
 				.collect(Collectors.toList());
 		
 		long eventsTotalCount = eventsRepository.countAllEventsWithStats(consumedFrom, consumedTo, eventUUID);
-		return new PageImpl<>(events, pageable, eventsTotalCount);
+		return new ResultPage<>(events, pageable, eventsTotalCount);
 	}
 	
 	@GetMapping(value = "/{eventId}", produces = APPLICATION_JSON_VALUE)

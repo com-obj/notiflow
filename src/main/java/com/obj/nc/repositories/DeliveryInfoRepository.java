@@ -22,14 +22,14 @@ package com.obj.nc.repositories;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUID> {
+public interface DeliveryInfoRepository extends PagingAndSortingRepository<DeliveryInfo, UUID> {
 
     @Query("select di.* " +
             "from nc_delivery_info di " +
@@ -72,6 +72,42 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
             "order by processed_on")
     List<DeliveryInfo> findByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,
                                                                     @Param("endpointId") UUID endpointId);
+
+    String QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "WITH deliveries_partitioned_by_endpoint_id AS (\n" +
+            "    SELECT di.*,\n" +
+            "           dense_rank() OVER (PARTITION BY di.endpoint_id ORDER BY di.processed_on DESC) rnk\n" +
+            "    FROM nc_delivery_info di\n" +
+            "             join nc_message m on di.message_id = m.id\n" +
+            "    where :eventId = ANY (m.previous_event_ids)\n" +
+            "      and ((:endpointId)::uuid is null or di.endpoint_id = (:endpointId)::uuid)\n" +
+            ")\n" +
+            "SELECT id, status, processed_on, version, failed_payload_id, message_id, endpoint_id\n" +
+            "FROM deliveries_partitioned_by_endpoint_id\n" +
+            "WHERE rnk = 1\n" +
+            "limit :size offset :offset";
+
+    @Query(QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
+    List<DeliveryInfo> findByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,
+                                                                    @Param("endpointId") UUID endpointId,
+                                                                    @Param("size") int size,
+                                                                    @Param("offset") long offset);
+
+
+    String QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "WITH deliveries_partitioned_by_endpoint_id AS (\n" +
+            "    SELECT di.*,\n" +
+            "           dense_rank() OVER (PARTITION BY di.endpoint_id ORDER BY di.processed_on DESC) rnk\n" +
+            "    FROM nc_delivery_info di\n" +
+            "             join nc_message m on di.message_id = m.id\n" +
+            "    where :eventId = ANY (m.previous_event_ids)\n" +
+            "      and ((:endpointId)::uuid is null or di.endpoint_id = (:endpointId)::uuid)\n" +
+            ")\n" +
+            "SELECT count(*)\n" +
+            "FROM deliveries_partitioned_by_endpoint_id\n" +
+            "WHERE rnk = 1\n";
+
+    @Query(QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
+    long countByEventIdAndEndpointId(@Param("eventId") UUID eventId, @Param("endpointId") UUID endpointId);
+
 
     List<DeliveryInfo> findByEndpointIdOrderByProcessedOn(UUID endpointId);
 

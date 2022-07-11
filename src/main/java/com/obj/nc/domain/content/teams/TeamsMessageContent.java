@@ -20,7 +20,11 @@
 package com.obj.nc.domain.content.teams;
 
 import com.obj.nc.domain.content.MessageContent;
-import lombok.*;
+import com.obj.nc.domain.dto.content.TeamsMessageContentDto;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
 
 @Getter
 @Builder
@@ -28,4 +32,9 @@ import lombok.*;
 public class TeamsMessageContent extends MessageContent {
     @NonNull
     private String text;
+
+    @Override
+    public TeamsMessageContentDto toDto() {
+        return TeamsMessageContentDto.create(this.text);
+    }
 }

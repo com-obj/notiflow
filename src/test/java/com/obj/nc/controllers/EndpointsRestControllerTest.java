@@ -262,7 +262,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	}
 
 	@Test
-	void testGetPage0Size20() throws Exception {
+	void testGetPage1Size20() throws Exception {
 		// GIVEN
 		persistNEmailEndpoints(19);
 
@@ -280,7 +280,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	}
 
 	@Test
-	void testGetPage0Size10() throws Exception {
+	void testGetPage1Size10() throws Exception {
     	// GIVEN
 		persistNEmailEndpoints(19);
 
@@ -298,14 +298,14 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	}
 
 	@Test
-	void testGetPage1Size10() throws Exception {
+	void testGetPage2Size10() throws Exception {
 		// GIVEN
 		persistNEmailEndpoints(19);
 
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
-						.param("page", "1")
+						.param("page", "2")
 						.param("size", "10")
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))

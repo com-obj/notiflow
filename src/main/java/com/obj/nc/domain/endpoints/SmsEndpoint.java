@@ -21,6 +21,8 @@ package com.obj.nc.domain.endpoints;
 
 import javax.validation.constraints.NotNull;
 
+import com.obj.nc.domain.dto.endpoint.ReceivingEndpointDto;
+import com.obj.nc.domain.dto.endpoint.SmsEndpointDto;
 import com.obj.nc.domain.recipients.Person;
 
 import lombok.AllArgsConstructor;
@@ -60,6 +62,11 @@ public class SmsEndpoint extends ReceivingEndpoint {
     @Override
     public String getEndpointType() {
         return JSON_TYPE_IDENTIFIER;
+    }
+
+    @Override
+    public ReceivingEndpointDto toDto() {
+        return SmsEndpointDto.create(this.getId().toString(), this.phone);
     }
 
 }
