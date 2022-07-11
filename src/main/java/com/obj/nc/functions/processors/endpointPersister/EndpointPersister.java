@@ -35,7 +35,7 @@ public class EndpointPersister extends ProcessorFunctionAdapter<BasePayload<?>, 
 
     @Override
     protected BasePayload<?> execute(BasePayload<?> basePayload) {
-        List<? extends ReceivingEndpoint> savedEndpoints = repo.persistEnpointIfNotExists(basePayload.getReceivingEndpoints());
+        List<? extends ReceivingEndpoint> savedEndpoints = repo.upsertEndpoints(basePayload.getReceivingEndpoints());
         
         // //TODO: this should be removed as soon as delivery options are persisted 
         // for (ReceivingEndpoint endpointBeforeSave : basePayload.getReceivingEndpoints()) {

@@ -34,7 +34,6 @@ import com.obj.nc.domain.headers.ProcessingInfo;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.Message;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.domain.notifIntent.content.IntentContent;
 import com.obj.nc.functions.processors.messageBuilder.MessagesFromIntentGenerator;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sources.genericEvents.GenericEventsSupplier;
@@ -59,6 +58,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -74,6 +74,7 @@ import static org.assertj.core.api.Assertions.entry;
 @SpringBootTest(properties = {
     "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
 })
+@EnabledIf(expression = "#{environment['nc.processing-info-generator.enabled'] == 'true'}", loadContext = true)
 public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
 	
 	@Autowired private GenericEventsSupplier eventSupplier;

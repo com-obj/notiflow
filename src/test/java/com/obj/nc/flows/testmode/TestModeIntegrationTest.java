@@ -204,7 +204,7 @@ public class TestModeIntegrationTest extends BaseIntegrationTest {
     
         // AND RECEIVED SMSs
         messageProcessingFlow.processMessage(inputSms);
-        await().atMost(10, TimeUnit.SECONDS).until(() -> smsSourceSupplier.getReceivedCount() >= 1);
+        await().atMost(10, TimeUnit.SECONDS).until(() -> smsSourceSupplier.getReceivedCount() == 2);
         List<SmsMessage> receivedSmsMessages = Stream.generate(smsSourceSupplier).limit(10).filter(Objects::nonNull).collect(Collectors.toList());
         Assertions.assertThat(receivedSmsMessages).hasSize(2);
         MessageSource<?> smsMessageSource = () -> new GenericMessage<>(receivedSmsMessages);

@@ -214,5 +214,41 @@ public class EndpointsRepositoryCustomImpl implements EndpointsRepositoryCustom 
     public boolean existsById(UUID id) {
         return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM nc_endpoint WHERE id = ?)", Boolean.class, id);
     }
+
+    /**
+     *
+     * Try to insert endpoint(s), but do nothing in case of constraint violation.
+     * Then fetch and return both the existing and the newly inserted endpoints.
+     *
+     * The old method was first checking whether a record exists and inserting if it is not.
+     * As such, it was vulnerable to the Time of Check problem: another thread could
+     * always insert during the time between the check and the insert.
+     */
+    @Override
+    public <T extends ReceivingEndpoint> List<T> upsertEndpoints(List<T> endpoints) {
+        String upsertEndpointStmt =
+                "INSERT INTO nc_endpoint (id, endpoint_name, endpoint_type, time_created) VALUES (?, ?, ?, ?)" +
+                        "ON CONFLICT (endpoint_name, endpoint_type) DO NOTHING";
+
+        jdbcTemplate.batchUpdate(upsertEndpointStmt, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ReceivingEndpoint re = endpoints.get(i);
+                ps.setObject(1, re.getId());
+                ps.setString(2, re.getEndpointId());
+                ps.setString(3, re.getEndpointType());
+                ps.setTimestamp(4, from(Instant.now()));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return endpoints.size();
+            }
+        });
+
+        List<T> result = this.findExistingEndpointsByNameId(endpoints);
+
+        return result;
+    }
     
 }
