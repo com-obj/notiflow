@@ -51,6 +51,11 @@ public class ResultPage<T> extends PageImpl<T> {
     }
 
     @JsonProperty
+    public int getNumberOfElements() {
+        return super.getNumberOfElements();
+    }
+
+    @JsonProperty
     public long getTotalElements() {
         return super.getTotalElements();
     }
