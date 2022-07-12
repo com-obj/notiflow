@@ -375,11 +375,15 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		message.setPreviousEventIds(Collections.singletonList(event.getEventId()));
 		message = messageRepo.save(message.toPersistentState()).toMessage();
 
-		DeliveryInfo deliveryInfo = DeliveryInfo.builder()
+		DeliveryInfo d1 = DeliveryInfo.builder()
 				.endpointId(email.getId()).messageId(message.getId()).status(DELIVERY_STATUS.PROCESSING)
 				.id(UUID.randomUUID()).build();
+		DeliveryInfo d2 = DeliveryInfo.builder()
+				.endpointId(email.getId()).messageId(message.getId()).status(DELIVERY_STATUS.SENT)
+				.id(UUID.randomUUID()).build();
 
-		deliveryRepo.save(deliveryInfo);
+		deliveryRepo.save(d1);
+		deliveryRepo.save(d2);
 
 		// WHEN
 		mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", event.getExternalId())
@@ -389,7 +393,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 				.andExpect(jsonPath("$.content.[0].endpoint.id", Matchers.is(email.getId().toString())))
 				.andExpect(jsonPath("$.content.[0].endpoint.email", Matchers.is(email.getEmail())))
 				.andExpect(jsonPath("$.content.[0].endpoint.value", Matchers.is(email.getEndpointId())))
-				.andExpect(jsonPath("$.content.[0].currentStatus", Matchers.is(deliveryInfo.getStatus().name())));
+				.andExpect(jsonPath("$.content.[0].currentStatus", Matchers.is(d2.getStatus().name())));
 	}
 
 	@Test

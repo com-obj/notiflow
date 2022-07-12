@@ -20,9 +20,11 @@
 package com.obj.nc.flows.testmode;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Data
@@ -34,6 +36,8 @@ public class TestModeProperties {
     private List<String> recipients;
 
     private int pollMockSourcesPeriodInSeconds=5;
+
+    private int maxMessagesPerPoll = 50;
     
     private boolean enabled = false;
 
