@@ -49,9 +49,9 @@ public class TestModeSmsFlowConfig {
     @DependsOn(TestModeFlowConfig.TEST_MODE_AGGREGATE_AND_SEND_FLOW_NAME)
     public IntegrationFlow testModeProcessReceivedSmsMessage() {
         return IntegrationFlows
-        		.fromSupplier(inMemorySmsSource,
-                      config -> config.poller(Pollers.trigger(testModeSourceTrigger()))
-                      .id(TEST_MODE_SMS_SOURCE_BEAN_NAME))
+        		.fromSupplier(inMemorySmsSource, config -> config
+                        .poller(Pollers.trigger(testModeSourceTrigger()).maxMessagesPerPoll(testModeProps.getMaxMessagesPerPoll()))
+                        .id(TEST_MODE_SMS_SOURCE_BEAN_NAME))
         		.split()
         		.channel(TestModeFlowConfig.TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME)
         		.get();
