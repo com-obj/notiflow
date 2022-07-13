@@ -55,7 +55,7 @@ public class SmsTemplateFormatter extends BaseTemplateFormatter<TemplateWithMode
 	protected Message<SimpleTextContent> createMessageWithFormattedContent(String formatedContent, Locale locale,  Message<TemplateWithModelContent<?>> payload) {		
 		SmsMessage smsMessage = Message.newTypedMessageFrom(SmsMessage.class, payload);
 
-		smsMessage.getBody().setText(formatedContent);
+		smsMessage.getBody().setText(formatedContent.trim());
 		
 		return smsMessage;
 	}
