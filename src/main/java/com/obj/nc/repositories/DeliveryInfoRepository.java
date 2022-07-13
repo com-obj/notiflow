@@ -73,12 +73,13 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
     List<DeliveryInfo> findByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,
                                                                     @Param("endpointId") UUID endpointId);
 
-    String QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "select di.*\n" +
-            "from nc_delivery_info di\n" +
-            "         join nc_message m on di.message_id = m.id\n" +
-            "where :eventId = ANY (m.previous_event_ids)\n" +
-            "  and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
-            "    and (status = 'SENT' OR status = 'FAILED')\n" +
+    String QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "select *\n" +
+            "    from (select di.*, row_number() over(partition by endpoint_id order by processed_on desc) rnk\n" +
+            "        from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
+            "        where :eventId = ANY (m.previous_event_ids)\n" +
+            "          and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
+            "          and (status = 'SENT' OR status = 'FAILED')) AS temp\n" +
+            "where rnk = 1\n" +
             "limit :size offset :offset";
 
     @Query(QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
@@ -89,11 +90,12 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
 
 
     String QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "select count(*)\n" +
-            "from nc_delivery_info di\n" +
-            "         join nc_message m on di.message_id = m.id\n" +
-            "where :eventId = ANY (m.previous_event_ids)\n" +
-            "  and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
-            "    and (status = 'SENT' OR status = 'FAILED');";
+            "    from (select di.*, row_number() over(partition by endpoint_id order by processed_on desc) rnk\n" +
+            "        from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
+            "        where :eventId = ANY (m.previous_event_ids)\n" +
+            "          and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
+            "          and (status = 'SENT' OR status = 'FAILED')) AS temp\n" +
+            "where rnk = 1";
 
     @Query(QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
     long countByEventIdAndEndpointId(@Param("eventId") UUID eventId, @Param("endpointId") UUID endpointId);
