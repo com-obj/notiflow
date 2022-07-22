@@ -28,6 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Component
@@ -50,19 +51,23 @@ public class InMemorySmsSourceSupplier extends SourceSupplierAdapter<SmsMessage>
 		if (received.isEmpty()) {
 			return null;
 		}
-		
-		SmsMessage sms= received.getFirst();
-		
-		SimpleTextContent content =sms.getBody();
-		
-		SmsEndpoint recipient = (SmsEndpoint)sms.getReceivingEndpoints().iterator().next();		
 
-		content.setAttributeValue(ORIGINAL_RECIPIENTS_PHONE_ATTR_NAME, recipient.getPhone());
-		// if (recipient.getRecipient()!=null) {
-		// 	content.setAttributeValue(ORIGINAL_RECIPIENTS_NAME_ATTR_NAME, recipient.getRecipient().getName());
-		// }
-		
-		received.removeFirst();
+		SmsMessage sms = null;
+		try {
+			sms = received.getFirst();
+			SimpleTextContent content =sms.getBody();
+
+			SmsEndpoint recipient = (SmsEndpoint)sms.getReceivingEndpoints().iterator().next();
+
+			content.setAttributeValue(ORIGINAL_RECIPIENTS_PHONE_ATTR_NAME, recipient.getPhone());
+			// if (recipient.getRecipient()!=null) {
+			// 	content.setAttributeValue(ORIGINAL_RECIPIENTS_NAME_ATTR_NAME, recipient.getRecipient().getName());
+			// }
+
+			received.removeFirst();
+		} catch (NoSuchElementException ex) {
+			received.clear();
+		}
 		
 		return sms;
 	}

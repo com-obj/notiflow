@@ -37,7 +37,7 @@ public class TestModeProperties {
 
     private int pollMockSourcesPeriodInSeconds=5;
 
-    private int maxMessagesPerPoll = 50;
+    private int maxMessagesPerPoll = 500;
     
     private boolean enabled = false;
 
