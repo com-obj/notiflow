@@ -462,6 +462,36 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		assertThat(totalPages).isEqualTo(2);
 	}
 
+	@Test
+	void shouldHaveTheSameFirstElementRegardlessOfPageSize() throws Exception {
+		String extId = setupMessageDeliveriesForSingleEvent();
+
+		ResultActions resp10 = mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", extId)
+						.param("page", "1")
+						.param("size", "10")
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+
+		ResultActions resp15 = mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", extId)
+						.param("page", "1")
+						.param("size", "15")
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+
+		String respContentAsStr10 = resp10.andReturn().getResponse().getContentAsString();
+		String respContentAsStr15 = resp15.andReturn().getResponse().getContentAsString();
+
+		List<LinkedHashMap<?, ?>> endpoints10 = JsonPath.read(respContentAsStr10, "$.content");
+		String statusReachedAt10 = (String) endpoints10.get(0).get("statusReachedAt");
+
+		List<LinkedHashMap<?, ?>> endpoints15 = JsonPath.read(respContentAsStr15, "$.content");
+		String statusReachedAt15 = (String) endpoints15.get(0).get("statusReachedAt");
+
+		assertThat(statusReachedAt10).isEqualTo(statusReachedAt15);
+	}
+
 	private String setupMessageDeliveriesForSingleEvent() {
 		GenericEvent event = eventRepo.save(GenericEventRepositoryTest.createProcessedEvent());
 
