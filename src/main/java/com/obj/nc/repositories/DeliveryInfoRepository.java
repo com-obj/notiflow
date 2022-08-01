@@ -79,6 +79,7 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
             "  and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
             "  and (status = 'SENT' OR status = 'FAILED')\n" +
             "  and m.message_class like '%Message'\n" +
+            "order by processed_on\n" +
             "limit :size offset :offset";
 
     @Query(QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
