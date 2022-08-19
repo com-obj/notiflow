@@ -25,6 +25,7 @@ import com.obj.nc.domain.event.EventRecieverResponce;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.pagination.ResultPage;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.flows.eventSummaryNotification.EventSummaryNotificationProperties;
 import com.obj.nc.functions.processors.eventValidator.GenericEventJsonSchemaValidator;
 import com.obj.nc.functions.processors.eventValidator.SimpleJsonValidator;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
@@ -64,6 +65,7 @@ public class EventsRestController {
 	private final SimpleJsonValidator simpleJsonValidator;
 	private final GenericEventJsonSchemaValidator jsonSchemaValidator;
 	private final GenericEventRepository eventsRepository;
+	private final EventSummaryNotificationProperties summaryNotifProps; 
 	
 	@PostMapping( consumes="application/json", produces="application/json")
     public EventRecieverResponce persistGenericEvent(
@@ -119,5 +121,15 @@ public class EventsRestController {
 				.findById(UUID.fromString(eventId))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
+
+	@GetMapping(value = "/summary-notification", produces = APPLICATION_JSON_VALUE)
+	public List<GenericEvent> findEventsForSummaryNotification() {
+		
+		List<GenericEvent> events = eventsRepository
+				.findEventsForSummaryNotification(summaryNotifProps.getMinutesSinceLastProcessing());
+		
+		return events;
+	}
+
 
 }

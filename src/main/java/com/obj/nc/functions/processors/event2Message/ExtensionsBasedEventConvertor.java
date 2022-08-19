@@ -20,7 +20,6 @@
 package com.obj.nc.functions.processors.event2Message;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
-import com.obj.nc.domain.HasEventId;
 import com.obj.nc.domain.HasPreviousEventIds;
 import com.obj.nc.domain.IsNotification;
 import com.obj.nc.domain.event.GenericEvent;

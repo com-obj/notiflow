@@ -70,6 +70,8 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	private JsonNode payloadJson;
 
 	private String externalId;
+
+	private Boolean notifyAfterProcessing;
 	
 	@CreatedDate
 	private Instant timeCreated;
@@ -165,7 +167,8 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
         PayloadDocumentation.fieldWithPath("flowId").description("Optional: Identification of the main flow"),
         PayloadDocumentation.fieldWithPath("payloadType").description("Optional: Identification of payload type. Can be used for routing configuration"),
         PayloadDocumentation.fieldWithPath("externalId").description("Optional: Identification of the event provided by the client. Can be used for search"),
-        PayloadDocumentation.fieldWithPath("payloadJson").description("JSON body of the input event")   
+        PayloadDocumentation.fieldWithPath("payloadJson").description("JSON body of the input event"),   
+        PayloadDocumentation.fieldWithPath("notifyAfterProcessing").description("Whether a summary notification should be send after all messages of this event has been processed"),   
     };
 
 	public static FieldDescriptor[] fieldDesc = ObjectArrays.concat(

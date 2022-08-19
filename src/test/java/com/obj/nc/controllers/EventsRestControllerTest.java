@@ -21,7 +21,9 @@ package com.obj.nc.controllers;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
+import com.obj.nc.Get;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.repositories.GenericEventRepository;
 import com.obj.nc.testUtils.BaseIntegrationTest;
@@ -48,11 +50,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
@@ -75,6 +79,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class EventsRestControllerTest extends BaseIntegrationTest {
         
         @Autowired private GenericEventRepository genericEventRepository;
+        @Autowired private TestDataRestController testDataController;
 	@Autowired protected MockMvc mockMvc;
 	
     @BeforeEach
@@ -603,6 +608,50 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         resp
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void testFindEventsForSummaryNotification() throws Exception {
+        // given
+        testDataController.persistFullEventProcessingData();
+        Get.getJdbc().update("update nc_delivery_info set processed_on = now()");
+
+        //THEN
+        findEventsForNotif(0);
+        
+        //GIVEN notifyAfterProcessing = true
+        GenericEvent testEvent = genericEventRepository.findById(TestDataRestController.EVENT_ID).get();
+        testEvent.setNotifyAfterProcessing(true);
+        genericEventRepository.save(testEvent);
+
+        //THEN
+        findEventsForNotif(0);
+
+        //WHEN
+        Get.getJdbc().update("update nc_delivery_info set processed_on = now() - INTERVAL '10 min'");
+
+        //THEN
+        List<JsonNode> events = findEventsForNotif(1);
+
+        testEvent = JsonUtils.readObjectFromJSON(events.get(0), GenericEvent.class);
+        assertThat(testEvent.getEventId()).isEqualTo(TestDataRestController.EVENT_ID);
+    }
+
+    private List<JsonNode> findEventsForNotif(int expectedCount) throws Exception, UnsupportedEncodingException {
+        ResultActions resp = mockMvc
+                .perform(MockMvcRequestBuilders.get("/events/summary-notification")
+                .contentType(APPLICATION_JSON_UTF8)
+        .accept(APPLICATION_JSON_UTF8))
+        .andDo(MockMvcResultHandlers.print());
+
+        //then no EVENT found
+        resp.andExpect(status().is2xxSuccessful());
+
+        List<JsonNode> events = JsonUtils.readJsonNodeListFromJSONString(resp.andReturn().getResponse().getContentAsString());
+        assertThat(events).hasSize(expectedCount);
+
+        return events;
+    }
+
     
     private UUID getMismatchedId(GenericEvent event) {
         UUID mismatchedId = UUID.fromString(event.getId().toString());

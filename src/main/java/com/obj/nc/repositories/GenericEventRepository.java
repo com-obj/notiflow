@@ -91,4 +91,14 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 								 @Param("consumedTo") Instant consumedTo,
 								 @Param("eventId") UUID eventId);
 
+    @Query(
+	"select e.id,e.flow_id,e.external_id, e.payload_json,e.time_created,e.time_consumed, e.payload_type, e.notify_after_processing " +
+	"from nc_event e " +
+	"	join nc_message m on (e.id  = ANY(m.previous_event_ids)) " +
+	"	join nc_delivery_info di on (di.message_id = m.id ) " +
+	"where notify_after_processing = true " +
+	"group by 1,2,3,4,5,6,7,8" +
+	"having max(di.processed_on) < NOW() - make_interval(mins  => :minutesSinceLastProcessing)") 
+    List<GenericEvent> findEventsForSummaryNotification(@Param("minutesSinceLastProcessing") Integer minutesSinceLastProcessing);								 
+
 }
