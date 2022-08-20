@@ -33,12 +33,14 @@ import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistentState;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
+import com.obj.nc.domain.relationship.Message2EndpointRelation;
 import com.obj.nc.flows.errorHandling.domain.FailedPayload;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.FailedPayloadRepository;
 import com.obj.nc.repositories.GenericEventRepository;
+import com.obj.nc.repositories.Message2EndpointRelationRepository;
 import com.obj.nc.repositories.MessageRepository;
 import com.obj.nc.repositories.NotificationIntentRepository;
 import com.obj.nc.repositories.ProcessingInfoRepository;
@@ -69,19 +71,26 @@ import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.D
 @RequiredArgsConstructor
 public class TestDataRestController {
     
-    public static final UUID EVENT_ID = UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d");
+        private static final UUID SMS_ID = UUID.fromString("c3ce484f-f03c-47b1-ae6a-2337ca4f6444");
+        private static final UUID EMAIL2_ID = UUID.fromString("4e91137e-93aa-4633-b137-3050442d26a5");
+        private static final UUID EMAIL1_ID = UUID.fromString("5f74929b-2635-4515-9f30-ba79e200e92b");
+        private static final UUID JOHN_DOE_SMS_ID = UUID.fromString("820023cf-7dd0-407f-abfa-0d6453bde6d3");
+        public static final UUID JOE_DUDLY_EMAIL_ID = UUID.fromString("d2ca2a68-1dc4-4052-a93a-67319449ef5b");
+        public static final UUID JOHN_DOE_EMAIL_ID = UUID.fromString("3d02890b-1b53-465c-b8c3-b0a722483a45");
+        public static final UUID EVENT_ID = UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d");
 
     private final GenericEventRepository genericEventRepository;
     private final NotificationIntentRepository notificationIntentRepository;
     private final EndpointsRepository endpointsRepository;
     private final MessageRepository messageRepository;
+    private final Message2EndpointRelationRepository msg2EndpointRepository;
     private final DeliveryInfoRepository deliveryInfoRepository;
     private final FailedPayloadRepository failedPayloadRepository;
     private final ProcessingInfoRepository processingInfoRepository;
     
     @GetMapping("/full-event-processing")
-    public void persistFullEventProcessingData() {
-        persistEvent(
+    public GenericEvent persistFullEventProcessingData() {
+        GenericEvent event = persistEvent(
                 EVENT_ID, 
                 47L,
                 Timestamp.valueOf("2021-08-24 09:37:39.366000").toInstant(),
@@ -90,9 +99,12 @@ public class TestDataRestController {
         persistReceivingEndpoints();
         persistNotificationIntent();
         persistMessages();
+        persistMessage2Endpoints();
         persistFailedPayload();
         persistDeliveryInfos();
         persistProcessingInfos();
+
+        return event;
     }
     
     @GetMapping("/random-events")
@@ -108,7 +120,7 @@ public class TestDataRestController {
         });
     }
     
-    private void persistEvent(UUID uuid, Long num, Instant timeConsumed, Instant timeCreated) {
+    private GenericEvent persistEvent(UUID uuid, Long num, Instant timeConsumed, Instant timeCreated) {
         DummyEventPayload payload = DummyEventPayload.builder()
                 .stringField("simple string")
                 .longField(num)
@@ -123,20 +135,20 @@ public class TestDataRestController {
     
         event = genericEventRepository.save(event);
         event.setTimeCreated(timeCreated);
-        genericEventRepository.save(event);
+        return genericEventRepository.save(event);
     }
     
     private void persistReceivingEndpoints() {
         EmailEndpoint johnDoeEmail = EmailEndpoint.builder().email("john.doe@objectify.sk").build();
-        johnDoeEmail.setId(UUID.fromString("3d02890b-1b53-465c-b8c3-b0a722483a45"));
+        johnDoeEmail.setId(JOHN_DOE_EMAIL_ID);
         saveEndpoint(johnDoeEmail, "2021-08-24 09:37:39.474000");
     
         EmailEndpoint johnDudlyEmail = EmailEndpoint.builder().email("john.dudly@objectify.sk").build();
-        johnDudlyEmail.setId(UUID.fromString("d2ca2a68-1dc4-4052-a93a-67319449ef5b"));
+        johnDudlyEmail.setId(JOE_DUDLY_EMAIL_ID);
         saveEndpoint(johnDudlyEmail, "2021-08-24 09:37:39.474000");
     
         SmsEndpoint phone = SmsEndpoint.builder().phone("0918111111").build();
-        phone.setId(UUID.fromString("820023cf-7dd0-407f-abfa-0d6453bde6d3"));
+        phone.setId(JOHN_DOE_SMS_ID);
         saveEndpoint(phone, "2021-08-24 09:37:39.474000");
     }
     
@@ -161,7 +173,7 @@ public class TestDataRestController {
         // Email 1
         MessagePersistentState message = new MessagePersistentState();
         message.setHeader(new Header());
-        message.setId(UUID.fromString("5f74929b-2635-4515-9f30-ba79e200e92b"));
+        message.setId(EMAIL1_ID);
         message.getHeader().setFlowId("default-flow");
         message.setPreviousEventIds(new UUID[]{ EVENT_ID });
         message.setBody(EmailContent.builder().subject("Subject").text("Text").build());
@@ -170,10 +182,11 @@ public class TestDataRestController {
         message = messageRepository.save(message);
         message.setTimeCreated(Timestamp.valueOf("2021-08-24 09:37:39.540000").toInstant());
         messageRepository.save(message);
+
         // Email 2
         message = new MessagePersistentState();
         message.setHeader(new Header());
-        message.setId(UUID.fromString("4e91137e-93aa-4633-b137-3050442d26a5"));
+        message.setId(EMAIL2_ID);
         message.getHeader().setFlowId("default-flow");
         message.setPreviousEventIds(new UUID[]{ EVENT_ID });
         message.setBody(EmailContent.builder().subject("Subject").text("Text").build());
@@ -182,18 +195,43 @@ public class TestDataRestController {
         message = messageRepository.save(message);
         message.setTimeCreated(Timestamp.valueOf("2021-08-24 09:37:39.575000").toInstant());
         messageRepository.save(message);
+
         // SMS 1
         message = new MessagePersistentState();
         message.setHeader(new Header());
-        message.setId(UUID.fromString("c3ce484f-f03c-47b1-ae6a-2337ca4f6444"));
+        message.setId(SMS_ID);
         message.getHeader().setFlowId("default-flow");
         message.setPreviousEventIds(new UUID[]{ EVENT_ID });
-        message.setBody(SimpleTextContent.builder().text("Text").build());
+        message.setBody(SimpleTextContent.builder().text("Failed SMS").build());
         message.setMessageClass(SmsMessage.class.getName());
 
         message = messageRepository.save(message);
         message.setTimeCreated(Timestamp.valueOf("2021-08-24 09:37:39.603000").toInstant());
         messageRepository.save(message);
+    }
+
+    private void persistMessage2Endpoints(){
+        Message2EndpointRelation rel1 = Message2EndpointRelation.builder()
+                .messageId(EMAIL1_ID)
+                .endpointId(JOHN_DOE_EMAIL_ID)
+                .build();
+
+        msg2EndpointRepository.save(rel1);
+
+        Message2EndpointRelation rel2 = Message2EndpointRelation.builder()
+                .messageId(EMAIL2_ID)
+                .endpointId(JOE_DUDLY_EMAIL_ID)
+                .build();
+
+        msg2EndpointRepository.save(rel2);
+
+        Message2EndpointRelation rel3 = Message2EndpointRelation.builder()
+                .messageId(SMS_ID)
+                .endpointId(JOHN_DOE_SMS_ID)
+                .build();
+
+        msg2EndpointRepository.save(rel3);
+
     }
     
     private void persistFailedPayload() {
@@ -227,8 +265,8 @@ public class TestDataRestController {
                 .id(UUID.fromString("2506d56e-4cdd-4bca-bfb7-c7adb95255ce"))
                 .version(0)
                 .failedPayloadId(null)
-                .messageId(UUID.fromString("5f74929b-2635-4515-9f30-ba79e200e92b"))
-                .endpointId(UUID.fromString("3d02890b-1b53-465c-b8c3-b0a722483a45"))
+                .messageId(EMAIL1_ID)
+                .endpointId(JOHN_DOE_EMAIL_ID)
                 .build();
     
         deliveryInfo = deliveryInfoRepository.save(deliveryInfo);
@@ -240,8 +278,8 @@ public class TestDataRestController {
                 .id(UUID.fromString("1e6be6ad-81af-453f-a595-9265f3c0a8c5"))
                 .version(0)
                 .failedPayloadId(null)
-                .messageId(UUID.fromString("4e91137e-93aa-4633-b137-3050442d26a5"))
-                .endpointId(UUID.fromString("d2ca2a68-1dc4-4052-a93a-67319449ef5b"))
+                .messageId(EMAIL2_ID)
+                .endpointId(JOE_DUDLY_EMAIL_ID)
                 .build();
     
         deliveryInfo = deliveryInfoRepository.save(deliveryInfo);
@@ -253,8 +291,8 @@ public class TestDataRestController {
                 .id(UUID.fromString("6d22d1a7-fe9b-4841-983d-a7e9bbc809a0"))
                 .version(0)
                 .failedPayloadId(null)
-                .messageId(UUID.fromString("c3ce484f-f03c-47b1-ae6a-2337ca4f6444"))                
-                .endpointId(UUID.fromString("820023cf-7dd0-407f-abfa-0d6453bde6d3"))
+                .messageId(SMS_ID)                
+                .endpointId(JOHN_DOE_SMS_ID)
                 .build();
     
         deliveryInfo = deliveryInfoRepository.save(deliveryInfo);
@@ -266,8 +304,8 @@ public class TestDataRestController {
                 .id(UUID.fromString("6ab79ba7-ca42-4851-bab7-56c775e5b424"))
                 .version(0)
                 .failedPayloadId(null)
-                .messageId(UUID.fromString("5f74929b-2635-4515-9f30-ba79e200e92b"))
-                .endpointId(UUID.fromString("3d02890b-1b53-465c-b8c3-b0a722483a45"))
+                .messageId(EMAIL1_ID)
+                .endpointId(JOHN_DOE_EMAIL_ID)
                 .build();
     
         deliveryInfo = deliveryInfoRepository.save(deliveryInfo);
@@ -279,8 +317,8 @@ public class TestDataRestController {
                 .id(UUID.fromString("07960564-d274-408c-89c9-fd16967b97f7"))
                 .version(0)
                 .failedPayloadId(null)
-                .messageId(UUID.fromString("4e91137e-93aa-4633-b137-3050442d26a5"))
-                .endpointId(UUID.fromString("d2ca2a68-1dc4-4052-a93a-67319449ef5b"))
+                .messageId(EMAIL2_ID)
+                .endpointId(JOE_DUDLY_EMAIL_ID)
                 .build();
     
         deliveryInfo = deliveryInfoRepository.save(deliveryInfo);
@@ -291,9 +329,9 @@ public class TestDataRestController {
                 .status(FAILED)
                 .id(UUID.fromString("7d80114f-cf90-4c3f-8fce-850556604e1d"))
                 .version(0)
-                .messageId(UUID.fromString("c3ce484f-f03c-47b1-ae6a-2337ca4f6444"))
+                .messageId(SMS_ID)
                 .failedPayloadId(UUID.fromString("5469855e-450d-4ab5-a64e-4f6ad8f547a3"))
-                .endpointId(UUID.fromString("820023cf-7dd0-407f-abfa-0d6453bde6d3"))
+                .endpointId(JOHN_DOE_SMS_ID)
                 .build();
     
         deliveryInfo = deliveryInfoRepository.save(deliveryInfo);

@@ -19,6 +19,8 @@
 
 package com.obj.nc.repositories;
 
+import com.obj.nc.domain.dto.DeliveryStatsByEndpointType;
+import com.obj.nc.domain.dto.DeliveryStatsByEndpointType.DeliveryStatsByEndpointTypeRowMapper;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.event.GenericEventWithStats;
 import com.obj.nc.domain.event.GenericEventWithStats.GenericEventWithStatsRowMapper;
@@ -77,6 +79,35 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 													   @Param("eventId") UUID eventId,
 													   @Param("offset") long offset,
 													   @Param("pageSize") int pageSize);
+	@Query(
+		value = 
+			"select " +
+			"	msg_with_endp.endpoint_type, " + 
+			"	count(distinct msg_with_endp.message_id) as messages_count,  " + 
+			"	count(distinct msg_with_endp.endpoint_id) as endpoints_count,  " + 
+			"	count(distinct di.id) filter(where di.status = 'SENT') as messages_sent_count,  " + 
+			"	count(distinct di.id) filter(where di.status = 'READ') as messages_read_count,  " + 
+			"	count(distinct di.id) filter(where di.status = 'FAILED') as messages_failed_count  " + 
+			"from  " + 
+			"	nc_event e  " + 
+			"left join (  " + 
+			"	select  " + 
+			"		msg.*,  " + 
+			"		m2e.message_id as message_id, " + 
+			"		m2e.endpoint_id as endpoint_id, " + 
+			"		ep.endpoint_type  " + 
+			"	from nc_message msg  " + 
+			"	inner join nc_message_2_endpoint_rel m2e on ( m2e.message_id = msg.id ) " + 
+			"	inner join nc_endpoint ep on ep.id = m2e.endpoint_id  " + 
+			") msg_with_endp on ( e.id = any( msg_with_endp.previous_event_ids )) " + 
+			"left join  " + 
+			"	nc_delivery_info di on di.message_id = msg_with_endp.id  " + 
+			"and  " + 
+			"	e.id = (:eventId)::uuid  " + 
+			"group by msg_with_endp.endpoint_type",
+		rowMapperClass = DeliveryStatsByEndpointTypeRowMapper.class
+	)						
+	List<DeliveryStatsByEndpointType> findEventStatsByEndpointType(@Param("eventId") UUID eventId);						   
 	
 	@Query(
 			value = "select " +
@@ -97,8 +128,8 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 	"	join nc_message m on (e.id  = ANY(m.previous_event_ids)) " +
 	"	join nc_delivery_info di on (di.message_id = m.id ) " +
 	"where notify_after_processing = true " +
-	"group by 1,2,3,4,5,6,7,8" +
-	"having max(di.processed_on) < NOW() - make_interval(mins  => :minutesSinceLastProcessing)") 
-    List<GenericEvent> findEventsForSummaryNotification(@Param("minutesSinceLastProcessing") Integer minutesSinceLastProcessing);								 
+	"group by 1,2,3,4,5,6,7,8 " +
+	"having max(di.processed_on) < NOW() - make_interval(secs  => :secondsSinceLastProcessing)") 
+    List<GenericEvent> findEventsForSummaryNotification(@Param("secondsSinceLastProcessing") int secondsSinceLastProcessing);								 
 
 }

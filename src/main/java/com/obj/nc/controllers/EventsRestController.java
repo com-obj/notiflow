@@ -20,12 +20,14 @@
 package com.obj.nc.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.domain.dto.DeliveryStatsByEndpointType;
 import com.obj.nc.domain.dto.GenericEventTableViewDto;
 import com.obj.nc.domain.event.EventRecieverResponce;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.pagination.ResultPage;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.flows.eventSummaryNotification.EventSummaryNotificationProperties;
+import com.obj.nc.flows.eventSummaryNotification.EventSummaryNotificationProperties.SUMMARY_NOTIF_EVENT_SELECTION;
 import com.obj.nc.functions.processors.eventValidator.GenericEventJsonSchemaValidator;
 import com.obj.nc.functions.processors.eventValidator.SimpleJsonValidator;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
@@ -33,7 +35,6 @@ import com.obj.nc.repositories.GenericEventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.relational.core.conversion.DbActionExecutionException;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -72,7 +73,8 @@ public class EventsRestController {
     		@RequestBody(required = true) String eventJsonString, 
     		@RequestParam(value = "flowId", required = false) String flowId,
     		@RequestParam(value = "externalId", required = false) String externalId,
-			@RequestParam(value = "payloadType", required = false) String payloadType) {
+			@RequestParam(value = "payloadType", required = false) String payloadType,
+			@RequestParam(value = "payloadType", required = false, defaultValue = "false") boolean notifyAfterProcessing) {
 		
 		JsonNode eventJson = simpleJsonValidator.apply(eventJsonString);
 		
@@ -80,6 +82,14 @@ public class EventsRestController {
     	event.overrideFlowIdIfApplicable(flowId);
     	event.overrideExternalIdIfApplicable(externalId);
     	event.overridePayloadTypeIfApplicable(payloadType);
+
+		if (summaryNotifProps.getEventSelection() == SUMMARY_NOTIF_EVENT_SELECTION.ALL_EVENT) {
+			event.setNotifyAfterProcessing(true);
+		} else if (summaryNotifProps.getEventSelection() == SUMMARY_NOTIF_EVENT_SELECTION.SELECTED_EVENTS) {
+			event.setNotifyAfterProcessing(notifyAfterProcessing);
+		} else {
+			event.setNotifyAfterProcessing(false);
+		}	
 		
 		if (payloadType != null) {
 			event = jsonSchemaValidator.apply(event);
@@ -114,7 +124,17 @@ public class EventsRestController {
 		long eventsTotalCount = eventsRepository.countAllEventsWithStats(consumedFrom, consumedTo, eventUUID);
 		return new ResultPage<>(events, pageable, eventsTotalCount);
 	}
+
+	@GetMapping(value = "/{eventId}/statsByType", produces = APPLICATION_JSON_VALUE)
+	public List<DeliveryStatsByEndpointType> findEventStatsByEndpointType(@PathVariable("eventId") String eventId) {
+		
+		List<DeliveryStatsByEndpointType> events = eventsRepository
+				.findEventStatsByEndpointType(UUID.fromString(eventId));
+		
+		return events;
+	}
 	
+
 	@GetMapping(value = "/{eventId}", produces = APPLICATION_JSON_VALUE)
 	public GenericEvent findEvent(@PathVariable("eventId") String eventId) {
 		return eventsRepository
@@ -126,7 +146,7 @@ public class EventsRestController {
 	public List<GenericEvent> findEventsForSummaryNotification() {
 		
 		List<GenericEvent> events = eventsRepository
-				.findEventsForSummaryNotification(summaryNotifProps.getMinutesSinceLastProcessing());
+				.findEventsForSummaryNotification(summaryNotifProps.getSecondsSinceLastProcessing());
 		
 		return events;
 	}

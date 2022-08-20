@@ -1,0 +1,57 @@
+<!--
+  ~   Copyright (C) 2021 the original author or authors.
+  ~
+  ~   This file is part of Notiflow
+  ~
+  ~   This program is free software: you can redistribute it and/or modify
+  ~   it under the terms of the GNU Lesser General Public License as published by
+  ~   the Free Software Foundation, either version 3 of the License, or
+  ~   (at your option) any later version.
+  ~
+  ~   This program is distributed in the hope that it will be useful,
+  ~   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~   GNU Lesser General Public License for more details.
+  ~
+  ~   You should have received a copy of the GNU Lesser General Public License
+  ~   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title th:text="#{emailSummary.title}">Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+    <body>
+    	<p>
+    		<span th:text="#{emailSummary.headerMain}">O co ide</span>
+    	</p>	
+    	
+		<table border="1" cellpadding="5" style="border-collapse:collapse; border: 1px solid gray;">		
+			<thead>
+				<tr>
+					<th th:text="#{emailSummary.header1.endpointType}"> # </th>
+					<th th:text="#{emailSummary.header1.messageCount}"> # </th>
+					<th th:text="#{emailSummary.header1.endpointsCount}"> endpoint # </th>
+					<th th:text="#{emailSummary.header1.messagesSentCount}"> send # </th>
+					<!-- <th th:text="#{emailSummary.header1.messagesReadCount}"> read # </th> -->
+					<th th:text="#{emailSummary.header1.messagesFailedCount}"> failed # </th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="stats: ${model.eventStatsByType}">
+					<td th:text="${stats.endpointType}"> </td>
+					<td th:text="${stats.messagesCount}"> </td>
+					<td th:text="${stats.endpointsCount}"> </td>
+					<td th:text="${stats.messagesSentCount}"> </td>
+					<!-- <td th:text="${stats.messagesReadCount}"> </td> -->
+					<td th:text="${stats.messagesFailedCount}"> </td>
+				</tr>
+			</tbody>
+		</table>
+	 
+	 	<p th:text="#{emailSummary.footerMain}"></p>
+    	<p th:text="#{emailSummary.signature}"></p>
+    </body>
+</html>

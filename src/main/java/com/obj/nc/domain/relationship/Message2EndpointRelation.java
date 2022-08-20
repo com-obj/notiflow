@@ -15,8 +15,12 @@
 
 package com.obj.nc.domain.relationship;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
@@ -26,10 +30,14 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Table("nc_message_2_endpoint_rel")
 public class Message2EndpointRelation implements Persistable<UUID> {
     @Id
     @EqualsAndHashCode.Include
+    @Builder.Default
     private UUID id = UUID.randomUUID();
 
     @CreatedDate

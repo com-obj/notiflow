@@ -15,19 +15,24 @@
 
 package com.obj.nc.flows.dataSources.http;
 
-class HttpDatasourceNameCreator {
+public class HttpDatasourceNameCreator {
+
+    public static final String PULL_HTTP_DS_POLLER_POSTFIX = "_POLLER";
+    public static final String PULL_HTTP_DS_NAME_PREFIX = "NC_HTTP_DATA_SOURCE_";
+    public static final String PULL_HTTP_DS_JOB_POSTFIX = "_INTEGRATION_FLOW";
+
     private HttpDatasourceNameCreator() {
     }
 
     static String createDataSourceId(String dataSourceName) {
-        return "NC_HTTP_DATA_SOURCE_".concat(dataSourceName);
+        return PULL_HTTP_DS_NAME_PREFIX.concat(dataSourceName);
     }
 
     static String createJobFlowId(String dataSourceName) {
-        return createDataSourceId(dataSourceName).concat("_INTEGRATION_FLOW");
+        return createDataSourceId(dataSourceName).concat(PULL_HTTP_DS_JOB_POSTFIX);
     }
 
     static String createJobPollerId(String dataSourceName) {
-        return createJobFlowId(dataSourceName).concat("_POLLER");
+        return createJobFlowId(dataSourceName).concat(PULL_HTTP_DS_POLLER_POSTFIX);
     }
 }

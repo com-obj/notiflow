@@ -91,18 +91,18 @@ public class JdbcDataSourceFlowsConfiguration {
                         .id(createJobPollerId(dataSourceName, job.getName()))), jobConfig);
     }
 
-    private String createDataSourceId(String dataSourceName) {
+    public static String createDataSourceId(String dataSourceName) {
         return "NC_JDBC_DATA_SOURCE_".concat(dataSourceName);
     }
 
-    private String createJobFlowId(String dataSourceName, String jobName) {
+    public static String createJobFlowId(String dataSourceName, String jobName) {
         return createDataSourceId(dataSourceName)
                 .concat("_")
                 .concat(jobName)
                 .concat("_INTEGRATION_FLOW");
     }
 
-    private String createJobPollerId(String dataSourceName, String jobName) {
+    public static String createJobPollerId(String dataSourceName, String jobName) {
         return createJobFlowId(dataSourceName, jobName)
                 .concat("_POLLER");
     }

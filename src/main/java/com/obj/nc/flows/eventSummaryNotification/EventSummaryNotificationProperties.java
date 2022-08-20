@@ -19,11 +19,12 @@
 
 package com.obj.nc.flows.eventSummaryNotification;
 
-import lombok.Data;
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
+import lombok.Data;
 
 @Data
 @Configuration
@@ -31,8 +32,20 @@ import java.util.Map;
 public class EventSummaryNotificationProperties {
 			
 	public static final String CONFIG_PROPS_PREFIX = "nc.flows.event-summary-notif";
+    public static final String EVENT_SUMMARY_DS_NAME = "NC.EventSummaryNotification";
 
-    private int minutesSinceLastProcessing=1;
+    public enum SUMMARY_NOTIF_EVENT_SELECTION {
+        NONE, ALL_EVENT, SELECTED_EVENTS /* NOT IMPLEMENTED */
+    }
+
+    private SUMMARY_NOTIF_EVENT_SELECTION eventSelection=SUMMARY_NOTIF_EVENT_SELECTION.NONE;
+
+    private int secondsSinceLastProcessing=60;
+
+    private String cron="* * * * *"; // every minute
+
+    private List<String> emailRecipients; 
     
-    
+    private String emailTemplateFileName = "event-summary.html";
+
 }
