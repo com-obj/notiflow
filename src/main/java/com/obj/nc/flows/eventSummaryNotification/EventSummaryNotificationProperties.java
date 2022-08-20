@@ -35,7 +35,7 @@ public class EventSummaryNotificationProperties {
     public static final String EVENT_SUMMARY_DS_NAME = "NC.EventSummaryNotification";
 
     public enum SUMMARY_NOTIF_EVENT_SELECTION {
-        NONE, ALL_EVENT, SELECTED_EVENTS /* NOT IMPLEMENTED */
+        NONE, ALL_EVENT, SELECTED_EVENTS
     }
 
     private SUMMARY_NOTIF_EVENT_SELECTION eventSelection=SUMMARY_NOTIF_EVENT_SELECTION.NONE;

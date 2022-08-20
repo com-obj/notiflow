@@ -44,12 +44,14 @@ public class EventSummaryNotificationConfiguration {
 			
     public static final String EVENT_SUMMARY_CONF_BEAN_NAME = "EventSummaryNotificationConfBean";
 
+    public static final String EVENT_TO_SUMMARY_MAIL_CONVERTER_BEAN_NAME = "ProcessedEventsToSummaryMailConverter";
+
     private final DataSourceFlowsProperties dataPullProps;
     private final ServerProperties serverProperties;
     private final EventSummaryNotificationProperties props;
     private final GenericEventRepository eventRepo;
 
-    @Bean
+    @Bean(EVENT_TO_SUMMARY_MAIL_CONVERTER_BEAN_NAME)
     public ProcessedEventsToSummaryMailConverter notifDataToEmailConverter(){
         return new ProcessedEventsToSummaryMailConverter(props, eventRepo);
     }

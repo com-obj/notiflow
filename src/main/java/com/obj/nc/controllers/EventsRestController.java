@@ -74,7 +74,7 @@ public class EventsRestController {
     		@RequestParam(value = "flowId", required = false) String flowId,
     		@RequestParam(value = "externalId", required = false) String externalId,
 			@RequestParam(value = "payloadType", required = false) String payloadType,
-			@RequestParam(value = "payloadType", required = false, defaultValue = "false") boolean notifyAfterProcessing) {
+			@RequestParam(value = "notifyAfterProcessing", required = false, defaultValue = "false") boolean notifyAfterProcessing) {
 		
 		JsonNode eventJson = simpleJsonValidator.apply(eventJsonString);
 		
