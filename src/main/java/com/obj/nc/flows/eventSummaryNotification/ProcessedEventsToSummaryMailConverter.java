@@ -54,7 +54,11 @@ public class ProcessedEventsToSummaryMailConverter implements PullNotifData2Noti
 			emailContent.setSubjectResourceKey("emailSummary.title");
 			emailContent.setTemplateFileName(properties.getEmailTemplateFileName());
 
-			SummaryEmailModel emailModel = SummaryEmailModel.builder().eventStatsByType(eventStats).build();
+			SummaryEmailModel emailModel = SummaryEmailModel.builder()
+					.eventStatsByType(eventStats)
+					.eventName(event.getName())
+					.eventDescription(event.getDescription())
+					.build();
 			emailContent.setModel(emailModel);
 
 			EmailMessageTemplated<SummaryEmailModel> message = new EmailMessageTemplated<>(emailContent);

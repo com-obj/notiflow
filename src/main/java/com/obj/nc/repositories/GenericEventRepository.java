@@ -123,7 +123,7 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 								 @Param("eventId") UUID eventId);
 
     @Query(
-	"select e.id,e.flow_id,e.external_id, e.payload_json,e.time_created,e.time_consumed, e.payload_type, e.notify_after_processing " +
+	"select e.id,e.flow_id,e.external_id, e.payload_json,e.time_created,e.time_consumed, e.payload_type, e.notify_after_processing, e.name, e.description " +
 	"from nc_event e " +
 	"	join nc_message m on (e.id  = ANY(m.previous_event_ids)) " +
 	"	join nc_delivery_info di on (di.message_id = m.id ) " +

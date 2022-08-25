@@ -68,7 +68,7 @@ public class EventSummaryNotificationConfiguration {
             String.format("http://%s:%d%s/events/summary-notification",
                 "localhost",
                 serverProperties.getPort(),
-                serverProperties.getServlet().getContextPath()
+                serverProperties.getServlet().getContextPath() != null ? serverProperties.getServlet().getContextPath() : ""
             )
         );
         httpPullProps.setPojoFCCN(GenericEvent.class.getName());

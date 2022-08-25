@@ -26,7 +26,11 @@
     <body>
     	<p>
     		<span th:text="#{emailSummary.headerMain}">O co ide</span>
-    	</p>	
+    	</p>
+		<p>
+			<b>Event name:</b> <span th:text="${model.eventName}" /><br>
+			<b>Event description:</b> <span th:text="${model.eventDescription}" />
+		</p>
     	
 		<table border="1" cellpadding="5" style="border-collapse:collapse; border: 1px solid gray;">		
 			<thead>
