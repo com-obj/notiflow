@@ -103,7 +103,7 @@ class EventSummaryNotificationTest extends BaseIntegrationTest {
             MailMessageForAssertions.as(
                 "cuzy@objetify.sk", 
                 "Summary delivery information for notification event", 
-                "This is an informational email about notification status", 
+                "This is an informational email about the notification status",
                 "EMAIL", "SMS", 
                 "0", "1", "2"
             )

@@ -102,8 +102,8 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 			") msg_with_endp on ( e.id = any( msg_with_endp.previous_event_ids )) " + 
 			"left join  " + 
 			"	nc_delivery_info di on di.message_id = msg_with_endp.id  " + 
-			"and  " + 
-			"	e.id = (:eventId)::uuid  " + 
+			"where  " +
+			"	e.id = (:eventId)::uuid and (di.status = 'SENT' or di.status = 'FAILED' or di.status = 'FAILED')  " +
 			"group by msg_with_endp.endpoint_type",
 		rowMapperClass = DeliveryStatsByEndpointTypeRowMapper.class
 	)						
