@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class ProcessedEventsToSummaryMailConverter implements PullNotifData2NotificationConverterExtension<GenericEvent> {
@@ -62,19 +63,19 @@ public class ProcessedEventsToSummaryMailConverter implements PullNotifData2Noti
 			emailContent.setModel(emailModel);
 
 			EmailMessageTemplated<SummaryEmailModel> message = new EmailMessageTemplated<>(emailContent);
-	
-			for (String email: properties.getEmailRecipients()) {
-				message.addReceivingEndpoints(
-					EmailEndpoint.builder()
-						.email(email)
-						.build()
-				);
-			}
+
+			getRecipients(event).forEach(message::addReceivingEndpoints);
 
 			resultEmails.add(message);
 		}
 
 		return resultEmails;
+	}
+
+	protected List<EmailEndpoint> getRecipients(GenericEvent event) {
+		return properties.getEmailRecipients().stream()
+				.map(EmailEndpoint::new)
+				.collect(Collectors.toList());
 	}
 
 	@Override
