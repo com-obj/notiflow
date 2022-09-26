@@ -5,21 +5,15 @@ import com.obj.nc.domain.content.email.TemplateWithModelEmailContent;
 import com.obj.nc.domain.dto.DeliveryStatsByEndpointType;
 import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
-import com.obj.nc.domain.event.GenericEventWithStats;
 import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.pullNotifData.PullNotifData;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.extensions.converters.pullNotifData.PullNotifData2NotificationConverterExtension;
 import com.obj.nc.flows.eventSummaryNotification.model.SummaryEmailModel;
 import com.obj.nc.repositories.GenericEventRepository;
-
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor

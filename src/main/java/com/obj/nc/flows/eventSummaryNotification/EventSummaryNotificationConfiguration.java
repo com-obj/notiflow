@@ -19,24 +19,17 @@
 
 package com.obj.nc.flows.eventSummaryNotification;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.flows.dataSources.DataSourceFlowsProperties;
 import com.obj.nc.flows.dataSources.http.properties.HttpDataSourceProperties;
 import com.obj.nc.repositories.GenericEventRepository;
-
 import lombok.AllArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
 
 @Configuration(EventSummaryNotificationConfiguration.EVENT_SUMMARY_CONF_BEAN_NAME)
 @AllArgsConstructor
@@ -52,7 +45,8 @@ public class EventSummaryNotificationConfiguration {
     private final GenericEventRepository eventRepo;
 
     @Bean(EVENT_TO_SUMMARY_MAIL_CONVERTER_BEAN_NAME)
-    public ProcessedEventsToSummaryMailConverter notifDataToEmailConverter(){
+    @ConditionalOnExpression("${nc.flows.event-summary-notif.default-summary-email-creation}")
+    public ProcessedEventsToSummaryMailConverter notifDataToEmailConverter() {
         return new ProcessedEventsToSummaryMailConverter(props, eventRepo);
     }
 
