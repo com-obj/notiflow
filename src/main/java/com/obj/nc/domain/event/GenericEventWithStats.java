@@ -23,6 +23,8 @@ import com.obj.nc.domain.stats.Stats;
 import com.obj.nc.repositories.converters.PgObjectToJsonNodeConverter;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import org.postgresql.util.PGobject;
 import org.springframework.jdbc.core.RowMapper;
 

@@ -20,7 +20,7 @@ database "Topic/Channels" {
 Interface "External REST API" as extRESTApi
 Interface "External JDBC" as extJDBCApi
 
- note top of extRESTApi 
+ note right of extRESTApi 
     ..configuration..
     nc.data-sources.http[0].name=TEST0-DS,
     nc.data-sources.http[0].url=http://service-0/json,
@@ -28,7 +28,7 @@ Interface "External JDBC" as extJDBCApi
     nc.data-sources.http[0].cron=*/5 * * * * *
 end note  
 
-note top of extJDBCApi
+note right of extJDBCApi
     ..configuration..
     nc.data-sources.jdbc[0].name=test-ds,
     nc.data-sources.jdbc[0].url=jdbc:postgresql://localhost:25432/nc,
@@ -42,12 +42,12 @@ note top of extJDBCApi
 end note  
 
 [restPoller] .u.> extRESTApi
-[jdbcPoller] .u.> extJDBCApi
+[jdbcPoller] .u..> extJDBCApi
 
 [jdbcPoller] --> [ToJsonTransformer] : (ResultSet)
 [restPoller] --> [ToJsonTransformer] : (String)
-[ToJsonTransformer] -> [Aggragate] : (JsonNode)
-[Aggragate] -> [NotificationDataPersister] : (List<JsonNode>)
+[ToJsonTransformer] --> [Aggragate] : (JsonNode)
+[Aggragate] --> [NotificationDataPersister] : (List<JsonNode>)
 [NotificationDataPersister] -d-> nc_notification_data : (List<JsonNode>)
 [NotificationDataPersister] -> [filterAndTransformer] : (Pojo)
 [filterAndTransformer] -> [Pojo2NotificationDataTransformer] : (NotificationData<Pojo>)
@@ -56,7 +56,7 @@ end note
 [ExtensionsBasedGenericData2EventConverter] .u.> [NOTIFICATION_DATA_CONVERTING_FLOW_ID_INPUT]
 [ExtensionsBasedGenericData2NotificationConverter] .u.> [NOTIFICATION_DATA_CONVERTING_FLOW_ID_INPUT]
 
-note top of ExtensionsBasedGenericData2EventConverter
+note left of ExtensionsBasedGenericData2EventConverter
     ..user defined converter..
     List<GenericData2EventConverterExtension<?>> converters
 end note 

@@ -41,9 +41,4 @@ public class ExtensionsBasedPullNotifData2EventConverter extends BaseExtensionsB
 	public List<? extends PullNotifDataConverterExtension<?, GenericEvent>> getConverterExtensions() {
 		return converters;
 	}
-
-
-	
-	
-	
 }

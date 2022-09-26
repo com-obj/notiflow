@@ -29,13 +29,7 @@ import com.obj.nc.domain.headers.HasHeader;
 import com.obj.nc.domain.headers.Header;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.utils.JsonUtils;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -66,10 +60,16 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 	private String flowId = DEFAULT_FLOW_ID;
 	
 	private String payloadType;
+
+	private String name;
+
+	private String description;
 	
 	private JsonNode payloadJson;
 
 	private String externalId;
+
+	private Boolean notifyAfterProcessing;
 	
 	@CreatedDate
 	private Instant timeCreated;
@@ -86,7 +86,8 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
 		event.flowId = state.get("flowId")!=null?state.get("flowId").textValue():DEFAULT_FLOW_ID;
 		event.externalId = state.get("externalId")!=null?state.get("externalId").textValue():null;
 		event.payloadType = state.get("payloadType")!=null?state.get("payloadType").textValue():null;
-		
+		event.name = state.get("name") != null ? state.get("name").textValue() : null;
+		event.description = state.get("description") != null ? state.get("description").textValue() : null;
 		event.id = UUID.randomUUID();
 
 		event.syncHeaderFields();
@@ -165,7 +166,10 @@ public class GenericEvent implements Persistable<UUID>, HasFlowId, HasJsonPayloa
         PayloadDocumentation.fieldWithPath("flowId").description("Optional: Identification of the main flow"),
         PayloadDocumentation.fieldWithPath("payloadType").description("Optional: Identification of payload type. Can be used for routing configuration"),
         PayloadDocumentation.fieldWithPath("externalId").description("Optional: Identification of the event provided by the client. Can be used for search"),
-        PayloadDocumentation.fieldWithPath("payloadJson").description("JSON body of the input event")   
+        PayloadDocumentation.fieldWithPath("payloadJson").description("JSON body of the input event"),   
+        PayloadDocumentation.fieldWithPath("notifyAfterProcessing").description("Whether a summary notification should be send after all messages of this event has been processed"),   
+        PayloadDocumentation.fieldWithPath("name").description("Name of the event"),
+        PayloadDocumentation.fieldWithPath("description").description("Description of the event"),
     };
 
 	public static FieldDescriptor[] fieldDesc = ObjectArrays.concat(

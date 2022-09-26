@@ -19,9 +19,13 @@ import com.obj.nc.flows.dataSources.DataSourceFlowsProperties;
 import com.obj.nc.flows.dataSources.PullNotifDataTransformationAndPersistFlow;
 import com.obj.nc.flows.dataSources.JobConfig;
 import com.obj.nc.flows.dataSources.http.properties.HttpDataSourceProperties;
+import com.obj.nc.flows.eventSummaryNotification.EventSummaryNotificationConfiguration;
+import com.obj.nc.flows.eventSummaryNotification.EventSummaryNotificationProperties;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpMethod;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
@@ -36,6 +40,7 @@ import static com.obj.nc.config.PureRestTemplateConfig.PURE_REST_TEMPLATE;
 import static org.springframework.integration.dsl.Pollers.cron;
 
 @Configuration
+@DependsOn(EventSummaryNotificationConfiguration.EVENT_SUMMARY_CONF_BEAN_NAME)
 public class HttpDataSourceFlowsConfiguration {
     private final DataSourceFlowsProperties dataSourceFlowsProperties;
     private final IntegrationFlowContext integrationFlowContext;
@@ -58,12 +63,16 @@ public class HttpDataSourceFlowsConfiguration {
     @PostConstruct
     public void createFlows() {
         dataSourceFlowsProperties.getHttp().forEach(dataSource -> {
-            integrationFlowContext
-                    .registration(createJobIntegrationFlow(dataSource))
-                    .id(HttpDatasourceNameCreator.createJobFlowId(dataSource.getName()))
-                    .register();
+            createHttpDataSourcePullFlow(dataSource);
         });
 
+    }
+
+    private void createHttpDataSourcePullFlow(HttpDataSourceProperties dataSource) {
+        integrationFlowContext
+                .registration(createJobIntegrationFlow(dataSource))
+                .id(HttpDatasourceNameCreator.createJobFlowId(dataSource.getName()))
+                .register();
     }
 
     private IntegrationFlow createJobIntegrationFlow(HttpDataSourceProperties dataSource) {
