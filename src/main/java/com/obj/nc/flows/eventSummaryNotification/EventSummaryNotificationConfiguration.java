@@ -25,6 +25,7 @@ import com.obj.nc.flows.dataSources.http.properties.HttpDataSourceProperties;
 import com.obj.nc.repositories.GenericEventRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +46,11 @@ public class EventSummaryNotificationConfiguration {
     private final GenericEventRepository eventRepo;
 
     @Bean(EVENT_TO_SUMMARY_MAIL_CONVERTER_BEAN_NAME)
-    @ConditionalOnExpression("${nc.flows.event-summary-notif.default-summary-email-creation}")
+    @ConditionalOnProperty(
+            value="nc.flows.event-summary-notif.default-summary-email-creation",
+            havingValue = "true",
+            matchIfMissing = true
+    )
     public ProcessedEventsToSummaryMailConverter notifDataToEmailConverter() {
         return new ProcessedEventsToSummaryMailConverter(props, eventRepo);
     }
