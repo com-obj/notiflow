@@ -78,7 +78,6 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
             "where :eventId = ANY (m.previous_event_ids)\n" +
             "  and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
             "  and (status = 'SENT' OR status = 'FAILED')\n" +
-            "  and m.message_class like '%Message'\n" +
             "order by processed_on\n" +
             "limit :size offset :offset";
 
@@ -93,8 +92,7 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
             "from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
             "where :eventId = ANY (m.previous_event_ids)\n" +
             "  and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
-            "  and (status = 'SENT' OR status = 'FAILED')\n" +
-            "  and m.message_class like '%Message'";
+            "  and (status = 'SENT' OR status = 'FAILED')";
 
     @Query(QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
     long countByEventIdAndEndpointId(@Param("eventId") UUID eventId, @Param("endpointId") UUID endpointId);
