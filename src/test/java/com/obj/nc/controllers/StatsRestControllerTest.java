@@ -102,7 +102,6 @@ class StatsRestControllerTest extends BaseIntegrationTest {
     }
     
     @Test
-
     void testFindEventStatsByEventId() throws Exception {
         // GIVEN
         GenericEvent event = processTestEventAndIntent();
@@ -121,7 +120,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(2)))
                 .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
                 .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(2)));
+                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(1)));
 
         //AND WHEN
         List<ReceivingEndpoint> endpoints = endpointsRepository.findByNameIds("john.doe@objectify.sk");
@@ -161,7 +160,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
         
         intentProcessingFlow.processNotificationIntent(intent);
         
-        await().atMost(5, TimeUnit.SECONDS).until(() ->  findSentDeliveryInfosForMessage(emailEndpoint.getId(),SENT).size() >= 1);
+        await().atMost(10, TimeUnit.SECONDS).until(() ->  findSentDeliveryInfosForMessage(emailEndpoint.getId(),SENT).size() >= 1);
         List<DeliveryInfo> sentInfos = findSentDeliveryInfosForMessage(emailEndpoint.getId(), SENT);
         
         ResultActions resp1 = mockMvc
