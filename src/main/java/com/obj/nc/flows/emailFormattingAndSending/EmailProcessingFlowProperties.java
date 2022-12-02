@@ -23,12 +23,18 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import static org.springframework.integration.scheduling.PollerMetadata.MAX_MESSAGES_UNBOUNDED;
+
 @Data
 @Configuration
 @ConfigurationProperties("nc.flows.email-processing")
 public class EmailProcessingFlowProperties {
     
     private MULTI_LOCALES_MERGE_STRATEGY multiLocalesMergeStrategy = MULTI_LOCALES_MERGE_STRATEGY.MESSAGE_PER_LOCALE;
+
+    private Long delaySendingPollRateMillis = 0L;
+
+    private Integer delaySendingMaxMessagesPerPoll = MAX_MESSAGES_UNBOUNDED;
     
     public enum MULTI_LOCALES_MERGE_STRATEGY {
         MESSAGE_PER_LOCALE, MERGE
