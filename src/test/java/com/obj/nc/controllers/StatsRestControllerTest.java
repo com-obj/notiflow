@@ -23,11 +23,9 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.config.NcAppConfigProperties;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.domain.recipients.Recipient;
 import com.obj.nc.extensions.providers.recipients.ContactsProvider;
 import com.obj.nc.flows.intenProcessing.NotificationIntentProcessingFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
@@ -98,7 +96,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
 
     @AfterEach
     public void waitForIntegrationFlowsToFinish() {
-        super.wiatForIntegrationFlowsToFinish(500000);
+        super.stopPollingHandlersAndWaitForIntegrationFlowsToFinish(500000);
     }
     
     @Test

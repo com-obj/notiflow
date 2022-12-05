@@ -36,12 +36,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.MDC;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.MediaType;
+import org.springframework.integration.endpoint.PollingConsumer;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SENDER_MESSAGE_HANDLER;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 
 
@@ -65,6 +69,9 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
 
     public static volatile String testName;
     public static final String MDC_FOR_TESTS_NAME = "testName";
+
+	@Qualifier(EMAIL_SENDER_MESSAGE_HANDLER) @Autowired private PollingConsumer emailSenderMessageHandler;
+
 
     @BeforeEach
     void startLogging() {
@@ -221,8 +228,10 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     	Get.setApplicationContext(applicationContext);
     }
 
-	public void wiatForIntegrationFlowsToFinish(int numberOfSeconds) {
-		Awaitility.await().atMost(Duration.ofSeconds(numberOfSeconds)).until(() -> taskScheduler.getActiveCount()==0);   		
+	public void stopPollingHandlersAndWaitForIntegrationFlowsToFinish(int numberOfSeconds) {
+		emailSenderMessageHandler.stop();
+
+		Awaitility.await().atMost(Duration.ofSeconds(numberOfSeconds)).until(() -> taskScheduler.getActiveCount()==0);
 	}
 
 }
