@@ -136,7 +136,7 @@ class PullNotifDataConvertingFlowTest extends BaseIntegrationTest {
     private void assertMessageDelivered() {
         Awaitility
                 .await()
-                .atMost(5, TimeUnit.SECONDS)
+                .atMost(10, TimeUnit.SECONDS)
                 .until(() -> findDeliveryInfosForMsg().size()>= 2);
     
         List<DeliveryInfo> infos = findDeliveryInfosForMsg();
