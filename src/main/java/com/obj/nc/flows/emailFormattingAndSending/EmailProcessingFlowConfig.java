@@ -38,8 +38,8 @@ import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.PollerSpec;
 import org.springframework.integration.dsl.Pollers;
-import org.springframework.integration.handler.GenericHandler;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
@@ -70,6 +70,9 @@ public class EmailProcessingFlowConfig {
 
 	public final static String INTERNAL_EMAIL_SEND_FLOW_ID = "INTERNAL_EMAIL_SEND_FLOW_ID";
 	public final static String INTERNAL_EMAIL_SEND_FLOW_INPUT_CHANNEL_ID = INTERNAL_EMAIL_SEND_FLOW_ID + "_INPUT";
+
+	public final static String EMAIL_SENDER_MESSAGE_HANDLER = "EMAIL_SENDER_MESSAGE_HANDLER";
+	public final static String EMAIL_SENDER_MESSAGE_HANDLER_POLLER = "EMAIL_SENDER_MESSAGE_HANDLER_POLLER";
 
 	@Bean(EMAIL_FORMAT_AND_SEND_FLOW_ID)
 	public IntegrationFlow emailFormatAndSendFlowDefinition() {
@@ -122,22 +125,23 @@ public class EmailProcessingFlowConfig {
 						.defaultOutputChannel(internalEmailSendInputChannel()))
 				.get();
 	}
-	
+
+	/*
+		Microsoft SMTP server has throttling to only accept at most 3 concurrent mail sending connections
+		therefore we need to create delays between message-sends. We use queue channel and poller to do so.
+		Default polling rate is 0ms, because this is a special case - not every SMTP server has this throttling
+	 */
 	@Bean(INTERNAL_EMAIL_SEND_FLOW_ID)
 	public IntegrationFlow internalEmailSendFlowDefinition() {
 		return IntegrationFlows
 				.from(internalEmailSendInputChannel())
-				// Microsoft SMTP server has throttling to only accept at most 3 concurrent mail sending connections
-				// therefore we need to create delays between message-sends. Default delay is 0ms, because this is a special case
-				// - not every SMTP server has this throttling
-				.handle((GenericHandler<EmailMessage>) (p, h) -> emailSender.apply(p),
-						c -> c.poller(Pollers.fixedDelay(properties.getDelaySendingPollRateMillis())
-								.maxMessagesPerPoll(properties.getDelaySendingMaxMessagesPerPoll())))
+				.handle(EmailMessage.class, (p, h) -> emailSender.apply(p),
+						c -> c.id(EMAIL_SENDER_MESSAGE_HANDLER).poller(emailSenderPoller()))
 				.wireTap(flowConfig -> flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID))
 				.channel(emailSendOutputChannel())
 				.get();
 	}
-	
+
 	@Bean(EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel emailFormatAndSendInputChannel() {
 		return new PublishSubscribeChannel(executor);
@@ -156,6 +160,13 @@ public class EmailProcessingFlowConfig {
 	@Bean(EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID)
 	public MessageChannel emailSendOutputChannel() {
 		return new PublishSubscribeChannel(executor);
+	}
+
+	@Bean(EMAIL_SENDER_MESSAGE_HANDLER_POLLER)
+	public PollerSpec emailSenderPoller() {
+		return Pollers.fixedDelay(properties.getDelaySendingPollRateMillis())
+				.maxMessagesPerPoll(properties.getDelaySendingMaxMessagesPerPoll())
+				.taskExecutor(executor);
 	}
 	
 }
