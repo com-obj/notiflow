@@ -150,4 +150,13 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
                                    @Param("status") DELIVERY_STATUS status);
 
     long countByEndpointIdAndProcessedOnAfter(UUID endpointId, Instant timestamp);
+
+    @Query("select di.* " +
+            "from nc_delivery_info di " +
+            "join nc_message m " +
+            "on di.message_id = m.id " +
+            "where di.status = 'SENT' " +
+            "and di.processed_on > :timestamp " +
+            "order by di.processed_on")
+    List<DeliveryInfo> findPendingDeliveriesNotOlderThan(@Param("timestamp") Instant timestamp);
 }
