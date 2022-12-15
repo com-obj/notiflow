@@ -19,8 +19,11 @@
 
 package com.obj.nc.repositories;
 
+import com.obj.nc.domain.dto.DeliveryInfoDto;
+import com.obj.nc.domain.dto.DeliveryInfoDto.DeliveryInfoDtoMapper;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -77,7 +80,7 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
             "from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
             "where :eventId = ANY (m.previous_event_ids)\n" +
             "  and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
-            "  and (status = 'SENT' OR status = 'FAILED')\n" +
+            "  and status IN ('SENT', 'FAILED', 'DELIVERED', 'DELIVERY_UNKNOWN', 'DELIVERY_FAILED', 'DELIVERY_PENDING')\n" +
             "order by processed_on\n" +
             "limit :size offset :offset";
 
@@ -92,7 +95,7 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
             "from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
             "where :eventId = ANY (m.previous_event_ids)\n" +
             "  and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
-            "  and (status = 'SENT' OR status = 'FAILED')";
+            "  and status IN ('SENT', 'FAILED', 'DELIVERED', 'DELIVERY_UNKNOWN', 'DELIVERY_FAILED', 'DELIVERY_PENDING')";
 
     @Query(QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
     long countByEventIdAndEndpointId(@Param("eventId") UUID eventId, @Param("endpointId") UUID endpointId);
@@ -151,12 +154,27 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
 
     long countByEndpointIdAndProcessedOnAfter(UUID endpointId, Instant timestamp);
 
-    @Query("select di.* " +
+    @Query(value = "select " +
+            "    di.id AS delivery_id, " +
+            "    m.id AS message_id, " +
+            "    e.endpoint_type AS endpoint_type, " +
+            "    di.status AS delivery_status, " +
+            "    di.additional_information AS additional_information " +
             "from nc_delivery_info di " +
             "join nc_message m " +
             "on di.message_id = m.id " +
-            "where di.status = 'SENT' " +
+            "join nc_endpoint e " +
+            "on di.endpoint_id = e.id " +
+            "where di.status IN ('SENT', 'DELIVERY_PENDING') " +
             "and di.processed_on > :timestamp " +
-            "order by di.processed_on")
-    List<DeliveryInfo> findPendingDeliveriesNotOlderThan(@Param("timestamp") Instant timestamp);
+            "order by di.processed_on",
+            rowMapperClass = DeliveryInfoDtoMapper.class)
+    List<DeliveryInfoDto> findUnfinishedDeliveriesNotOlderThan(@Param("timestamp") Instant timestamp);
+
+    @Modifying
+    @Query(value = "update nc_delivery_info " +
+            "set status = :status, " +
+            "    additional_information = :additional_information " +
+            "where id = :id ")
+    void updateStatusAndAdditionalInformationById(@Param("status") DELIVERY_STATUS status, @Param("additional_information") String additionalInformation, @Param("id") UUID id);
 }

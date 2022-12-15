@@ -59,7 +59,11 @@ public interface EndpointsRepository extends PagingAndSortingRepository<Receivin
                     "	count(distinct ep.id) as endpoints_count, " +
                     "	count(distinct di.id) filter(where di.status = 'SENT') as messages_sent_count, " +
                     "	count(distinct di.id) filter(where di.status = 'READ') as messages_read_count, " +
-                    "	count(distinct di.id) filter(where di.status = 'FAILED') as messages_failed_count " +
+                    "	count(distinct di.id) filter(where di.status = 'FAILED') as messages_failed_count, " +
+                    "	count(distinct di.id) filter(where di.status = 'DELIVERED') as messages_delivered_count, " +
+                    "	count(distinct di.id) filter(where di.status = 'DELIVERY_PENDING') as messages_delivery_pending_count, " +
+                    "	count(distinct di.id) filter(where di.status = 'DELIVERY_UNKNOWN') as messages_delivery_unknown_count, " +
+                    "	count(distinct di.id) filter(where di.status = 'DELIVERY_FAILED') as messages_delivery_failed_count " +
                     "from " +
                     "	nc_endpoint ep " +
                     " left join ( " +
