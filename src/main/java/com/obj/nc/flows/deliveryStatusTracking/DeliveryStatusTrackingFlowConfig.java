@@ -16,6 +16,7 @@ import org.springframework.messaging.support.GenericMessage;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.TimeUnit;
 
 @Configuration(DeliveryStatusTrackingFlowConfig.DELIVERY_STATUS_TRACKING_FLOW_CONF_BEAN_NAME)
 @AllArgsConstructor
@@ -24,6 +25,8 @@ public class DeliveryStatusTrackingFlowConfig {
 
     private final ExtensionBasedDeliveryStatusUpdate extensionBasedDeliveryStatusUpdate;
     private final TaskExecutor threadPoolTaskExecutor;
+
+    private final DeliveryStatusTrackingProperties deliveryStatusTrackingProperties;
 
     @Bean
     public ExecutorChannel executorChannelForDeliveryStatusTracking() {
@@ -34,9 +37,9 @@ public class DeliveryStatusTrackingFlowConfig {
     public IntegrationFlow deliveryStatusTrackerFlow(DeliveryInfoRepository deliveryInfoRepository) {
         return IntegrationFlows.from(
                         () -> new GenericMessage<>(
-                                deliveryInfoRepository.findUnfinishedDeliveriesNotOlderThan(LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0)).minus(30, ChronoUnit.DAYS))
+                                deliveryInfoRepository.findUnfinishedDeliveriesNotOlderThan(LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0)).minus(deliveryStatusTrackingProperties.getMaxAgeOfUnfinishedDeliveriesInDays(), ChronoUnit.DAYS))
                         ),
-                        e -> e.poller(Pollers.fixedDelay(1000))
+                        e -> e.poller(Pollers.fixedDelay(deliveryStatusTrackingProperties.getPollIntervalInSeconds(), TimeUnit.SECONDS))
                 )
                 .split()
                 .channel(executorChannelForDeliveryStatusTracking())
