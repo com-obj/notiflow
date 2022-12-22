@@ -1,9 +1,12 @@
 package com.obj.nc.flows.deliveryStatusTracking;
 
+import com.obj.nc.domain.dto.DeliveryInfoDto;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Arrays;
 
 import static com.obj.nc.flows.deliveryStatusTracking.DeliveryStatusTrackingProperties.CONFIG_PROPS_PREFIX;
 
@@ -16,6 +19,7 @@ public class DeliveryStatusTrackingProperties {
 
     private long pollIntervalInSeconds = 600;
     private long maxAgeOfUnfinishedDeliveriesInDays = 30;
+    private String[] endpointTypesToTrack = Arrays.stream(DeliveryInfoDto.EndpointType.values()).map(Enum::name).toArray(String[]::new);
 }
 
 

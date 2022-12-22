@@ -167,10 +167,11 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
             "join nc_endpoint e " +
             "on di.endpoint_id = e.id " +
             "where di.status IN ('SENT', 'DELIVERY_PENDING') " +
+            "and e.endpoint_type IN (:endpointTypes) " +
             "and di.processed_on > :timestamp " +
             "order by di.processed_on",
             rowMapperClass = DeliveryInfoDtoMapper.class)
-    List<DeliveryInfoDto> findUnfinishedDeliveriesNotOlderThan(@Param("timestamp") Instant timestamp);
+    List<DeliveryInfoDto> findUnfinishedDeliveriesNotOlderThan(@Param("timestamp") Instant timestamp, @Param("endpointTypes") List<String> endpointTypes);
 
     @Modifying
     @Query(value = "update nc_delivery_info " +
