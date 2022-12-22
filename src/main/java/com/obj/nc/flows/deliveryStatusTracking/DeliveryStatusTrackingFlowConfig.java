@@ -1,7 +1,7 @@
 package com.obj.nc.flows.deliveryStatusTracking;
 
 import com.obj.nc.domain.dto.DeliveryInfoDto;
-import com.obj.nc.functions.processors.deliveryStatusUpdater.ExtensionBasedDeliveryStatusUpdate;
+import com.obj.nc.functions.sink.deliveryStatusUpdater.ExtensionBasedDeliveryStatusUpdate;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -39,13 +39,15 @@ public class DeliveryStatusTrackingFlowConfig {
                         () -> new GenericMessage<>(
                                 deliveryInfoRepository.findUnfinishedDeliveriesNotOlderThan(LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0)).minus(deliveryStatusTrackingProperties.getMaxAgeOfUnfinishedDeliveriesInDays(), ChronoUnit.DAYS))
                         ),
-                        e -> e.poller(Pollers.fixedDelay(deliveryStatusTrackingProperties.getPollIntervalInSeconds(), TimeUnit.SECONDS))
+                        e -> e.poller(Pollers.fixedRate(
+                                deliveryStatusTrackingProperties.getPollIntervalInSeconds(), TimeUnit.SECONDS)
+                        )
                 )
                 .split()
                 .channel(executorChannelForDeliveryStatusTracking())
                 .handle((p) -> {
                     DeliveryInfoDto delivery = (DeliveryInfoDto) p.getPayload();
-                    extensionBasedDeliveryStatusUpdate.apply(delivery);
+                    extensionBasedDeliveryStatusUpdate.accept(delivery);
                 })
                 .get();
     }

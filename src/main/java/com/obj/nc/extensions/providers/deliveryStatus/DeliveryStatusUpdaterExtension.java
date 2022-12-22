@@ -4,9 +4,9 @@ import com.obj.nc.exceptions.PayloadValidationException;
 
 import java.util.Optional;
 
-public interface DeliveryStatusUpdaterExtension<IN, OUT> {
+public interface DeliveryStatusUpdaterExtension<IN> {
 
-        Optional<PayloadValidationException> canHandle(IN payload);
+        Optional<PayloadValidationException> checkPreCondition(IN payload);
 
-        OUT updateDeliveryStatus(IN payload);
+        void updateDeliveryStatus(IN payload);
 }

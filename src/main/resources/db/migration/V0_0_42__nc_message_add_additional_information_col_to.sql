@@ -1,0 +1,1 @@
+ALTER TABLE nc_message ADD COLUMN reference_number varchar(250);

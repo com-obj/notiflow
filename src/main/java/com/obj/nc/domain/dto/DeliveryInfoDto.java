@@ -21,6 +21,7 @@ public class DeliveryInfoDto {
     private String deliveryStatus;
     private String additionalInformation;
     private String endpointType;
+    private String referenceNumber;
 
     public static class DeliveryInfoDtoMapper implements RowMapper<DeliveryInfoDto> {
 
@@ -32,6 +33,7 @@ public class DeliveryInfoDto {
                     .deliveryStatus(rs.getString("delivery_status"))
                     .additionalInformation(rs.getString("additional_information"))
                     .endpointType(rs.getString("endpoint_type"))
+                    .referenceNumber(rs.getString("reference_number"))
                     .build();
         }
     }

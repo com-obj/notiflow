@@ -159,7 +159,8 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
             "    m.id AS message_id, " +
             "    e.endpoint_type AS endpoint_type, " +
             "    di.status AS delivery_status, " +
-            "    di.additional_information AS additional_information " +
+            "    di.additional_information AS additional_information, " +
+            "    m.reference_number AS reference_number " +
             "from nc_delivery_info di " +
             "join nc_message m " +
             "on di.message_id = m.id " +
