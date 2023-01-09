@@ -26,12 +26,12 @@ import java.util.UUID;
 
 @Data
 @EqualsAndHashCode
-public class EventRecieverResponce {
+public class EventReceiverResponse {
 	
 	private UUID ncEventId;
 
-	public static EventRecieverResponce from(UUID id) {
-		EventRecieverResponce resp = new EventRecieverResponce();
+	public static EventReceiverResponse from(UUID id) {
+		EventReceiverResponse resp = new EventReceiverResponse();
 		resp.ncEventId = id;
 		return resp;
 	}

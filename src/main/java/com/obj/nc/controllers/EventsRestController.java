@@ -22,7 +22,7 @@ package com.obj.nc.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.dto.DeliveryStatsByEndpointType;
 import com.obj.nc.domain.dto.GenericEventTableViewDto;
-import com.obj.nc.domain.event.EventRecieverResponce;
+import com.obj.nc.domain.event.EventReceiverResponse;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.pagination.ResultPage;
 import com.obj.nc.exceptions.PayloadValidationException;
@@ -69,7 +69,7 @@ public class EventsRestController {
 	private final EventSummaryNotificationProperties summaryNotifProps; 
 	
 	@PostMapping( consumes="application/json", produces="application/json")
-    public EventRecieverResponce persistGenericEvent(
+    public EventReceiverResponse persistGenericEvent(
     		@RequestBody(required = true) String eventJsonString, 
     		@RequestParam(value = "flowId", required = false) String flowId,
     		@RequestParam(value = "externalId", required = false) String externalId,
@@ -103,7 +103,7 @@ public class EventsRestController {
     		}
     	}
 
-    	return EventRecieverResponce.from(event.getId());
+    	return EventReceiverResponse.from(event.getId());
     }
 	
 	@GetMapping(produces = APPLICATION_JSON_VALUE)

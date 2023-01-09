@@ -55,6 +55,8 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 	//TODO: purely technical staf, should be moved to header
 	@NotNull
 	private List<UUID> previousMessageIds = new ArrayList<>();
+
+	private String referenceNumber;
 	
 	@SneakyThrows
 	public static <T extends Message<?>> T newTypedMessageFrom(Class<T> messageType,
@@ -113,6 +115,7 @@ public abstract class Message<BODY_TYPE extends MessageContent> extends BasePayl
 		persistentState.setPreviousMessageIds(previousMessageIds.toArray(new UUID[0]));
 		persistentState.setMessageClass(getClass().getName());
 		persistentState.setTimeCreated(getTimeCreated());
+		persistentState.setReferenceNumber(getReferenceNumber());
 		return persistentState;	 
 	}
 	

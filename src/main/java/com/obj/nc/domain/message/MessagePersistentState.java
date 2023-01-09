@@ -84,6 +84,9 @@ public class MessagePersistentState implements Persistable<UUID> {
 	@Transient
 	private List<ReceivingEndpoint> receivingEndpoints;
 
+	@JsonIgnore
+	private String referenceNumber;
+
 
 	@Override
 	@JsonIgnore
@@ -103,6 +106,7 @@ public class MessagePersistentState implements Persistable<UUID> {
 		msg.setPreviousEventIds(Arrays.asList(previousEventIds));
 		msg.setPreviousIntentIds(Arrays.asList(previousIntentIds));
 		msg.setPreviousMessageIds(Arrays.asList(previousMessageIds));
+		msg.setReferenceNumber(getReferenceNumber());
 
         msg.setReceivingEndpoints(getReceivingEndpoints());
 		

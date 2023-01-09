@@ -48,7 +48,11 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 					"	count(distinct message.endpoint_id) as endpoints_count, " +
 					"	count(distinct di.id) filter(where di.status = 'SENT') as messages_sent_count, " +
 					"	count(distinct di.id) filter(where di.status = 'READ') as messages_read_count, " +
-					"	count(distinct di.id) filter(where di.status = 'FAILED') as messages_failed_count " +
+					"	count(distinct di.id) filter(where di.status = 'FAILED') as messages_failed_count, " +
+					"	count(distinct di.id) filter(where di.status = 'DELIVERED') as messages_delivered_count, " +
+					"	count(distinct di.id) filter(where di.status = 'DELIVERY_PENDING') as messages_delivery_pending_count, " +
+					"	count(distinct di.id) filter(where di.status = 'DELIVERY_UNKNOWN') as messages_delivery_unknown_count, " +
+					"	count(distinct di.id) filter(where di.status = 'DELIVERY_FAILED') as messages_delivery_failed_count " +
 					"from " +
 					"	nc_event event " +
 					"left join " +
@@ -87,7 +91,11 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 			"	count(distinct msg_with_endp.endpoint_id) as endpoints_count,  " + 
 			"	count(distinct di.id) filter(where di.status = 'SENT') as messages_sent_count,  " + 
 			"	count(distinct di.id) filter(where di.status = 'READ') as messages_read_count,  " + 
-			"	count(distinct di.id) filter(where di.status = 'FAILED') as messages_failed_count  " + 
+			"	count(distinct di.id) filter(where di.status = 'FAILED') as messages_failed_count,  " +
+			"	count(distinct di.id) filter(where di.status = 'DELIVERED') as messages_delivered_count, " +
+			"	count(distinct di.id) filter(where di.status = 'DELIVERY_PENDING') as messages_delivery_pending_count, " +
+			"	count(distinct di.id) filter(where di.status = 'DELIVERY_UNKNOWN') as messages_delivery_unknown_count, " +
+			"	count(distinct di.id) filter(where di.status = 'DELIVERY_FAILED') as messages_delivery_failed_count " +
 			"from  " + 
 			"	nc_event e  " + 
 			"left join (  " + 
@@ -103,7 +111,9 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 			"left join  " + 
 			"	nc_delivery_info di on di.message_id = msg_with_endp.id  " + 
 			"where  " +
-			"	e.id = (:eventId)::uuid and (di.status = 'SENT' or di.status = 'FAILED' or di.status = 'READ')  and message_class NOT LIKE '%Templated'" +
+			"	e.id = (:eventId)::uuid " +
+					"and di.status IN ('SENT', 'FAILED', 'READ', 'DELIVERED', 'DELIVERY_PENDING', 'DELIVERY_UNKNOWN', 'DELIVERY_FAILED')  " +
+					"and message_class NOT LIKE '%Templated'" +
 			"group by msg_with_endp.endpoint_type",
 		rowMapperClass = DeliveryStatsByEndpointTypeRowMapper.class
 	)						

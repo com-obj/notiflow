@@ -102,6 +102,7 @@ public class DeliveryInfoRestController {
 							.message(msg.map(MessagePersistentState::getBody).map(MessageContent::toDto).orElse(null))
 							.currentStatus(delivery.getStatus())
 							.statusReachedAt(delivery.getProcessedOn())
+							.additionalInformation(delivery.getAdditionalInformation())
 							.build();
 				})
 				.collect(Collectors.toList());
@@ -181,6 +182,7 @@ public class DeliveryInfoRestController {
 		MessageContentDto message;
 		ReceivingEndpointDto endpoint;
 		DELIVERY_STATUS currentStatus;
+		String additionalInformation;
 		Instant statusReachedAt;
 
 		public static List<EndpointDeliveryInfoDto> createFrom(List<DeliveryInfo> deliveryInfos) {
@@ -204,6 +206,7 @@ public class DeliveryInfoRestController {
 					.currentStatus(lastInfo.getStatus())
 					.endpointId(endpointId)
 					.statusReachedAt(lastInfo.getProcessedOn())
+					.additionalInformation(lastInfo.getAdditionalInformation())
 					.build();
 
 				result.add(dto);
