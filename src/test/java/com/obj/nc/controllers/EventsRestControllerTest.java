@@ -379,6 +379,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         //WHEN TEST REST
         ResultActions resp = mockMvc
                 .perform(MockMvcRequestBuilders.get("/events")
+                        .params(getDefaultPagingParams())
                         .contentType(APPLICATION_JSON_UTF8)
                         .accept(APPLICATION_JSON_UTF8))
                 .andDo(MockMvcResultHandlers.print());
@@ -399,6 +400,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         //WHEN
         ResultActions resp = mockMvc
                 .perform(MockMvcRequestBuilders.get("/events")
+                        .params(getDefaultPagingParams())
                         .param("consumedFrom", Instant.now().minus(20, ChronoUnit.MINUTES).toString())
                         .param("consumedTo", Instant.now().plus(150, ChronoUnit.MINUTES).toString())
                         .contentType(APPLICATION_JSON_UTF8)
@@ -421,6 +423,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         //WHEN
         ResultActions resp = mockMvc
                 .perform(MockMvcRequestBuilders.get("/events")
+                        .params(getDefaultPagingParams())
                         .param("consumedFrom", Instant.now().plus(150, ChronoUnit.MINUTES).toString())
                         .contentType(APPLICATION_JSON_UTF8)
                         .accept(APPLICATION_JSON_UTF8))
@@ -442,6 +445,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         //WHEN
         ResultActions resp = mockMvc
                 .perform(MockMvcRequestBuilders.get("/events")
+                        .params(getDefaultPagingParams())
                         .param("consumedTo", Instant.now().plus(150, ChronoUnit.MINUTES).toString())
                         .contentType(APPLICATION_JSON_UTF8)
                         .accept(APPLICATION_JSON_UTF8))
@@ -463,6 +467,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         //WHEN
         ResultActions resp = mockMvc
                 .perform(MockMvcRequestBuilders.get("/events")
+                        .params(getDefaultPagingParams())
                         .param("eventId", eventIds.get(0).toString())
                         .accept(APPLICATION_JSON_UTF8))
                 .andDo(MockMvcResultHandlers.print());
@@ -483,7 +488,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         //WHEN
         ResultActions resp = mockMvc
                 .perform(MockMvcRequestBuilders.get("/events")
-                        .param("page", "0")
+                        .param("page", "1")
                         .param("size", "20")
                         .contentType(APPLICATION_JSON_UTF8)
                         .accept(APPLICATION_JSON_UTF8))
@@ -501,7 +506,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         //WHEN
         ResultActions resp = mockMvc
                 .perform(MockMvcRequestBuilders.get("/events")
-                        .param("page", "0")
+                        .param("page", "1")
                         .param("size", "10")
                         .contentType(APPLICATION_JSON_UTF8)
                         .accept(APPLICATION_JSON_UTF8))

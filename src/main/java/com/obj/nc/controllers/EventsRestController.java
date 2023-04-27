@@ -20,6 +20,7 @@
 package com.obj.nc.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.domain.dto.DeliveryStatsByEndpointType;
 import com.obj.nc.domain.dto.GenericEventTableViewDto;
 import com.obj.nc.domain.event.EventReceiverResponse;
@@ -54,6 +55,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.obj.nc.utils.PagingUtils.createPageRequest;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Validated
@@ -66,7 +68,8 @@ public class EventsRestController {
 	private final SimpleJsonValidator simpleJsonValidator;
 	private final GenericEventJsonSchemaValidator jsonSchemaValidator;
 	private final GenericEventRepository eventsRepository;
-	private final EventSummaryNotificationProperties summaryNotifProps; 
+	private final EventSummaryNotificationProperties summaryNotifProps;
+	private final NcAppConfigProperties ncAppConfigProperties;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
     public EventReceiverResponse persistGenericEvent(
@@ -112,7 +115,9 @@ public class EventsRestController {
 														@RequestParam(value = "consumedTo", required = false, defaultValue = "9999-01-01T12:00:00Z") 
 															@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedTo,
 														@RequestParam(value = "eventId", required = false) String eventId,
-														Pageable pageable) {
+														@RequestParam("page") int page,
+														@RequestParam("size") int size) {
+		Pageable pageable = createPageRequest(page, size, ncAppConfigProperties.getWeb().getPaging());
 		UUID eventUUID = eventId == null ? null : UUID.fromString(eventId);
 		
 		List<GenericEventTableViewDto> events = eventsRepository

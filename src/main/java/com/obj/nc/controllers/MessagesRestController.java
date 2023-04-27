@@ -19,6 +19,7 @@
 
 package com.obj.nc.controllers;
 
+import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.domain.dto.MessageTableViewDto;
 import com.obj.nc.domain.dto.SendEmailMessageRequest;
 import com.obj.nc.domain.message.EmailMessage;
@@ -29,7 +30,6 @@ import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
 import com.obj.nc.repositories.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -47,6 +47,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import static com.obj.nc.utils.PagingUtils.createPageRequest;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Validated
@@ -57,6 +58,7 @@ public class MessagesRestController {
     
     private final MessageProcessingFlow messageProcessingFlow;
     private final MessageRepository messageRepository;
+    private final NcAppConfigProperties ncAppConfigProperties;
 	
 	@PostMapping(path = "/send-email", consumes="application/json", produces="application/json")
     public SendMessageResponse receiveEmailMessage(@RequestBody(required = true) SendEmailMessageRequest emailMessageRequest) {
@@ -71,7 +73,9 @@ public class MessagesRestController {
                                                      @RequestParam(value = "createdTo", required = false, defaultValue = "9999-01-01T12:00:00Z") 
                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdTo,
                                                      @RequestParam(value = "eventId", required = false) String eventId,
-                                                     Pageable pageable) {
+                                                     @RequestParam("page") int page,
+                                                     @RequestParam("size") int size) {
+        Pageable pageable = createPageRequest(page, size, ncAppConfigProperties.getWeb().getPaging());
         UUID eventUUID = eventId == null ? null : UUID.fromString(eventId);
         
         List<MessageTableViewDto> messages = messageRepository

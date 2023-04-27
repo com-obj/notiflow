@@ -144,6 +144,7 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .get("/messages")
+                        .params(getDefaultPagingParams())
                         .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.content.size()", Matchers.is(19)))
@@ -161,6 +162,7 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .get("/messages")
+                        .params(getDefaultPagingParams())
                         .param("createdFrom", Instant.now().minus(10, ChronoUnit.DAYS).toString())
                         .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().is2xxSuccessful())
@@ -176,6 +178,7 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .get("/messages")
+                        .params(getDefaultPagingParams())
                         .param("createdTo", Instant.now().minus(10, ChronoUnit.DAYS).toString())
                         .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().is2xxSuccessful())
@@ -191,6 +194,7 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .get("/messages")
+                        .params(getDefaultPagingParams())
                         .param("createdFrom", Instant.now().minus(15, ChronoUnit.DAYS).toString())
                         .param("createdTo", Instant.now().minus(10, ChronoUnit.DAYS).toString())
                         .accept(APPLICATION_JSON_UTF8))
@@ -207,6 +211,7 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .get("/messages")
+                        .params(getDefaultPagingParams())
                         .param("eventId", eventId.toString())
                         .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().is2xxSuccessful())
@@ -222,7 +227,7 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .get("/messages")
-                        .param("page", "0")
+                        .param("page", "1")
                         .param("size", "10")
                         .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().is2xxSuccessful())

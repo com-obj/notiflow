@@ -42,7 +42,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -52,6 +51,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.obj.nc.utils.PagingUtils.createPageRequest;
 
 @Slf4j
 @Validated
@@ -70,8 +71,11 @@ public class DeliveryInfoRestController {
 	public ResultPage<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
 			@PathVariable (value = "eventId", required = true) String eventId,
 			@RequestParam(value = "endpointId", required = false) String endpointId,
-			@PageableDefault(size = 20) Pageable pageable
+			@RequestParam("page") int page,
+			@RequestParam("size") int size
 	) {
+		Pageable pageable = createPageRequest(page, size, ncAppConfigProperties.getWeb().getPaging());
+
 		UUID endpointUUID = endpointId == null ? null : UUID.fromString(endpointId);
 
 		long total = deliveryRepo.countByEventIdAndEndpointId(UUID.fromString(eventId), endpointUUID);
@@ -114,7 +118,8 @@ public class DeliveryInfoRestController {
 	public ResultPage<EndpointDeliveryInfoDto> findDeliveryInfosByExtId(
 			@PathVariable (value = "extEventId", required = true) String extEventId,
 			@RequestParam(value = "endpointId", required = false) String endpointId,
-			@PageableDefault(size = 20) Pageable pageable
+			@RequestParam("page") int page,
+			@RequestParam("size") int size
 	) {
 
 		GenericEvent event = eventRepo.findByExternalId(extEventId);
@@ -122,7 +127,7 @@ public class DeliveryInfoRestController {
 			throw new IllegalArgumentException("Event with " +  extEventId +" external ID not found");
 		}
 
-		return findDeliveryInfosByEventId(event.getId().toString(), endpointId, pageable);
+		return findDeliveryInfosByEventId(event.getId().toString(), endpointId, page, size);
 	}
 
 	@GetMapping(value = "/messages/{messageId}/mark-as-read")

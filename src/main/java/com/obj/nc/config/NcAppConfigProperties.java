@@ -47,4 +47,16 @@ public class NcAppConfigProperties {
     @Value("${nc.app.url.context-path:/notiflow}")
     private String contextPath;
 
+    private Web web = new Web();
+
+    @Data
+    public static class Web {
+        private Paging paging = new Paging();
+
+        @Data
+        public static class Paging {
+            private int maxPageSize = 2000;
+            private boolean oneIndexedParameters = true;
+        }
+    }
 }
