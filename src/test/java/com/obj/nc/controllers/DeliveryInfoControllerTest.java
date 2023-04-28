@@ -155,7 +155,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		deliveryRepo.saveAll(Arrays.asList(info1, info2, info3, info4));
 
 		//WHEN
-		ResultPage<EndpointDeliveryInfoDto> infos = controller.findDeliveryInfosByEventId(eventId.toString(), null, PageRequest.of(0, 20));
+		ResultPage<EndpointDeliveryInfoDto> infos = controller.findDeliveryInfosByEventId(eventId.toString(), null, 1, 20);
 
 		//THEN
 		Assertions.assertThat(infos.getContent().size()).isEqualTo(2);
@@ -200,6 +200,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		//WHEN TEST REST
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/delivery-info/events/{eventId}", eventId.toString())
+						.params(getDefaultPagingParams())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
@@ -346,6 +347,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 	void testEventWithExtIdDoesNotExist() throws Exception {
 		String nonExistingExtId = UUID.randomUUID().toString();
 		mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", nonExistingExtId)
+						.params(getDefaultPagingParams())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andExpect(MockMvcResultMatchers.status().is4xxClientError())
@@ -359,6 +361,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 		String extId = eventRepo.save(event).getExternalId();
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", extId)
+						.params(getDefaultPagingParams())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andExpect(MockMvcResultMatchers.content().json("{\"content\": []}"));
@@ -387,6 +390,7 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 
 		// WHEN
 		mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", event.getExternalId())
+						.params(getDefaultPagingParams())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andExpect(jsonPath("$.content", Matchers.hasSize(1)))
@@ -394,6 +398,36 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 				.andExpect(jsonPath("$.content.[0].endpoint.email", Matchers.is(email.getEmail())))
 				.andExpect(jsonPath("$.content.[0].endpoint.value", Matchers.is(email.getEndpointId())))
 				.andExpect(jsonPath("$.content.[0].currentStatus", Matchers.is(d2.getStatus().name())));
+	}
+
+	@Test
+	void testGetPage0Size20() throws Exception {
+		String extId = setupMessageDeliveriesForSingleEvent();
+
+		ResultActions resp = mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", extId)
+						.param("page", "0")
+						.param("size", "20")
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+
+		String respContentAsStr = resp.andReturn().getResponse().getContentAsString();
+		assertThat(respContentAsStr).contains("Page number is out of bounds: 0, indexed from one: true");
+	}
+
+	@Test
+	void testGetPage1SizeGT2000() throws Exception {
+		String extId = setupMessageDeliveriesForSingleEvent();
+
+		ResultActions resp = mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", extId)
+						.param("page", "1")
+						.param("size", "2001")
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+
+		String respContentAsStr = resp.andReturn().getResponse().getContentAsString();
+		assertThat(respContentAsStr).contains("Page size is out of bounds: 2001, max page size: 2000");
 	}
 
 	@Test

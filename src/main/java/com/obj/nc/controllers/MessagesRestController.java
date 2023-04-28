@@ -19,6 +19,7 @@
 
 package com.obj.nc.controllers;
 
+import com.obj.nc.config.PagingConfigProperties;
 import com.obj.nc.domain.dto.MessageTableViewDto;
 import com.obj.nc.domain.dto.SendEmailMessageRequest;
 import com.obj.nc.domain.message.EmailMessage;
@@ -29,24 +30,18 @@ import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
 import com.obj.nc.repositories.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import static com.obj.nc.utils.PagingUtils.createPageRequest;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Validated
@@ -57,7 +52,8 @@ public class MessagesRestController {
     
     private final MessageProcessingFlow messageProcessingFlow;
     private final MessageRepository messageRepository;
-	
+    private final PagingConfigProperties pagingConfigProperties;
+
 	@PostMapping(path = "/send-email", consumes="application/json", produces="application/json")
     public SendMessageResponse receiveEmailMessage(@RequestBody(required = true) SendEmailMessageRequest emailMessageRequest) {
         EmailMessage message = emailMessageRequest.toEmailMessage();
@@ -71,7 +67,9 @@ public class MessagesRestController {
                                                      @RequestParam(value = "createdTo", required = false, defaultValue = "9999-01-01T12:00:00Z") 
                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdTo,
                                                      @RequestParam(value = "eventId", required = false) String eventId,
-                                                     Pageable pageable) {
+                                                     @RequestParam("page") int page,
+                                                     @RequestParam("size") int size) {
+        Pageable pageable = createPageRequest(page, size, pagingConfigProperties);
         UUID eventUUID = eventId == null ? null : UUID.fromString(eventId);
         
         List<MessageTableViewDto> messages = messageRepository

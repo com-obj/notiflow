@@ -44,9 +44,12 @@ import org.springframework.integration.endpoint.PollingConsumer;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SENDER_MESSAGE_HANDLER;
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static java.util.Collections.singletonList;
 
 
 import javax.mail.MessagingException;
@@ -234,4 +237,10 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
 		Awaitility.await().atMost(Duration.ofSeconds(numberOfSeconds)).until(() -> taskScheduler.getActiveCount()==0);
 	}
 
+	public MultiValueMap<String, String> getDefaultPagingParams() {
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.put("page", singletonList("1"));
+		params.put("size", singletonList("20"));
+		return params;
+	}
 }

@@ -108,6 +108,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN TEST REST
         ResultActions resp = mockMvc
         		.perform(MockMvcRequestBuilders.get("/endpoints")
+				.params(getDefaultPagingParams())
                 .contentType(APPLICATION_JSON_UTF8)
         		.accept(APPLICATION_JSON_UTF8))
         		.andDo(MockMvcResultHandlers.print());
@@ -130,6 +131,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.params(getDefaultPagingParams())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
@@ -153,6 +155,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.params(getDefaultPagingParams())
 						.param("processedFrom", Instant.now().minusSeconds(60).toString())
 						.param("processedTo", Instant.now().plusSeconds(60).toString())
 						.contentType(APPLICATION_JSON_UTF8)
@@ -178,6 +181,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.params(getDefaultPagingParams())
 						.param("processedFrom", Instant.now().minusSeconds(60).toString())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
@@ -202,6 +206,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.params(getDefaultPagingParams())
 						.param("processedTo", Instant.now().plusSeconds(60).toString())
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
@@ -226,6 +231,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.params(getDefaultPagingParams())
 						.param("endpointType", "SMS")
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
@@ -247,6 +253,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.params(getDefaultPagingParams())
 						.param("eventId", eventId.toString())
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
@@ -269,7 +276,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
-						.param("page", "0")
+						.param("page", "1")
 						.param("size", "20")
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
@@ -287,7 +294,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
-						.param("page", "0")
+						.param("page", "1")
 						.param("size", "10")
 						.contentType(APPLICATION_JSON_UTF8)
 						.accept(APPLICATION_JSON_UTF8))
@@ -323,6 +330,7 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		//WHEN
 		ResultActions resp = mockMvc
 				.perform(MockMvcRequestBuilders.get("/endpoints")
+						.params(getDefaultPagingParams())
 						.param("endpointId", endpointId.toString())
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());

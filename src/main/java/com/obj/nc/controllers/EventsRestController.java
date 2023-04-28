@@ -20,6 +20,7 @@
 package com.obj.nc.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.config.PagingConfigProperties;
 import com.obj.nc.domain.dto.DeliveryStatsByEndpointType;
 import com.obj.nc.domain.dto.GenericEventTableViewDto;
 import com.obj.nc.domain.event.EventReceiverResponse;
@@ -40,13 +41,7 @@ import org.springframework.data.relational.core.conversion.DbActionExecutionExce
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -54,6 +49,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.obj.nc.utils.PagingUtils.createPageRequest;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Validated
@@ -66,7 +62,8 @@ public class EventsRestController {
 	private final SimpleJsonValidator simpleJsonValidator;
 	private final GenericEventJsonSchemaValidator jsonSchemaValidator;
 	private final GenericEventRepository eventsRepository;
-	private final EventSummaryNotificationProperties summaryNotifProps; 
+	private final EventSummaryNotificationProperties summaryNotifProps;
+	private final PagingConfigProperties pagingConfigProperties;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
     public EventReceiverResponse persistGenericEvent(
@@ -112,7 +109,9 @@ public class EventsRestController {
 														@RequestParam(value = "consumedTo", required = false, defaultValue = "9999-01-01T12:00:00Z") 
 															@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedTo,
 														@RequestParam(value = "eventId", required = false) String eventId,
-														Pageable pageable) {
+														@RequestParam("page") int page,
+														@RequestParam("size") int size) {
+		Pageable pageable = createPageRequest(page, size, pagingConfigProperties);
 		UUID eventUUID = eventId == null ? null : UUID.fromString(eventId);
 		
 		List<GenericEventTableViewDto> events = eventsRepository
