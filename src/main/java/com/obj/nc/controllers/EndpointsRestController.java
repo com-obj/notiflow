@@ -19,7 +19,7 @@
 
 package com.obj.nc.controllers;
 
-import com.obj.nc.config.NcAppConfigProperties;
+import com.obj.nc.config.PagingConfigProperties;
 import com.obj.nc.domain.dto.EndpointTableViewDto;
 import com.obj.nc.domain.dto.EndpointTableViewDto.EndpointType;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
@@ -49,7 +49,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class EndpointsRestController {
     
     private final EndpointsRepository endpointsRepository;
-    private final NcAppConfigProperties ncAppConfigProperties;
+    private final PagingConfigProperties pagingConfigProperties;
     
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public Page<EndpointTableViewDto> findAllEndpoints(@RequestParam(value = "processedFrom", required = false, defaultValue = "2000-01-01T12:00:00Z")
@@ -61,7 +61,7 @@ public class EndpointsRestController {
                                                        @RequestParam(value = "endpointId", required = false) UUID endpointId,
                                                        @RequestParam("page") int page,
                                                        @RequestParam("size") int size) {
-        Pageable pageable = createPageRequest(page, size, ncAppConfigProperties.getWeb().getPaging());
+        Pageable pageable = createPageRequest(page, size, pagingConfigProperties);
         List<EndpointTableViewDto> endpoints = endpointsRepository
                 .findAllEndpointsWithStats(processedFrom, processedTo, endpointType, eventId, endpointId, pageable.getOffset(), pageable.getPageSize())
                 .stream()

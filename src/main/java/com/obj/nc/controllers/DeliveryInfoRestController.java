@@ -21,6 +21,7 @@ package com.obj.nc.controllers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.obj.nc.config.NcAppConfigProperties;
+import com.obj.nc.config.PagingConfigProperties;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.dto.content.MessageContentDto;
 import com.obj.nc.domain.dto.endpoint.ReceivingEndpointDto;
@@ -66,6 +67,7 @@ public class DeliveryInfoRestController {
     @Autowired private MessageRepository messageRepo;
 	@Autowired private DeliveryInfoFlow deliveryInfoFlow;
 	@Autowired private NcAppConfigProperties ncAppConfigProperties;
+	@Autowired private PagingConfigProperties pagingConfigProperties;
 
 	@GetMapping(value = "/events/{eventId}", produces="application/json")
 	public ResultPage<EndpointDeliveryInfoDto> findDeliveryInfosByEventId(
@@ -74,7 +76,7 @@ public class DeliveryInfoRestController {
 			@RequestParam("page") int page,
 			@RequestParam("size") int size
 	) {
-		Pageable pageable = createPageRequest(page, size, ncAppConfigProperties.getWeb().getPaging());
+		Pageable pageable = createPageRequest(page, size, pagingConfigProperties);
 
 		UUID endpointUUID = endpointId == null ? null : UUID.fromString(endpointId);
 

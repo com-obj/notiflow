@@ -20,7 +20,7 @@
 package com.obj.nc.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.config.NcAppConfigProperties;
+import com.obj.nc.config.PagingConfigProperties;
 import com.obj.nc.domain.dto.DeliveryStatsByEndpointType;
 import com.obj.nc.domain.dto.GenericEventTableViewDto;
 import com.obj.nc.domain.event.EventReceiverResponse;
@@ -41,13 +41,7 @@ import org.springframework.data.relational.core.conversion.DbActionExecutionExce
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -69,7 +63,7 @@ public class EventsRestController {
 	private final GenericEventJsonSchemaValidator jsonSchemaValidator;
 	private final GenericEventRepository eventsRepository;
 	private final EventSummaryNotificationProperties summaryNotifProps;
-	private final NcAppConfigProperties ncAppConfigProperties;
+	private final PagingConfigProperties pagingConfigProperties;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
     public EventReceiverResponse persistGenericEvent(
@@ -117,7 +111,7 @@ public class EventsRestController {
 														@RequestParam(value = "eventId", required = false) String eventId,
 														@RequestParam("page") int page,
 														@RequestParam("size") int size) {
-		Pageable pageable = createPageRequest(page, size, ncAppConfigProperties.getWeb().getPaging());
+		Pageable pageable = createPageRequest(page, size, pagingConfigProperties);
 		UUID eventUUID = eventId == null ? null : UUID.fromString(eventId);
 		
 		List<GenericEventTableViewDto> events = eventsRepository

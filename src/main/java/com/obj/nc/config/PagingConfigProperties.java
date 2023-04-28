@@ -20,31 +20,13 @@
 package com.obj.nc.config;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties("nc.app")
-public class NcAppConfigProperties {
-    
-    private String url;
-    private boolean checkReferenceIntegrity = false;
-
-    @Value("${nc.app.executor.core-pool-size:10}")
-    private int corePoolSize;
-
-    @Value("${nc.app.executor.max-pool-size:20}")
-    private int maxPoolSize;
-
-    @Value("${nc.app.executor.queue-capacity:1000}")
-    private int queueCapacity;
-
-    @Value("${nc.app.executor.block-policy-wait-time:5}")
-    private int blockPolicyWaitTimeInSec;
-
-    @Value("${nc.app.url.context-path:/notiflow}")
-    private String contextPath;
-
+@ConfigurationProperties("nc.app.paging")
+public class PagingConfigProperties {
+    private int maxPageSize = 2000;
+    private boolean oneIndexedParameters = true;
 }

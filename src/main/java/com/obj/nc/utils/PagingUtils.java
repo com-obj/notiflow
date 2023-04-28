@@ -1,6 +1,6 @@
 package com.obj.nc.utils;
 
-import com.obj.nc.config.NcAppConfigProperties.Web.Paging;
+import com.obj.nc.config.PagingConfigProperties;
 import com.obj.nc.exceptions.PayloadValidationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 import static java.lang.String.format;
 
 public class PagingUtils {
-    public static Pageable createPageRequest(int pageNumber, int pageSize, Paging pagingProps) {
+    public static Pageable createPageRequest(int pageNumber, int pageSize, PagingConfigProperties pagingProps) {
         int maxPageSize = pagingProps.getMaxPageSize();
         boolean oneIndexedParameters = pagingProps.isOneIndexedParameters();
         int lowerBound = oneIndexedParameters ? 1 : 0;
