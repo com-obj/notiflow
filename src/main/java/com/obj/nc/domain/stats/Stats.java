@@ -33,5 +33,9 @@ public class Stats {
     private long messagesSentCount;
     private long messagesReadCount;
     private long messagesFailedCount;
+    private long messagesDeliveryPendingCount;
+    private long messagesDeliveryUnknownCount;
+    private long messagesDeliveredCount;
+    private long messagesDeliveryFailedCount;
     
 }

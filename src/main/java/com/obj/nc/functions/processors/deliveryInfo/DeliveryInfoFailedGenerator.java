@@ -65,22 +65,12 @@ public class DeliveryInfoFailedGenerator extends ProcessorFunctionAdapter<Failed
         }
 		
         for (ReceivingEndpoint endpoint: endpoints) {
-			if (payload instanceof HasPreviousMessageIds) {
-				List<UUID> messageIds = ((HasPreviousMessageIds) payload).getPreviousMessageIds();
-
-				if (payload instanceof Message<?>) {
-					messageIds.add(((Message<?>) payload).getId());
-				}
-
-				messageIds.forEach(messageId ->
-						results.add(
-							failedDeliveryInfoBuilder(failedPayload, endpoint)
-							.messageId(messageId)
+			// Only add failed delivery info for the last message, not for all previous forms of the last message
+			results.add(
+					failedDeliveryInfoBuilder(failedPayload, endpoint)
+							.messageId(((Message<?>) payload).getId())
 							.build()
-						)
-				);
-			}
-			
+			);
 		}
 		
 		return results;

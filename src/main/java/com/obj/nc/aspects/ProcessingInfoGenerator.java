@@ -31,6 +31,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.Message;
@@ -44,6 +45,7 @@ import java.util.List;
 
 @Aspect
 @Component
+@ConditionalOnProperty(name = "nc.processing-info-generator.enabled", havingValue = "true")
 @Slf4j
 public class ProcessingInfoGenerator {
 
@@ -221,8 +223,4 @@ public class ProcessingInfoGenerator {
 		
 		piRepo.save(event.getPi());
 	}
-
-
-
-
 }

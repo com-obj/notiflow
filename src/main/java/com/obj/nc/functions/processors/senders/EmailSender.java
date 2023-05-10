@@ -122,9 +122,9 @@ public class EmailSender extends ProcessorFunctionAdapter<EmailMessage, EmailMes
 			Instant sendStart = Instant.now();
 			
 			mailSender.send(message);
-			
-			log.info("Sending mail vie SMTP took {} ms", ChronoUnit.MILLIS.between(sendStart, Instant.now()));
-			
+
+			log.info("Sending mail via SMTP to {} took {} ms", payload.getReceivingEndpoints().get(0).getEmail(),
+					ChronoUnit.MILLIS.between(sendStart, Instant.now()));
 		} catch (MessagingException e) {
 			throw new ProcessingException(EmailSender.class, e);
 		}

@@ -20,6 +20,8 @@
 package com.obj.nc.domain.content.mailchimp;
 
 import com.obj.nc.domain.content.TrackableContent;
+import com.obj.nc.domain.dto.content.MailchimpContentDto;
+import com.obj.nc.domain.dto.content.MessageContentDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -49,5 +51,9 @@ public class MailchimpContent extends BaseMailchimpContent implements TrackableC
     public void setHtmlText(String text) {
         setHtml(text);
     }
-    
+
+    @Override
+    public MessageContentDto toDto() {
+        return MailchimpContentDto.create(this.html, this.getSubject(), this.getAttachments());
+    }
 }

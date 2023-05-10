@@ -31,8 +31,20 @@ public class NcAppConfigProperties {
     
     private String url;
     private boolean checkReferenceIntegrity = false;
-    
+
+    @Value("${nc.app.executor.core-pool-size:10}")
+    private int corePoolSize;
+
+    @Value("${nc.app.executor.max-pool-size:20}")
+    private int maxPoolSize;
+
+    @Value("${nc.app.executor.queue-capacity:1000}")
+    private int queueCapacity;
+
+    @Value("${nc.app.executor.block-policy-wait-time:5}")
+    private int blockPolicyWaitTimeInSec;
+
     @Value("${nc.app.url.context-path:/notiflow}")
     private String contextPath;
-    
+
 }

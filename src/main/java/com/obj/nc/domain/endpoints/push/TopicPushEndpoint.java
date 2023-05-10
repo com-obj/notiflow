@@ -20,6 +20,7 @@
 package com.obj.nc.domain.endpoints.push;
 
 import com.google.firebase.messaging.Message;
+import com.obj.nc.domain.dto.endpoint.TopicPushEndpointDto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -54,5 +55,10 @@ public class TopicPushEndpoint extends PushEndpoint {
     public String getEndpointType() {
         return JSON_TYPE_IDENTIFIER;
     }
-    
+
+    @Override
+    public TopicPushEndpointDto toDto() {
+        return TopicPushEndpointDto.create(this.getId().toString(), this.topic);
+    }
+
 }

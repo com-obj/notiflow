@@ -20,10 +20,15 @@
 package com.obj.nc.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.obj.nc.config.PagingConfigProperties;
+import com.obj.nc.domain.dto.DeliveryStatsByEndpointType;
 import com.obj.nc.domain.dto.GenericEventTableViewDto;
-import com.obj.nc.domain.event.EventRecieverResponce;
+import com.obj.nc.domain.event.EventReceiverResponse;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.pagination.ResultPage;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.flows.eventSummaryNotification.EventSummaryNotificationProperties;
+import com.obj.nc.flows.eventSummaryNotification.EventSummaryNotificationProperties.SUMMARY_NOTIF_EVENT_SELECTION;
 import com.obj.nc.functions.processors.eventValidator.GenericEventJsonSchemaValidator;
 import com.obj.nc.functions.processors.eventValidator.SimpleJsonValidator;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
@@ -31,19 +36,12 @@ import com.obj.nc.repositories.GenericEventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.relational.core.conversion.DbActionExecutionException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -51,6 +49,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.obj.nc.utils.PagingUtils.createPageRequest;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Validated
@@ -63,13 +62,16 @@ public class EventsRestController {
 	private final SimpleJsonValidator simpleJsonValidator;
 	private final GenericEventJsonSchemaValidator jsonSchemaValidator;
 	private final GenericEventRepository eventsRepository;
+	private final EventSummaryNotificationProperties summaryNotifProps;
+	private final PagingConfigProperties pagingConfigProperties;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
-    public EventRecieverResponce persistGenericEvent(
+    public EventReceiverResponse persistGenericEvent(
     		@RequestBody(required = true) String eventJsonString, 
     		@RequestParam(value = "flowId", required = false) String flowId,
     		@RequestParam(value = "externalId", required = false) String externalId,
-			@RequestParam(value = "payloadType", required = false) String payloadType) {
+			@RequestParam(value = "payloadType", required = false) String payloadType,
+			@RequestParam(value = "notifyAfterProcessing", required = false, defaultValue = "false") boolean notifyAfterProcessing) {
 		
 		JsonNode eventJson = simpleJsonValidator.apply(eventJsonString);
 		
@@ -77,6 +79,14 @@ public class EventsRestController {
     	event.overrideFlowIdIfApplicable(flowId);
     	event.overrideExternalIdIfApplicable(externalId);
     	event.overridePayloadTypeIfApplicable(payloadType);
+
+		if (summaryNotifProps.getEventSelection() == SUMMARY_NOTIF_EVENT_SELECTION.ALL_EVENT) {
+			event.setNotifyAfterProcessing(true);
+		} else if (summaryNotifProps.getEventSelection() == SUMMARY_NOTIF_EVENT_SELECTION.SELECTED_EVENTS) {
+			event.setNotifyAfterProcessing(notifyAfterProcessing);
+		} else {
+			event.setNotifyAfterProcessing(false);
+		}	
 		
 		if (payloadType != null) {
 			event = jsonSchemaValidator.apply(event);
@@ -90,7 +100,7 @@ public class EventsRestController {
     		}
     	}
 
-    	return EventRecieverResponce.from(event.getId());
+    	return EventReceiverResponse.from(event.getId());
     }
 	
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
@@ -99,7 +109,9 @@ public class EventsRestController {
 														@RequestParam(value = "consumedTo", required = false, defaultValue = "9999-01-01T12:00:00Z") 
 															@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedTo,
 														@RequestParam(value = "eventId", required = false) String eventId,
-														Pageable pageable) {
+														@RequestParam("page") int page,
+														@RequestParam("size") int size) {
+		Pageable pageable = createPageRequest(page, size, pagingConfigProperties);
 		UUID eventUUID = eventId == null ? null : UUID.fromString(eventId);
 		
 		List<GenericEventTableViewDto> events = eventsRepository
@@ -109,14 +121,34 @@ public class EventsRestController {
 				.collect(Collectors.toList());
 		
 		long eventsTotalCount = eventsRepository.countAllEventsWithStats(consumedFrom, consumedTo, eventUUID);
-		return new PageImpl<>(events, pageable, eventsTotalCount);
+		return new ResultPage<>(events, pageable, eventsTotalCount);
+	}
+
+	@GetMapping(value = "/{eventId}/statsByType", produces = APPLICATION_JSON_VALUE)
+	public List<DeliveryStatsByEndpointType> findEventStatsByEndpointType(@PathVariable("eventId") String eventId) {
+		
+		List<DeliveryStatsByEndpointType> events = eventsRepository
+				.findEventStatsByEndpointType(UUID.fromString(eventId));
+		
+		return events;
 	}
 	
+
 	@GetMapping(value = "/{eventId}", produces = APPLICATION_JSON_VALUE)
 	public GenericEvent findEvent(@PathVariable("eventId") String eventId) {
 		return eventsRepository
 				.findById(UUID.fromString(eventId))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
+
+	@GetMapping(value = "/summary-notification", produces = APPLICATION_JSON_VALUE)
+	public List<GenericEvent> findEventsForSummaryNotification() {
+		
+		List<GenericEvent> events = eventsRepository
+				.findEventsForSummaryNotification(summaryNotifProps.getSecondsSinceLastProcessing());
+		
+		return events;
+	}
+
 
 }

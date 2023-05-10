@@ -60,6 +60,7 @@ public class TemplatedSmsProcessingFlowConfig {
 				.handle(smsFormatter)
 				.split()
 				.handle(messagePersister)
+				.handle(messageAndEndpointPersister)
 				.handle(smsSender)
 				.wireTap( flowConfig -> 
 					flowConfig.channel(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)

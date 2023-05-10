@@ -17,22 +17,16 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.event;
+package com.obj.nc.config;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import java.util.UUID;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 @Data
-@EqualsAndHashCode
-public class EventRecieverResponce {
-	
-	private UUID ncEventId;
-
-	public static EventRecieverResponce from(UUID id) {
-		EventRecieverResponce resp = new EventRecieverResponce();
-		resp.ncEventId = id;
-		return resp;
-	}
+@Configuration
+@ConfigurationProperties("nc.app.paging")
+public class PagingConfigProperties {
+    private int maxPageSize = 2000;
+    private boolean oneIndexedParameters = true;
 }

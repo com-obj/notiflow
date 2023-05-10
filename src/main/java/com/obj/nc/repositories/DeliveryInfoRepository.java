@@ -19,17 +19,20 @@
 
 package com.obj.nc.repositories;
 
+import com.obj.nc.domain.dto.DeliveryInfoDto;
+import com.obj.nc.domain.dto.DeliveryInfoDto.DeliveryInfoDtoMapper;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUID> {
+public interface DeliveryInfoRepository extends PagingAndSortingRepository<DeliveryInfo, UUID> {
 
     @Query("select di.* " +
             "from nc_delivery_info di " +
@@ -72,6 +75,31 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
             "order by processed_on")
     List<DeliveryInfo> findByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,
                                                                     @Param("endpointId") UUID endpointId);
+
+    String QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "select di.*\n" +
+            "from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
+            "where :eventId = ANY (m.previous_event_ids)\n" +
+            "  and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
+            "  and status IN ('SENT', 'FAILED', 'DELIVERED', 'DELIVERY_UNKNOWN', 'DELIVERY_FAILED', 'DELIVERY_PENDING')\n" +
+            "order by processed_on\n" +
+            "limit :size offset :offset";
+
+    @Query(QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
+    List<DeliveryInfo> findByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,
+                                                                    @Param("endpointId") UUID endpointId,
+                                                                    @Param("size") int size,
+                                                                    @Param("offset") long offset);
+
+
+    String QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "select count(di.*)\n" +
+            "from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
+            "where :eventId = ANY (m.previous_event_ids)\n" +
+            "  and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
+            "  and status IN ('SENT', 'FAILED', 'DELIVERED', 'DELIVERY_UNKNOWN', 'DELIVERY_FAILED', 'DELIVERY_PENDING')";
+
+    @Query(QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
+    long countByEventIdAndEndpointId(@Param("eventId") UUID eventId, @Param("endpointId") UUID endpointId);
+
 
     List<DeliveryInfo> findByEndpointIdOrderByProcessedOn(UUID endpointId);
 
@@ -125,4 +153,30 @@ public interface DeliveryInfoRepository extends CrudRepository<DeliveryInfo, UUI
                                    @Param("status") DELIVERY_STATUS status);
 
     long countByEndpointIdAndProcessedOnAfter(UUID endpointId, Instant timestamp);
+
+    @Query(value = "select " +
+            "    di.id AS delivery_id, " +
+            "    m.id AS message_id, " +
+            "    e.endpoint_type AS endpoint_type, " +
+            "    di.status AS delivery_status, " +
+            "    di.additional_information AS additional_information, " +
+            "    m.reference_number AS reference_number " +
+            "from nc_delivery_info di " +
+            "join nc_message m " +
+            "on di.message_id = m.id " +
+            "join nc_endpoint e " +
+            "on di.endpoint_id = e.id " +
+            "where di.status IN ('SENT', 'DELIVERY_PENDING') " +
+            "and e.endpoint_type IN (:endpointTypes) " +
+            "and di.processed_on > :timestamp " +
+            "order by di.processed_on",
+            rowMapperClass = DeliveryInfoDtoMapper.class)
+    List<DeliveryInfoDto> findUnfinishedDeliveriesNotOlderThan(@Param("timestamp") Instant timestamp, @Param("endpointTypes") List<String> endpointTypes);
+
+    @Modifying
+    @Query(value = "update nc_delivery_info " +
+            "set status = :status, " +
+            "    additional_information = :additional_information " +
+            "where id = :id ")
+    void updateStatusAndAdditionalInformationById(@Param("status") DELIVERY_STATUS status, @Param("additional_information") String additionalInformation, @Param("id") UUID id);
 }

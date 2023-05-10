@@ -19,11 +19,8 @@
 
 package com.obj.nc.domain.content.mailchimp;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.obj.nc.domain.dto.content.TemplatedMailchimpContentDto;
+import lombok.*;
 
 import java.util.Map;
 
@@ -41,5 +38,10 @@ public class TemplatedMailchimpContent extends BaseMailchimpContent {
     private String mergeLanguage;
     
     private Map<String, Object> mergeVariables;
-    
+
+    @Override
+    public TemplatedMailchimpContentDto toDto() {
+        return TemplatedMailchimpContentDto.create(this.templateName, this.templateContent, this.mergeLanguage,
+                this.mergeVariables, this.getSubject(), this.getAttachments());
+    }
 }

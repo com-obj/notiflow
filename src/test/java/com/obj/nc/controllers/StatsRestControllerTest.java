@@ -23,11 +23,9 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.obj.nc.config.NcAppConfigProperties;
-import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.notifIntent.NotificationIntent;
-import com.obj.nc.domain.recipients.Recipient;
 import com.obj.nc.extensions.providers.recipients.ContactsProvider;
 import com.obj.nc.flows.intenProcessing.NotificationIntentProcessingFlow;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
@@ -98,11 +96,10 @@ class StatsRestControllerTest extends BaseIntegrationTest {
 
     @AfterEach
     public void waitForIntegrationFlowsToFinish() {
-        super.wiatForIntegrationFlowsToFinish(500000);
+        super.stopPollingHandlersAndWaitForIntegrationFlowsToFinish(500000);
     }
     
     @Test
-
     void testFindEventStatsByEventId() throws Exception {
         // GIVEN
         GenericEvent event = processTestEventAndIntent();
@@ -121,7 +118,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.endpointsCount").value(CoreMatchers.is(2)))
                 .andExpect(jsonPath("$.messagesSentCount").value(CoreMatchers.is(1)))
                 .andExpect(jsonPath("$.messagesReadCount").value(CoreMatchers.is(1)))
-                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(2)));
+                .andExpect(jsonPath("$.messagesFailedCount").value(CoreMatchers.is(1)));
 
         //AND WHEN
         List<ReceivingEndpoint> endpoints = endpointsRepository.findByNameIds("john.doe@objectify.sk");
@@ -161,7 +158,7 @@ class StatsRestControllerTest extends BaseIntegrationTest {
         
         intentProcessingFlow.processNotificationIntent(intent);
         
-        await().atMost(5, TimeUnit.SECONDS).until(() ->  findSentDeliveryInfosForMessage(emailEndpoint.getId(),SENT).size() >= 1);
+        await().atMost(10, TimeUnit.SECONDS).until(() ->  findSentDeliveryInfosForMessage(emailEndpoint.getId(),SENT).size() >= 1);
         List<DeliveryInfo> sentInfos = findSentDeliveryInfosForMessage(emailEndpoint.getId(), SENT);
         
         ResultActions resp1 = mockMvc

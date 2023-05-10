@@ -22,6 +22,8 @@ package com.obj.nc.domain.content.email;
 import com.obj.nc.Get;
 import com.obj.nc.domain.Attachment;
 import com.obj.nc.domain.content.TemplateWithModelContent;
+import com.obj.nc.domain.dto.content.TemplateWithModelContentDto;
+import com.obj.nc.domain.dto.content.TemplateWithModelEmailContentDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -62,5 +64,10 @@ public class TemplateWithModelEmailContent<MODEL_TYPE> extends TemplateWithModel
 		}
 		return subject;
 	}
-	
+
+	@Override
+	public TemplateWithModelEmailContentDto<MODEL_TYPE> toDto() {
+		return TemplateWithModelEmailContentDto.create(this.getTemplateFileName(), this.getModel(), this.getRequiredLocales(),
+				this.subjectResourceKey, this.subjectResourcesMessageParameters, this.subject, this.attachments);
+	}
 }

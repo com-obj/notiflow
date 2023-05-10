@@ -22,11 +22,8 @@ package com.obj.nc.domain.content.email;
 import com.obj.nc.domain.Attachment;
 import com.obj.nc.domain.content.MessageContent;
 import com.obj.nc.domain.content.TrackableContent;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.obj.nc.domain.dto.content.EmailContentDto;
+import lombok.*;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
@@ -70,5 +67,9 @@ public class EmailContent extends MessageContent implements TrackableContent {
 	public void setHtmlText(String text) {
 		setText(text);
 	}
-	
+
+	@Override
+	public EmailContentDto toDto() {
+		return EmailContentDto.create(this.subject, this.text, this.contentType, this.attachments);
+	}
 }

@@ -19,22 +19,19 @@
 
 package com.obj.nc.controllers;
 
+import com.obj.nc.config.PagingConfigProperties;
 import com.obj.nc.domain.dto.EndpointTableViewDto;
 import com.obj.nc.domain.dto.EndpointTableViewDto.EndpointType;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
+import com.obj.nc.domain.pagination.ResultPage;
 import com.obj.nc.repositories.EndpointsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -42,6 +39,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.obj.nc.utils.PagingUtils.createPageRequest;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Validated
@@ -51,6 +49,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class EndpointsRestController {
     
     private final EndpointsRepository endpointsRepository;
+    private final PagingConfigProperties pagingConfigProperties;
     
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public Page<EndpointTableViewDto> findAllEndpoints(@RequestParam(value = "processedFrom", required = false, defaultValue = "2000-01-01T12:00:00Z")
@@ -60,7 +59,9 @@ public class EndpointsRestController {
                                                        @RequestParam(value = "endpointType", required = false) EndpointType endpointType,
                                                        @RequestParam(value = "eventId", required = false) UUID eventId,
                                                        @RequestParam(value = "endpointId", required = false) UUID endpointId,
-                                                       Pageable pageable) {
+                                                       @RequestParam("page") int page,
+                                                       @RequestParam("size") int size) {
+        Pageable pageable = createPageRequest(page, size, pagingConfigProperties);
         List<EndpointTableViewDto> endpoints = endpointsRepository
                 .findAllEndpointsWithStats(processedFrom, processedTo, endpointType, eventId, endpointId, pageable.getOffset(), pageable.getPageSize())
                 .stream()
@@ -69,7 +70,7 @@ public class EndpointsRestController {
         
         long endpointsTotalCount = endpointsRepository.countAllEndpointsWithStats(processedFrom, processedTo, endpointType, eventId, endpointId);
         
-        return new PageImpl<>(endpoints, pageable, endpointsTotalCount);
+        return new ResultPage<>(endpoints, pageable, endpointsTotalCount);
     }
     
     @GetMapping(value = "/{endpointId}", produces = APPLICATION_JSON_VALUE)

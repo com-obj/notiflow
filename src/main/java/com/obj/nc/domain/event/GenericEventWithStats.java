@@ -23,6 +23,8 @@ import com.obj.nc.domain.stats.Stats;
 import com.obj.nc.repositories.converters.PgObjectToJsonNodeConverter;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import org.postgresql.util.PGobject;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -62,6 +64,10 @@ public class GenericEventWithStats {
                     .messagesSentCount(resultSet.getLong("messages_sent_count"))
                     .messagesReadCount(resultSet.getLong("messages_read_count"))
                     .messagesFailedCount(resultSet.getLong("messages_failed_count"))
+                    .messagesDeliveredCount(resultSet.getLong("messages_delivered_count"))
+                    .messagesDeliveryPendingCount(resultSet.getLong("messages_delivery_pending_count"))
+                    .messagesDeliveryUnknownCount(resultSet.getLong("messages_delivery_unknown_count"))
+                    .messagesDeliveryFailedCount(resultSet.getLong("messages_delivery_failed_count"))
                     .build();
             
             return GenericEventWithStats

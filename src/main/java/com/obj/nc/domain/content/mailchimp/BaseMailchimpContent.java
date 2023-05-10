@@ -36,7 +36,5 @@ import java.util.List;
 public abstract class BaseMailchimpContent extends MessageContent {
     
     private String subject;
-    
     private List<Attachment> attachments = new ArrayList<>();
-    
 }

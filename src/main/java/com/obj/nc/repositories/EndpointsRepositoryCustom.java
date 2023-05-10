@@ -29,6 +29,8 @@ import java.util.UUID;
 public interface EndpointsRepositoryCustom extends EntityExistenceChecker<UUID> {
     
     <T extends ReceivingEndpoint> List<T> persistEnpointIfNotExists(List<T> toPersist);
+
+    <T extends ReceivingEndpoint> List<T> upsertEndpoints(List<T> endpoints);
     
     Map<String, ReceivingEndpoint> persistEnpointIfNotExistsMappedToNameId(List<ReceivingEndpoint> toPersist);
     
