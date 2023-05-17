@@ -53,7 +53,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -413,6 +412,47 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 
 		String respContentAsStr = resp.andReturn().getResponse().getContentAsString();
 		assertThat(respContentAsStr).contains("Page number is out of bounds: 0, indexed from one: true");
+	}
+
+	@Test
+	void testPagingMissingPageAndSizeParameters() throws Exception {
+		String extId = setupMessageDeliveriesForSingleEvent();
+
+		ResultActions resp = mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", extId)
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+
+		String errorMessage = resp.andReturn().getResponse().getErrorMessage();
+		assertThat(errorMessage).contains("Required request parameter 'page' for method parameter type int is not present");
+	}
+
+	@Test
+	void testPagingMissingPageParameter() throws Exception {
+		String extId = setupMessageDeliveriesForSingleEvent();
+
+		ResultActions resp = mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", extId)
+						.param("size", "20")
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+
+		String errorMessage = resp.andReturn().getResponse().getErrorMessage();
+		assertThat(errorMessage).contains("Required request parameter 'page' for method parameter type int is not present");
+	}
+
+	@Test
+	void testPagingMissingSizeParameter() throws Exception {
+		String extId = setupMessageDeliveriesForSingleEvent();
+
+		ResultActions resp = mockMvc.perform(MockMvcRequestBuilders.get("/delivery-info/events/ext/{extId}", extId)
+						.param("page", "1")
+						.contentType(APPLICATION_JSON_UTF8)
+						.accept(APPLICATION_JSON_UTF8))
+				.andDo(MockMvcResultHandlers.print());
+
+		String errorMessage = resp.andReturn().getResponse().getErrorMessage();
+		assertThat(errorMessage).contains("Required request parameter 'size' for method parameter type int is not present");
 	}
 
 	@Test
