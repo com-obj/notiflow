@@ -24,7 +24,8 @@ import com.obj.nc.domain.content.sms.SimpleTextContent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
@@ -43,8 +44,14 @@ public class TestModeDigestModel {
 		if (!emailContent.getContentType().equals(MediaType.TEXT_HTML_VALUE)) {
 			return;
 		}
-		
-		String bodyPartHtml = StringUtils.substringBetween(emailContent.getText(), "<body>", "</body>");
+
+		String contentText = emailContent.getText();
+		if (contentText == null) {
+			contentText = "";
+		}
+
+		Element body = Jsoup.parse(contentText).body();
+		String bodyPartHtml = body.html();
 		emailContent.setText("<div>" + bodyPartHtml + "</div>");
 	}
 
