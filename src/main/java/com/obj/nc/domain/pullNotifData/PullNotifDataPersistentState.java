@@ -16,6 +16,7 @@
 package com.obj.nc.domain.pullNotifData;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.obj.nc.exceptions.PayloadValidationException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.utils.JsonUtils;
@@ -116,8 +118,18 @@ public class PullNotifDataPersistentState implements Persistable<UUID> {
             bodyJsonAttributesSubset = bodyJson;
         } else {
             ObjectNode node = JsonUtils.createJsonObjectNode();
+
+            List<String> nonExistingAttributesFromConfig = new ArrayList<>();
             for (String attribute : attributesSubset) {
+                if (!bodyJson.has(attribute)) {
+                    nonExistingAttributesFromConfig.add(attribute);
+                }
+
                 node.set(attribute, bodyJson.get(attribute));
+            }
+            if (!nonExistingAttributesFromConfig.isEmpty()) {
+                throw new PayloadValidationException(String.format("Could not calculate hash, attributes [%s] not found in pulled data object",
+                        nonExistingAttributesFromConfig.stream().collect(Collectors.joining(", "))));
             }
 
             bodyJsonAttributesSubset = node;

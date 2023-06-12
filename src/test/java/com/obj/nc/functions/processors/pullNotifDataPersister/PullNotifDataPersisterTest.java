@@ -22,7 +22,6 @@ import com.obj.nc.domain.pullNotifData.PullNotifDataPersistentState;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.repositories.PullNotifDataRepository;
 import com.obj.nc.utils.JsonUtils;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -33,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class PullNotifDataPersisterTest {
     ObjectMapper mapper = new ObjectMapper();
@@ -124,6 +125,20 @@ public class PullNotifDataPersisterTest {
 
         verifyPersistingProcess(Arrays.asList(extId3), Collections.singletonList(previous), pulledNotifData, hashAttributes, expectPersisted);
     }
+
+    @Test
+    void testPersistingExistingWithNonExistingAttributesSubset() {
+        List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(pulledData2);
+        List<String> hashAttributes = Arrays.asList("InvalidAttribute1", "InvalidAttribute2");
+
+        PulledNotificationDataNewAndChangedPersister persister = new PulledNotificationDataNewAndChangedPersister(repo, "id", hashAttributes);
+        assertThatThrownBy(() -> {
+            List<JsonNode> notifDataNewAndChanged = persister.apply(pulledNotifData);
+        })
+                .isInstanceOf(PayloadValidationException.class)
+                .hasMessage("Could not calculate hash, attributes [InvalidAttribute1, InvalidAttribute2] not found in pulled data object");
+   }
+
 
     @Test
     void testNotPersistingExistingWithAttributesSubset() throws JsonProcessingException {
