@@ -29,4 +29,7 @@ public class FirestoreJobProperties {
     private String externalIdAttrName;
 
     private String queryExtensionBeanName;
+
+    // empty == all
+    private List<String> hashAttributes = new ArrayList<>();
 }
