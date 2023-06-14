@@ -28,10 +28,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 public class PulledNotificationDataNewAndChangedPersister extends ProcessorFunctionAdapter<List<JsonNode>, List<JsonNode>> {
     private final PullNotifDataRepository pullNotifDataRepository;
     private final String externalIdAttrName;
+    private final List<String> hashAttributes;
+
+    public PulledNotificationDataNewAndChangedPersister(PullNotifDataRepository pullNotifDataRepository, String externalIdAttrName) {
+        this(pullNotifDataRepository, externalIdAttrName, new ArrayList<>());
+    }
+
+    public PulledNotificationDataNewAndChangedPersister(PullNotifDataRepository pullNotifDataRepository, String externalIdAttrName, List<String> hashAttributes) {
+        this.pullNotifDataRepository = pullNotifDataRepository;
+        this.externalIdAttrName = externalIdAttrName;
+        this.hashAttributes = hashAttributes;
+    }
 
     @Override
     protected Optional<PayloadValidationException> checkPreCondition(List<JsonNode> payload) {
@@ -82,7 +92,7 @@ public class PulledNotificationDataNewAndChangedPersister extends ProcessorFunct
 
     private Optional<PullNotifDataPersistentState> mapToPullNotifData(List<PullNotifDataPersistentState> found, JsonNode incomingData) {
         String externalId = PullNotifDataPersistentState.extractIdFromPayload(incomingData, externalIdAttrName);
-        String incomingHash = PullNotifDataPersistentState.calculateHash(incomingData);    
+        String incomingHash = PullNotifDataPersistentState.calculateHash(incomingData, hashAttributes);
 
         Optional<PullNotifDataPersistentState> record = getRecordByExternalId(found, externalId);
 
@@ -92,7 +102,7 @@ public class PulledNotificationDataNewAndChangedPersister extends ProcessorFunct
 
             if (!existingHash.equals(incomingHash)) {
                 //existing data, changed hash
-                return Optional.of(exitingData.updateFromJson(incomingData));
+                return Optional.of(exitingData.updateFromJson(incomingData, hashAttributes));
             }
 
             //existing data, same hash,.. filter out
@@ -101,7 +111,7 @@ public class PulledNotificationDataNewAndChangedPersister extends ProcessorFunct
           
         //new data
         return Optional.of(
-            PullNotifDataPersistentState.createFromJson(incomingData, externalIdAttrName)
+            PullNotifDataPersistentState.createFromJson(incomingData, externalIdAttrName, hashAttributes)
         );
     }
 

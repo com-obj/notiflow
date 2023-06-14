@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.obj.nc.exceptions.PayloadValidationException;
 import org.springframework.integration.support.json.Jackson2JsonObjectMapper;
@@ -250,6 +251,11 @@ public class JsonUtils {
 		} catch (Exception e) {
 		       return Optional.of(e.getMessage());
 	    }
+	}
+
+	public static ObjectNode createJsonObjectNode() {
+		final ObjectMapper mapper = getObjectMapperWithSortedProperties();
+		return mapper.createObjectNode();
 	}
 	
 	public static JsonNode checkIfJsonValidAndReturn(String eventJson) {
