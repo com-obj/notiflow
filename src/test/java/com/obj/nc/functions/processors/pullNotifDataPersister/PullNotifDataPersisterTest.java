@@ -20,19 +20,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obj.nc.domain.pullNotifData.PullNotifDataPersistentState;
 import com.obj.nc.exceptions.PayloadValidationException;
-import com.obj.nc.functions.processors.pullNotifDataPersister.PulledNotificationDataNewAndChangedPersister;
 import com.obj.nc.repositories.PullNotifDataRepository;
 import com.obj.nc.utils.JsonUtils;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class PullNotifDataPersisterTest {
     ObjectMapper mapper = new ObjectMapper();
@@ -40,11 +41,16 @@ public class PullNotifDataPersisterTest {
 
     final String extId1 = "id-1";
     final String extId2 = "id-2";
+    final List<String> extIds12 = Arrays.asList(extId1, extId2);
+    final String extId3 = "id-3";
     final String content1 = "{\"id\" : \"" + extId1 + "\" , \"data\" : 3}";
     final String content1_changed = "{ \"id\": \"" + extId1 + "\" , \"data\" : 3}";
     final String content2 = "{\"id\":\"" + extId2 + "\",\"data\": 3}";
+    final String content3 = "{\"id\":\"" + extId3 + "\",\"data\": 3}";
+    final String content4 = "{\"id\":\"" + extId3 + "\",\"data\": 4}";
     final String content_other = "{\"id\" :\"other\" , \"data\": 3}";
     final String pulledData = "["+content1+","+content2+"]";
+    final String pulledData2 = "["+content4+"]";
     final String invalidJson = "[{\"id-other-name\":\"" + extId1 + "\"}]";
 
     @Test
@@ -70,7 +76,7 @@ public class PullNotifDataPersisterTest {
 
         List<PullNotifDataPersistentState> existingData = Collections.emptyList();
 
-        verifyPersistingProcess(existingData, pulledNotifData, expectPersisted1, expectPersisted2);
+        verifyPersistingProcess(extIds12, existingData, pulledNotifData, expectPersisted1, expectPersisted2);
     }
 
     @Test
@@ -82,7 +88,7 @@ public class PullNotifDataPersisterTest {
 
         List<PullNotifDataPersistentState> existingData = Collections.singletonList(PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content_other), "id"));
 
-        verifyPersistingProcess(existingData, pulledNotifData, expectPersisted1, expectPersisted2);
+        verifyPersistingProcess(extIds12, existingData, pulledNotifData, expectPersisted1, expectPersisted2);
     }
 
     @Test
@@ -92,9 +98,9 @@ public class PullNotifDataPersisterTest {
         PullNotifDataPersistentState expectPersisted1 = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");
         PullNotifDataPersistentState expectPersisted2 = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
 
-        PullNotifDataPersistentState previous = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content_other), "id");           
+        PullNotifDataPersistentState previous = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content_other), "id");
 
-        verifyPersistingProcess(Collections.singletonList(previous),pulledNotifData, expectPersisted1, expectPersisted2);
+        verifyPersistingProcess(extIds12, Collections.singletonList(previous),pulledNotifData, expectPersisted1, expectPersisted2);
     }
 
     @Test
@@ -103,18 +109,55 @@ public class PullNotifDataPersisterTest {
 
         PullNotifDataPersistentState expectPersisted2 = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content2), "id");
 
-        PullNotifDataPersistentState previous = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");           
+        PullNotifDataPersistentState previous = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content1), "id");
 
-        verifyPersistingProcess(Collections.singletonList(previous),pulledNotifData, expectPersisted2);
+        verifyPersistingProcess(extIds12, Collections.singletonList(previous),pulledNotifData, expectPersisted2);
     }
 
-    private void verifyPersistingProcess(List<PullNotifDataPersistentState> storedRecords, List<JsonNode> pulledNotifData, PullNotifDataPersistentState ... expectedPersisted) throws JsonProcessingException {
+    @Test
+    void testPersistingExistingWithAttributesSubset() throws JsonProcessingException {
+        List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(pulledData2);
+        // data field will be changed
+        List<String> hashAttributes = Arrays.asList("data");
+
+        PullNotifDataPersistentState expectPersisted = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content4), "id", hashAttributes);
+        PullNotifDataPersistentState previous = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content3), "id", hashAttributes);
+
+        verifyPersistingProcess(Arrays.asList(extId3), Collections.singletonList(previous), pulledNotifData, hashAttributes, expectPersisted);
+    }
+
+    @Test
+    void testPersistingExistingWithNonExistingAttributesSubset() {
+        List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(pulledData2);
+        List<String> hashAttributes = Arrays.asList("InvalidAttribute1", "InvalidAttribute2");
+
+        PulledNotificationDataNewAndChangedPersister persister = new PulledNotificationDataNewAndChangedPersister(repo, "id", hashAttributes);
+        assertThatThrownBy(() -> {
+            List<JsonNode> notifDataNewAndChanged = persister.apply(pulledNotifData);
+        })
+                .isInstanceOf(PayloadValidationException.class)
+                .hasMessage("Could not calculate hash, attributes [InvalidAttribute1, InvalidAttribute2] not found in pulled data object");
+   }
+
+
+    @Test
+    void testNotPersistingExistingWithAttributesSubset() throws JsonProcessingException {
+        List<JsonNode> pulledNotifData = JsonUtils.readJsonNodeListFromJSONString(pulledData2);
+        // id field will not be changed
+        List<String> hashAttributes = Arrays.asList("id");
+
+        PullNotifDataPersistentState previous = PullNotifDataPersistentState.createFromJson(JsonUtils.readJsonNodeFromJSONString(content3), "id", hashAttributes);
+
+        verifyPersistingProcess(Arrays.asList(extId3), Collections.singletonList(previous), pulledNotifData, hashAttributes);
+    }
+
+    private void verifyPersistingProcess(List<String> extIds, List<PullNotifDataPersistentState> storedRecords, List<JsonNode> pulledNotifData, List<String> hashAttributes, PullNotifDataPersistentState ... expectedPersisted) throws JsonProcessingException {
         // given
-        Mockito.when(repo.findAllHashesByExternalId(Arrays.asList(extId1, extId2))).thenReturn(storedRecords);
+        Mockito.when(repo.findAllHashesByExternalId(extIds)).thenReturn(storedRecords);
         Mockito.when(repo.saveAll(ArgumentMatchers.any())).thenAnswer(a -> a.getArgument(0));
 
         // when
-        PulledNotificationDataNewAndChangedPersister persister = new PulledNotificationDataNewAndChangedPersister(repo, "id");
+        PulledNotificationDataNewAndChangedPersister persister = new PulledNotificationDataNewAndChangedPersister(repo, "id", hashAttributes);
         List<JsonNode> notifDataNewAndChanged = persister.apply(pulledNotifData);
 
         // then
@@ -122,7 +165,7 @@ public class PullNotifDataPersisterTest {
         Assertions.assertEquals(expectedPersisted.length, notifDataNewAndChanged.size());
 
         //all input notifs have been checked
-        Mockito.verify(repo).findAllHashesByExternalId(Arrays.asList(extId1, extId2));
+        Mockito.verify(repo).findAllHashesByExternalId(extIds);
 
         //all new and changed have been persisted
         ArgumentCaptor<List<PullNotifDataPersistentState>> newAndChangedCaptor = ArgumentCaptor.forClass(List.class);
@@ -134,6 +177,10 @@ public class PullNotifDataPersisterTest {
         for (int i =0; i< expectedPersisted.length; i++) {
             assertEquals(expectedPersisted[i], newAndChanged.get(i));
         }
+    }
+
+    private void verifyPersistingProcess(List<String> extIds, List<PullNotifDataPersistentState> storedRecords, List<JsonNode> pulledNotifData, PullNotifDataPersistentState ... expectedPersisted) throws JsonProcessingException {
+        verifyPersistingProcess(extIds, storedRecords, pulledNotifData, new ArrayList<>(), expectedPersisted);
     }
 
     private void assertEquals(PullNotifDataPersistentState expected, PullNotifDataPersistentState actual) {

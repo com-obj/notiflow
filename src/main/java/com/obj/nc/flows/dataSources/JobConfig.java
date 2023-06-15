@@ -19,10 +19,16 @@ package com.obj.nc.flows.dataSources;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Setter
 @Getter
 public class JobConfig {
     private String externalIdAttrName;
     private String pojoFCCN;
     private String spelFilterExpression;
+
+    // empty == all
+    private List<String> hashAttributes = new ArrayList<>();
 }

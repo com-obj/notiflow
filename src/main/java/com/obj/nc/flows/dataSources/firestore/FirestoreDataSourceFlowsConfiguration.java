@@ -63,6 +63,7 @@ public class FirestoreDataSourceFlowsConfiguration {
         jobConfig.setExternalIdAttrName(jobProperties.getExternalIdAttrName());
         jobConfig.setPojoFCCN(jobProperties.getPojoFCCN());
         jobConfig.setSpelFilterExpression(jobProperties.getSpelFilterExpression());
+        jobConfig.setHashAttributes(jobProperties.getHashAttributes());
 
         return nextFlow.continueFlow(IntegrationFlows.from(
                 firestoreChannelAdapter,

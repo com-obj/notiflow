@@ -15,12 +15,12 @@
 
 package com.obj.nc.domain.pullNotifData;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.obj.nc.exceptions.PayloadValidationException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.With;
-import lombok.experimental.Accessors;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -32,8 +32,11 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.utils.JsonUtils;
@@ -73,15 +76,15 @@ public class PullNotifDataPersistentState implements Persistable<UUID> {
         return timeCreated == null;
     }
 
-    public PullNotifDataPersistentState updateFromJson(JsonNode json) {
-        this.hash = calculateHash(json);
+    public PullNotifDataPersistentState updateFromJson(JsonNode json, List<String> attributesSubset) {
+        this.hash = calculateHash(json, attributesSubset);
         this.body = JsonUtils.writeObjectToJSONString(json);
         this.bodyJson = json;
 
         return this;
     }
 
-    public static PullNotifDataPersistentState createFromJson(JsonNode json, String extIdAttributeName) {
+    public static PullNotifDataPersistentState createFromJson(JsonNode json, String extIdAttributeName, List<String> attributesSubset) {
         String jsonString = JsonUtils.writeObjectToJSONString(json);
         String externalId = extractIdFromPayload(json, extIdAttributeName);
 
@@ -89,10 +92,14 @@ public class PullNotifDataPersistentState implements Persistable<UUID> {
             .id(UUID.randomUUID())
             .externalId(externalId)
             .body(jsonString)
-            .hash(calculateHash(jsonString))
+            .hash(calculateHash(json, attributesSubset))
             .build();
         notifData.setBodyJson(json);
         return notifData;
+    }
+
+    public static PullNotifDataPersistentState createFromJson(JsonNode json, String extIdAttributeName) {
+        return createFromJson(json, extIdAttributeName, new ArrayList<>());
     }
 
     public static String extractIdFromPayload(JsonNode jsonNode, String externalIdAttrName) {
@@ -105,8 +112,30 @@ public class PullNotifDataPersistentState implements Persistable<UUID> {
         return attr.asText();
     }
         
-    public static String calculateHash(JsonNode bodyJson) {
-        String jsonStr = JsonUtils.writeObjectToJSONString(bodyJson);
+    public static String calculateHash(JsonNode bodyJson, List<String> attributesSubset) {
+        JsonNode bodyJsonAttributesSubset;
+        if (attributesSubset == null || attributesSubset.isEmpty()) {
+            bodyJsonAttributesSubset = bodyJson;
+        } else {
+            ObjectNode node = JsonUtils.createJsonObjectNode();
+
+            List<String> nonExistingAttributesFromConfig = new ArrayList<>();
+            for (String attribute : attributesSubset) {
+                if (!bodyJson.has(attribute)) {
+                    nonExistingAttributesFromConfig.add(attribute);
+                }
+
+                node.set(attribute, bodyJson.get(attribute));
+            }
+            if (!nonExistingAttributesFromConfig.isEmpty()) {
+                throw new PayloadValidationException(String.format("Could not calculate hash, attributes [%s] not found in pulled data object",
+                        nonExistingAttributesFromConfig.stream().collect(Collectors.joining(", "))));
+            }
+
+            bodyJsonAttributesSubset = node;
+        }
+
+        String jsonStr = JsonUtils.writeObjectToJSONString(bodyJsonAttributesSubset);
         return calculateHash(jsonStr);
     }
 

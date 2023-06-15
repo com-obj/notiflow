@@ -27,6 +27,8 @@ import org.springframework.integration.dsl.Transformers;
 import org.springframework.integration.json.ObjectToJsonTransformer;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 import static com.obj.nc.flows.dataSources.PulledNotificationDataConvertingFlowConfiguration.PULL_NOTIF_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID;
 
 @Component
@@ -36,11 +38,12 @@ public class PullNotifDataTransformationAndPersistFlow {
 
     public StandardIntegrationFlow continueFlow(IntegrationFlowBuilder builder, JobConfig jobConfig) {
         String externalIdKey = selectExternalIdKey(jobConfig);
+        List<String> hashAttributes = jobConfig.getHashAttributes();
 
         return builder.transform(Transformers.toJson(JsonUtils.getJsonObjectMapperUsingSortedProperties(), ObjectToJsonTransformer.ResultType.NODE))
                 .split() // split ArrayNode to JsonNode-s
                 .aggregate() // aggregate JsonNode-s to List<JsonNode>
-                .handle(new PulledNotificationDataNewAndChangedPersister(pullNotifDataRepository, externalIdKey))
+                .handle(new PulledNotificationDataNewAndChangedPersister(pullNotifDataRepository, externalIdKey, hashAttributes))
                 .handle(new JsonNodeFilterAndTransformer(jobConfig.getPojoFCCN(), jobConfig.getSpelFilterExpression()))
                 .handle(new Data2PullNotifDataTransformer())
                 .channel(PULL_NOTIF_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
