@@ -38,8 +38,10 @@
 					<th th:text="#{emailSummary.header1.endpointType}"> # </th>
 					<th th:text="#{emailSummary.header1.messageCount}"> # </th>
 					<th th:text="#{emailSummary.header1.endpointsCount}"> endpoint # </th>
+					<th th:text="#{emailSummary.header1.messagesProcessingCount}"> processing # </th>
 					<th th:text="#{emailSummary.header1.messagesSentCount}"> send # </th>
 					<th th:text="#{emailSummary.header1.messagesFailedCount}"> failed # </th>
+					<th th:text="#{emailSummary.header1.messagesDiscardedCount}"> discarded # </th>
 					<th th:text="#{emailSummary.header1.messagesDeliveredCount}"> delivered # </th>
 					<th th:text="#{emailSummary.header1.messagesDeliveryFailed}"> delivery failed # </th>
 					<th th:text="#{emailSummary.header1.messagesDeliveryUnknownCount}"> delivery unknown # </th>
@@ -51,8 +53,10 @@
 					<td th:text="${stats.endpointType}"> </td>
 					<td th:text="${stats.messagesCount}"> </td>
 					<td th:text="${stats.endpointsCount}"> </td>
-					<td th:with="sent=${stats.messagesSentCount + stats.messagesDeliveredCount + stats.messagesDeliveryFailedCount + stats.messagesDeliveryUnknownCount + stats.messagesDeliveryPendingCount}" th:text="${sent}"> </td>
+					<td th:text="${stats.messagesProcessingCount}"> </td>
+					<td th:text="${stats.messagesSentCount}"> </td>
 					<td th:text="${stats.messagesFailedCount}"> </td>
+					<td th:text="${stats.messagesDiscardedCount}"> </td>
 					<td th:text="${stats.messagesDeliveredCount}"> </td>
 					<td th:text="${stats.messagesDeliveryFailedCount}"> </td>
 					<td th:text="${stats.messagesDeliveryUnknownCount}"> </td>

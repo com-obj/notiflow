@@ -154,29 +154,34 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
 
     long countByEndpointIdAndProcessedOnAfter(UUID endpointId, Instant timestamp);
 
-    @Query(value = "select " +
-            "    di.id AS delivery_id, " +
-            "    m.id AS message_id, " +
-            "    e.endpoint_type AS endpoint_type, " +
-            "    di.status AS delivery_status, " +
-            "    di.additional_information AS additional_information, " +
-            "    m.reference_number AS reference_number " +
-            "from nc_delivery_info di " +
-            "join nc_message m " +
-            "on di.message_id = m.id " +
-            "join nc_endpoint e " +
-            "on di.endpoint_id = e.id " +
-            "where di.status IN ('SENT', 'DELIVERY_PENDING') " +
-            "and e.endpoint_type IN (:endpointTypes) " +
-            "and di.processed_on > :timestamp " +
-            "order by di.processed_on",
-            rowMapperClass = DeliveryInfoDtoMapper.class)
-    List<DeliveryInfoDto> findUnfinishedDeliveriesNotOlderThan(@Param("timestamp") Instant timestamp, @Param("endpointTypes") List<String> endpointTypes);
+    @Query(
+        value = "select distinct on (m.id)" +
+                "    di.id AS delivery_id, " +
+                "    m.id AS message_id, " +
+                "    e.endpoint_type AS endpoint_type, " +
+                "    di.status AS delivery_status, " +
+                "    di.additional_information AS additional_information, " +
+                "    m.reference_number AS reference_number " +
+                "from nc_delivery_info di " +
+                "join nc_message m " +
+                "on di.message_id = m.id " +
+                "join nc_endpoint e " +
+                "on di.endpoint_id = e.id " +
+                "where di.status IN ('SENT', 'DELIVERY_PENDING') " +
+                "and e.endpoint_type IN (:endpointTypes) " +
+                "and di.processed_on > :timestamp " +
+                "and not exists ( " +
+                "   select 1 " +
+                "   from nc_delivery_info di2 " +
+                "   where di.message_id = di2.message_id " +
+                "   and di2.status IN ('FAILED', 'DISCARDED', 'DELIVERED', 'DELIVERY_FAILED', 'DELIVERY_UNKNOWN', 'READ')" +
+                ") " +
+                "order by m.id, di.processed_on desc",
+        rowMapperClass = DeliveryInfoDtoMapper.class
+    )
+    List<DeliveryInfoDto> findUnfinishedDeliveriesNotOlderThan(
+            @Param("timestamp") Instant timestamp,
+            @Param("endpointTypes") List<String> endpointTypes
+    );
 
-    @Modifying
-    @Query(value = "update nc_delivery_info " +
-            "set status = :status, " +
-            "    additional_information = :additional_information " +
-            "where id = :id ")
-    void updateStatusAndAdditionalInformationById(@Param("status") DELIVERY_STATUS status, @Param("additional_information") String additionalInformation, @Param("id") UUID id);
 }
