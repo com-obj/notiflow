@@ -42,6 +42,8 @@ public class DeliveryStatsByEndpointType {
     private long messagesDeliveryPendingCount;
     private long messagesDeliveryUnknownCount;
     private long messagesDeliveryFailedCount;
+    private long messagesProcessingCount;
+    private long messagesDiscardedCount;
 
     public static class DeliveryStatsByEndpointTypeRowMapper implements RowMapper<DeliveryStatsByEndpointType> {
         
@@ -59,6 +61,8 @@ public class DeliveryStatsByEndpointType {
                     .messagesDeliveryPendingCount(resultSet.getLong("messages_delivery_pending_count"))
                     .messagesDeliveryUnknownCount(resultSet.getLong("messages_delivery_unknown_count"))
                     .messagesDeliveryFailedCount(resultSet.getLong("messages_delivery_failed_count"))
+                    .messagesProcessingCount(resultSet.getLong("messages_processing_count"))
+                    .messagesDiscardedCount(resultSet.getLong("messages_discarded_count"))
                     .build();
             
             return stats;

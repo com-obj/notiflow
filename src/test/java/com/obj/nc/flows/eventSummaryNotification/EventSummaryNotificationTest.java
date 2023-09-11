@@ -104,8 +104,11 @@ class EventSummaryNotificationTest extends BaseIntegrationTest {
                 "cuzy@objetify.sk", 
                 "Summary delivery information for notification event", 
                 "This is an informational email about the notification status",
-                "EMAIL", "SMS", 
-                "0", "1", "2"
+                "EMAIL", "SMS",
+                "0", "1", "2",
+                "Message type", "Messages produced", "Number of recipients",
+                "NC Processing", "NC Sent", "NC Failed", "NC Discarded", "Delivered",
+                "Delivery Failed", "Delivery Unknown", "Delivery Pending"
             )
         );
     }
