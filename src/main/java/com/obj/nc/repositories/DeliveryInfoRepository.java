@@ -154,6 +154,14 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
 
     long countByEndpointIdAndProcessedOnAfter(UUID endpointId, Instant timestamp);
 
+    /*
+    * NOTICE
+    * - this method is used for finding messages in non-terminal state so that we can ask external system for its current state
+    * "NOT EXISTS" part filters messages, which are already in terminal state - because we INSERT (instead of UPDATE) new deliveryInfo when message delivery state changes,
+    * we store multiple deliveryInfos per message, so we try to find such message for which doesn't exist terminal state deliveryInfo
+    * - in "where di.status IN ('SENT', 'DELIVERY_PENDING')" statement there isn't PROCESSING state because we haven't sent the message yet, so
+    * asking external system for its state wouldn't make sense
+    * */
     @Query(
         value = "select distinct on (m.id)" +
                 "    di.id AS delivery_id, " +
