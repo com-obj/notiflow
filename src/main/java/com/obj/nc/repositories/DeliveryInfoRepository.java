@@ -154,29 +154,42 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
 
     long countByEndpointIdAndProcessedOnAfter(UUID endpointId, Instant timestamp);
 
-    @Query(value = "select " +
-            "    di.id AS delivery_id, " +
-            "    m.id AS message_id, " +
-            "    e.endpoint_type AS endpoint_type, " +
-            "    di.status AS delivery_status, " +
-            "    di.additional_information AS additional_information, " +
-            "    m.reference_number AS reference_number " +
-            "from nc_delivery_info di " +
-            "join nc_message m " +
-            "on di.message_id = m.id " +
-            "join nc_endpoint e " +
-            "on di.endpoint_id = e.id " +
-            "where di.status IN ('SENT', 'DELIVERY_PENDING') " +
-            "and e.endpoint_type IN (:endpointTypes) " +
-            "and di.processed_on > :timestamp " +
-            "order by di.processed_on",
-            rowMapperClass = DeliveryInfoDtoMapper.class)
-    List<DeliveryInfoDto> findUnfinishedDeliveriesNotOlderThan(@Param("timestamp") Instant timestamp, @Param("endpointTypes") List<String> endpointTypes);
+    /*
+    * NOTICE
+    * - this method is used for finding messages in non-terminal state so that we can ask external system for its current state
+    * "NOT EXISTS" part filters messages, which are already in terminal state - because we INSERT (instead of UPDATE) new deliveryInfo when message delivery state changes,
+    * we store multiple deliveryInfos per message, so we try to find such message for which doesn't exist terminal state deliveryInfo
+    * - in "where di.status IN ('SENT', 'DELIVERY_PENDING')" statement there isn't PROCESSING state because we haven't sent the message yet, so
+    * asking external system for its state wouldn't make sense
+    * */
+    @Query(
+        value = "select distinct on (m.id)" +
+                "    di.id AS delivery_id, " +
+                "    m.id AS message_id, " +
+                "    e.endpoint_type AS endpoint_type, " +
+                "    di.status AS delivery_status, " +
+                "    di.additional_information AS additional_information, " +
+                "    m.reference_number AS reference_number " +
+                "from nc_delivery_info di " +
+                "join nc_message m " +
+                "on di.message_id = m.id " +
+                "join nc_endpoint e " +
+                "on di.endpoint_id = e.id " +
+                "where di.status IN ('SENT', 'DELIVERY_PENDING') " +
+                "and e.endpoint_type IN (:endpointTypes) " +
+                "and di.processed_on > :timestamp " +
+                "and not exists ( " +
+                "   select 1 " +
+                "   from nc_delivery_info di2 " +
+                "   where di.message_id = di2.message_id " +
+                "   and di2.status IN ('FAILED', 'DISCARDED', 'DELIVERED', 'DELIVERY_FAILED', 'DELIVERY_UNKNOWN', 'READ')" +
+                ") " +
+                "order by m.id, di.processed_on desc",
+        rowMapperClass = DeliveryInfoDtoMapper.class
+    )
+    List<DeliveryInfoDto> findUnfinishedDeliveriesNotOlderThan(
+            @Param("timestamp") Instant timestamp,
+            @Param("endpointTypes") List<String> endpointTypes
+    );
 
-    @Modifying
-    @Query(value = "update nc_delivery_info " +
-            "set status = :status, " +
-            "    additional_information = :additional_information " +
-            "where id = :id ")
-    void updateStatusAndAdditionalInformationById(@Param("status") DELIVERY_STATUS status, @Param("additional_information") String additionalInformation, @Param("id") UUID id);
 }
