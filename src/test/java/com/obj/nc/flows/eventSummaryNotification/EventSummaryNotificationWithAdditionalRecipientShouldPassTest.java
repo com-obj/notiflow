@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
                 "nc.flows.event-summary-notif.seconds-since-last-processing=1",
                 "nc.flows.event-summary-notif.cron=*/12 * * * * *",
                 "nc.flows.event-summary-notif.email_recipients[0]=cuzy@objectify.sk",
-                "nc.flows.event-summary-notif.additional-email-recipients[0].email=bazik@objectify.sk",
+                "nc.flows.event-summary-notif.additional-email-recipients[0].emails=bazik@objectify.sk,bazik2@objectify.sk",
                 // {'A','B','C'} contains 'A' => should pass
                 "nc.flows.event-summary-notif.additional-email-recipients[0].event-spel-filter-expression={'A','B','C'}.contains(#jsonPath(payloadJson.toString(), '$.@type'))"
         }
@@ -79,13 +79,14 @@ class EventSummaryNotificationWithAdditionalRecipientShouldPassTest extends Base
         springJdbcTemplate.update("update nc_delivery_info set processed_on = now() - INTERVAL '1 min'");
 
         //then
-        boolean received = greenMail.waitForIncomingEmail(15000L, 2);   //this test can take some time
+        boolean received = greenMail.waitForIncomingEmail(15000L, 3);   //this test can take some time
         assertEquals(true, received);
-        assertEquals(2, greenMail.getReceivedMessages().length);
+        assertEquals(3, greenMail.getReceivedMessages().length);
 
         MimeMessage[] receivedMessage = greenMail.getReceivedMessages();
         assertMessagesSendTo(receivedMessage, "cuzy@objectify.sk", 1);
         assertMessagesSendTo(receivedMessage, "bazik@objectify.sk", 1);
+        assertMessagesSendTo(receivedMessage, "bazik2@objectify.sk", 1);
     }
 
     @RegisterExtension

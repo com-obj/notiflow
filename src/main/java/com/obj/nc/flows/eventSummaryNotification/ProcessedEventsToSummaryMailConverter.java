@@ -79,8 +79,14 @@ public class ProcessedEventsToSummaryMailConverter implements PullNotifData2Noti
 
 		for (AdditionalEmailRecipient additionalRecipient : properties.getAdditionalEmailRecipients()) {
 			String spelFilterExpression = additionalRecipient.getEventSpelFilterExpression();
+
 			if (eventMatchesExpression(event, spelFilterExpression)) {
-				recipients.add(new EmailEndpoint(additionalRecipient.getEmail()));
+				List<EmailEndpoint> additionalRecipientEndpoints = additionalRecipient
+						.getEmails().stream()
+						.map(EmailEndpoint::new)
+						.collect(Collectors.toList());
+
+				recipients.addAll(additionalRecipientEndpoints);
 			}
 		}
 

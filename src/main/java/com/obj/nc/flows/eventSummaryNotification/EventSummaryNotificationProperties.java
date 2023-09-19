@@ -56,7 +56,7 @@ public class EventSummaryNotificationProperties {
     @Getter
     @Setter
     public static class AdditionalEmailRecipient {
-        private String email;
+        private List<String> emails;
 
         // nc.flows.event-summary-notif.additional-email-recipients[0].event-spel-filter-expression={'A','B','C'}.contains(#jsonPath(payloadJson.toString(), '$.@type'))
         private String eventSpelFilterExpression;

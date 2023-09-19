@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
                 "nc.flows.event-summary-notif.seconds-since-last-processing=1",
                 "nc.flows.event-summary-notif.cron=*/12 * * * * *",
                 "nc.flows.event-summary-notif.email_recipients[0]=cuzy@objectify.sk",
-                "nc.flows.event-summary-notif.additional-email-recipients[0].email=bazik@objectify.sk",
+                "nc.flows.event-summary-notif.additional-email-recipients[0].emails=bazik@objectify.sk,bazik2@objectify.sk",
                 // {'B','C'} does not contain 'A' => should fail
                 "nc.flows.event-summary-notif.additional-email-recipients[0].event-spel-filter-expression={'B','C'}.contains(#jsonPath(payloadJson.toString(), '$.@type'))"
         }
@@ -79,7 +79,7 @@ class EventSummaryNotificationWithAdditionalRecipientShouldFailTest extends Base
         springJdbcTemplate.update("update nc_delivery_info set processed_on = now() - INTERVAL '1 min'");
 
         //then
-        boolean received = greenMail.waitForIncomingEmail(15000L, 2);   //this test can take some time
+        boolean received = greenMail.waitForIncomingEmail(15000L, 3);   //this test can take some time
         assertEquals(false, received);
         assertEquals(1, greenMail.getReceivedMessages().length);
         MimeMessage[] receivedMessage = greenMail.getReceivedMessages();
