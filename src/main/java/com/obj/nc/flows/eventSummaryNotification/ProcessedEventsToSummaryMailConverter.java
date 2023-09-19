@@ -9,12 +9,17 @@ import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.domain.pullNotifData.PullNotifData;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.extensions.converters.pullNotifData.PullNotifData2NotificationConverterExtension;
+import com.obj.nc.flows.eventSummaryNotification.EventSummaryNotificationProperties.AdditionalEmailRecipient;
 import com.obj.nc.flows.eventSummaryNotification.model.SummaryEmailModel;
+import com.obj.nc.functions.processors.spelFilter.SpelFilterPojo;
 import com.obj.nc.repositories.GenericEventRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.lang.Boolean.TRUE;
+import static java.util.Collections.singletonList;
 
 @RequiredArgsConstructor
 public class ProcessedEventsToSummaryMailConverter implements PullNotifData2NotificationConverterExtension<GenericEvent> {
@@ -67,9 +72,29 @@ public class ProcessedEventsToSummaryMailConverter implements PullNotifData2Noti
 	}
 
 	protected List<EmailEndpoint> getRecipients(GenericEvent event) {
-		return properties.getEmailRecipients().stream()
+		List<EmailEndpoint> recipients = properties
+				.getEmailRecipients().stream()
 				.map(EmailEndpoint::new)
 				.collect(Collectors.toList());
+
+		for (AdditionalEmailRecipient additionalRecipient : properties.getAdditionalEmailRecipients()) {
+			String spelFilterExpression = additionalRecipient.getEventSpelFilterExpression();
+			if (eventMatchesExpression(event, spelFilterExpression)) {
+				recipients.add(new EmailEndpoint(additionalRecipient.getEmail()));
+			}
+		}
+
+		return recipients;
+	}
+
+	private Boolean eventMatchesExpression(GenericEvent event, String spELFilterExpression) {
+		if (spELFilterExpression == null) {
+			return TRUE;
+		}
+
+		SpelFilterPojo<GenericEvent> filter = new SpelFilterPojo<>(spELFilterExpression);
+		List<GenericEvent> apply = filter.apply(singletonList(event));
+		return apply.size() == 1;
 	}
 
 	@Override
