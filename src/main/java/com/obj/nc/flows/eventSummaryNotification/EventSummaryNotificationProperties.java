@@ -19,8 +19,11 @@
 
 package com.obj.nc.flows.eventSummaryNotification;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -47,5 +50,16 @@ public class EventSummaryNotificationProperties {
     private List<String> emailRecipients; 
     
     private String emailTemplateFileName = "event-summary.html";
+
+    private List<AdditionalEmailRecipient> additionalEmailRecipients = new ArrayList<>();
+
+    @Getter
+    @Setter
+    public static class AdditionalEmailRecipient {
+        private List<String> emails;
+
+        // nc.flows.event-summary-notif.additional-email-recipients[0].event-spel-filter-expression={'A','B','C'}.contains(#jsonPath(payloadJson.toString(), '$.@type'))
+        private String eventSpelFilterExpression;
+    }
 
 }

@@ -20,17 +20,20 @@ package com.obj.nc.functions.processors.spelFilter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.obj.nc.aspects.DocumentProcessingInfo;
 import com.obj.nc.exceptions.ProcessingException;
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.integration.json.JsonPathUtils;
 
 @Slf4j
 @DocumentProcessingInfo("SpelFilterPojo")
@@ -50,6 +53,8 @@ public class SpelFilterPojo<T> extends ProcessorFunctionAdapter<List<T>, List<T>
         for (T payload: payloads) {
             StandardEvaluationContext context = new StandardEvaluationContext();
             context.setRootObject(payload);
+
+            context.registerFunction("jsonPath", Objects.requireNonNull(BeanUtils.resolveSignature("evaluate", JsonPathUtils.class)));
 
             Object value = expression.getValue(context);
 

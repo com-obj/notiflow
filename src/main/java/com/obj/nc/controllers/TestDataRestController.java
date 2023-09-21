@@ -19,6 +19,9 @@
 
 package com.obj.nc.controllers;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.domain.content.email.EmailContent;
@@ -50,6 +53,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.EqualsAndHashCode;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,6 +66,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
+import static com.obj.nc.controllers.TestDataRestController.BaseDummyEventPayload.DUMMY_PAYLOAD_TYPE;
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.FAILED;
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.PROCESSING;
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
@@ -500,20 +506,29 @@ public class TestDataRestController {
         return Instant.ofEpochSecond(random);
     }
     
+
+    @Data
+    @JsonTypeInfo(use = NAME)
+    @JsonSubTypes({
+            @Type(value = DummyEventPayload.class, name = DUMMY_PAYLOAD_TYPE)
+    })
+    @NoArgsConstructor
+    static abstract class BaseDummyEventPayload {
+        public static final String DUMMY_PAYLOAD_TYPE = "A";
+    }
+
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-    static class DummyEventPayload {
-    
+    @EqualsAndHashCode(callSuper = true)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    static class DummyEventPayload extends BaseDummyEventPayload {
         String stringField;
         Long longField;
-        
+
         JsonNode toJsonNode() {
             return JsonUtils.readJsonNodeFromPojo(this);
         }
-        
     }
-    
 }
