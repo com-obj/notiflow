@@ -77,6 +77,8 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 
+	api 'com.jayway.jsonpath:json-path:2.4.0'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.integration:spring-integration-test'
 
