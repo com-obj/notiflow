@@ -67,7 +67,7 @@ public class EmailEndpoint extends ReceivingEndpoint {
 
 	@Override
 	public String getEndpointId() {
-		return email;
+		return email.toLowerCase();
 	}
 	
 	@Override
@@ -82,7 +82,7 @@ public class EmailEndpoint extends ReceivingEndpoint {
 
 	@Override
 	public ReceivingEndpointDto toDto() {
-		return EmailEndpointDto.create(this.getId().toString(), this.email);
+		return EmailEndpointDto.create(this.getId().toString(), getEndpointId());
 	}
 
 	public static FieldDescriptor[] fieldDesc = ObjectArrays.concat(
