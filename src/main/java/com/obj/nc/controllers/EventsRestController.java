@@ -151,10 +151,9 @@ public class EventsRestController {
 //		GenericEvent start = eventsRepository.findByExternalId("74514-start");
 //		GenericEvent end = eventsRepository.findByExternalId("74514-end");
 //		return Arrays.asList(start, end);
-		int secondsSinceLastProcessing = summaryNotifProps.getSecondsSinceLastProcessing();
 		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
-		Instant period = now.minus(deliveryStatusTrackingProperties.getMaxAgeOfUnfinishedDeliveriesInDays(), ChronoUnit.DAYS);
-		List<GenericEvent> events = eventsRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, period);
+		Instant before = now.minus(deliveryStatusTrackingProperties.getMaxAgeOfUnfinishedDeliveriesInDays(), ChronoUnit.DAYS);
+		List<GenericEvent> events = eventsRepository.findEventsForSummaryNotification(before);
 		return events;
 	}
 }

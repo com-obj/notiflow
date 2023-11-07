@@ -78,22 +78,20 @@ public class GenericEventRepositoryTest extends BaseIntegrationTest {
 	public void testShouldFindOneEventForSummaryNotification() {
 		persistEventWithDeliveryInfoProcessedOneDayAgo();
 
-		int secondsSinceLastProcessing = 60;
 		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
-		Instant period = now.minus(2, ChronoUnit.DAYS);
-
-		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, period);
-		Assertions.assertThat(events).size().isEqualTo(1);
+		Instant period = now.minus(1, ChronoUnit.DAYS);
+		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(period);
+		Assertions.assertThat(events).hasSize(1);
 	}
 
 	@Test
 	public void testShouldNotFindAnyEventForSummaryNotification() {
 		persistEventWithDeliveryInfoProcessedOneDayAgo();
 
-		int secondsSinceLastProcessing = 60;
 		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
-		Instant period = now.minus(1, ChronoUnit.DAYS);
-		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, period);
+		Instant period = now.minus(2, ChronoUnit.DAYS);
+
+		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(period);
 		Assertions.assertThat(events).isEmpty();
 	}
 
@@ -116,7 +114,7 @@ public class GenericEventRepositoryTest extends BaseIntegrationTest {
 				.build();
 		deliveryInfoRepo.save(deliveryInfo);
 
-		Get.getJdbc().update("update nc_delivery_info set processed_on = now() - INTERVAL '1 day'");
+		Get.getJdbc().update("update nc_delivery_info set processed_on = now() - INTERVAL '30 hours'");
 	}
 
 	public static GenericEvent createProcessedEvent() {

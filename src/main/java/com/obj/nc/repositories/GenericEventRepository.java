@@ -143,8 +143,6 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 	"	join nc_delivery_info di on (di.message_id = m.id ) " +
 	"where notify_after_processing = true " +
 	"group by 1,2,3,4,5,6,7,8,9,10 " +
-	"having max(di.processed_on) < NOW() - make_interval(secs  => :secondsSinceLastProcessing) " +
-	"and min(di.processed_on) > :timestamp")
-    List<GenericEvent> findEventsForSummaryNotification(@Param("secondsSinceLastProcessing") int secondsSinceLastProcessing,
-														@Param("timestamp") Instant timestamp);
+	"having max(di.processed_on) < :timestamp")
+    List<GenericEvent> findEventsForSummaryNotification(@Param("timestamp") Instant timestamp);
 }
