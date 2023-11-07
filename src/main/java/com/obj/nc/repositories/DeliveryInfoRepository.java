@@ -23,7 +23,6 @@ import com.obj.nc.domain.dto.DeliveryInfoDto;
 import com.obj.nc.domain.dto.DeliveryInfoDto.DeliveryInfoDtoMapper;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -78,26 +77,26 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
 
     String WITH_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID =
         "with latest_msg_di as (\n" +
-        "    select di.message_id as message_id, MAX(di.processed_on) as processed_on\n" +
+        "    select di.status, di.message_id as message_id, MAX(di.processed_on) as processed_on\n" +
         "    from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
         "    where :eventId = ANY (m.previous_event_ids)\n" +
         "    and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
-        "    and status IN ('SENT', 'FAILED', 'DELIVERED', 'DELIVERY_UNKNOWN', 'DELIVERY_FAILED', 'DELIVERY_PENDING')\n" +
-        "    GROUP BY di.message_id\n" +
+        "    and di.status IN ('SENT', 'FAILED', 'DELIVERED', 'DELIVERY_UNKNOWN', 'DELIVERY_FAILED', 'DELIVERY_PENDING')\n" +
+        "    GROUP BY di.status, di.message_id\n" +
         ")\n";
 
     String QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = WITH_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID +
-            "select di.* " +
-            "from nc_delivery_info di " +
-            "join latest_msg_di on latest_msg_di.message_id = di.message_id and latest_msg_di.processed_on = di.processed_on " +
-            "order by processed_on " +
+            "select di.*\n" +
+            "from nc_delivery_info di\n" +
+            "join latest_msg_di latest on latest.message_id = di.message_id and latest.processed_on = di.processed_on and latest.status = di.status\n" +
+            "order by processed_on\n" +
             "limit :size offset :offset";
 
     @Query(QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
-    List<DeliveryInfo> findByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,
-                                                                    @Param("endpointId") UUID endpointId,
-                                                                    @Param("size") int size,
-                                                                    @Param("offset") long offset);
+    List<DeliveryInfo> findLatestByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,
+                                                                          @Param("endpointId") UUID endpointId,
+                                                                          @Param("size") int size,
+                                                                          @Param("offset") long offset);
 
     String QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID
             = WITH_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID + "select count(1) from latest_msg_di";

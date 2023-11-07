@@ -27,6 +27,7 @@ import com.obj.nc.domain.event.EventReceiverResponse;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.pagination.ResultPage;
 import com.obj.nc.exceptions.PayloadValidationException;
+import com.obj.nc.flows.deliveryStatusTracking.DeliveryStatusTrackingProperties;
 import com.obj.nc.flows.eventSummaryNotification.EventSummaryNotificationProperties;
 import com.obj.nc.flows.eventSummaryNotification.EventSummaryNotificationProperties.SUMMARY_NOTIF_EVENT_SELECTION;
 import com.obj.nc.functions.processors.eventValidator.GenericEventJsonSchemaValidator;
@@ -45,8 +46,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.obj.nc.utils.PagingUtils.createPageRequest;
@@ -64,6 +67,7 @@ public class EventsRestController {
 	private final GenericEventRepository eventsRepository;
 	private final EventSummaryNotificationProperties summaryNotifProps;
 	private final PagingConfigProperties pagingConfigProperties;
+	private final DeliveryStatusTrackingProperties deliveryStatusTrackingProperties;
 	
 	@PostMapping( consumes="application/json", produces="application/json")
     public EventReceiverResponse persistGenericEvent(
@@ -143,12 +147,14 @@ public class EventsRestController {
 
 	@GetMapping(value = "/summary-notification", produces = APPLICATION_JSON_VALUE)
 	public List<GenericEvent> findEventsForSummaryNotification() {
-		
-		List<GenericEvent> events = eventsRepository
-				.findEventsForSummaryNotification(summaryNotifProps.getSecondsSinceLastProcessing());
-		
+		//TODO remove after testing
+//		GenericEvent start = eventsRepository.findByExternalId("74514-start");
+//		GenericEvent end = eventsRepository.findByExternalId("74514-end");
+//		return Arrays.asList(start, end);
+		int secondsSinceLastProcessing = summaryNotifProps.getSecondsSinceLastProcessing();
+		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
+		Instant period = now.minus(deliveryStatusTrackingProperties.getMaxAgeOfUnfinishedDeliveriesInDays(), ChronoUnit.DAYS);
+		List<GenericEvent> events = eventsRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, period);
 		return events;
 	}
-
-
 }
