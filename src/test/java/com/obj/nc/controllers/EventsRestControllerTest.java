@@ -631,7 +631,7 @@ class EventsRestControllerTest extends BaseIntegrationTest {
         findEventsForNotif(0);
 
         //WHEN
-        Get.getJdbc().update("update nc_delivery_info set processed_on = now() - INTERVAL '10 min'");
+        Get.getJdbc().update("update nc_delivery_info set processed_on = now() - INTERVAL '25 hours'");
 
         //THEN
         List<JsonNode> events = findEventsForNotif(1);
