@@ -147,10 +147,6 @@ public class EventsRestController {
 
 	@GetMapping(value = "/summary-notification", produces = APPLICATION_JSON_VALUE)
 	public List<GenericEvent> findEventsForSummaryNotification() {
-		//TODO remove after testing
-//		GenericEvent start = eventsRepository.findByExternalId("74514-start");
-//		GenericEvent end = eventsRepository.findByExternalId("74514-end");
-//		return Arrays.asList(start, end);
 		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
 		Instant before = now.minus(deliveryStatusTrackingProperties.getMaxAgeOfUnfinishedDeliveriesInDays(), ChronoUnit.DAYS);
 		List<GenericEvent> events = eventsRepository.findEventsForSummaryNotification(before);
