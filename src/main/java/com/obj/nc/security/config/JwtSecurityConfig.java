@@ -38,7 +38,7 @@ import java.time.LocalDateTime;
 
 import static com.obj.nc.security.config.Constants.DEFAULT_EXCEPTION_MSG;
 import static com.obj.nc.security.config.Constants.EXCEPTION_ATTR_NAME;
-import static com.obj.nc.security.config.Constants.NOT_PROTECTED_RESOURCES;
+import static com.obj.nc.security.config.Constants.UNPROTECTED_PATHS;
 
 @Configuration
 @RequiredArgsConstructor
@@ -46,7 +46,7 @@ import static com.obj.nc.security.config.Constants.NOT_PROTECTED_RESOURCES;
 public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	private final JwtRequestFilter jwtRequestFilter;
-	
+
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -57,7 +57,7 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
 				.authorizeRequests()
-				.antMatchers(NOT_PROTECTED_RESOURCES.toArray(new String[0])).permitAll()
+				.antMatchers(UNPROTECTED_PATHS).permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
@@ -77,7 +77,5 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 			);
 		});
 	}
-	
+
 }
-
-

@@ -29,11 +29,15 @@ public interface Constants {
     String JWT_TOKEN_PREFIX = "Bearer ";
     String EXCEPTION_ATTR_NAME = "javax.servlet.error.exception";
     String DEFAULT_EXCEPTION_MSG = "Authentication failed";
-    
-    List<String> NOT_PROTECTED_RESOURCES = asList(
-            "/authenticate", 
+
+    String[] UNPROTECTED_PATHS = {
+            "/authenticate",
             "/delivery-info/messages/*/mark-as-read",
-            "/resources/images/px.png"
-    );
+            "/resources/images/px.png",
+            "/v2/api-docs",
+            "/swagger-ui.html",
+            "/swagger-resources/**",
+            "/webjars/**"
+    };
     
 }

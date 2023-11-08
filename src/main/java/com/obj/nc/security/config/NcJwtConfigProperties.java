@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("nc.jwt")
 public class NcJwtConfigProperties {
     
+    private boolean enabled;
     private String username;
     private String password;
     private String signatureSecret;
