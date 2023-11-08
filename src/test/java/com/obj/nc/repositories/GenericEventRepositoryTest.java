@@ -93,7 +93,7 @@ public class GenericEventRepositoryTest extends BaseIntegrationTest {
 
 		int secondsSinceLastProcessing = 60;
 		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
-		Instant period = now.minus(1, ChronoUnit.DAYS);
+		Instant period = now.minus(2, ChronoUnit.DAYS);
 
 		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, period);
 		Assertions.assertThat(events).hasSize(1);
@@ -125,7 +125,7 @@ public class GenericEventRepositoryTest extends BaseIntegrationTest {
 		DeliveryInfo deliveryInfo = DeliveryInfo.builder()
 				.endpointId(endpoint.get(0).getId())
 				.messageId(message.getId())
-				.status(DELIVERY_PENDING)
+				.status(status)
 				.id(UUID.randomUUID())
 				.build();
 		deliveryInfoRepo.save(deliveryInfo);
