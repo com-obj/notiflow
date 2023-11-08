@@ -186,7 +186,7 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
                 "   select 1 " +
                 "   from nc_delivery_info di2 " +
                 "   where di.message_id = di2.message_id " +
-                "   and di2.status IN ('FAILED', 'DISCARDED', 'DELIVERED', 'DELIVERY_FAILED', 'DELIVERY_UNKNOWN', 'READ')" +
+                "   and di2.status NOT IN ('PROCESSING', 'SENT', 'DELIVERY_PENDING')" +
                 ") " +
                 "order by m.id, di.processed_on desc",
         rowMapperClass = DeliveryInfoDtoMapper.class

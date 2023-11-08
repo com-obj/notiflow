@@ -45,6 +45,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.*;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
@@ -75,27 +76,42 @@ public class GenericEventRepositoryTest extends BaseIntegrationTest {
 	}
 
 	@Test
-	public void testShouldFindOneEventForSummaryNotification() {
-		persistEventWithDeliveryInfoProcessedOneDayAgo();
+	public void testFindEventForSummaryNotification_ByTooOldPendingDelivery() {
+		persistEventWithDeliveryInfoProcessedOneDayAgo(DELIVERY_PENDING);
 
+		int secondsSinceLastProcessing = 60;
 		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
 		Instant period = now.minus(1, ChronoUnit.DAYS);
-		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(period);
+
+		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, period);
 		Assertions.assertThat(events).hasSize(1);
 	}
 
 	@Test
-	public void testShouldNotFindAnyEventForSummaryNotification() {
-		persistEventWithDeliveryInfoProcessedOneDayAgo();
+	public void testFindEventForSummaryNotification_BySendingCompleted() {
+		persistEventWithDeliveryInfoProcessedOneDayAgo(DELIVERY_FAILED);
 
+		int secondsSinceLastProcessing = 60;
+		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
+		Instant period = now.minus(1, ChronoUnit.DAYS);
+
+		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, period);
+		Assertions.assertThat(events).hasSize(1);
+	}
+
+	@Test
+	public void testFindAnyEventForSummaryNotification_NoneByTooOldPendingDelivery() {
+		persistEventWithDeliveryInfoProcessedOneDayAgo(DELIVERY_PENDING);
+
+		int secondsSinceLastProcessing = 60;
 		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
 		Instant period = now.minus(2, ChronoUnit.DAYS);
 
-		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(period);
+		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, period);
 		Assertions.assertThat(events).isEmpty();
 	}
 
-	private void persistEventWithDeliveryInfoProcessedOneDayAgo() {
+	private void persistEventWithDeliveryInfoProcessedOneDayAgo(DeliveryInfo.DELIVERY_STATUS status) {
 		GenericEvent event = createProcessedEvent();
 		event.setNotifyAfterProcessing(true);
 		eventRepository.save(event);
@@ -109,7 +125,7 @@ public class GenericEventRepositoryTest extends BaseIntegrationTest {
 		DeliveryInfo deliveryInfo = DeliveryInfo.builder()
 				.endpointId(endpoint.get(0).getId())
 				.messageId(message.getId())
-				.status(DeliveryInfo.DELIVERY_STATUS.SENT)
+				.status(DELIVERY_PENDING)
 				.id(UUID.randomUUID())
 				.build();
 		deliveryInfoRepo.save(deliveryInfo);

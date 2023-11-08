@@ -107,7 +107,7 @@ class EventSummaryNotificationTest extends BaseIntegrationTest {
                 "EMAIL", "SMS",
                 "0", "1", "2",
                 "Message type", "Messages produced", "Number of recipients",
-                "NC Processing", "NC Sent", "NC Failed", "NC Discarded", "Delivered",
+                "NC Sent", "NC Failed", "NC Discarded", "Delivered",
                 "Delivery Failed", "Delivery Unknown", "Delivery Pending"
             )
         );
