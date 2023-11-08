@@ -78,7 +78,7 @@ import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.D
 @Slf4j
 @RestController
 @RequestMapping("/test-data")
-@ConditionalOnProperty(name = "nc.flows.test-mode.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "nc.app.test-data.enabled", havingValue = "true")
 @RequiredArgsConstructor
 public class TestDataRestController {
     
