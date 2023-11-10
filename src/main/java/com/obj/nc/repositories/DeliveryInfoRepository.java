@@ -77,20 +77,20 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
 
     String WITH_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID =
         "with latest_msg_di as (\n" +
-        "    select di.status, di.message_id as message_id, MAX(di.processed_on) as processed_on\n" +
+        "    select distinct on (di.message_id) di.id as delivery_id\n" +
         "    from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
         "    where :eventId = ANY (m.previous_event_ids)\n" +
-        "    and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
-        "    and di.status IN ('SENT', 'FAILED', 'DELIVERED', 'DELIVERY_UNKNOWN', 'DELIVERY_FAILED', 'DELIVERY_PENDING')\n" +
-        "    GROUP BY di.status, di.message_id\n" +
+        "      and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
+        "      and di.status IN ('SENT', 'FAILED', 'DELIVERED', 'DELIVERY_UNKNOWN', 'DELIVERY_FAILED', 'DELIVERY_PENDING')\n" +
+        "    order by di.message_id, di.processed_on desc\n" +
         ")\n";
 
     String QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = WITH_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID +
             "select di.*\n" +
             "from nc_delivery_info di\n" +
-            "join latest_msg_di latest on latest.message_id = di.message_id and latest.processed_on = di.processed_on and latest.status = di.status\n" +
+            "join latest_msg_di latest on latest.delivery_id = di.id\n" +
             "order by processed_on\n" +
-            "limit :size offset :offset";
+            "limit :size offset :offset\n";
 
     @Query(QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
     List<DeliveryInfo> findLatestByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,

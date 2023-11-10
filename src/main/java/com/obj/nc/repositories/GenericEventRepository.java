@@ -88,11 +88,12 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 	@Query(
 		value =
 			"with latest_msg_di as (\n" +
-			"    select di.message_id as message_id, di.status, MAX(di.processed_on) as processed_on\n" +
-			"    from nc_delivery_info di\n" +
-			"    join nc_message m on di.message_id = m.id\n" +
+			"    select distinct on (di.message_id)\n" +
+			"        di.message_id as message_id,\n" +
+			"        di.status as status\n" +
+			"    from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
 			"    where di.status != 'PROCESSING'\n" +
-			"    GROUP BY di.message_id, di.status\n" +
+			"    order by di.message_id, di.processed_on desc\n" +
 			")\n" +
 			"select msg_with_endp.endpoint_type,\n" +
 			"       count(msg_with_endp.message_id)                                    as messages_count,\n" +
@@ -106,12 +107,12 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 			"       count(di.message_id) filter (where di.status = 'DELIVERY_FAILED')  as messages_delivery_failed_count,\n" +
 			"       count(di.message_id) filter (where di.status = 'DISCARDED')        as messages_discarded_count\n" +
 			"from nc_event e\n" +
-			"    left join (select msg.*, m2e.message_id as message_id, m2e.endpoint_id as endpoint_id, ep.endpoint_type\n" +
-			"        from nc_message msg\n" +
-			"            inner join nc_message_2_endpoint_rel m2e on (m2e.message_id = msg.id)\n" +
-			"            inner join nc_endpoint ep on ep.id = m2e.endpoint_id) msg_with_endp\n" +
-			"        on (e.id = any (msg_with_endp.previous_event_ids))\n" +
-			"    left join latest_msg_di di on di.message_id = msg_with_endp.id\n" +
+			"         left join (select msg.*, m2e.message_id as message_id, m2e.endpoint_id as endpoint_id, ep.endpoint_type\n" +
+			"                    from nc_message msg\n" +
+			"                             inner join nc_message_2_endpoint_rel m2e on (m2e.message_id = msg.id)\n" +
+			"                             inner join nc_endpoint ep on ep.id = m2e.endpoint_id) msg_with_endp\n" +
+			"                   on (e.id = any (msg_with_endp.previous_event_ids))\n" +
+			"         left join latest_msg_di di on di.message_id = msg_with_endp.id\n" +
 			"where e.id = (:eventId)::uuid\n" +
 			"  and message_class NOT LIKE '%Templated'\n" +
 			"group by msg_with_endp.endpoint_type",
@@ -137,18 +138,20 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 	@Query(
 		"select e.id,e.flow_id,e.external_id, e.payload_json,e.time_created,e.time_consumed, e.payload_type, e.notify_after_processing, e.name, e.description\n" +
 		"from nc_event e\n" +
-		"    join nc_message m on (e.id  = ANY(m.previous_event_ids))\n" +
-		"    join nc_delivery_info di on (di.message_id = m.id )\n" +
+		"         join nc_message m on (e.id  = ANY(m.previous_event_ids))\n" +
+		"         join nc_delivery_info di on (di.message_id = m.id)\n" +
 		"where notify_after_processing = true\n" +
 		"group by 1,2,3,4,5,6,7,8,9,10\n" +
 		"having max(di.processed_on) < :timestamp\n" +
 		"union (\n" +
 		"    with latest_msg_di as (\n" +
-		"        select di.message_id as message_id, di.status, MAX(di.processed_on) as processed_on\n" +
-		"        from nc_delivery_info di\n" +
-		"                 join nc_message m on di.message_id = m.id\n" +
+		"        select distinct on (di.message_id)\n" +
+		"            di.message_id as message_id,\n" +
+		"            di.status as status,\n" +
+		"            di.processed_on as processed_on\n" +
+		"        from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
 		"        where di.status != 'PROCESSING'\n" +
-		"        GROUP BY di.message_id, di.status\n" +
+		"        order by di.message_id, di.processed_on desc\n" +
 		"    )\n" +
 		"    select e.id,e.flow_id,e.external_id, e.payload_json,e.time_created,e.time_consumed, e.payload_type, e.notify_after_processing, e.name, e.description\n" +
 		"    from nc_event e\n" +
@@ -157,7 +160,7 @@ public interface GenericEventRepository extends PagingAndSortingRepository<Gener
 		"    where notify_after_processing = true\n" +
 		"    group by 1,2,3,4,5,6,7,8,9,10\n" +
 		"    having max(di.processed_on) < NOW() - make_interval(secs  => :secondsSinceLastProcessing)\n" +
-			"and count(di.message_id) filter (where di.status != 'DELIVERY_PENDING') = count(di.message_id)\n" +
+		"       and count(di.message_id) filter (where di.status != 'DELIVERY_PENDING') = count(di.message_id)\n" +
 		")\n"
 	)
 	List<GenericEvent> findEventsForSummaryNotification(@Param("secondsSinceLastProcessing") int secondsSinceLastProcessing,
