@@ -202,6 +202,8 @@ public class TestDataRestController {
         message.setId(EMAIL1_ID);
         message.getHeader().setFlowId("default-flow");
         message.setPreviousEventIds(new UUID[]{ EVENT_ID });
+        message.setPreviousIntentIds(new UUID[]{ });
+        message.setPreviousMessageIds(new UUID[]{ });
         message.setBody(EmailContent.builder().subject("Subject").text("Text").build());
         message.setMessageClass(EmailMessage.class.getName());
 
@@ -215,6 +217,8 @@ public class TestDataRestController {
         message.setId(EMAIL2_ID);
         message.getHeader().setFlowId("default-flow");
         message.setPreviousEventIds(new UUID[]{ EVENT_ID });
+        message.setPreviousIntentIds(new UUID[]{ });
+        message.setPreviousMessageIds(new UUID[]{ });
         message.setBody(EmailContent.builder().subject("Subject").text("Text").build());
         message.setMessageClass(EmailMessage.class.getName());
 
@@ -228,6 +232,8 @@ public class TestDataRestController {
         message.setId(SMS_ID);
         message.getHeader().setFlowId("default-flow");
         message.setPreviousEventIds(new UUID[]{ EVENT_ID });
+        message.setPreviousIntentIds(new UUID[]{ });
+        message.setPreviousMessageIds(new UUID[]{ });
         message.setBody(SimpleTextContent.builder().text("Failed SMS").build());
         message.setMessageClass(SmsMessage.class.getName());
 
