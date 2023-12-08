@@ -30,15 +30,17 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 import javax.servlet.http.HttpServletResponse;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 import static com.obj.nc.security.config.Constants.DEFAULT_EXCEPTION_MSG;
 import static com.obj.nc.security.config.Constants.EXCEPTION_ATTR_NAME;
-import static com.obj.nc.security.config.Constants.NOT_PROTECTED_RESOURCES;
+import static com.obj.nc.security.config.Constants.UNPROTECTED_PATHS;
 
 @Configuration
 @RequiredArgsConstructor
@@ -46,7 +48,7 @@ import static com.obj.nc.security.config.Constants.NOT_PROTECTED_RESOURCES;
 public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	private final JwtRequestFilter jwtRequestFilter;
-	
+
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -55,9 +57,17 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.csrf().disable()
+		httpSecurity
+				.cors().configurationSource(request -> {
+					CorsConfiguration cors = new CorsConfiguration();
+					cors.setAllowedOrigins(Arrays.asList("http://localhost:9000"));
+					cors.setAllowedMethods(Arrays.asList("*"));
+					cors.setAllowedHeaders(Arrays.asList("*"));
+					return cors;
+				}).and()
+				.csrf().disable()
 				.authorizeRequests()
-				.antMatchers(NOT_PROTECTED_RESOURCES.toArray(new String[0])).permitAll()
+				.antMatchers(UNPROTECTED_PATHS).permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
@@ -77,7 +87,5 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 			);
 		});
 	}
-	
+
 }
-
-

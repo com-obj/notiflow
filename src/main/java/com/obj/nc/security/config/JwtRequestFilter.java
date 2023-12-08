@@ -38,10 +38,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static com.obj.nc.security.config.Constants.AUTHORIZATION_HEADER;
 import static com.obj.nc.security.config.Constants.JWT_TOKEN_PREFIX;
-import static com.obj.nc.security.config.Constants.NOT_PROTECTED_RESOURCES;
+import static com.obj.nc.security.config.Constants.UNPROTECTED_PATHS;
 
 @Component
 @ConditionalOnBean(JwtSecurityConfig.class)
@@ -51,7 +52,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	private final JwtUserDetailsService jwtUserDetailsService;
 	private final JwtTokenUtil jwtTokenUtil;
 	private final AntPathMatcher antPathMatcher;
-	private final NcAppConfigProperties ncAppConfigProperties;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -95,9 +95,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	}
 	
 	private boolean isProtectedResource(HttpServletRequest request) {
-		return NOT_PROTECTED_RESOURCES.stream()
-				.map(resource -> ncAppConfigProperties.getContextPath() + resource)
-				.noneMatch(resource -> antPathMatcher.match(resource, request.getRequestURI()));
+		String requestUriWithoutContextPath = request.getRequestURI().substring(request.getContextPath().length());
+		return Arrays.stream(UNPROTECTED_PATHS).noneMatch(resource -> antPathMatcher.match(resource, requestUriWithoutContextPath));
 	}
 
 }

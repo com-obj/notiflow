@@ -79,6 +79,9 @@ dependencies {
 
 	api 'com.jayway.jsonpath:json-path:2.4.0'
 
+	api 'io.springfox:springfox-swagger2:2.9.2'
+	api 'io.springfox:springfox-swagger-ui:2.9.2'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.integration:spring-integration-test'
 
