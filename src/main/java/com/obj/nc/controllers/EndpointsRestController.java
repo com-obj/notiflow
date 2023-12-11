@@ -20,8 +20,8 @@
 package com.obj.nc.controllers;
 
 import com.obj.nc.config.PagingConfigProperties;
-import com.obj.nc.domain.dto.EndpointTableViewDto;
-import com.obj.nc.domain.dto.EndpointTableViewDto.EndpointType;
+import com.obj.nc.domain.dto.fe.EndpointDetailDto;
+import com.obj.nc.domain.dto.fe.EndpointDetailDto.EndpointType;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.pagination.ResultPage;
 import com.obj.nc.repositories.EndpointsRepository;
@@ -52,20 +52,20 @@ public class EndpointsRestController {
     private final PagingConfigProperties pagingConfigProperties;
     
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public Page<EndpointTableViewDto> findAllEndpoints(@RequestParam(value = "processedFrom", required = false, defaultValue = "2000-01-01T12:00:00Z")
+    public Page<EndpointDetailDto> findAllEndpoints(@RequestParam(value = "processedFrom", required = false, defaultValue = "2000-01-01T12:00:00Z")
                                                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant processedFrom,
-                                                       @RequestParam(value = "processedTo", required = false, defaultValue = "9999-01-01T12:00:00Z")
-                                                           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant processedTo, 
-                                                       @RequestParam(value = "endpointType", required = false) EndpointType endpointType,
-                                                       @RequestParam(value = "eventId", required = false) UUID eventId,
-                                                       @RequestParam(value = "endpointId", required = false) UUID endpointId,
-                                                       @RequestParam("page") int page,
-                                                       @RequestParam("size") int size) {
+                                                    @RequestParam(value = "processedTo", required = false, defaultValue = "2100-01-01T12:00:00Z")
+                                                           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant processedTo,
+                                                    @RequestParam(value = "endpointType", required = false) EndpointType endpointType,
+                                                    @RequestParam(value = "eventId", required = false) UUID eventId,
+                                                    @RequestParam(value = "endpointId", required = false) UUID endpointId,
+                                                    @RequestParam("page") int page,
+                                                    @RequestParam("size") int size) {
         Pageable pageable = createPageRequest(page, size, pagingConfigProperties);
-        List<EndpointTableViewDto> endpoints = endpointsRepository
+        List<EndpointDetailDto> endpoints = endpointsRepository
                 .findAllEndpointsWithStats(processedFrom, processedTo, endpointType, eventId, endpointId, pageable.getOffset(), pageable.getPageSize())
                 .stream()
-                .map(EndpointTableViewDto::from)
+                .map(EndpointDetailDto::from)
                 .collect(Collectors.toList());
         
         long endpointsTotalCount = endpointsRepository.countAllEndpointsWithStats(processedFrom, processedTo, endpointType, eventId, endpointId);

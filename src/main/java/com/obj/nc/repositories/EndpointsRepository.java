@@ -19,7 +19,7 @@
 
 package com.obj.nc.repositories;
 
-import com.obj.nc.domain.dto.EndpointTableViewDto.EndpointType;
+import com.obj.nc.domain.dto.fe.EndpointDetailDto.EndpointType;
 import com.obj.nc.domain.endpoints.ReceivingEndpoint;
 import com.obj.nc.domain.endpoints.ReceivingEndpointWithStats;
 import com.obj.nc.domain.endpoints.ReceivingEndpointWithStats.ReceivingEndpointWithStatsRowMapper;

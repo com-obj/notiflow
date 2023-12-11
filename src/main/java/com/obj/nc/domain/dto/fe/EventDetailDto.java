@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.dto;
+package com.obj.nc.domain.dto.fe;
 
 import com.obj.nc.domain.event.GenericEventWithStats;
 import lombok.Builder;
@@ -28,7 +28,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class GenericEventTableViewDto {
+public class EventDetailDto {
     
     private UUID id;
     private String externalId;
@@ -43,8 +43,8 @@ public class GenericEventTableViewDto {
     private long messagesReadCount;
     private long messagesFailedCount;
     
-    public static GenericEventTableViewDto from(GenericEventWithStats genericEventWithStats) {
-        return GenericEventTableViewDto
+    public static EventDetailDto from(GenericEventWithStats genericEventWithStats) {
+        return EventDetailDto
                 .builder()
                 .id(genericEventWithStats.getEvent().getId())
                 .externalId(genericEventWithStats.getEvent().getExternalId())
