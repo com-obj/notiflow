@@ -21,7 +21,7 @@ jobs:
         env:
           POSTGRES_DB: nc
           POSTGRES_USER: nc
-          POSTGRES_PASSWORD: ZMss4o9mdBLV
+          POSTGRES_PASSWORD: Ahoj123
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
