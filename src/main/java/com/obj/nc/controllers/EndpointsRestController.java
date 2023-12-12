@@ -52,15 +52,19 @@ public class EndpointsRestController {
     private final PagingConfigProperties pagingConfigProperties;
     
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public Page<EndpointDetailDto> findAllEndpoints(@RequestParam(value = "processedFrom", required = false, defaultValue = "2000-01-01T12:00:00Z")
-                                                           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant processedFrom,
-                                                    @RequestParam(value = "processedTo", required = false, defaultValue = "2100-01-01T12:00:00Z")
-                                                           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant processedTo,
-                                                    @RequestParam(value = "endpointType", required = false) EndpointType endpointType,
-                                                    @RequestParam(value = "eventId", required = false) UUID eventId,
-                                                    @RequestParam(value = "endpointId", required = false) UUID endpointId,
-                                                    @RequestParam("page") int page,
-                                                    @RequestParam("size") int size) {
+    public Page<EndpointDetailDto> findAllEndpoints(
+            @RequestParam(value = "processedFrom", required = false, defaultValue = "2000-01-01T12:00:00Z")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            Instant processedFrom,
+            @RequestParam(value = "processedTo", required = false, defaultValue = "2100-01-01T12:00:00Z")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            Instant processedTo,
+            @RequestParam(value = "endpointType", required = false) EndpointType endpointType,
+            @RequestParam(value = "eventId", required = false) UUID eventId,
+            @RequestParam(value = "endpointId", required = false) UUID endpointId,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    ) {
         Pageable pageable = createPageRequest(page, size, pagingConfigProperties);
         List<EndpointDetailDto> endpoints = endpointsRepository
                 .findAllEndpointsWithStats(processedFrom, processedTo, endpointType, eventId, endpointId, pageable.getOffset(), pageable.getPageSize())

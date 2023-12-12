@@ -108,13 +108,17 @@ public class EventsRestController {
     }
 	
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	public Page<EventDetailDto> findAllEvents(@RequestParam(value = "consumedFrom", required = false, defaultValue = "2000-01-01T12:00:00Z")
-															@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedFrom,
-                                              @RequestParam(value = "consumedTo", required = false, defaultValue = "2100-01-01T12:00:00Z")
-															@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedTo,
-                                              @RequestParam(value = "eventId", required = false) String eventId,
-                                              @RequestParam("page") int page,
-                                              @RequestParam("size") int size) {
+	public Page<EventDetailDto> findAllEvents(
+			@RequestParam(value = "consumedFrom", required = false, defaultValue = "2000-01-01T12:00:00Z")
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+			Instant consumedFrom,
+			@RequestParam(value = "consumedTo", required = false, defaultValue = "2100-01-01T12:00:00Z")
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+			Instant consumedTo,
+			@RequestParam(value = "eventId", required = false) String eventId,
+			@RequestParam("page") int page,
+			@RequestParam("size") int size
+	) {
 		Pageable pageable = createPageRequest(page, size, pagingConfigProperties);
 		UUID eventUUID = eventId == null ? null : UUID.fromString(eventId);
 		

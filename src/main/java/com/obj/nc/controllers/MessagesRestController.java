@@ -64,9 +64,11 @@ public class MessagesRestController {
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public Page<MessageDto> findAllMessages(
             @RequestParam(value = "createdFrom", required = false, defaultValue = "2000-01-01T12:00:00Z")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdFrom,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            Instant createdFrom,
             @RequestParam(value = "createdTo", required = false, defaultValue = "2100-01-01T12:00:00Z")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdTo,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            Instant createdTo,
             @RequestParam(value = "eventId", required = false) String eventId,
             @RequestParam("page") int page,
             @RequestParam("size") int size
