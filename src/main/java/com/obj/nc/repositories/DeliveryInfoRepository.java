@@ -19,8 +19,8 @@
 
 package com.obj.nc.repositories;
 
-import com.obj.nc.domain.dto.DeliveryInfoDto;
-import com.obj.nc.domain.dto.DeliveryInfoDto.DeliveryInfoDtoMapper;
+import com.obj.nc.domain.dto.fe.DeliveryInfoDto;
+import com.obj.nc.domain.dto.fe.DeliveryInfoDto.DeliveryInfoDtoMapper;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import org.springframework.data.jdbc.repository.query.Query;

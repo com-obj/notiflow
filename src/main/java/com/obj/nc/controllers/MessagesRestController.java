@@ -20,7 +20,7 @@
 package com.obj.nc.controllers;
 
 import com.obj.nc.config.PagingConfigProperties;
-import com.obj.nc.domain.dto.MessageTableViewDto;
+import com.obj.nc.domain.dto.fe.MessageDto;
 import com.obj.nc.domain.dto.SendEmailMessageRequest;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistentState;
@@ -60,21 +60,25 @@ public class MessagesRestController {
         messageProcessingFlow.processMessage(message);
     	return SendMessageResponse.from(message.getId());
     }
-    
+
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public Page<MessageTableViewDto> findAllMessages(@RequestParam(value = "createdFrom", required = false, defaultValue = "2000-01-01T12:00:00Z") 
-                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdFrom,
-                                                     @RequestParam(value = "createdTo", required = false, defaultValue = "9999-01-01T12:00:00Z") 
-                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdTo,
-                                                     @RequestParam(value = "eventId", required = false) String eventId,
-                                                     @RequestParam("page") int page,
-                                                     @RequestParam("size") int size) {
+    public Page<MessageDto> findAllMessages(
+            @RequestParam(value = "createdFrom", required = false, defaultValue = "2000-01-01T12:00:00Z")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            Instant createdFrom,
+            @RequestParam(value = "createdTo", required = false, defaultValue = "2100-01-01T12:00:00Z")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            Instant createdTo,
+            @RequestParam(value = "eventId", required = false) String eventId,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    ) {
         Pageable pageable = createPageRequest(page, size, pagingConfigProperties);
         UUID eventUUID = eventId == null ? null : UUID.fromString(eventId);
-        
-        List<MessageTableViewDto> messages = messageRepository
+
+        List<MessageDto> messages = messageRepository
                 .findAllMessages(createdFrom, createdTo, eventUUID, pageable.getOffset(), pageable.getPageSize());
-        
+
         long messagesTotalCount = messageRepository.countAllMessages(createdFrom, createdTo, eventUUID);
         return new ResultPage<>(messages, pageable, messagesTotalCount);
     }

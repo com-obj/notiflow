@@ -150,7 +150,8 @@ class MessagesRestControllerTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.content.size()", Matchers.is(19)))
                 .andExpect(jsonPath("$.content[0].id", Matchers.notNullValue()))
                 .andExpect(jsonPath("$.content[0].timeCreated", DateFormatMatcher.matchesISO8601()))
-                .andExpect(jsonPath("$.content[0].endpointIds", Matchers.not(Matchers.emptyArray())));
+                .andExpect(jsonPath("$.content[0].endpoints", Matchers.not(Matchers.emptyArray())))
+                .andExpect(jsonPath("$.content[0].events", Matchers.not(Matchers.emptyArray())));
     }
     
     @Test

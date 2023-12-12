@@ -21,14 +21,18 @@ package com.obj.nc.repositories;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.obj.nc.domain.dto.fe.MessageDto;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.MessagePersistentState;
+import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
@@ -50,6 +54,7 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 	@Autowired MessageRepository messageRepository;
 	@Autowired EndpointsRepository endpointRepo;
 	@Autowired GenericEventRepository eventRepo;
+	@Autowired MessageAndEndpointPersister messageAndEndpointPersister;
 	
 
 	@BeforeEach
@@ -109,6 +114,31 @@ public class MessageRepositoryTest extends BaseIntegrationTest {
 				UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981c")));
 		// THEN
 		Assertions.assertThat(oIntentInDB.isEmpty()).isTrue();
+	}
+
+	@Test
+	public void testFindAllMessages() {
+		GenericEvent event = GenericEvent.builder()
+				.id(UUID.randomUUID())
+				.name("NAME")
+				.payloadJson(JsonUtils.readJsonNodeFromJSONString("{\"a\": \"b\"}"))
+				.build();
+		eventRepo.save(event);
+
+		EmailMessage emailMsg = createTestMessage();
+		emailMsg.setId(UUID.fromString("bf44aedf-6439-4e7f-a136-3dc78202981b"));
+		emailMsg.addPreviousEventId(event.getEventId());
+		messageAndEndpointPersister.apply(emailMsg);
+
+		// WHEN
+		List<MessageDto> msgInDb = messageRepository.findAllMessages(
+			Instant.now().minus(1, ChronoUnit.MINUTES), Instant.now(), null, 0, 10
+		);
+		// THEN
+		Assertions.assertThat(msgInDb.get(0).getId()).isEqualTo("bf44aedf-6439-4e7f-a136-3dc78202981b");
+		Assertions.assertThat(msgInDb.get(0).getEndpoints().get(0).getName()).isEqualTo("john.doe@objectify.sk");
+		Assertions.assertThat(msgInDb.get(0).getEndpoints().get(0).getType()).isEqualTo("EMAIL");
+		Assertions.assertThat(msgInDb.get(0).getEvents().get(0).getName()).isEqualTo("NAME");
 	}
 
 	@Test

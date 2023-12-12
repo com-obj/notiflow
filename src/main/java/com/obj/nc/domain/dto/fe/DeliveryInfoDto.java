@@ -1,4 +1,4 @@
-package com.obj.nc.domain.dto;
+package com.obj.nc.domain.dto.fe;
 
 import lombok.Builder;
 import lombok.Data;

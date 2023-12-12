@@ -242,7 +242,6 @@ nc.data-sources.jdbc[0].url=jdbc:postgresql://localhost:25432/nc
 nc.data-sources.jdbc[0].username=nc
 nc.data-sources.jdbc[0].password=xxx
 nc.data-sources.jdbc[0].jobs[0].name=check-agreements-expiry
-nc.data-sources.jdbc[0].jobs[0].entity-name=license_agreement
 nc.data-sources.jdbc[0].jobs[0].sqlQuery=select * from license_agreement  
 nc.data-sources.jdbc[0].jobs[0].pojoFCCN=com.obj.nc.flows.dataSources.config.TestLicenseAgreement     
 nc.data-sources.jdbc[0].jobs[0].cron=*/5 * * * * *

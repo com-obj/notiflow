@@ -155,6 +155,8 @@ public class TestDataRestController {
         GenericEvent event = GenericEvent.builder()
                 .id(uuid)
                 .flowId("default-flow")
+                .name("Something happened")
+                .description("Catastrophic disaster")
                 .payloadJson(payload.toJsonNode())
                 .timeConsumed(timeConsumed)
                 .build();
