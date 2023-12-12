@@ -21,11 +21,6 @@ package com.obj.nc.domain.dto.fe;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obj.nc.Get;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
-import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,7 +29,7 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.UUID;
+import java.util.List;
 
 import static com.obj.nc.utils.JsonUtils.getObjectMapperWithSortedProperties;
 
@@ -45,53 +40,44 @@ public class MessageDto {
     private final String flowId;
     private final Instant timeCreated;
     private final String latestStatus;
-    private final EndpointDto[] endpoints;
-    private final EventDto[] events;
+    private final List<EndpointDto> endpoints;
+    private final List<EventDto> events;
 
     public static class MessageTableViewDtoRowMapper implements RowMapper<MessageDto> {
         @Override
         public MessageDto mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-            EndpointDto[] endpoints = {};
-            EventDto[] events = {};
-
-            String ep = resultSet.getString("endpoints");
-            String ev = resultSet.getString("events");
-
-
-            try {
-                final EndpointDto[] endpointsRow = getObjectMapperWithSortedProperties().readValue(
-                        ep, new TypeReference<EndpointDto[]>() {}
-                );
-
-                endpoints = endpointsRow != null ? endpointsRow : endpoints;
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-
-            try {
-                final EventDto[] eventsRow = getObjectMapperWithSortedProperties().readValue(
-                        ev, new TypeReference<EventDto[]>() {}
-                );
-
-                events = eventsRow != null ? eventsRow : events;
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-
-            return MessageDto.builder()
+            MessageDtoBuilder dtoBuilder = MessageDto.builder()
                     .id(resultSet.getString("id"))
                     .flowId(resultSet.getString("flow_id"))
                     .timeCreated(resultSet.getTimestamp("time_created").toInstant())
-                    .latestStatus(resultSet.getString("latest_status"))
-                    .endpoints(endpoints)
-                    .events(events)
-                    .build();
+                    .latestStatus(resultSet.getString("latest_status"));
+
+            try {
+                String endpointsJson = resultSet.getString("endpoints");
+                if (endpointsJson != null) {
+                    TypeReference<List<EndpointDto>> endpointsType = new TypeReference<List<EndpointDto>>() {};
+                    List<EndpointDto> endpointsRow = getObjectMapperWithSortedProperties().readValue(endpointsJson, endpointsType);
+                    dtoBuilder = dtoBuilder.endpoints(endpointsRow);
+                }
+
+                String eventsJson = resultSet.getString("events");
+                if (eventsJson != null) {
+                    TypeReference<List<EventDto>> eventsType = new TypeReference<List<EventDto>>() {};
+                    List<EventDto> eventsRow = getObjectMapperWithSortedProperties().readValue(eventsJson, eventsType);
+                    dtoBuilder = dtoBuilder.events(eventsRow);
+                }
+
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+
+            return dtoBuilder.build();
         }
     }
 
     @Data
     @NoArgsConstructor
-    static class EndpointDto {
+    public static class EndpointDto {
         private String id;
         private String name;
         private String type;
@@ -99,7 +85,7 @@ public class MessageDto {
 
     @Data
     @NoArgsConstructor
-    static class EventDto {
+    public static class EventDto {
         private String id;
         private String name;
         private String description;
