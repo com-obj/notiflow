@@ -63,7 +63,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(properties = {
 		"nc.flows.test-mode.enabled=true", 
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
-@DirtiesContext(classMode =ClassMode.AFTER_CLASS) //need to dispose @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME) testModeEmailsReciver
+@DirtiesContext(classMode =ClassMode.AFTER_EACH_TEST_METHOD) //need to dispose @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME) testModeEmailsReciver
 @Tag("test-mode")
 public class GreenMailReceiverSourceSupplierTest extends BaseIntegrationTest {
 
