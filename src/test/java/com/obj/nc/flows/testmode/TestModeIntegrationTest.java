@@ -84,7 +84,7 @@ import static org.awaitility.Awaitility.await;
 @SpringIntegrationTest(noAutoStartup = {TEST_MODE_GREEN_MAIL_SOURCE_BEAN_NAME, TEST_MODE_SMS_SOURCE_BEAN_NAME })
 @SpringBootTest(properties = {
 		"nc.flows.test-mode.enabled=true", 
-		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
+		"nc.flows.test-mode.recipients=ismayilov@objectify.sk"})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //need to dispose @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME) testModeEmailsReciver
 @Tag("test-mode")
 public class TestModeIntegrationTest extends BaseIntegrationTest {
