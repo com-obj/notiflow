@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@ConditionalOnProperty(name = "nc.flows.delivery-status-tracking.polling", havingValue = "true")
 @Configuration(DeliveryStatusTrackingFlowConfig.DELIVERY_STATUS_TRACKING_FLOW_CONF_BEAN_NAME)
 @AllArgsConstructor
 public class DeliveryStatusTrackingFlowConfig {
@@ -40,7 +41,6 @@ public class DeliveryStatusTrackingFlowConfig {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "nc.flows.delivery-status-tracking.polling", havingValue = "true")
     public IntegrationFlow deliveryStatusTrackerFlow(DeliveryInfoRepository deliveryInfoRepository) {
         return IntegrationFlows.from(
                         () -> {
