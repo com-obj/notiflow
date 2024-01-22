@@ -5,6 +5,7 @@ import com.obj.nc.functions.sink.deliveryStatusUpdater.ExtensionBasedDeliverySta
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@ConditionalOnProperty(name = "nc.flows.delivery-status-tracking.polling", havingValue = "true")
 @Configuration(DeliveryStatusTrackingFlowConfig.DELIVERY_STATUS_TRACKING_FLOW_CONF_BEAN_NAME)
 @AllArgsConstructor
 public class DeliveryStatusTrackingFlowConfig {
