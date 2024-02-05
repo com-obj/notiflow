@@ -86,7 +86,7 @@ class EventSummaryNotificationTest extends BaseIntegrationTest {
         testEvent.setNotifyAfterProcessing(true);
         eventRepo.save(testEvent);
 
-        springJdbcTemplate.update("update nc_delivery_info set processed_on = now() - INTERVAL '1 min'");
+        springJdbcTemplate.update("update nc_delivery_info set processed_on = now() - INTERVAL '25 hours'");
 
         //then
         boolean received = greenMail.waitForIncomingEmail(15000L, 1);   //this test can take some time
@@ -107,7 +107,7 @@ class EventSummaryNotificationTest extends BaseIntegrationTest {
                 "EMAIL", "SMS",
                 "0", "1", "2",
                 "Message type", "Messages produced", "Number of recipients",
-                "NC Processing", "NC Sent", "NC Failed", "NC Discarded", "Delivered",
+                "NC Sent", "NC Failed", "NC Discarded", "Delivered",
                 "Delivery Failed", "Delivery Unknown", "Delivery Pending"
             )
         );

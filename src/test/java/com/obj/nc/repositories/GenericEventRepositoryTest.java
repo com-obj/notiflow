@@ -19,24 +19,33 @@
 
 package com.obj.nc.repositories;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.obj.nc.aspects.ProcessingInfoGeneratorTest.TestPayload;
+import com.obj.nc.Get;
+import com.obj.nc.domain.endpoints.EmailEndpoint;
 import com.obj.nc.domain.event.GenericEvent;
+import com.obj.nc.domain.message.EmailMessage;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.test.context.SpringIntegrationTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
+import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.*;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
@@ -44,7 +53,15 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 public class GenericEventRepositoryTest extends BaseIntegrationTest {
 
 	@Autowired GenericEventRepository eventRepository;
-	
+	@Autowired MessageRepository messageRepository;
+	@Autowired EndpointsRepository endpointRepo;
+
+
+	@BeforeEach
+	void setUp(@Autowired JdbcTemplate jdbcTemplate) {
+		purgeNotifTables(jdbcTemplate);
+	}
+
 	@Test
 	public void testPersistingSingleEvent() {
 		//GIVEN
@@ -58,6 +75,64 @@ public class GenericEventRepositoryTest extends BaseIntegrationTest {
 
 	}
 
+	@Test
+	public void testFindEventForSummaryNotification_ByTooOldPendingDelivery() {
+		persistEventWithDeliveryInfoProcessedOneDayAgo(DELIVERY_PENDING);
+
+		int secondsSinceLastProcessing = 60;
+		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
+		Instant period = now.minus(1, ChronoUnit.DAYS);
+
+		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, period);
+		Assertions.assertThat(events).hasSize(1);
+	}
+
+	@Test
+	public void testFindEventForSummaryNotification_BySendingCompleted() {
+		persistEventWithDeliveryInfoProcessedOneDayAgo(DELIVERY_FAILED);
+
+		int secondsSinceLastProcessing = 60;
+		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
+		Instant period = now.minus(2, ChronoUnit.DAYS);
+
+		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, period);
+		Assertions.assertThat(events).hasSize(1);
+	}
+
+	@Test
+	public void testFindAnyEventForSummaryNotification_NoneByTooOldPendingDelivery() {
+		persistEventWithDeliveryInfoProcessedOneDayAgo(DELIVERY_PENDING);
+
+		int secondsSinceLastProcessing = 60;
+		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
+		Instant period = now.minus(2, ChronoUnit.DAYS);
+
+		List<GenericEvent> events = eventRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, period);
+		Assertions.assertThat(events).isEmpty();
+	}
+
+	private void persistEventWithDeliveryInfoProcessedOneDayAgo(DeliveryInfo.DELIVERY_STATUS status) {
+		GenericEvent event = createProcessedEvent();
+		event.setNotifyAfterProcessing(true);
+		eventRepository.save(event);
+
+		EmailMessage message = createTestMessage();
+		message.addPreviousEventId(event.getId());
+		messageRepository.save(message.toPersistentState());
+
+		List<EmailEndpoint> endpoint = endpointRepo.persistEnpointIfNotExists(message.getReceivingEndpoints());
+
+		DeliveryInfo deliveryInfo = DeliveryInfo.builder()
+				.endpointId(endpoint.get(0).getId())
+				.messageId(message.getId())
+				.status(status)
+				.id(UUID.randomUUID())
+				.build();
+		deliveryInfoRepo.save(deliveryInfo);
+
+		Get.getJdbc().update("update nc_delivery_info set processed_on = now() - INTERVAL '30 hours'");
+	}
+
 	public static GenericEvent createProcessedEvent() {
 		String content = JsonUtils.readJsonStringFromClassPathResource("intents/direct_message.json");
 		
@@ -66,9 +141,15 @@ public class GenericEventRepositoryTest extends BaseIntegrationTest {
 				.flowId("FLOW_ID")
 				.id(UUID.randomUUID())
 				.payloadJson(JsonUtils.readJsonNodeFromJSONString(content))
-				.timeConsumed(Instant.now()) 
+				.timeConsumed(Instant.now())
 				.build();
 		return event;
+	}
+
+	private EmailMessage createTestMessage() {
+		String INPUT_JSON_FILE = "messages/email_message.json";
+		EmailMessage emailMsg = JsonUtils.readObjectFromClassPathResource(INPUT_JSON_FILE, EmailMessage.class);
+		return emailMsg;
 	}
 
 }

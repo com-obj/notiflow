@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
         "nc.data-sources.jdbc[0].name=test-ds",
         "nc.data-sources.jdbc[0].url=jdbc:postgresql://localhost:25432/nc",
         "nc.data-sources.jdbc[0].username=nc",
-        "nc.data-sources.jdbc[0].password=ZMss4o9mdBLV",
+        "nc.data-sources.jdbc[0].password=Ahoj123",
         "nc.data-sources.jdbc[0].jobs[0].name=check-agreements-expiry",
         "nc.data-sources.jdbc[0].jobs[0].entity-name=license_agreement",
         "nc.data-sources.jdbc[0].jobs[0].sqlQuery=select * from license_agreement",  

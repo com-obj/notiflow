@@ -76,7 +76,7 @@ class EventSummaryNotificationWithAdditionalRecipientShouldFailTest extends Base
         GenericEvent testEvent = testDataController.persistFullEventProcessingData();
         testEvent.setNotifyAfterProcessing(true);
         eventRepo.save(testEvent);
-        springJdbcTemplate.update("update nc_delivery_info set processed_on = now() - INTERVAL '1 min'");
+        springJdbcTemplate.update("update nc_delivery_info set processed_on = now() - INTERVAL '25 hours'");
 
         //then
         boolean received = greenMail.waitForIncomingEmail(15000L, 3);   //this test can take some time

@@ -81,7 +81,7 @@ public class DeliveryInfoRestController {
 		UUID endpointUUID = endpointId == null ? null : UUID.fromString(endpointId);
 
 		long total = deliveryRepo.countByEventIdAndEndpointId(UUID.fromString(eventId), endpointUUID);
-		List<DeliveryInfo> deliveries = deliveryRepo.findByEventIdAndEndpointIdOrderByProcessedOn(
+		List<DeliveryInfo> deliveries = deliveryRepo.findLatestByEventIdAndEndpointIdOrderByProcessedOn(
 				UUID.fromString(eventId), endpointUUID, pageable.getPageSize(), pageable.getOffset());
 
 		if (deliveries.isEmpty()) {

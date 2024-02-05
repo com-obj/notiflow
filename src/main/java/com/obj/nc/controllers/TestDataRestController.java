@@ -54,6 +54,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -72,18 +75,20 @@ import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.D
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.PROCESSING;
 import static com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS.SENT;
 
+@Slf4j
 @RestController
 @RequestMapping("/test-data")
+@ConditionalOnProperty(name = "nc.app.test-data.enabled", havingValue = "true")
 @RequiredArgsConstructor
 public class TestDataRestController {
     
-        private static final UUID SMS_ID = UUID.fromString("c3ce484f-f03c-47b1-ae6a-2337ca4f6444");
-        private static final UUID EMAIL2_ID = UUID.fromString("4e91137e-93aa-4633-b137-3050442d26a5");
-        private static final UUID EMAIL1_ID = UUID.fromString("5f74929b-2635-4515-9f30-ba79e200e92b");
-        private static final UUID JOHN_DOE_SMS_ID = UUID.fromString("820023cf-7dd0-407f-abfa-0d6453bde6d3");
-        public static final UUID JOE_DUDLY_EMAIL_ID = UUID.fromString("d2ca2a68-1dc4-4052-a93a-67319449ef5b");
-        public static final UUID JOHN_DOE_EMAIL_ID = UUID.fromString("3d02890b-1b53-465c-b8c3-b0a722483a45");
-        public static final UUID EVENT_ID = UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d");
+    private static final UUID SMS_ID = UUID.fromString("c3ce484f-f03c-47b1-ae6a-2337ca4f6444");
+    private static final UUID EMAIL2_ID = UUID.fromString("4e91137e-93aa-4633-b137-3050442d26a5");
+    private static final UUID EMAIL1_ID = UUID.fromString("5f74929b-2635-4515-9f30-ba79e200e92b");
+    private static final UUID JOHN_DOE_SMS_ID = UUID.fromString("820023cf-7dd0-407f-abfa-0d6453bde6d3");
+    public static final UUID JOE_DUDLY_EMAIL_ID = UUID.fromString("d2ca2a68-1dc4-4052-a93a-67319449ef5b");
+    public static final UUID JOHN_DOE_EMAIL_ID = UUID.fromString("3d02890b-1b53-465c-b8c3-b0a722483a45");
+    public static final UUID EVENT_ID = UUID.fromString("e2c59478-6032-4bde-a8c1-0ce42248484d");
 
     private final GenericEventRepository genericEventRepository;
     private final NotificationIntentRepository notificationIntentRepository;
@@ -93,7 +98,22 @@ public class TestDataRestController {
     private final DeliveryInfoRepository deliveryInfoRepository;
     private final FailedPayloadRepository failedPayloadRepository;
     private final ProcessingInfoRepository processingInfoRepository;
-    
+    private final JdbcTemplate jdbcTemplate;
+
+    @GetMapping("/clear-all-data")
+    public void clearAllData() {
+        log.info("Purging all tables in test");
+        jdbcTemplate.execute("truncate table nc_event cascade");
+        jdbcTemplate.execute("truncate table nc_intent cascade");
+        jdbcTemplate.execute("truncate table nc_message cascade");
+        jdbcTemplate.execute("truncate table nc_pulled_notif_data cascade");
+        jdbcTemplate.execute("truncate table nc_endpoint cascade");
+        jdbcTemplate.execute("truncate table nc_delivery_info cascade");
+        jdbcTemplate.execute("truncate table nc_message_2_endpoint_rel cascade");
+        jdbcTemplate.execute("truncate table nc_failed_payload cascade");
+        jdbcTemplate.execute("truncate table nc_processing_info cascade");
+    }
+
     @GetMapping("/full-event-processing")
     public GenericEvent persistFullEventProcessingData() {
         GenericEvent event = persistEvent(
@@ -112,7 +132,7 @@ public class TestDataRestController {
 
         return event;
     }
-    
+
     @GetMapping("/random-events")
     public void persistRandomEventsData(@RequestParam(value = "count", defaultValue = "47") Long count) {
         Random random = new Random();
@@ -182,6 +202,8 @@ public class TestDataRestController {
         message.setId(EMAIL1_ID);
         message.getHeader().setFlowId("default-flow");
         message.setPreviousEventIds(new UUID[]{ EVENT_ID });
+        message.setPreviousIntentIds(new UUID[]{ });
+        message.setPreviousMessageIds(new UUID[]{ });
         message.setBody(EmailContent.builder().subject("Subject").text("Text").build());
         message.setMessageClass(EmailMessage.class.getName());
 
@@ -195,6 +217,8 @@ public class TestDataRestController {
         message.setId(EMAIL2_ID);
         message.getHeader().setFlowId("default-flow");
         message.setPreviousEventIds(new UUID[]{ EVENT_ID });
+        message.setPreviousIntentIds(new UUID[]{ });
+        message.setPreviousMessageIds(new UUID[]{ });
         message.setBody(EmailContent.builder().subject("Subject").text("Text").build());
         message.setMessageClass(EmailMessage.class.getName());
 
@@ -208,6 +232,8 @@ public class TestDataRestController {
         message.setId(SMS_ID);
         message.getHeader().setFlowId("default-flow");
         message.setPreviousEventIds(new UUID[]{ EVENT_ID });
+        message.setPreviousIntentIds(new UUID[]{ });
+        message.setPreviousMessageIds(new UUID[]{ });
         message.setBody(SimpleTextContent.builder().text("Failed SMS").build());
         message.setMessageClass(SmsMessage.class.getName());
 

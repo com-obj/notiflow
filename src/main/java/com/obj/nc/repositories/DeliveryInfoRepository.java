@@ -30,9 +30,14 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface DeliveryInfoRepository extends PagingAndSortingRepository<DeliveryInfo, UUID> {
+
+    @Modifying
+    @Query("UPDATE nc_delivery_info SET status = :status, additional_information = :additionalInfo WHERE message_id = :messageId")
+    int updateDeliveryInfoStatus(UUID messageId, DELIVERY_STATUS status, String additionalInfo);
 
     @Query("select di.* " +
             "from nc_delivery_info di " +
@@ -42,7 +47,7 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
             "and (:eventId)::uuid = ANY(m.previous_event_ids) " +
             "order by processed_on")
     List<DeliveryInfo> findByEventIdAndStatusOrderByProcessedOn(
-            @Param("eventId") UUID eventId, 
+            @Param("eventId") UUID eventId,
             @Param("status") DELIVERY_STATUS status);
 
     @Query("select di.* " +
@@ -53,8 +58,8 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
             "and (:intentId)::uuid = ANY(m.previous_intent_ids) " +
             "order by processed_on")
     List<DeliveryInfo> findByIntentIdAndStatusOrderByProcessedOn(
-            @Param("intentId") UUID intentId, 
-            @Param("status") DELIVERY_STATUS status);            
+            @Param("intentId") UUID intentId,
+            @Param("status") DELIVERY_STATUS status);
 
     @Query("select di.* " +
             "from nc_delivery_info di " +
@@ -76,26 +81,31 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
     List<DeliveryInfo> findByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,
                                                                     @Param("endpointId") UUID endpointId);
 
-    String QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "select di.*\n" +
-            "from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
-            "where :eventId = ANY (m.previous_event_ids)\n" +
-            "  and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
-            "  and status IN ('SENT', 'FAILED', 'DELIVERED', 'DELIVERY_UNKNOWN', 'DELIVERY_FAILED', 'DELIVERY_PENDING')\n" +
+    String WITH_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID =
+            "with latest_msg_di as (\n" +
+                    "    select distinct on (di.message_id) di.id as delivery_id\n" +
+                    "    from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
+                    "    where :eventId = ANY (m.previous_event_ids)\n" +
+                    "      and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
+                    "      and di.status IN ('SENT', 'FAILED', 'DELIVERED', 'DELIVERY_UNKNOWN', 'DELIVERY_FAILED', 'DELIVERY_PENDING')\n" +
+                    "    order by di.message_id, di.processed_on desc\n" +
+                    ")\n";
+
+    String QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = WITH_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID +
+            "select di.*\n" +
+            "from nc_delivery_info di\n" +
+            "join latest_msg_di latest on latest.delivery_id = di.id\n" +
             "order by processed_on\n" +
-            "limit :size offset :offset";
+            "limit :size offset :offset\n";
 
     @Query(QRY_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
-    List<DeliveryInfo> findByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,
-                                                                    @Param("endpointId") UUID endpointId,
-                                                                    @Param("size") int size,
-                                                                    @Param("offset") long offset);
+    List<DeliveryInfo> findLatestByEventIdAndEndpointIdOrderByProcessedOn(@Param("eventId") UUID eventId,
+                                                                          @Param("endpointId") UUID endpointId,
+                                                                          @Param("size") int size,
+                                                                          @Param("offset") long offset);
 
-
-    String QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID = "select count(di.*)\n" +
-            "from nc_delivery_info di join nc_message m on di.message_id = m.id\n" +
-            "where :eventId = ANY (m.previous_event_ids)\n" +
-            "  and ((:endpointId)::uuid is null or endpoint_id = (:endpointId)::uuid)\n" +
-            "  and status IN ('SENT', 'FAILED', 'DELIVERED', 'DELIVERY_UNKNOWN', 'DELIVERY_FAILED', 'DELIVERY_PENDING')";
+    String QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID
+            = WITH_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID + "select count(1) from latest_msg_di";
 
     @Query(QRY_COUNT_LATEST_DELIVERY_INFO_BY_ENDPOINT_ID)
     long countByEventIdAndEndpointId(@Param("eventId") UUID eventId, @Param("endpointId") UUID endpointId);
@@ -133,8 +143,8 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
             "    select msg_chain.id from msg_chain) " +
             "order by di.processed_on")
     List<DeliveryInfo> findByMessageIdAndStatusOrderByProcessedOn(
-                @Param("messageId") UUID messageId,
-                @Param("status") DELIVERY_STATUS status);
+            @Param("messageId") UUID messageId,
+            @Param("status") DELIVERY_STATUS status);
 
     @Query("select count(di.id) " +
             "from nc_delivery_info di " +
@@ -155,37 +165,37 @@ public interface DeliveryInfoRepository extends PagingAndSortingRepository<Deliv
     long countByEndpointIdAndProcessedOnAfter(UUID endpointId, Instant timestamp);
 
     /*
-    * NOTICE
-    * - this method is used for finding messages in non-terminal state so that we can ask external system for its current state
-    * "NOT EXISTS" part filters messages, which are already in terminal state - because we INSERT (instead of UPDATE) new deliveryInfo when message delivery state changes,
-    * we store multiple deliveryInfos per message, so we try to find such message for which doesn't exist terminal state deliveryInfo
-    * - in "where di.status IN ('SENT', 'DELIVERY_PENDING')" statement there isn't PROCESSING state because we haven't sent the message yet, so
-    * asking external system for its state wouldn't make sense
-    * */
+     * NOTICE
+     * - this method is used for finding messages in non-terminal state so that we can ask external system for its current state
+     * "NOT EXISTS" part filters messages, which are already in terminal state - because we INSERT (instead of UPDATE) new deliveryInfo when message delivery state changes,
+     * we store multiple deliveryInfos per message, so we try to find such message for which doesn't exist terminal state deliveryInfo
+     * - in "where di.status IN ('SENT', 'DELIVERY_PENDING')" statement there isn't PROCESSING state because we haven't sent the message yet, so
+     * asking external system for its state wouldn't make sense
+     * */
     @Query(
-        value = "select distinct on (m.id)" +
-                "    di.id AS delivery_id, " +
-                "    m.id AS message_id, " +
-                "    e.endpoint_type AS endpoint_type, " +
-                "    di.status AS delivery_status, " +
-                "    di.additional_information AS additional_information, " +
-                "    m.reference_number AS reference_number " +
-                "from nc_delivery_info di " +
-                "join nc_message m " +
-                "on di.message_id = m.id " +
-                "join nc_endpoint e " +
-                "on di.endpoint_id = e.id " +
-                "where di.status IN ('SENT', 'DELIVERY_PENDING') " +
-                "and e.endpoint_type IN (:endpointTypes) " +
-                "and di.processed_on > :timestamp " +
-                "and not exists ( " +
-                "   select 1 " +
-                "   from nc_delivery_info di2 " +
-                "   where di.message_id = di2.message_id " +
-                "   and di2.status IN ('FAILED', 'DISCARDED', 'DELIVERED', 'DELIVERY_FAILED', 'DELIVERY_UNKNOWN', 'READ')" +
-                ") " +
-                "order by m.id, di.processed_on desc",
-        rowMapperClass = DeliveryInfoDtoMapper.class
+            value = "select distinct on (m.id)" +
+                    "    di.id AS delivery_id, " +
+                    "    m.id AS message_id, " +
+                    "    e.endpoint_type AS endpoint_type, " +
+                    "    di.status AS delivery_status, " +
+                    "    di.additional_information AS additional_information, " +
+                    "    m.reference_number AS reference_number " +
+                    "from nc_delivery_info di " +
+                    "join nc_message m " +
+                    "on di.message_id = m.id " +
+                    "join nc_endpoint e " +
+                    "on di.endpoint_id = e.id " +
+                    "where di.status IN ('SENT', 'DELIVERY_PENDING') " +
+                    "and e.endpoint_type IN (:endpointTypes) " +
+                    "and di.processed_on > :timestamp " +
+                    "and not exists ( " +
+                    "   select 1 " +
+                    "   from nc_delivery_info di2 " +
+                    "   where di.message_id = di2.message_id " +
+                    "   and di2.status NOT IN ('PROCESSING', 'SENT', 'DELIVERY_PENDING')" +
+                    ") " +
+                    "order by m.id, di.processed_on desc",
+            rowMapperClass = DeliveryInfoDtoMapper.class
     )
     List<DeliveryInfoDto> findUnfinishedDeliveriesNotOlderThan(
             @Param("timestamp") Instant timestamp,

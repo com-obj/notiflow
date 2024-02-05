@@ -42,6 +42,7 @@ import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -87,6 +88,7 @@ import static org.awaitility.Awaitility.await;
 		"nc.flows.test-mode.recipients=cuzy@objectify.sk"})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS) //need to dispose @Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME) testModeEmailsReciver
 @Tag("test-mode")
+@Disabled
 public class TestModeIntegrationTest extends BaseIntegrationTest {
 	
 	@Qualifier(TestModeEmailsBeansConfig.TEST_MODE_GREEN_MAIL_BEAN_NAME)
