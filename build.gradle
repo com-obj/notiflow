@@ -2,7 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.4.5'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'maven-publish'
-	id 'net.nemerosa.versioning' version '2.14.0'
+	id 'com.palantir.git-version' version '3.0.0'
 	id 'java-library'	
 	id 'signing'
 	id 'io.freefair.lombok' version '5.3.2'
@@ -20,13 +20,12 @@ group = 'sk.objectify'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-if (versioning.info.tag && !versioning.info.dirty) {
-	
-	version = extractVersionFromTag(versioning.info.tag, false)
+def versionDetails = versionDetails()
+if (versionDetails.lastTag && versionDetails.isCleanTag) {
+	version = extractVersionFromTag(versionDetails.lastTag, false)
 	println 'Commit tagged and no uncommited changes. CREATING FINAL VERSION ' + version
-}
-else {
-	version = extractVersionFromTag(versioning.info.lastTag, true)
+} else {
+	version = extractVersionFromTag(versionDetails.lastTag, true)
 	println 'Commit not tagged or not all changes commited. CREATING SNAPSHOT VERSION ' + version
 }
 
