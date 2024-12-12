@@ -22,7 +22,7 @@ package com.obj.nc.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.obj.nc.config.PagingConfigProperties;
 import com.obj.nc.domain.dto.DeliveryStatsByEndpointType;
-import com.obj.nc.domain.dto.GenericEventTableViewDto;
+import com.obj.nc.domain.dto.fe.EventDetailDto;
 import com.obj.nc.domain.event.EventReceiverResponse;
 import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.pagination.ResultPage;
@@ -108,20 +108,24 @@ public class EventsRestController {
     }
 	
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	public Page<GenericEventTableViewDto> findAllEvents(@RequestParam(value = "consumedFrom", required = false, defaultValue = "2000-01-01T12:00:00Z") 
-															@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedFrom,
-														@RequestParam(value = "consumedTo", required = false, defaultValue = "9999-01-01T12:00:00Z") 
-															@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant consumedTo,
-														@RequestParam(value = "eventId", required = false) String eventId,
-														@RequestParam("page") int page,
-														@RequestParam("size") int size) {
+	public Page<EventDetailDto> findAllEvents(
+			@RequestParam(value = "consumedFrom", required = false, defaultValue = "2000-01-01T12:00:00Z")
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+			Instant consumedFrom,
+			@RequestParam(value = "consumedTo", required = false, defaultValue = "2100-01-01T12:00:00Z")
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+			Instant consumedTo,
+			@RequestParam(value = "eventId", required = false) String eventId,
+			@RequestParam("page") int page,
+			@RequestParam("size") int size
+	) {
 		Pageable pageable = createPageRequest(page, size, pagingConfigProperties);
 		UUID eventUUID = eventId == null ? null : UUID.fromString(eventId);
 		
-		List<GenericEventTableViewDto> events = eventsRepository
+		List<EventDetailDto> events = eventsRepository
 				.findAllEventsWithStats(consumedFrom, consumedTo, eventUUID, pageable.getOffset(), pageable.getPageSize())
 				.stream()
-				.map(GenericEventTableViewDto::from)
+				.map(EventDetailDto::from)
 				.collect(Collectors.toList());
 		
 		long eventsTotalCount = eventsRepository.countAllEventsWithStats(consumedFrom, consumedTo, eventUUID);
