@@ -32,6 +32,8 @@ import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 
+import java.util.concurrent.Executors;
+
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SEND_FLOW_INPUT_CHANNEL_ID;
@@ -66,8 +68,8 @@ public class MessageProcessingFlowConfig {
         return IntegrationFlows
                 .from(messageProcessingInputChannel())
                 .handle(messageAndEndpointPersister)
-                .transform(messageByRecipientTokenizer)
-                .split()
+                .split(messageByRecipientTokenizer)
+                .channel(c -> c.executor(Executors.newCachedThreadPool()))
                 .handle(messageAndEndpointPersister) //need to persist, otherwise delivery info will have invalid reference
                 .filter(spamPreventionFilter::test)
                 .wireTap(flowConfig ->
