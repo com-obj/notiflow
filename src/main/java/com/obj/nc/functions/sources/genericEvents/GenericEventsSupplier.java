@@ -24,11 +24,13 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
 import com.obj.nc.repositories.GenericEventRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Instant;
 import java.util.Optional;
 
+@Slf4j
 @DocumentProcessingInfo("InputEventSupplier")
 public class GenericEventsSupplier extends SourceSupplierAdapter<GenericEvent> {
 	
@@ -44,9 +46,12 @@ public class GenericEventsSupplier extends SourceSupplierAdapter<GenericEvent> {
 	protected GenericEvent execute() {
 		GenericEvent eventsToProcess = repository.findFirstByTimeConsumedIsNullOrderByTimeCreatedAsc();
 
-		if (eventsToProcess==null) {
+		if (eventsToProcess == null) {
 			return null;
 		}
+
+		log.info("Found an event to process with externalId {}, id {}, and eventId {}",
+				eventsToProcess.getExternalId(), eventsToProcess.getId(), eventsToProcess.getEventId());
 		
 		eventsToProcess.setTimeConsumed(Instant.now());
 		//this is duplicating eventIds
