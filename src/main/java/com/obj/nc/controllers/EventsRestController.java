@@ -35,6 +35,7 @@ import com.obj.nc.functions.processors.eventValidator.SimpleJsonValidator;
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
 import com.obj.nc.repositories.GenericEventRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,6 +56,7 @@ import java.util.stream.Collectors;
 import static com.obj.nc.utils.PagingUtils.createPageRequest;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+@Slf4j
 @Validated
 @RestController
 @RequestMapping("/events")
@@ -71,12 +73,13 @@ public class EventsRestController {
 	
 	@PostMapping( consumes="application/json", produces="application/json")
     public EventReceiverResponse persistGenericEvent(
-    		@RequestBody(required = true) String eventJsonString, 
+    		@RequestBody(required = true) String eventJsonString,
     		@RequestParam(value = "flowId", required = false) String flowId,
     		@RequestParam(value = "externalId", required = false) String externalId,
 			@RequestParam(value = "payloadType", required = false) String payloadType,
 			@RequestParam(value = "notifyAfterProcessing", required = false, defaultValue = "false") boolean notifyAfterProcessing) {
-		
+		log.info("Received event with externalId {}", externalId);
+
 		JsonNode eventJson = simpleJsonValidator.apply(eventJsonString);
 		
 		GenericEvent event = GenericEvent.from(eventJson);
@@ -96,14 +99,18 @@ public class EventsRestController {
 			event = jsonSchemaValidator.apply(event);
 		}
 
+		log.info("Event with externalId {} validated successfully", externalId);
+
     	try {
+			log.info("Persisting event with externalId {} and id {}", externalId, event.getId());
     		persister.accept(event);
+			log.info("Event persisted with externalId {} and id {}", externalId, event.getId());
     	} catch (DbActionExecutionException e) {
+			log.error("Error persisting event with externalId {} and id {}", externalId, event.getId(), e);
     		if (DuplicateKeyException.class.equals(e.getCause().getClass())) {
     			throw new PayloadValidationException("Duplicate external ID detected. Payload rejected: " + eventJson);
     		}
     	}
-
     	return EventReceiverResponse.from(event.getId());
     }
 	

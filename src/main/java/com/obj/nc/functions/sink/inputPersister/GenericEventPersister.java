@@ -56,8 +56,6 @@ public class GenericEventPersister extends SinkConsumerAdapter<GenericEvent> {
 	}
 	
     protected void execute(GenericEvent payload) {
-        log.debug("Persisting generic event {}",payload);
-        
         genericEventRepository.save(payload);
     }
     
