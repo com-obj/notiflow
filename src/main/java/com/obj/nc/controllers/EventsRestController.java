@@ -50,7 +50,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.obj.nc.utils.PagingUtils.createPageRequest;
@@ -110,6 +111,7 @@ public class EventsRestController {
     		if (DuplicateKeyException.class.equals(e.getCause().getClass())) {
     			throw new PayloadValidationException("Duplicate external ID detected. Payload rejected: " + eventJson);
     		}
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error persisting event", e);
     	}
     	return EventReceiverResponse.from(event.getId());
     }
@@ -137,11 +139,9 @@ public class EventsRestController {
 
 	@GetMapping(value = "/{eventId}/statsByType", produces = APPLICATION_JSON_VALUE)
 	public List<DeliveryStatsByEndpointType> findEventStatsByEndpointType(@PathVariable("eventId") String eventId) {
-		
-		List<DeliveryStatsByEndpointType> events = eventsRepository
+
+		return eventsRepository
 				.findEventStatsByEndpointType(UUID.fromString(eventId));
-		
-		return events;
 	}
 	
 
@@ -157,7 +157,6 @@ public class EventsRestController {
 		int secondsSinceLastProcessing = summaryNotifProps.getSecondsSinceLastProcessing();
 		Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
 		Instant before = now.minus(deliveryStatusTrackingProperties.getMaxAgeOfUnfinishedDeliveriesInDays(), ChronoUnit.DAYS);
-		List<GenericEvent> events = eventsRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, before);
-		return events;
+		return eventsRepository.findEventsForSummaryNotification(secondsSinceLastProcessing, before);
 	}
 }
