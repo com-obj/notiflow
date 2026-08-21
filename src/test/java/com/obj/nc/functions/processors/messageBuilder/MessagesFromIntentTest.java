@@ -53,9 +53,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest(properties = {
-    "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
-})
+@SpringBootTest
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
 class MessagesFromIntentTest extends BaseIntegrationTest {
 

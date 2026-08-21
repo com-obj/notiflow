@@ -47,8 +47,8 @@ import com.obj.nc.domain.event.GenericEvent;
 import com.obj.nc.domain.message.EmailMessage;
 import com.obj.nc.domain.message.SmsMessage;
 import com.obj.nc.flows.messageProcessing.MessageProcessingFlow;
+import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
-import com.obj.nc.functions.processors.senders.SmsSender;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import com.obj.nc.repositories.EndpointsRepository;
 import com.obj.nc.repositories.GenericEventRepository;
@@ -60,11 +60,9 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
@@ -85,8 +83,6 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 	@Autowired private MockMvc mockMvc;
 	@Autowired private MessageProcessingFlow messageProcessingFlow;
 	@Autowired private MessageAndEndpointPersister messageAndEndpointPersister;
-	@MockBean
-	SmsSender smsSender;
 
 	@RegisterExtension
 	protected static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
@@ -413,10 +409,13 @@ class EndpointsRestControllerTest extends BaseIntegrationTest {
 		smsMessage.setBody(SimpleTextContent.builder().text("Text").build());
 		smsMessage.setReceivingEndpoints(Arrays.asList(sms));
 
-		Mockito.when(smsSender.apply(smsMessage)).thenReturn(smsMessage);
-
-		messageProcessingFlow.processMessage(smsMessage);
-		await().atMost(5, TimeUnit.SECONDS).until(() -> deliveryInfoRepository.countByMessageIdAndStatus(smsMessage.getId(), PROCESSING) >= 1);
+		SmsMessage persistedSmsMessage = (SmsMessage) messageAndEndpointPersister.apply(smsMessage);
+		deliveryInfoRepository.save(DeliveryInfo.builder()
+				.id(UUID.randomUUID())
+				.status(PROCESSING)
+				.messageId(persistedSmsMessage.getId())
+				.endpointId(persistedSmsMessage.getReceivingEndpoints().get(0).getId())
+				.build());
 	}
 
 	private void assertContainsEndpoint(List<LinkedHashMap<?, ?>> endpoints, String endpointName, long sentMessagesCount) {

@@ -43,9 +43,7 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest(properties = {
-	"nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
-})
+@SpringBootTest
 public class NotificationIntentRepositoryTest extends BaseIntegrationTest {
 	
 	@Autowired NotificationIntentRepository intentRepository;

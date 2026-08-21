@@ -41,11 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest(properties = {
-        "nc.jwt.username=testUser",
-        "nc.jwt.password=testPassword",
-        "nc.jwt.signature-secret=testSecret"
-})
+@SpringBootTest
 class JwtAuthenticationDisabledTest extends BaseIntegrationTest {
     
 	@Autowired protected MockMvc mockMvc;

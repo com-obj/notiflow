@@ -69,9 +69,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @AutoConfigureMockMvc
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest(properties = {
-        "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
-})
+@SpringBootTest
 class StatsRestControllerTest extends BaseIntegrationTest {
     
     @Autowired private GenericEventRepository genericEventRepository;

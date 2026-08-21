@@ -1,7 +1,5 @@
 package com.obj.nc.extensions.providers.recipients;
 
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -11,29 +9,14 @@ import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.recipients.Group;
 import com.obj.nc.domain.recipients.Person;
 import com.obj.nc.domain.recipients.Recipient;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-
-import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.integration.test.context.SpringIntegrationTest;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest(properties = {
-    "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
-})
-@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-public class RecipientsAndEndpointsResolutionTest extends BaseIntegrationTest {
+public class RecipientsAndEndpointsResolutionTest {
 
-    @Autowired
-    protected ContactsStoreConfigProperties config;
-    @Autowired 
-    protected ContactsJsonStoreProvider contactStore;
+    private final ContactsJsonStoreProvider contactStore = new ContactsJsonStoreProvider(
+            "src/test/resources/contact-store/contact-store.json");
 
     @Test
     public void testFindEndpoints() {
