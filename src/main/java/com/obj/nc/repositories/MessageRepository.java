@@ -28,11 +28,15 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageRepository extends PagingAndSortingRepository<MessagePersistentState, UUID>, EntityExistenceChecker<UUID> {
 	
 	List<MessagePersistentState> findByIdIn(List<UUID> intentIds);
+
+    @Query("select id from nc_message where id = :messageId for update")
+    Optional<UUID> lockById(@Param("messageId") UUID messageId);
     
     @Query(
             value = "select " +

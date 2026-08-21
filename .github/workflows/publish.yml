@@ -18,14 +18,14 @@ jobs:
         env:
           POSTGRES_DB: nc
           POSTGRES_USER: nc
-          POSTGRES_PASSWORD: Ahoj123
+          POSTGRES_PASSWORD: ahoj
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 25432:5432
+          - 25433:5432
     
     steps:
       - uses: actions/checkout@v2
@@ -52,4 +52,3 @@ jobs:
             -P gpgSigningPassword=${{ secrets.GPG_SIGNING_PASSWORD }} \
             publishToSonatype \
             closeAndReleaseSonatypeStagingRepository
-

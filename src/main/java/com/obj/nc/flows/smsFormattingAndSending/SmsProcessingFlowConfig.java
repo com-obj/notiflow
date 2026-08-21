@@ -22,30 +22,43 @@ package com.obj.nc.flows.smsFormattingAndSending;
 import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.SmsSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
+import static com.obj.nc.config.ThreadPoolConfig.SMS_SENDING_TASK_EXECUTOR;
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 
 @Configuration
-@RequiredArgsConstructor
 public class SmsProcessingFlowConfig {
 
     private final SmsSender smsSender;
     private final PaylaodLoggerSinkConsumer logConsumer;
     private final MessageAndEndpointPersister messageAndEndpointPersister;
+    private final TaskExecutor smsSendingTaskExecutor;
 
     public final static String SMS_PROCESSING_FLOW_ID = "SMS_PROCESSING_FLOW_ID";
     public final static String SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID = SMS_PROCESSING_FLOW_ID + "_INPUT";
 
+    public SmsProcessingFlowConfig(
+            SmsSender smsSender,
+            PaylaodLoggerSinkConsumer logConsumer,
+            MessageAndEndpointPersister messageAndEndpointPersister,
+            @Qualifier(SMS_SENDING_TASK_EXECUTOR) TaskExecutor smsSendingTaskExecutor) {
+        this.smsSender = smsSender;
+        this.logConsumer = logConsumer;
+        this.messageAndEndpointPersister = messageAndEndpointPersister;
+        this.smsSendingTaskExecutor = smsSendingTaskExecutor;
+    }
+
     @Bean(SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID)
     public MessageChannel smsProcessingInputChangel() {
-        return new PublishSubscribeChannel();
+        return new PublishSubscribeChannel(smsSendingTaskExecutor);
     }
 
     @Bean(SMS_PROCESSING_FLOW_ID)

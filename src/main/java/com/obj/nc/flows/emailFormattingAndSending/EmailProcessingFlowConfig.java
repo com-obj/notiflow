@@ -31,8 +31,11 @@ import com.obj.nc.functions.processors.messageTemplating.config.TrackingConfigPr
 import com.obj.nc.functions.processors.messageTracking.EmailReadTrackingDecorator;
 import com.obj.nc.functions.processors.senders.EmailSender;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.MediaType;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.channel.QueueChannel;
@@ -41,8 +44,9 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.PollerSpec;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
+import static com.obj.nc.config.ThreadPoolConfig.ASYNC_FLOW_TASK_EXECUTOR;
+import static com.obj.nc.config.ThreadPoolConfig.EMAIL_SENDING_TASK_EXECUTOR;
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowProperties.MULTI_LOCALES_MERGE_STRATEGY.MERGE;
 
@@ -57,7 +61,12 @@ public class EmailProcessingFlowConfig {
 	private final EmailProcessingFlowProperties properties;
 	private final MessagePersister messagePersister;
 	private final MessageAndEndpointPersister messageAndEndpointPersister;
-	private final ThreadPoolTaskScheduler executor;
+	@Autowired
+	@Qualifier(ASYNC_FLOW_TASK_EXECUTOR)
+	private TaskExecutor asyncFlowTaskExecutor;
+	@Autowired
+	@Qualifier(EMAIL_SENDING_TASK_EXECUTOR)
+	private TaskExecutor emailSendingTaskExecutor;
 	private final EmailMessageAggregationStrategy emailMessageAggregationStrategy;
 	
 	public final static String EMAIL_FORMAT_AND_SEND_FLOW_ID = "EMAIL_FORMAT_AND_SEND_FLOW_ID";
@@ -144,12 +153,12 @@ public class EmailProcessingFlowConfig {
 
 	@Bean(EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel emailFormatAndSendInputChannel() {
-		return new PublishSubscribeChannel(executor);
+		return new PublishSubscribeChannel(asyncFlowTaskExecutor);
 	}
 	
 	@Bean(EMAIL_SEND_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel emailSendInputChannel() {
-		return new PublishSubscribeChannel(executor);
+		return new PublishSubscribeChannel(asyncFlowTaskExecutor);
 	}
 
 	@Bean(INTERNAL_EMAIL_SEND_FLOW_INPUT_CHANNEL_ID)
@@ -159,14 +168,14 @@ public class EmailProcessingFlowConfig {
 	
 	@Bean(EMAIL_SEND_FLOW_OUTPUT_CHANNEL_ID)
 	public MessageChannel emailSendOutputChannel() {
-		return new PublishSubscribeChannel(executor);
+		return new PublishSubscribeChannel(asyncFlowTaskExecutor);
 	}
 
 	@Bean(EMAIL_SENDER_MESSAGE_HANDLER_POLLER)
 	public PollerSpec emailSenderPoller() {
 		return Pollers.fixedDelay(properties.getDelaySendingPollRateMillis())
 				.maxMessagesPerPoll(properties.getDelaySendingMaxMessagesPerPoll())
-				.taskExecutor(executor);
+				.taskExecutor(emailSendingTaskExecutor);
 	}
 	
 }

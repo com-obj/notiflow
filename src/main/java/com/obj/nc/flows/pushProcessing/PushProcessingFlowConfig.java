@@ -22,14 +22,17 @@ package com.obj.nc.flows.pushProcessing;
 import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
 import com.obj.nc.functions.processors.senders.PushSender;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
+import static com.obj.nc.config.ThreadPoolConfig.ASYNC_FLOW_TASK_EXECUTOR;
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID;
 
 @Configuration
@@ -42,7 +45,9 @@ public class PushProcessingFlowConfig {
 	
 	private final PushSender pushSender;
 	private final MessageAndEndpointPersister persister;
-	private final ThreadPoolTaskScheduler executor;
+	@Autowired
+	@Qualifier(ASYNC_FLOW_TASK_EXECUTOR)
+	private TaskExecutor executor;
 	
 	@Bean(PUSH_PROCESSING_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel pushSendInputChannel() {

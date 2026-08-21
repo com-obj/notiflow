@@ -22,18 +22,23 @@ package com.obj.nc.flows.inputEventRouting.config;
 import com.obj.nc.flows.inputEventRouting.InputEventRouter;
 import com.obj.nc.functions.sources.genericEvents.GenericEventsSupplier;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.router.AbstractMessageRouter;
 
+import static com.obj.nc.config.ThreadPoolConfig.EVENT_POLLING_TASK_EXECUTOR;
+
 @Configuration
 public class InputEventRoutingFlowConfig {
 		
 	@Autowired private InputEventRoutingProperties routingProps;	
+	@Autowired @Qualifier(EVENT_POLLING_TASK_EXECUTOR) private TaskExecutor eventPollingTaskExecutor;
 	
     public static final String GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME = "genericEventSupplierFlowId"; 
     
@@ -41,7 +46,8 @@ public class InputEventRoutingFlowConfig {
     public IntegrationFlow inputEventRoutingFlow() {
     	return IntegrationFlows
 			.fromSupplier(genericEventSupplier(), 
-					conf-> conf.poller(Pollers.fixedRate(routingProps.getPollPeriodInMiliSeconds()))
+					conf-> conf.poller(Pollers.fixedRate(routingProps.getPollPeriodInMiliSeconds())
+							.taskExecutor(eventPollingTaskExecutor))
 					.id(GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME))
 			.channel(new DirectChannel())
 			.route(inputEventRouter())

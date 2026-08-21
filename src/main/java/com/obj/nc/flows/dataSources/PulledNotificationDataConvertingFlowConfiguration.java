@@ -24,12 +24,16 @@ import com.obj.nc.functions.processors.pullNotifDataConverter.ExtensionsBasedPul
 import com.obj.nc.functions.sink.inputPersister.GenericEventPersister;
 import com.obj.nc.routers.MessageOrIntentRouter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+import static com.obj.nc.config.ThreadPoolConfig.ASYNC_FLOW_TASK_EXECUTOR;
 
 @Configuration
 @RequiredArgsConstructor
@@ -42,7 +46,9 @@ public class PulledNotificationDataConvertingFlowConfiguration {
     private final ExtensionsBasedPullNotifData2NotificationConverter pullNotifData2NotificationsConverter;
     private final MessageOrIntentRouter messageOrIntentRouter;
     private final GenericEventPersister genericEventPersister;
-    private final ThreadPoolTaskScheduler executor;
+    @Autowired
+    @Qualifier(ASYNC_FLOW_TASK_EXECUTOR)
+    private TaskExecutor executor;
     
     @Bean(PULL_NOTIF_DATA_CONVERTING_FLOW_ID_INPUT_CHANNEL_ID)
     public PublishSubscribeChannel pullNotifDataConvertingFlowInputChannel() {
