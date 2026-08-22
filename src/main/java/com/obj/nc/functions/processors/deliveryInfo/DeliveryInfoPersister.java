@@ -21,38 +21,20 @@ package com.obj.nc.functions.processors.deliveryInfo;
 
 import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
-import com.obj.nc.repositories.DeliveryInfoRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 @AllArgsConstructor
 public class DeliveryInfoPersister extends ProcessorFunctionAdapter<List<DeliveryInfo>,List<DeliveryInfo>> {
 
-    @Autowired
-    private DeliveryInfoRepository deliveryInfoRepo;
+    private final DeliveryInfoStatusRecorder deliveryInfoStatusRecorder;
 
 	@Override
 	protected List<DeliveryInfo> execute(List<DeliveryInfo> deliveryInfos) {
-		List<DeliveryInfo> deliveryInfosInDB = new ArrayList<>();
-		
-		
-		deliveryInfos.forEach(deliveryInfo -> {
-			if (deliveryInfo.isNew()) {
-				deliveryInfo.setId(UUID.randomUUID());
-			}
-			
-			DeliveryInfo deliveryInfoInDB = deliveryInfoRepo.save(deliveryInfo);
-			deliveryInfosInDB.add(deliveryInfoInDB);
-		});
-
-		
-		return deliveryInfosInDB;
+		return deliveryInfoStatusRecorder.persist(deliveryInfos);
 	}	
 
 }

@@ -21,13 +21,17 @@ package com.obj.nc.flows.deliveryInfo;
 
 import com.obj.nc.functions.processors.deliveryInfo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+import static com.obj.nc.config.ThreadPoolConfig.DELIVERY_INFO_TASK_EXECUTOR;
 
 @Configuration
 public class DeliveryInfoFlowConfig {
@@ -54,7 +58,7 @@ public class DeliveryInfoFlowConfig {
 	@Autowired private DeliveryInfoReadGenerator deliveryInfoReadGenerator;
 	@Autowired private DeliveryInfoFailedGenerator deliveryInfoFailedGenerator;
 	@Autowired private DeliveryInfoProcessingGenerator deliveryInfoProcessingGenerator;
-	@Autowired private ThreadPoolTaskScheduler executor;
+	@Autowired @Qualifier(DELIVERY_INFO_TASK_EXECUTOR) private TaskExecutor executor;
 
     @Bean
     public IntegrationFlow deliveryInfoFailedFlow() {
@@ -91,7 +95,7 @@ public class DeliveryInfoFlowConfig {
 
     @Bean(DELIVERY_INFO_SEND_FLOW_INPUT_CHANNEL_ID)
 	public MessageChannel deliveryInfoSendInputChannel() {
-		return new PublishSubscribeChannel(executor);
+		return new DirectChannel();
 	}
 
     @Bean(DELIVERY_INFO_SEND_FLOW_OUTPUT_CHANNEL_ID)

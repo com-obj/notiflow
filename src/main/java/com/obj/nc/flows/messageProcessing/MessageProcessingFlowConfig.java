@@ -24,7 +24,7 @@ import com.obj.nc.functions.processors.spamPrevention.SpamPreventionFilter;
 import com.obj.nc.functions.processors.messageBuilder.MessageByRecipientTokenizer;
 import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersister;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -32,8 +32,8 @@ import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 
-import java.util.concurrent.Executors;
-
+import static com.obj.nc.config.ThreadPoolConfig.MESSAGE_DISPATCH_TASK_EXECUTOR;
+import static com.obj.nc.config.ThreadPoolConfig.MESSAGE_PROCESSING_TASK_EXECUTOR;
 import static com.obj.nc.flows.deliveryInfo.DeliveryInfoFlowConfig.DELIVERY_INFO_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_FORMAT_AND_SEND_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.emailFormattingAndSending.EmailProcessingFlowConfig.EMAIL_SEND_FLOW_INPUT_CHANNEL_ID;
@@ -45,22 +45,34 @@ import static com.obj.nc.flows.smsFormattingAndSending.SmsProcessingFlowConfig.S
 import static com.obj.nc.flows.smsFormattingAndSending.TemplatedSmsProcessingFlowConfig.TEMPLATED_SMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 import static com.obj.nc.flows.teamsMessageProcessing.TeamsMessageProcessingFlowConfig.TEAMS_PROCESSING_FLOW_INPUT_CHANNEL_ID;
 
-@RequiredArgsConstructor
 @Configuration
 public class MessageProcessingFlowConfig {
     private final MessageByRecipientTokenizer<?> messageByRecipientTokenizer;
     private final MessageAndEndpointPersister messageAndEndpointPersister;
     private final SpamPreventionFilter spamPreventionFilter;
+    private final TaskExecutor messageProcessingTaskExecutor;
+    private final TaskExecutor messageDispatchTaskExecutor;
 
 
     public final static String MESSAGE_PROCESSING_FLOW_ID = "MESSAGE_PROCESSING_FLOW_ID";
     public final static String MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID = MESSAGE_PROCESSING_FLOW_ID + "_INPUT";
 
-    private final TaskExecutor threadPoolTaskExecutor;
+    public MessageProcessingFlowConfig(
+            MessageByRecipientTokenizer<?> messageByRecipientTokenizer,
+            MessageAndEndpointPersister messageAndEndpointPersister,
+            SpamPreventionFilter spamPreventionFilter,
+            @Qualifier(MESSAGE_PROCESSING_TASK_EXECUTOR) TaskExecutor messageProcessingTaskExecutor,
+            @Qualifier(MESSAGE_DISPATCH_TASK_EXECUTOR) TaskExecutor messageDispatchTaskExecutor) {
+        this.messageByRecipientTokenizer = messageByRecipientTokenizer;
+        this.messageAndEndpointPersister = messageAndEndpointPersister;
+        this.spamPreventionFilter = spamPreventionFilter;
+        this.messageProcessingTaskExecutor = messageProcessingTaskExecutor;
+        this.messageDispatchTaskExecutor = messageDispatchTaskExecutor;
+    }
 
     @Bean(MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID)
     public PublishSubscribeChannel messageProcessingInputChannel() {
-        return new PublishSubscribeChannel(threadPoolTaskExecutor);
+        return new PublishSubscribeChannel(messageProcessingTaskExecutor);
     }
 
     @Bean(MESSAGE_PROCESSING_FLOW_ID)
@@ -69,7 +81,7 @@ public class MessageProcessingFlowConfig {
                 .from(messageProcessingInputChannel())
                 .handle(messageAndEndpointPersister)
                 .split(messageByRecipientTokenizer)
-                .channel(c -> c.executor(Executors.newCachedThreadPool()))
+                .channel(c -> c.executor(messageDispatchTaskExecutor))
                 .handle(messageAndEndpointPersister) //need to persist, otherwise delivery info will have invalid reference
                 .filter(spamPreventionFilter::test)
                 .wireTap(flowConfig ->

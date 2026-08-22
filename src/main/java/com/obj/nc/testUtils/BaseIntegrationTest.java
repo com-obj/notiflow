@@ -43,6 +43,7 @@ import org.springframework.http.MediaType;
 import org.springframework.integration.endpoint.PollingConsumer;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -69,6 +70,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     protected DeliveryInfoRepository deliveryInfoRepo;
 
     @Autowired ThreadPoolTaskScheduler taskScheduler; 
+    @Autowired Map<String, ThreadPoolTaskExecutor> taskExecutors;
 
     public static volatile String testName;
     public static final String MDC_FOR_TESTS_NAME = "testName";
@@ -234,7 +236,10 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
 	public void stopPollingHandlersAndWaitForIntegrationFlowsToFinish(int numberOfSeconds) {
 		emailSenderMessageHandler.stop();
 
-		Awaitility.await().atMost(Duration.ofSeconds(numberOfSeconds)).until(() -> taskScheduler.getActiveCount()==0);
+		Awaitility.await().atMost(Duration.ofSeconds(numberOfSeconds)).until(() ->
+				taskScheduler.getActiveCount() == 0 && taskExecutors.values().stream().allMatch(executor ->
+						executor.getActiveCount() == 0
+								&& executor.getThreadPoolExecutor().getQueue().isEmpty()));
 	}
 
 	public MultiValueMap<String, String> getDefaultPagingParams() {

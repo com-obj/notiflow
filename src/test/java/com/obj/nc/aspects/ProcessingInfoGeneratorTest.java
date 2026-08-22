@@ -71,9 +71,7 @@ import static org.assertj.core.api.Assertions.entry;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest(properties = {
-    "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
-})
+@SpringBootTest
 @EnabledIf(expression = "#{environment['nc.processing-info-generator.enabled'] == 'true'}", loadContext = true)
 public class ProcessingInfoGeneratorTest extends BaseIntegrationTest {
 	

@@ -23,7 +23,6 @@ import com.obj.nc.domain.dto.DeliveryInfoDto;
 import com.obj.nc.domain.dto.DeliveryInfoDto.DeliveryInfoDtoMapper;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
-import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -35,9 +34,13 @@ import java.util.UUID;
 
 public interface DeliveryInfoRepository extends PagingAndSortingRepository<DeliveryInfo, UUID> {
 
-    @Modifying
-    @Query("UPDATE nc_delivery_info SET status = :status, additional_information = :additionalInfo WHERE message_id = :messageId")
-    int updateDeliveryInfoStatus(UUID messageId, DELIVERY_STATUS status, String additionalInfo);
+    @Query("select * from nc_delivery_info where message_id = :messageId and status = :status order by processed_on desc")
+    List<DeliveryInfo> findExactByMessageIdAndStatus(@Param("messageId") UUID messageId,
+                                                      @Param("status") DELIVERY_STATUS status);
+
+    @Query("select count(*) > 0 from nc_delivery_info " +
+            "where message_id = :messageId and status not in ('PROCESSING', 'SENT')")
+    boolean hasProviderStatus(@Param("messageId") UUID messageId);
 
     @Query("select di.* " +
             "from nc_delivery_info di " +

@@ -15,8 +15,6 @@
 
 package com.obj.nc.extensions.providers.deliveryOptions;
 
-import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
-
 import java.util.stream.Stream;
 
 import com.obj.nc.domain.deliveryOptions.EndpointDeliveryOptions;
@@ -28,28 +26,15 @@ import com.obj.nc.domain.endpoints.SlackEndpoint;
 import com.obj.nc.domain.endpoints.SmsEndpoint;
 import com.obj.nc.domain.endpoints.TeamsEndpoint;
 import com.obj.nc.domain.endpoints.push.DirectPushEndpoint;
-import com.obj.nc.testUtils.BaseIntegrationTest;
-import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.integration.test.context.SpringIntegrationTest;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
-@SpringBootTest(properties = {
-    "nc.delivery-options.jsonStorePathAndFileName=src/test/resources/deliver-options/delivery-options-setting.json", 
-})
-@SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-public class SpamPreventionConfigCalculationTest extends BaseIntegrationTest {
+public class SpamPreventionConfigCalculationTest {
 
-    @Autowired
-    protected DeliveryOptionsConfigProperties config;
-    @Autowired
-    protected JsonStoreDeliveryOptionsProvider doProvider;
+    private final JsonStoreDeliveryOptionsProvider doProvider = new JsonStoreDeliveryOptionsProvider(
+            new DeliveryOptionsConfigProperties(
+                    "src/test/resources/deliver-options/delivery-options-setting.json"));
 
     @ParameterizedTest
     @MethodSource("prepareTestInput")

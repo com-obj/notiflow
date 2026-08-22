@@ -41,8 +41,14 @@ public class NcAppConfigProperties {
     @Value("${nc.app.executor.queue-capacity:1000}")
     private int queueCapacity;
 
-    @Value("${nc.app.executor.block-policy-wait-time:5}")
-    private int blockPolicyWaitTimeInSec;
+    @Value("${nc.app.sms-sending-executor.core-pool-size:${nc.app.executor.core-pool-size:10}}")
+    private int smsSendingCorePoolSize;
+
+    @Value("${nc.app.sms-sending-executor.max-pool-size:${nc.app.executor.max-pool-size:20}}")
+    private int smsSendingMaxPoolSize;
+
+    @Value("${nc.app.sms-sending-executor.queue-capacity:${nc.app.executor.queue-capacity:1000}}")
+    private int smsSendingQueueCapacity;
 
     @Value("${nc.app.url.context-path:/notiflow}")
     private String contextPath;

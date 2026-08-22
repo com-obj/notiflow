@@ -52,9 +52,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles(value = "test", resolver = SystemPropertyActiveProfileResolver.class)
 @SpringIntegrationTest(noAutoStartup = GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME)
-@SpringBootTest(properties = {
-    "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
-})
+@SpringBootTest
 public class NotificationIntentPersisterTest extends BaseIntegrationTest {
 
 	@Autowired NotificationIntentPersister intentPersister;

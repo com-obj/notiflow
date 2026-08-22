@@ -63,9 +63,7 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 
 @ActiveProfiles(value = {"test"}, resolver = SystemPropertyActiveProfileResolver.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@SpringBootTest(properties = {
-    "nc.contacts-store.jsonStorePathAndFileName=src/test/resources/contact-store/contact-store.json", 
-})
+@SpringBootTest
 public class ExtensionBasedEventConverterTests extends BaseIntegrationTest {
 
     @Autowired

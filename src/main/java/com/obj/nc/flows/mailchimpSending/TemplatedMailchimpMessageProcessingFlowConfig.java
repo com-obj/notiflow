@@ -23,13 +23,17 @@ import com.obj.nc.functions.processors.messagePersister.MessageAndEndpointPersis
 import com.obj.nc.functions.processors.senders.mailchimp.TemplatedMailchimpMessageSender;
 import com.obj.nc.functions.sink.payloadLogger.PaylaodLoggerSinkConsumer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+import static com.obj.nc.config.ThreadPoolConfig.ASYNC_FLOW_TASK_EXECUTOR;
 
 @Configuration
 @RequiredArgsConstructor
@@ -41,7 +45,9 @@ public class TemplatedMailchimpMessageProcessingFlowConfig {
     private final TemplatedMailchimpMessageSender templatedMailchimpMessageSender;
     private final PaylaodLoggerSinkConsumer logConsumer;
     private final MessageAndEndpointPersister persister;
-    private final ThreadPoolTaskScheduler executor;
+    @Autowired
+    @Qualifier(ASYNC_FLOW_TASK_EXECUTOR)
+    private TaskExecutor executor;
     
     @Bean(MAILCHIMP_TEMPLATE_PROCESSING_FLOW_INPUT_CHANNEL_ID)
     public MessageChannel mailchimpTemplateProcessingInputChangel() {
