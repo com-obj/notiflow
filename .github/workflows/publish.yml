@@ -28,7 +28,12 @@ jobs:
           - 25433:5432
     
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
       
       - name: Set up JDK 8
         uses: actions/setup-java@v2
@@ -43,12 +48,5 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: Publish to Maven Central
-        run: |
-          ./gradlew \
-            -P sonatypeUsername=${{ secrets.SONATYPE_USERNAME }} \
-            -P sonatypePassword=${{ secrets.SONATYPE_PASSWORD }} \
-            -P gpgSigningKey=${{ secrets.GPG_SIGNING_KEY }} \
-            -P gpgSigningPassword=${{ secrets.GPG_SIGNING_PASSWORD }} \
-            publishToSonatype \
-            closeAndReleaseSonatypeStagingRepository
+      - name: Publish to Objectify Artifact Registry
+        run: ./gradlew publish
