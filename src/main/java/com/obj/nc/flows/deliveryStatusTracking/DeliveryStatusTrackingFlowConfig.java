@@ -1,6 +1,6 @@
 package com.obj.nc.flows.deliveryStatusTracking;
 
-import com.obj.nc.domain.dto.DeliveryInfoDto;
+import com.obj.nc.domain.dto.fe.DeliveryInfoDto;
 import com.obj.nc.functions.sink.deliveryStatusUpdater.ExtensionBasedDeliveryStatusUpdate;
 import com.obj.nc.repositories.DeliveryInfoRepository;
 import lombok.AllArgsConstructor;

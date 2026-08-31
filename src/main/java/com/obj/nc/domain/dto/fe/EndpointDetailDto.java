@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.obj.nc.domain.dto;
+package com.obj.nc.domain.dto.fe;
 
 import com.obj.nc.domain.endpoints.ReceivingEndpointWithStats;
 import lombok.Builder;
@@ -27,7 +27,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class EndpointTableViewDto {
+public class EndpointDetailDto {
     
     private final UUID id;
     private final String name;
@@ -44,8 +44,8 @@ public class EndpointTableViewDto {
         EMAIL, SMS, MAILCHIMP
     }
     
-    public static EndpointTableViewDto from(ReceivingEndpointWithStats endpointWithStats) {
-        return EndpointTableViewDto
+    public static EndpointDetailDto from(ReceivingEndpointWithStats endpointWithStats) {
+        return EndpointDetailDto
                 .builder()
                 .id(endpointWithStats.getEndpoint().getId())
                 .name(endpointWithStats.getEndpoint().getEndpointId())

@@ -1,9 +1,7 @@
 package com.obj.nc.functions.sink.deliveryStatusUpdater;
 
-import com.obj.nc.domain.dto.DeliveryInfoDto;
+import com.obj.nc.domain.dto.fe.DeliveryInfoDto;
 import com.obj.nc.extensions.providers.deliveryStatus.DeliveryStatusUpdaterExtension;
-import com.obj.nc.functions.processors.ProcessorFunctionAdapter;
-import com.obj.nc.functions.sink.SinkConsumer;
 import com.obj.nc.functions.sink.SinkConsumerAdapter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

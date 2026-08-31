@@ -1,6 +1,6 @@
 package com.obj.nc.flows.deliveryStatusTracking;
 
-import com.obj.nc.domain.dto.DeliveryInfoDto;
+import com.obj.nc.domain.dto.fe.DeliveryInfoDto;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
