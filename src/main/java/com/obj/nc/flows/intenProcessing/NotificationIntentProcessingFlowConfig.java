@@ -27,7 +27,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
 import static com.obj.nc.flows.messageProcessing.MessageProcessingFlowConfig.MESSAGE_PROCESSING_FLOW_INPUT_CHANNEL_ID;
@@ -49,7 +48,7 @@ public class NotificationIntentProcessingFlowConfig {
 	
 	@Bean(INTENT_PROCESSING_FLOW_ID)
 	public IntegrationFlow intentProcessingFlowDefinition() {
-		return IntegrationFlows
+		return IntegrationFlow
 				.from(intentProcessingInputChannel())
 				// .handle(endpointPersister)
 				.handle(notificationIntentPersister)	

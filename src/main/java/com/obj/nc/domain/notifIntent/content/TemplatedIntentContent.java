@@ -36,7 +36,7 @@ import lombok.Singular;
 
 import org.apache.commons.lang3.NotImplementedException;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 import java.util.Locale;

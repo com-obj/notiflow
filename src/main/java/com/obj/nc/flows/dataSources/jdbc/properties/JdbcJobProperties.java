@@ -21,7 +21,7 @@ package com.obj.nc.flows.dataSources.jdbc.properties;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 @Data
 public class JdbcJobProperties {

@@ -19,32 +19,23 @@
 
 package com.obj.nc.security.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
 
-@Order(2)
 @Configuration
-@RequiredArgsConstructor
 @ConditionalOnProperty(name = "nc.jwt.enabled", havingValue = "false", matchIfMissing = true)
-public class DisabledSecurityConfig extends WebSecurityConfigurerAdapter {
+public class DisabledSecurityConfig {
 
-	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
-
-	@Override
-	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.csrf().disable().authorizeRequests().antMatchers("/**").permitAll();
-	}
-
+    @Bean
+    @Order(2)
+    public SecurityFilterChain disabledSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(requests -> requests.anyRequest().permitAll())
+                .build();
+    }
 }
-
-

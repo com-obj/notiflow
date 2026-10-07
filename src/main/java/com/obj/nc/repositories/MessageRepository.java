@@ -24,6 +24,7 @@ import com.obj.nc.domain.message.MessagePersistentState;
 import com.obj.nc.domain.refIntegrity.EntityExistenceChecker;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface MessageRepository extends PagingAndSortingRepository<MessagePersistentState, UUID>, EntityExistenceChecker<UUID> {
+public interface MessageRepository extends PagingAndSortingRepository<MessagePersistentState, UUID>, CrudRepository<MessagePersistentState, UUID>, EntityExistenceChecker<UUID> {
 	
 	List<MessagePersistentState> findByIdIn(List<UUID> intentIds);
 

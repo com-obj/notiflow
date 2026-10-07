@@ -8,10 +8,9 @@ import com.obj.nc.flows.dataSources.firestore.properties.FirestoreDataSourceProp
 import com.obj.nc.flows.dataSources.firestore.properties.FirestoreJobProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import java.util.concurrent.TimeUnit;
 
@@ -65,7 +64,7 @@ public class FirestoreDataSourceFlowsConfiguration {
         jobConfig.setSpelFilterExpression(jobProperties.getSpelFilterExpression());
         jobConfig.setHashAttributes(jobProperties.getHashAttributes());
 
-        return nextFlow.continueFlow(IntegrationFlows.from(
+        return nextFlow.continueFlow(IntegrationFlow.from(
                 firestoreChannelAdapter,
                 consumer -> consumer
                         .poller(cron(jobProperties.getCron()))

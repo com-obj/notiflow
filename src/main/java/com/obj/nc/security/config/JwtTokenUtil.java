@@ -21,7 +21,9 @@ package com.obj.nc.security.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,7 +41,7 @@ import java.util.function.Function;
 public class JwtTokenUtil implements Serializable {
 
 	private static final long serialVersionUID = -7573345844238770803L;
-	
+
 	public static final long JWT_TOKEN_VALIDITY = 5*60*60;
 
 	private final NcJwtConfigProperties ncJwtConfigProperties;
@@ -62,7 +64,7 @@ public class JwtTokenUtil implements Serializable {
 	}
 
 	private Claims getAllClaimsFromToken(String token) {
-		return Jwts.parser().setSigningKey(ncJwtConfigProperties.getSignatureSecret()).parseClaimsJws(token).getBody();
+		return Jwts.parser().verifyWith(signingKey(ncJwtConfigProperties.getSignatureSecret())).build().parseSignedClaims(token).getPayload();
 	}
 
 	private Boolean isTokenExpired(String token) {
@@ -82,9 +84,18 @@ public class JwtTokenUtil implements Serializable {
 
 	private String doGenerateToken(Map<String, Object> claims, String subject, String signature) {
 
-		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY*1000))
-				.signWith(SignatureAlgorithm.HS512, signature).compact();
+		return Jwts.builder().claims(claims).subject(subject).issuedAt(new Date(System.currentTimeMillis()))
+				.expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY*1000))
+				.signWith(signingKey(signature), Jwts.SIG.HS512).compact();
+	}
+
+	private SecretKey signingKey(String signature) {
+		// JJWT 0.9 interpreted String keys as Base64; retain that format for existing deployments.
+		byte[] key = Decoders.BASE64.decode(signature);
+		if (key.length < 64) {
+			throw new IllegalArgumentException("nc.jwt.signature-secret must be Base64 encoding of at least 64 bytes for HS512");
+		}
+		return new SecretKeySpec(key, "HmacSHA512");
 	}
 
 	public Boolean canTokenBeRefreshed(String token) {

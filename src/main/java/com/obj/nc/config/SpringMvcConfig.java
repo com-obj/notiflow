@@ -26,6 +26,9 @@ import com.obj.nc.exceptions.PayloadValidationException;
 import com.obj.nc.security.model.AuthenticationError;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
+import org.springframework.boot.webmvc.error.DefaultErrorAttributes;
+import org.springframework.boot.webmvc.error.ErrorAttributes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -34,12 +37,27 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.context.request.WebRequest;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @RestControllerAdvice
 public class SpringMvcConfig {
+
+    @Bean
+    public ErrorAttributes errorAttributes() {
+        return new DefaultErrorAttributes() {
+            @Override
+            public Map<String, Object> getErrorAttributes(WebRequest request, ErrorAttributeOptions options) {
+                Map<String, Object> attributes = super.getErrorAttributes(request, options);
+                // Boot 2 included an empty message when details were hidden. Preserve that JSON shape.
+                attributes.putIfAbsent("message", "");
+                return attributes;
+            }
+        };
+    }
 
     @ExceptionHandler({PayloadValidationException.class})
     ResponseEntity<String> handleMethodArgumentNotValidException(PayloadValidationException e) {
@@ -70,7 +88,7 @@ public class SpringMvcConfig {
     
     @ExceptionHandler({ResponseStatusException.class})
     ResponseEntity<String> handleResponseStatusException(ResponseStatusException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.valueOf(e.getRawStatusCode()));
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.valueOf(e.getStatusCode().value()));
     }
     
     @ExceptionHandler({RuntimeException.class})

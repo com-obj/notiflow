@@ -28,7 +28,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.router.AbstractMessageRouter;
 
@@ -44,7 +43,7 @@ public class InputEventRoutingFlowConfig {
     
     @Bean
     public IntegrationFlow inputEventRoutingFlow() {
-    	return IntegrationFlows
+        return IntegrationFlow
 			.fromSupplier(genericEventSupplier(), 
 					conf-> conf.poller(Pollers.fixedRate(routingProps.getPollPeriodInMiliSeconds())
 							.taskExecutor(eventPollingTaskExecutor))

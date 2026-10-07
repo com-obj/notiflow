@@ -28,7 +28,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
 import static com.obj.nc.config.ThreadPoolConfig.SMS_SENDING_TASK_EXECUTOR;
@@ -63,7 +62,7 @@ public class SmsProcessingFlowConfig {
 
     @Bean(SMS_PROCESSING_FLOW_ID)
     public IntegrationFlow smsProcessingFlowDefinition() {
-        return IntegrationFlows
+        return IntegrationFlow
                 .from(smsProcessingInputChangel())
                 .handle(messageAndEndpointPersister)
                 .handle(smsSender)

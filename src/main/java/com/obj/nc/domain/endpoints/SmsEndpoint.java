@@ -19,7 +19,7 @@
 
 package com.obj.nc.domain.endpoints;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import com.obj.nc.domain.dto.endpoint.ReceivingEndpointDto;
 import com.obj.nc.domain.dto.endpoint.SmsEndpointDto;

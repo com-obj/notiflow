@@ -12,11 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.integration.jdbc.JdbcPollingChannelAdapter;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,7 +84,7 @@ public class JdbcDataSourceFlowsConfiguration {
         jobConfig.setPojoFCCN(job.getPojoFCCN());
         jobConfig.setSpelFilterExpression(job.getSpelFilterExpression());
 
-        return pollFlowAdapter.continueFlow(IntegrationFlows
+        return pollFlowAdapter.continueFlow(IntegrationFlow
                 .from(jdbcPollingChannelAdapter, c -> c
                         .poller(cron(job.getCron()))
                         .id(createJobPollerId(dataSourceName, job.getName()))), jobConfig);

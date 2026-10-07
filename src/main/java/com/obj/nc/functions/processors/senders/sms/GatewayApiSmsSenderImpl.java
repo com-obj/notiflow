@@ -73,7 +73,7 @@ public class GatewayApiSmsSenderImpl extends ProcessorFunctionAdapter<SmsMessage
     protected SmsMessage execute(SmsMessage payload) {
         ResponseEntity<String> response = restTemplate.postForEntity(config.getSendSmsUrl(), prepareRequest(payload), String.class);
 
-        int statusCode = response.getStatusCodeValue();
+        int statusCode = response.getStatusCode().value();
 
         if (statusCode != 200) {
             String msg = String.format("SmsSender: GatewayApi responded with status code %s and reason: %s.", statusCode, response.getBody());

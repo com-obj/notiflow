@@ -97,7 +97,7 @@ public class SlackMessageSender extends ProcessorFunctionAdapter<SlackMessage, S
 
     private void verifyResponse(ResponseEntity<SlackResponse> response) {
         SlackResponse slackResponse = response.getBody();
-        final int statusCodeValue = response.getStatusCodeValue();
+        final int statusCodeValue = response.getStatusCode().value();
 
         if (statusCodeValue != 200 || slackResponse == null) {
             log.error("Failed to send slack message. Status code: " + statusCodeValue);

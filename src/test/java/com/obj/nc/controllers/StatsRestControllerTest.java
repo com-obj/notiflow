@@ -43,7 +43,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -93,8 +93,8 @@ class StatsRestControllerTest extends BaseIntegrationTest {
     }
 
     @AfterEach
-    public void waitForIntegrationFlowsToFinish() {
-        super.stopPollingHandlersAndWaitForIntegrationFlowsToFinish(500000);
+    public void waitForIntegrationFlowToFinish() {
+        super.stopPollingHandlersAndWaitForIntegrationFlowToFinish(500000);
     }
     
     @Test

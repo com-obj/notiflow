@@ -28,7 +28,6 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
 import static com.obj.nc.config.ThreadPoolConfig.DELIVERY_INFO_TASK_EXECUTOR;
@@ -63,7 +62,7 @@ public class DeliveryInfoFlowConfig {
     @Bean
     public IntegrationFlow deliveryInfoFailedFlow() {
         return 
-        	IntegrationFlows.from(deliveryInfoFailedInputChannel())
+            IntegrationFlow.from(deliveryInfoFailedInputChannel())
 				.handle(deliveryInfoFailedGenerator)
 				.handle(deliveryInfoPersister)
 				.channel(DELIVERY_INFO_FAILED_FLOW_OUTPUT_CHANNEL_ID)
@@ -84,7 +83,7 @@ public class DeliveryInfoFlowConfig {
     @Bean
     public IntegrationFlow deliveryInfoSendFlow() {
         return 
-        	IntegrationFlows.from(deliveryInfoSendInputChannel())
+            IntegrationFlow.from(deliveryInfoSendInputChannel())
 				.handle(deliveryInfoSendGenerator)
 				.split()
 				.handle(deliveryTransformer)
@@ -107,7 +106,7 @@ public class DeliveryInfoFlowConfig {
     @Bean
     public IntegrationFlow deliveryInfoProcessingFlow() {
         return 
-        	IntegrationFlows.from(deliveryInfoProcessingInputChannel())
+            IntegrationFlow.from(deliveryInfoProcessingInputChannel())
 				.handle(deliveryInfoProcessingGenerator)
 				.split()
 				.handle(deliveryTransformer)
@@ -130,7 +129,7 @@ public class DeliveryInfoFlowConfig {
 	@Bean
 	public IntegrationFlow deliveryInfoReadFlow() {
 		return
-			IntegrationFlows.from(deliveryInfoReadInputChannel())
+			IntegrationFlow.from(deliveryInfoReadInputChannel())
 				.handle(deliveryInfoReadGenerator)
 				.split()
 				.handle(deliveryTransformer)

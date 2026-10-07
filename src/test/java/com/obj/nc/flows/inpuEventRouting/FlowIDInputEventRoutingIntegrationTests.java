@@ -46,7 +46,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowConfig.GENERIC_EVENT_CHANNEL_ADAPTER_BEAN_NAME;
 import static org.assertj.core.api.Assertions.assertThat;

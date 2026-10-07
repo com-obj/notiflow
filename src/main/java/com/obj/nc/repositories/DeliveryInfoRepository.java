@@ -25,6 +25,7 @@ import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
@@ -32,7 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface DeliveryInfoRepository extends PagingAndSortingRepository<DeliveryInfo, UUID> {
+public interface DeliveryInfoRepository extends PagingAndSortingRepository<DeliveryInfo, UUID>, CrudRepository<DeliveryInfo, UUID> {
 
     @Query("select * from nc_delivery_info where message_id = :messageId and status = :status order by processed_on desc")
     List<DeliveryInfo> findExactByMessageIdAndStatus(@Param("messageId") UUID messageId,

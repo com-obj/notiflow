@@ -73,7 +73,7 @@ public abstract class BaseReadTrackingDecorator<T extends MessageContent> extend
         Element img = html.body().appendElement("img");
         
         URI readMessageCallbackUri = UriComponentsBuilder
-                .fromHttpUrl(ncAppConfigProperties.getUrl())
+                .fromUriString(ncAppConfigProperties.getUrl())
                 .path("/delivery-info/messages/{messageId}/mark-as-read")
                 .build(result.getId());
         

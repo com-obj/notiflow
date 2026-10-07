@@ -39,7 +39,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.aggregator.CorrelationStrategy;
 import org.springframework.integration.aggregator.ReleaseStrategy;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.store.MessageGroup;
 
 import java.util.concurrent.Executors;
@@ -68,7 +67,7 @@ public class TestModeFlowConfig {
     public IntegrationFlow testModeAggregateAndSendMessage() {
     	printBanner();
     	
-        return IntegrationFlows
+        return IntegrationFlow
         		.from(executor(TEST_MODE_THREAD_EXECUTOR_CHANNEL_NAME, Executors.newSingleThreadExecutor()))
 				.handle(persister)
         		.aggregate(

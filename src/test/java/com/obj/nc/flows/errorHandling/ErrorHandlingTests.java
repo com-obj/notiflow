@@ -51,7 +51,7 @@ import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
+
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.messaging.Message;
@@ -149,7 +149,7 @@ public class ErrorHandlingTests extends BaseIntegrationTest {
         @Bean
         public IntegrationFlow errorProducingFlow1() {
             return 
-            	IntegrationFlows.from(testInputChannel1())
+                IntegrationFlow.from(testInputChannel1())
     				.handle((p,h)-> {
     					//this can fail with NumberFormatException
     					return ((TestPayload)p).convertStrToNum();

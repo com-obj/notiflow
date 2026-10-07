@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
+
 
 import static com.obj.nc.config.ThreadPoolConfig.MESSAGE_DISPATCH_TASK_EXECUTOR;
 import static com.obj.nc.config.ThreadPoolConfig.MESSAGE_PROCESSING_TASK_EXECUTOR;
@@ -77,7 +77,7 @@ public class MessageProcessingFlowConfig {
 
     @Bean(MESSAGE_PROCESSING_FLOW_ID)
     public IntegrationFlow messageProcessingFlowDefinition() {
-        return IntegrationFlows
+        return IntegrationFlow
                 .from(messageProcessingInputChannel())
                 .handle(messageAndEndpointPersister)
                 .split(messageByRecipientTokenizer)

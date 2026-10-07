@@ -3,7 +3,7 @@ package com.obj.nc.flows.dataSources.firestore.properties;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 

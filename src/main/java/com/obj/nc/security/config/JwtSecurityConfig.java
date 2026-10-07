@@ -19,70 +19,58 @@
 
 package com.obj.nc.security.config;
 
-import com.obj.nc.security.model.AuthenticationError;
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
-import javax.servlet.http.HttpServletResponse;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-
-import static com.obj.nc.security.config.Constants.*;
+import static com.obj.nc.security.config.Constants.UNPROTECTED_PATHS;
 
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "nc.jwt.enabled", havingValue = "true")
-public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
-	
-	private final JwtRequestFilter jwtRequestFilter;
-	private final CorsConfigProperties corsConfigProperties;
+public class JwtSecurityConfig {
 
-	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
-	
-	@Override
-	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity
-				.cors().configurationSource(request -> {
-					CorsConfiguration cors = new CorsConfiguration();
-					corsConfigProperties.getAllowedOrigins().forEach(cors::addAllowedOrigin);
-					corsConfigProperties.getAllowedMethods().forEach(cors::addAllowedMethod);
-					corsConfigProperties.getAllowedHeaders().forEach(cors::addAllowedHeader);
-					return cors;
-				}).and()
-				.csrf().disable()
-				.authorizeRequests()
-				.antMatchers(UNPROTECTED_PATHS).permitAll()
-				.anyRequest().authenticated()
-				.and()
-				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		
-		httpSecurity.exceptionHandling().authenticationEntryPoint((request, response, exception) -> {
-			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			
-			Exception exceptionAttribute = (Exception) request.getAttribute(EXCEPTION_ATTR_NAME);
-			String exceptionMessage = exceptionAttribute == null ? DEFAULT_EXCEPTION_MSG : exceptionAttribute.getMessage();
-			
-			response.getWriter().write(AuthenticationError.builder()
-					.timestamp(Timestamp.valueOf(LocalDateTime.now()))
-					.message(exceptionMessage)
-					.build().toString()
-			);
-		});
-	}
+    private final JwtRequestFilter jwtRequestFilter;
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+    private final CorsConfigProperties corsConfigProperties;
 
+    @Bean
+    @Order(2)
+    public SecurityFilterChain jwtSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http.cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration configuration = new CorsConfiguration();
+                    corsConfigProperties.getAllowedOrigins().forEach(configuration::addAllowedOrigin);
+                    corsConfigProperties.getAllowedMethods().forEach(configuration::addAllowedMethod);
+                    corsConfigProperties.getAllowedHeaders().forEach(configuration::addAllowedHeader);
+                    return configuration;
+                }))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(requests -> requests
+                        // Preserve the controller's status on a servlet error dispatch after JWT authentication.
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                        .requestMatchers(UNPROTECTED_PATHS).permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(authenticationEntryPoint))
+                .build();
+    }
+
+    @Bean
+    public FilterRegistrationBean<JwtRequestFilter> jwtFilterRegistration() {
+        // GAP callbacks use Basic authentication and must not run through the JWT filter.
+        var registration = new FilterRegistrationBean<>(jwtRequestFilter);
+        registration.setEnabled(false);
+        return registration;
+    }
 }
