@@ -93,8 +93,8 @@ class StatsRestControllerTest extends BaseIntegrationTest {
     }
 
     @AfterEach
-    public void waitForIntegrationFlowToFinish() {
-        super.stopPollingHandlersAndWaitForIntegrationFlowToFinish(500000);
+    public void waitForIntegrationFlowsToFinish() {
+        super.stopPollingHandlersAndWaitForIntegrationFlowsToFinish(500000);
     }
     
     @Test

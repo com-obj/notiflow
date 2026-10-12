@@ -16,18 +16,9 @@ The main goal of notiflow is to greatly simplify delivery of information message
 
 To understand in details how notiflow is solving this problems, check our [documentation](https://com-obj.github.io/notiflow/)
 
+## Upgrading to 2.0
+Notiflow 2.0 is built with JDK 25 and Spring Boot 4 (Spring Framework 7, Jakarta EE). Consuming applications must upgrade to Spring Boot 4 and Java 25 as well.
 
-## JDK 25 / Spring Boot 4 build
-
-This checkout uses JDK 25, Gradle 9.1.0 and Spring Boot 4.0.8. Select a Java 25 installation and use the wrapper:
-
-```sh
-docker compose -f ../osk-flows/docker/osk-flows-test/docker-compose.yml up -d --wait
-./gradlew clean build
-```
-
-The complete build includes tests, a plain library JAR, sources and Javadoc. Tests use PostgreSQL on port 25433 and purge notification tables; run sequentially with the sibling application's tests. The adjacent `osk-flows` checkout automatically uses this source checkout through a composite build.
-
-This is a Jakarta/Spring Framework 7 library; existing Spring Boot 2 consumers must upgrade with it. Jackson 2 is retained through Boot 4's supported compatibility module to preserve persisted notification payloads and API JSON. `nc.jwt.signature-secret` retains its Base64 format and, when JWT is enabled, must decode to at least 64 bytes for HS512. Existing sufficiently strong secrets and tokens remain compatible.
-
-See [the application migration notes](../osk-flows/docs/jdk25-boot4-upgrade.md) for dependency versions, runtime commands, compatibility decisions and verification results.
+* Jackson 2 is still used for REST and persisted notification payloads, through Spring Boot's Jackson 2 compatibility module. Notiflow registers the required defaults (`spring.http.converters.preferred-json-mapper=jackson2`, `spring.main.allow-circular-references=true`); applications do not need to set them.
+* When `nc.jwt.enabled=true`, `nc.jwt.signature-secret` must be Base64 that decodes to at least 64 bytes (HS512). Otherwise the application fails at startup. Tokens issued with an existing secret of that strength remain valid.
+* The API documentation moved from Springfox (`/v2/api-docs`) to springdoc OpenAPI 3: `/v3/api-docs` and `/swagger-ui.html`.

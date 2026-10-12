@@ -2,20 +2,11 @@ plugins {
 	id 'org.springframework.boot' version '4.0.8'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'maven-publish'
-	id 'com.google.cloud.artifactregistry.gradle-plugin' version '2.2.5' apply false
+	id 'com.google.cloud.artifactregistry.gradle-plugin' version '2.2.5'
 	id 'com.palantir.git-version' version '5.1.0'
 	id 'java-library'	
+	id 'io.freefair.lombok' version '9.1.0'
 //	id 'org.asciidoctor.jvm.convert' version '3.3.0'
-}
-
-// The credential helper eagerly invokes gcloud. Local builds and IDE imports use
-// only public dependencies, so initialize it only for the remote publication tasks.
-def remotePublishRequested = gradle.startParameter.taskNames.any { task ->
-	def taskName = task.tokenize(':').last()
-	taskName == 'publish' || taskName.endsWith('ToMavenRepository')
-}
-if (remotePublishRequested) {
-	apply plugin: 'com.google.cloud.artifactregistry.gradle-plugin'
 }
 
 /*
@@ -63,7 +54,6 @@ dependencies {
 	api 'org.springframework.boot:spring-boot-jackson2'
 	api 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	api 'org.junit.jupiter:junit-jupiter-api'
-	api 'junit:junit'
 	api 'org.springframework:spring-test'
 
 	api 'com.google.guava:guava:33.7.2-jre'
@@ -106,6 +96,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-resttestclient'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation 'org.springframework.integration:spring-integration-test'
+	testImplementation 'junit:junit'
 
 
 	testImplementation 'commons-jxpath:commons-jxpath:1.4.0'
@@ -137,8 +128,6 @@ test {
 	if (System.getProperty("spring.profiles.active")) {
         systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
     }
-    maxParallelForks = 1
-    maxHeapSize = "1g"
 	useJUnitPlatform()
 }
 
@@ -204,22 +193,7 @@ publishing {
 	}
 }
 
-// Javadoc needs Lombok-generated builder types as well as the handwritten sources.
-def delombokSources = layout.buildDirectory.dir('generated/sources/delombok')
-tasks.register('delombok', JavaExec) {
-	inputs.dir('src/main/java')
-	inputs.files(configurations.compileClasspath)
-	outputs.dir(delombokSources)
-	javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
-	classpath = configurations.compileClasspath
-	mainClass = 'lombok.launch.Main'
-	args 'delombok', 'src/main/java', '-d', delombokSources.get().asFile.absolutePath,
-			'--classpath', configurations.compileClasspath.asPath, '--encoding', 'UTF-8'
-}
-
 javadoc {
-	dependsOn tasks.named('delombok')
-	source = fileTree(delombokSources)
 	if(JavaVersion.current().isJava8Compatible()) {
 		options.addStringOption('Xdoclint:none', '-quiet')
 	}
@@ -238,6 +212,6 @@ def extractVersionFromTag(tagLabel, snapshot) {
 	}
 }
 
- tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs.add("-parameters")
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs.add("-parameters")
 }

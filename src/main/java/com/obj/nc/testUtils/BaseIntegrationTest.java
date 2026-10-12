@@ -233,7 +233,7 @@ public abstract class BaseIntegrationTest implements ApplicationContextAware {
     	Get.setApplicationContext(applicationContext);
     }
 
-	public void stopPollingHandlersAndWaitForIntegrationFlowToFinish(int numberOfSeconds) {
+	public void stopPollingHandlersAndWaitForIntegrationFlowsToFinish(int numberOfSeconds) {
 		emailSenderMessageHandler.stop();
 
 		Awaitility.await().atMost(Duration.ofSeconds(numberOfSeconds)).until(() ->

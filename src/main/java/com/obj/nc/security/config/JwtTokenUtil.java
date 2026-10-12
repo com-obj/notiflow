@@ -22,6 +22,7 @@ package com.obj.nc.security.config;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
+import jakarta.annotation.PostConstruct;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.Data;
@@ -45,6 +46,17 @@ public class JwtTokenUtil implements Serializable {
 	public static final long JWT_TOKEN_VALIDITY = 5*60*60;
 
 	private final NcJwtConfigProperties ncJwtConfigProperties;
+
+	@PostConstruct
+	public void validateSignatureSecret() {
+		// Reject an incompatible secret at startup rather than on the first authenticated request.
+		if (ncJwtConfigProperties.isEnabled()) {
+			if (ncJwtConfigProperties.getSignatureSecret() == null) {
+				throw new IllegalStateException("nc.jwt.signature-secret must be set when nc.jwt.enabled=true");
+			}
+			signingKey(ncJwtConfigProperties.getSignatureSecret());
+		}
+	}
 
 	public String getUsernameFromToken(String token) {
 		return getClaimFromToken(token, Claims::getSubject);

@@ -66,4 +66,16 @@ class JwtTokenCompatibilityTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("at least 64 bytes");
     }
+
+    @Test
+    void rejectsWeakSigningKeysAtStartupOnlyWhenJwtIsEnabled() {
+        var properties = new NcJwtConfigProperties();
+        properties.setSignatureSecret("testSecret");
+        new JwtTokenUtil(properties).validateSignatureSecret();
+
+        properties.setEnabled(true);
+        assertThatThrownBy(() -> new JwtTokenUtil(properties).validateSignatureSecret())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("at least 64 bytes");
+    }
 }
