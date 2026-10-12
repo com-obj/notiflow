@@ -29,6 +29,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.webmvc.error.DefaultErrorAttributes;
 import org.springframework.boot.webmvc.error.ErrorAttributes;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -38,6 +40,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.filter.UrlHandlerFilter;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -45,6 +48,15 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class SpringMvcConfig {
+
+    @Bean
+    public FilterRegistrationBean<UrlHandlerFilter> trailingSlashFilter() {
+        var filter = UrlHandlerFilter.trailingSlashHandler("/**").wrapRequest().build();
+        var registration = new FilterRegistrationBean<>(filter);
+        // Restore trailing-slash URLs before Security and MVC make decisions about the request path.
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 10);
+        return registration;
+    }
 
     @Bean
     public ErrorAttributes errorAttributes() {
