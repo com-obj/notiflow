@@ -35,8 +35,8 @@ import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.restdocs.test.autoconfigure.AutoConfigureRestDocs;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.integration.test.context.SpringIntegrationTest;
@@ -86,6 +86,17 @@ class EventsRestControllerTest extends BaseIntegrationTest {
     	purgeNotifTables(jdbcTemplate);
     }
     
+    @Test
+    void persistenceFailuresKeepTheirExistingHttpStatusAndReason() throws Exception {
+        var response = mockMvc.perform(MockMvcRequestBuilders.post("/events")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content("{\"name\":\"" + "x".repeat(300) + "\"}"))
+                .andExpect(status().isInternalServerError())
+                .andReturn().getResponse();
+        assertThat(response.getContentAsString()).startsWith("500 INTERNAL_SERVER_ERROR \"Error persisting event\"");
+        assertThat(genericEventRepository.count()).isZero();
+    }
+
     @Test
     void testPersistGenericEvent() throws Exception {
         // given

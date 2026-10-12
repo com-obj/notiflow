@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.ExecutorChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.messaging.support.GenericMessage;
 
@@ -42,7 +41,7 @@ public class DeliveryStatusTrackingFlowConfig {
 
     @Bean
     public IntegrationFlow deliveryStatusTrackerFlow(DeliveryInfoRepository deliveryInfoRepository) {
-        return IntegrationFlows.from(
+        return IntegrationFlow.from(
                         () -> {
                             log.info("Polling for deliveries whose status needs an update");
                             Instant now = LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0));
@@ -53,7 +52,7 @@ public class DeliveryStatusTrackingFlowConfig {
                             return new GenericMessage<>(deliveries);
                         },
                         e -> e.poller(Pollers.fixedRate(
-                                deliveryStatusTrackingProperties.getPollIntervalInSeconds(), TimeUnit.SECONDS)
+                                java.time.Duration.ofSeconds(deliveryStatusTrackingProperties.getPollIntervalInSeconds()))
                         )
                 )
                 .split()

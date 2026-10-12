@@ -28,7 +28,7 @@ import com.obj.nc.repositories.converters.PgObjectToIntentContentConverter;
 import com.obj.nc.repositories.converters.PgObjectToJsonNodeConverter;
 import com.obj.nc.repositories.converters.PgObjectToUUIDArrayConverter;
 import com.obj.nc.repositories.converters.UUIDArrayToPgObjectConverter;
-import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
+import org.springframework.boot.flyway.autoconfigure.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;

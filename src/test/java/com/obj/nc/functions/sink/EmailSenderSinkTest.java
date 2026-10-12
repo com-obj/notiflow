@@ -48,8 +48,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,46 +1,25 @@
 package com.obj.nc.config;
 
 import com.obj.nc.security.config.NcJwtConfigProperties;
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiKey;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.SecurityReference;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.service.contexts.SecurityContext;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import static java.util.Arrays.asList;
 
 @Configuration
-@EnableSwagger2
-@RequiredArgsConstructor
 public class SwaggerConfiguration {
-    private final NcJwtConfigProperties jwtConfigProperties;
 
     @Bean
-    public Docket api() {
-        Docket docket = new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.obj.nc.controllers"))
-                .build();
-
-        if (jwtConfigProperties.isEnabled()) {
-            docket = docket
-                    .securitySchemes(asList(new ApiKey("Bearer Token", "Authorization", "header")))
-                    .securityContexts(asList(SecurityContext.builder()
-                            .securityReferences(asList(
-                                    new SecurityReference("Bearer Token", new AuthorizationScope[] {
-                                            new AuthorizationScope("global", "accessEverything")
-                                    }
-                                    )))
-                            .build()
-                    ));
+    public OpenAPI notificationCenterApi(NcJwtConfigProperties jwtProperties) {
+        var api = new OpenAPI().info(new Info().title("Notification Center").version("1"));
+        if (jwtProperties.isEnabled()) {
+            api.components(new Components().addSecuritySchemes("bearerAuth", new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")))
+                    .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
         }
-
-        return docket;
+        return api;
     }
 }

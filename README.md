@@ -15,3 +15,10 @@ The main goal of notiflow is to greatly simplify delivery of information message
   * message aggregation
 
 To understand in details how notiflow is solving this problems, check our [documentation](https://com-obj.github.io/notiflow/)
+
+## Upgrading to 2.0
+Notiflow 2.0 is built with JDK 25 and Spring Boot 4 (Spring Framework 7, Jakarta EE). Consuming applications must upgrade to Spring Boot 4 and Java 25 as well.
+
+* Jackson 2 is still used for REST and persisted notification payloads, through Spring Boot's Jackson 2 compatibility module. Notiflow registers the required defaults (`spring.http.converters.preferred-json-mapper=jackson2`, `spring.main.allow-circular-references=true`); applications do not need to set them.
+* When `nc.jwt.enabled=true`, `nc.jwt.signature-secret` must be Base64 that decodes to at least 64 bytes (HS512). Otherwise the application fails at startup. Tokens issued with an existing secret of that strength remain valid.
+* The API documentation moved from Springfox (`/v2/api-docs`) to springdoc OpenAPI 3: `/v3/api-docs` and `/swagger-ui.html`.

@@ -27,7 +27,7 @@ public interface Constants {
     
     String AUTHORIZATION_HEADER = "Authorization";
     String JWT_TOKEN_PREFIX = "Bearer ";
-    String EXCEPTION_ATTR_NAME = "javax.servlet.error.exception";
+    String EXCEPTION_ATTR_NAME = "jakarta.servlet.error.exception";
     String DEFAULT_EXCEPTION_MSG = "Authentication failed";
 
     String[] UNPROTECTED_PATHS = {
@@ -35,6 +35,8 @@ public interface Constants {
             "/delivery-info/messages/*/mark-as-read",
             "/resources/images/px.png",
             "/v2/api-docs",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
             "/swagger-ui.html",
             "/swagger-resources/**",
             "/webjars/**"

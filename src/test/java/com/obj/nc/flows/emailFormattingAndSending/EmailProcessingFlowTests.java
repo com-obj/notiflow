@@ -29,7 +29,7 @@ import com.obj.nc.domain.message.EmailMessageTemplated;
 import com.obj.nc.testUtils.BaseIntegrationTest;
 import com.obj.nc.testUtils.SystemPropertyActiveProfileResolver;
 import com.obj.nc.utils.JsonUtils;
-import org.apache.commons.mail.util.MimeMessageParser;
+import org.apache.commons.mail2.jakarta.util.MimeMessageParser;
 import org.apache.commons.text.StringEscapeUtils;
 import org.hamcrest.CoreMatchers;
 import org.jsoup.Jsoup;
@@ -44,7 +44,7 @@ import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;

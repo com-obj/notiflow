@@ -37,6 +37,7 @@ import com.obj.nc.repositories.GenericEventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.relational.core.conversion.DbActionExecutionException;
@@ -106,12 +107,18 @@ public class EventsRestController {
 			log.info("Persisting event with externalId {} and id {}", externalId, event.getId());
     		persister.accept(event);
 			log.info("Event persisted with externalId {} and id {}", externalId, event.getId());
+        } catch (DuplicateKeyException e) {
+			// Spring Data JDBC 4 propagates this exception directly instead of wrapping it.
+			throw new PayloadValidationException("Duplicate external ID detected. Payload rejected: " + eventJson);
     	} catch (DbActionExecutionException e) {
 			log.error("Error persisting event with externalId {} and id {}", externalId, event.getId(), e);
     		if (DuplicateKeyException.class.equals(e.getCause().getClass())) {
     			throw new PayloadValidationException("Duplicate external ID detected. Payload rejected: " + eventJson);
     		}
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error persisting event", e);
+        } catch (DataAccessException e) {
+            // Spring Data JDBC 4 can expose other persistence failures directly as well.
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error persisting event", e);
     	}
     	return EventReceiverResponse.from(event.getId());
     }

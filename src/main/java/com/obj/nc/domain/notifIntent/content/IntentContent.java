@@ -38,7 +38,7 @@ import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.http.MediaType;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;

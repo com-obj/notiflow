@@ -32,7 +32,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -105,40 +105,40 @@ class EventsRestControllerWithAuthenticationTest extends BaseIntegrationTest {
     }
     
     @Test
-    void testReceiveEventWithNoToken() {
+    void testReceiveEventWithNoToken() throws Exception {
         // given
         String INPUT_JSON_FILE = "events/generic_event.json";
         String eventJson = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
         
         //when
-        assertThatThrownBy(() -> mockMvc.perform(MockMvcRequestBuilders.post("/events")
+        mockMvc.perform(MockMvcRequestBuilders.post("/events")
                     .contentType(APPLICATION_JSON_UTF8)
                     .content(eventJson)
-                    .accept(APPLICATION_JSON_UTF8)))
-                .isInstanceOf(UserNotAuthenticatedException.class)
-                .hasMessageContaining("JWT Token does not begin with Bearer String");
+                    .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value(CoreMatchers.containsString("JWT Token does not begin with Bearer String")));
     }
     
     @Test
-    void testReceiveEventWithInvalidSignature() {
+    void testReceiveEventWithInvalidSignature() throws Exception {
         // given
         String INPUT_JSON_FILE = "events/generic_event.json";
         String eventJson = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
         String token = jwtTokenUtil.generateToken(new User("testUser", passwordEncoder.encode("testPassword"), new ArrayList<>()), 
-                "invalidSignature");
+                java.util.Base64.getEncoder().encodeToString("another-test-signing-secret-for-hs512-at-least-64-bytes-long-1234567890".getBytes(java.nio.charset.StandardCharsets.UTF_8)));
         
         //when
-        assertThatThrownBy(() -> mockMvc.perform(MockMvcRequestBuilders.post("/events")
+        mockMvc.perform(MockMvcRequestBuilders.post("/events")
                     .contentType(APPLICATION_JSON_UTF8)
                     .content(eventJson)
                     .accept(APPLICATION_JSON_UTF8)
-                    .header(AUTHORIZATION, JWT_TOKEN_PREFIX.concat(token))))
-                .isInstanceOf(UserNotAuthenticatedException.class)
-                .hasMessageContaining("JWT signature does not match locally computed signature.");
+                    .header(AUTHORIZATION, JWT_TOKEN_PREFIX.concat(token)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value(CoreMatchers.containsString("JWT signature does not match locally computed signature.")));
     }
     
     @Test
-    void testReceiveEventWithInvalidUsername() {
+    void testReceiveEventWithInvalidUsername() throws Exception {
         // given
         String INPUT_JSON_FILE = "events/generic_event.json";
         String eventJson = JsonUtils.readJsonStringFromClassPathResource(INPUT_JSON_FILE);
@@ -146,14 +146,14 @@ class EventsRestControllerWithAuthenticationTest extends BaseIntegrationTest {
                 ncJwtConfigProperties.getSignatureSecret());
         
         //when
-        assertThatThrownBy(() -> mockMvc
+        mockMvc
                 .perform(MockMvcRequestBuilders.post("/events")
                         .contentType(APPLICATION_JSON_UTF8)
                         .content(eventJson)
                         .accept(APPLICATION_JSON_UTF8)
-                        .header(AUTHORIZATION, JWT_TOKEN_PREFIX.concat(token))))
-                .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessageContaining("User not found with username: invalidUser");
+                        .header(AUTHORIZATION, JWT_TOKEN_PREFIX.concat(token)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value(CoreMatchers.containsString("User not found with username: invalidUser")));
     }
  
 }

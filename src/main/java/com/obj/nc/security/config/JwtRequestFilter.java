@@ -19,11 +19,11 @@
 
 package com.obj.nc.security.config;
 
-import com.obj.nc.config.NcAppConfigProperties;
 import com.obj.nc.security.exception.UserNotAuthenticatedException;
 import com.obj.nc.security.service.JwtUserDetailsService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,10 +32,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -45,55 +45,62 @@ import static com.obj.nc.security.config.Constants.JWT_TOKEN_PREFIX;
 import static com.obj.nc.security.config.Constants.UNPROTECTED_PATHS;
 
 @Component
-@ConditionalOnBean(JwtSecurityConfig.class)
+@ConditionalOnProperty(name = "nc.jwt.enabled", havingValue = "true")
 @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
 
 	private final JwtUserDetailsService jwtUserDetailsService;
 	private final JwtTokenUtil jwtTokenUtil;
 	private final AntPathMatcher antPathMatcher;
+	private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
-		String requestTokenHeader = request.getHeader(AUTHORIZATION_HEADER);
-		String username = null;
-		String jwtToken = null;
-		
 		if (!isProtectedResource(request)) {
 			chain.doFilter(request, response);
 			return;
 		}
 
-		if (requestTokenHeader != null && requestTokenHeader.startsWith(JWT_TOKEN_PREFIX)) {
-			jwtToken = requestTokenHeader.substring(JWT_TOKEN_PREFIX.length());
-			try {
-				username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-			} catch (Exception e) {
-				throw new UserNotAuthenticatedException(e.getMessage());
-			}
-		} else {
-			throw new UserNotAuthenticatedException("JWT Token does not begin with Bearer String");
-		}
+		try {
+			String requestTokenHeader = request.getHeader(AUTHORIZATION_HEADER);
+			String username = null;
+			String jwtToken = null;
 
-		if (username != null) {
-			UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
-			
-			Boolean validated = jwtTokenUtil.validateToken(jwtToken, userDetails);
-			if (validated) {
-				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-						userDetails, null, userDetails.getAuthorities());
-				usernamePasswordAuthenticationToken
-						.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+			if (requestTokenHeader != null && requestTokenHeader.startsWith(JWT_TOKEN_PREFIX)) {
+				jwtToken = requestTokenHeader.substring(JWT_TOKEN_PREFIX.length());
+				try {
+					username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+				} catch (Exception e) {
+					throw new UserNotAuthenticatedException(e.getMessage());
+				}
 			} else {
-				throw new UserNotAuthenticatedException("JWT Token validation failed");
+				throw new UserNotAuthenticatedException("JWT Token does not begin with Bearer String");
 			}
+
+			if (username != null) {
+				UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+
+				Boolean validated = jwtTokenUtil.validateToken(jwtToken, userDetails);
+				if (validated) {
+					UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+							userDetails, null, userDetails.getAuthorities());
+					usernamePasswordAuthenticationToken
+							.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+				} else {
+					throw new UserNotAuthenticatedException("JWT Token validation failed");
+				}
+			}
+
+		} catch (AuthenticationException exception) {
+			SecurityContextHolder.clearContext();
+			authenticationEntryPoint.commence(request, response, exception);
+			return;
 		}
-		
 		chain.doFilter(request, response);
 	}
-	
+
 	private boolean isProtectedResource(HttpServletRequest request) {
 		String requestUriWithoutContextPath = request.getRequestURI().substring(request.getContextPath().length());
 		return Arrays.stream(UNPROTECTED_PATHS).noneMatch(resource -> antPathMatcher.match(resource, requestUriWithoutContextPath));

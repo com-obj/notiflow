@@ -28,7 +28,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.handler.LoggingHandler.Level;
 import org.springframework.messaging.MessageHeaders;
 
@@ -56,7 +55,7 @@ public class ErrorHandlingFlowConfig {
     @Bean
     public IntegrationFlow errorPayloadReceivedFlowConfig() {
         return 
-        	IntegrationFlows
+            IntegrationFlow
                 .from(errorChannel)
                 .log(Level.WARN, "ERROR HANDLING")
                 .enrichHeaders(h -> h.header(MessageHeaders.ERROR_CHANNEL, ERROR_CHANNEL_FOR_ERROR_HANDLING_FLOW_NAME, true))
@@ -64,16 +63,16 @@ public class ErrorHandlingFlowConfig {
                 .handle(failedPayloadPersister)
                 .handle(deliveryInfoFlow, "createAndPersistFailedDeliveryInfo")
                 .log(Level.DEBUG, "ERROR HANDLING FINISHED")
-        		.get();
+                .nullChannel();
     }
 
     @Bean
     public IntegrationFlow errorPayloadReceivedFromErrorHandlingFlowConfig() {
         return 
-        	IntegrationFlows
+            IntegrationFlow
                 .from(errorChannelTerminal)
                 .log(Level.ERROR, "ERROR HANDLING ocurred in error handling flow")
-        		.get();
+                .nullChannel();
     }
 
     @Bean(ERROR_CHANNEL_FOR_ERROR_HANDLING_FLOW_NAME)

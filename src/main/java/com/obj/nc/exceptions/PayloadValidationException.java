@@ -19,7 +19,7 @@
 
 package com.obj.nc.exceptions;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 public class PayloadValidationException extends RuntimeException {
 

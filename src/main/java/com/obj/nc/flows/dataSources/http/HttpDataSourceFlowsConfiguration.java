@@ -23,18 +23,17 @@ import com.obj.nc.flows.eventSummaryNotification.EventSummaryNotificationConfigu
 import com.obj.nc.flows.eventSummaryNotification.EventSummaryNotificationProperties;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpMethod;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.integration.http.dsl.Http;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import static com.obj.nc.config.PureRestTemplateConfig.PURE_REST_TEMPLATE;
 import static org.springframework.integration.dsl.Pollers.cron;
@@ -81,7 +80,7 @@ public class HttpDataSourceFlowsConfiguration {
         jobConfig.setPojoFCCN(dataSource.getPojoFCCN());
         jobConfig.setSpelFilterExpression(dataSource.getSpelFilterExpression());
 
-        return nextFlow.continueFlow(IntegrationFlows.from(
+        return nextFlow.continueFlow(IntegrationFlow.from(
                         () -> new GenericMessage<>(""),
                         c -> c
                                 .poller(cron(dataSource.getCron()))

@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
+
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class InputEventExtensionConvertingFlowConfig {
 	
     @Bean
     public IntegrationFlow extensionBasedRoutingFlow(List<InputEventConverterExtension<? extends IsNotification>> eventProcessors) {
-    	return IntegrationFlows
+        return IntegrationFlow
 			.from(messageProcessingInputChannel())
 			.handle(extensionsBasedEventConvertor(eventProcessors))
 			.split()

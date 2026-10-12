@@ -96,7 +96,7 @@ public class TeamsMessageSender extends ProcessorFunctionAdapter<TeamsMessage, T
     }
 
     private void verifyResponse(ResponseEntity<String> response) {
-        final int statusCode = response.getStatusCodeValue();
+        final int statusCode = response.getStatusCode().value();
 
         if (statusCode != 200) {
             throw new RuntimeException("Error sending teams message. Service responded with code " + statusCode + " and Reason: " + response.getBody());

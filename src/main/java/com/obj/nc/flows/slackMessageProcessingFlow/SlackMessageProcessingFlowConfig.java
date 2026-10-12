@@ -29,7 +29,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
 
 import static com.obj.nc.config.ThreadPoolConfig.ASYNC_FLOW_TASK_EXECUTOR;
@@ -60,7 +59,7 @@ public class SlackMessageProcessingFlowConfig {
 
     @Bean(SLACK_PROCESSING_FLOW_ID)
     public IntegrationFlow pushSendFlow() {
-        return IntegrationFlows
+        return IntegrationFlow
                 .from(sendInputChannel())
                 .handle(persister)
                 .handle(slackMessageSender)

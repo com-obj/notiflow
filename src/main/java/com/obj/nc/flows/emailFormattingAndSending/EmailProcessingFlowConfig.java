@@ -40,7 +40,6 @@ import org.springframework.http.MediaType;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.PollerSpec;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.messaging.MessageChannel;
@@ -85,7 +84,7 @@ public class EmailProcessingFlowConfig {
 
 	@Bean(EMAIL_FORMAT_AND_SEND_FLOW_ID)
 	public IntegrationFlow emailFormatAndSendFlowDefinition() {
-		return IntegrationFlows
+		return IntegrationFlow
 				.from(emailFormatAndSendInputChannel())
 				.handle(messageAndEndpointPersister)
 				.routeToRecipients(spec -> spec
@@ -121,7 +120,7 @@ public class EmailProcessingFlowConfig {
 	
 	@Bean(EMAIL_SEND_FLOW_ID)
 	public IntegrationFlow emailSendFlowDefinition() {
-		return IntegrationFlows
+		return IntegrationFlow
 				.from(emailSendInputChannel())
 				.handle(messageAndEndpointPersister)
 				.routeToRecipients(spec -> spec
@@ -142,7 +141,7 @@ public class EmailProcessingFlowConfig {
 	 */
 	@Bean(INTERNAL_EMAIL_SEND_FLOW_ID)
 	public IntegrationFlow internalEmailSendFlowDefinition() {
-		return IntegrationFlows
+		return IntegrationFlow
 				.from(internalEmailSendInputChannel())
 				.handle(EmailMessage.class, (p, h) -> emailSender.apply(p),
 						c -> c.id(EMAIL_SENDER_MESSAGE_HANDLER).poller(emailSenderPoller()))

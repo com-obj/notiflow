@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
+
 
 import static com.obj.nc.config.ThreadPoolConfig.ASYNC_FLOW_TASK_EXECUTOR;
 
@@ -57,7 +57,7 @@ public class PulledNotificationDataConvertingFlowConfiguration {
     
     @Bean(PULL_NOTIF_DATA_CONVERTING_FLOW_ID)
     public IntegrationFlow pullNotifDataConvertingFlow() {
-        return IntegrationFlows
+        return IntegrationFlow
                 .from(pullNotifDataConvertingFlowInputChannel())
                 .publishSubscribeChannel(spec -> spec
                         .subscribe(subFlow -> subFlow

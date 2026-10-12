@@ -25,7 +25,7 @@ import com.obj.nc.domain.headers.Header;
 import com.obj.nc.functions.processors.deliveryInfo.domain.DeliveryInfo.DELIVERY_STATUS;
 import lombok.*;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
  

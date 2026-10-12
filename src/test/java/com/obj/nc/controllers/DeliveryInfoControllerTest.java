@@ -51,7 +51,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.integration.test.context.SpringIntegrationTest;
@@ -423,8 +423,9 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
 
-		String errorMessage = resp.andReturn().getResponse().getErrorMessage();
-		assertThat(errorMessage).contains("Required request parameter 'page' for method parameter type int is not present");
+		resp.andExpect(status().isBadRequest());
+		assertThat(resp.andReturn().getResolvedException()).isInstanceOf(org.springframework.web.bind.MissingServletRequestParameterException.class);
+		assertThat(((org.springframework.web.bind.MissingServletRequestParameterException) resp.andReturn().getResolvedException()).getParameterName()).isEqualTo("page");
 	}
 
 	@Test
@@ -437,8 +438,9 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
 
-		String errorMessage = resp.andReturn().getResponse().getErrorMessage();
-		assertThat(errorMessage).contains("Required request parameter 'page' for method parameter type int is not present");
+		resp.andExpect(status().isBadRequest());
+		assertThat(resp.andReturn().getResolvedException()).isInstanceOf(org.springframework.web.bind.MissingServletRequestParameterException.class);
+		assertThat(((org.springframework.web.bind.MissingServletRequestParameterException) resp.andReturn().getResolvedException()).getParameterName()).isEqualTo("page");
 	}
 
 	@Test
@@ -451,8 +453,9 @@ class DeliveryInfoControllerTest extends BaseIntegrationTest {
 						.accept(APPLICATION_JSON_UTF8))
 				.andDo(MockMvcResultHandlers.print());
 
-		String errorMessage = resp.andReturn().getResponse().getErrorMessage();
-		assertThat(errorMessage).contains("Required request parameter 'size' for method parameter type int is not present");
+		resp.andExpect(status().isBadRequest());
+		assertThat(resp.andReturn().getResolvedException()).isInstanceOf(org.springframework.web.bind.MissingServletRequestParameterException.class);
+		assertThat(((org.springframework.web.bind.MissingServletRequestParameterException) resp.andReturn().getResolvedException()).getParameterName()).isEqualTo("size");
 	}
 
 	@Test

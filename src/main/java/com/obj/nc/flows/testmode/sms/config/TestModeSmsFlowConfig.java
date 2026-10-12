@@ -28,7 +28,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
@@ -48,7 +47,7 @@ public class TestModeSmsFlowConfig {
     @Bean
     @DependsOn(TestModeFlowConfig.TEST_MODE_AGGREGATE_AND_SEND_FLOW_NAME)
     public IntegrationFlow testModeProcessReceivedSmsMessage() {
-        return IntegrationFlows
+        return IntegrationFlow
         		.fromSupplier(inMemorySmsSource, config -> config
                         .poller(Pollers.trigger(testModeSourceTrigger()).maxMessagesPerPoll(testModeProps.getMaxMessagesPerPoll()))
                         .id(TEST_MODE_SMS_SOURCE_BEAN_NAME))

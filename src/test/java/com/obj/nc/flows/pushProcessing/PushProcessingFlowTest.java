@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.integration.test.context.SpringIntegrationTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
@@ -60,7 +60,7 @@ class PushProcessingFlowTest extends BaseIntegrationTest {
     @Autowired private MessageRepository messageRepository;
     @Autowired private DeliveryInfoRepository deliveryInfoRepository;
     
-    @MockBean private PushSender pushSender;
+    @MockitoBean private PushSender pushSender;
     
     @BeforeEach
     void setUp(@Autowired JdbcTemplate jdbcTemplate) {

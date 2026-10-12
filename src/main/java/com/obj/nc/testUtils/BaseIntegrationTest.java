@@ -53,9 +53,9 @@ import static com.obj.nc.flows.inputEventRouting.config.InputEventRoutingFlowCon
 import static java.util.Collections.singletonList;
 
 
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.*;

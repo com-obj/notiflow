@@ -34,7 +34,7 @@ import com.obj.nc.functions.processors.senders.EmailSender;
 import com.obj.nc.functions.sources.SourceSupplierAdapter;
 import com.obj.nc.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.mail.util.MimeMessageParser;
+import org.apache.commons.mail2.jakarta.util.MimeMessageParser;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,10 +42,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import javax.mail.Address;
-import javax.mail.Flags;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.Address;
+import jakarta.mail.Flags;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -147,9 +147,9 @@ public class GreenMailReceiverSourceSupplier extends SourceSupplierAdapter<List<
     }
     
 	private void copyHeaderValues(MimeMessage src, EmailMessage dest) throws MessagingException {
-		Enumeration<javax.mail.Header> headers = src.getAllHeaders();
+		Enumeration<jakarta.mail.Header> headers = src.getAllHeaders();
 		while  (headers.hasMoreElements()) {
-			javax.mail.Header header =headers.nextElement();
+			jakarta.mail.Header header =headers.nextElement();
 			
 			if (header.getName().equals(EmailSender.EVENT_IDS_EMAIL_HEANDER)) {
 				List<String> eventIDs = JsonUtils.readObjectFromJSONString(header.getValue(), List.class);
